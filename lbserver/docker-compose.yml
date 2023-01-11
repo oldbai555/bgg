@@ -1,0 +1,46 @@
+version: '3'
+
+networks:
+  myhost:
+
+services:
+  go-lb:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: lbserver
+    image: go-lb
+    ports:
+      - "12001:8003"
+    networks:
+      - myhost
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8003" ]
+      interval: 5m30s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      - lb-db
+  lb-db:
+    image: mysql:8.0.31
+    environment:
+      - MYSQL_DATABASE=biz
+      - MYSQL_ROOT_PASSWORD=123456
+    volumes:
+      - lb-data:/var/lib/mysql
+      - /home/app/sql:/docker-entrypoint-initdb.d
+    networks:
+      - myhost
+    command:
+      [
+          "--character-set-server=utf8mb4",
+          "--collation-server=utf8mb4_unicode_ci",
+          "--skip-character-set-client-handshake"
+      ]
+    healthcheck:
+      test: [ "CMD", 'mysqladmin', 'ping', '-h', 'localhost', '-u', 'root', '-p$$MYSQL_ROOT_PASSWORD' ]
+      interval: 5m
+      timeout: 5s
+      retries: 5
+volumes:
+  lb-data:

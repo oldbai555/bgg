@@ -1,0 +1,14 @@
+server:
+  name: "lbserver"
+  port: 8003
+mysql:
+  addr: "127.0.0.1"
+  port: 3309
+  username: "oldbai"
+  password: "Lzslov123!"
+zipkin:
+  addr: "http://127.0.0.1:9411/api/v2/spans"
+redis:
+  database: 1
+  host: 127.0.0.1
+  port: 6379
