@@ -29,8 +29,7 @@ func Cors() gin.HandlerFunc {
 // RegisterUuidTrace 注册一个链路Id进入日志中
 func RegisterUuidTrace() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		log.SetModuleName("lbblog")
-		c.Set("server", "lbblog")
+		log.SetModuleName(lb.Sc.Name)
 		var traceId string
 		hint := c.Value(LogWithHint)
 		if hint == nil {
@@ -128,9 +127,8 @@ var defaultLogFormatter = func(param gin.LogFormatterParams) string {
 	}
 
 	hint := param.Keys[LogWithHint]
-	server := param.Keys["server"]
 	return fmt.Sprintf("[GIN] %s<%s> %v |%s %3d %s| %13v | %15s |%s %-7s %s %#v\n%s",
-		server,
+		lb.Sc.Name,
 		hint,
 		param.TimeStamp.Format("2006/01/02 - 15:04:05"),
 		statusColor, param.StatusCode, resetColor,

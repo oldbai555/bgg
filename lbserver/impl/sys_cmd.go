@@ -18,6 +18,7 @@ var lb *Tool
 type Tool struct {
 	*webtool.WebTool
 	Rbac *grbac.Controller
+	Sc   ServerConfig
 }
 
 type ServerConfig struct {
@@ -48,8 +49,7 @@ func StartServer() {
 	}
 
 	// 拿到服务的信息
-	var sc ServerConfig
-	err = lb.GetJson4Apollo(defaultApolloServerPrefix, &sc)
+	err = lb.GetJson4Apollo(defaultApolloServerPrefix, &lb.Sc)
 	if err != nil {
 		log.Errorf("err is : %v", err)
 		return
@@ -78,7 +78,7 @@ func StartServer() {
 	InitDbOrm()
 
 	// 启动服务
-	err = h.Run(fmt.Sprintf(":%d", sc.Port))
+	err = h.Run(fmt.Sprintf(":%d", lb.Sc.Port))
 	if err != nil {
 		log.Errorf("err is %v", err)
 		return
