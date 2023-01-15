@@ -669,6 +669,52 @@ func (m *GetArticleListRsp) validate(all bool) error {
 
 	}
 
+	{
+		sorted_keys := make([]uint64, len(m.GetCategoryMap()))
+		i := 0
+		for key := range m.GetCategoryMap() {
+			sorted_keys[i] = key
+			i++
+		}
+		sort.Slice(sorted_keys, func(i, j int) bool { return sorted_keys[i] < sorted_keys[j] })
+		for _, key := range sorted_keys {
+			val := m.GetCategoryMap()[key]
+			_ = val
+
+			// no validation rules for CategoryMap[key]
+
+			if all {
+				switch v := interface{}(val).(type) {
+				case interface{ ValidateAll() error }:
+					if err := v.ValidateAll(); err != nil {
+						errors = append(errors, GetArticleListRspValidationError{
+							field:  fmt.Sprintf("CategoryMap[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				case interface{ Validate() error }:
+					if err := v.Validate(); err != nil {
+						errors = append(errors, GetArticleListRspValidationError{
+							field:  fmt.Sprintf("CategoryMap[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				}
+			} else if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+				if err := v.Validate(); err != nil {
+					return GetArticleListRspValidationError{
+						field:  fmt.Sprintf("CategoryMap[%v]", key),
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		}
+	}
+
 	if len(errors) > 0 {
 		return GetArticleListRspMultiError(errors)
 	}
@@ -3205,6 +3251,98 @@ func (m *GetCommentListRsp) validate(all bool) error {
 			}
 		}
 
+	}
+
+	{
+		sorted_keys := make([]uint64, len(m.GetArticleMap()))
+		i := 0
+		for key := range m.GetArticleMap() {
+			sorted_keys[i] = key
+			i++
+		}
+		sort.Slice(sorted_keys, func(i, j int) bool { return sorted_keys[i] < sorted_keys[j] })
+		for _, key := range sorted_keys {
+			val := m.GetArticleMap()[key]
+			_ = val
+
+			// no validation rules for ArticleMap[key]
+
+			if all {
+				switch v := interface{}(val).(type) {
+				case interface{ ValidateAll() error }:
+					if err := v.ValidateAll(); err != nil {
+						errors = append(errors, GetCommentListRspValidationError{
+							field:  fmt.Sprintf("ArticleMap[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				case interface{ Validate() error }:
+					if err := v.Validate(); err != nil {
+						errors = append(errors, GetCommentListRspValidationError{
+							field:  fmt.Sprintf("ArticleMap[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				}
+			} else if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+				if err := v.Validate(); err != nil {
+					return GetCommentListRspValidationError{
+						field:  fmt.Sprintf("ArticleMap[%v]", key),
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		}
+	}
+
+	{
+		sorted_keys := make([]uint64, len(m.GetUserMap()))
+		i := 0
+		for key := range m.GetUserMap() {
+			sorted_keys[i] = key
+			i++
+		}
+		sort.Slice(sorted_keys, func(i, j int) bool { return sorted_keys[i] < sorted_keys[j] })
+		for _, key := range sorted_keys {
+			val := m.GetUserMap()[key]
+			_ = val
+
+			// no validation rules for UserMap[key]
+
+			if all {
+				switch v := interface{}(val).(type) {
+				case interface{ ValidateAll() error }:
+					if err := v.ValidateAll(); err != nil {
+						errors = append(errors, GetCommentListRspValidationError{
+							field:  fmt.Sprintf("UserMap[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				case interface{ Validate() error }:
+					if err := v.Validate(); err != nil {
+						errors = append(errors, GetCommentListRspValidationError{
+							field:  fmt.Sprintf("UserMap[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				}
+			} else if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+				if err := v.Validate(); err != nil {
+					return GetCommentListRspValidationError{
+						field:  fmt.Sprintf("UserMap[%v]", key),
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		}
 	}
 
 	if len(errors) > 0 {

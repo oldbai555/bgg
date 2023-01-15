@@ -1,7 +1,7 @@
 package impl
 
 import (
-	"github.com/oldbai555/go-lb/client/lbblog"
+	"github.com/oldbai555/bgg/lbblog"
 	"github.com/oldbai555/lbtool/log"
 	"testing"
 )

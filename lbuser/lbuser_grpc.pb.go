@@ -28,6 +28,41 @@ type LbuserClient interface {
 	Logout(ctx context.Context, in *LogoutReq, opts ...grpc.CallOption) (*LogoutRsp, error)
 	// @desc: 获取登录用户的信息
 	GetLoginUser(ctx context.Context, in *GetLoginUserReq, opts ...grpc.CallOption) (*GetLoginUserRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error: 更新登陆的用户信息
+	UpdateLoginUserInfo(ctx context.Context, in *UpdateLoginUserInfoReq, opts ...grpc.CallOption) (*UpdateLoginUserInfoRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	AddUser(ctx context.Context, in *AddUserReq, opts ...grpc.CallOption) (*AddUserRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	GetUserList(ctx context.Context, in *GetUserListReq, opts ...grpc.CallOption) (*GetUserListRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	DelUser(ctx context.Context, in *DelUserReq, opts ...grpc.CallOption) (*DelUserRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	GetUser(ctx context.Context, in *GetUserReq, opts ...grpc.CallOption) (*GetUserRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	UpdateUserNameWithRole(ctx context.Context, in *UpdateUserNameWithRoleReq, opts ...grpc.CallOption) (*UpdateUserNameWithRoleRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	ResetPassword(ctx context.Context, in *ResetPasswordReq, opts ...grpc.CallOption) (*ResetPasswordRsp, error)
 }
 
 type lbuserClient struct {
@@ -65,6 +100,69 @@ func (c *lbuserClient) GetLoginUser(ctx context.Context, in *GetLoginUserReq, op
 	return out, nil
 }
 
+func (c *lbuserClient) UpdateLoginUserInfo(ctx context.Context, in *UpdateLoginUserInfoReq, opts ...grpc.CallOption) (*UpdateLoginUserInfoRsp, error) {
+	out := new(UpdateLoginUserInfoRsp)
+	err := c.cc.Invoke(ctx, "/lbuser.lbuser/UpdateLoginUserInfo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbuserClient) AddUser(ctx context.Context, in *AddUserReq, opts ...grpc.CallOption) (*AddUserRsp, error) {
+	out := new(AddUserRsp)
+	err := c.cc.Invoke(ctx, "/lbuser.lbuser/AddUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbuserClient) GetUserList(ctx context.Context, in *GetUserListReq, opts ...grpc.CallOption) (*GetUserListRsp, error) {
+	out := new(GetUserListRsp)
+	err := c.cc.Invoke(ctx, "/lbuser.lbuser/GetUserList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbuserClient) DelUser(ctx context.Context, in *DelUserReq, opts ...grpc.CallOption) (*DelUserRsp, error) {
+	out := new(DelUserRsp)
+	err := c.cc.Invoke(ctx, "/lbuser.lbuser/DelUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbuserClient) GetUser(ctx context.Context, in *GetUserReq, opts ...grpc.CallOption) (*GetUserRsp, error) {
+	out := new(GetUserRsp)
+	err := c.cc.Invoke(ctx, "/lbuser.lbuser/GetUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbuserClient) UpdateUserNameWithRole(ctx context.Context, in *UpdateUserNameWithRoleReq, opts ...grpc.CallOption) (*UpdateUserNameWithRoleRsp, error) {
+	out := new(UpdateUserNameWithRoleRsp)
+	err := c.cc.Invoke(ctx, "/lbuser.lbuser/UpdateUserNameWithRole", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbuserClient) ResetPassword(ctx context.Context, in *ResetPasswordReq, opts ...grpc.CallOption) (*ResetPasswordRsp, error) {
+	out := new(ResetPasswordRsp)
+	err := c.cc.Invoke(ctx, "/lbuser.lbuser/ResetPassword", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // LbuserServer is the server API for Lbuser service.
 // All implementations must embed UnimplementedLbuserServer
 // for forward compatibility
@@ -75,6 +173,41 @@ type LbuserServer interface {
 	Logout(context.Context, *LogoutReq) (*LogoutRsp, error)
 	// @desc: 获取登录用户的信息
 	GetLoginUser(context.Context, *GetLoginUserReq) (*GetLoginUserRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error: 更新登陆的用户信息
+	UpdateLoginUserInfo(context.Context, *UpdateLoginUserInfoReq) (*UpdateLoginUserInfoRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	AddUser(context.Context, *AddUserReq) (*AddUserRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	GetUserList(context.Context, *GetUserListReq) (*GetUserListRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	DelUser(context.Context, *DelUserReq) (*DelUserRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	GetUser(context.Context, *GetUserReq) (*GetUserRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	UpdateUserNameWithRole(context.Context, *UpdateUserNameWithRoleReq) (*UpdateUserNameWithRoleRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	ResetPassword(context.Context, *ResetPasswordReq) (*ResetPasswordRsp, error)
 	mustEmbedUnimplementedLbuserServer()
 }
 
@@ -90,6 +223,27 @@ func (UnimplementedLbuserServer) Logout(context.Context, *LogoutReq) (*LogoutRsp
 }
 func (UnimplementedLbuserServer) GetLoginUser(context.Context, *GetLoginUserReq) (*GetLoginUserRsp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetLoginUser not implemented")
+}
+func (UnimplementedLbuserServer) UpdateLoginUserInfo(context.Context, *UpdateLoginUserInfoReq) (*UpdateLoginUserInfoRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateLoginUserInfo not implemented")
+}
+func (UnimplementedLbuserServer) AddUser(context.Context, *AddUserReq) (*AddUserRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddUser not implemented")
+}
+func (UnimplementedLbuserServer) GetUserList(context.Context, *GetUserListReq) (*GetUserListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserList not implemented")
+}
+func (UnimplementedLbuserServer) DelUser(context.Context, *DelUserReq) (*DelUserRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelUser not implemented")
+}
+func (UnimplementedLbuserServer) GetUser(context.Context, *GetUserReq) (*GetUserRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
+}
+func (UnimplementedLbuserServer) UpdateUserNameWithRole(context.Context, *UpdateUserNameWithRoleReq) (*UpdateUserNameWithRoleRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserNameWithRole not implemented")
+}
+func (UnimplementedLbuserServer) ResetPassword(context.Context, *ResetPasswordReq) (*ResetPasswordRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ResetPassword not implemented")
 }
 func (UnimplementedLbuserServer) mustEmbedUnimplementedLbuserServer() {}
 
@@ -158,6 +312,132 @@ func _Lbuser_GetLoginUser_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Lbuser_UpdateLoginUserInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateLoginUserInfoReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbuserServer).UpdateLoginUserInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbuser.lbuser/UpdateLoginUserInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbuserServer).UpdateLoginUserInfo(ctx, req.(*UpdateLoginUserInfoReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbuser_AddUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddUserReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbuserServer).AddUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbuser.lbuser/AddUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbuserServer).AddUser(ctx, req.(*AddUserReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbuser_GetUserList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbuserServer).GetUserList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbuser.lbuser/GetUserList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbuserServer).GetUserList(ctx, req.(*GetUserListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbuser_DelUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelUserReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbuserServer).DelUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbuser.lbuser/DelUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbuserServer).DelUser(ctx, req.(*DelUserReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbuser_GetUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbuserServer).GetUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbuser.lbuser/GetUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbuserServer).GetUser(ctx, req.(*GetUserReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbuser_UpdateUserNameWithRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateUserNameWithRoleReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbuserServer).UpdateUserNameWithRole(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbuser.lbuser/UpdateUserNameWithRole",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbuserServer).UpdateUserNameWithRole(ctx, req.(*UpdateUserNameWithRoleReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbuser_ResetPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResetPasswordReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbuserServer).ResetPassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbuser.lbuser/ResetPassword",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbuserServer).ResetPassword(ctx, req.(*ResetPasswordReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Lbuser_ServiceDesc is the grpc.ServiceDesc for Lbuser service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -176,6 +456,34 @@ var Lbuser_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetLoginUser",
 			Handler:    _Lbuser_GetLoginUser_Handler,
+		},
+		{
+			MethodName: "UpdateLoginUserInfo",
+			Handler:    _Lbuser_UpdateLoginUserInfo_Handler,
+		},
+		{
+			MethodName: "AddUser",
+			Handler:    _Lbuser_AddUser_Handler,
+		},
+		{
+			MethodName: "GetUserList",
+			Handler:    _Lbuser_GetUserList_Handler,
+		},
+		{
+			MethodName: "DelUser",
+			Handler:    _Lbuser_DelUser_Handler,
+		},
+		{
+			MethodName: "GetUser",
+			Handler:    _Lbuser_GetUser_Handler,
+		},
+		{
+			MethodName: "UpdateUserNameWithRole",
+			Handler:    _Lbuser_UpdateUserNameWithRole_Handler,
+		},
+		{
+			MethodName: "ResetPassword",
+			Handler:    _Lbuser_ResetPassword_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

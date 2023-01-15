@@ -39,6 +39,7 @@
                 </template>
               </a-upload>
             </a-form-model-item>
+
           </a-col>
         </a-row>
         <a-form-model-item label="文章内容" prop="content">

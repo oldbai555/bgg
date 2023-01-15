@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/oldbai555/bgg/lbblog"
 	"github.com/oldbai555/bgg/lbconst"
+	"github.com/oldbai555/bgg/lbuser"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/utils"
 )
@@ -40,6 +41,17 @@ func (a *LbblogServer) GetArticleList(ctx context.Context, req *lbblog.GetArticl
 		return nil, err
 	}
 
+	if len(rsp.List) == 0 {
+		return &rsp, nil
+	}
+	categoryIdList := utils.PluckUint64List(rsp.List, lbblog.FieldCategoryId)
+	var categoryList []*lbblog.ModelCategory
+	err = CategoryOrm.NewScope().In(lbblog.FieldId_, categoryIdList).Find(ctx, &categoryList)
+	if err != nil {
+		log.Errorf("err is %v", err)
+		return nil, err
+	}
+	rsp.CategoryMap = utils.Slice2MapKeyByStructField(categoryList, lbblog.FieldId).(map[uint64]*lbblog.ModelCategory)
 	return &rsp, nil
 }
 
@@ -182,11 +194,29 @@ func (a *LbblogServer) GetCommentList(ctx context.Context, req *lbblog.GetCommen
 		return nil, err
 	}
 
-	rsp.Page, err = db.FindPage(ctx, &rsp.List)
+	rsp.Page, err = db.OrderByDesc(lbblog.FieldCreatedAt_).FindPage(ctx, &rsp.List)
 	if err != nil {
 		log.Errorf("err is %v", err)
 		return nil, err
 	}
+
+	articleIdList := utils.PluckUint64List(rsp.List, lbblog.FieldArticleId)
+	var articleList []*lbblog.ModelArticle
+	err = ArticleOrm.NewScope().In(lbblog.FieldId_, articleIdList).Find(ctx, &articleList)
+	if err != nil {
+		log.Errorf("err is %v", err)
+		return nil, err
+	}
+	rsp.ArticleMap = utils.Slice2MapKeyByStructField(articleList, lbblog.FieldId).(map[uint64]*lbblog.ModelArticle)
+
+	userIdList := utils.PluckUint64List(rsp.List, lbblog.FieldUserId)
+	var userList []*lbuser.ModelUser
+	err = UserOrm.NewScope().In(lbuser.FieldId_, userIdList).Find(ctx, &userList)
+	if err != nil {
+		log.Errorf("err is %v", err)
+		return nil, err
+	}
+	rsp.UserMap = utils.Slice2MapKeyByStructField(userList, lbuser.FieldId).(map[uint64]*lbuser.ModelUser)
 
 	return &rsp, nil
 }
@@ -224,7 +254,7 @@ func (a *LbblogServer) UpdateComment(ctx context.Context, req *lbblog.UpdateComm
 func (a *LbblogServer) DelComment(ctx context.Context, req *lbblog.DelCommentReq) (*lbblog.DelCommentRsp, error) {
 	var rsp lbblog.DelCommentRsp
 
-	err := CategoryOrm.NewScope().Eq(lbblog.FieldId_, req.Id).Delete(ctx)
+	err := CommentOrm.NewScope().Eq(lbblog.FieldId_, req.Id).Delete(ctx)
 	if err != nil {
 		log.Errorf("err is %v", err)
 		return nil, err
@@ -236,7 +266,7 @@ func (a *LbblogServer) DelComment(ctx context.Context, req *lbblog.DelCommentReq
 func (a *LbblogServer) AddComment(ctx context.Context, req *lbblog.AddCommentReq) (*lbblog.AddCommentRsp, error) {
 	var rsp lbblog.AddCommentRsp
 
-	err := CategoryOrm.NewScope().Create(ctx, req.Comment)
+	err := CommentOrm.NewScope().Create(ctx, req.Comment)
 	if err != nil {
 		log.Errorf("err is %v", err)
 		return nil, err

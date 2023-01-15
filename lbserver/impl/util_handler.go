@@ -87,10 +87,11 @@ func (r *Handler) Response(httpCode int, errorCode int, data interface{}, msg st
 // Success 响应数据
 func (r *Handler) Success(data interface{}) {
 	// 特殊转化一下json
-	m, err := utils.StructToMapV2(data, "json")
+	m, err := utils.StructToMapV2(data)
 	if err != nil {
 		log.Errorf("err is %v", err)
 	}
+	log.Infof("val is %v", m)
 	r.Response(http.StatusOK, int(lbconst.ErrCode_Success), m, defaultRspMsg)
 }
 

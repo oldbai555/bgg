@@ -17,29 +17,33 @@
       </a-row>
 
       <a-table
-        rowKey="ID"
+        :rowKey="(record,index)=>{return index}"
         :columns="columns"
         :pagination="pagination"
         :dataSource="userlist"
         bordered
         @change="handleTableChange"
       >
-        <span slot="role" slot-scope="data">{{ data == 1 ? '管理员' : '订阅者' }}</span>
+
+        <span slot="role" slot-scope="data">{{ data === 1 ? '管理员' : '订阅者' }}</span>
+
         <template slot="action" slot-scope="data">
           <div class="actionSlot">
             <a-button
               type="primary"
               icon="edit"
               style="margin-right: 15px"
-              @click="editUser(data.ID)"
-            >编辑</a-button>
+              @click="editUser(data.id)"
+            >编辑
+            </a-button>
             <a-button
               type="danger"
               icon="delete"
               style="margin-right: 15px"
-              @click="deleteUser(data.ID)"
-            >删除</a-button>
-            <a-button type="info" icon="info" @click="ChangePassword(data.ID)">修改密码</a-button>
+              @click="deleteUser(data.id)"
+            >删除
+            </a-button>
+            <a-button type="info" icon="info" @click="ChangePassword(data.id)">修改密码</a-button>
           </div>
         </template>
       </a-table>
@@ -116,12 +120,12 @@
 </template>
 
 <script>
-import day from 'dayjs'
+import {formatDate} from '../../plugin/time'
 
 const columns = [
   {
     title: 'ID',
-    dataIndex: 'ID',
+    dataIndex: 'id',
     width: '10%',
     key: 'id',
     align: 'center',
@@ -135,12 +139,13 @@ const columns = [
   },
   {
     title: '注册时间',
-    dataIndex: 'CreatedAt',
+    dataIndex: 'created_at',
     width: '20%',
-    key: 'CreatedAt',
+    key: 'created_at',
     align: 'center',
     customRender: (val) => {
-      return val ? day(val).format('YYYY年MM月DD日 HH:mm') : '暂无'
+      const date = new Date(val * 1000);
+      return val ? formatDate(date, 'yyyy年MM月dd日 hh:mm:ss') : '暂无'
     },
   },
   {
@@ -149,14 +154,21 @@ const columns = [
     width: '20%',
     key: 'role',
     align: 'center',
-    scopedSlots: { customRender: 'role' },
+    scopedSlots: {customRender: 'role'},
+  },
+  {
+    title: '昵称',
+    dataIndex: 'nickname',
+    width: '20%',
+    key: 'nickname',
+    align: 'center',
   },
   {
     title: '操作',
     width: '30%',
     key: 'action',
     align: 'center',
-    scopedSlots: { customRender: 'action' },
+    scopedSlots: {customRender: 'action'},
   },
 ]
 
@@ -186,6 +198,7 @@ export default {
       changePassword: {
         id: 0,
         password: '',
+        oldPassword: '',
         checkPass: '',
       },
       columns,
@@ -199,7 +212,7 @@ export default {
         username: [
           {
             validator: (rule, value, callback) => {
-              if (this.userInfo.username == '') {
+              if (this.userInfo.username === '') {
                 callback(new Error('请输入用户名'))
               }
               if ([...this.userInfo.username].length < 4 || [...this.userInfo.username].length > 12) {
@@ -214,7 +227,7 @@ export default {
         password: [
           {
             validator: (rule, value, callback) => {
-              if (this.userInfo.password == '') {
+              if (this.userInfo.password === '') {
                 callback(new Error('请输入密码'))
               }
               if ([...this.userInfo.password].length < 6 || [...this.userInfo.password].length > 20) {
@@ -229,7 +242,7 @@ export default {
         checkpass: [
           {
             validator: (rule, value, callback) => {
-              if (this.userInfo.checkpass == '') {
+              if (this.userInfo.checkpass === '') {
                 callback(new Error('请输入密码'))
               }
               if (this.userInfo.password !== this.userInfo.checkpass) {
@@ -246,7 +259,7 @@ export default {
         username: [
           {
             validator: (rule, value, callback) => {
-              if (this.newUser.username == '') {
+              if (this.newUser.username === '') {
                 callback(new Error('请输入用户名'))
               }
               if ([...this.newUser.username].length < 4 || [...this.newUser.username].length > 12) {
@@ -261,7 +274,7 @@ export default {
         password: [
           {
             validator: (rule, value, callback) => {
-              if (this.newUser.password == '') {
+              if (this.newUser.password === '') {
                 callback(new Error('请输入密码'))
               }
               if ([...this.newUser.password].length < 6 || [...this.newUser.password].length > 20) {
@@ -276,7 +289,7 @@ export default {
         checkpass: [
           {
             validator: (rule, value, callback) => {
-              if (this.newUser.checkpass == '') {
+              if (this.newUser.checkpass === '') {
                 callback(new Error('请输入密码'))
               }
               if (this.newUser.password !== this.newUser.checkpass) {
@@ -293,7 +306,7 @@ export default {
         password: [
           {
             validator: (rule, value, callback) => {
-              if (this.changePassword.password == '') {
+              if (this.changePassword.password === '') {
                 callback(new Error('请输入密码'))
               }
               if ([...this.changePassword.password].length < 6 || [...this.changePassword.password].length > 20) {
@@ -308,7 +321,7 @@ export default {
         checkpass: [
           {
             validator: (rule, value, callback) => {
-              if (this.changePassword.checkpass == '') {
+              if (this.changePassword.checkpass === '') {
                 callback(new Error('请输入密码'))
               }
               if (this.changePassword.password !== this.changePassword.checkpass) {
@@ -331,53 +344,67 @@ export default {
   },
   computed: {
     IsAdmin: function () {
-      if (this.userInfo.role === 1) {
-        return true
-      } else {
-        return false
-      }
+      return this.userInfo.role === 1;
     },
   },
   methods: {
     // 获取用户列表
     async getUserList() {
-      const { data: res } = await this.$http.get('admin/users', {
-        params: {
-          username: this.queryParam.username,
-          pagesize: this.queryParam.pagesize,
-          pagenum: this.queryParam.pagenum,
-        },
-      })
-      if (res.status !== 200) {
-        if (res.status === 1004 || 1005 || 1006 || 1007) {
-          window.sessionStorage.clear()
-          this.$router.push('/login')
-        }
-        this.$message.error(res.message)
+      const listOption = {
+        limit: this.queryParam.pagesize,
+        offset: (this.queryParam.pagenum - 1) * this.queryParam.pagesize,
+        options: []
       }
-      this.userlist = res.data
-      this.pagination.total = res.total
+      const {data: res} = await this.$http.post('user/GetUserList', {
+        list_option: listOption
+      })
+
+      if (res.code !== 200) {
+        this.$message.error(res.message)
+        if (res.code === 401) {
+          window.sessionStorage.clear()
+          await this.$router.push('/login')
+        }
+        return
+      }
+
+      this.userlist = res.data.list
+      this.pagination.total = res.data.page.total
     },
 
     // 搜索用户
     async searchUser() {
-      this.queryParam.pagenum = 1
-      this.pagination.current = 1
-      const { data: res } = await this.$http.get('admin/users', {
-        params: {
-          username: this.queryParam.username,
-          pagesize: this.queryParam.pagesize,
-          pagenum: this.queryParam.pagenum,
-        },
+      const listOption = {
+        limit: this.queryParam.pagesize,
+        offset: (this.queryParam.pagenum - 1) * this.queryParam.pagesize,
+        options: [
+          {
+            type: 1,
+            value: this.queryParam.username + '',
+          },
+        ]
+      }
+
+      const {data: res} = await this.$http.post('user/GetUserList', {
+        list_option: listOption
       })
-      if (res.status !== 200) return this.$message.error(res.message)
-      this.userlist = res.data
-      this.pagination.total = res.total
+
+      if (res.code !== 200) {
+        this.$message.error(res.message)
+        if (res.code === 401) {
+          window.sessionStorage.clear()
+          await this.$router.push('/login')
+        }
+        return
+      }
+
+      this.userlist = res.data.list
+      this.pagination.total = res.data.page.total
     },
 
     // 更改分页
     handleTableChange(pagination, filters, sorter) {
-      var pager = { ...this.pagination }
+      var pager = {...this.pagination}
       pager.current = pagination.current
       pager.pageSize = pagination.pageSize
       this.queryParam.pagesize = pagination.pageSize
@@ -396,10 +423,21 @@ export default {
         title: '提示：请再次确认',
         content: '确定要删除该用户吗？一旦删除，无法恢复',
         onOk: async () => {
-          const { data: res } = await this.$http.delete(`user/${id}`)
-          if (res.status != 200) return this.$message.error(res.message)
+          const {data: res} = await this.$http.post(`user/DelUser`, {
+            id: Number(id)
+          })
+
+          if (res.code !== 200) {
+            this.$message.error(res.message)
+            if (res.code === 401) {
+              window.sessionStorage.clear()
+              await this.$router.push('/login')
+            }
+            return
+          }
+
           this.$message.success('删除成功')
-          this.getUserList()
+          await this.getUserList()
         },
         onCancel: () => {
           this.$message.info('已取消删除')
@@ -410,16 +448,27 @@ export default {
     addUserOk() {
       this.$refs.addUserRef.validate(async (valid) => {
         if (!valid) return this.$message.error('参数不符合要求，请重新输入')
-        const { data: res } = await this.$http.post('user/add', {
-          username: this.newUser.username,
-          password: this.newUser.password,
-          role: this.newUser.role,
+        const {data: res} = await this.$http.post('user/AddUser', {
+          user: {
+            username: this.newUser.username,
+            password: this.newUser.password,
+            role: this.newUser.role,
+          }
         })
-        if (res.status != 200) return this.$message.error(res.message)
+
+        if (res.code !== 200) {
+          this.$message.error(res.message)
+          if (res.code === 401) {
+            window.sessionStorage.clear()
+            await this.$router.push('/login')
+          }
+          return
+        }
+
         this.$refs.addUserRef.resetFields()
         this.addUserVisible = false
         this.$message.success('添加用户成功')
-        this.getUserList()
+        await this.getUserList()
       })
     },
     addUserCancel() {
@@ -437,21 +486,33 @@ export default {
     // 编辑用户
     async editUser(id) {
       this.editUserVisible = true
-      const { data: res } = await this.$http.get(`user/${id}`)
-      this.userInfo = res.data
-      this.userInfo.id = id
+      const {data: res} = await this.$http.post(`user/GetUser`, {
+        id: id,
+      })
+      this.userInfo = res.data.user
     },
     editUserOk() {
       this.$refs.addUserRef.validate(async (valid) => {
         if (!valid) return this.$message.error('参数不符合要求，请重新输入')
-        const { data: res } = await this.$http.put(`user/${this.userInfo.id}`, {
+        const {data: res} = await this.$http.post(`user/UpdateUserNameWithRole`, {
+          id: this.userInfo.id,
           username: this.userInfo.username,
           role: this.userInfo.role,
         })
-        if (res.status != 200) return this.$message.error(res.message)
+
+        if (res.code !== 200) {
+          this.$message.error(res.message)
+          if (res.code === 401) {
+            window.sessionStorage.clear()
+            await this.$router.push('/login')
+          }
+          return
+        }
+
         this.editUserVisible = false
         this.$message.success('更新用户信息成功')
-        this.getUserList()
+        this.$refs.addUserRef.resetFields()
+        await this.getUserList()
       })
     },
     editUserCancel() {
@@ -463,19 +524,34 @@ export default {
     // 修改密码
     async ChangePassword(id) {
       this.changePasswordVisible = true
-      const { data: res } = await this.$http.get(`user/${id}`)
-      this.changePassword.id = id
+      const {data: res} = await this.$http.post(`user/GetUser`, {
+        id: id,
+      })
+      this.changePassword.id = res.data.user.id
+      this.changePassword.oldPassword = res.data.user.password
     },
     changePasswordOk() {
       this.$refs.changePasswordRef.validate(async (valid) => {
         if (!valid) return this.$message.error('参数不符合要求，请重新输入')
-        const { data: res } = await this.$http.put(`admin/changepw/${this.changePassword.id}`, {
-          password: this.changePassword.password,
+        const {data: res} = await this.$http.post(`user/ResetPassword`, {
+          new_password: this.changePassword.password,
+          old_password: this.changePassword.oldPassword,
+          id: this.changePassword.id,
         })
-        if (res.status != 200) return this.$message.error(res.message)
+
+        if (res.code !== 200) {
+          this.$message.error(res.message)
+          if (res.code === 401) {
+            window.sessionStorage.clear()
+            await this.$router.push('/login')
+          }
+          return
+        }
+
         this.changePasswordVisible = false
         this.$message.success('修改密码成功')
-        this.getUserList()
+        this.$refs.changePasswordRef.resetFields()
+        await this.getUserList()
       })
     },
     changePasswordCancel() {

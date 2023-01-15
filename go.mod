@@ -4,7 +4,6 @@ go 1.18
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/emicklei/proto v1.11.1
 	github.com/envoyproxy/protoc-gen-validate v0.9.1
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-redis/redis/v8 v8.11.5
@@ -12,7 +11,7 @@ require (
 	github.com/mitchellh/mapstructure v1.4.3
 	github.com/oldbai555/driver-mysql v0.0.0-20221011051826-9dcf64ef2d7b
 	github.com/oldbai555/gorm v0.0.0-20221011044346-e65800014b93
-	github.com/oldbai555/lbtool v0.0.5-0.20230108165226-bf1d9f8b7713
+	github.com/oldbai555/lbtool v0.0.5-0.20230114050630-a6be3fb7a8b7
 	github.com/pkg/errors v0.9.1
 	github.com/storyicon/grbac v0.0.0-20200224041032-a0461737df7e
 	google.golang.org/grpc v1.43.0

@@ -201,10 +201,18 @@ func (p *Scope) Gte(f string, v interface{}) *Scope {
 	return p
 }
 
-func (p *Scope) Order(order ...string) *Scope {
-	for _, s := range order {
-		p.db.Order(s)
-	}
+func (p *Scope) Order(order string) *Scope {
+	p.db.Order(order)
+	return p
+}
+
+func (p *Scope) OrderByDesc(order ...string) *Scope {
+	p.db.Order(fmt.Sprintf("%s DESC", strings.Join(order, ",")))
+	return p
+}
+
+func (p *Scope) OrderByAsc(order ...string) *Scope {
+	p.db.Order(fmt.Sprintf("%s ASC", strings.Join(order, ",")))
 	return p
 }
 
@@ -241,10 +249,11 @@ func (p *Scope) First(ctx context.Context, dest interface{}) error {
 }
 
 // IsEmpty 是否存在
-func (p *Scope) IsEmpty(ctx context.Context, dest interface{}) (bool, error) {
+func (p *Scope) IsEmpty(ctx context.Context) (bool, error) {
+	dest := clone.Clone(p.obj)
 	err := p.db.First(dest).Error
 	if err != gorm.ErrRecordNotFound {
-		return false, p.err
+		return false, err
 	}
 	return gorm.ErrRecordNotFound == err, nil
 }

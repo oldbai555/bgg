@@ -2,13 +2,20 @@
   <div>
     <a-card>
       <a-table
-        rowKey="ID"
+        :rowKey="(record,index)=>{return index}"
         :columns="columns"
         :pagination="pagination"
         :dataSource="commentList"
         bordered
         @change="handleTableChange"
       >
+        <span slot="article_id" slot-scope="data">{{ articleMap[data].title }}</span>
+
+        <span slot="user_id" slot-scope="data"
+              v-if="(userMap[data]&&userMap[data].nickname)">{{ userMap[data].nickname }}</span>
+        <span slot="user_id" v-else>陌生人</span>
+
+
         <span slot="status" slot-scope="data">{{ data == 1 ? '审核通过' : '未审核' }}</span>
         <template slot="action" slot-scope="data">
           <div class="actionSlot">
@@ -16,20 +23,23 @@
               type="primary"
               icon="edit"
               style="margin-right: 15px"
-              @click="commentCheck(data.ID)"
-            >通过审核</a-button>
+              @click="commentCheck(data.id)"
+            >通过审核
+            </a-button>
             <a-button
               type="primary"
               icon="info"
               style="margin-right: 15px"
-              @click="commentUncheck(data.ID)"
-            >撤下评论</a-button>
+              @click="commentUncheck(data.id)"
+            >撤下评论
+            </a-button>
             <a-button
               type="danger"
               icon="delete"
               style="margin-right: 15px"
-              @click="deleteComment(data.ID)"
-            >删除</a-button>
+              @click="deleteComment(data.id)"
+            >删除
+            </a-button>
           </div>
         </template>
       </a-table>
@@ -37,38 +47,42 @@
   </div>
 </template>
 <script>
-import day from 'dayjs'
+import {formatDate} from '../../plugin/time'
+
 const columns = [
   {
     title: 'ID',
-    dataIndex: 'ID',
+    dataIndex: 'id',
     width: '2%',
     key: 'id',
     align: 'center',
   },
   {
     title: '创建时间',
-    dataIndex: 'CreatedAt',
+    dataIndex: 'created_at',
     width: '10%',
-    key: 'CreatedAt',
+    key: 'created_at',
     align: 'center',
     customRender: (val) => {
-      return val ? day(val).format('YYYY年MM月DD日 HH:mm') : '暂无'
+      const date = new Date(val * 1000);
+      return val ? formatDate(date, 'yyyy年MM月dd日 hh:mm:ss') : '暂无'
     },
   },
   {
     title: '评论文章',
-    dataIndex: 'article_title',
+    dataIndex: 'article_id',
     width: '7%',
-    key: 'article_title',
+    key: 'article_id',
     align: 'center',
+    scopedSlots: {customRender: 'article_id'},
   },
   {
     title: '评论者',
-    dataIndex: 'username',
+    dataIndex: 'user_id',
     width: '7%',
-    key: 'username',
+    key: 'user_id',
     align: 'center',
+    scopedSlots: {customRender: 'user_id'},
   },
   {
     title: '评论内容',
@@ -83,14 +97,14 @@ const columns = [
     width: '7%',
     key: 'status',
     align: 'center',
-    scopedSlots: { customRender: 'status' },
+    scopedSlots: {customRender: 'status'},
   },
   {
     title: '操作',
     width: '20%',
     key: 'action',
     align: 'center',
-    scopedSlots: { customRender: 'action' },
+    scopedSlots: {customRender: 'action'},
   },
 ]
 export default {
@@ -108,6 +122,8 @@ export default {
         showTotal: (total) => `共${total}条`,
       },
       columns,
+      articleMap: {},
+      userMap: {},
       queryParam: {
         pagesize: 10,
         pagenum: 1,
@@ -120,27 +136,33 @@ export default {
   methods: {
     // 获取评论列表
     async getCommentList() {
-      const { data: res } = await this.$http.get('comment/list', {
-        params: {
-          pagesize: this.queryParam.pagesize,
-          pagenum: this.queryParam.pagenum,
-        },
+      const listOption = {
+        limit: this.queryParam.pagesize,
+        offset: (this.queryParam.pagenum - 1) * this.queryParam.pagesize,
+        options: []
+      }
+      const {data: res} = await this.$http.post('blog/GetCommentList', {
+        list_option: listOption
       })
 
-      if (res.status !== 200) {
-        if (res.status === 1004 || 1005 || 1006 || 1007) {
-          window.sessionStorage.clear()
-          this.$router.push('/login')
-        }
+      if (res.code !== 200) {
         this.$message.error(res.message)
+        if (res.code === 401) {
+          window.sessionStorage.clear()
+          await this.$router.push('/login')
+        }
+        return
       }
-      this.commentList = res.data
-      this.pagination.total = res.total
+
+      this.commentList = res.data.list || []
+      this.userMap = res.data.user_map || {}
+      this.articleMap = res.data.article_map || {}
+      this.pagination.total = res.data.page.total
     },
 
     // 更改分页
     handleTableChange(pagination, filters, sorter) {
-      var pager = { ...this.pagination }
+      const pager = {...this.pagination};
       pager.current = pagination.current
       pager.pageSize = pagination.pageSize
       this.queryParam.pagesize = pagination.pageSize
@@ -160,14 +182,30 @@ export default {
         title: '提示：请再次确认',
         content: '要通过审核吗？',
         onOk: async () => {
-          const { data: res_status } = await this.$http.get(`comment/info/${id}`)
-          if (res_status.data.status === 1) return this.$message.error('该评论已处于显示状态，无需审核')
-          const { data: res } = await this.$http.put(`checkcomment/${id}`, {
-            status: 1,
+          const {data: res} = await this.$http.post(`blog/GetComment`, {
+            id: Number(id)
           })
-          if (res.status != 200) return this.$message.error(res.message)
+
+          if (res.data.comment.status === 1) {
+            return this.$message.error('该评论已处于显示状态，无需审核')
+          }
+
+          res.data.comment.status = 1
+          const {data: uRes} = await this.$http.post(`blog/UpdateComment`, {
+            comment: res.data.comment,
+          })
+
+          if (uRes.code !== 200) {
+            this.$message.error(uRes.message)
+            if (uRes.code === 401) {
+              window.sessionStorage.clear()
+              await this.$router.push('/login')
+            }
+            return
+          }
+
           this.$message.success('审核成功')
-          this.getCommentList()
+          await this.getCommentList()
         },
         onCancel: () => {
           this.$message.info('已取消')
@@ -181,14 +219,33 @@ export default {
         title: '提示：请再次确认',
         content: '要撤下该评论吗？',
         onOk: async () => {
-          const { data: res_status } = await this.$http.get(`comment/info/${id}`)
-          if (res_status.data.status === 2) return this.$message.error('该评论已处于未审核状态，无需撤下')
-          const { data: res } = await this.$http.put(`uncheckcomment/${id}`, {
-            status: 2,
+          const {data: res} = await this.$http.post(`blog/GetComment`, {
+            id: Number(id)
           })
-          if (res.status != 200) return this.$message.error(res.message)
+
+          if (res.data.comment.status === 2) {
+            return this.$message.error('该评论已处于未审核状态，无需撤下')
+          }
+
+          if (res.data.status === 2) {
+            return this.$message.error('该评论已处于未审核状态，无需撤下')
+          }
+
+          res.data.comment.status = 2
+          const {data: uRes} = await this.$http.post(`blog/UpdateComment`, {
+            comment: res.data.comment,
+          })
+
+          if (uRes.code !== 200) {
+            this.$message.error(uRes.message)
+            if (uRes.code === 401) {
+              window.sessionStorage.clear()
+              await this.$router.push('/login')
+            }
+            return
+          }
           this.$message.success('评论已撤下')
-          this.getCommentList()
+          await this.getCommentList()
         },
         onCancel: () => {
           this.$message.info('已取消')
@@ -202,10 +259,21 @@ export default {
         title: '提示：请再次确认',
         content: '要删除吗？',
         onOk: async () => {
-          const { data: res } = await this.$http.delete(`delcomment/${id}`)
-          if (res.status != 200) return this.$message.error(res.message)
+          const {data: res} = await this.$http.post(`blog/DelComment`, {
+            id: Number(id)
+          })
+
+          if (res.code !== 200) {
+            this.$message.error(res.message)
+            if (res.code === 401) {
+              window.sessionStorage.clear()
+              await this.$router.push('/login')
+            }
+            return
+          }
+
           this.$message.success('删除成功')
-          this.getCommentList()
+          await this.getCommentList()
         },
         onCancel: () => {
           this.$message.info('已取消')

@@ -69,63 +69,6 @@
 <script>
 import {formatDate} from '../../plugin/time'
 
-const columns = [
-  {
-    title: 'ID',
-    dataIndex: 'id',
-    width: '5%',
-    key: 'id',
-    align: 'center',
-  },
-  {
-    title: '更新日期',
-    dataIndex: 'updated_at',
-    width: '10%',
-    key: 'updated_at',
-    align: 'center',
-    customRender: (val) => {
-      const date = new Date(val*1000);
-      return val ? formatDate(date, 'yyyy年MM月dd日 hh:mm:ss') : '暂无'
-    },
-  },
-  {
-    title: '分类',
-    dataIndex: 'category_id',
-    width: '5%',
-    key: 'name',
-    align: 'center',
-  },
-  {
-    title: '文章标题',
-    dataIndex: 'title',
-    width: '15%',
-    key: 'title',
-    align: 'center',
-  },
-  {
-    title: '文章描述',
-    dataIndex: 'desc',
-    width: '20%',
-    key: 'desc',
-    align: 'center',
-  },
-  {
-    title: '缩略图',
-    dataIndex: 'img',
-    width: '20%',
-    key: 'img',
-    align: 'center',
-    scopedSlots: {customRender: 'img'},
-  },
-  {
-    title: '操作',
-    width: '15%',
-    key: 'action',
-    align: 'center',
-    scopedSlots: {customRender: 'action'},
-  },
-]
-
 export default {
   data() {
     return {
@@ -137,13 +80,75 @@ export default {
         showTotal: (total) => `共${total}条`,
       },
       Artlist: [],
+      CateMap: {},
       Catelist: [],
-      columns,
       queryParam: {
         title: '',
         pagesize: 5,
         pagenum: 1,
       },
+      columns: [
+        {
+          title: 'ID',
+          dataIndex: 'id',
+          width: '5%',
+          key: 'id',
+          align: 'center',
+        },
+        {
+          title: '更新日期',
+          dataIndex: 'updated_at',
+          width: '10%',
+          key: 'updated_at',
+          align: 'center',
+          customRender: (val) => {
+            const date = new Date(val * 1000);
+            return val ? formatDate(date, 'yyyy年MM月dd日 hh:mm:ss') : '暂无'
+          },
+        },
+        {
+          title: '分类',
+          dataIndex: 'category_id',
+          width: '5%',
+          key: 'category_id',
+          align: 'center',
+          customRender: (val) => {
+            if (val && this.CateMap[val].name){
+              return this.CateMap[val].name
+            }
+            return '暂无'
+          },
+        },
+        {
+          title: '文章标题',
+          dataIndex: 'title',
+          width: '15%',
+          key: 'title',
+          align: 'center',
+        },
+        {
+          title: '文章描述',
+          dataIndex: 'desc',
+          width: '20%',
+          key: 'desc',
+          align: 'center',
+        },
+        {
+          title: '缩略图',
+          dataIndex: 'img',
+          width: '20%',
+          key: 'img',
+          align: 'center',
+          scopedSlots: {customRender: 'img'},
+        },
+        {
+          title: '操作',
+          width: '15%',
+          key: 'action',
+          align: 'center',
+          scopedSlots: {customRender: 'action'},
+        },
+      ],
     }
   },
   created() {
@@ -176,6 +181,7 @@ export default {
       }
 
       this.Artlist = res.data.list
+      this.CateMap = res.data.category_map || {}
       this.pagination.total = res.data.page.total
     },
 
@@ -226,7 +232,7 @@ export default {
         title: '提示：请再次确认',
         content: '确定要删除该文章吗？一旦删除，无法恢复',
         onOk: async () => {
-          const {data: res} = await this.$http.post(`blog/DelArticle`,{
+          const {data: res} = await this.$http.post(`blog/DelArticle`, {
             id: id
           })
 
@@ -283,6 +289,7 @@ export default {
       }
 
       this.Artlist = res.data.list
+      this.CateMap = res.data.category_map || {}
       this.pagination.total = res.data.page.total
     },
   },

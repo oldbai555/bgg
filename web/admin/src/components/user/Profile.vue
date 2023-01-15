@@ -49,15 +49,13 @@ export default {
   data() {
     return {
       profileInfo: {
-        id: 1,
         nickname: '',
         desc: '',
         github: '',
         email: '',
-        img: '',
         avatar: '',
       },
-      upUrl: Url + 'upload',
+      upUrl: Url + '/upload',
       headers: {},
     }
   },
@@ -84,7 +82,7 @@ export default {
         return
       }
       this.profileInfo = res.data
-      this.profileInfo.id = sid
+      this.profileInfo.id = res.data.id
     },
 
     // 上传头像
@@ -93,7 +91,7 @@ export default {
       }
       if (info.file.status === 'done') {
         this.$message.success(`图片上传成功`)
-        const imgUrl = info.file.response.url
+        const imgUrl = info.file.response.data.url
         this.profileInfo.avatar = imgUrl
       } else if (info.file.status === 'error') {
         this.$message.error(`图片上传失败`)
@@ -102,8 +100,19 @@ export default {
 
     // 更新
     async updateProfile() {
-      const {data: res} = await this.$http.put(`profile/${this.profileInfo.id}`, this.profileInfo)
-      if (res.status !== 200) return this.$message.error(res.message)
+      const {data: res} = await this.$http.post(`user/UpdateLoginUserInfo`, {
+        user: this.profileInfo,
+      })
+
+      if (res.code !== 200) {
+        this.$message.error(res.message)
+        if (res.code === 401) {
+          window.sessionStorage.clear()
+          await this.$router.push('/login')
+        }
+        return
+      }
+
       this.$message.success(`个人信息更新成功`)
       await this.$router.push('/index')
     },
