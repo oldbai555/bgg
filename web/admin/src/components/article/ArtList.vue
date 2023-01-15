@@ -38,6 +38,11 @@
         bordered
         @change="handleTableChange"
       >
+        <span class="ArtImg" slot="category_id" slot-scope="category_id">
+          <span v-if="(CateMap&&CateMap[category_id]&&CateMap[category_id].name)">{{CateMap[category_id].name}}</span>
+          <span v-else>暂无分类</span>
+        </span>
+
         <span class="ArtImg" slot="img" slot-scope="img">
           <img :src="img"/>
         </span>
@@ -69,6 +74,64 @@
 <script>
 import {formatDate} from '../../plugin/time'
 
+const columns = [
+  {
+    title: 'ID',
+    dataIndex: 'id',
+    width: '5%',
+    key: 'id',
+    align: 'center',
+  },
+  {
+    title: '更新日期',
+    dataIndex: 'updated_at',
+    width: '10%',
+    key: 'updated_at',
+    align: 'center',
+    customRender: (val) => {
+      const date = new Date(val * 1000);
+      return val ? formatDate(date, 'yyyy年MM月dd日 hh:mm:ss') : '暂无'
+    },
+  },
+  {
+    title: '分类',
+    dataIndex: 'category_id',
+    width: '5%',
+    key: 'category_id',
+    align: 'center',
+    scopedSlots: {customRender: 'category_id'},
+  },
+  {
+    title: '文章标题',
+    dataIndex: 'title',
+    width: '15%',
+    key: 'title',
+    align: 'center',
+  },
+  {
+    title: '文章描述',
+    dataIndex: 'desc',
+    width: '20%',
+    key: 'desc',
+    align: 'center',
+  },
+  {
+    title: '缩略图',
+    dataIndex: 'img',
+    width: '20%',
+    key: 'img',
+    align: 'center',
+    scopedSlots: {customRender: 'img'},
+  },
+  {
+    title: '操作',
+    width: '15%',
+    key: 'action',
+    align: 'center',
+    scopedSlots: {customRender: 'action'},
+  },
+]
+
 export default {
   data() {
     return {
@@ -82,73 +145,12 @@ export default {
       Artlist: [],
       CateMap: {},
       Catelist: [],
+      columns,
       queryParam: {
         title: '',
         pagesize: 5,
         pagenum: 1,
       },
-      columns: [
-        {
-          title: 'ID',
-          dataIndex: 'id',
-          width: '5%',
-          key: 'id',
-          align: 'center',
-        },
-        {
-          title: '更新日期',
-          dataIndex: 'updated_at',
-          width: '10%',
-          key: 'updated_at',
-          align: 'center',
-          customRender: (val) => {
-            const date = new Date(val * 1000);
-            return val ? formatDate(date, 'yyyy年MM月dd日 hh:mm:ss') : '暂无'
-          },
-        },
-        {
-          title: '分类',
-          dataIndex: 'category_id',
-          width: '5%',
-          key: 'category_id',
-          align: 'center',
-          customRender: (val) => {
-            if (val && this.CateMap[val].name){
-              return this.CateMap[val].name
-            }
-            return '暂无'
-          },
-        },
-        {
-          title: '文章标题',
-          dataIndex: 'title',
-          width: '15%',
-          key: 'title',
-          align: 'center',
-        },
-        {
-          title: '文章描述',
-          dataIndex: 'desc',
-          width: '20%',
-          key: 'desc',
-          align: 'center',
-        },
-        {
-          title: '缩略图',
-          dataIndex: 'img',
-          width: '20%',
-          key: 'img',
-          align: 'center',
-          scopedSlots: {customRender: 'img'},
-        },
-        {
-          title: '操作',
-          width: '15%',
-          key: 'action',
-          align: 'center',
-          scopedSlots: {customRender: 'action'},
-        },
-      ],
     }
   },
   created() {
