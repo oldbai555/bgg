@@ -33,22 +33,23 @@
     <div v-html="artInfo.content" class="content ma-5 pa-3 text-justify"></div>
 
     <v-divider class="ma-5"></v-divider>
+
     <v-sheet class="ma-3 pa-3">
       <div>
         <v-list
             outlined
             class="ma-3 pa-3"
             v-for="item in commentList"
-            :key="item.ID"
+            :key="item.id"
             v-show="item.status === 1"
         >
           <template>
             <v-list-item>
               <v-list-item-content>
                 <v-list-item-title>
-                  {{ item.username }}
+                  {{ item.user_email }}
                   {{
-                    item.created_at | dateformat('YYYY-MM-DD')
+                    item.created_at*1000 | dateformat('YYYY-MM-DD')
                   }}
                 </v-list-item-title>
                 <v-list-item-subtitle class="mr-3">
@@ -61,6 +62,7 @@
           </template>
         </v-list>
       </div>
+
       <div class="text-center" v-if="commentList">
         <v-pagination
             class="my-2"
@@ -70,10 +72,12 @@
             @input="getCommentList()"
         ></v-pagination>
       </div>
+
       <div>
         <template>
           <v-card flat>
-            <v-alert v-if="!headers.username" class="ma-3" dense outlined type="error">你还未登录，请登录后留言</v-alert>
+<!--            <v-alert v-if="!headers.username" class="ma-3" dense outlined type="error">你还未登录，请登录后留言</v-alert>-->
+            <v-alert v-if="!headers.username" class="ma-3" dense outlined type="error">暂未提供登陆留言功能,如需联系博主请查阅博主联系方式</v-alert>
             <div v-if="headers.username">
               <v-textarea class="mx-3" outlined v-model="comment.content"></v-textarea>
               <v-btn class="ml-3 mb-1" dark color="indigo" small @click="pushComment()">确定</v-btn>
@@ -81,6 +85,7 @@
           </v-card>
         </template>
       </div>
+
     </v-sheet>
   </div>
 </template>
