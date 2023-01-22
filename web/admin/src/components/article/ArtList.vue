@@ -39,7 +39,7 @@
         @change="handleTableChange"
       >
         <span class="ArtImg" slot="category_id" slot-scope="category_id">
-          <span v-if="(CateMap&&CateMap[category_id]&&CateMap[category_id].name)">{{CateMap[category_id].name}}</span>
+          <span v-if="(CateMap&&CateMap[category_id]&&CateMap[category_id].name)">{{ CateMap[category_id].name }}</span>
           <span v-else>暂无分类</span>
         </span>
 
@@ -182,7 +182,7 @@ export default {
         return
       }
 
-      this.Artlist = res.data.list
+      this.Artlist = res.data.list || []
       this.CateMap = res.data.category_map || {}
       this.pagination.total = res.data.page.total
     },

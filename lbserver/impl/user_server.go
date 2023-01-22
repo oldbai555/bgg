@@ -19,7 +19,7 @@ type LbuserServer struct {
 	*lbuser.UnimplementedLbuserServer
 }
 
-func (u *LbuserServer) Login(ctx context.Context, req *lbuser.LoginReq) (*lbuser.LoginRsp, error) {
+func (a *LbuserServer) Login(ctx context.Context, req *lbuser.LoginReq) (*lbuser.LoginRsp, error) {
 	var rsp lbuser.LoginRsp
 	var user lbuser.ModelUser
 	err := UserOrm.NewScope().Eq(lbuser.FieldUsername_, req.Username).First(ctx, &user)
@@ -55,7 +55,7 @@ func (u *LbuserServer) Login(ctx context.Context, req *lbuser.LoginReq) (*lbuser
 	return &rsp, nil
 }
 
-func (u *LbuserServer) Logout(ctx context.Context, req *lbuser.LogoutReq) (*lbuser.LogoutRsp, error) {
+func (a *LbuserServer) Logout(ctx context.Context, req *lbuser.LogoutReq) (*lbuser.LogoutRsp, error) {
 	var rsp lbuser.LogoutRsp
 
 	err := lb.Rdb.Del(ctx, req.Sid).Err()
@@ -67,7 +67,7 @@ func (u *LbuserServer) Logout(ctx context.Context, req *lbuser.LogoutReq) (*lbus
 	return &rsp, nil
 }
 
-func (u *LbuserServer) GetLoginUser(ctx context.Context, req *lbuser.GetLoginUserReq) (*lbuser.GetLoginUserRsp, error) {
+func (a *LbuserServer) GetLoginUser(ctx context.Context, req *lbuser.GetLoginUserReq) (*lbuser.GetLoginUserRsp, error) {
 	var rsp lbuser.GetLoginUserRsp
 	var user lbuser.ModelUser
 
@@ -91,7 +91,7 @@ func (u *LbuserServer) GetLoginUser(ctx context.Context, req *lbuser.GetLoginUse
 	return &rsp, nil
 }
 
-func (u *LbuserServer) UpdateLoginUserInfo(ctx context.Context, req *lbuser.UpdateLoginUserInfoReq) (*lbuser.UpdateLoginUserInfoRsp, error) {
+func (a *LbuserServer) UpdateLoginUserInfo(ctx context.Context, req *lbuser.UpdateLoginUserInfoReq) (*lbuser.UpdateLoginUserInfoRsp, error) {
 	var rsp lbuser.UpdateLoginUserInfoRsp
 
 	claims, ok := ctx.Value(CtxWithClaim).(*webtool.Claims)
@@ -210,5 +210,22 @@ func (a *LbuserServer) ResetPassword(ctx context.Context, req *lbuser.ResetPassw
 		return nil, err
 	}
 
+	return &rsp, nil
+}
+func (a *LbuserServer) GetFrontUser(ctx context.Context, req *lbuser.GetFrontUserReq) (*lbuser.GetLoginUserRsp, error) {
+	var rsp lbuser.GetLoginUserRsp
+
+	var user lbuser.ModelUser
+	err := UserOrm.NewScope().Eq(lbuser.FieldId_, 4).First(ctx, &user)
+	if err != nil {
+		log.Errorf("err is : %v", err)
+		return nil, err
+	}
+
+	rsp.Avatar = user.Avatar
+	rsp.Email = user.Email
+	rsp.Github = user.Github
+	rsp.Nickname = user.Nickname
+	rsp.Desc = user.Desc
 	return &rsp, nil
 }

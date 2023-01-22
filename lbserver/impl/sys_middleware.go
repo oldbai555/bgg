@@ -45,6 +45,14 @@ func RegisterUuidTrace() gin.HandlerFunc {
 	}
 }
 
+func RegisterShowReq() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		mapV2, err := utils.StructToMapV2(c.Request)
+		log.Infof("req is %v ,err is %v", mapV2, err)
+		c.Next()
+	}
+}
+
 // RegisterJwt 是我们用来检查令牌是否有效的中间件。如果返回401状态无效，则返回给客户。
 func RegisterJwt() gin.HandlerFunc {
 	return func(c *gin.Context) {

@@ -61,7 +61,7 @@ func StartServer() {
 
 	// 配置跨域中间件
 	// 链路追踪
-	h.Use(Cors(), RegisterUuidTrace(), gin.LoggerWithFormatter(defaultLogFormatter), gin.Recovery())
+	h.Use(Cors(), RegisterUuidTrace(), gin.LoggerWithFormatter(defaultLogFormatter), gin.Recovery(), RegisterShowReq())
 
 	// 权限管理
 	// 在这里，我们通过“grbac.WithLoader”接口使用自定义Loader功能
@@ -89,4 +89,5 @@ func InitSysApi(h *gin.Engine) {
 	registerLbuserApi(h)
 	registerLbblogApi(h)
 	registerStoreApi(h)
+	registerPublicApi(h)
 }

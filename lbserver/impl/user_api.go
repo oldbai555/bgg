@@ -245,3 +245,16 @@ func ResetPassword(c *gin.Context) {
 	}
 	handler.Success(rsp)
 }
+
+func GetFrontUser(c *gin.Context) {
+	var req lbuser.GetFrontUserReq
+	handler := NewHandler(c)
+
+	rsp, err := lbuserServer.GetFrontUser(c, &req)
+	if err != nil {
+		log.Errorf("err is : %v", err)
+		handler.RespError(err)
+		return
+	}
+	handler.Success(rsp)
+}

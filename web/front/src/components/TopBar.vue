@@ -197,8 +197,26 @@ export default {
   methods: {
     // 获取分类
     async GetCateList() {
-      const { data: res } = await this.$http.get('category')
-      this.cateList = res.data
+      const queryParam = {
+        pagesize: 10,
+        pagenum: 1,
+      };
+      const listOption = {
+        limit: queryParam.pagesize,
+        offset: (queryParam.pagenum - 1) * queryParam.pagesize,
+        options: []
+      }
+
+      const {data: res} = await this.$http.post('public/GetCategoryList', {
+        list_option: listOption
+      })
+
+      if (res.code !== 200) {
+        this.$message.error(res.message)
+        return
+      }
+
+      this.cateList = res.data.list
     },
 
     // 查找文章标题

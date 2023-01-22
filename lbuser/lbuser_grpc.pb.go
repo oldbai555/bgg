@@ -63,6 +63,11 @@ type LbuserClient interface {
 	// @desc:
 	// @error:
 	ResetPassword(ctx context.Context, in *ResetPasswordReq, opts ...grpc.CallOption) (*ResetPasswordRsp, error)
+	// @cat: front
+	// @name:
+	// @desc:
+	// @error:
+	GetFrontUser(ctx context.Context, in *GetFrontUserReq, opts ...grpc.CallOption) (*GetLoginUserRsp, error)
 }
 
 type lbuserClient struct {
@@ -163,6 +168,15 @@ func (c *lbuserClient) ResetPassword(ctx context.Context, in *ResetPasswordReq, 
 	return out, nil
 }
 
+func (c *lbuserClient) GetFrontUser(ctx context.Context, in *GetFrontUserReq, opts ...grpc.CallOption) (*GetLoginUserRsp, error) {
+	out := new(GetLoginUserRsp)
+	err := c.cc.Invoke(ctx, "/lbuser.lbuser/GetFrontUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // LbuserServer is the server API for Lbuser service.
 // All implementations must embed UnimplementedLbuserServer
 // for forward compatibility
@@ -208,6 +222,11 @@ type LbuserServer interface {
 	// @desc:
 	// @error:
 	ResetPassword(context.Context, *ResetPasswordReq) (*ResetPasswordRsp, error)
+	// @cat: front
+	// @name:
+	// @desc:
+	// @error:
+	GetFrontUser(context.Context, *GetFrontUserReq) (*GetLoginUserRsp, error)
 	mustEmbedUnimplementedLbuserServer()
 }
 
@@ -244,6 +263,9 @@ func (UnimplementedLbuserServer) UpdateUserNameWithRole(context.Context, *Update
 }
 func (UnimplementedLbuserServer) ResetPassword(context.Context, *ResetPasswordReq) (*ResetPasswordRsp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ResetPassword not implemented")
+}
+func (UnimplementedLbuserServer) GetFrontUser(context.Context, *GetFrontUserReq) (*GetLoginUserRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFrontUser not implemented")
 }
 func (UnimplementedLbuserServer) mustEmbedUnimplementedLbuserServer() {}
 
@@ -438,6 +460,24 @@ func _Lbuser_ResetPassword_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Lbuser_GetFrontUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetFrontUserReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbuserServer).GetFrontUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbuser.lbuser/GetFrontUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbuserServer).GetFrontUser(ctx, req.(*GetFrontUserReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Lbuser_ServiceDesc is the grpc.ServiceDesc for Lbuser service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -484,6 +524,10 @@ var Lbuser_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ResetPassword",
 			Handler:    _Lbuser_ResetPassword_Handler,
+		},
+		{
+			MethodName: "GetFrontUser",
+			Handler:    _Lbuser_GetFrontUser_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -188,6 +188,10 @@ func (a *LbblogServer) GetCommentList(ctx context.Context, req *lbblog.GetCommen
 
 	db := CommentOrm.NewList(req.ListOption)
 	err := lbconst.NewListOptionProcessor(req.ListOption).
+		AddUint64(lbblog.GetCommentListReq_ListOptionArticleId, func(val uint64) error {
+			db.Eq(lbblog.FieldArticleId_, val)
+			return nil
+		}).
 		Process()
 	if err != nil {
 		log.Errorf("err is %v", err)

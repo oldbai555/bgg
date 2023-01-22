@@ -18,33 +18,33 @@
     <v-divider color="indigo"></v-divider>
 
     <v-list nav dense>
-      <v-list-item>
-        <v-list-item-icon class="ma-3">
-          <v-icon color="blue darken-2">{{ 'mdi-qqchat' }}</v-icon>
-        </v-list-item-icon>
-        <v-list-item-content class="grey--text">{{ profileInfo.qq_chat }}</v-list-item-content>
-      </v-list-item>
+<!--      <v-list-item>-->
+<!--        <v-list-item-icon class="ma-3">-->
+<!--          <v-icon color="blue darken-2">{{ 'mdi-qqchat' }}</v-icon>-->
+<!--        </v-list-item-icon>-->
+<!--        <v-list-item-content class="grey&#45;&#45;text">{{ profileInfo.qq_chat }}</v-list-item-content>-->
+<!--      </v-list-item>-->
 
-      <v-list-item>
-        <v-list-item-icon class="ma-3">
-          <v-icon color="green darken-2">{{ 'mdi-wechat' }}</v-icon>
-        </v-list-item-icon>
-        <v-list-item-content class="grey--text">{{ profileInfo.wechat }}</v-list-item-content>
-      </v-list-item>
+<!--      <v-list-item>-->
+<!--        <v-list-item-icon class="ma-3">-->
+<!--          <v-icon color="green darken-2">{{ 'mdi-wechat' }}</v-icon>-->
+<!--        </v-list-item-icon>-->
+<!--        <v-list-item-content class="grey&#45;&#45;text">{{ profileInfo.wechat }}</v-list-item-content>-->
+<!--      </v-list-item>-->
 
-      <v-list-item>
-        <v-list-item-icon class="ma-3">
-          <v-icon color="orange darken-2">{{ 'mdi-sina-weibo' }}</v-icon>
-        </v-list-item-icon>
-        <v-list-item-content class="grey--text">{{ profileInfo.weibo }}</v-list-item-content>
-      </v-list-item>
+<!--      <v-list-item>-->
+<!--        <v-list-item-icon class="ma-3">-->
+<!--          <v-icon color="orange darken-2">{{ 'mdi-sina-weibo' }}</v-icon>-->
+<!--        </v-list-item-icon>-->
+<!--        <v-list-item-content class="grey&#45;&#45;text">{{ profileInfo.weibo }}</v-list-item-content>-->
+<!--      </v-list-item>-->
 
-      <v-list-item>
-        <v-list-item-icon class="ma-3">
-          <v-icon color="primary">{{ "mdi-youtube" }}</v-icon>
-        </v-list-item-icon>
-        <v-list-item-content class="grey--text">{{ profileInfo.bili }}</v-list-item-content>
-      </v-list-item>
+<!--      <v-list-item>-->
+<!--        <v-list-item-icon class="ma-3">-->
+<!--          <v-icon color="primary">{{ "mdi-youtube" }}</v-icon>-->
+<!--        </v-list-item-icon>-->
+<!--        <v-list-item-content class="grey&#45;&#45;text">{{ profileInfo.bili }}</v-list-item-content>-->
+<!--      </v-list-item>-->
 
       <v-list-item>
         <v-list-item-icon class="ma-3">
@@ -59,9 +59,7 @@
 export default {
   data() {
     return {
-      profileInfo: {
-        id: 1
-      }
+      profileInfo: {}
     }
   },
   created() {
@@ -70,16 +68,8 @@ export default {
   methods: {
     // 获取个人设置
     async getProfileInfo() {
-      const item = window.sessionStorage.getItem("user");
-      const sid = window.sessionStorage.getItem("sid");
-      if (item === null || sid === null) {
-        this.$message.error("登录信息失效")
-        window.sessionStorage.clear("user")
-        window.sessionStorage.clear("sid")
-        await this.$router.push('/login')
-      }
-      const user = JSON.parse(item);
-      this.profileInfo.id = sid
+      const { data: res } = await this.$http.get('public/GetFrontUser')
+      this.profileInfo = res.data
     }
   }
 }

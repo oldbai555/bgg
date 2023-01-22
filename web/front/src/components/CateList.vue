@@ -13,7 +13,7 @@
         v-for="item in artList"
         :key="item.id"
         link
-        @click="$router.push(`/article/detail/${item.ID}`)"
+        @click="$router.push(`/article/detail/${item.id}`)"
       >
         <v-row no-gutters class="d-flex align-center">
           <v-avatar class="ma-3 hidden-sm-and-down" size="125" tile>
@@ -22,7 +22,7 @@
           <v-col>
             <v-card-title>
               <v-chip color="purple" outlined label class="mr-3 white--text">{{
-                item.Category.name
+                  CateMap[item.category_id].name
               }}</v-chip>
               <div>{{ item.title }}</div>
             </v-card-title>
@@ -32,7 +32,7 @@
               <div class="d-flex align-center">
                 <v-icon class="mr-1" small>{{ 'mdi-calendar-month' }}</v-icon>
                 <span>{{
-                  item.CreatedAt | dateformat('YYYY-MM-DD HH:MM')
+                    item.created_at*1000 | dateformat('YYYY-MM-DD HH:MM')
                 }}</span>
               </div>
               <div class="mx-4 d-flex align-center">
@@ -70,6 +70,7 @@ export default {
         pagesize: 5,
         pagenum: 1
       },
+      CateMap: {},
       total: 0,
       isLoad: false
     }
@@ -80,14 +81,30 @@ export default {
   methods: {
     // 获取文章列表
     async getArtList() {
-      const { data: res } = await this.$http.get(`article/list/${this.cid}`, {
-        params: {
-          pagesize: this.queryParam.pagesize,
-          pagenum: this.queryParam.pagenum
-        }
+      const listOption = {
+        limit: this.queryParam.pagesize,
+        offset: (this.queryParam.pagenum - 1) * this.queryParam.pagesize,
+        options: [
+          {
+            type: 1,
+            value: this.cid,
+          },
+          {
+            type: 2,
+            value: this.queryParam.title,
+          }
+        ]
+      }
+      const {data: res} = await this.$http.post('public/GetArticleList', {
+        list_option: listOption
       })
-      this.artList = res.data
-      this.total = res.total
+      if (res.code !== 200) {
+        this.$message.error(res.message)
+        return
+      }
+      this.artList = res.data.list || []
+      this.CateMap = res.data.category_map || {}
+      this.total = res.data.page.total
       this.isLoad = true
     }
   }

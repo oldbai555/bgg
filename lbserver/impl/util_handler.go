@@ -76,12 +76,14 @@ func (r *Handler) GetClaims() (*webtool.Claims, error) {
 func (r *Handler) Response(httpCode int, errorCode int, data interface{}, msg string) {
 	r.C.Header(HttpHeaderContentType, HttpHeaderContentTypeByJson)
 	hint := r.C.Value(LogWithHint)
-	r.C.JSON(httpCode, result.JSONResult{
+	jsonResult := result.JSONResult{
 		Code:    errorCode,
 		Message: msg,
 		Data:    data,
 		Hint:    fmt.Sprintf("%s", hint),
-	})
+	}
+	log.Infof("jsonRes is %v", jsonResult)
+	r.C.JSON(httpCode, jsonResult)
 }
 
 // Success 响应数据

@@ -5,10 +5,10 @@
       <div class="d-flex mx-10 justify-center">
         <v-icon class="mr-1" color="indigo" small>
           {{
-          'mdi-calendar-month'
+            'mdi-calendar-month'
           }}
         </v-icon>
-        <span>{{ artInfo.CreatedAt | dateformat('YYYY-MM-DD') }}</span>
+        <span>{{ artInfo.created_at*1000 | dateformat('YYYY-MM-DD') }}</span>
       </div>
       <div class="d-flex mr-10 justify-center">
         <v-icon class="mr-1" color="pink" small>{{ 'mdi-comment' }}</v-icon>
@@ -21,13 +21,14 @@
     </div>
     <v-divider class="pa-3 ma-3"></v-divider>
     <v-alert
-      class="ma-4"
-      elevation="1"
-      color="indigo"
-      dark
-      border="left"
-      outlined
-    >{{ artInfo.desc }}</v-alert>
+        class="ma-4"
+        elevation="1"
+        color="indigo"
+        dark
+        border="left"
+        outlined
+    >{{ artInfo.desc }}
+    </v-alert>
 
     <div v-html="artInfo.content" class="content ma-5 pa-3 text-justify"></div>
 
@@ -35,11 +36,11 @@
     <v-sheet class="ma-3 pa-3">
       <div>
         <v-list
-          outlined
-          class="ma-3 pa-3"
-          v-for="item in commentList"
-          :key="item.ID"
-          v-show="item.status === 1"
+            outlined
+            class="ma-3 pa-3"
+            v-for="item in commentList"
+            :key="item.ID"
+            v-show="item.status === 1"
         >
           <template>
             <v-list-item>
@@ -47,12 +48,12 @@
                 <v-list-item-title>
                   {{ item.username }}
                   {{
-                  item.CreatedAt | dateformat('YYYY-MM-DD')
+                    item.created_at | dateformat('YYYY-MM-DD')
                   }}
                 </v-list-item-title>
                 <v-list-item-subtitle class="mr-3">
                   {{
-                  item.content
+                    item.content
                   }}
                 </v-list-item-subtitle>
               </v-list-item-content>
@@ -62,11 +63,11 @@
       </div>
       <div class="text-center" v-if="commentList">
         <v-pagination
-          class="my-2"
-          total-visible="7"
-          v-model="queryParam.pagenum"
-          :length="Math.ceil(total / queryParam.pagesize)"
-          @input="getCommentList()"
+            class="my-2"
+            total-visible="7"
+            v-model="queryParam.pagenum"
+            :length="Math.ceil(total / queryParam.pagesize)"
+            @input="getCommentList()"
         ></v-pagination>
       </div>
       <div>
@@ -98,6 +99,8 @@ export default {
         username: '',
         user_id: 0
       },
+      articleMap: {},
+      userMap: {},
       queryParam: {
         pagesize: 5,
         pagenum: 1
@@ -115,30 +118,57 @@ export default {
   methods: {
     // 查询文章
     async getArtInfo() {
-      const { data: res } = await this.$http.get(`article/info/${this.id}`)
-      this.artInfo = res.data
+      const {data: res} = await this.$http.post(`public/GetArticle`,
+          {
+            id: Number(this.id),
+          }
+      )
+      if (res.code !== 200) {
+        this.$message.error(res.message)
+        return
+      }
+      this.artInfo = res.data.article
       window.sessionStorage.setItem('title', this.artInfo.title)
     },
     // 获取评论
     async getCommentList() {
-      const { data: res } = await this.$http.get(`commentfront/${this.id}`, {
-        params: {
-          pagesize: this.queryParam.pagesize,
-          pagenum: this.queryParam.pagenum
-        }
+      const listOption = {
+        limit: 2000,
+        offset: 0,
+        options: [
+          {
+            type: 1,
+            value: this.id,
+          }
+        ]
+      }
+      const {data: res} = await this.$http.post('public/GetCommentList', {
+        list_option: listOption
       })
-      this.commentList = res.data
-      this.total = res.total
+      if (res.code !== 200) {
+        this.$message.error(res.message)
+        return
+      }
+      this.commentList = res.data.list || []
+      this.userMap = res.data.user_map || {}
+      this.articleMap = res.data.article_map || {}
+      this.total = res.data.page.total
     },
     // 发送评论
     async pushComment() {
-      const { data: res } = await this.$http.post('addcomment', {
-        article_id: parseInt(this.id),
-        content: this.comment.content,
-        user_id: parseInt(this.headers.user_id),
-        username: this.headers.username
+      const {data: res} = await this.$http.post('public/AddComment', {
+        comment: {
+          article_id: parseInt(this.id),
+          content: this.comment.content,
+          user_id: 4,
+        },
       })
-      if (res.status !== 200) return this.$message.error(res.message)
+
+      if (res.code !== 200) {
+        this.$message.error(res.message)
+        return
+      }
+
       this.$message.success('评论成功，待审核后显示')
       this.$router.go(0)
     }
