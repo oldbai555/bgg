@@ -45,7 +45,12 @@
 <!--        </v-list-item-icon>-->
 <!--        <v-list-item-content class="grey&#45;&#45;text">{{ profileInfo.bili }}</v-list-item-content>-->
 <!--      </v-list-item>-->
-
+`      <v-list-item>
+        <v-list-item-icon class="ma-3">
+          <v-icon color="orange darken-2">{{ 'mdi-github' }}</v-icon>
+        </v-list-item-icon>
+        <v-list-item-content class="grey--text">{{ profileInfo.github }}</v-list-item-content>
+      </v-list-item>
       <v-list-item>
         <v-list-item-icon class="ma-3">
           <v-icon color="indigo">{{ 'mdi-email' }}</v-icon>
