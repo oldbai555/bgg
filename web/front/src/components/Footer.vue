@@ -1,7 +1,7 @@
 <template>
   <v-footer padless color="indigo darken-2">
     <v-row justify="center" no-gutters>
-      <v-col class="py-4 text-center white--text" cols="12">{{ new Date().getFullYear() }} - 老白的博客</v-col>
+<!--      <v-col class="py-4 text-center white&#45;&#45;text" cols="12">{{ new Date().getFullYear() }} - 老白的博客</v-col>-->
 
       <div class="text-center white--text">
         <a class="text-center white--text" target="_blank"

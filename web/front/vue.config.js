@@ -3,7 +3,7 @@ module.exports = {
   assetsDir: 'static',
   chainWebpack: config => {
     config.plugin('html').tap(args => {
-      args[0].title = '欢迎来到老白的博客'
+      args[0].title = '白与慧的歌'
       return args
     })
   },

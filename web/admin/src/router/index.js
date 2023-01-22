@@ -34,7 +34,7 @@ const routes = [
     path: '/',
     name: 'admin',
     meta: {
-      title: '白与慧的歌'
+      title: '管理后台'
     },
     component: Admin,
     children: [
@@ -42,7 +42,7 @@ const routes = [
         path: 'index',
         component: Index,
         meta: {
-          title: '白与慧的歌'
+          title: '管理后台'
         }
       },
       {
