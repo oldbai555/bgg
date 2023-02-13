@@ -7,12 +7,14 @@ require (
 	github.com/envoyproxy/protoc-gen-validate v0.9.1
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-redis/redis/v8 v8.11.5
+	github.com/gorilla/websocket v1.4.2
 	github.com/huandu/go-clone v1.4.1
 	github.com/mitchellh/mapstructure v1.4.3
 	github.com/oldbai555/driver-mysql v0.0.0-20221011051826-9dcf64ef2d7b
 	github.com/oldbai555/gorm v0.0.0-20221011044346-e65800014b93
 	github.com/oldbai555/lbtool v0.0.5-0.20230114050630-a6be3fb7a8b7
 	github.com/pkg/errors v0.9.1
+	github.com/sashabaranov/go-gpt3 v1.0.1
 	github.com/storyicon/grbac v0.0.0-20200224041032-a0461737df7e
 	google.golang.org/grpc v1.43.0
 	google.golang.org/protobuf v1.28.1
@@ -31,6 +33,7 @@ require (
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/go-playground/validator/v10 v10.10.0 // indirect
+	github.com/go-resty/resty/v2 v2.7.0 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/goccy/go-json v0.9.7 // indirect
 	github.com/gogf/gf v1.16.9 // indirect

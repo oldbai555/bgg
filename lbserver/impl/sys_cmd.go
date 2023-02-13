@@ -32,7 +32,7 @@ func StartServer() {
 	lb.WebTool, err = webtool.NewWebTool(&webtool.ApolloConf{
 		AppId:     "golb",
 		NameSpace: "application.yaml",
-		Address:   "http://127.0.0.1:8080",
+		Address:   "http://localhost:8080",
 		Cluster:   "DEV",
 		Secret:    "0e0c07411823424a9aeef49b20d046ce",
 	}, webtool.OptionWithOrm(
@@ -90,4 +90,5 @@ func InitSysApi(h *gin.Engine) {
 	registerLbblogApi(h)
 	registerStoreApi(h)
 	registerPublicApi(h)
+	registerLbwebsocketApi(h)
 }
