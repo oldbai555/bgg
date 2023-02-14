@@ -9,7 +9,7 @@ type Option func(tool *WebTool)
 func OptionWithOrm(dto ...interface{}) Option {
 	return func(tool *WebTool) {
 		gorm := &GormMysqlConf{}
-		err := gorm.InitConf(tool.ApoC)
+		err := gorm.InitConf(tool.V)
 		if err != nil {
 			panic(fmt.Sprintf("err:%v", err))
 		}
@@ -23,7 +23,7 @@ func OptionWithOrm(dto ...interface{}) Option {
 func OptionWithRdb() Option {
 	return func(tool *WebTool) {
 		rdb := &RedisConf{}
-		err := rdb.InitConf(tool.ApoC)
+		err := rdb.InitConf(tool.V)
 		if err != nil {
 			panic(fmt.Sprintf("err:%v", err))
 		}
@@ -37,11 +37,25 @@ func OptionWithRdb() Option {
 func OptionWithStorage() Option {
 	return func(tool *WebTool) {
 		rdb := &StorageConf{}
-		err := rdb.InitConf(tool.ApoC)
+		err := rdb.InitConf(tool.V)
 		if err != nil {
 			panic(fmt.Sprintf("err:%v", err))
 		}
 		err = rdb.GenConfTool(tool)
+		if err != nil {
+			panic(fmt.Sprintf("err:%v", err))
+		}
+	}
+}
+
+func OptionWithServer() Option {
+	return func(tool *WebTool) {
+		sc := &ServerConf{}
+		err := sc.InitConf(tool.V)
+		if err != nil {
+			panic(fmt.Sprintf("err:%v", err))
+		}
+		err = sc.GenConfTool(tool)
 		if err != nil {
 			panic(fmt.Sprintf("err:%v", err))
 		}

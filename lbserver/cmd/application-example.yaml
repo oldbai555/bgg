@@ -17,3 +17,5 @@ storage:
   secret_id: ""
   secret_key: ""
   bucket_url: ""
+chatGpt:
+  api_key:

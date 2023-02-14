@@ -5,8 +5,8 @@ import (
 	mysql "github.com/oldbai555/driver-mysql"
 	"github.com/oldbai555/gorm"
 	"github.com/oldbai555/gorm/logger"
-	"github.com/oldbai555/lbtool/extpkg/lbconf/bconf"
 	"github.com/oldbai555/lbtool/log"
+	"github.com/spf13/viper"
 	"time"
 )
 
@@ -21,11 +21,12 @@ type GormMysqlConf struct {
 	TablePrefix string `json:"table_prefix"`
 }
 
-func (m *GormMysqlConf) InitConf(apollo bconf.Config) error {
+func (m *GormMysqlConf) InitConf(viper *viper.Viper) error {
 	var v GormMysqlConf
-	err := getJson4Apollo(apollo, defaultApolloMysqlPrefix, &v)
+	val := viper.Get(defaultApolloMysqlPrefix)
+	err := jsonConvertStruct(val, &v)
 	if err != nil {
-		log.Errorf(fmt.Sprintf("err is : %v", err))
+		log.Errorf("err is %v", err)
 		return err
 	}
 	log.Infof("init mysql successfully")

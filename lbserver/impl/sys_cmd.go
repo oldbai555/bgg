@@ -11,50 +11,27 @@ import (
 	"time"
 )
 
-const defaultApolloServerPrefix = "server"
-
 var lb *Tool
 
 type Tool struct {
 	*webtool.WebTool
 	Rbac *grbac.Controller
-	Sc   ServerConfig
-}
-
-type ServerConfig struct {
-	Name string `json:"name"`
-	Port int    `json:"port"`
 }
 
 func StartServer() {
 	var err error
 	lb = &Tool{}
-	lb.WebTool, err = webtool.NewWebTool(&webtool.ApolloConf{
-		AppId:     "golb",
-		NameSpace: "application.yaml",
-		Address:   "http://localhost:8080",
-		Cluster:   "DEV",
-		Secret:    "0e0c07411823424a9aeef49b20d046ce",
-	}, webtool.OptionWithOrm(
+	lb.WebTool, err = webtool.NewWebTool(webtool.OptionWithOrm(
 		&lbuser.ModelUser{},
 		&lbblog.ModelArticle{},
 		&lbblog.ModelCategory{},
 		&lbblog.ModelComment{},
-	), webtool.OptionWithRdb(),
-		webtool.OptionWithStorage())
+	), webtool.OptionWithRdb(), webtool.OptionWithStorage())
 
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return
 	}
-
-	// 拿到服务的信息
-	err = lb.GetJson4Apollo(defaultApolloServerPrefix, &lb.Sc)
-	if err != nil {
-		log.Errorf("err is : %v", err)
-		return
-	}
-	log.Infof("init server successfully")
 
 	gin.DefaultWriter = log.GetWriter()
 	h := gin.New()

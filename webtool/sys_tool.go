@@ -4,11 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/go-redis/redis/v8"
 	"github.com/oldbai555/gorm"
 	"github.com/oldbai555/lbtool/extpkg/lbconf/bconf"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/storage"
+	"github.com/spf13/viper"
 	"time"
 )
 
@@ -18,6 +20,8 @@ type WebTool struct {
 	Orm     *gorm.DB
 	Rdb     *ProxyRdb
 	Storage storage.FileStorageInterface
+	V       *viper.Viper
+	Sc      *ServerConf
 }
 
 type ProxyRdb struct {
@@ -54,19 +58,30 @@ func (c *ProxyRdb) GetJson(ctx context.Context, key string, j interface{}) error
 	return nil
 }
 
-// NewWebTool 只支持 apollo
-func NewWebTool(conf *ApolloConf, option ...Option) (*WebTool, error) {
-	var err error
-	lb := &WebTool{}
+func initViper() error {
+	viper.SetConfigName("application")                                               // name of config file (without extension)
+	viper.SetConfigType("yaml")                                                      // REQUIRED if the config file does not have the extension in the name
+	viper.AddConfigPath("/etc/work/")                                                // path to look for the config file in
+	viper.AddConfigPath("$HOME/work/lb/github.com/oldbai555/bgg/lbserver/resource/") // call multiple times to add many search paths
+	viper.AddConfigPath("./")                                                        // optionally look for config in the working directory
+	viper.AddConfigPath("../resource/")                                              // optionally look for config in the working directory
+	err := viper.ReadInConfig()                                                      // Find and read the config file
+	if err != nil {                                                                  // Handle errors reading the config file
+		panic(fmt.Errorf("fatal error config file: %w", err))
+	}
+	return nil
+}
 
-	// 初始化 apollo 配置中心
-	apollo, err := initApollo(conf)
+func NewWebTool(option ...Option) (*WebTool, error) {
+	err := initViper()
 	if err != nil {
 		log.Errorf("err is %v", err)
 		return nil, err
 	}
-	lb.ApoC = apollo
-
+	lb := &WebTool{
+		V: viper.GetViper(),
+	}
+	option = append(option, OptionWithServer())
 	// 初始化组件
 	for _, o := range option {
 		o(lb)

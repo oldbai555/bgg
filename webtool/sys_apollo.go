@@ -58,6 +58,15 @@ func getJson4Apollo(conf bconf.Config, key string, out interface{}) error {
 		log.Errorf("err is : %v", err)
 		return err
 	}
+	err = jsonConvertStruct(re, out)
+	if err != nil {
+		log.Errorf("err is %v", err)
+		return err
+	}
+	return nil
+}
+
+func jsonConvertStruct(re interface{}, out interface{}) error {
 	marshal, err := json.Marshal(re)
 	if err != nil {
 		log.Errorf("err is : %v", err)

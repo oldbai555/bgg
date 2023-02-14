@@ -3,8 +3,8 @@ package webtool
 import (
 	"fmt"
 	"github.com/go-redis/redis/v8"
-	"github.com/oldbai555/lbtool/extpkg/lbconf/bconf"
 	"github.com/oldbai555/lbtool/log"
+	"github.com/spf13/viper"
 )
 
 const defaultApolloRedisPrefix = "redis"
@@ -16,11 +16,12 @@ type RedisConf struct {
 	Password string `json:"password"`
 }
 
-func (r *RedisConf) InitConf(apollo bconf.Config) error {
+func (r *RedisConf) InitConf(viper *viper.Viper) error {
 	var v RedisConf
-	err := getJson4Apollo(apollo, defaultApolloRedisPrefix, &v)
+	val := viper.Get(defaultApolloRedisPrefix)
+	err := jsonConvertStruct(val, &v)
 	if err != nil {
-		log.Errorf(fmt.Sprintf("err is : %v", err))
+		log.Errorf("err is %v", err)
 		return err
 	}
 	log.Infof("init redis successfully")

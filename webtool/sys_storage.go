@@ -1,10 +1,9 @@
 package webtool
 
 import (
-	"fmt"
-	"github.com/oldbai555/lbtool/extpkg/lbconf/bconf"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/storage"
+	"github.com/spf13/viper"
 )
 
 const defaultApolloStoragePrefix = "storage"
@@ -16,11 +15,12 @@ type StorageConf struct {
 	BucketUrl string `json:"bucket_url"`
 }
 
-func (r *StorageConf) InitConf(apollo bconf.Config) error {
+func (r *StorageConf) InitConf(viper *viper.Viper) error {
 	var v StorageConf
-	err := getJson4Apollo(apollo, defaultApolloStoragePrefix, &v)
+	val := viper.Get(defaultApolloStoragePrefix)
+	err := jsonConvertStruct(val, &v)
 	if err != nil {
-		log.Errorf(fmt.Sprintf("err is : %v", err))
+		log.Errorf("err is %v", err)
 		return err
 	}
 	log.Infof("init redis successfully")
