@@ -66,7 +66,7 @@ func (a *LbwebsocketServer) HandleWs(ctx context.Context, req *lbwebsocket.Handl
 	}
 
 	// 接入chatGPT
-	var gpt = gogpt.NewClient("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")
+	var gpt = gogpt.NewClient("")
 	stream, err := gpt.CreateCompletionStream(ctx, gogpt.CompletionRequest{
 		Prompt:    req.WsData.Content.Text.Text,
 		Model:     gogpt.GPT3TextDavinci003,
