@@ -1,25 +1,6 @@
 version: "3.8"
 
 services:
-  web:
-    build: .
-    ports:
-      - "8003:8003"
-    depends_on:
-      - db
-      - redis
-    networks:
-      - my-network
-    volumes:
-      - "/etc/data/app:/app/data"
-    environment:
-      - DB_HOST=db
-      - DB_PORT=3309
-      - DB_USER=oldbai
-      - DB_PASSWORD=123456
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-
   db:
     image: mysql:8.0
     restart: always
@@ -30,17 +11,44 @@ services:
       - MYSQL_DATABASE=biz
       - MYSQL_USER=oldbai
       - MYSQL_PASSWORD=123456
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     volumes:
-      - "/etc/data/mysql:/var/lib/mysql"
+      - "/Users/zhangjianjun/work/data/mysql:/var/lib/mysql"
     networks:
       - my-network
-
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
   redis:
     image: redis:6.0
+    restart: always
     ports:
-      - "6379:6379"
+      - "6679:6379"
+    volumes:
+      - "/Users/zhangjianjun/work/data/redis:/data"
     networks:
       - my-network
+  web:
+    build: .
+    ports:
+      - "8003:8003"
+    restart: always
+    depends_on:
+      - db
+      - redis
+    networks:
+      - my-network
+    volumes:
+      - "/Users/zhangjianjun/work/data/app:/app/data"
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3309
+      - DB_USER=oldbai
+      - DB_PASSWORD=123456
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
 
 networks:
   my-network:
