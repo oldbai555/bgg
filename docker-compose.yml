@@ -1,46 +1,47 @@
-version: '3'
-
-networks:
-  myhost:
+version: "3.8"
 
 services:
-  go-lb:
-    build:
-      context: lbserver
-      dockerfile: Dockerfile
-    container_name: lbserver
-    image: go-lb
+  web:
+    build: .
     ports:
-      - "12001:8003"
-    networks:
-      - myhost
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8003" ]
-      interval: 5m30s
-      timeout: 5s
-      retries: 5
+      - "8003:8003"
     depends_on:
-      - lb-db
-  lb-db:
-    image: mysql:8.0.31
-    environment:
-      - MYSQL_DATABASE=biz
-      - MYSQL_ROOT_PASSWORD=123456
-    volumes:
-      - lb-data:/var/lib/mysql
-      - /home/app/sql:/docker-entrypoint-initdb.d
+      - db
+      - redis
     networks:
-      - myhost
-    command:
-      [
-          "--character-set-server=utf8mb4",
-          "--collation-server=utf8mb4_unicode_ci",
-          "--skip-character-set-client-handshake"
-      ]
-    healthcheck:
-      test: [ "CMD", 'mysqladmin', 'ping', '-h', 'localhost', '-u', 'root', '-p$$MYSQL_ROOT_PASSWORD' ]
-      interval: 5m
-      timeout: 5s
-      retries: 5
-volumes:
-  lb-data:
+      - my-network
+    volumes:
+      - "/etc/data/app:/app/data"
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3309
+      - DB_USER=oldbai
+      - DB_PASSWORD=123456
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+
+  db:
+    image: mysql:8.0
+    restart: always
+    ports:
+      - "3309:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_DATABASE=biz
+      - MYSQL_USER=oldbai
+      - MYSQL_PASSWORD=123456
+    volumes:
+      - "/etc/data/mysql:/var/lib/mysql"
+    networks:
+      - my-network
+
+  redis:
+    image: redis:6.0
+    ports:
+      - "6379:6379"
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge
