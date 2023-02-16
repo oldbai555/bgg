@@ -22,23 +22,25 @@ RUN set -eux && sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk
 # 更新软件包和安装git
 RUN apk update && apk add git
 
-# 配置工作目录
-WORKDIR /source
-
 # 拷贝
-COPY . .
+COPY . /root/build
+# 配置工作目录
+WORKDIR /root/build
+
+RUN go mod download
 RUN go env -w GOPROXY=https://goproxy.io,direct
-RUN go env -w GO111MODULE=on
+RUN go env -w GO111MODULE=auto
 RUN go env -w GOOS=linux
 RUN go env -w GOARCH=amd64
-RUN go build -o lbapp-blog ./lbblog.proto/cmd/main.go
+RUN go build -o lb lbserver/cmd/main.go
 
 # === 2.镜像工作目录 ===
 FROM golang:1.18.9-alpine3.17
 # 配置工作目录
 WORKDIR /appruntime
 # 拷贝
-COPY --from=build /source/lbapp-blog .
-ENTRYPOINT ["./lbapp-blog"]
+COPY --from=build /root/build/lb .
+COPY --from=build /root/build/lbserver/resource/application.yaml .
+ENTRYPOINT ["./lb"]
 
 EXPOSE 8003

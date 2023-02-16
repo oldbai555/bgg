@@ -6,7 +6,7 @@ networks:
 services:
   go-lb:
     build:
-      context: ./
+      context: lbserver
       dockerfile: Dockerfile
     container_name: lbserver
     image: go-lb

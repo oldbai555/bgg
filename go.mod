@@ -7,6 +7,7 @@ require (
 	github.com/envoyproxy/protoc-gen-validate v0.9.1
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-redis/redis/v8 v8.11.5
+	github.com/go-resty/resty/v2 v2.7.0
 	github.com/gorilla/websocket v1.4.2
 	github.com/huandu/go-clone v1.4.1
 	github.com/mitchellh/mapstructure v1.4.3
@@ -15,6 +16,7 @@ require (
 	github.com/oldbai555/lbtool v0.0.5-0.20230114050630-a6be3fb7a8b7
 	github.com/pkg/errors v0.9.1
 	github.com/sashabaranov/go-gpt3 v1.0.1
+	github.com/spf13/viper v1.9.0
 	github.com/storyicon/grbac v0.0.0-20200224041032-a0461737df7e
 	google.golang.org/grpc v1.43.0
 	google.golang.org/protobuf v1.28.1
@@ -33,7 +35,6 @@ require (
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/go-playground/validator/v10 v10.10.0 // indirect
-	github.com/go-resty/resty/v2 v2.7.0 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/goccy/go-json v0.9.7 // indirect
 	github.com/gogf/gf v1.16.9 // indirect
@@ -64,7 +65,6 @@ require (
 	github.com/spf13/cast v1.4.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/spf13/viper v1.9.0 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/tencentyun/cos-go-sdk-v5 v0.7.38 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
