@@ -6,8 +6,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-resty/resty/v2"
-	"github.com/oldbai555/bgg/lbuser"
-	"github.com/oldbai555/bgg/webtool"
+	"github.com/oldbai555/bgg/client/lbuser"
+	webtool2 "github.com/oldbai555/bgg/pkg/webtool"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/restysdk"
 	gogpt "github.com/sashabaranov/go-gpt3"
@@ -17,7 +17,7 @@ import (
 
 func init() {
 	lb = &Tool{}
-	lb.WebTool, _ = webtool.NewWebTool(webtool.OptionWithOrm(&lbuser.ModelUser{}), webtool.OptionWithRdb())
+	lb.WebTool, _ = webtool2.NewWebTool(webtool2.OptionWithOrm(&lbuser.ModelUser{}), webtool2.OptionWithRdb())
 	InitDbOrm()
 }
 

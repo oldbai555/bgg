@@ -3,7 +3,7 @@ package impl
 import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
-	"github.com/oldbai555/bgg/lbwebsocket"
+	"github.com/oldbai555/bgg/client/lbwebsocket"
 	"github.com/oldbai555/lbtool/log"
 )
 

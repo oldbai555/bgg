@@ -2,7 +2,7 @@ package impl
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/oldbai555/bgg/lbblog"
+	"github.com/oldbai555/bgg/client/lbblog"
 	"github.com/oldbai555/lbtool/log"
 )
 

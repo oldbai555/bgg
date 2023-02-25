@@ -2,7 +2,8 @@ package impl
 
 import (
 	"github.com/gorilla/websocket"
-	"github.com/oldbai555/bgg/lbwebsocket"
+	"github.com/oldbai555/bgg/client/lbwebsocket"
+
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/lberr"
 	"net/http"

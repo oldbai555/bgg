@@ -1,0 +1,21 @@
+server:
+  name: "lbuser"
+  port: 18002
+mysql:
+  addr: "127.0.0.1"
+  port: 3309 # 使用对内的mysql接口
+  username: "oldbai"
+  password: "123456"
+zipkin:
+  addr: "http://127.0.0.1:9411/api/v2/spans"
+redis:
+  database: 0
+  host: '127.0.0.1' # 使用对内的redis接口
+  port: 6679
+storage:
+  type: ""
+  secret_id: ""
+  secret_key: ""
+  bucket_url: ""
+chatGpt:
+  api_key:

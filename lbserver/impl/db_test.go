@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/oldbai555/bgg/lbconst"
 	"github.com/oldbai555/bgg/lbuser"
-	"github.com/oldbai555/bgg/webtool"
+	webtool2 "github.com/oldbai555/bgg/pkg/webtool"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/utils"
 	"testing"
@@ -13,7 +13,7 @@ import (
 
 func init() {
 	lb = &Tool{}
-	lb.WebTool, _ = webtool.NewWebTool(webtool.OptionWithOrm(&lbuser.ModelUser{}), webtool.OptionWithRdb())
+	lb.WebTool, _ = webtool2.NewWebTool(webtool2.OptionWithOrm(&lbuser.ModelUser{}), webtool2.OptionWithRdb())
 	InitDbOrm()
 }
 

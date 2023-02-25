@@ -3,7 +3,7 @@ package impl
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/oldbai555/bgg/webtool"
+	"github.com/oldbai555/bgg/pkg/webtool"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/utils"
 	"github.com/storyicon/grbac"

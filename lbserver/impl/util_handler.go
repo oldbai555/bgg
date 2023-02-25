@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/oldbai555/bgg/lbconst"
-	"github.com/oldbai555/bgg/lbuser"
-	"github.com/oldbai555/bgg/webtool"
+	"github.com/oldbai555/bgg/client/lbconst"
+	"github.com/oldbai555/bgg/client/lbuser"
+	"github.com/oldbai555/bgg/pkg/webtool"
+
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/lberr"
 	"github.com/oldbai555/lbtool/pkg/result"

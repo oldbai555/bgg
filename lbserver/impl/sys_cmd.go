@@ -3,9 +3,10 @@ package impl
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/oldbai555/bgg/lbblog"
-	"github.com/oldbai555/bgg/lbuser"
-	"github.com/oldbai555/bgg/webtool"
+	"github.com/oldbai555/bgg/client/lbblog"
+	"github.com/oldbai555/bgg/client/lbuser"
+	webtool2 "github.com/oldbai555/bgg/pkg/webtool"
+
 	"github.com/oldbai555/lbtool/log"
 	"github.com/storyicon/grbac"
 	"time"
@@ -14,19 +15,19 @@ import (
 var lb *Tool
 
 type Tool struct {
-	*webtool.WebTool
+	*webtool2.WebTool
 	Rbac *grbac.Controller
 }
 
 func StartServer() {
 	var err error
 	lb = &Tool{}
-	lb.WebTool, err = webtool.NewWebTool(webtool.OptionWithOrm(
+	lb.WebTool, err = webtool2.NewWebTool(webtool2.OptionWithOrm(
 		&lbuser.ModelUser{},
 		&lbblog.ModelArticle{},
 		&lbblog.ModelCategory{},
 		&lbblog.ModelComment{},
-	), webtool.OptionWithRdb(), webtool.OptionWithStorage())
+	), webtool2.OptionWithRdb(), webtool2.OptionWithStorage())
 
 	if err != nil {
 		log.Errorf("err:%v", err)

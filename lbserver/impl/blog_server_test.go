@@ -2,7 +2,8 @@ package impl
 
 import (
 	"context"
-	"github.com/oldbai555/bgg/lbblog"
+	"github.com/oldbai555/bgg/client/lbblog"
+
 	"testing"
 )
 

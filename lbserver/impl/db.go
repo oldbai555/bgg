@@ -1,9 +1,9 @@
 package impl
 
 import (
-	"github.com/oldbai555/bgg/lbblog"
-	"github.com/oldbai555/bgg/lbuser"
-	"github.com/oldbai555/bgg/lbwebsocket"
+	"github.com/oldbai555/bgg/client/lbblog"
+	"github.com/oldbai555/bgg/client/lbuser"
+	"github.com/oldbai555/bgg/client/lbwebsocket"
 	"github.com/oldbai555/lbtool/pkg/lberr"
 )
 

@@ -1,7 +1,7 @@
 package impl
 
 import (
-	"github.com/oldbai555/bgg/lbuser"
+	"github.com/oldbai555/bgg/client/lbuser"
 	"github.com/oldbai555/lbtool/pkg/lberr"
 )
 

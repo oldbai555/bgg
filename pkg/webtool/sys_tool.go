@@ -59,14 +59,13 @@ func (c *ProxyRdb) GetJson(ctx context.Context, key string, j interface{}) error
 }
 
 func initViper() error {
-	viper.SetConfigName("application")                                               // name of config file (without extension)
-	viper.SetConfigType("yaml")                                                      // REQUIRED if the config file does not have the extension in the name
-	viper.AddConfigPath("/etc/work/")                                                // path to look for the config file in
-	viper.AddConfigPath("$HOME/work/lb/github.com/oldbai555/bgg/lbserver/resource/") // call multiple times to add many search paths
-	viper.AddConfigPath("./")                                                        // optionally look for config in the working directory
-	viper.AddConfigPath("../resource/")                                              // optionally look for config in the working directory
-	err := viper.ReadInConfig()                                                      // Find and read the config file
-	if err != nil {                                                                  // Handle errors reading the config file
+	viper.SetConfigName("application")  // name of config file (without extension)
+	viper.SetConfigType("yaml")         // REQUIRED if the config file does not have the extension in the name
+	viper.AddConfigPath("/etc/work/")   // path to look for the config file in
+	viper.AddConfigPath("./")           // optionally look for config in the working directory
+	viper.AddConfigPath("../resource/") // optionally look for config in the working directory
+	err := viper.ReadInConfig()         // Find and read the config file
+	if err != nil {                     // Handle errors reading the config file
 		panic(fmt.Errorf("fatal error config file: %w", err))
 	}
 	return nil
