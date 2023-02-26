@@ -15,7 +15,7 @@ services:
     volumes:
       - "/Users/zhangjianjun/work/data/mysql:/var/lib/mysql"
     networks:
-      - my-network
+      - lb_network
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       interval: 5s
@@ -28,8 +28,9 @@ services:
       - "6679:6379"
     volumes:
       - "/Users/zhangjianjun/work/data/redis:/data"
+      - "/Users/zhangjianjun/work/data/app/log:/tmp/lb/log"
     networks:
-      - my-network
+      - lb_network
   web:
     build: .
     ports:
@@ -39,17 +40,17 @@ services:
       - db
       - redis
     networks:
-      - my-network
+      - lb_network
     volumes:
       - "/Users/zhangjianjun/work/data/app:/app/data"
     environment:
       - DB_HOST=db
-      - DB_PORT=3309
+      - DB_PORT=3306
       - DB_USER=oldbai
       - DB_PASSWORD=123456
       - REDIS_HOST=redis
       - REDIS_PORT=6379
 
 networks:
-  my-network:
+  lb_network:
     driver: bridge
