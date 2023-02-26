@@ -2,12 +2,12 @@
 
 package lbwebsocket
 
-func (*ModelMessage) TableName() string {
-	return "lbwebsocket_message"
-}
 func (*ModelChat) TableName() string {
 	return "lbwebsocket_chat"
 }
 func (*ModelVisitor) TableName() string {
 	return "lbwebsocket_visitor"
+}
+func (*ModelMessage) TableName() string {
+	return "lbwebsocket_message"
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/oldbai555/bgg/client/lbblog"
 	"github.com/oldbai555/bgg/client/lbuser"
 	webtool2 "github.com/oldbai555/bgg/pkg/webtool"
+	"github.com/spf13/viper"
 
 	"github.com/oldbai555/lbtool/log"
 	"github.com/storyicon/grbac"
@@ -19,10 +20,14 @@ type Tool struct {
 	Rbac *grbac.Controller
 }
 
-func StartServer() {
-	var err error
+func StartServer() error {
+	v, err := initViper()
+	if err != nil {
+		log.Errorf("err is %v", err)
+		return err
+	}
 	lb = &Tool{}
-	lb.WebTool, err = webtool2.NewWebTool(webtool2.OptionWithOrm(
+	lb.WebTool, err = webtool2.NewWebTool(v, webtool2.OptionWithOrm(
 		&lbuser.ModelUser{},
 		&lbblog.ModelArticle{},
 		&lbblog.ModelCategory{},
@@ -31,7 +36,7 @@ func StartServer() {
 
 	if err != nil {
 		log.Errorf("err:%v", err)
-		return
+		return err
 	}
 
 	gin.DefaultWriter = log.GetWriter()
@@ -46,7 +51,7 @@ func StartServer() {
 	// 并指定应每分钟调用一次LoadAuthorizationRules函数以获取最新的身份验证规则。
 	if lb.Rbac, err = grbac.New(grbac.WithLoader(LoadAuthorizationRules, time.Minute)); err != nil {
 		log.Errorf("err is : %v", err)
-		return
+		return err
 	}
 
 	// 初始化接口
@@ -59,8 +64,9 @@ func StartServer() {
 	err = h.Run(fmt.Sprintf(":%d", lb.Sc.Port))
 	if err != nil {
 		log.Errorf("err is %v", err)
-		return
+		return err
 	}
+	return nil
 }
 
 func InitSysApi(h *gin.Engine) {
@@ -69,4 +75,17 @@ func InitSysApi(h *gin.Engine) {
 	registerStoreApi(h)
 	registerPublicApi(h)
 	registerLbwebsocketApi(h)
+}
+
+func initViper() (*viper.Viper, error) {
+	viper.SetConfigName("application")          // name of config file (without extension)
+	viper.SetConfigType("yaml")                 // REQUIRED if the config file does not have the extension in the name
+	viper.AddConfigPath("/etc/work/")           // path to look for the config file in
+	viper.AddConfigPath("./lbserver/cmd/")      // optionally look for config in the working directory
+	viper.AddConfigPath("./lbserver/resource/") // optionally look for config in the working directory
+	err := viper.ReadInConfig()                 // Find and read the config file
+	if err != nil {                             // Handle errors reading the config file
+		panic(fmt.Errorf("fatal error config file: %w", err))
+	}
+	return viper.GetViper(), nil
 }

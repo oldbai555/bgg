@@ -3,6 +3,7 @@
 package lbblog
 
 const (
+	ServerName       = "lbblog"
 	FieldArticle     = "Article"
 	FieldArticleId   = "ArticleId"
 	FieldArticleMap  = "ArticleMap"

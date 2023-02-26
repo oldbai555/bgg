@@ -3,6 +3,7 @@
 package lbuser
 
 const (
+	ServerName       = "lbuser"
 	FieldAvatar      = "Avatar"
 	FieldCreatedAt   = "CreatedAt"
 	FieldDeletedAt   = "DeletedAt"

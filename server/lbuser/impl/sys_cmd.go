@@ -3,8 +3,9 @@ package impl
 import (
 	"fmt"
 	"github.com/oldbai555/bgg/client/lbuser"
-	webtool2 "github.com/oldbai555/bgg/pkg/webtool"
+	"github.com/oldbai555/bgg/pkg/webtool"
 	"github.com/oldbai555/lbtool/log"
+	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 	"net"
 )
@@ -12,19 +13,24 @@ import (
 var lb *Tool
 
 type Tool struct {
-	*webtool2.WebTool
+	*webtool.WebTool
 
 	// 可以向下扩展其他的rpc服务
 }
 
-func StartServer() {
-	var err error
+func StartServer() error {
+	v, err := initViper()
+	if err != nil {
+		log.Errorf("err is %v", err)
+		return err
+	}
+
 	lb = &Tool{}
-	lb.WebTool, err = webtool2.NewWebTool(webtool2.OptionWithOrm(), webtool2.OptionWithRdb(), webtool2.OptionWithStorage())
+	lb.WebTool, err = webtool.NewWebTool(v, webtool.OptionWithOrm(), webtool.OptionWithRdb(), webtool.OptionWithStorage())
 
 	if err != nil {
 		log.Errorf("err:%v", err)
-		return
+		return err
 	}
 
 	// 初始化数据库工具类
@@ -36,7 +42,7 @@ func StartServer() {
 	listener, err := net.Listen("tcp", addr)
 	if err != nil {
 		log.Errorf("err is %v", err)
-		return
+		return err
 	}
 	log.Infof("监听端口：%s", addr)
 	// 2.实例化gRPC
@@ -46,5 +52,20 @@ func StartServer() {
 	// 4.启动服务端
 	if err = s.Serve(listener); err != nil {
 		log.Errorf("err is %v", err)
+		return err
 	}
+	return nil
+}
+
+func initViper() (*viper.Viper, error) {
+	viper.SetConfigName("application")          // name of config file (without extension)
+	viper.SetConfigType("yaml")                 // REQUIRED if the config file does not have the extension in the name
+	viper.AddConfigPath("/etc/work/")           // path to look for the config file in
+	viper.AddConfigPath("./")                   // optionally look for config in the working directory
+	viper.AddConfigPath("./server/lbuser/cmd/") // optionally look for config in the working directory
+	err := viper.ReadInConfig()                 // Find and read the config file
+	if err != nil {                             // Handle errors reading the config file
+		panic(fmt.Errorf("fatal error config file: %w", err))
+	}
+	return viper.GetViper(), nil
 }

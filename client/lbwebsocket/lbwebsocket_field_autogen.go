@@ -3,6 +3,7 @@
 package lbwebsocket
 
 const (
+	ServerName        = "lbwebsocket"
 	FieldCid          = "Cid"
 	FieldContent      = "Content"
 	FieldCreatedAt    = "CreatedAt"
