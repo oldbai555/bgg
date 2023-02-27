@@ -30,7 +30,6 @@ services:
       - "6679:6379"
     volumes:
       - "/Users/zhangjianjun/work/data/redis:/data"
-      - "/Users/zhangjianjun/work/data/app/log:/tmp/lb/log"
     networks:
       - lb_network
   web:
@@ -46,6 +45,7 @@ services:
       - lb_network
     volumes:
       - "/Users/zhangjianjun/work/data/app:/app/data"
+      - "/Users/zhangjianjun/work/data/app/log:/tmp/lb/log"
     environment:
       - DB_HOST=db
       - DB_PORT=3306
