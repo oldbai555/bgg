@@ -16,8 +16,13 @@ import (
 )
 
 func init() {
+	v, err := initViper()
+	if err != nil {
+		log.Errorf("err is %v", err)
+		return
+	}
 	lb = &Tool{}
-	lb.WebTool, _ = webtool2.NewWebTool(webtool2.OptionWithOrm(&lbuser.ModelUser{}), webtool2.OptionWithRdb())
+	lb.WebTool, _ = webtool2.NewWebTool(v, webtool2.OptionWithOrm(&lbuser.ModelUser{}), webtool2.OptionWithRdb())
 	InitDbOrm()
 }
 

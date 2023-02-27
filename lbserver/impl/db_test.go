@@ -3,8 +3,8 @@ package impl
 import (
 	"context"
 	"fmt"
-	"github.com/oldbai555/bgg/lbconst"
-	"github.com/oldbai555/bgg/lbuser"
+	"github.com/oldbai555/bgg/client/lbconst"
+	"github.com/oldbai555/bgg/client/lbuser"
 	webtool2 "github.com/oldbai555/bgg/pkg/webtool"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/utils"
@@ -12,18 +12,24 @@ import (
 )
 
 func init() {
+	v, err := initViper()
+	if err != nil {
+		log.Errorf("err is %v", err)
+		return
+	}
 	lb = &Tool{}
-	lb.WebTool, _ = webtool2.NewWebTool(webtool2.OptionWithOrm(&lbuser.ModelUser{}), webtool2.OptionWithRdb())
+	lb.WebTool, _ = webtool2.NewWebTool(v, webtool2.OptionWithOrm(&lbuser.ModelUser{}), webtool2.OptionWithRdb())
 	InitDbOrm()
 }
 
 func TestGenUserOrm(t *testing.T) {
 	var user lbuser.ModelUser
 	err := UserOrm.NewScope().UpdateOrCreate(context.Background(), map[string]interface{}{
-		"username": "oldbai",
+		"username": "superadmin",
 		"password": utils.StrMd5("123456"),
 	}, map[string]interface{}{
 		"password": utils.StrMd5("123456"),
+		"role":     1,
 	}, &user)
 	if err != nil {
 		log.Errorf("err is %v", err)

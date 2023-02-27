@@ -5,7 +5,7 @@
       <v-toolbar-title>
         <v-app-bar-nav-icon class="mx-15 hidden-md-and-down">
           <v-avatar size="40" color="grey">
-            <img src="../assets/logo.png" alt />
+            <img src="https://baifile-1309918034.cos.ap-guangzhou.myqcloud.com/public/link-info/assets/images/20230131-162920.webp?q-sign-algorithm=sha1&q-ak=AKIDMdBgXmJYhQRDFl7jQpHSkkhEW8SWJ45pxWAo97i99jJ2h8LTQSDsGFjEQWo2rcZA&q-sign-time=1677482696;1677486296&q-key-time=1677482696;1677486296&q-header-list=host&q-url-param-list=&q-signature=f2e9596899d7ba53538d53aa8769bf1c200b8048&x-cos-security-token=cmQy9hKYWHE2Aky9IqB24lrnPcSjSxxa1e185b23d8a0b37adf32b2a10b8bf60ftMDG9SnQ3PrH8A865yHjc-fydov9_kpZF7BPkyZeDjRnJvoJ-Wpa65XPyeNPDsDxNxXmofHTRctr4MZ85Bpp737B50JU2SVcKLA1GoYqcuwZWenmQK-ZXaJcodc7Ws7kE767ySQJcIltv4TTc_QG9OZ8XK6d6hkfBi-Jo_NIOQDhL1UhFhNE4PAHLy-EYJpJ" alt />
           </v-avatar>
         </v-app-bar-nav-icon>
       </v-toolbar-title>
