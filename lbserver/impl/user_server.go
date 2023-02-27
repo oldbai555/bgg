@@ -217,7 +217,7 @@ func (a *LbuserServer) GetFrontUser(ctx context.Context, req *lbuser.GetFrontUse
 	var rsp lbuser.GetLoginUserRsp
 
 	var user lbuser.ModelUser
-	err := UserOrm.NewScope().Eq(lbuser.FieldId_, 4).First(ctx, &user)
+	err := UserOrm.NewScope().Eq(lbuser.FieldRole_, uint32(lbuser.ModelUser_RoleAdmin)).First(ctx, &user)
 	if err != nil {
 		log.Errorf("err is : %v", err)
 		return nil, err
