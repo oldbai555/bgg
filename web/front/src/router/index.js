@@ -20,7 +20,7 @@ VueRouter.prototype.push = function push(location) {
 }
 
 const routes = [
-  { path: '/', component: ArticleList, meta: { title: '白与慧的歌' } },
+  { path: '/', component: ArticleList, meta: { title: 'LB小破站' } },
   {
     path: '/article/detail/:id',
     component: Detail,
