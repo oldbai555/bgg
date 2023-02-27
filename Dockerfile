@@ -1,46 +1,48 @@
-# Copyright 2021 CloudWeGo Authors
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-
 # === 1. 镜像从源码阶段编译 ===
-FROM golang:1.18.9-alpine3.17 AS build
+FROM ubuntu:18.04 AS build
 
-# 换alpine镜像源
-RUN set -eux && sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
+# 安装必要的工具和库
+RUN apt-get update && \
+    apt-get install -y curl git build-essential
 
-# 更新软件包和安装git
-RUN apk update && apk add git
+# 安装 Go 1.18
+RUN curl -O https://storage.googleapis.com/golang/go1.18.linux-amd64.tar.gz && \
+    tar -C /usr/local -xzf go1.18.linux-amd64.tar.gz && \
+    rm -rf go1.18.linux-amd64.tar.gz
 
-# 拷贝
-COPY . /root/build
-# 配置工作目录
-WORKDIR /root/build
+# 设置环境变量
+ENV PATH=$PATH:/usr/local/go/bin
+ENV GOPATH=/go
+ENV GOBIN=$GOPATH/bin
 
-RUN go mod download
+# 创建工作目录
+RUN mkdir -p $GOPATH/src/app
+WORKDIR $GOPATH/src/app
+
+# 拷贝代码到工作目录中
+COPY . .
+
+# 配制go环境变量
 RUN go env -w GOPROXY=https://goproxy.io,direct
 RUN go env -w GO111MODULE=auto
 RUN go env -w GOOS=linux
 RUN go env -w GOARCH=amd64
+RUN go mod download
 RUN go build -o lb lbserver/cmd/main.go
 
 # === 2.镜像工作目录 ===
-FROM golang:1.18.9-alpine3.17
+FROM ubuntu:18.04
+
+# 安装必要的工具和库
+RUN apt-get update && \
+    apt-get install -y curl git build-essential
+
 # 配置工作目录
 WORKDIR /appruntime
+
 # 拷贝
-COPY --from=build /root/build/lb .
-COPY --from=build /root/build/lbserver/resource/application.yaml .
+COPY --from=build /go/src/app/lb .
+COPY --from=build /go/src/app/lbserver/resource/application.yaml .
 ENTRYPOINT ["./lb"]
 
 EXPOSE 8003
