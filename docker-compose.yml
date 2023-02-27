@@ -2,6 +2,7 @@ version: "3.8"
 
 services:
   db:
+    container_name: db
     image: mysql:8.0
     restart: always
     ports:
@@ -22,6 +23,7 @@ services:
       timeout: 3s
       retries: 5
   redis:
+    container_name: redis
     image: redis:6.0
     restart: always
     ports:
@@ -32,6 +34,7 @@ services:
     networks:
       - lb_network
   web:
+    container_name: web
     build: .
     ports:
       - "8003:8003"
