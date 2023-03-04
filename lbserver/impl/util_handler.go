@@ -50,6 +50,10 @@ func (r *Handler) GetHeader(key string) string {
 	return r.C.GetHeader(key)
 }
 
+func (r *Handler) GetQuery(key string) (string, bool) {
+	return r.C.GetQuery(key)
+}
+
 func (r *Handler) CheckUser() (*lbuser.ModelUser, error) {
 	claims, err := r.GetClaims()
 	if err != nil {

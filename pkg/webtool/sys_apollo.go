@@ -52,13 +52,13 @@ func initApollo(conf *ApolloConf) (bconf.Config, error) {
 	return config, nil
 }
 
-func getJson4Apollo(conf bconf.Config, key string, out interface{}) error {
+func GetJson4Apollo(conf bconf.Config, key string, out interface{}) error {
 	re, err := conf.Get(key)
 	if err != nil {
 		log.Errorf("err is : %v", err)
 		return err
 	}
-	err = jsonConvertStruct(re, out)
+	err = JsonConvertStruct(re, out)
 	if err != nil {
 		log.Errorf("err is %v", err)
 		return err
@@ -66,7 +66,7 @@ func getJson4Apollo(conf bconf.Config, key string, out interface{}) error {
 	return nil
 }
 
-func jsonConvertStruct(re interface{}, out interface{}) error {
+func JsonConvertStruct(re interface{}, out interface{}) error {
 	marshal, err := json.Marshal(re)
 	if err != nil {
 		log.Errorf("err is : %v", err)

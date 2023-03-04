@@ -19,3 +19,8 @@ storage:
   bucket_url: ""
 chatGpt:
   api_key:
+wechatConf:
+  app_id: ""
+  app_secret: ""
+  token: ""
+  encoding_aes_key: ""

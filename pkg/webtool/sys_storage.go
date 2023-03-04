@@ -18,7 +18,7 @@ type StorageConf struct {
 func (r *StorageConf) InitConf(viper *viper.Viper) error {
 	var v StorageConf
 	val := viper.Get(defaultApolloStoragePrefix)
-	err := jsonConvertStruct(val, &v)
+	err := JsonConvertStruct(val, &v)
 	if err != nil {
 		log.Errorf("err is %v", err)
 		return err

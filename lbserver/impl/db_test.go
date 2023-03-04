@@ -48,3 +48,7 @@ func TestFindUser(t *testing.T) {
 	log.Infof("users is %v", users)
 	log.Infof("page is %v", page)
 }
+
+func TestGenToken(t *testing.T) {
+	log.Infof("token is %v", utils.StrMd5("Aroot@123"))
+}

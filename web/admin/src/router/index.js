@@ -1,15 +1,15 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-const Login = () => import(/* webpackChunkName: "Login" */ '../views/Login.vue')
-const Admin = () => import(/* webpackChunkName: "Admin" */ '../views/Admin.vue')
+const Login = () => import(/* webpackChunkName: "Login" */ '../views/login.vue')
+const Admin = () => import(/* webpackChunkName: "Admin" */ '../views/admin.vue')
 
 // 页面路由组件
-const Index = () => import(/* webpackChunkName: "Index" */ '../components/admin/Index')
-const AddArt = () => import(/* webpackChunkName: "AddArt" */ '../components/article/AddArt.vue')
-const ArtList = () => import(/* webpackChunkName: "ArtList" */ '../components/article/ArtList.vue')
-const CateList = () => import(/* webpackChunkName: "CateList" */ '../components/category/CateList.vue')
-const UserList = () => import(/* webpackChunkName: "UserList" */ '../components/user/UserList.vue')
-const Profile = () => import(/* webpackChunkName: "UserList" */ '../components/user/Profile.vue')
+const Index = () => import(/* webpackChunkName: "Index" */ '../components/admin')
+const AddArt = () => import(/* webpackChunkName: "AddArt" */ '../components/article/addArt.vue')
+const ArtList = () => import(/* webpackChunkName: "ArtList" */ '../components/article/artList.vue')
+const CateList = () => import(/* webpackChunkName: "CateList" */ '../components/category/cateList.vue')
+const UserList = () => import(/* webpackChunkName: "UserList" */ '../components/user/userList.vue')
+const Profile = () => import(/* webpackChunkName: "UserList" */ '../components/user/profile.vue')
 const CommentList = () => import(/* webpackChunkName: "UserList" */ '../components/comment/commentList.vue')
 
 // 路由重复点击捕获错误

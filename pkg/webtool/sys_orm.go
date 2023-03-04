@@ -24,7 +24,7 @@ type GormMysqlConf struct {
 func (m *GormMysqlConf) InitConf(viper *viper.Viper) error {
 	var v GormMysqlConf
 	val := viper.Get(defaultApolloMysqlPrefix)
-	err := jsonConvertStruct(val, &v)
+	err := JsonConvertStruct(val, &v)
 	if err != nil {
 		log.Errorf("err is %v", err)
 		return err

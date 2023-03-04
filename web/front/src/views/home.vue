@@ -22,9 +22,9 @@
 </template>
 
 <script>
-import TopBar from '../components/TopBar'
-import Footer from '../components/Footer'
-import Nav from '../components/Nav'
+import TopBar from '../components/topBar'
+import Footer from '../components/footer'
+import Nav from '../components/nav'
 export default {
   components: { TopBar, Footer, Nav }
 }

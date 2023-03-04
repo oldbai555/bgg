@@ -15,7 +15,7 @@ type ServerConf struct {
 func (r *ServerConf) InitConf(viper *viper.Viper) error {
 	var v ServerConf
 	val := viper.Get(defaultApolloServerPrefix)
-	err := jsonConvertStruct(val, &v)
+	err := JsonConvertStruct(val, &v)
 	if err != nil {
 		log.Errorf("err is %v", err)
 		return err

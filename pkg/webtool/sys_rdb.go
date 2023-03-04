@@ -19,7 +19,7 @@ type RedisConf struct {
 func (r *RedisConf) InitConf(viper *viper.Viper) error {
 	var v RedisConf
 	val := viper.Get(defaultApolloRedisPrefix)
-	err := jsonConvertStruct(val, &v)
+	err := JsonConvertStruct(val, &v)
 	if err != nil {
 		log.Errorf("err is %v", err)
 		return err

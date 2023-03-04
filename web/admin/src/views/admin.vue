@@ -18,9 +18,9 @@
 </template>
 
 <script>
-import Nav from '../components/admin/Nav'
-import Footer from '../components/admin/Footer'
-import Header from '../components/admin/Header'
+import Nav from '../components/admin/nav'
+import Footer from '../components/admin/footer'
+import Header from '../components/admin/header'
 export default {
   components: { Nav, Footer, Header },
 }

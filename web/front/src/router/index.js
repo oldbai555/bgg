@@ -2,13 +2,13 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 
 const ArticleList = () =>
-  import(/* webpackChunkName: "group-index" */ '../components/ArticleList.vue')
+  import(/* webpackChunkName: "group-index" */ '../components/articleList.vue')
 const Detail = () =>
-  import(/* webpackChunkName: "group-detail" */ '../components/Details.vue')
+  import(/* webpackChunkName: "group-detail" */ '../components/details.vue')
 const Category = () =>
-  import(/* webpackChunkName: "group-category" */ '../components/CateList.vue')
+  import(/* webpackChunkName: "group-category" */ '../components/cateList.vue')
 const Search = () =>
-  import(/* webpackChunkName: "group-search" */ '../components/Search.vue')
+  import(/* webpackChunkName: "group-search" */ '../components/search.vue')
 
 Vue.use(VueRouter)
 

@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/oldbai555/bgg/client/lbblog"
 	"github.com/oldbai555/bgg/client/lbuser"
-	webtool2 "github.com/oldbai555/bgg/pkg/webtool"
+	"github.com/oldbai555/bgg/pkg/webtool"
 	"github.com/spf13/viper"
 
 	"github.com/oldbai555/lbtool/log"
@@ -16,8 +16,9 @@ import (
 var lb *Tool
 
 type Tool struct {
-	*webtool2.WebTool
-	Rbac *grbac.Controller
+	*webtool.WebTool
+	Rbac       *grbac.Controller
+	WechatConf WeChatGzhConf
 }
 
 func StartServer() error {
@@ -27,15 +28,22 @@ func StartServer() error {
 		return err
 	}
 	lb = &Tool{}
-	lb.WebTool, err = webtool2.NewWebTool(v, webtool2.OptionWithOrm(
+	lb.WebTool, err = webtool.NewWebTool(v, webtool.OptionWithOrm(
 		&lbuser.ModelUser{},
 		&lbblog.ModelArticle{},
 		&lbblog.ModelCategory{},
 		&lbblog.ModelComment{},
-	), webtool2.OptionWithRdb(), webtool2.OptionWithStorage())
+	), webtool.OptionWithRdb(), webtool.OptionWithStorage())
 
 	if err != nil {
 		log.Errorf("err:%v", err)
+		return err
+	}
+
+	val := lb.V.Get("wechatConf")
+	err = webtool.JsonConvertStruct(val, &lb.WechatConf)
+	if err != nil {
+		log.Errorf("err is %v", err)
 		return err
 	}
 
@@ -75,6 +83,7 @@ func InitSysApi(h *gin.Engine) {
 	registerStoreApi(h)
 	registerPublicApi(h)
 	registerLbwebsocketApi(h)
+	registerWechatGzhApi(h)
 }
 
 func initViper() (*viper.Viper, error) {
@@ -83,7 +92,9 @@ func initViper() (*viper.Viper, error) {
 	viper.AddConfigPath("/etc/work/")           // path to look for the config file in
 	viper.AddConfigPath("./")                   // optionally look for config in the working directory
 	viper.AddConfigPath("./lbserver/cmd/")      // optionally look for config in the working directory
+	viper.AddConfigPath("../cmd/")              // optionally look for config in the working directory
 	viper.AddConfigPath("./lbserver/resource/") // optionally look for config in the working directory
+	viper.AddConfigPath("../resource/")         // optionally look for config in the working directory
 	err := viper.ReadInConfig()                 // Find and read the config file
 	if err != nil {                             // Handle errors reading the config file
 		panic(fmt.Errorf("fatal error config file: %w", err))
