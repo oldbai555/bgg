@@ -3,7 +3,7 @@ module.exports = {
         disableHostCheck: true
     },
     transpileDependencies: ['vuetify'],
-    assetsDir: 'static',
+    assetsDir: './',
     chainWebpack: config => {
         config.plugin('html').tap(args => {
             args[0].title = 'LB小破站'
