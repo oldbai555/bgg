@@ -2,6 +2,7 @@ package impl
 
 import (
 	"crypto/sha1"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/oldbai555/lbtool/log"
 	"sort"
@@ -31,17 +32,22 @@ func AuthWeChatGzh(c *gin.Context) {
 	echostr, _ := handler.GetQuery("echostr")
 	nonce, _ := handler.GetQuery("nonce")
 
-	strList := []string{lb.WechatConf.Token, timestamp, nonce}
-	// 字典排序
-	sort.Strings(strList)
+	//3.token，timestamp，nonce按字典排序的字符串list
+	strs := sort.StringSlice{lb.WechatConf.Token, timestamp, nonce} // 使用本地的token生成校验
+	sort.Strings(strs)
+	str := ""
+	for _, s := range strs {
+		str += s
+	}
 
-	// sha1 加密
+	// 4. 哈希算法加密list得到hashcode
 	h := sha1.New()
-	sum := h.Sum([]byte(strings.Join(strList, "")))
+	h.Write([]byte(str))
+	hashcode := fmt.Sprintf("%x", h.Sum(nil)) // h.Sum(nil) 做hash
 
 	var rspStr = echostr
 	// 比对数据
-	if signature != string(sum) {
+	if signature != hashcode {
 		rspStr = "error"
 	}
 
