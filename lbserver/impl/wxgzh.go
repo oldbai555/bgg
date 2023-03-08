@@ -1,12 +1,18 @@
 package impl
 
 import (
+	"context"
 	"crypto/sha1"
 	"encoding/xml"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v8"
+	"github.com/oldbai555/bgg/lbserver/impl/gpt"
 	"github.com/oldbai555/lbtool/log"
+	"github.com/oldbai555/lbtool/pkg/routine"
+	"github.com/oldbai555/lbtool/utils"
 	"sort"
+	"strings"
 	"time"
 )
 
@@ -33,7 +39,7 @@ func AuthWeChatGzh(c *gin.Context) {
 	echostr, _ := handler.GetQuery("echostr")
 	nonce, _ := handler.GetQuery("nonce")
 
-	//3.token，timestamp，nonce按字典排序的字符串list
+	// 3.token，timestamp，nonce按字典排序的字符串list
 	strs := sort.StringSlice{lb.WechatConf.Token, timestamp, nonce} // 使用本地的token生成校验
 	sort.Strings(strs)
 	str := ""
@@ -83,8 +89,86 @@ func WXMsgReceive(c *gin.Context) {
 
 	log.Infof("[消息接收] - 收到消息, 消息类型为: %s, 消息内容为: %s", textMsg.MsgType, textMsg.Content)
 
-	// 对接收的消息进行被动回复
-	WXMsgReply(c, textMsg.ToUserName, textMsg.FromUserName)
+	var result string
+	if strings.HasSuffix(textMsg.Content, "获取答案:") {
+		split := strings.Split(textMsg.Content, ":")
+		if len(split) != 2 {
+			WXMsgReply(c, textMsg.ToUserName, textMsg.FromUserName, "对不起,我找不到你想要的答案,请按格式=>\n获取答案:xxxxxxxx\n获取结果。")
+			return
+		}
+		r, err := lb.Rdb.Get(c, split[1]).Result()
+		if err != nil && err != redis.Nil {
+			log.Errorf("err:%v", err)
+			return
+		}
+		if err == redis.Nil {
+			result = "答案还在生成中,请稍等"
+		}
+		if err == nil {
+			result = r
+		}
+		WXMsgReply(c, textMsg.ToUserName, textMsg.FromUserName, result)
+		return
+	}
+
+	if strings.HasSuffix("提问:", textMsg.Content) {
+		uuid := utils.GenUUID()
+		// 异步去处理
+		routine.Go(c, func(ctx context.Context) error {
+			completionRsp, err := gpt.DoChatCompletion(lb.V.GetString("chatGpt.api_key"), &gpt.ChatCompletionReq{
+				Model: "gpt-3.5-turbo",
+				Messages: []*gpt.ChatcompletionreqMessage{
+					{
+						Content: textMsg.Content,
+						Role:    "user",
+					},
+				},
+			})
+			if err != nil {
+				log.Errorf("err:%v", err)
+				return err
+			}
+
+			var result string
+			for _, choice := range completionRsp.Choices {
+				if choice.Message != nil {
+					result = result + choice.Message.Content
+				}
+			}
+
+			if len(result) == 0 {
+				result = "对不起,你说的我暂时不能理解"
+			}
+			err = lb.Rdb.Set(ctx, uuid, result, time.Hour*24).Err()
+			if err != nil {
+				log.Errorf("err:%v", err)
+				return err
+			}
+			return nil
+		})
+
+		timer := time.NewTimer(3 * time.Second)
+		select {
+		case <-timer.C:
+			r, err := lb.Rdb.Get(c, uuid).Result()
+			if err != nil && err != redis.Nil {
+				log.Errorf("err:%v", err)
+				return
+			}
+			if err == redis.Nil {
+				result = fmt.Sprintf("你的等待序号为:%s,一分钟后请按格式=>\n获取答案:xxxxxxxx\n获取结果", uuid)
+			}
+			if err == nil {
+				result = r
+			}
+		}
+
+		// 对接收的消息进行被动回复
+		WXMsgReply(c, textMsg.ToUserName, textMsg.FromUserName, result)
+		return
+	}
+
+	WXMsgReply(c, textMsg.ToUserName, textMsg.FromUserName, "请按格式=>\n提问:今天是星期几\n进行提问")
 }
 
 // WXRepTextMsg 微信回复文本消息结构体
@@ -100,13 +184,13 @@ type WXRepTextMsg struct {
 }
 
 // WXMsgReply 微信消息回复
-func WXMsgReply(c *gin.Context, fromUser, toUser string) {
+func WXMsgReply(c *gin.Context, fromUser, toUser, Content string) {
 	repTextMsg := WXRepTextMsg{
 		ToUserName:   toUser,
 		FromUserName: fromUser,
 		CreateTime:   time.Now().Unix(),
 		MsgType:      "text",
-		Content:      fmt.Sprintf("[消息回复] - %s", time.Now().Format("2006-01-02 15:04:05")),
+		Content:      Content,
 	}
 
 	msg, err := xml.Marshal(&repTextMsg)
