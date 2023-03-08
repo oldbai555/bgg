@@ -124,7 +124,7 @@ func WXMsgReceive(c *gin.Context) {
 				Model: "gpt-3.5-turbo",
 				Messages: []*gpt.ChatcompletionreqMessage{
 					{
-						Content: textMsg.Content,
+						Content: split[1],
 						Role:    "user",
 					},
 				},
