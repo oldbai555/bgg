@@ -131,6 +131,8 @@ func WXMsgReceive(c *gin.Context) {
 			})
 			if err != nil {
 				log.Errorf("err:%v", err)
+				result = "对不起,我暂时找不到答案"
+				WXMsgReply(c, textMsg.ToUserName, textMsg.FromUserName, result)
 				return err
 			}
 
@@ -161,7 +163,7 @@ func WXMsgReceive(c *gin.Context) {
 				return
 			}
 			if err == redis.Nil {
-				result = fmt.Sprintf("你的等待序号为:%s,一分钟后请按格式=>\n获取答案:xxxxxxxx\n获取结果", uuid)
+				result = fmt.Sprintf("你的等待序号为:%s,\n一分钟后请按格式=>\n获取答案:xxxxxxxx\n获取结果", uuid)
 			}
 			if err == nil {
 				result = r
