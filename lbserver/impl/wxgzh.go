@@ -90,7 +90,7 @@ func WXMsgReceive(c *gin.Context) {
 	log.Infof("[消息接收] - 收到消息, 消息类型为: %s, 消息内容为: %s", textMsg.MsgType, textMsg.Content)
 
 	var result string
-	if strings.HasSuffix(textMsg.Content, "获取答案:") {
+	if strings.HasPrefix(textMsg.Content, "获取答案:") {
 		split := strings.Split(textMsg.Content, ":")
 		if len(split) != 2 {
 			WXMsgReply(c, textMsg.ToUserName, textMsg.FromUserName, "对不起,我找不到你想要的答案,请按格式=>\n获取答案:xxxxxxxx\n获取结果。")
@@ -111,7 +111,12 @@ func WXMsgReceive(c *gin.Context) {
 		return
 	}
 
-	if strings.HasSuffix("提问:", textMsg.Content) {
+	if strings.HasPrefix("提问:", textMsg.Content) {
+		split := strings.Split(textMsg.Content, ":")
+		if len(split) != 2 {
+			WXMsgReply(c, textMsg.ToUserName, textMsg.FromUserName, "对不起,我找不到你想要的提问的内容,请按格式=>\n提问:今天是星期几\n进行提问")
+			return
+		}
 		uuid := utils.GenUUID()
 		// 异步去处理
 		routine.Go(c, func(ctx context.Context) error {
