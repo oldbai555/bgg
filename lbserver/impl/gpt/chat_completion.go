@@ -52,7 +52,7 @@ type APIError struct {
 }
 
 func (e APIError) Error() string {
-	return fmt.Sprintf("[%d:%s] %s , param：%s", e.Code, e.Type, e.Message, e.Param)
+	return fmt.Sprintf("[%v:%s] %s , param:%v", e.Code, e.Type, e.Message, e.Param)
 }
 
 // APIErrorResponse is the full error respnose that has been returned by an API.
