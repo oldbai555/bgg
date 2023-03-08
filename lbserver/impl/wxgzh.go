@@ -111,7 +111,7 @@ func WXMsgReceive(c *gin.Context) {
 		return
 	}
 
-	if strings.HasPrefix("提问:", textMsg.Content) {
+	if strings.HasPrefix(textMsg.Content, "提问:") {
 		split := strings.Split(textMsg.Content, ":")
 		if len(split) != 2 {
 			WXMsgReply(c, textMsg.ToUserName, textMsg.FromUserName, "对不起,我找不到你想要的提问的内容,请按格式=>\n提问:今天是星期几\n进行提问")
