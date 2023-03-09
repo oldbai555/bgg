@@ -120,7 +120,7 @@ func WXMsgReceive(c *gin.Context) {
 		uuid := utils.GenUUID()
 		// 异步去处理
 		routine.Go(c, func(ctx context.Context) error {
-			completionRsp, err := gpt.DoChatCompletion(lb.V.GetString("chatGpt.api_key"), &gpt.ChatCompletionReq{
+			completionRsp, err := gpt.DoChatCompletion(lb.V.GetString("chatGpt.proxy"), lb.V.GetString("chatGpt.api_key"), &gpt.ChatCompletionReq{
 				Model: "gpt-3.5-turbo",
 				Messages: []*gpt.ChatcompletionreqMessage{
 					{
@@ -132,7 +132,11 @@ func WXMsgReceive(c *gin.Context) {
 			if err != nil {
 				log.Errorf("err:%v", err)
 				result = "对不起,我暂时找不到答案"
-				WXMsgReply(c, textMsg.ToUserName, textMsg.FromUserName, result)
+				rErr := lb.Rdb.Set(ctx, uuid, result, time.Hour*24).Err()
+				if rErr != nil {
+					log.Errorf("err:%v", rErr)
+					return rErr
+				}
 				return err
 			}
 

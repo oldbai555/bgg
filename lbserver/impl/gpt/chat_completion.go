@@ -89,10 +89,14 @@ func checkForSuccess(data []byte, statusCode int) error {
 	return result.Error
 }
 
-func DoChatCompletion(apiKey string, req *ChatCompletionReq) (*ChatCompletionRsp, error) {
+func DoChatCompletion(proxy string, apiKey string, req *ChatCompletionReq) (*ChatCompletionRsp, error) {
 	var rsp ChatCompletionRsp
 	urlSuffix := "/chat/completions"
-	resp, err := resty.New().SetTimeout(time.Minute).NewRequest().SetHeaders(map[string]string{ // 最多等待一分钟的回复
+	client := resty.New()
+	if proxy != "" {
+		client.SetProxy(proxy)
+	}
+	resp, err := client.SetTimeout(time.Minute).NewRequest().SetHeaders(map[string]string{ // 最多等待一分钟的回复
 		"Content-type":  "application/json",
 		"Accept":        "application/json; charset=utf-8",
 		"Authorization": fmt.Sprintf("Bearer %s", apiKey),
