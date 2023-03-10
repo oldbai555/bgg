@@ -33,12 +33,13 @@ const (
 
 const (
 	SpeechAnswer      = "获取答案"
-	SpeechAnswerFail  = "对不起,我找不到您获取的答案，您可以向我提问。例如：\n\n提问 今天是星期几\n\n进行提问，注意中间的空格用于区分。"
+	SpeechAnswerFail  = "对不起,我找不到您获取的答案，您可以向我提问。例如：\n\n提问 苹果好吃吗\n\n进行提问，注意中间的空格用于区分。"
+	SpeechAnswerTip   = "您可以向我提问。例如：\n\n提问 苹果好吃吗\n\n进行提问，注意中间的空格用于区分。"
 	SpeechAnswerReady = "答案还在生成，请稍后再试。"
 
 	SpeechAsk          = "提问"
 	SpeechAskSensitive = "对不起，您的提问比较敏感。"
-	SpeechAskFail      = "对不起，我找不到您提问的内容，请按示例进行提问。例如：\n\n提问 今天是星期几\n\n进行提问，注意中间的空格用于区分。"
+	SpeechAskFail      = "对不起，我找不到您提问的内容，请按示例进行提问。例如：\n\n提问 苹果好吃吗\n\n进行提问，注意中间的空格用于区分。"
 	SpeechErr          = "对不起，我还在学习中。"
 
 	SpeechQueueStartTemplate = "您的排号为：%s,一分钟后重新获取结果\n例如：\n获取答案 xxxxxxxx\n"

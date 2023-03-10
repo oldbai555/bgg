@@ -70,14 +70,15 @@ func doHandlerWxEvent(callBackData *CallBackData) (content string, err error) {
 // 处理文本回调
 func doHandlerMsgTypeText(callBackData *CallBackData) (string, error) {
 	ctx := context.TODO()
-	var content string
+	var content = SpeechAnswerTip
 
 	// 检查是否有敏感词
 	exit, err := wordscheck.DoCheckWords("http://www.wordscheck.com/wordcheck", callBackData.Content)
 	if err != nil {
 		log.Errorf("err:%v", err)
-		return "", err
+		return SpeechErr, err
 	}
+
 	if exit {
 		return SpeechAskSensitive, nil
 	}
@@ -86,35 +87,46 @@ func doHandlerMsgTypeText(callBackData *CallBackData) (string, error) {
 	if strings.HasPrefix(callBackData.Content, SpeechAnswer) {
 		split := strings.Split(callBackData.Content, " ")
 		if len(split) != 2 {
-			content = SpeechAnswerFail
-			return content, nil
+			return SpeechAnswerFail, nil
 		}
+
+		// 拿到等待编号
 		var uuid = split[1]
+
+		// 从 redis 拿
 		r, err := lb.Rdb.Get(ctx, uuid).Result()
 		if err != nil && err != redis.Nil {
 			log.Errorf("err:%v", err)
-			return content, nil
+			return SpeechAnswerFail, nil
 		}
+
+		// 结果为空
 		if err == redis.Nil {
-			content = SpeechAnswerReady
+			return SpeechAnswerReady, nil
 		}
+
+		// 找到啦
 		if err == nil {
-			content = r
 			err := lb.Rdb.Del(ctx, uuid).Err()
 			if err != nil {
 				log.Errorf("err:%v", err)
 			}
+			return r, nil
 		}
+
+		// 应该不会走到这里吧
 		return content, nil
 	}
 
 	// 检查是否是提问
 	if strings.HasPrefix(callBackData.Content, SpeechAsk) {
+
 		split := strings.Split(callBackData.Content, " ")
 		if len(split) != 2 {
-			content = SpeechAskFail
-			return content, nil
+			return SpeechAskFail, nil
 		}
+
+		// 生成等待编号
 		uuid := utils.GenUUID()
 
 		// 异步去获取结果
@@ -129,10 +141,11 @@ func doHandlerMsgTypeText(callBackData *CallBackData) (string, error) {
 					},
 				},
 			})
+
+			// 出错啦
 			if err != nil {
 				log.Errorf("err:%v", err) // 一般是请求不过去或者网络超时
-				content = SpeechErr
-				err = SetGptResult(ctx, uuid, content)
+				err = SetGptResult(ctx, uuid, SpeechErr)
 				if err != nil {
 					log.Errorf("err:%v", err)
 					return err
