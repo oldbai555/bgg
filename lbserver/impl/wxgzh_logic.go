@@ -166,6 +166,18 @@ func doHandlerMsgTypeText(callBackData *CallBackData) (string, error) {
 				result = SpeechErr
 			}
 
+			if len(result) > 0 {
+				if strings.Contains(result, "AI语言模型") {
+					strings.ReplaceAll(result, "AI语言模型", "公众号")
+				}
+				if strings.Contains(result, "AI") {
+					strings.ReplaceAll(result, "AI", "公众号")
+				}
+				if strings.Contains(result, "公众号公众号") {
+					strings.ReplaceAll(result, "公众号公众号", "公众号")
+				}
+			}
+
 			// 写入redis
 			err = SetGptResult(ctx, uuid, result)
 			if err != nil {
