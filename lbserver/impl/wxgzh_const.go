@@ -42,7 +42,7 @@ const (
 	SpeechAskFail      = "对不起，我找不到您提问的内容，请按示例进行提问。例如：\n\n提问 苹果好吃吗\n\n进行提问，注意中间的空格用于区分。"
 	SpeechErr          = "对不起，我还在学习中。"
 
-	SpeechQueueStartTemplate = "您的排号为：%s,一分钟后重新获取结果\n例如：\n获取答案 xxxxxxxx\n"
+	SpeechQueueStartTemplate = "您的排号为：%s\n获取结果示例：\n\n获取答案 xxxxxxxx"
 )
 
 // CallBackData 微信回调
