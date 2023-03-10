@@ -214,18 +214,17 @@ func GetGptResult(ctx context.Context, uuid string) (content string, err error) 
 		log.Errorf("err:%v", err)
 		return
 	}
-	if err == redis.Nil {
-		content = fmt.Sprintf(SpeechQueueStartTemplate, uuid)
-		return
-	}
+	// 没错就结束咯
 	if err == nil {
 		err = lb.Rdb.Del(ctx, uuid).Err()
 		if err != nil {
 			log.Errorf("err:%v", err)
 			return
 		}
+		return
 	}
-	return
+	// 拿不到就给个默认的话语
+	return fmt.Sprintf(SpeechQueueStartTemplate, uuid), nil
 }
 
 // SetGptResult 写入gpt的结果
