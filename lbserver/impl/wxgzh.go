@@ -75,6 +75,7 @@ func WXMsgReceive(c *gin.Context) {
 
 // WXMsgReply 微信消息回复
 func WXMsgReply(c *gin.Context, reply *WXRepTextMsg) {
+	log.Infof("reply: %v", reply)
 	msg, err := xml.Marshal(&reply)
 	if err != nil {
 		log.Infof("[消息回复] - 将对象进行XML编码出错: %v\n", err)

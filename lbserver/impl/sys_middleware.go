@@ -1,7 +1,6 @@
 package impl
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/oldbai555/bgg/pkg/webtool"
@@ -42,12 +41,7 @@ func RegisterUuidTrace() gin.HandlerFunc {
 		}
 		log.SetLogHint(traceId)
 		c.Set(LogWithHint, traceId)
-		bytes, err := json.Marshal(c)
-		if err != nil {
-			log.Errorf("err:%v", err)
-			return
-		}
-		log.Infof("init to req , context is %s", string(bytes))
+		log.Infof("RemoteIP: %s , ClientIP: %s", c.RemoteIP(), c.ClientIP())
 		c.Next()
 	}
 }
