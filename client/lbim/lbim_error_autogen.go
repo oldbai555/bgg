@@ -7,5 +7,6 @@ import (
 )
 
 var (
-	Success = lberr.NewErr(int32(ErrCode_Success), "Success")
+	Success            = lberr.NewErr(int32(ErrCode_Success), "Success")
+	ErrNotFoundMessage = lberr.NewErr(int32(ErrCode_ErrNotFoundMessage), "ErrNotFoundMessage")
 )

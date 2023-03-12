@@ -3,7 +3,10 @@ package impl
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/oldbai555/bgg/client/lbaccount"
 	"github.com/oldbai555/bgg/client/lbblog"
+	"github.com/oldbai555/bgg/client/lbcustomer"
+	"github.com/oldbai555/bgg/client/lbim"
 	"github.com/oldbai555/bgg/client/lbuser"
 	"github.com/oldbai555/bgg/pkg/webtool"
 	"github.com/spf13/viper"
@@ -33,6 +36,9 @@ func StartServer() error {
 		&lbblog.ModelArticle{},
 		&lbblog.ModelCategory{},
 		&lbblog.ModelComment{},
+		&lbim.ModelMessage{},
+		&lbaccount.ModelAccount{},
+		&lbcustomer.ModelCustomer{},
 	), webtool.OptionWithRdb(), webtool.OptionWithStorage())
 
 	if err != nil {
@@ -82,7 +88,6 @@ func InitSysApi(h *gin.Engine) {
 	registerLbblogApi(h)
 	registerStoreApi(h)
 	registerPublicApi(h)
-	registerLbwebsocketApi(h)
 	registerWechatGzhApi(h)
 }
 

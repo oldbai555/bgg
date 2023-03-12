@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-redis/redis/v8"
+	"github.com/oldbai555/bgg/client/lbim"
 	"github.com/oldbai555/bgg/lbserver/impl/gpt"
 	"github.com/oldbai555/bgg/lbserver/impl/wordscheck"
 	"github.com/oldbai555/lbtool/log"
@@ -22,12 +23,32 @@ func doHandlerWXMsgReceive(callBackData *CallBackData) (*WXRepTextMsg, error) {
 		MsgType:      MsgTypeText,
 	}
 
+	var msg = lbim.ModelMessage{
+		ServerMsgId: fmt.Sprintf("%d", callBackData.MsgId),
+		SendAt:      uint64(callBackData.CreateTime),
+		From:        callBackData.FromUserName,
+		To:          callBackData.ToUserName,
+		Source:      uint32(lbim.MessageSource_MessageSourceWxGzh),
+		Content:     &lbim.Content{},
+	}
+
 	var err error
 	switch callBackData.MsgType {
 	case MsgTypeText:
 		rsp.Content, err = doHandlerMsgTypeText(callBackData)
+		msg.Content.Text = &lbim.Content_Text{
+			Content: callBackData.Content,
+		}
 	case MsgTypeImage:
 		rsp.Content = SpeechErr
+		url, err := ConvertMediaFile(fmt.Sprintf("%s.jpg", utils.GenUUID()), callBackData.PicUrl)
+		if err != nil {
+			log.Errorf("err is %v", err)
+			url = callBackData.PicUrl
+		}
+		msg.Content.Image = &lbim.Content_Image{
+			Url: url,
+		}
 	case MsgTypeVoice:
 		rsp.Content = SpeechErr
 	case MsgTypeVideo:

@@ -62,3 +62,27 @@ func Upload(c *gin.Context) {
 	}
 	handler.Success(&rsp)
 }
+
+func ConvertMediaFile(filename, url string) (string, error) {
+	objectKey := `public/link-info/assets/images/` + filename
+
+	open, err := http.Get(url)
+	if err != nil {
+		log.Errorf("err is %v", err)
+		return "", err
+	}
+
+	err = lb.Storage.Put(objectKey, open.Body)
+	if err != nil {
+		log.Errorf("err is %v", err)
+		return "", err
+	}
+
+	signedURL, err := lb.Storage.SignURL(objectKey, http.MethodGet, 60*60*24*365)
+	if err != nil {
+		log.Errorf("err is %v", err)
+		return "", err
+	}
+
+	return signedURL, nil
+}

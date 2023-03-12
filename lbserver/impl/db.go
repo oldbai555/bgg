@@ -1,10 +1,11 @@
 package impl
 
 import (
+	"github.com/oldbai555/bgg/client/lbaccount"
 	"github.com/oldbai555/bgg/client/lbblog"
+	"github.com/oldbai555/bgg/client/lbcustomer"
+	"github.com/oldbai555/bgg/client/lbim"
 	"github.com/oldbai555/bgg/client/lbuser"
-	"github.com/oldbai555/bgg/client/lbwebsocket"
-	"github.com/oldbai555/lbtool/pkg/lberr"
 )
 
 var (
@@ -12,43 +13,44 @@ var (
 	ArticleOrm  *OrmCondBuilder
 	CategoryOrm *OrmCondBuilder
 	CommentOrm  *OrmCondBuilder
-	ChatOrm     *OrmCondBuilder
 	MessageOrm  *OrmCondBuilder
-	VisitorOrm  *OrmCondBuilder
+	CustomerOrm *OrmCondBuilder
+	AccountOrm  *OrmCondBuilder
 )
 
 func InitDbOrm() {
 	UserOrm = NewOrmCondBuilder(
 		&lbuser.ModelUser{},
-		lberr.NewErr(int32(lbuser.ErrCode_ErrUserNotFound), "ErrUserNotFound"),
+		lbuser.ErrUserNotFound,
 	)
 	ArticleOrm = NewOrmCondBuilder(
 		&lbblog.ModelArticle{},
-		lberr.NewErr(int32(lbblog.ErrCode_ErrArticleNotFound), "ErrArticleNotFound"),
+		lbblog.ErrArticleNotFound,
 	)
 
 	CategoryOrm = NewOrmCondBuilder(
 		&lbblog.ModelCategory{},
-		lberr.NewErr(int32(lbblog.ErrCode_ErrCategoryNotFound), "ErrCategoryNotFound"),
+		lbblog.ErrCategoryNotFound,
 	)
 
 	CommentOrm = NewOrmCondBuilder(
 		&lbblog.ModelComment{},
-		lberr.NewErr(int32(lbblog.ErrCode_ErrCommentNotFound), "ErrCommentNotFound"),
-	)
-
-	ChatOrm = NewOrmCondBuilder(
-		&lbwebsocket.ModelChat{},
-		lberr.NewErr(int32(lbwebsocket.ErrCode_ErrChatNotFound), "ErrChatNotFound"),
+		lbblog.ErrCommentNotFound,
 	)
 
 	MessageOrm = NewOrmCondBuilder(
-		&lbwebsocket.ModelMessage{},
-		lberr.NewErr(int32(lbwebsocket.ErrCode_ErrMessageNotFound), "ErrMessageNotFound"),
+		&lbim.ModelMessage{},
+		lbim.ErrNotFoundMessage,
 	)
 
-	VisitorOrm = NewOrmCondBuilder(
-		&lbwebsocket.ModelVisitor{},
-		lberr.NewErr(int32(lbwebsocket.ErrCode_ErrVisitorNotFound), "ErrVisitorNotFound"),
+	CustomerOrm = NewOrmCondBuilder(
+		&lbcustomer.ModelCustomer{},
+		lbcustomer.ErrNotFoundCustomer,
 	)
+
+	AccountOrm = NewOrmCondBuilder(
+		&lbaccount.ModelAccount{},
+		lbaccount.ErrNotFoundAccount,
+	)
+
 }

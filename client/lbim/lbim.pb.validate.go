@@ -106,6 +106,8 @@ func (m *ModelMessage) validate(all bool) error {
 
 	// no validation rules for Source
 
+	// no validation rules for Type
+
 	if len(errors) > 0 {
 		return ModelMessageMultiError(errors)
 	}
