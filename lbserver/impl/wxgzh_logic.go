@@ -83,7 +83,7 @@ func doHandlerWXMsgReceive(callBackData *CallBackData) (*WXRepTextMsg, error) {
 		url, err := ConvertMediaBytes(fmt.Sprintf("%s.mp4", utils.GenUUID()), bytes)
 		if err != nil {
 			log.Errorf("err:%v", err)
-			return nil, err
+			url = callBackData.MediaId
 		}
 		bytes, err = GetWxGzhMediaBytes(context.TODO(), callBackData.ThumbMediaId)
 		if err != nil {
@@ -94,7 +94,7 @@ func doHandlerWXMsgReceive(callBackData *CallBackData) (*WXRepTextMsg, error) {
 		videoPicUrl, err := ConvertMediaBytes(fmt.Sprintf("%s.jpg", utils.GenUUID()), bytes)
 		if err != nil {
 			log.Errorf("err:%v", err)
-			return nil, err
+			videoPicUrl = callBackData.ThumbMediaId
 		}
 		msg.Content.Video = &lbim.Content_Video{
 			Url:     url,
