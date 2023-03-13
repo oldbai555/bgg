@@ -76,7 +76,7 @@ type MessageSource int32
 
 const (
 	MessageSource_MessageSourceNil   MessageSource = 0
-	MessageSource_MessageSourceWxGzh MessageSource = 1 //微信
+	MessageSource_MessageSourceWxGzh MessageSource = 1 // 微信
 )
 
 // Enum value maps for MessageSource.
@@ -174,14 +174,14 @@ type ModelMessage struct {
 	CreatedAt   int32    `protobuf:"varint,2,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt   int32    `protobuf:"varint,3,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	DeletedAt   int32    `protobuf:"varint,4,opt,name=deleted_at,json=deletedAt,proto3" json:"deleted_at,omitempty"`
-	ServerMsgId string   `protobuf:"bytes,5,opt,name=server_msg_id,json=serverMsgId,proto3" json:"server_msg_id,omitempty"` //服务给过来的消息ID
-	SysMsgId    string   `protobuf:"bytes,7,opt,name=sys_msg_id,json=sysMsgId,proto3" json:"sys_msg_id,omitempty"`          //系统自己生成的消息ID
-	SendAt      uint64   `protobuf:"varint,8,opt,name=send_at,json=sendAt,proto3" json:"send_at,omitempty"`                 //发送消息的时间
+	ServerMsgId string   `protobuf:"bytes,5,opt,name=server_msg_id,json=serverMsgId,proto3" json:"server_msg_id,omitempty"` // 服务给过来的消息ID
+	SysMsgId    string   `protobuf:"bytes,7,opt,name=sys_msg_id,json=sysMsgId,proto3" json:"sys_msg_id,omitempty"`          // 系统自己生成的消息ID
+	SendAt      uint64   `protobuf:"varint,8,opt,name=send_at,json=sendAt,proto3" json:"send_at,omitempty"`                 // 发送消息的时间
 	From        string   `protobuf:"bytes,9,opt,name=from,proto3" json:"from,omitempty"`                                    // 发送着
 	To          string   `protobuf:"bytes,10,opt,name=to,proto3" json:"to,omitempty"`                                       // 接收者
-	Content     *Content `protobuf:"bytes,11,opt,name=content,proto3" json:"content,omitempty"`                             //内容
+	Content     *Content `protobuf:"bytes,11,opt,name=content,proto3" json:"content,omitempty" gorm:"json"`                 // 内容
 	Source      uint32   `protobuf:"varint,12,opt,name=source,proto3" json:"source,omitempty"`                              // 消息来源
-	Type        uint32   `protobuf:"varint,13,opt,name=type,proto3" json:"type,omitempty"`                                  //消息类型
+	Type        uint32   `protobuf:"varint,13,opt,name=type,proto3" json:"type,omitempty"`                                  // 消息类型
 }
 
 func (x *ModelMessage) Reset() {
@@ -451,7 +451,7 @@ type Content_Image struct {
 	Url      string `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
 	Caption  string `protobuf:"bytes,2,opt,name=caption,proto3" json:"caption,omitempty"`                   // 描述
 	FileName string `protobuf:"bytes,3,opt,name=file_name,json=fileName,proto3" json:"file_name,omitempty"` // 名称
-	Format   string `protobuf:"bytes,4,opt,name=format,proto3" json:"format,omitempty"`                     //格式
+	Format   string `protobuf:"bytes,4,opt,name=format,proto3" json:"format,omitempty"`                     // 格式
 }
 
 func (x *Content_Image) Reset() {
@@ -522,7 +522,7 @@ type Content_Video struct {
 	Url      string `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
 	Caption  string `protobuf:"bytes,2,opt,name=caption,proto3" json:"caption,omitempty"`                   // 描述
 	FileName string `protobuf:"bytes,3,opt,name=file_name,json=fileName,proto3" json:"file_name,omitempty"` // 名称
-	Format   string `protobuf:"bytes,4,opt,name=format,proto3" json:"format,omitempty"`                     //格式
+	Format   string `protobuf:"bytes,4,opt,name=format,proto3" json:"format,omitempty"`                     // 格式
 }
 
 func (x *Content_Video) Reset() {
@@ -593,8 +593,8 @@ type Content_Voice struct {
 	Url         string `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
 	Caption     string `protobuf:"bytes,2,opt,name=caption,proto3" json:"caption,omitempty"`                   // 描述
 	FileName    string `protobuf:"bytes,3,opt,name=file_name,json=fileName,proto3" json:"file_name,omitempty"` // 名称
-	Format      string `protobuf:"bytes,4,opt,name=format,proto3" json:"format,omitempty"`                     //格式
-	Recognition string `protobuf:"bytes,5,opt,name=recognition,proto3" json:"recognition,omitempty"`           //语音识别结果
+	Format      string `protobuf:"bytes,4,opt,name=format,proto3" json:"format,omitempty"`                     // 格式
+	Recognition string `protobuf:"bytes,5,opt,name=recognition,proto3" json:"recognition,omitempty"`           // 语音识别结果
 }
 
 func (x *Content_Voice) Reset() {
@@ -672,7 +672,7 @@ type Content_Document struct {
 	Url      string `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
 	Caption  string `protobuf:"bytes,2,opt,name=caption,proto3" json:"caption,omitempty"`                   // 描述
 	FileName string `protobuf:"bytes,3,opt,name=file_name,json=fileName,proto3" json:"file_name,omitempty"` // 名称
-	Format   string `protobuf:"bytes,4,opt,name=format,proto3" json:"format,omitempty"`                     //格式
+	Format   string `protobuf:"bytes,4,opt,name=format,proto3" json:"format,omitempty"`                     // 格式
 }
 
 func (x *Content_Document) Reset() {

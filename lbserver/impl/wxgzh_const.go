@@ -2,6 +2,7 @@ package impl
 
 import (
 	"encoding/xml"
+	"fmt"
 )
 
 type WeChatGzhConf struct {
@@ -43,6 +44,11 @@ const (
 	SpeechErr          = "对不起，我还在学习中。"
 
 	SpeechQueueStartTemplate = "您的排号为：%s\n获取结果示例：\n\n获取答案 xxxxxxxx"
+)
+
+const (
+	WxGzhAccessTokenUrl = "https://api.weixin.qq.com/cgi-bin/token"     // 获取token的url
+	WxGzhMediaUrl       = "https://api.weixin.qq.com/cgi-bin/media/get" // 获取token的url
 )
 
 // CallBackData 微信回调
@@ -94,4 +100,24 @@ type WXRepTextMsg struct {
 
 	// 若不标记XMLName, 则解析后的xml名为该结构体的名称
 	XMLName xml.Name `xml:"xml"`
+}
+
+// AccessTokenResp 获取access_token返回的json数据
+type AccessTokenResp struct {
+	AccessToken string `json:"access_token"` // 获取到的凭证
+	ExpiresIn   uint32 `json:"expires_in"`   // 凭证有效时间，单位：秒
+}
+
+// WxGzhApiErr 微信公众号请求错误
+type WxGzhApiErr struct {
+	ErrCode uint32 `json:"errcode"`
+	ErrMsg  string `json:"errmsg"`
+}
+
+func (e *WxGzhApiErr) Error() string {
+	return fmt.Sprintf("errcode is %d,errmsg is %s", e.ErrCode, e.ErrMsg)
+}
+
+func (e *WxGzhApiErr) String() string {
+	return fmt.Sprintf("errcode is %d,errmsg is %s", e.ErrCode, e.ErrMsg)
 }

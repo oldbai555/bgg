@@ -1,11 +1,14 @@
 package impl
 
 import (
+	"context"
 	"crypto/sha1"
 	"encoding/xml"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/oldbai555/bgg/client/lbim"
 	"github.com/oldbai555/lbtool/log"
+	"github.com/oldbai555/lbtool/utils"
 	"sort"
 )
 
@@ -81,5 +84,30 @@ func WXMsgReply(c *gin.Context, reply *WXRepTextMsg) {
 		log.Infof("[消息回复] - 将对象进行XML编码出错: %v\n", err)
 		return
 	}
-	_, _ = c.Writer.Write(msg)
+
+	// 回复消息
+	_, err = c.Writer.Write(msg)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return
+	}
+
+	// 将消息写入数据库
+	// todo 应该补充消息发送状态
+	err = MessageOrm.NewScope().Create(context.TODO(), &lbim.ModelMessage{
+		SysMsgId: utils.GenUUID(),
+		SendAt:   uint64(reply.CreateTime),
+		From:     reply.FromUserName,
+		To:       reply.ToUserName,
+		Source:   uint32(lbim.MessageSource_MessageSourceWxGzh),
+		Content: &lbim.Content{
+			Text: &lbim.Content_Text{
+				Content: reply.Content,
+			},
+		},
+	})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return
+	}
 }

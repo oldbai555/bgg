@@ -2,12 +2,17 @@ package impl
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/go-redis/redis/v8"
+	"github.com/oldbai555/bgg/client/lbaccount"
+	"github.com/oldbai555/bgg/client/lbcustomer"
 	"github.com/oldbai555/bgg/client/lbim"
 	"github.com/oldbai555/bgg/lbserver/impl/gpt"
 	"github.com/oldbai555/bgg/lbserver/impl/wordscheck"
 	"github.com/oldbai555/lbtool/log"
+	"github.com/oldbai555/lbtool/pkg/lberr"
+	"github.com/oldbai555/lbtool/pkg/restysdk"
 	"github.com/oldbai555/lbtool/pkg/routine"
 	"github.com/oldbai555/lbtool/utils"
 	"strings"
@@ -41,7 +46,7 @@ func doHandlerWXMsgReceive(callBackData *CallBackData) (*WXRepTextMsg, error) {
 		}
 	case MsgTypeImage:
 		rsp.Content = SpeechErr
-		url, err := ConvertMediaFile(fmt.Sprintf("%s.jpg", utils.GenUUID()), callBackData.PicUrl)
+		url, err := ConvertMediaUrl(fmt.Sprintf("%s.jpg", utils.GenUUID()), callBackData.PicUrl)
 		if err != nil {
 			log.Errorf("err is %v", err)
 			url = callBackData.PicUrl
@@ -50,19 +55,104 @@ func doHandlerWXMsgReceive(callBackData *CallBackData) (*WXRepTextMsg, error) {
 			Url: url,
 		}
 	case MsgTypeVoice:
+		// 语音获取资源是得到一个字节流文件，可以直接下载
 		rsp.Content = SpeechErr
+		bytes, err := GetWxGzhMediaBytes(context.TODO(), callBackData.MediaId)
+		if err != nil {
+			log.Errorf("err:%v", err)
+			return nil, err
+		}
+		url, err := ConvertMediaBytes(fmt.Sprintf("%s.%s", utils.GenUUID(), callBackData.Format), bytes)
+		if err != nil {
+			log.Errorf("err:%v", err)
+			url = callBackData.MediaId
+		}
+		msg.Content.Voice = &lbim.Content_Voice{
+			Url:         url,
+			Format:      callBackData.Format,
+			Recognition: callBackData.Recognition,
+		}
 	case MsgTypeVideo:
 		rsp.Content = SpeechErr
+		bytes, err := GetWxGzhMediaBytes(context.TODO(), callBackData.MediaId)
+		if err != nil {
+			log.Errorf("err:%v", err)
+			return nil, err
+		}
+
+		url, err := ConvertMediaBytes(fmt.Sprintf("%s.mp4", utils.GenUUID()), bytes)
+		if err != nil {
+			log.Errorf("err:%v", err)
+			return nil, err
+		}
+		bytes, err = GetWxGzhMediaBytes(context.TODO(), callBackData.ThumbMediaId)
+		if err != nil {
+			log.Errorf("err:%v", err)
+			return nil, err
+		}
+
+		videoPicUrl, err := ConvertMediaBytes(fmt.Sprintf("%s.jpg", utils.GenUUID()), bytes)
+		if err != nil {
+			log.Errorf("err:%v", err)
+			return nil, err
+		}
+		msg.Content.Video = &lbim.Content_Video{
+			Url:     url,
+			Caption: videoPicUrl, // todo 应有一个字段来承接视频封面
+		}
 	case MsgTypeLocation:
 		rsp.Content = SpeechErr
+		msg.Content.Location = &lbim.Content_Location{
+			X:     callBackData.Location_X,
+			Y:     callBackData.Location_Y,
+			Scale: float64(callBackData.Scale),
+			Label: callBackData.Label,
+		}
 	case MsgTypeLink:
 		rsp.Content = SpeechErr
+		msg.Content.Document = &lbim.Content_Document{
+			Url:     callBackData.Url,
+			Caption: fmt.Sprintf("标题：%s,描述：%s", callBackData.Title, callBackData.Description),
+		}
 	case MsgTypeEvent:
 		rsp.Content, err = doHandlerWxEvent(callBackData)
 	default:
 		rsp.Content = SpeechErr
 	}
 
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	// 插入消息记录
+	err = MessageOrm.NewScope().Create(context.TODO(), &msg)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	// 插入客户
+	err = CustomerOrm.NewScope().UpdateOrCreate(context.TODO(), map[string]interface{}{
+		lbcustomer.FieldSn_:      callBackData.FromUserName,
+		lbcustomer.FieldChannel_: uint32(lbcustomer.Channel_ChannelWx),
+	}, map[string]interface{}{
+		lbcustomer.FieldSn_:      callBackData.FromUserName,
+		lbcustomer.FieldChannel_: uint32(lbcustomer.Channel_ChannelWx),
+	}, &lbcustomer.ModelCustomer{})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	// 插入系统账号
+	err = AccountOrm.NewScope().UpdateOrCreate(context.TODO(), map[string]interface{}{
+		lbaccount.FieldSn_:      callBackData.ToUserName,
+		lbaccount.FieldChannel_: uint32(lbaccount.Channel_ChannelWxGzh),
+	}, map[string]interface{}{
+		lbaccount.FieldSn_:      callBackData.ToUserName,
+		lbaccount.FieldChannel_: uint32(lbaccount.Channel_ChannelWxGzh),
+	}, &lbaccount.ModelAccount{})
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
@@ -255,5 +345,96 @@ func SetGptResult(ctx context.Context, uuid string, content string) error {
 		log.Errorf("err:%v", err)
 		return err
 	}
+	return nil
+}
+
+// GetWxGzhAccessToken 获取 accessToken
+func GetWxGzhAccessToken(ctx context.Context) (string, error) {
+	accessToken, err := lb.Rdb.Get(ctx, fmt.Sprintf("%s_%s", lb.WechatConf.AppId, lb.WechatConf.AppSecret)).Result()
+
+	if err != nil && err != redis.Nil {
+		log.Errorf("err:%v", err)
+		return "", err
+	}
+
+	if err == nil && accessToken != "" {
+		return accessToken, nil
+	}
+
+	// 找不到 那就去微信拿
+	resp, err := restysdk.NewRequest().SetQueryParams(map[string]string{
+		"grant_type": "client_credential",
+		"appid":      lb.WechatConf.AppId,
+		"secret":     lb.WechatConf.AppSecret,
+	}).Get(WxGzhAccessTokenUrl)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return "", err
+	}
+
+	log.Debugf("url is %s", resp.Request.URL)
+
+	if err = CheckWxGzhApiErr(resp.Body()); err != nil {
+		log.Errorf("err:%v", err)
+		return "", err
+	}
+
+	var accessResp AccessTokenResp
+	err = json.Unmarshal(resp.Body(), &accessResp)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return "", err
+	}
+
+	if accessResp.AccessToken == "" {
+		log.Errorf("accessResp.AccessToken is null")
+		return "", lberr.NewInvalidArg("accessResp.AccessToken is null")
+	}
+
+	// 写入redis
+	if accessResp.ExpiresIn == 0 {
+		accessResp.ExpiresIn = 7200
+	}
+
+	err = lb.Rdb.Set(ctx, fmt.Sprintf("%s_%s", lb.WechatConf.AppId, lb.WechatConf.AppSecret), accessResp.AccessToken, time.Duration(accessResp.ExpiresIn)*time.Second).Err()
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return "", err
+	}
+
+	return "", nil
+}
+
+// GetWxGzhMediaBytes 获取临时媒体资源的字节流
+func GetWxGzhMediaBytes(ctx context.Context, mediaId string) ([]byte, error) {
+	token, err := GetWxGzhAccessToken(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	resp, err := restysdk.NewRequest().SetQueryParams(map[string]string{
+		"access_token": token,
+		"media_id":     mediaId,
+	}).Get(WxGzhMediaUrl)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	return resp.Body(), nil
+}
+
+// CheckWxGzhApiErr 检查是否错误
+func CheckWxGzhApiErr(data []byte) error {
+	var apiErr WxGzhApiErr
+	err := json.Unmarshal(data, &apiErr)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return err
+	}
+
+	if apiErr.ErrCode != 0 {
+		return &apiErr
+	}
+
 	return nil
 }

@@ -18,7 +18,7 @@ func init() {
 		return
 	}
 	lb = &Tool{}
-	lb.WebTool, _ = webtool2.NewWebTool(v, webtool2.OptionWithOrm(&lbuser.ModelUser{}), webtool2.OptionWithRdb())
+	lb.WebTool, _ = webtool2.NewWebTool(v, webtool2.OptionWithOrm(&lbuser.ModelUser{}), webtool2.OptionWithRdb(), webtool2.OptionWithStorage())
 	InitDbOrm()
 }
 
