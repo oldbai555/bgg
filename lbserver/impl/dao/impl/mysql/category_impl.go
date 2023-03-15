@@ -9,12 +9,9 @@ import (
 	webtool "github.com/oldbai555/bgg/pkg/webtoolv2"
 	"github.com/oldbai555/gorm"
 	"github.com/oldbai555/lbtool/log"
-	"sync/atomic"
 )
 
 var _ dao.CategoryDao = (*CategoryImpl)(nil)
-
-var migratedCategory atomic.Bool
 
 type CategoryImpl struct {
 	mysqlConn
@@ -162,12 +159,10 @@ func NewCategoryImpl(ctx context.Context, dsn string) (dao.CategoryDao, error) {
 			dsn: dsn,
 		},
 	}
-	if !migratedCategory.Load() {
-		err := d.mustGetConn(ctx).Set(autoMigrateOptKey, autoMigrateOptValue).AutoMigrate(&lbblog.ModelCategory{})
-		if err != nil {
-			log.Errorf("err:%v", err)
-			return nil, err
-		}
+	err := d.mustGetConn(ctx).Set(autoMigrateOptKey, autoMigrateOptValue).AutoMigrate(&lbblog.ModelCategory{})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
 	}
 	return d, nil
 }

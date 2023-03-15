@@ -229,7 +229,7 @@ func doHandlerMsgTypeText(callBackData *constant.CallBackData) (string, error) {
 		var uuid = split[1]
 
 		// 从 redis 拿
-		r, err := cache.Rdb.Get(ctx, uuid).Result()
+		content, err = cache.GetGptResult(ctx, uuid)
 		if err != nil && err != redis.Nil {
 			log.Errorf("err:%v", err)
 			return constant.SpeechAnswerFail, nil
@@ -238,15 +238,6 @@ func doHandlerMsgTypeText(callBackData *constant.CallBackData) (string, error) {
 		// 结果为空
 		if err == redis.Nil {
 			return constant.SpeechAnswerReady, nil
-		}
-
-		// 找到啦
-		if err == nil {
-			err := cache.Rdb.Del(ctx, uuid).Err()
-			if err != nil {
-				log.Errorf("err:%v", err)
-			}
-			return r, nil
 		}
 
 		// 应该不会走到这里吧
@@ -280,7 +271,7 @@ func doHandlerMsgTypeText(callBackData *constant.CallBackData) (string, error) {
 			// 出错啦
 			if err != nil {
 				log.Errorf("err:%v", err) // 一般是请求不过去或者网络超时
-				err = SetGptResult(ctx, uuid, constant.SpeechErr)
+				err = cache.SetGptResult(ctx, uuid, constant.SpeechErr)
 				if err != nil {
 					log.Errorf("err:%v", err)
 					return err
@@ -314,7 +305,7 @@ func doHandlerMsgTypeText(callBackData *constant.CallBackData) (string, error) {
 			}
 
 			// 写入redis
-			err = SetGptResult(ctx, uuid, result)
+			err = cache.SetGptResult(ctx, uuid, result)
 			if err != nil {
 				log.Errorf("err:%v", err)
 				return err
@@ -327,7 +318,7 @@ func doHandlerMsgTypeText(callBackData *constant.CallBackData) (string, error) {
 		timer := time.NewTimer(3 * time.Second)
 		select {
 		case <-timer.C:
-			content, err = GetGptResult(ctx, uuid)
+			content, err = cache.GetGptResult(ctx, uuid)
 			if err != nil {
 				log.Errorf("err:%v", err)
 				return content, err
@@ -340,36 +331,6 @@ func doHandlerMsgTypeText(callBackData *constant.CallBackData) (string, error) {
 
 	// 返回结果
 	return content, nil
-}
-
-// GetGptResult 获取gpt的结果
-func GetGptResult(ctx context.Context, uuid string) (content string, err error) {
-	content, err = cache.Rdb.Get(ctx, uuid).Result()
-	if err != nil && err != redis.Nil {
-		log.Errorf("err:%v", err)
-		return
-	}
-	// 没错就结束咯
-	if err == nil {
-		err = cache.Rdb.Del(ctx, uuid).Err()
-		if err != nil {
-			log.Errorf("err:%v", err)
-			return
-		}
-		return
-	}
-	// 拿不到就给个默认的话语
-	return fmt.Sprintf(constant.SpeechQueueStartTemplate, uuid), nil
-}
-
-// SetGptResult 写入gpt的结果
-func SetGptResult(ctx context.Context, uuid string, content string) error {
-	err := cache.Rdb.Set(ctx, uuid, content, time.Hour).Err()
-	if err != nil {
-		log.Errorf("err:%v", err)
-		return err
-	}
-	return nil
 }
 
 // GetWxGzhAccessToken 获取 accessToken
@@ -420,7 +381,7 @@ func GetWxGzhAccessToken(ctx context.Context, appId, appSecret string) (string, 
 		accessResp.ExpiresIn = 7200
 	}
 
-	err = cache.SetWxGzhAccessToken(ctx, fmt.Sprintf("%s_%s", appId, appSecret), accessResp.AccessToken, accessResp.ExpiresIn)
+	err = cache.SetWxGzhAccessToken(ctx, fmt.Sprintf("%s_%s", appId, appSecret), accessResp.AccessToken, time.Duration(accessResp.ExpiresIn)*time.Second)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return "", err

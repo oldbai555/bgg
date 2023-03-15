@@ -9,12 +9,9 @@ import (
 	webtool "github.com/oldbai555/bgg/pkg/webtoolv2"
 	"github.com/oldbai555/gorm"
 	"github.com/oldbai555/lbtool/log"
-	"sync/atomic"
 )
 
 var _ dao.CustomerDao = (*CustomerImpl)(nil)
-
-var migratedCustomer atomic.Bool
 
 type CustomerImpl struct {
 	mysqlConn
@@ -162,12 +159,10 @@ func NewCustomerImpl(ctx context.Context, dsn string) (dao.CustomerDao, error) {
 			dsn: dsn,
 		},
 	}
-	if !migratedCustomer.Load() {
-		err := d.mustGetConn(ctx).Set(autoMigrateOptKey, autoMigrateOptValue).AutoMigrate(&lbcustomer.ModelCustomer{})
-		if err != nil {
-			log.Errorf("err:%v", err)
-			return nil, err
-		}
+	err := d.mustGetConn(ctx).Set(autoMigrateOptKey, autoMigrateOptValue).AutoMigrate(&lbcustomer.ModelCustomer{})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
 	}
 	return d, nil
 }

@@ -76,13 +76,13 @@ func (a *LbuserServer) Login(ctx context.Context, req *lbuser.LoginReq) (*lbuser
 	}
 
 	sid := utils.GenUUID()
-	err = cache.Rdb.Set(ctx, sid, genToken, time.Hour).Err()
+	err = cache.SetLoginUserToken(ctx, sid, genToken, time.Hour)
 	if err != nil {
 		log.Errorf("err is : %v", err)
 		return nil, err
 	}
 
-	err = cache.Rdb.SetJson(ctx, fmt.Sprintf("%d", user.Id), user, time.Hour)
+	err = cache.SetLoginUser(ctx, fmt.Sprintf("%d", user.Id), user, time.Hour)
 	if err != nil {
 		log.Errorf("err is %v", err)
 		return nil, err
@@ -169,7 +169,7 @@ func (a *LbuserServer) UpdateUserNameWithRole(ctx context.Context, req *lbuser.U
 func (a *LbuserServer) Logout(ctx context.Context, req *lbuser.LogoutReq) (*lbuser.LogoutRsp, error) {
 	var rsp lbuser.LogoutRsp
 
-	err := cache.Rdb.Del(ctx, req.Sid).Err()
+	err := cache.DelLoginUserToken(ctx, req.Sid)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err

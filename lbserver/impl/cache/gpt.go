@@ -2,29 +2,36 @@ package cache
 
 import (
 	"context"
+	"fmt"
 	"github.com/go-redis/redis/v8"
+	"github.com/oldbai555/bgg/lbserver/impl/constant"
 	"github.com/oldbai555/lbtool/log"
 	"time"
 )
 
-// GetWxGzhAccessToken 获取 accessToken
-func GetWxGzhAccessToken(ctx context.Context, key string) (string, error) {
-	accessToken, err := Rdb.Get(ctx, key).Result()
-
+// GetGptResult 获取gpt的结果
+func GetGptResult(ctx context.Context, uuid string) (content string, err error) {
+	content, err = rdb.Get(ctx, uuid).Result()
 	if err != nil && err != redis.Nil {
 		log.Errorf("err:%v", err)
-		return "", err
+		return
 	}
-
-	if err == nil && accessToken != "" {
-		return accessToken, nil
+	// 没错就结束咯
+	if err == nil {
+		err = rdb.Del(ctx, uuid).Err()
+		if err != nil {
+			log.Errorf("err:%v", err)
+			return
+		}
+		return
 	}
-	return "", nil
+	// 拿不到就给个默认的话语
+	return fmt.Sprintf(constant.SpeechQueueStartTemplate, uuid), nil
 }
 
-// SetWxGzhAccessToken 设置 accessToken
-func SetWxGzhAccessToken(ctx context.Context, key, val string, expiresIn uint32) error {
-	err := Rdb.Set(ctx, key, val, time.Duration(expiresIn)*time.Second).Err()
+// SetGptResult 写入gpt的结果
+func SetGptResult(ctx context.Context, uuid string, content string) error {
+	err := rdb.Set(ctx, uuid, content, time.Hour).Err()
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return err

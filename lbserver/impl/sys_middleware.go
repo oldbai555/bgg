@@ -68,7 +68,7 @@ func RegisterJwt() gin.HandlerFunc {
 		sid := handler.GetHeader(HttpHeaderAuthorization)
 
 		// step 2: 拿到 token
-		token, err := cache.Rdb.Get(c, sid).Result()
+		token, err := cache.GetLoginUserToken(c, sid)
 		if err != nil {
 			log.Errorf("err is : %v", err)
 			handler.Response(http.StatusOK, http.StatusUnauthorized, nil, "权限不足")

@@ -63,7 +63,7 @@ func (r *Handler) CheckUser() (*lbuser.ModelUser, error) {
 		return nil, err
 	}
 	var user lbuser.ModelUser
-	err = cache.Rdb.GetJson(context.TODO(), fmt.Sprintf("%d", claims.UserId), &user)
+	err = cache.GetLoginUser(context.TODO(), fmt.Sprintf("%d", claims.UserId), &user)
 	if err != nil {
 		log.Errorf("err is %v", err)
 		return nil, err

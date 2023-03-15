@@ -9,12 +9,9 @@ import (
 	webtool "github.com/oldbai555/bgg/pkg/webtoolv2"
 	"github.com/oldbai555/gorm"
 	"github.com/oldbai555/lbtool/log"
-	"sync/atomic"
 )
 
 var _ dao.MessageDao = (*MessageImpl)(nil)
-
-var migratedMessage atomic.Bool
 
 type MessageImpl struct {
 	mysqlConn
@@ -162,12 +159,10 @@ func NewMessageImpl(ctx context.Context, dsn string) (dao.MessageDao, error) {
 			dsn: dsn,
 		},
 	}
-	if !migratedMessage.Load() {
-		err := d.mustGetConn(ctx).Set(autoMigrateOptKey, autoMigrateOptValue).AutoMigrate(&lbim.ModelMessage{})
-		if err != nil {
-			log.Errorf("err:%v", err)
-			return nil, err
-		}
+	err := d.mustGetConn(ctx).Set(autoMigrateOptKey, autoMigrateOptValue).AutoMigrate(&lbim.ModelMessage{})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
 	}
 	return d, nil
 }

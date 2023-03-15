@@ -10,12 +10,9 @@ import (
 	webtool "github.com/oldbai555/bgg/pkg/webtoolv2"
 	"github.com/oldbai555/gorm"
 	"github.com/oldbai555/lbtool/log"
-	"sync/atomic"
 )
 
 var _ dao.UserDao = (*UserImpl)(nil)
-
-var migratedUser atomic.Bool
 
 type UserImpl struct {
 	mysqlConn
@@ -209,12 +206,10 @@ func NewUserImpl(ctx context.Context, dsn string) (dao.UserDao, error) {
 			dsn: dsn,
 		},
 	}
-	if !migratedUser.Load() {
-		err := d.mustGetConn(ctx).Set(autoMigrateOptKey, autoMigrateOptValue).AutoMigrate(&lbuser.ModelUser{})
-		if err != nil {
-			log.Errorf("err:%v", err)
-			return nil, err
-		}
+	err := d.mustGetConn(ctx).Set(autoMigrateOptKey, autoMigrateOptValue).AutoMigrate(&lbuser.ModelUser{})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
 	}
 	return d, nil
 }

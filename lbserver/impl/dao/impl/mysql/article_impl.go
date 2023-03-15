@@ -10,12 +10,9 @@ import (
 	webtool "github.com/oldbai555/bgg/pkg/webtoolv2"
 	"github.com/oldbai555/gorm"
 	"github.com/oldbai555/lbtool/log"
-	"sync/atomic"
 )
 
 var _ dao.ArticleDao = (*ArticleImpl)(nil)
-
-var migratedArticle atomic.Bool
 
 type ArticleImpl struct {
 	mysqlConn
@@ -171,12 +168,10 @@ func NewArticleImpl(ctx context.Context, dsn string) (dao.ArticleDao, error) {
 			dsn: dsn,
 		},
 	}
-	if !migratedArticle.Load() {
-		err := d.mustGetConn(ctx).Set(autoMigrateOptKey, autoMigrateOptValue).AutoMigrate(&lbblog.ModelArticle{})
-		if err != nil {
-			log.Errorf("err:%v", err)
-			return nil, err
-		}
+	err := d.mustGetConn(ctx).Set(autoMigrateOptKey, autoMigrateOptValue).AutoMigrate(&lbblog.ModelArticle{})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
 	}
 	return d, nil
 }

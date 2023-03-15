@@ -9,12 +9,9 @@ import (
 	webtool "github.com/oldbai555/bgg/pkg/webtoolv2"
 	"github.com/oldbai555/gorm"
 	"github.com/oldbai555/lbtool/log"
-	"sync/atomic"
 )
 
 var _ dao.CommentDao = (*CommentImpl)(nil)
-
-var migratedComment atomic.Bool
 
 type CommentImpl struct {
 	mysqlConn
@@ -166,12 +163,10 @@ func NewCommentImpl(ctx context.Context, dsn string) (dao.CommentDao, error) {
 			dsn: dsn,
 		},
 	}
-	if !migratedComment.Load() {
-		err := d.mustGetConn(ctx).Set(autoMigrateOptKey, autoMigrateOptValue).AutoMigrate(&lbblog.ModelComment{})
-		if err != nil {
-			log.Errorf("err:%v", err)
-			return nil, err
-		}
+	err := d.mustGetConn(ctx).Set(autoMigrateOptKey, autoMigrateOptValue).AutoMigrate(&lbblog.ModelComment{})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
 	}
 	return d, nil
 }
