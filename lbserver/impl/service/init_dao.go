@@ -18,6 +18,7 @@ var (
 )
 
 func InitDao(ctx context.Context, dsn string) (err error) {
+	log.Infof("start init db dao......")
 	Account, err = mysql.NewAccountImpl(ctx, dsn)
 	if err != nil {
 		log.Errorf("err:%v", err)
@@ -53,5 +54,6 @@ func InitDao(ctx context.Context, dsn string) (err error) {
 		log.Errorf("err:%v", err)
 		return
 	}
+	log.Infof("stop init db dao......")
 	return
 }

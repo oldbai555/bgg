@@ -17,6 +17,10 @@ type MessageImpl struct {
 	mysqlConn
 }
 
+func (a *MessageImpl) mustGetConn(ctx context.Context) *gorm.DB {
+	return a.mysqlConn.mustGetConn(ctx).Model(&lbim.ModelMessage{})
+}
+
 func (a *MessageImpl) UpdateByIdList(ctx context.Context, idList []uint64, updateMap map[string]interface{}) error {
 	db := webtool.NewCondBuilder(a.mustGetConn(ctx))
 	_, err := db.In(lbim.FieldId_, idList).Update(ctx, updateMap)
@@ -159,10 +163,12 @@ func NewMessageImpl(ctx context.Context, dsn string) (dao.MessageDao, error) {
 			dsn: dsn,
 		},
 	}
-	err := d.mustGetConn(ctx).Set(autoMigrateOptKey, autoMigrateOptValue).AutoMigrate(&lbim.ModelMessage{})
+
+	err := d.mysqlConn.mustGetConn(ctx).Set(autoMigrateOptKey, autoMigrateOptValue).AutoMigrate(&lbim.ModelMessage{})
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
 	}
+
 	return d, nil
 }

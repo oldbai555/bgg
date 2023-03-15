@@ -73,11 +73,7 @@ func WXMsgReceive(c *gin.Context) {
 		return
 	}
 
-	WXMsgReply(c, reply)
-}
-
-// WXMsgReply 微信消息回复
-func WXMsgReply(c *gin.Context, reply *constant.WXRepTextMsg) {
+	// 微信消息回复
 	log.Infof("reply: %v", reply)
 	msg, err := xml.Marshal(&reply)
 	if err != nil {

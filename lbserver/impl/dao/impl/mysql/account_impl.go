@@ -17,6 +17,10 @@ type AccountImpl struct {
 	mysqlConn
 }
 
+func (a *AccountImpl) mustGetConn(ctx context.Context) *gorm.DB {
+	return a.mysqlConn.mustGetConn(ctx).Model(&lbaccount.ModelAccount{})
+}
+
 func (a *AccountImpl) UpdateByIdList(ctx context.Context, idList []uint64, updateMap map[string]interface{}) error {
 	db := webtool.NewCondBuilder(a.mustGetConn(ctx))
 	_, err := db.In(lbaccount.FieldId_, idList).Update(ctx, updateMap)
@@ -159,7 +163,8 @@ func NewAccountImpl(ctx context.Context, dsn string) (dao.AccountDao, error) {
 			dsn: dsn,
 		},
 	}
-	err := d.mustGetConn(ctx).Set(autoMigrateOptKey, autoMigrateOptValue).AutoMigrate(&lbaccount.ModelAccount{})
+
+	err := d.mysqlConn.mustGetConn(ctx).Set(autoMigrateOptKey, autoMigrateOptValue).AutoMigrate(&lbaccount.ModelAccount{})
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err

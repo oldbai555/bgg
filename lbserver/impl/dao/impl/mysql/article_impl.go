@@ -18,6 +18,10 @@ type ArticleImpl struct {
 	mysqlConn
 }
 
+func (a *ArticleImpl) mustGetConn(ctx context.Context) *gorm.DB {
+	return a.mysqlConn.mustGetConn(ctx).Model(&lbblog.ModelArticle{})
+}
+
 func (a *ArticleImpl) UpdateByIdList(ctx context.Context, idList []uint64, updateMap map[string]interface{}) error {
 	db := webtool.NewCondBuilder(a.mustGetConn(ctx))
 	_, err := db.In(lbblog.FieldId_, idList).Update(ctx, updateMap)
@@ -168,7 +172,7 @@ func NewArticleImpl(ctx context.Context, dsn string) (dao.ArticleDao, error) {
 			dsn: dsn,
 		},
 	}
-	err := d.mustGetConn(ctx).Set(autoMigrateOptKey, autoMigrateOptValue).AutoMigrate(&lbblog.ModelArticle{})
+	err := d.mysqlConn.mustGetConn(ctx).Set(autoMigrateOptKey, autoMigrateOptValue).AutoMigrate(&lbblog.ModelArticle{})
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err

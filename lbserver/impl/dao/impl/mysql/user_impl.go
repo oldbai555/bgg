@@ -18,6 +18,10 @@ type UserImpl struct {
 	mysqlConn
 }
 
+func (a *UserImpl) mustGetConn(ctx context.Context) *gorm.DB {
+	return a.mysqlConn.mustGetConn(ctx).Model(&lbuser.ModelUser{})
+}
+
 // id:需要排除的 ID
 func (a *UserImpl) CheckUserNameExit(ctx context.Context, id uint64, username string) (bool, error) {
 	db := webtool.NewCondBuilder(a.mustGetConn(ctx))
@@ -206,7 +210,7 @@ func NewUserImpl(ctx context.Context, dsn string) (dao.UserDao, error) {
 			dsn: dsn,
 		},
 	}
-	err := d.mustGetConn(ctx).Set(autoMigrateOptKey, autoMigrateOptValue).AutoMigrate(&lbuser.ModelUser{})
+	err := d.mysqlConn.mustGetConn(ctx).Set(autoMigrateOptKey, autoMigrateOptValue).AutoMigrate(&lbuser.ModelUser{})
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err

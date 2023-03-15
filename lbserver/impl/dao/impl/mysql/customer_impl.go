@@ -17,6 +17,10 @@ type CustomerImpl struct {
 	mysqlConn
 }
 
+func (a *CustomerImpl) mustGetConn(ctx context.Context) *gorm.DB {
+	return a.mysqlConn.mustGetConn(ctx).Model(&lbcustomer.ModelCustomer{})
+}
+
 func (a *CustomerImpl) UpdateByIdList(ctx context.Context, idList []uint64, updateMap map[string]interface{}) error {
 	db := webtool.NewCondBuilder(a.mustGetConn(ctx))
 	_, err := db.In(lbcustomer.FieldId_, idList).Update(ctx, updateMap)
@@ -159,10 +163,12 @@ func NewCustomerImpl(ctx context.Context, dsn string) (dao.CustomerDao, error) {
 			dsn: dsn,
 		},
 	}
-	err := d.mustGetConn(ctx).Set(autoMigrateOptKey, autoMigrateOptValue).AutoMigrate(&lbcustomer.ModelCustomer{})
+
+	err := d.mysqlConn.mustGetConn(ctx).Set(autoMigrateOptKey, autoMigrateOptValue).AutoMigrate(&lbcustomer.ModelCustomer{})
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
 	}
+
 	return d, nil
 }

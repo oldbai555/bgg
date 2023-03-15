@@ -17,6 +17,10 @@ type CategoryImpl struct {
 	mysqlConn
 }
 
+func (a *CategoryImpl) mustGetConn(ctx context.Context) *gorm.DB {
+	return a.mysqlConn.mustGetConn(ctx).Model(&lbblog.ModelCategory{})
+}
+
 func (a *CategoryImpl) UpdateByIdList(ctx context.Context, idList []uint64, updateMap map[string]interface{}) error {
 	db := webtool.NewCondBuilder(a.mustGetConn(ctx))
 	_, err := db.In(lbblog.FieldId_, idList).Update(ctx, updateMap)
@@ -159,7 +163,7 @@ func NewCategoryImpl(ctx context.Context, dsn string) (dao.CategoryDao, error) {
 			dsn: dsn,
 		},
 	}
-	err := d.mustGetConn(ctx).Set(autoMigrateOptKey, autoMigrateOptValue).AutoMigrate(&lbblog.ModelCategory{})
+	err := d.mysqlConn.mustGetConn(ctx).Set(autoMigrateOptKey, autoMigrateOptValue).AutoMigrate(&lbblog.ModelCategory{})
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err

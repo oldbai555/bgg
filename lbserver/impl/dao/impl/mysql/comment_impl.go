@@ -17,6 +17,10 @@ type CommentImpl struct {
 	mysqlConn
 }
 
+func (a *CommentImpl) mustGetConn(ctx context.Context) *gorm.DB {
+	return a.mysqlConn.mustGetConn(ctx).Model(&lbblog.ModelComment{})
+}
+
 func (a *CommentImpl) UpdateByIdList(ctx context.Context, idList []uint64, updateMap map[string]interface{}) error {
 	db := webtool.NewCondBuilder(a.mustGetConn(ctx))
 	_, err := db.In(lbblog.FieldId_, idList).Update(ctx, updateMap)
@@ -163,7 +167,7 @@ func NewCommentImpl(ctx context.Context, dsn string) (dao.CommentDao, error) {
 			dsn: dsn,
 		},
 	}
-	err := d.mustGetConn(ctx).Set(autoMigrateOptKey, autoMigrateOptValue).AutoMigrate(&lbblog.ModelComment{})
+	err := d.mysqlConn.mustGetConn(ctx).Set(autoMigrateOptKey, autoMigrateOptValue).AutoMigrate(&lbblog.ModelComment{})
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
