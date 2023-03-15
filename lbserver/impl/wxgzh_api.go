@@ -1,14 +1,14 @@
 package impl
 
 import (
-	"context"
 	"crypto/sha1"
 	"encoding/xml"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/oldbai555/bgg/client/lbim"
+	"github.com/oldbai555/bgg/lbserver/impl/conf"
+	"github.com/oldbai555/bgg/lbserver/impl/constant"
+	"github.com/oldbai555/bgg/lbserver/impl/service"
 	"github.com/oldbai555/lbtool/log"
-	"github.com/oldbai555/lbtool/utils"
 	"sort"
 )
 
@@ -29,7 +29,7 @@ func WXGzhAuth(c *gin.Context) {
 	nonce, _ := handler.GetQuery("nonce")
 
 	// 3.token，timestamp，nonce按字典排序的字符串list
-	strs := sort.StringSlice{lb.WechatConf.Token, timestamp, nonce} // 使用本地的token生成校验
+	strs := sort.StringSlice{conf.Global.WxGzhConf.Token, timestamp, nonce} // 使用本地的token生成校验
 	sort.Strings(strs)
 	str := ""
 	for _, s := range strs {
@@ -59,7 +59,7 @@ func WXGzhAuth(c *gin.Context) {
 
 // WXMsgReceive 微信消息接收
 func WXMsgReceive(c *gin.Context) {
-	var callBackData CallBackData
+	var callBackData constant.CallBackData
 	err := c.ShouldBindXML(&callBackData)
 	if err != nil {
 		log.Infof("[消息接收] - XML数据包解析失败: %v", err)
@@ -67,7 +67,7 @@ func WXMsgReceive(c *gin.Context) {
 	}
 
 	log.Infof("[消息接收] - 收到消息, 消息类型为: %s , 消息内容: %v", callBackData.MsgType, callBackData)
-	reply, err := doHandlerWXMsgReceive(&callBackData)
+	reply, err := service.DoHandlerWXMsgReceive(&callBackData)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return
@@ -77,7 +77,7 @@ func WXMsgReceive(c *gin.Context) {
 }
 
 // WXMsgReply 微信消息回复
-func WXMsgReply(c *gin.Context, reply *WXRepTextMsg) {
+func WXMsgReply(c *gin.Context, reply *constant.WXRepTextMsg) {
 	log.Infof("reply: %v", reply)
 	msg, err := xml.Marshal(&reply)
 	if err != nil {
@@ -87,25 +87,6 @@ func WXMsgReply(c *gin.Context, reply *WXRepTextMsg) {
 
 	// 回复消息
 	_, err = c.Writer.Write(msg)
-	if err != nil {
-		log.Errorf("err:%v", err)
-		return
-	}
-
-	// 将消息写入数据库
-	// todo 应该补充消息发送状态
-	err = MessageOrm.NewScope().Create(context.TODO(), &lbim.ModelMessage{
-		SysMsgId: utils.GenUUID(),
-		SendAt:   uint64(reply.CreateTime),
-		From:     reply.FromUserName,
-		To:       reply.ToUserName,
-		Source:   uint32(lbim.MessageSource_MessageSourceWxGzh),
-		Content: &lbim.Content{
-			Text: &lbim.Content_Text{
-				Content: reply.Content,
-			},
-		},
-	})
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return

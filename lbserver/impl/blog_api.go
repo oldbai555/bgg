@@ -3,6 +3,7 @@ package impl
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/oldbai555/bgg/client/lbblog"
+	"github.com/oldbai555/bgg/lbserver/impl/service"
 	"github.com/oldbai555/lbtool/log"
 )
 
@@ -47,7 +48,7 @@ func GetArticleList(c *gin.Context) {
 		return
 	}
 
-	rsp, err := lbblogServer.GetArticleList(c, &req)
+	rsp, err := service.BlogServer.GetArticleList(c, &req)
 	if err != nil {
 		log.Errorf("err is : %v", err)
 		handler.RespError(err)
@@ -73,7 +74,7 @@ func GetArticle(c *gin.Context) {
 		return
 	}
 
-	rsp, err := lbblogServer.GetArticle(c, &req)
+	rsp, err := service.BlogServer.GetArticle(c, &req)
 	if err != nil {
 		log.Errorf("err is : %v", err)
 		handler.RespError(err)
@@ -99,7 +100,7 @@ func UpdateArticle(c *gin.Context) {
 		return
 	}
 
-	rsp, err := lbblogServer.UpdateArticle(c, &req)
+	rsp, err := service.BlogServer.UpdateArticle(c, &req)
 	if err != nil {
 		log.Errorf("err is : %v", err)
 		handler.RespError(err)
@@ -125,7 +126,7 @@ func DelArticle(c *gin.Context) {
 		return
 	}
 
-	rsp, err := lbblogServer.DelArticle(c, &req)
+	rsp, err := service.BlogServer.DelArticle(c, &req)
 	if err != nil {
 		log.Errorf("err is : %v", err)
 		handler.RespError(err)
@@ -151,7 +152,7 @@ func AddArticle(c *gin.Context) {
 		return
 	}
 
-	rsp, err := lbblogServer.AddArticle(c, &req)
+	rsp, err := service.BlogServer.AddArticle(c, &req)
 	if err != nil {
 		log.Errorf("err is : %v", err)
 		handler.RespError(err)
@@ -177,7 +178,7 @@ func GetCategoryList(c *gin.Context) {
 		return
 	}
 
-	rsp, err := lbblogServer.GetCategoryList(c, &req)
+	rsp, err := service.BlogServer.GetCategoryList(c, &req)
 	if err != nil {
 		log.Errorf("err is : %v", err)
 		handler.RespError(err)
@@ -203,7 +204,7 @@ func GetCategory(c *gin.Context) {
 		return
 	}
 
-	rsp, err := lbblogServer.GetCategory(c, &req)
+	rsp, err := service.BlogServer.GetCategory(c, &req)
 	if err != nil {
 		log.Errorf("err is : %v", err)
 		handler.RespError(err)
@@ -229,7 +230,7 @@ func UpdateCategory(c *gin.Context) {
 		return
 	}
 
-	rsp, err := lbblogServer.UpdateCategory(c, &req)
+	rsp, err := service.BlogServer.UpdateCategory(c, &req)
 	if err != nil {
 		log.Errorf("err is : %v", err)
 		handler.RespError(err)
@@ -255,7 +256,7 @@ func DelCategory(c *gin.Context) {
 		return
 	}
 
-	rsp, err := lbblogServer.DelCategory(c, &req)
+	rsp, err := service.BlogServer.DelCategory(c, &req)
 	if err != nil {
 		log.Errorf("err is : %v", err)
 		handler.RespError(err)
@@ -281,7 +282,7 @@ func AddCategory(c *gin.Context) {
 		return
 	}
 
-	rsp, err := lbblogServer.AddCategory(c, &req)
+	rsp, err := service.BlogServer.AddCategory(c, &req)
 	if err != nil {
 		log.Errorf("err is : %v", err)
 		handler.RespError(err)
@@ -307,7 +308,7 @@ func GetCommentList(c *gin.Context) {
 		return
 	}
 
-	rsp, err := lbblogServer.GetCommentList(c, &req)
+	rsp, err := service.BlogServer.GetCommentList(c, &req)
 	if err != nil {
 		log.Errorf("err is : %v", err)
 		handler.RespError(err)
@@ -333,7 +334,7 @@ func GetComment(c *gin.Context) {
 		return
 	}
 
-	rsp, err := lbblogServer.GetComment(c, &req)
+	rsp, err := service.BlogServer.GetComment(c, &req)
 	if err != nil {
 		log.Errorf("err is : %v", err)
 		handler.RespError(err)
@@ -359,7 +360,7 @@ func UpdateComment(c *gin.Context) {
 		return
 	}
 
-	rsp, err := lbblogServer.UpdateComment(c, &req)
+	rsp, err := service.BlogServer.UpdateComment(c, &req)
 	if err != nil {
 		log.Errorf("err is : %v", err)
 		handler.RespError(err)
@@ -385,7 +386,7 @@ func DelComment(c *gin.Context) {
 		return
 	}
 
-	rsp, err := lbblogServer.DelComment(c, &req)
+	rsp, err := service.BlogServer.DelComment(c, &req)
 	if err != nil {
 		log.Errorf("err is : %v", err)
 		handler.RespError(err)
@@ -411,7 +412,7 @@ func AddComment(c *gin.Context) {
 		return
 	}
 
-	rsp, err := lbblogServer.AddComment(c, &req)
+	rsp, err := service.BlogServer.AddComment(c, &req)
 	if err != nil {
 		log.Errorf("err is : %v", err)
 		handler.RespError(err)

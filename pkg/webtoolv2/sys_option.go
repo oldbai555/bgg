@@ -4,7 +4,7 @@ type Option func(tool *WebTool)
 
 func OptionWithOrm() Option {
 	return func(tool *WebTool) {
-		tool.GormMysqlConf = NewGormMysqlConf(tool.V)
+		tool.MysqlConf = NewGormMysqlConf(tool.V)
 	}
 }
 
@@ -29,5 +29,11 @@ func OptionWithServer() Option {
 func OptionWithWxGzh() Option {
 	return func(tool *WebTool) {
 		tool.WxGzhConf = NewWxGzhConf(tool.V)
+	}
+}
+
+func OptionWithChatGpt() Option {
+	return func(tool *WebTool) {
+		tool.ChatGpt = NewChatGpt(tool.V)
 	}
 }

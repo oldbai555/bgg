@@ -1,4 +1,4 @@
-package impl
+package constant
 
 import (
 	"github.com/oldbai555/bgg/client/lbuser"

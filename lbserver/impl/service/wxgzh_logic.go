@@ -1,4 +1,4 @@
-package impl
+package service
 
 import (
 	"context"
@@ -8,7 +8,11 @@ import (
 	"github.com/oldbai555/bgg/client/lbaccount"
 	"github.com/oldbai555/bgg/client/lbcustomer"
 	"github.com/oldbai555/bgg/client/lbim"
+	"github.com/oldbai555/bgg/lbserver/impl/cache"
+	"github.com/oldbai555/bgg/lbserver/impl/conf"
+	"github.com/oldbai555/bgg/lbserver/impl/constant"
 	"github.com/oldbai555/bgg/lbserver/impl/gpt"
+	"github.com/oldbai555/bgg/lbserver/impl/storage"
 	"github.com/oldbai555/bgg/lbserver/impl/wordscheck"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/lberr"
@@ -20,12 +24,12 @@ import (
 )
 
 // 处理回调
-func doHandlerWXMsgReceive(callBackData *CallBackData) (*WXRepTextMsg, error) {
-	var rsp = WXRepTextMsg{
+func DoHandlerWXMsgReceive(callBackData *constant.CallBackData) (*constant.WXRepTextMsg, error) {
+	var rsp = constant.WXRepTextMsg{
 		ToUserName:   callBackData.FromUserName,
 		FromUserName: callBackData.ToUserName,
 		CreateTime:   time.Now().Unix(),
-		MsgType:      MsgTypeText,
+		MsgType:      constant.MsgTypeText,
 	}
 
 	var msg = lbim.ModelMessage{
@@ -39,14 +43,14 @@ func doHandlerWXMsgReceive(callBackData *CallBackData) (*WXRepTextMsg, error) {
 
 	var err error
 	switch callBackData.MsgType {
-	case MsgTypeText:
+	case constant.MsgTypeText:
 		rsp.Content, err = doHandlerMsgTypeText(callBackData)
 		msg.Content.Text = &lbim.Content_Text{
 			Content: callBackData.Content,
 		}
-	case MsgTypeImage:
-		rsp.Content = SpeechErr
-		url, err := ConvertMediaUrl(fmt.Sprintf("%s.jpg", utils.GenUUID()), callBackData.PicUrl)
+	case constant.MsgTypeImage:
+		rsp.Content = constant.SpeechErr
+		url, err := storage.ConvertMediaUrl(fmt.Sprintf("%s.jpg", utils.GenUUID()), callBackData.PicUrl)
 		if err != nil {
 			log.Errorf("err is %v", err)
 			url = callBackData.PicUrl
@@ -54,15 +58,15 @@ func doHandlerWXMsgReceive(callBackData *CallBackData) (*WXRepTextMsg, error) {
 		msg.Content.Image = &lbim.Content_Image{
 			Url: url,
 		}
-	case MsgTypeVoice:
+	case constant.MsgTypeVoice:
 		// 语音获取资源是得到一个字节流文件，可以直接下载
-		rsp.Content = SpeechErr
+		rsp.Content = constant.SpeechErr
 		bytes, err := GetWxGzhMediaBytes(context.TODO(), callBackData.MediaId)
 		if err != nil {
 			log.Errorf("err:%v", err)
 			return nil, err
 		}
-		url, err := ConvertMediaBytes(fmt.Sprintf("%s.%s", utils.GenUUID(), callBackData.Format), bytes)
+		url, err := storage.ConvertMediaBytes(fmt.Sprintf("%s.%s", utils.GenUUID(), callBackData.Format), bytes)
 		if err != nil {
 			log.Errorf("err:%v", err)
 			url = callBackData.MediaId
@@ -72,15 +76,15 @@ func doHandlerWXMsgReceive(callBackData *CallBackData) (*WXRepTextMsg, error) {
 			Format:      callBackData.Format,
 			Recognition: callBackData.Recognition,
 		}
-	case MsgTypeVideo:
-		rsp.Content = SpeechErr
+	case constant.MsgTypeVideo:
+		rsp.Content = constant.SpeechErr
 		bytes, err := GetWxGzhMediaBytes(context.TODO(), callBackData.MediaId)
 		if err != nil {
 			log.Errorf("err:%v", err)
 			return nil, err
 		}
 
-		url, err := ConvertMediaBytes(fmt.Sprintf("%s.mp4", utils.GenUUID()), bytes)
+		url, err := storage.ConvertMediaBytes(fmt.Sprintf("%s.mp4", utils.GenUUID()), bytes)
 		if err != nil {
 			log.Errorf("err:%v", err)
 			url = callBackData.MediaId
@@ -91,7 +95,7 @@ func doHandlerWXMsgReceive(callBackData *CallBackData) (*WXRepTextMsg, error) {
 			return nil, err
 		}
 
-		videoPicUrl, err := ConvertMediaBytes(fmt.Sprintf("%s.jpg", utils.GenUUID()), bytes)
+		videoPicUrl, err := storage.ConvertMediaBytes(fmt.Sprintf("%s.jpg", utils.GenUUID()), bytes)
 		if err != nil {
 			log.Errorf("err:%v", err)
 			videoPicUrl = callBackData.ThumbMediaId
@@ -100,24 +104,24 @@ func doHandlerWXMsgReceive(callBackData *CallBackData) (*WXRepTextMsg, error) {
 			Url:     url,
 			Caption: videoPicUrl, // todo 应有一个字段来承接视频封面
 		}
-	case MsgTypeLocation:
-		rsp.Content = SpeechErr
+	case constant.MsgTypeLocation:
+		rsp.Content = constant.SpeechErr
 		msg.Content.Location = &lbim.Content_Location{
 			X:     callBackData.Location_X,
 			Y:     callBackData.Location_Y,
 			Scale: float64(callBackData.Scale),
 			Label: callBackData.Label,
 		}
-	case MsgTypeLink:
-		rsp.Content = SpeechErr
+	case constant.MsgTypeLink:
+		rsp.Content = constant.SpeechErr
 		msg.Content.Document = &lbim.Content_Document{
 			Url:     callBackData.Url,
 			Caption: fmt.Sprintf("标题：%s,描述：%s", callBackData.Title, callBackData.Description),
 		}
-	case MsgTypeEvent:
+	case constant.MsgTypeEvent:
 		rsp.Content, err = doHandlerWxEvent(callBackData)
 	default:
-		rsp.Content = SpeechErr
+		rsp.Content = constant.SpeechErr
 	}
 
 	if err != nil {
@@ -126,14 +130,14 @@ func doHandlerWXMsgReceive(callBackData *CallBackData) (*WXRepTextMsg, error) {
 	}
 
 	// 插入消息记录
-	err = MessageOrm.NewScope().Create(context.TODO(), &msg)
+	err = Message.Create(context.TODO(), &msg)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
 	}
 
 	// 插入客户
-	err = CustomerOrm.NewScope().UpdateOrCreate(context.TODO(), map[string]interface{}{
+	err = Customer.UpdateOrCreate(context.TODO(), map[string]interface{}{
 		lbcustomer.FieldSn_:      callBackData.FromUserName,
 		lbcustomer.FieldChannel_: uint32(lbcustomer.Channel_ChannelWx),
 	}, map[string]interface{}{
@@ -146,7 +150,7 @@ func doHandlerWXMsgReceive(callBackData *CallBackData) (*WXRepTextMsg, error) {
 	}
 
 	// 插入系统账号
-	err = AccountOrm.NewScope().UpdateOrCreate(context.TODO(), map[string]interface{}{
+	err = Account.UpdateOrCreate(context.TODO(), map[string]interface{}{
 		lbaccount.FieldSn_:      callBackData.ToUserName,
 		lbaccount.FieldChannel_: uint32(lbaccount.Channel_ChannelWxGzh),
 	}, map[string]interface{}{
@@ -158,67 +162,87 @@ func doHandlerWXMsgReceive(callBackData *CallBackData) (*WXRepTextMsg, error) {
 		return nil, err
 	}
 
+	// 写入回复消息
+	// 将消息写入数据库
+	// todo 应该补充消息发送状态
+	err = Message.Create(context.TODO(), &lbim.ModelMessage{
+		SysMsgId: utils.GenUUID(),
+		SendAt:   uint64(rsp.CreateTime),
+		From:     rsp.FromUserName,
+		To:       rsp.ToUserName,
+		Source:   uint32(lbim.MessageSource_MessageSourceWxGzh),
+		Content: &lbim.Content{
+			Text: &lbim.Content_Text{
+				Content: rsp.Content,
+			},
+		},
+	})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
 	return &rsp, nil
 }
 
 // 处理事件回调
-func doHandlerWxEvent(callBackData *CallBackData) (content string, err error) {
+func doHandlerWxEvent(callBackData *constant.CallBackData) (content string, err error) {
 	switch callBackData.Event {
-	case EventTypeSubscribe:
+	case constant.EventTypeSubscribe:
 		content = "谢谢你那么好看还可以来关注我 ~ 我是一个热爱技术的公众号，你可以向我提问，但我不一定会。"
-	case EventTypeUnsubscribe:
+	case constant.EventTypeUnsubscribe:
 		content = "希望下一次你还能关注我"
-	case EventTypeScan:
-	case EventTypeLocation:
-	case EventTypeClick:
-	case EventTypeView:
+	case constant.EventTypeScan:
+	case constant.EventTypeLocation:
+	case constant.EventTypeClick:
+	case constant.EventTypeView:
 	default:
-		content = SpeechErr
+		content = constant.SpeechErr
 	}
 	return
 }
 
 // 处理文本回调
-func doHandlerMsgTypeText(callBackData *CallBackData) (string, error) {
+func doHandlerMsgTypeText(callBackData *constant.CallBackData) (string, error) {
 	ctx := context.TODO()
-	var content = SpeechAnswerTip
+	var content = constant.SpeechAnswerTip
 
 	// 检查是否有敏感词
 	exit, err := wordscheck.DoCheckWords("http://www.wordscheck.com/wordcheck", callBackData.Content)
 	if err != nil {
 		log.Errorf("err:%v", err)
-		return SpeechErr, err
+		return constant.SpeechErr, err
 	}
 
 	if exit {
-		return SpeechAskSensitive, nil
+		return constant.SpeechAskSensitive, nil
 	}
 
 	// 检查是否是获取结果
-	if strings.HasPrefix(callBackData.Content, SpeechAnswer) {
+	if strings.HasPrefix(callBackData.Content, constant.SpeechAnswer) {
 		split := strings.Split(callBackData.Content, " ")
 		if len(split) != 2 {
-			return SpeechAnswerFail, nil
+			return constant.SpeechAnswerFail, nil
 		}
 
 		// 拿到等待编号
 		var uuid = split[1]
 
 		// 从 redis 拿
-		r, err := lb.Rdb.Get(ctx, uuid).Result()
+		r, err := cache.Rdb.Get(ctx, uuid).Result()
 		if err != nil && err != redis.Nil {
 			log.Errorf("err:%v", err)
-			return SpeechAnswerFail, nil
+			return constant.SpeechAnswerFail, nil
 		}
 
 		// 结果为空
 		if err == redis.Nil {
-			return SpeechAnswerReady, nil
+			return constant.SpeechAnswerReady, nil
 		}
 
 		// 找到啦
 		if err == nil {
-			err := lb.Rdb.Del(ctx, uuid).Err()
+			err := cache.Rdb.Del(ctx, uuid).Err()
 			if err != nil {
 				log.Errorf("err:%v", err)
 			}
@@ -230,11 +254,11 @@ func doHandlerMsgTypeText(callBackData *CallBackData) (string, error) {
 	}
 
 	// 检查是否是提问
-	if strings.HasPrefix(callBackData.Content, SpeechAsk) {
+	if strings.HasPrefix(callBackData.Content, constant.SpeechAsk) {
 
 		split := strings.Split(callBackData.Content, " ")
 		if len(split) != 2 {
-			return SpeechAskFail, nil
+			return constant.SpeechAskFail, nil
 		}
 
 		// 生成等待编号
@@ -243,7 +267,7 @@ func doHandlerMsgTypeText(callBackData *CallBackData) (string, error) {
 		// 异步去获取结果
 		routine.Go(ctx, func(ctx context.Context) error {
 			// 去查gpt
-			completionRsp, err := gpt.DoChatCompletion(lb.V.GetString("chatGpt.proxy"), lb.V.GetString("chatGpt.api_key"), &gpt.ChatCompletionReq{
+			completionRsp, err := gpt.DoChatCompletion(conf.Global.ChatGpt.Proxy, conf.Global.ChatGpt.ApiKey, &gpt.ChatCompletionReq{
 				Model: gpt.DefualtModel,
 				Messages: []*gpt.ChatCompletionReqMessage{
 					{
@@ -256,7 +280,7 @@ func doHandlerMsgTypeText(callBackData *CallBackData) (string, error) {
 			// 出错啦
 			if err != nil {
 				log.Errorf("err:%v", err) // 一般是请求不过去或者网络超时
-				err = SetGptResult(ctx, uuid, SpeechErr)
+				err = SetGptResult(ctx, uuid, constant.SpeechErr)
 				if err != nil {
 					log.Errorf("err:%v", err)
 					return err
@@ -274,7 +298,7 @@ func doHandlerMsgTypeText(callBackData *CallBackData) (string, error) {
 
 			// 兜底回复
 			if len(result) == 0 {
-				result = SpeechErr
+				result = constant.SpeechErr
 			}
 
 			if len(result) > 0 {
@@ -320,14 +344,14 @@ func doHandlerMsgTypeText(callBackData *CallBackData) (string, error) {
 
 // GetGptResult 获取gpt的结果
 func GetGptResult(ctx context.Context, uuid string) (content string, err error) {
-	content, err = lb.Rdb.Get(ctx, uuid).Result()
+	content, err = cache.Rdb.Get(ctx, uuid).Result()
 	if err != nil && err != redis.Nil {
 		log.Errorf("err:%v", err)
 		return
 	}
 	// 没错就结束咯
 	if err == nil {
-		err = lb.Rdb.Del(ctx, uuid).Err()
+		err = cache.Rdb.Del(ctx, uuid).Err()
 		if err != nil {
 			log.Errorf("err:%v", err)
 			return
@@ -335,12 +359,12 @@ func GetGptResult(ctx context.Context, uuid string) (content string, err error) 
 		return
 	}
 	// 拿不到就给个默认的话语
-	return fmt.Sprintf(SpeechQueueStartTemplate, uuid), nil
+	return fmt.Sprintf(constant.SpeechQueueStartTemplate, uuid), nil
 }
 
 // SetGptResult 写入gpt的结果
 func SetGptResult(ctx context.Context, uuid string, content string) error {
-	err := lb.Rdb.Set(ctx, uuid, content, time.Hour).Err()
+	err := cache.Rdb.Set(ctx, uuid, content, time.Hour).Err()
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return err
@@ -349,8 +373,8 @@ func SetGptResult(ctx context.Context, uuid string, content string) error {
 }
 
 // GetWxGzhAccessToken 获取 accessToken
-func GetWxGzhAccessToken(ctx context.Context) (string, error) {
-	accessToken, err := lb.Rdb.Get(ctx, fmt.Sprintf("%s_%s", lb.WechatConf.AppId, lb.WechatConf.AppSecret)).Result()
+func GetWxGzhAccessToken(ctx context.Context, appId, appSecret string) (string, error) {
+	accessToken, err := cache.GetWxGzhAccessToken(ctx, fmt.Sprintf("%s_%s", appId, appSecret))
 
 	if err != nil && err != redis.Nil {
 		log.Errorf("err:%v", err)
@@ -364,9 +388,9 @@ func GetWxGzhAccessToken(ctx context.Context) (string, error) {
 	// 找不到 那就去微信拿
 	resp, err := restysdk.NewRequest().SetQueryParams(map[string]string{
 		"grant_type": "client_credential",
-		"appid":      lb.WechatConf.AppId,
-		"secret":     lb.WechatConf.AppSecret,
-	}).Get(WxGzhAccessTokenUrl)
+		"appid":      appId,
+		"secret":     appSecret,
+	}).Get(constant.WxGzhAccessTokenUrl)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return "", err
@@ -379,7 +403,7 @@ func GetWxGzhAccessToken(ctx context.Context) (string, error) {
 		return "", err
 	}
 
-	var accessResp AccessTokenResp
+	var accessResp constant.AccessTokenResp
 	err = json.Unmarshal(resp.Body(), &accessResp)
 	if err != nil {
 		log.Errorf("err:%v", err)
@@ -396,18 +420,19 @@ func GetWxGzhAccessToken(ctx context.Context) (string, error) {
 		accessResp.ExpiresIn = 7200
 	}
 
-	err = lb.Rdb.Set(ctx, fmt.Sprintf("%s_%s", lb.WechatConf.AppId, lb.WechatConf.AppSecret), accessResp.AccessToken, time.Duration(accessResp.ExpiresIn)*time.Second).Err()
+	err = cache.SetWxGzhAccessToken(ctx, fmt.Sprintf("%s_%s", appId, appSecret), accessResp.AccessToken, accessResp.ExpiresIn)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return "", err
 	}
 
-	return "", nil
+	return accessResp.AccessToken, nil
 }
 
 // GetWxGzhMediaBytes 获取临时媒体资源的字节流
 func GetWxGzhMediaBytes(ctx context.Context, mediaId string) ([]byte, error) {
-	token, err := GetWxGzhAccessToken(ctx)
+	var appId, appSecret = conf.Global.WxGzhConf.AppId, conf.Global.WxGzhConf.AppSecret
+	token, err := GetWxGzhAccessToken(ctx, appId, appSecret)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
@@ -415,7 +440,7 @@ func GetWxGzhMediaBytes(ctx context.Context, mediaId string) ([]byte, error) {
 	resp, err := restysdk.NewRequest().SetQueryParams(map[string]string{
 		"access_token": token,
 		"media_id":     mediaId,
-	}).Get(WxGzhMediaUrl)
+	}).Get(constant.WxGzhMediaUrl)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
@@ -425,7 +450,7 @@ func GetWxGzhMediaBytes(ctx context.Context, mediaId string) ([]byte, error) {
 
 // CheckWxGzhApiErr 检查是否错误
 func CheckWxGzhApiErr(data []byte) error {
-	var apiErr WxGzhApiErr
+	var apiErr constant.WxGzhApiErr
 	err := json.Unmarshal(data, &apiErr)
 	if err != nil {
 		log.Errorf("err:%v", err)

@@ -3,6 +3,9 @@ package impl
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/oldbai555/bgg/lbserver/impl/cache"
+	"github.com/oldbai555/bgg/lbserver/impl/conf"
+	"github.com/oldbai555/bgg/lbserver/impl/constant"
 	"github.com/oldbai555/bgg/pkg/webtool"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/utils"
@@ -10,6 +13,8 @@ import (
 	"net/http"
 	"time"
 )
+
+var Rbac *grbac.Controller
 
 // Cors 跨域配制
 func Cors() gin.HandlerFunc {
@@ -29,9 +34,9 @@ func Cors() gin.HandlerFunc {
 // RegisterUuidTrace 注册一个链路Id进入日志中
 func RegisterUuidTrace() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		log.SetModuleName(lb.Sc.Name)
+		log.SetModuleName(conf.Global.ServerConf.Name)
 		var traceId string
-		hint := c.Value(LogWithHint)
+		hint := c.Value(constant.LogWithHint)
 		if hint == nil {
 			traceId = utils.GenUUID()
 		} else if fmt.Sprintf("%v", hint) == "" {
@@ -40,7 +45,7 @@ func RegisterUuidTrace() gin.HandlerFunc {
 			traceId = fmt.Sprintf("%v.%s", hint, utils.GenUUID())
 		}
 		log.SetLogHint(traceId)
-		c.Set(LogWithHint, traceId)
+		c.Set(constant.LogWithHint, traceId)
 		log.Infof("RemoteIP: %s , ClientIP: %s", c.RemoteIP(), c.ClientIP())
 		c.Next()
 	}
@@ -63,7 +68,7 @@ func RegisterJwt() gin.HandlerFunc {
 		sid := handler.GetHeader(HttpHeaderAuthorization)
 
 		// step 2: 拿到 token
-		token, err := lb.Rdb.Get(c, sid).Result()
+		token, err := cache.Rdb.Get(c, sid).Result()
 		if err != nil {
 			log.Errorf("err is : %v", err)
 			handler.Response(http.StatusOK, http.StatusUnauthorized, nil, "权限不足")
@@ -97,7 +102,7 @@ func RegisterJwt() gin.HandlerFunc {
 		}
 
 		// step 6: 权限校验
-		granted, err := lb.Rbac.IsQueryGranted(&grbac.Query{
+		granted, err := Rbac.IsQueryGranted(&grbac.Query{
 			Method: c.Request.Method,
 			Path:   c.Request.URL.Path,
 			Host:   c.Request.Host,
@@ -118,7 +123,7 @@ func RegisterJwt() gin.HandlerFunc {
 		}
 
 		// step 8: 将claims信息放入 context.Context 中
-		c.Set(CtxWithClaim, claims)
+		c.Set(constant.CtxWithClaim, claims)
 		c.Next()
 	}
 }
@@ -135,9 +140,9 @@ var defaultLogFormatter = func(param gin.LogFormatterParams) string {
 		param.Latency = param.Latency.Truncate(time.Second)
 	}
 
-	hint := param.Keys[LogWithHint]
+	hint := param.Keys[constant.LogWithHint]
 	return fmt.Sprintf("[GIN] %s<%s> %v |%s %3d %s| %13v | %15s |%s %-7s %s %#v\n%s",
-		lb.Sc.Name,
+		conf.Global.ServerConf.Name,
 		hint,
 		param.TimeStamp.Format("2006/01/02 - 15:04:05"),
 		statusColor, param.StatusCode, resetColor,

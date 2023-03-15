@@ -10,11 +10,12 @@ import (
 type WebTool struct {
 	V *viper.Viper
 
-	GormMysqlConf *GormMysqlConf
-	RedisConf     *RedisConf
-	StorageConf   *StorageConf
-	ServerConf    *ServerConf
-	WxGzhConf     *WxGzhConf
+	MysqlConf   *MysqlConf
+	RedisConf   *RedisConf
+	StorageConf *StorageConf
+	ServerConf  *ServerConf
+	WxGzhConf   *WxGzhConf
+	ChatGpt     *ChatGpt
 }
 
 var lb *WebTool

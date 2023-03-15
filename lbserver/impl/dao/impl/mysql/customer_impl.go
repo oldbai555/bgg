@@ -3,8 +3,8 @@ package mysql
 import (
 	"context"
 	"github.com/mitchellh/mapstructure"
-	"github.com/oldbai555/bgg/client/lbaccount"
 	"github.com/oldbai555/bgg/client/lbconst"
+	"github.com/oldbai555/bgg/client/lbcustomer"
 	"github.com/oldbai555/bgg/lbserver/impl/dao"
 	webtool "github.com/oldbai555/bgg/pkg/webtoolv2"
 	"github.com/oldbai555/gorm"
@@ -12,17 +12,17 @@ import (
 	"sync/atomic"
 )
 
-var _ dao.AccountDao = (*AccountImpl)(nil)
+var _ dao.CustomerDao = (*CustomerImpl)(nil)
 
-var migratedAccount atomic.Bool
+var migratedCustomer atomic.Bool
 
-type AccountImpl struct {
+type CustomerImpl struct {
 	mysqlConn
 }
 
-func (a *AccountImpl) UpdateByIdList(ctx context.Context, idList []uint64, updateMap map[string]interface{}) error {
+func (a *CustomerImpl) UpdateByIdList(ctx context.Context, idList []uint64, updateMap map[string]interface{}) error {
 	db := webtool.NewCondBuilder(a.mustGetConn(ctx))
-	_, err := db.In(lbaccount.FieldId_, idList).Update(ctx, updateMap)
+	_, err := db.In(lbcustomer.FieldId_, idList).Update(ctx, updateMap)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return err
@@ -30,9 +30,9 @@ func (a *AccountImpl) UpdateByIdList(ctx context.Context, idList []uint64, updat
 	return nil
 }
 
-func (a *AccountImpl) DeleteByIdList(ctx context.Context, idList []uint64) error {
+func (a *CustomerImpl) DeleteByIdList(ctx context.Context, idList []uint64) error {
 	db := webtool.NewCondBuilder(a.mustGetConn(ctx))
-	_, err := db.In(lbaccount.FieldId_, idList).Delete(ctx, &lbaccount.ModelAccount{})
+	_, err := db.In(lbcustomer.FieldId_, idList).Delete(ctx, &lbcustomer.ModelCustomer{})
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return err
@@ -40,10 +40,10 @@ func (a *AccountImpl) DeleteByIdList(ctx context.Context, idList []uint64) error
 	return nil
 }
 
-func (a *AccountImpl) GetByIdList(ctx context.Context, idList []uint64) ([]*lbaccount.ModelAccount, error) {
-	var valList []*lbaccount.ModelAccount
+func (a *CustomerImpl) GetByIdList(ctx context.Context, idList []uint64) ([]*lbcustomer.ModelCustomer, error) {
+	var valList []*lbcustomer.ModelCustomer
 	db := webtool.NewCondBuilder(a.mustGetConn(ctx))
-	err := db.In(lbaccount.FieldId_, idList).Find(ctx, &valList)
+	err := db.In(lbcustomer.FieldId_, idList).Find(ctx, &valList)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
@@ -51,9 +51,9 @@ func (a *AccountImpl) GetByIdList(ctx context.Context, idList []uint64) ([]*lbac
 	return valList, nil
 }
 
-func (a *AccountImpl) UpdateById(ctx context.Context, id uint64, updateMap map[string]interface{}) error {
+func (a *CustomerImpl) UpdateById(ctx context.Context, id uint64, updateMap map[string]interface{}) error {
 	db := webtool.NewCondBuilder(a.mustGetConn(ctx))
-	_, err := db.Eq(lbaccount.FieldId_, id).Update(ctx, updateMap)
+	_, err := db.Eq(lbcustomer.FieldId_, id).Update(ctx, updateMap)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return err
@@ -61,7 +61,7 @@ func (a *AccountImpl) UpdateById(ctx context.Context, id uint64, updateMap map[s
 	return nil
 }
 
-func (a *AccountImpl) UpdateOrCreate(ctx context.Context, candMap, attrMap map[string]interface{}, out *lbaccount.ModelAccount) error {
+func (a *CustomerImpl) UpdateOrCreate(ctx context.Context, candMap, attrMap map[string]interface{}, out *lbcustomer.ModelCustomer) error {
 	selectDb := webtool.NewCondBuilder(a.mustGetConn(ctx))
 	err := selectDb.AndMap(candMap).First(ctx, out)
 	if err != nil && err != gorm.ErrRecordNotFound {
@@ -97,7 +97,7 @@ func (a *AccountImpl) UpdateOrCreate(ctx context.Context, candMap, attrMap map[s
 	return nil
 }
 
-func (a *AccountImpl) BatchCreate(ctx context.Context, valList []*lbaccount.ModelAccount) error {
+func (a *CustomerImpl) BatchCreate(ctx context.Context, valList []*lbcustomer.ModelCustomer) error {
 	res := a.mustGetConn(ctx).CreateInBatches(valList, len(valList))
 	log.Infof("batch create rows_affected %d", res.RowsAffected)
 	if res.Error != nil {
@@ -107,7 +107,7 @@ func (a *AccountImpl) BatchCreate(ctx context.Context, valList []*lbaccount.Mode
 	return nil
 }
 
-func (a *AccountImpl) Create(ctx context.Context, val *lbaccount.ModelAccount) error {
+func (a *CustomerImpl) Create(ctx context.Context, val *lbcustomer.ModelCustomer) error {
 	db := webtool.NewCondBuilder(a.mustGetConn(ctx))
 	_, err := db.Create(ctx, val)
 	if err != nil {
@@ -117,9 +117,9 @@ func (a *AccountImpl) Create(ctx context.Context, val *lbaccount.ModelAccount) e
 	return nil
 }
 
-func (a *AccountImpl) DeleteById(ctx context.Context, id uint64) error {
+func (a *CustomerImpl) DeleteById(ctx context.Context, id uint64) error {
 	db := webtool.NewCondBuilder(a.mustGetConn(ctx))
-	_, err := db.Eq(lbaccount.FieldId_, id).Delete(ctx, &lbaccount.ModelAccount{})
+	_, err := db.Eq(lbcustomer.FieldId_, id).Delete(ctx, &lbcustomer.ModelCustomer{})
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return err
@@ -127,10 +127,10 @@ func (a *AccountImpl) DeleteById(ctx context.Context, id uint64) error {
 	return nil
 }
 
-func (a *AccountImpl) GetById(ctx context.Context, id uint64) (*lbaccount.ModelAccount, error) {
-	var val lbaccount.ModelAccount
+func (a *CustomerImpl) GetById(ctx context.Context, id uint64) (*lbcustomer.ModelCustomer, error) {
+	var val lbcustomer.ModelCustomer
 	db := webtool.NewCondBuilder(a.mustGetConn(ctx))
-	err := db.Eq(lbaccount.FieldId_, id).First(ctx, &val)
+	err := db.Eq(lbcustomer.FieldId_, id).First(ctx, &val)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
@@ -138,8 +138,8 @@ func (a *AccountImpl) GetById(ctx context.Context, id uint64) (*lbaccount.ModelA
 	return &val, nil
 }
 
-func (a *AccountImpl) FindPage(ctx context.Context, listOption *lbconst.ListOption) ([]*lbaccount.ModelAccount, *lbconst.Page, error) {
-	var list []*lbaccount.ModelAccount
+func (a *CustomerImpl) FindPage(ctx context.Context, listOption *lbconst.ListOption) ([]*lbcustomer.ModelCustomer, *lbconst.Page, error) {
+	var list []*lbcustomer.ModelCustomer
 	db := webtool.NewList(a.mustGetConn(ctx), listOption)
 	err := lbconst.NewListOptionProcessor(listOption).
 		Process()
@@ -156,14 +156,14 @@ func (a *AccountImpl) FindPage(ctx context.Context, listOption *lbconst.ListOpti
 	return list, page, nil
 }
 
-func NewAccountImpl(ctx context.Context, dsn string) (dao.AccountDao, error) {
-	var d = &AccountImpl{
+func NewCustomerImpl(ctx context.Context, dsn string) (dao.CustomerDao, error) {
+	var d = &CustomerImpl{
 		mysqlConn{
 			dsn: dsn,
 		},
 	}
-	if !migratedAccount.Load() {
-		err := d.mustGetConn(ctx).Set(autoMigrateOptKey, autoMigrateOptValue).AutoMigrate(&lbaccount.ModelAccount{})
+	if !migratedCustomer.Load() {
+		err := d.mustGetConn(ctx).Set(autoMigrateOptKey, autoMigrateOptValue).AutoMigrate(&lbcustomer.ModelCustomer{})
 		if err != nil {
 			log.Errorf("err:%v", err)
 			return nil, err

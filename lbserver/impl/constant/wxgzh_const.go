@@ -1,16 +1,9 @@
-package impl
+package constant
 
 import (
 	"encoding/xml"
 	"fmt"
 )
-
-type WeChatGzhConf struct {
-	AppId          string `json:"app_id"`
-	AppSecret      string `json:"app_secret"`
-	Token          string `json:"token"`
-	EncodingAESKey string `json:"encoding_aes_key"`
-}
 
 const (
 	MsgTypeText     = "text"
