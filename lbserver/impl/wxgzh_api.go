@@ -67,7 +67,7 @@ func WXMsgReceive(c *gin.Context) {
 	}
 
 	log.Infof("[消息接收] - 收到消息, 消息类型为: %s , 消息内容: %v", callBackData.MsgType, callBackData)
-	reply, err := service.DoHandlerWXMsgReceive(&callBackData)
+	reply, err := service.DoHandlerWXMsgReceive(c, &callBackData)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return

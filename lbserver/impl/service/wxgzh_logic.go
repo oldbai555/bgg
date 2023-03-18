@@ -23,8 +23,8 @@ import (
 	"time"
 )
 
-// 处理回调
-func DoHandlerWXMsgReceive(callBackData *constant.CallBackData) (*constant.WXRepTextMsg, error) {
+// DoHandlerWXMsgReceive 处理回调
+func DoHandlerWXMsgReceive(ctx context.Context, callBackData *constant.CallBackData) (*constant.WXRepTextMsg, error) {
 	var rsp = constant.WXRepTextMsg{
 		ToUserName:   callBackData.FromUserName,
 		FromUserName: callBackData.ToUserName,
@@ -61,7 +61,7 @@ func DoHandlerWXMsgReceive(callBackData *constant.CallBackData) (*constant.WXRep
 	case constant.MsgTypeVoice:
 		// 语音获取资源是得到一个字节流文件，可以直接下载
 		rsp.Content = constant.SpeechErr
-		bytes, err := GetWxGzhMediaBytes(context.TODO(), callBackData.MediaId)
+		bytes, err := GetWxGzhMediaBytes(ctx, callBackData.MediaId)
 		if err != nil {
 			log.Errorf("err:%v", err)
 			return nil, err
@@ -78,7 +78,7 @@ func DoHandlerWXMsgReceive(callBackData *constant.CallBackData) (*constant.WXRep
 		}
 	case constant.MsgTypeVideo:
 		rsp.Content = constant.SpeechErr
-		bytes, err := GetWxGzhMediaBytes(context.TODO(), callBackData.MediaId)
+		bytes, err := GetWxGzhMediaBytes(ctx, callBackData.MediaId)
 		if err != nil {
 			log.Errorf("err:%v", err)
 			return nil, err
@@ -89,7 +89,7 @@ func DoHandlerWXMsgReceive(callBackData *constant.CallBackData) (*constant.WXRep
 			log.Errorf("err:%v", err)
 			url = callBackData.MediaId
 		}
-		bytes, err = GetWxGzhMediaBytes(context.TODO(), callBackData.ThumbMediaId)
+		bytes, err = GetWxGzhMediaBytes(ctx, callBackData.ThumbMediaId)
 		if err != nil {
 			log.Errorf("err:%v", err)
 			return nil, err
@@ -101,8 +101,8 @@ func DoHandlerWXMsgReceive(callBackData *constant.CallBackData) (*constant.WXRep
 			videoPicUrl = callBackData.ThumbMediaId
 		}
 		msg.Content.Video = &lbim.Content_Video{
-			Url:     url,
-			Caption: videoPicUrl, // todo 应有一个字段来承接视频封面
+			Url:      url,
+			CoverUrl: videoPicUrl,
 		}
 	case constant.MsgTypeLocation:
 		rsp.Content = constant.SpeechErr
@@ -130,14 +130,14 @@ func DoHandlerWXMsgReceive(callBackData *constant.CallBackData) (*constant.WXRep
 	}
 
 	// 插入消息记录
-	err = Message.Create(context.TODO(), &msg)
+	err = Message.Create(ctx, &msg)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
 	}
 
 	// 插入客户
-	err = Customer.UpdateOrCreate(context.TODO(), map[string]interface{}{
+	err = Customer.UpdateOrCreate(ctx, map[string]interface{}{
 		lbcustomer.FieldSn_:      callBackData.FromUserName,
 		lbcustomer.FieldChannel_: uint32(lbcustomer.Channel_ChannelWx),
 	}, map[string]interface{}{
@@ -150,7 +150,7 @@ func DoHandlerWXMsgReceive(callBackData *constant.CallBackData) (*constant.WXRep
 	}
 
 	// 插入系统账号
-	err = Account.UpdateOrCreate(context.TODO(), map[string]interface{}{
+	err = Account.UpdateOrCreate(ctx, map[string]interface{}{
 		lbaccount.FieldSn_:      callBackData.ToUserName,
 		lbaccount.FieldChannel_: uint32(lbaccount.Channel_ChannelWxGzh),
 	}, map[string]interface{}{
@@ -165,7 +165,7 @@ func DoHandlerWXMsgReceive(callBackData *constant.CallBackData) (*constant.WXRep
 	// 写入回复消息
 	// 将消息写入数据库
 	// todo 应该补充消息发送状态
-	err = Message.Create(context.TODO(), &lbim.ModelMessage{
+	err = Message.Create(ctx, &lbim.ModelMessage{
 		SysMsgId: utils.GenUUID(),
 		SendAt:   uint64(rsp.CreateTime),
 		From:     rsp.FromUserName,

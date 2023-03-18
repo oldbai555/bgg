@@ -108,6 +108,8 @@ func (m *ModelMessage) validate(all bool) error {
 
 	// no validation rules for Type
 
+	// no validation rules for Status
+
 	if len(errors) > 0 {
 		return ModelMessageMultiError(errors)
 	}
@@ -697,6 +699,8 @@ func (m *Content_Video) validate(all bool) error {
 	// no validation rules for FileName
 
 	// no validation rules for Format
+
+	// no validation rules for CoverUrl
 
 	if len(errors) > 0 {
 		return Content_VideoMultiError(errors)

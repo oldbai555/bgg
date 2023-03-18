@@ -1,1 +1,2 @@
-protoc-go-inject-tag -input="./*/*.pb.go"
+#go install github.com/favadi/protoc-go-inject-tag@latest
+protoc-go-inject-tag -input="client/*/*.pb.go"
