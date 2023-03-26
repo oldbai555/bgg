@@ -13,9 +13,9 @@ import (
 	"time"
 )
 
-func StartServer() error {
+func Server(ctx context.Context) error {
 	// 初始化数据库
-	err := service.InitDao(context.Background(), conf.Global.MysqlConf.Dsn())
+	err := service.InitDao(ctx, conf.Global.MysqlConf.Dsn())
 	if err != nil {
 		log.Errorf("err:%v", err)
 		panic(err)

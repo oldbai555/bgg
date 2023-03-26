@@ -4,30 +4,30 @@ import (
 	"context"
 	"github.com/mitchellh/mapstructure"
 	"github.com/oldbai555/bgg/client/lbconst"
-	"github.com/oldbai555/bgg/client/lbcustomer"
+	"github.com/oldbai555/bgg/client/lbim"
 	"github.com/oldbai555/bgg/lbserver/impl/dao"
 	webtool "github.com/oldbai555/bgg/pkg/webtoolv2"
 	"github.com/oldbai555/gorm"
 	"github.com/oldbai555/lbtool/log"
 )
 
-var _ dao.CustomerDao = (*CustomerImpl)(nil)
+var _ dao.ChatDao = (*ChatImpl)(nil)
 
-type CustomerImpl struct {
+type ChatImpl struct {
 	mysqlConn
 }
 
-func (a *CustomerImpl) FirstOrCreate(ctx context.Context, val *lbcustomer.ModelCustomer, cand map[string]interface{}) error {
-	return a.mysqlConn.mustGetConn(ctx).Model(&lbcustomer.ModelCustomer{}).FirstOrCreate(val, cand).Error
+func (a *ChatImpl) mustGetConn(ctx context.Context) *gorm.DB {
+	return a.mysqlConn.mustGetConn(ctx).Model(&lbim.ModelChat{})
 }
 
-func (a *CustomerImpl) mustGetConn(ctx context.Context) *gorm.DB {
-	return a.mysqlConn.mustGetConn(ctx).Model(&lbcustomer.ModelCustomer{})
+func (a *ChatImpl) FirstOrCreate(ctx context.Context, val *lbim.ModelChat, cand map[string]interface{}) error {
+	return a.mysqlConn.mustGetConn(ctx).Model(&lbim.ModelChat{}).FirstOrCreate(val, cand).Error
 }
 
-func (a *CustomerImpl) UpdateByIdList(ctx context.Context, idList []uint64, updateMap map[string]interface{}) error {
+func (a *ChatImpl) UpdateByIdList(ctx context.Context, idList []uint64, updateMap map[string]interface{}) error {
 	db := webtool.NewCondBuilder(a.mustGetConn(ctx))
-	_, err := db.In(lbcustomer.FieldId_, idList).Update(ctx, updateMap)
+	_, err := db.In(lbim.FieldId_, idList).Update(ctx, updateMap)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return err
@@ -35,9 +35,9 @@ func (a *CustomerImpl) UpdateByIdList(ctx context.Context, idList []uint64, upda
 	return nil
 }
 
-func (a *CustomerImpl) DeleteByIdList(ctx context.Context, idList []uint64) error {
+func (a *ChatImpl) DeleteByIdList(ctx context.Context, idList []uint64) error {
 	db := webtool.NewCondBuilder(a.mustGetConn(ctx))
-	_, err := db.In(lbcustomer.FieldId_, idList).Delete(ctx, &lbcustomer.ModelCustomer{})
+	_, err := db.In(lbim.FieldId_, idList).Delete(ctx, &lbim.ModelChat{})
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return err
@@ -45,10 +45,10 @@ func (a *CustomerImpl) DeleteByIdList(ctx context.Context, idList []uint64) erro
 	return nil
 }
 
-func (a *CustomerImpl) GetByIdList(ctx context.Context, idList []uint64) ([]*lbcustomer.ModelCustomer, error) {
-	var valList []*lbcustomer.ModelCustomer
+func (a *ChatImpl) GetByIdList(ctx context.Context, idList []uint64) ([]*lbim.ModelChat, error) {
+	var valList []*lbim.ModelChat
 	db := webtool.NewCondBuilder(a.mustGetConn(ctx))
-	err := db.In(lbcustomer.FieldId_, idList).Find(ctx, &valList)
+	err := db.In(lbim.FieldId_, idList).Find(ctx, &valList)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
@@ -56,9 +56,9 @@ func (a *CustomerImpl) GetByIdList(ctx context.Context, idList []uint64) ([]*lbc
 	return valList, nil
 }
 
-func (a *CustomerImpl) UpdateById(ctx context.Context, id uint64, updateMap map[string]interface{}) error {
+func (a *ChatImpl) UpdateById(ctx context.Context, id uint64, updateMap map[string]interface{}) error {
 	db := webtool.NewCondBuilder(a.mustGetConn(ctx))
-	_, err := db.Eq(lbcustomer.FieldId_, id).Update(ctx, updateMap)
+	_, err := db.Eq(lbim.FieldId_, id).Update(ctx, updateMap)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return err
@@ -66,7 +66,7 @@ func (a *CustomerImpl) UpdateById(ctx context.Context, id uint64, updateMap map[
 	return nil
 }
 
-func (a *CustomerImpl) UpdateOrCreate(ctx context.Context, candMap, attrMap map[string]interface{}, out *lbcustomer.ModelCustomer) error {
+func (a *ChatImpl) UpdateOrCreate(ctx context.Context, candMap, attrMap map[string]interface{}, out *lbim.ModelChat) error {
 	selectDb := webtool.NewCondBuilder(a.mustGetConn(ctx))
 	err := selectDb.AndMap(candMap).First(ctx, out)
 	if err != nil && err != gorm.ErrRecordNotFound {
@@ -102,7 +102,7 @@ func (a *CustomerImpl) UpdateOrCreate(ctx context.Context, candMap, attrMap map[
 	return nil
 }
 
-func (a *CustomerImpl) BatchCreate(ctx context.Context, valList []*lbcustomer.ModelCustomer) error {
+func (a *ChatImpl) BatchCreate(ctx context.Context, valList []*lbim.ModelChat) error {
 	res := a.mustGetConn(ctx).CreateInBatches(valList, len(valList))
 	log.Infof("batch create rows_affected %d", res.RowsAffected)
 	if res.Error != nil {
@@ -112,7 +112,7 @@ func (a *CustomerImpl) BatchCreate(ctx context.Context, valList []*lbcustomer.Mo
 	return nil
 }
 
-func (a *CustomerImpl) Create(ctx context.Context, val *lbcustomer.ModelCustomer) error {
+func (a *ChatImpl) Create(ctx context.Context, val *lbim.ModelChat) error {
 	db := webtool.NewCondBuilder(a.mustGetConn(ctx))
 	_, err := db.Create(ctx, val)
 	if err != nil {
@@ -122,9 +122,9 @@ func (a *CustomerImpl) Create(ctx context.Context, val *lbcustomer.ModelCustomer
 	return nil
 }
 
-func (a *CustomerImpl) DeleteById(ctx context.Context, id uint64) error {
+func (a *ChatImpl) DeleteById(ctx context.Context, id uint64) error {
 	db := webtool.NewCondBuilder(a.mustGetConn(ctx))
-	_, err := db.Eq(lbcustomer.FieldId_, id).Delete(ctx, &lbcustomer.ModelCustomer{})
+	_, err := db.Eq(lbim.FieldId_, id).Delete(ctx, &lbim.ModelChat{})
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return err
@@ -132,10 +132,10 @@ func (a *CustomerImpl) DeleteById(ctx context.Context, id uint64) error {
 	return nil
 }
 
-func (a *CustomerImpl) GetById(ctx context.Context, id uint64) (*lbcustomer.ModelCustomer, error) {
-	var val lbcustomer.ModelCustomer
+func (a *ChatImpl) GetById(ctx context.Context, id uint64) (*lbim.ModelChat, error) {
+	var val lbim.ModelChat
 	db := webtool.NewCondBuilder(a.mustGetConn(ctx))
-	err := db.Eq(lbcustomer.FieldId_, id).First(ctx, &val)
+	err := db.Eq(lbim.FieldId_, id).First(ctx, &val)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
@@ -143,8 +143,8 @@ func (a *CustomerImpl) GetById(ctx context.Context, id uint64) (*lbcustomer.Mode
 	return &val, nil
 }
 
-func (a *CustomerImpl) FindPage(ctx context.Context, listOption *lbconst.ListOption) ([]*lbcustomer.ModelCustomer, *lbconst.Page, error) {
-	var list []*lbcustomer.ModelCustomer
+func (a *ChatImpl) FindPage(ctx context.Context, listOption *lbconst.ListOption) ([]*lbim.ModelChat, *lbconst.Page, error) {
+	var list []*lbim.ModelChat
 	db := webtool.NewList(a.mustGetConn(ctx), listOption)
 	err := lbconst.NewListOptionProcessor(listOption).
 		Process()
@@ -161,14 +161,14 @@ func (a *CustomerImpl) FindPage(ctx context.Context, listOption *lbconst.ListOpt
 	return list, page, nil
 }
 
-func NewCustomerImpl(ctx context.Context, dsn string) (dao.CustomerDao, error) {
-	var d = &CustomerImpl{
+func NewChatImpl(ctx context.Context, dsn string) (dao.ChatDao, error) {
+	var d = &ChatImpl{
 		mysqlConn{
 			dsn: dsn,
 		},
 	}
 
-	err := d.mysqlConn.mustGetConn(ctx).Set(autoMigrateOptKey, autoMigrateOptValue).AutoMigrate(&lbcustomer.ModelCustomer{})
+	err := d.mysqlConn.mustGetConn(ctx).Set(autoMigrateOptKey, autoMigrateOptValue).AutoMigrate(&lbim.ModelChat{})
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err

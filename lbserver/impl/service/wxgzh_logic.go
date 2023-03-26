@@ -39,6 +39,7 @@ func DoHandlerWXMsgReceive(ctx context.Context, callBackData *constant.CallBackD
 		To:          callBackData.ToUserName,
 		Source:      uint32(lbim.MessageSource_MessageSourceWxGzh),
 		Content:     &lbim.Content{},
+		Status:      uint32(lbim.MessageStatus_MessageStatusReceiveRead),
 	}
 
 	var err error
@@ -164,7 +165,6 @@ func DoHandlerWXMsgReceive(ctx context.Context, callBackData *constant.CallBackD
 
 	// 写入回复消息
 	// 将消息写入数据库
-	// todo 应该补充消息发送状态
 	err = Message.Create(ctx, &lbim.ModelMessage{
 		SysMsgId: utils.GenUUID(),
 		SendAt:   uint64(rsp.CreateTime),
@@ -176,6 +176,7 @@ func DoHandlerWXMsgReceive(ctx context.Context, callBackData *constant.CallBackD
 				Content: rsp.Content,
 			},
 		},
+		Status: uint32(lbim.MessageStatus_MessageStatusWaitSend),
 	})
 	if err != nil {
 		log.Errorf("err:%v", err)

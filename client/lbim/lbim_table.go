@@ -2,6 +2,9 @@
 
 package lbim
 
+func (*ModelChat) TableName() string {
+	return "lbim_chat"
+}
 func (*ModelMessage) TableName() string {
 	return "lbim_message"
 }

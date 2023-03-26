@@ -11,6 +11,7 @@ type CustomerDao interface {
 	// 基础SQL - 自动生成
 
 	Create(ctx context.Context, val *lbcustomer.ModelCustomer) error
+	FirstOrCreate(ctx context.Context, val *lbcustomer.ModelCustomer, cand map[string]interface{}) error
 	BatchCreate(ctx context.Context, valList []*lbcustomer.ModelCustomer) error
 	UpdateOrCreate(ctx context.Context, candMap, attrMap map[string]interface{}, out *lbcustomer.ModelCustomer) error
 	UpdateById(ctx context.Context, id uint64, updateMap map[string]interface{}) error
