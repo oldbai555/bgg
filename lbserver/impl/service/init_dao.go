@@ -15,6 +15,7 @@ var (
 	Customer dao.CustomerDao
 	Message  dao.MessageDao
 	User     dao.UserDao
+	Bill     dao.BillDao
 )
 
 func InitDao(ctx context.Context, dsn string) (err error) {
@@ -54,6 +55,11 @@ func InitDao(ctx context.Context, dsn string) (err error) {
 		log.Errorf("err:%v", err)
 		return
 	}
-	log.Infof("stop init db dao......")
+	Bill, err = mysql.NewBillImpl(ctx, dsn)
+	if err != nil {
+		log.Errorf("err is %v", err)
+		return
+	}
+	log.Infof("end init db dao......")
 	return
 }
