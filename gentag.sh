@@ -1,1 +1,0 @@
-protoc-go-inject-tag -input="./*/*.pb.go"

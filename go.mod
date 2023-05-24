@@ -4,16 +4,17 @@ go 1.18
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/emicklei/proto v1.11.1
 	github.com/envoyproxy/protoc-gen-validate v0.9.1
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-redis/redis/v8 v8.11.5
-	github.com/huandu/go-clone v1.4.1
+	github.com/go-resty/resty/v2 v2.7.0
+	github.com/golang/protobuf v1.5.2
 	github.com/mitchellh/mapstructure v1.4.3
 	github.com/oldbai555/driver-mysql v0.0.0-20221011051826-9dcf64ef2d7b
 	github.com/oldbai555/gorm v0.0.0-20221011044346-e65800014b93
-	github.com/oldbai555/lbtool v0.0.5-0.20230108165226-bf1d9f8b7713
+	github.com/oldbai555/lbtool v0.0.2-0.20230516102620-1dd6c818054d
 	github.com/pkg/errors v0.9.1
+	github.com/spf13/viper v1.9.0
 	github.com/storyicon/grbac v0.0.0-20200224041032-a0461737df7e
 	google.golang.org/grpc v1.43.0
 	google.golang.org/protobuf v1.28.1
@@ -21,7 +22,6 @@ require (
 
 require (
 	github.com/aliyun/aliyun-oss-go-sdk v2.2.5+incompatible // indirect
-	github.com/apolloconfig/agollo/v4 v4.2.0 // indirect
 	github.com/bwmarrin/snowflake v0.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/clbanning/mxj v1.8.5-0.20200714211355-ff02cfb8ea28 // indirect
@@ -35,7 +35,6 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/goccy/go-json v0.9.7 // indirect
 	github.com/gogf/gf v1.16.9 // indirect
-	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-cmp v0.5.8 // indirect
 	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/hashicorp/errwrap v1.0.0 // indirect
@@ -62,7 +61,6 @@ require (
 	github.com/spf13/cast v1.4.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/spf13/viper v1.9.0 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/tencentyun/cos-go-sdk-v5 v0.7.38 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect

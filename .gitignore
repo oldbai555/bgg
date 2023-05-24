@@ -1,0 +1,10 @@
+/lbserver/cmd/application.yaml
+/lbserver/resource/
+/web/.idea/
+/webv2/admin/node_modules/
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/jsLibraryMappings.xml
+/.idea/*
+/.idea/**
+/.idea
+git remote set-url origin https://token@github.com/oldbai555/bgg.git
