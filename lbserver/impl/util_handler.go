@@ -4,9 +4,12 @@ import (
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/oldbai555/bgg/lbconst"
-	"github.com/oldbai555/bgg/lbuser"
-	"github.com/oldbai555/bgg/webtool"
+	"github.com/oldbai555/bgg/client/lb"
+	"github.com/oldbai555/bgg/client/lbuser"
+	"github.com/oldbai555/bgg/lbserver/impl/cache"
+	"github.com/oldbai555/bgg/lbserver/impl/constant"
+	"github.com/oldbai555/bgg/pkg/webtool"
+
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/lberr"
 	"github.com/oldbai555/lbtool/pkg/result"
@@ -49,6 +52,10 @@ func (r *Handler) GetHeader(key string) string {
 	return r.C.GetHeader(key)
 }
 
+func (r *Handler) GetQuery(key string) (string, bool) {
+	return r.C.GetQuery(key)
+}
+
 func (r *Handler) CheckUser() (*lbuser.ModelUser, error) {
 	claims, err := r.GetClaims()
 	if err != nil {
@@ -56,7 +63,7 @@ func (r *Handler) CheckUser() (*lbuser.ModelUser, error) {
 		return nil, err
 	}
 	var user lbuser.ModelUser
-	err = lb.Rdb.GetJson(context.TODO(), fmt.Sprintf("%d", claims.UserId), &user)
+	err = cache.GetLoginUser(context.TODO(), fmt.Sprintf("%d", claims.GetUserId()), &user)
 	if err != nil {
 		log.Errorf("err is %v", err)
 		return nil, err
@@ -65,9 +72,10 @@ func (r *Handler) CheckUser() (*lbuser.ModelUser, error) {
 }
 
 func (r *Handler) GetClaims() (*webtool.Claims, error) {
-	claims, ok := r.C.Value(CtxWithClaim).(*webtool.Claims)
-	if !ok {
-		return nil, ErrNotLoginInfo
+	claims, err := webtool.GetClaimsWithCtx(r.C)
+	if err != nil {
+		log.Errorf("err is %v", err)
+		return nil, err
 	}
 	return claims, nil
 }
@@ -75,23 +83,26 @@ func (r *Handler) GetClaims() (*webtool.Claims, error) {
 // Response 自定义自定义数据
 func (r *Handler) Response(httpCode int, errorCode int, data interface{}, msg string) {
 	r.C.Header(HttpHeaderContentType, HttpHeaderContentTypeByJson)
-	hint := r.C.Value(LogWithHint)
-	r.C.JSON(httpCode, result.JSONResult{
+	hint := r.C.Value(constant.LogWithHint)
+	jsonResult := result.JSONResult{
 		Code:    errorCode,
 		Message: msg,
 		Data:    data,
 		Hint:    fmt.Sprintf("%s", hint),
-	})
+	}
+	log.Infof("jsonRes is %v", jsonResult)
+	r.C.JSON(httpCode, jsonResult)
 }
 
 // Success 响应数据
 func (r *Handler) Success(data interface{}) {
 	// 特殊转化一下json
-	m, err := utils.StructToMapV2(data, "json")
+	m, err := utils.StructToMapV2(data)
 	if err != nil {
 		log.Errorf("err is %v", err)
 	}
-	r.Response(http.StatusOK, int(lbconst.ErrCode_Success), m, defaultRspMsg)
+	log.Infof("val is %v", m)
+	r.Response(http.StatusOK, int(lb.ErrCode_Success), m, defaultRspMsg)
 }
 
 // RespError 响应错误
@@ -104,5 +115,5 @@ func (r *Handler) RespError(err error) {
 		return
 	}
 
-	r.Response(http.StatusOK, int(lbconst.ErrCode_ErrAnInvalidRsp), nil, err.Error())
+	r.Response(http.StatusOK, int(lb.ErrCode_ErrAnInvalidRsp), nil, err.Error())
 }

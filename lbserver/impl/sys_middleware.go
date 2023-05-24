@@ -3,13 +3,19 @@ package impl
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/oldbai555/bgg/webtool"
+	"github.com/oldbai555/bgg/lbserver/impl/cache"
+	"github.com/oldbai555/bgg/lbserver/impl/conf"
+	"github.com/oldbai555/bgg/lbserver/impl/constant"
+	"github.com/oldbai555/bgg/pkg/webtool"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/utils"
 	"github.com/storyicon/grbac"
 	"net/http"
+	"strings"
 	"time"
 )
+
+var Rbac *grbac.Controller
 
 // Cors 跨域配制
 func Cors() gin.HandlerFunc {
@@ -29,10 +35,9 @@ func Cors() gin.HandlerFunc {
 // RegisterUuidTrace 注册一个链路Id进入日志中
 func RegisterUuidTrace() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		log.SetModuleName("lbblog")
-		c.Set("server", "lbblog")
+		log.SetModuleName(conf.Global.ServerConf.Name)
 		var traceId string
-		hint := c.Value(LogWithHint)
+		hint := c.Value(constant.LogWithHint)
 		if hint == nil {
 			traceId = utils.GenUUID()
 		} else if fmt.Sprintf("%v", hint) == "" {
@@ -41,7 +46,8 @@ func RegisterUuidTrace() gin.HandlerFunc {
 			traceId = fmt.Sprintf("%v.%s", hint, utils.GenUUID())
 		}
 		log.SetLogHint(traceId)
-		c.Set(LogWithHint, traceId)
+		c.Set(constant.LogWithHint, traceId)
+		log.Infof("RemoteIP: %s , ClientIP: %s", c.RemoteIP(), c.ClientIP())
 		c.Next()
 	}
 }
@@ -49,13 +55,34 @@ func RegisterUuidTrace() gin.HandlerFunc {
 // RegisterJwt 是我们用来检查令牌是否有效的中间件。如果返回401状态无效，则返回给客户。
 func RegisterJwt() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		var cm *Cmd
+		for _, cmd := range CmdList {
+			if strings.HasSuffix(c.Request.RequestURI, cmd.Path) {
+				cm = &cmd
+				break
+			}
+		}
+
+		// 找不到
+		if cm == nil {
+			// 交给 gin 去 404
+			c.Next()
+			return
+		}
+
+		// 不用校验权限 - pub
+		if !cm.IsUserAuthType() {
+			c.Next()
+			return
+		}
+
 		handler := NewHandler(c)
 
 		// step 1: 拿到 sid
 		sid := handler.GetHeader(HttpHeaderAuthorization)
 
 		// step 2: 拿到 token
-		token, err := lb.Rdb.Get(c, sid).Result()
+		token, err := cache.GetLoginUserToken(c, sid)
 		if err != nil {
 			log.Errorf("err is : %v", err)
 			handler.Response(http.StatusOK, http.StatusUnauthorized, nil, "权限不足")
@@ -79,38 +106,8 @@ func RegisterJwt() gin.HandlerFunc {
 			return
 		}
 
-		// step 5: 拿到用户所属角色
-		roles, err := GetUserRoles(c, claims.UserId)
-		if err != nil {
-			log.Errorf("err is : %v", err)
-			handler.Response(http.StatusOK, http.StatusUnauthorized, nil, "权限不足")
-			c.Abort()
-			return
-		}
-
-		// step 6: 权限校验
-		granted, err := lb.Rbac.IsQueryGranted(&grbac.Query{
-			Method: c.Request.Method,
-			Path:   c.Request.URL.Path,
-			Host:   c.Request.Host,
-		}, roles)
-		if err != nil {
-			log.Errorf("err is : %v", err)
-			handler.Response(http.StatusOK, http.StatusUnauthorized, nil, "权限不足")
-			c.AbortWithStatus(http.StatusUnauthorized)
-			return
-		}
-
-		// step 7: 权限校验是否通过
-		if !granted.IsGranted() {
-			log.Errorf("err is : %s", "权限不足")
-			handler.Response(http.StatusOK, http.StatusUnauthorized, nil, "权限不足")
-			c.AbortWithStatus(http.StatusUnauthorized)
-			return
-		}
-
-		// step 8: 将claims信息放入 context.Context 中
-		c.Set(CtxWithClaim, claims)
+		// 将claims信息放入 context.Context 中
+		c.Set(webtool.CtxWithClaim, claims)
 		c.Next()
 	}
 }
@@ -127,10 +124,9 @@ var defaultLogFormatter = func(param gin.LogFormatterParams) string {
 		param.Latency = param.Latency.Truncate(time.Second)
 	}
 
-	hint := param.Keys[LogWithHint]
-	server := param.Keys["server"]
+	hint := param.Keys[constant.LogWithHint]
 	return fmt.Sprintf("[GIN] %s<%s> %v |%s %3d %s| %13v | %15s |%s %-7s %s %#v\n%s",
-		server,
+		conf.Global.ServerConf.Name,
 		hint,
 		param.TimeStamp.Format("2006/01/02 - 15:04:05"),
 		statusColor, param.StatusCode, resetColor,

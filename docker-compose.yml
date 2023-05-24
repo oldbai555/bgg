@@ -1,0 +1,59 @@
+version: "3.8"
+
+services:
+  db:
+    container_name: db
+    image: mysql:8.0
+    restart: always
+    ports:
+      - "3309:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_DATABASE=biz
+      - MYSQL_USER=oldbai
+      - MYSQL_PASSWORD=123456
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - "/Users/zhangjianjun/work/data/mysql:/var/lib/mysql"
+    networks:
+      - lb_network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+  redis:
+    container_name: redis
+    image: redis:6.0
+    restart: always
+    ports:
+      - "6679:6379"
+    volumes:
+      - "/Users/zhangjianjun/work/data/redis:/data"
+    networks:
+      - lb_network
+  web:
+    container_name: web
+    build: .
+    ports:
+      - "8003:8003"
+    restart: always
+    depends_on:
+      - db
+      - redis
+    networks:
+      - lb_network
+    volumes:
+      - "/Users/zhangjianjun/work/data/app:/app/data"
+      - "/Users/zhangjianjun/work/data/app/log:/tmp/lb/log"
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=oldbai
+      - DB_PASSWORD=123456
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+
+networks:
+  lb_network:
+    driver: bridge

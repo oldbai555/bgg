@@ -2,63 +2,136 @@ package impl
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/oldbai555/bgg/client/lbstore"
+	"github.com/oldbai555/bgg/lbserver/impl/service"
 	"github.com/oldbai555/lbtool/log"
-	"math/rand"
-	"mime/multipart"
-	"net/http"
-	"time"
 )
 
-// FileParas 需要请求的content-type为：multipart/form-data
-type FileParas struct {
-	F *multipart.FileHeader `form:"file"`
-}
-
-type UploadRsp struct {
-	Url string `json:"url"`
-}
-
-func registerStoreApi(h *gin.Engine) {
-	h.POST("/upload", Upload)
-}
-
 func Upload(c *gin.Context) {
-	var req FileParas
+	var req lbstore.UploadReq
 	handler := NewHandler(c)
 
-	err := handler.C.ShouldBind(&req)
+	err := handler.BindAndValidateReq(&req)
 	if err != nil {
 		log.Errorf("err is : %v", err)
 		handler.RespError(err)
 		return
 	}
 
-	rand.Seed(time.Now().UnixNano())
-	objectKey := `public/link-info/assets/images/` + req.F.Filename
-
-	open, err := req.F.Open()
-	if err != nil {
-		log.Errorf("err is %v", err)
+	if err = req.ValidateAll(); err != nil {
+		log.Errorf("err is : %v", err)
 		handler.RespError(err)
 		return
 	}
 
-	err = lb.Storage.Put(objectKey, open)
+	rsp, err := service.StoreServer.Upload(c, &req)
 	if err != nil {
-		log.Errorf("err is %v", err)
+		log.Errorf("err is : %v", err)
+		handler.RespError(err)
+		return
+	}
+	handler.Success(rsp)
+}
+
+func GetFileList(c *gin.Context) {
+	var req lbstore.GetFileListReq
+	handler := NewHandler(c)
+
+	err := handler.BindAndValidateReq(&req)
+	if err != nil {
+		log.Errorf("err is : %v", err)
 		handler.RespError(err)
 		return
 	}
 
-	signedURL, err := lb.Storage.SignURL(objectKey, http.MethodGet, 60*60*24*365)
-	if err != nil {
-		log.Errorf("err is %v", err)
+	if err = req.ValidateAll(); err != nil {
+		log.Errorf("err is : %v", err)
 		handler.RespError(err)
 		return
 	}
 
-	var rsp = UploadRsp{
-		Url: signedURL,
+	rsp, err := service.StoreServer.GetFileList(c, &req)
+	if err != nil {
+		log.Errorf("err is : %v", err)
+		handler.RespError(err)
+		return
 	}
-	handler.Success(&rsp)
+	handler.Success(rsp)
+}
+
+func RefreshFileSignedUrl(c *gin.Context) {
+	var req lbstore.RefreshFileSignedUrlReq
+	handler := NewHandler(c)
+
+	err := handler.BindAndValidateReq(&req)
+	if err != nil {
+		log.Errorf("err is : %v", err)
+		handler.RespError(err)
+		return
+	}
+
+	if err = req.ValidateAll(); err != nil {
+		log.Errorf("err is : %v", err)
+		handler.RespError(err)
+		return
+	}
+
+	rsp, err := service.StoreServer.RefreshFileSignedUrl(c, &req)
+	if err != nil {
+		log.Errorf("err is : %v", err)
+		handler.RespError(err)
+		return
+	}
+	handler.Success(rsp)
+}
+
+func GetSignature(c *gin.Context) {
+	var req lbstore.GetSignatureReq
+	handler := NewHandler(c)
+
+	err := handler.BindAndValidateReq(&req)
+	if err != nil {
+		log.Errorf("err is : %v", err)
+		handler.RespError(err)
+		return
+	}
+
+	if err = req.ValidateAll(); err != nil {
+		log.Errorf("err is : %v", err)
+		handler.RespError(err)
+		return
+	}
+
+	rsp, err := service.StoreServer.GetSignature(c, &req)
+	if err != nil {
+		log.Errorf("err is : %v", err)
+		handler.RespError(err)
+		return
+	}
+	handler.Success(rsp)
+}
+func ReportUploadFile(c *gin.Context) {
+	var req lbstore.ReportUploadFileReq
+	handler := NewHandler(c)
+
+	err := handler.BindAndValidateReq(&req)
+	if err != nil {
+		log.Errorf("err is : %v", err)
+		handler.RespError(err)
+		return
+	}
+
+	if err = req.ValidateAll(); err != nil {
+		log.Errorf("err is : %v", err)
+		handler.RespError(err)
+		return
+	}
+
+	rsp, err := service.StoreServer.ReportUploadFile(c, &req)
+	if err != nil {
+		log.Errorf("err is : %v", err)
+		handler.RespError(err)
+		return
+	}
+	handler.Success(rsp)
 }
