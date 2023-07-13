@@ -9,13 +9,10 @@ import (
 	"github.com/oldbai555/bgg/pkg/webtool"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/utils"
-	"github.com/storyicon/grbac"
 	"net/http"
 	"strings"
 	"time"
 )
-
-var Rbac *grbac.Controller
 
 // Cors 跨域配制
 func Cors() gin.HandlerFunc {

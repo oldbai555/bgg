@@ -4,12 +4,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/oldbai555/bgg/client/lbstore"
 	"github.com/oldbai555/bgg/lbserver/impl/service"
+	"github.com/oldbai555/bgg/pkg/gin_tool"
 	"github.com/oldbai555/lbtool/log"
 )
 
 func Upload(c *gin.Context) {
 	var req lbstore.UploadReq
-	handler := NewHandler(c)
+	handler := gin_tool.NewHandler(c)
 
 	err := handler.BindAndValidateReq(&req)
 	if err != nil {
@@ -35,7 +36,7 @@ func Upload(c *gin.Context) {
 
 func GetFileList(c *gin.Context) {
 	var req lbstore.GetFileListReq
-	handler := NewHandler(c)
+	handler := gin_tool.NewHandler(c)
 
 	err := handler.BindAndValidateReq(&req)
 	if err != nil {
@@ -61,7 +62,7 @@ func GetFileList(c *gin.Context) {
 
 func RefreshFileSignedUrl(c *gin.Context) {
 	var req lbstore.RefreshFileSignedUrlReq
-	handler := NewHandler(c)
+	handler := gin_tool.NewHandler(c)
 
 	err := handler.BindAndValidateReq(&req)
 	if err != nil {
@@ -87,7 +88,7 @@ func RefreshFileSignedUrl(c *gin.Context) {
 
 func GetSignature(c *gin.Context) {
 	var req lbstore.GetSignatureReq
-	handler := NewHandler(c)
+	handler := gin_tool.NewHandler(c)
 
 	err := handler.BindAndValidateReq(&req)
 	if err != nil {
@@ -112,7 +113,7 @@ func GetSignature(c *gin.Context) {
 }
 func ReportUploadFile(c *gin.Context) {
 	var req lbstore.ReportUploadFileReq
-	handler := NewHandler(c)
+	handler := gin_tool.NewHandler(c)
 
 	err := handler.BindAndValidateReq(&req)
 	if err != nil {

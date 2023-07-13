@@ -4,12 +4,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/oldbai555/bgg/client/lbblog"
 	"github.com/oldbai555/bgg/lbserver/impl/service"
+	"github.com/oldbai555/bgg/pkg/gin_tool"
 	"github.com/oldbai555/lbtool/log"
 )
 
 func GetArticleList(c *gin.Context) {
 	var req lbblog.GetArticleListReq
-	handler := NewHandler(c)
+	handler := gin_tool.NewHandler(c)
 
 	err := handler.BindAndValidateReq(&req)
 	if err != nil {
@@ -35,7 +36,7 @@ func GetArticleList(c *gin.Context) {
 
 func GetArticle(c *gin.Context) {
 	var req lbblog.GetArticleReq
-	handler := NewHandler(c)
+	handler := gin_tool.NewHandler(c)
 
 	err := handler.BindAndValidateReq(&req)
 	if err != nil {
@@ -61,7 +62,7 @@ func GetArticle(c *gin.Context) {
 
 func UpdateArticle(c *gin.Context) {
 	var req lbblog.UpdateArticleReq
-	handler := NewHandler(c)
+	handler := gin_tool.NewHandler(c)
 
 	err := handler.BindAndValidateReq(&req)
 	if err != nil {
@@ -87,7 +88,7 @@ func UpdateArticle(c *gin.Context) {
 
 func DelArticle(c *gin.Context) {
 	var req lbblog.DelArticleReq
-	handler := NewHandler(c)
+	handler := gin_tool.NewHandler(c)
 
 	err := handler.BindAndValidateReq(&req)
 	if err != nil {
@@ -113,7 +114,7 @@ func DelArticle(c *gin.Context) {
 
 func AddArticle(c *gin.Context) {
 	var req lbblog.AddArticleReq
-	handler := NewHandler(c)
+	handler := gin_tool.NewHandler(c)
 
 	err := handler.BindAndValidateReq(&req)
 	if err != nil {
@@ -139,7 +140,7 @@ func AddArticle(c *gin.Context) {
 
 func GetCategoryList(c *gin.Context) {
 	var req lbblog.GetCategoryListReq
-	handler := NewHandler(c)
+	handler := gin_tool.NewHandler(c)
 
 	err := handler.BindAndValidateReq(&req)
 	if err != nil {
@@ -165,7 +166,7 @@ func GetCategoryList(c *gin.Context) {
 
 func GetCategory(c *gin.Context) {
 	var req lbblog.GetCategoryReq
-	handler := NewHandler(c)
+	handler := gin_tool.NewHandler(c)
 
 	err := handler.BindAndValidateReq(&req)
 	if err != nil {
@@ -191,7 +192,7 @@ func GetCategory(c *gin.Context) {
 
 func UpdateCategory(c *gin.Context) {
 	var req lbblog.UpdateCategoryReq
-	handler := NewHandler(c)
+	handler := gin_tool.NewHandler(c)
 
 	err := handler.BindAndValidateReq(&req)
 	if err != nil {
@@ -217,7 +218,7 @@ func UpdateCategory(c *gin.Context) {
 
 func DelCategory(c *gin.Context) {
 	var req lbblog.DelCategoryReq
-	handler := NewHandler(c)
+	handler := gin_tool.NewHandler(c)
 
 	err := handler.BindAndValidateReq(&req)
 	if err != nil {
@@ -243,7 +244,7 @@ func DelCategory(c *gin.Context) {
 
 func AddCategory(c *gin.Context) {
 	var req lbblog.AddCategoryReq
-	handler := NewHandler(c)
+	handler := gin_tool.NewHandler(c)
 
 	err := handler.BindAndValidateReq(&req)
 	if err != nil {
@@ -269,7 +270,7 @@ func AddCategory(c *gin.Context) {
 
 func GetCommentList(c *gin.Context) {
 	var req lbblog.GetCommentListReq
-	handler := NewHandler(c)
+	handler := gin_tool.NewHandler(c)
 
 	err := handler.BindAndValidateReq(&req)
 	if err != nil {
@@ -295,7 +296,7 @@ func GetCommentList(c *gin.Context) {
 
 func GetComment(c *gin.Context) {
 	var req lbblog.GetCommentReq
-	handler := NewHandler(c)
+	handler := gin_tool.NewHandler(c)
 
 	err := handler.BindAndValidateReq(&req)
 	if err != nil {
@@ -321,7 +322,7 @@ func GetComment(c *gin.Context) {
 
 func UpdateComment(c *gin.Context) {
 	var req lbblog.UpdateCommentReq
-	handler := NewHandler(c)
+	handler := gin_tool.NewHandler(c)
 
 	err := handler.BindAndValidateReq(&req)
 	if err != nil {
@@ -347,7 +348,7 @@ func UpdateComment(c *gin.Context) {
 
 func DelComment(c *gin.Context) {
 	var req lbblog.DelCommentReq
-	handler := NewHandler(c)
+	handler := gin_tool.NewHandler(c)
 
 	err := handler.BindAndValidateReq(&req)
 	if err != nil {
@@ -373,7 +374,7 @@ func DelComment(c *gin.Context) {
 
 func AddComment(c *gin.Context) {
 	var req lbblog.AddCommentReq
-	handler := NewHandler(c)
+	handler := gin_tool.NewHandler(c)
 
 	err := handler.BindAndValidateReq(&req)
 	if err != nil {

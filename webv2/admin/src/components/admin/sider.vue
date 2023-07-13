@@ -57,6 +57,7 @@
             </span>
         </template>
         <a-menu-item key="profile">个人中心</a-menu-item>
+        <a-menu-item key="game">测试ws</a-menu-item>
       </a-sub-menu>
 
 

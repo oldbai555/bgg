@@ -80,6 +80,13 @@ func register(gin *gin.Engine) {
 }
 
 const (
+	UploadCmdPath                 = "/lbstore/Upload"
+	GetFileListCmdPath            = "/lbstore/GetFileList"
+	RefreshFileSignedUrlCmdPath   = "/lbstore/RefreshFileSignedUrl"
+	GetSignatureCmdPath           = "/lbstore/GetSignature"
+	ReportUploadFileCmdPath       = "/lbstore/ReportUploadFile"
+	HandleWxGzhAuthCmdPath        = "/lbwechat/HandleWxGzhAuth"
+	HandleWxGzhMsgCmdPath         = "/lbwechat/HandleWxGzhMsg"
 	AddBillCmdPath                = "/lbbill/AddBill"
 	DelBillCmdPath                = "/lbbill/DelBill"
 	UpdateBillCmdPath             = "/lbbill/UpdateBill"
@@ -117,28 +124,9 @@ const (
 	ResetPasswordCmdPath          = "/lbuser/ResetPassword"
 	GetFrontUserCmdPath           = "/lbuser/GetFrontUser"
 	ChatCompletionCmdPath         = "/lbchatgpt/ChatCompletion"
-	UploadCmdPath                 = "/lbstore/Upload"
-	GetFileListCmdPath            = "/lbstore/GetFileList"
-	RefreshFileSignedUrlCmdPath   = "/lbstore/RefreshFileSignedUrl"
-	GetSignatureCmdPath           = "/lbstore/GetSignature"
-	ReportUploadFileCmdPath       = "/lbstore/ReportUploadFile"
-	HandleWxGzhAuthCmdPath        = "/lbwechat/HandleWxGzhAuth"
-	HandleWxGzhMsgCmdPath         = "/lbwechat/HandleWxGzhMsg"
 )
 
 var CmdList = []Cmd{
-	{Server: lbwechat.ServerName, Path: HandleWxGzhAuthCmdPath, Func: HandleWxGzhAuth, OptionMap: map[string]string{"ApiMethod": "GET", "AuthType": "public"}},
-	{Server: lbwechat.ServerName, Path: HandleWxGzhMsgCmdPath, Func: HandleWxGzhMsg, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "public"}},
-	{Server: lbbill.ServerName, Path: AddBillCmdPath, Func: AddBill, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
-	{Server: lbbill.ServerName, Path: DelBillCmdPath, Func: DelBill, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
-	{Server: lbbill.ServerName, Path: UpdateBillCmdPath, Func: UpdateBill, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
-	{Server: lbbill.ServerName, Path: GetBillCmdPath, Func: GetBill, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
-	{Server: lbbill.ServerName, Path: GetBillListCmdPath, Func: GetBillList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
-	{Server: lbbill.ServerName, Path: AddBillCategoryCmdPath, Func: AddBillCategory, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
-	{Server: lbbill.ServerName, Path: DelBillCategoryCmdPath, Func: DelBillCategory, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
-	{Server: lbbill.ServerName, Path: UpdateBillCategoryCmdPath, Func: UpdateBillCategory, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
-	{Server: lbbill.ServerName, Path: GetBillCategoryCmdPath, Func: GetBillCategory, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
-	{Server: lbbill.ServerName, Path: GetBillCategoryListCmdPath, Func: GetBillCategoryList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
 	{Server: lbblog.ServerName, Path: GetArticleListCmdPath, Func: GetArticleList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
 	{Server: lbblog.ServerName, Path: GetArticleCmdPath, Func: GetArticle, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
 	{Server: lbblog.ServerName, Path: UpdateArticleCmdPath, Func: UpdateArticle, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
@@ -171,4 +159,16 @@ var CmdList = []Cmd{
 	{Server: lbstore.ServerName, Path: RefreshFileSignedUrlCmdPath, Func: RefreshFileSignedUrl, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
 	{Server: lbstore.ServerName, Path: GetSignatureCmdPath, Func: GetSignature, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
 	{Server: lbstore.ServerName, Path: ReportUploadFileCmdPath, Func: ReportUploadFile, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+	{Server: lbwechat.ServerName, Path: HandleWxGzhAuthCmdPath, Func: HandleWxGzhAuth, OptionMap: map[string]string{"ApiMethod": "GET", "AuthType": "public"}},
+	{Server: lbwechat.ServerName, Path: HandleWxGzhMsgCmdPath, Func: HandleWxGzhMsg, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "public"}},
+	{Server: lbbill.ServerName, Path: AddBillCmdPath, Func: AddBill, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+	{Server: lbbill.ServerName, Path: DelBillCmdPath, Func: DelBill, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+	{Server: lbbill.ServerName, Path: UpdateBillCmdPath, Func: UpdateBill, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+	{Server: lbbill.ServerName, Path: GetBillCmdPath, Func: GetBill, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+	{Server: lbbill.ServerName, Path: GetBillListCmdPath, Func: GetBillList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+	{Server: lbbill.ServerName, Path: AddBillCategoryCmdPath, Func: AddBillCategory, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+	{Server: lbbill.ServerName, Path: DelBillCategoryCmdPath, Func: DelBillCategory, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+	{Server: lbbill.ServerName, Path: UpdateBillCategoryCmdPath, Func: UpdateBillCategory, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+	{Server: lbbill.ServerName, Path: GetBillCategoryCmdPath, Func: GetBillCategory, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+	{Server: lbbill.ServerName, Path: GetBillCategoryListCmdPath, Func: GetBillCategoryList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
 }
