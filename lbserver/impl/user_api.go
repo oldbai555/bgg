@@ -4,13 +4,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/oldbai555/bgg/client/lbuser"
 	"github.com/oldbai555/bgg/lbserver/impl/service"
+	"github.com/oldbai555/bgg/pkg/gin_tool"
 
 	"github.com/oldbai555/lbtool/log"
 )
 
 func Login(c *gin.Context) {
 	var req lbuser.LoginReq
-	handler := NewHandler(c)
+	handler := gin_tool.NewHandler(c)
 
 	err := handler.BindAndValidateReq(&req)
 	if err != nil {
@@ -35,7 +36,7 @@ func Login(c *gin.Context) {
 }
 func Logout(c *gin.Context) {
 	var req lbuser.LogoutReq
-	handler := NewHandler(c)
+	handler := gin_tool.NewHandler(c)
 
 	rsp, err := service.UserServer.Logout(c, &req)
 	if err != nil {
@@ -47,7 +48,7 @@ func Logout(c *gin.Context) {
 }
 func GetLoginUser(c *gin.Context) {
 	var req lbuser.GetLoginUserReq
-	handler := NewHandler(c)
+	handler := gin_tool.NewHandler(c)
 
 	rsp, err := service.UserServer.GetLoginUser(c, &req)
 	if err != nil {
@@ -59,7 +60,7 @@ func GetLoginUser(c *gin.Context) {
 }
 func UpdateLoginUserInfo(c *gin.Context) {
 	var req lbuser.UpdateLoginUserInfoReq
-	handler := NewHandler(c)
+	handler := gin_tool.NewHandler(c)
 
 	err := handler.BindAndValidateReq(&req)
 	if err != nil {
@@ -84,7 +85,7 @@ func UpdateLoginUserInfo(c *gin.Context) {
 }
 func DelUser(c *gin.Context) {
 	var req lbuser.DelUserReq
-	handler := NewHandler(c)
+	handler := gin_tool.NewHandler(c)
 
 	err := handler.BindAndValidateReq(&req)
 	if err != nil {
@@ -109,7 +110,7 @@ func DelUser(c *gin.Context) {
 }
 func AddUser(c *gin.Context) {
 	var req lbuser.AddUserReq
-	handler := NewHandler(c)
+	handler := gin_tool.NewHandler(c)
 
 	err := handler.BindAndValidateReq(&req)
 	if err != nil {
@@ -134,7 +135,7 @@ func AddUser(c *gin.Context) {
 }
 func GetUserList(c *gin.Context) {
 	var req lbuser.GetUserListReq
-	handler := NewHandler(c)
+	handler := gin_tool.NewHandler(c)
 
 	err := handler.BindAndValidateReq(&req)
 	if err != nil {
@@ -159,7 +160,7 @@ func GetUserList(c *gin.Context) {
 }
 func GetUser(c *gin.Context) {
 	var req lbuser.GetUserReq
-	handler := NewHandler(c)
+	handler := gin_tool.NewHandler(c)
 
 	err := handler.BindAndValidateReq(&req)
 	if err != nil {
@@ -184,7 +185,7 @@ func GetUser(c *gin.Context) {
 }
 func UpdateUserNameWithRole(c *gin.Context) {
 	var req lbuser.UpdateUserNameWithRoleReq
-	handler := NewHandler(c)
+	handler := gin_tool.NewHandler(c)
 
 	err := handler.BindAndValidateReq(&req)
 	if err != nil {
@@ -209,7 +210,7 @@ func UpdateUserNameWithRole(c *gin.Context) {
 }
 func ResetPassword(c *gin.Context) {
 	var req lbuser.ResetPasswordReq
-	handler := NewHandler(c)
+	handler := gin_tool.NewHandler(c)
 
 	err := handler.BindAndValidateReq(&req)
 	if err != nil {
@@ -235,7 +236,7 @@ func ResetPassword(c *gin.Context) {
 
 func GetFrontUser(c *gin.Context) {
 	var req lbuser.GetFrontUserReq
-	handler := NewHandler(c)
+	handler := gin_tool.NewHandler(c)
 
 	rsp, err := service.UserServer.GetFrontUser(c, &req)
 	if err != nil {

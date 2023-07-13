@@ -8,12 +8,13 @@ import (
 	"github.com/oldbai555/bgg/lbserver/impl/conf"
 	"github.com/oldbai555/bgg/lbserver/impl/constant"
 	"github.com/oldbai555/bgg/lbserver/impl/service"
+	"github.com/oldbai555/bgg/pkg/gin_tool"
 	"github.com/oldbai555/lbtool/log"
 	"sort"
 )
 
 func HandleWxGzhAuth(c *gin.Context) {
-	handler := NewHandler(c)
+	handler := gin_tool.NewHandler(c)
 
 	signature, _ := handler.GetQuery("signature")
 	timestamp, _ := handler.GetQuery("timestamp")
@@ -40,7 +41,7 @@ func HandleWxGzhAuth(c *gin.Context) {
 	}
 
 	// 写入结果
-	c.Header(HttpHeaderContentType, "text/plain;charset=utf-8")
+	c.Header(gin_tool.HttpHeaderContentType, "text/plain;charset=utf-8")
 	_, err := c.Writer.WriteString(rspStr)
 	if err != nil {
 		log.Errorf("err is %v", err)

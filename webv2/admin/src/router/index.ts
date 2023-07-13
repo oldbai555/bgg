@@ -12,6 +12,7 @@ import CommentList from '../components/comment/list.vue'
 import FileList from '../components/file/list.vue'
 import UserList from '../components/user/list.vue'
 import Profile from '../components/user/profile.vue'
+import Game from '../components/game/window.vue';
 import {clearAllCaches, getToken} from "@/plugin/utils/cache";
 
 const router = createRouter({
@@ -112,6 +113,14 @@ const router = createRouter({
                     component: Profile,
                     meta: {
                         title: '个人中心'
+                    }
+                },
+                {
+                    path: '/game',
+                    name: 'game',
+                    component: Game,
+                    meta: {
+                        title: '测试ws'
                     }
                 },
             ]

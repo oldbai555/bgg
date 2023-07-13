@@ -1,0 +1,5 @@
+mysql:
+  addr: "127.0.0.1"
+  port: 3309 # 使用对内的mysql接口
+  username: "root"
+  password: "123456"
