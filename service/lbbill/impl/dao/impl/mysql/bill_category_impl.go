@@ -3,9 +3,9 @@ package mysql
 import (
 	"context"
 	"github.com/mitchellh/mapstructure"
-	"github.com/oldbai555/bgg/client/lb"
-	"github.com/oldbai555/bgg/client/lbbill"
 	"github.com/oldbai555/bgg/pkg/webtool"
+	"github.com/oldbai555/bgg/service/lb"
+	"github.com/oldbai555/bgg/service/lbbill"
 	"github.com/oldbai555/bgg/service/lbbill/impl/dao"
 	"github.com/oldbai555/gorm"
 	"github.com/oldbai555/lbtool/log"

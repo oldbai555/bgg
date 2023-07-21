@@ -6,6 +6,15 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
+	"github.com/oldbai555/bgg/pkg/_const"
+	"github.com/oldbai555/bgg/pkg/cmd"
+	"github.com/oldbai555/lbtool/pkg/routine"
+	"google.golang.org/grpc/metadata"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/oldbai555/bgg/service/gateway/internal/conf"
 
@@ -16,23 +25,49 @@ import (
 	"strings"
 )
 
-func Server(_ context.Context) error {
+func Server(ctx context.Context) error {
 	conf.InitWebTool()
 	log.SetModuleName("gateway")
 
 	gin.DefaultWriter = log.GetWriter()
-	h := gin.New()
+	router := gin.Default()
 
 	// 配置跨域中间件
 	// 链路追踪
-	h.Use(Cors(), RegisterUuidTrace(), gin.LoggerWithFormatter(defaultLogFormatter), gin.Recovery(), RegisterJwt())
+	router.Use(
+		gin_tool.Cors(),
+		gin_tool.RegisterUuidTrace(),
+		RegisterSvr(),
+		gin.LoggerWithFormatter(gin_tool.DefaultLogFormatter),
+		gin.Recovery(),
+		RegisterJwt(),
+	)
 
-	h.POST("/gateway/*path", revProxy)
+	router.POST("/gateway/*path", revProxy)
+
+	srv := &http.Server{
+		Addr:    fmt.Sprintf(":%d", conf.Global.ServerConf.Port),
+		Handler: router,
+	}
+
+	routine.Go(ctx, func(ctx context.Context) error {
+		signalCh := make(chan os.Signal, 1)
+		signal.Notify(signalCh, syscall.SIGINT, syscall.SIGTERM, os.Kill)
+		log.Infof("listening on gatewway exited notify")
+		<-signalCh
+		log.Warnf("exit: close gatewway server connect")
+		err := srv.Shutdown(ctx)
+		if err != nil {
+			log.Errorf("err:%v", err)
+			return err
+		}
+		return nil
+	})
 
 	// 启动服务
-	err := h.Run(fmt.Sprintf(":%d", conf.Global.ServerConf.Port))
+	err := srv.ListenAndServe()
 	if err != nil {
-		log.Errorf("err is %v", err)
+		log.Warnf("err is %v", err)
 		return err
 	}
 	return nil
@@ -40,15 +75,16 @@ func Server(_ context.Context) error {
 
 func revProxy(c *gin.Context) {
 	// 找到对应的 rpc path
-	var cm *gin_tool.Cmd
+	var cm *cmd.Cmd
 	handler := gin_tool.NewHandler(c)
-	for _, cmd := range CmdList {
-		if strings.HasSuffix(c.Request.RequestURI, cmd.Path) {
-			cm = &cmd
+	for _, cc := range CmdList {
+		if strings.HasSuffix(c.Request.RequestURI, cc.Path) {
+			cm = &cc
 			break
 		}
 	}
 
+	// 校验方法
 	h := cm.GRpcFunc
 	v := reflect.ValueOf(h)
 	t := v.Type()
@@ -62,6 +98,7 @@ func revProxy(c *gin.Context) {
 		panic("XX(context.Context, proto.Message)(proto.Message, error): second out arg must be error")
 	}
 
+	// 拼装 request
 	reqT := t.In(1).Elem()
 	reqV := reflect.New(reqT)
 	msg := reqV.Interface().(proto.Message)
@@ -74,16 +111,32 @@ func revProxy(c *gin.Context) {
 	}
 	log.Infof("req is %v", msg.String())
 
-	handlerRet := v.Call([]reflect.Value{reflect.ValueOf(c), reqV})
+	// 携带一些参数过去
+	header := metadata.New(map[string]string{
+		_const.HeaderLBTraceId:  c.GetHeader(_const.HeaderLBTraceId),
+		_const.HeaderLBDeviceId: c.GetHeader(_const.HeaderLBDeviceId),
+		_const.HeaderLBSid:      c.GetHeader(_const.HeaderLBSid),
+		_const.HeaderLBCallFrom: c.GetHeader(_const.HeaderLBCallFrom),
+	})
+
+	// 执行方法 - 得到结果 - 最长等待 5 s
+	newCtx, cancel := context.WithTimeout(c, 5*time.Second)
+	defer cancel()
+	var ctx = metadata.NewOutgoingContext(newCtx, header)
+	handlerRet := v.Call([]reflect.Value{reflect.ValueOf(ctx), reqV})
+
+	// 检查是否有误
 	var callRes error
 	if !handlerRet[1].IsNil() {
 		callRes = handlerRet[1].Interface().(error)
 	}
 	if callRes != nil {
 		log.Errorf("err:%v", callRes)
-		handler.RespError(err)
+		handler.RespError(callRes)
 		return
 	}
+
+	// 检查返回值
 	if handlerRet[0].IsValid() && !handlerRet[0].IsNil() {
 		rspBody, ok := handlerRet[0].Interface().(proto.Message)
 		if !ok {
@@ -94,5 +147,7 @@ func revProxy(c *gin.Context) {
 		handler.Success(rspBody)
 		return
 	}
+
+	// 走到这里说明走不动了
 	handler.RespError(lberr.NewInvalidArg("un ok"))
 }

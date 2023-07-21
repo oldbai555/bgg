@@ -3,9 +3,8 @@ package gin_tool
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/oldbai555/bgg/client/lb"
+	"github.com/oldbai555/bgg/pkg/_const"
 	"github.com/oldbai555/bgg/pkg/webtool"
-
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/lberr"
 	"github.com/oldbai555/lbtool/pkg/result"
@@ -16,13 +15,7 @@ import (
 )
 
 const (
-	LogWithHint = "hint"
-)
-
-const (
-	HttpHeaderAuthorization     = "Authorization"
 	HttpHeaderContentType       = "Content-Type"
-	HttpHeaderUserAgent         = "User-Agent"
 	HttpHeaderContentTypeByJson = "application/json"
 	defaultRspMsg               = "ok"
 )
@@ -68,7 +61,7 @@ func (r *Handler) GetClaims() (*webtool.Claims, error) {
 // Response 自定义自定义数据
 func (r *Handler) Response(httpCode int, errorCode int, data interface{}, msg string) {
 	r.C.Header(HttpHeaderContentType, HttpHeaderContentTypeByJson)
-	hint := r.C.Value(LogWithHint)
+	hint := r.C.Value(_const.LogWithHint)
 	jsonResult := result.JSONResult{
 		Code:    errorCode,
 		Message: msg,
@@ -87,7 +80,7 @@ func (r *Handler) Success(data interface{}) {
 		log.Errorf("err is %v", err)
 	}
 	log.Infof("rsp:%+v", m)
-	r.Response(http.StatusOK, int(lb.ErrCode_Success), m, defaultRspMsg)
+	r.Response(http.StatusOK, 0, m, defaultRspMsg)
 }
 
 // RespError 响应错误
@@ -96,9 +89,9 @@ func (r *Handler) RespError(err error) {
 	rootErr := errors.Cause(err)
 
 	if e, ok := rootErr.(*lberr.LbErr); ok {
-		r.Response(http.StatusOK, int(e.Code()), nil, e.Message())
+		r.Response(http.StatusOK, int(e.Code()), "", e.Message())
 		return
 	}
 
-	r.Response(http.StatusOK, int(lb.ErrCode_ErrAnInvalidRsp), nil, err.Error())
+	r.Response(http.StatusOK, 20002, "", err.Error())
 }

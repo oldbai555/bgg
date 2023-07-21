@@ -52,7 +52,7 @@ func init() {
 	if runtime.GOOS == "windows" {
 		ConfigPath = `etcd.json`
 	} else {
-		ConfigPath = `/Users/zhangjianjun/work/lb/github.com/oldbai555/bgg/pkg/grpc_tool/etcd.json`
+		ConfigPath = `/etc/work/etcd.json`
 	}
 }
 
