@@ -3,7 +3,7 @@ package webtool
 import (
 	"context"
 	"fmt"
-	"github.com/oldbai555/bgg/client/lb"
+	"github.com/oldbai555/bgg/service/lb"
 	"github.com/oldbai555/gorm"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/utils"
@@ -118,6 +118,11 @@ func NewList(db *gorm.DB, listOption *lb.Options) *OrmCondBuilder {
 		page:      listOption.GetPage(),
 		skipTotal: listOption.GetSkipTotal(),
 	}
+}
+
+func (p *OrmCondBuilder) Select(fields []string) *OrmCondBuilder {
+	p.db.Select(fields)
+	return p
 }
 
 func (p *OrmCondBuilder) Eq(field string, v interface{}) *OrmCondBuilder {

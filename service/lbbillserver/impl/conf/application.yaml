@@ -1,0 +1,12 @@
+server:
+  name: "lbbill"
+  port:
+mysql:
+  addr: ""
+  port:
+  username: ""
+  password: ""
+redis:
+  database:
+  host: ""
+  port:

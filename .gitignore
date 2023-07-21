@@ -8,3 +8,6 @@
 /.idea/**
 /.idea
 git remote set-url origin https://token@github.com/oldbai555/bgg.git
+/client/lb/lb_client.go
+/client/lb/lb_conn.go
+/client/lb/lb_rpc_cmd_path_autogen.go
