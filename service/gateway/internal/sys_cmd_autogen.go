@@ -3,11 +3,11 @@
 package internal
 
 import (
+	"github.com/oldbai555/bgg/pkg/cmd"
 	"github.com/oldbai555/bgg/service/lbbill"
 	"github.com/oldbai555/bgg/service/lbblog"
 	"github.com/oldbai555/bgg/service/lbstore"
 	"github.com/oldbai555/bgg/service/lbuser"
-	"github.com/oldbai555/bgg/pkg/cmd"
 )
 
 var CmdList = []cmd.Cmd{

@@ -2,23 +2,20 @@
 package lbbill
 
 import (
-	"context"
 	"errors"
 	"fmt"
 
 	"github.com/oldbai555/bgg/pkg/grpc_tool"
 
 	"github.com/oldbai555/lbtool/log"
-	"github.com/oldbai555/lbtool/pkg/routine"
 
+	"github.com/oldbai555/lbtool/pkg/signal"
 	eclient "go.etcd.io/etcd/client/v3"
 	eresolver "go.etcd.io/etcd/client/v3/naming/resolver"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/balancer/roundrobin"
 	"google.golang.org/grpc/credentials/insecure"
 	"os"
-	"os/signal"
-	"syscall"
 	"time"
 )
 
@@ -65,12 +62,8 @@ func init() {
 	cliMgr.cli = NewLbbillClient(conn)
 	cliMgr.conn = conn
 
-	routine.Go(context.Background(), func(ctx context.Context) error {
-		signalCh := make(chan os.Signal, 1)
-		signal.Notify(signalCh, syscall.SIGINT, syscall.SIGTERM, os.Kill)
-
-		<-signalCh
-		log.Warnf("exit: close %s client connect", ServerName)
+	signal.Reg(func(signal os.Signal) error {
+		log.Warnf("exit: close %s client connect, signal [%v]", ServerName, signal)
 		if err = conn.Close(); err != nil {
 			log.Errorf("err:%v", err)
 			return err
