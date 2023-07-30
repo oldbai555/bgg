@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/oldbai555/bgg/service/lbblog"
+	"github.com/oldbai555/bgg/service/lbuser"
 
 	"github.com/oldbai555/bgg/pkg/grpc_tool"
 	"github.com/oldbai555/bgg/pkg/register"
@@ -41,7 +42,7 @@ func Run(ctx *cli.Context) error {
 
 	// 新建gRPC服务器实例
 	grpcServer := grpc.NewServer(
-		grpc.ChainUnaryInterceptor(grpc_tool.Recover(), grpc_tool.AutoValidate()),
+		grpc.ChainUnaryInterceptor(grpc_tool.Recover(), grpc_tool.AutoValidate(), lbuser.CheckUser()),
 	)
 
 	// 在gRPC服务器注册我们的服务

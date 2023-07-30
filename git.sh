@@ -1,4 +1,4 @@
-git reset "$(git merge-base main "$(git branch --show-current)")"
+#git reset "$(git merge-base main "$(git branch --show-current)")"
 git add -A && git commit -m 'v.0.0.2'
 #git pull
 #git push --force

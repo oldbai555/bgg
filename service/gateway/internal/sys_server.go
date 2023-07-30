@@ -8,12 +8,10 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/oldbai555/bgg/pkg/_const"
 	"github.com/oldbai555/bgg/pkg/cmd"
-	"github.com/oldbai555/lbtool/pkg/routine"
+	"github.com/oldbai555/lbtool/pkg/signal"
 	"google.golang.org/grpc/metadata"
 	"net/http"
 	"os"
-	"os/signal"
-	"syscall"
 	"time"
 
 	"github.com/oldbai555/bgg/service/gateway/internal/conf"
@@ -50,12 +48,8 @@ func Server(ctx context.Context) error {
 		Handler: router,
 	}
 
-	routine.Go(ctx, func(ctx context.Context) error {
-		signalCh := make(chan os.Signal, 1)
-		signal.Notify(signalCh, syscall.SIGINT, syscall.SIGTERM, os.Kill)
-		log.Infof("listening on gatewway exited notify")
-		<-signalCh
-		log.Warnf("exit: close gatewway server connect")
+	signal.Reg(func(signal os.Signal) error {
+		log.Warnf("exit: close gatewway server connect , signal[%v]", signal)
 		err := srv.Shutdown(ctx)
 		if err != nil {
 			log.Errorf("err:%v", err)
@@ -63,6 +57,7 @@ func Server(ctx context.Context) error {
 		}
 		return nil
 	})
+	signal.Do()
 
 	// 启动服务
 	err := srv.ListenAndServe()
