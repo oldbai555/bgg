@@ -16,7 +16,7 @@ require (
 	github.com/oldbai555/baix v0.0.0-20230606105504-0fab8afd9bb1
 	github.com/oldbai555/driver-mysql v0.0.0-20221011051826-9dcf64ef2d7b
 	github.com/oldbai555/gorm v0.0.0-20221011044346-e65800014b93
-	github.com/oldbai555/lbtool v0.0.0-20230713090045-92d3ba68e3dc
+	github.com/oldbai555/lbtool v0.0.0-20230729141934-40bb4a9012fc
 	github.com/petermattis/goid v0.0.0-20220824145935-af5520614cb6
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/viper v1.9.0
