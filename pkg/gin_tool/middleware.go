@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+const KeyBySvr = "svr"
+
 // Cors 跨域配制
 func Cors() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -63,7 +65,7 @@ var DefaultLogFormatter = func(param gin.LogFormatterParams) string {
 	}
 
 	hint := param.Keys[_const.LogWithHint]
-	svr := param.Keys["svr"]
+	svr := param.Keys[KeyBySvr]
 	v := fmt.Sprintf("[GIN] %s<%s> %v |%s %3d %s| %13v | %15s |%s %-7s %s %#v\n%s",
 		svr,
 		hint,

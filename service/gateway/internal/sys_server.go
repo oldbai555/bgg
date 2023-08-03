@@ -25,7 +25,7 @@ import (
 
 func Server(ctx context.Context) error {
 	conf.InitWebTool()
-	log.SetModuleName("gateway")
+	log.SetModuleName(conf.Global.ServerConf.Name)
 
 	gin.DefaultWriter = log.GetWriter()
 	router := gin.Default()
@@ -49,7 +49,7 @@ func Server(ctx context.Context) error {
 	}
 
 	signal.Reg(func(signal os.Signal) error {
-		log.Warnf("exit: close gatewway server connect , signal[%v]", signal)
+		log.Warnf("exit: close gateway server connect , signal[%v]", signal)
 		err := srv.Shutdown(ctx)
 		if err != nil {
 			log.Errorf("err:%v", err)

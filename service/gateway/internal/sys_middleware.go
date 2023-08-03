@@ -5,6 +5,7 @@ import (
 	"github.com/oldbai555/bgg/pkg/_const"
 	_cmd "github.com/oldbai555/bgg/pkg/cmd"
 	"github.com/oldbai555/bgg/pkg/gin_tool"
+	"github.com/oldbai555/bgg/service/gateway/internal/conf"
 	"net/http"
 	"strings"
 )
@@ -44,7 +45,7 @@ func RegisterJwt() gin.HandlerFunc {
 
 func RegisterSvr() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Set("svr", "gateway")
+		c.Set(gin_tool.KeyBySvr, conf.Global.ServerConf.Name)
 		c.Next()
 	}
 }
