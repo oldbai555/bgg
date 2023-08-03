@@ -7,21 +7,18 @@ require (
 	github.com/envoyproxy/protoc-gen-validate v0.9.1
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-redis/redis/v8 v8.11.5
-	github.com/go-resty/resty/v2 v2.7.0
 	github.com/golang/protobuf v1.5.2
-	github.com/google/uuid v1.3.0
 	github.com/json-iterator/go v1.1.12
 	github.com/mitchellh/mapstructure v1.4.3
 	github.com/name5566/leaf v0.0.0-20221021105039-af71eb082cda
 	github.com/oldbai555/baix v0.0.0-20230606105504-0fab8afd9bb1
 	github.com/oldbai555/driver-mysql v0.0.0-20221011051826-9dcf64ef2d7b
 	github.com/oldbai555/gorm v0.0.0-20221011044346-e65800014b93
-	github.com/oldbai555/lbtool v0.0.0-20230729141934-40bb4a9012fc
+	github.com/oldbai555/lbtool v0.0.0-20230803162801-451294e9d912
 	github.com/petermattis/goid v0.0.0-20220824145935-af5520614cb6
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/viper v1.9.0
 	github.com/urfave/cli/v2 v2.3.0
-	go.etcd.io/etcd/api/v3 v3.5.9
 	go.etcd.io/etcd/client/v3 v3.5.9
 	google.golang.org/grpc v1.43.0
 	google.golang.org/protobuf v1.28.1
@@ -42,6 +39,7 @@ require (
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/go-playground/validator/v10 v10.10.0 // indirect
+	github.com/go-resty/resty/v2 v2.7.0 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/goccy/go-json v0.9.7 // indirect
 	github.com/gogf/gf v1.16.9 // indirect
@@ -70,6 +68,7 @@ require (
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/tencentyun/cos-go-sdk-v5 v0.7.38 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
+	go.etcd.io/etcd/api/v3 v3.5.9 // indirect
 	go.etcd.io/etcd/client/pkg/v3 v3.5.9 // indirect
 	go.opentelemetry.io/otel v1.0.1 // indirect
 	go.opentelemetry.io/otel/trace v1.0.1 // indirect

@@ -223,7 +223,6 @@ github.com/google/renameio v0.1.0/go.mod h1:KWCgfxg9yswjAJkECMjeO8J8rahYeXnNhOm4
 github.com/google/uuid v1.1.1/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/google/uuid v1.1.2/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/google/uuid v1.3.0 h1:t6JiXgmwXMjEs8VusXIJk2BXHsn+wx8BZdTaoZ5fu7I=
-github.com/google/uuid v1.3.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/googleapis/gax-go/v2 v2.0.4/go.mod h1:0Wqv26UfaUD9n4G6kQubkQ+KchISgw+vpHVxEJEs9eg=
 github.com/googleapis/gax-go/v2 v2.0.5/go.mod h1:DWXyrwAJ9X0FpwwEdw+IPEYBICEFu5mhpdKc/us6bOk=
 github.com/googleapis/gax-go/v2 v2.1.0/go.mod h1:Q3nei7sK6ybPYH7twZdmQpAd1MKb7pfu6SK+H1/DsU0=
@@ -326,16 +325,8 @@ github.com/oldbai555/driver-mysql v0.0.0-20221011051826-9dcf64ef2d7b h1:uOwlZEwT
 github.com/oldbai555/driver-mysql v0.0.0-20221011051826-9dcf64ef2d7b/go.mod h1:JN8xnb/1VQVE4ppvSMjd0pbcg2Kq7x7kw9B3zSd0oS4=
 github.com/oldbai555/gorm v0.0.0-20221011044346-e65800014b93 h1:dsnisfvCBhh9HEKB+xSxNk/Wox3vcwXSY43SnPDcXZI=
 github.com/oldbai555/gorm v0.0.0-20221011044346-e65800014b93/go.mod h1:fpKBwqWdOF0xr5eRQsNkma/JtzbsDCVmKi0mhvWCoIY=
-github.com/oldbai555/lbtool v0.0.0-20230713090045-92d3ba68e3dc h1:Bppx8rZORhRwptWZ/kzokQaj3pCF8eaXVT9vuQ4eHsE=
-github.com/oldbai555/lbtool v0.0.0-20230713090045-92d3ba68e3dc/go.mod h1:fNyksIVo1aPfousjan9XOOFAIG0G8tRjkGgD7fO7N3w=
-github.com/oldbai555/lbtool v0.0.0-20230729074244-2916860a464f h1:wC65/U+kImffyf2mEjzd0Ull5iTgv9PSquwm+3n5oV8=
-github.com/oldbai555/lbtool v0.0.0-20230729074244-2916860a464f/go.mod h1:fNyksIVo1aPfousjan9XOOFAIG0G8tRjkGgD7fO7N3w=
-github.com/oldbai555/lbtool v0.0.0-20230729084947-daaf3206fc54 h1:X+bP6fxHJKOzbvKPNj2qlrF97Vm5Ht5yYG8mdB3BkTQ=
-github.com/oldbai555/lbtool v0.0.0-20230729084947-daaf3206fc54/go.mod h1:fNyksIVo1aPfousjan9XOOFAIG0G8tRjkGgD7fO7N3w=
-github.com/oldbai555/lbtool v0.0.0-20230729141934-40bb4a9012fc h1:o26tcvpn4V2h+nu0eN/AXuG+mQPrDNvySGHixXeYygI=
-github.com/oldbai555/lbtool v0.0.0-20230729141934-40bb4a9012fc/go.mod h1:fNyksIVo1aPfousjan9XOOFAIG0G8tRjkGgD7fO7N3w=
-github.com/oldbai555/lbtool v0.0.2-0.20230516102620-1dd6c818054d h1:BlzvhEO2pUeeGgN9oReSM0CHyhHMT9aZPCHaWjtFva8=
-github.com/oldbai555/lbtool v0.0.2-0.20230516102620-1dd6c818054d/go.mod h1:hcc8NbjTZ4fdrEA+a7sFfxth2qgXF5SJVprdKuON/GI=
+github.com/oldbai555/lbtool v0.0.0-20230803162801-451294e9d912 h1:KH3Us7bURe1imGn833Xc/H7FmLTol/WsOQkmyu23MaI=
+github.com/oldbai555/lbtool v0.0.0-20230803162801-451294e9d912/go.mod h1:fNyksIVo1aPfousjan9XOOFAIG0G8tRjkGgD7fO7N3w=
 github.com/olekukonko/tablewriter v0.0.5 h1:P2Ga83D34wi1o9J6Wh1mRuqd4mF/x/lgBS7N7AbDhec=
 github.com/olekukonko/tablewriter v0.0.5/go.mod h1:hPp6KlRPjbx+hW8ykQs1w3UBbZlj6HuIJcUGPhkA7kY=
 github.com/onsi/ginkgo v1.16.5 h1:8xi0RTUf59SOSfEtZMvwTvXYMzG4gV23XVHOZiXNtnE=
