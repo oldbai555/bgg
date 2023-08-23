@@ -64,7 +64,7 @@ func Run(ctx *cli.Context) error {
 
 	signal.Reg(func(signal os.Signal) error {
 		log.Warnf("exit: close %s server connect, signal [%v]", lbblog.ServerName, signal)
-		grpcServer.Stop()
+		grpcServer.GracefulStop()
 		return nil
 	})
 	signal.Do()
