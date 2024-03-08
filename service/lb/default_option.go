@@ -1,39 +1,38 @@
-package option
+package lb
 
 import (
 	"github.com/oldbai555/bgg/internal/bgorm"
-	"github.com/oldbai555/bgg/service/lb"
 	"github.com/oldbai555/lbtool/log"
 )
 
-func ProcessDefaultOptions(listOption *lb.Options, db *bgorm.Scope) error {
-	err := lb.NewOptionsProcessor(listOption).
+func ProcessDefaultOptions(listOption *Options, db *bgorm.Scope) error {
+	err := NewOptionsProcessor(listOption).
 		AddStringList(
-			lb.DefaultListOption_DefaultListOptionSelect,
+			DefaultListOption_DefaultListOptionSelect,
 			func(valList []string) error {
 				db.Select(valList)
 				return nil
 			}).
 		AddUint32(
-			lb.DefaultListOption_DefaultListOptionOrderBy,
+			DefaultListOption_DefaultListOptionOrderBy,
 			func(val uint32) error {
-				if val == uint32(lb.DefaultOrderBy_DefaultOrderByCreatedDesc) {
+				if val == uint32(DefaultOrderBy_DefaultOrderByCreatedDesc) {
 					db.OrderByDesc("created_at")
-				} else if val == uint32(lb.DefaultOrderBy_DefaultOrderByCreatedAcs) {
+				} else if val == uint32(DefaultOrderBy_DefaultOrderByCreatedAcs) {
 					db.OrderByAsc("created_at")
-				} else if val == uint32(lb.DefaultOrderBy_DefaultOrderByIdDesc) {
+				} else if val == uint32(DefaultOrderBy_DefaultOrderByIdDesc) {
 					db.OrderByDesc("id")
 				}
 				return nil
 			}).
 		AddStringList(
-			lb.DefaultListOption_DefaultListOptionGroupBy,
+			DefaultListOption_DefaultListOptionGroupBy,
 			func(valList []string) error {
 				db.Group(valList...)
 				return nil
 			}).
 		AddBool(
-			lb.DefaultListOption_DefaultListOptionWithTrash,
+			DefaultListOption_DefaultListOptionWithTrash,
 			func(val bool) error {
 				if val {
 					db.UnScoped()
@@ -41,7 +40,7 @@ func ProcessDefaultOptions(listOption *lb.Options, db *bgorm.Scope) error {
 				return nil
 			}).
 		AddUint64List(
-			lb.DefaultListOption_DefaultListOptionIdList,
+			DefaultListOption_DefaultListOptionIdList,
 			func(valList []uint64) error {
 				if len(valList) == 1 {
 					db.Eq("id", valList[0])
@@ -51,13 +50,13 @@ func ProcessDefaultOptions(listOption *lb.Options, db *bgorm.Scope) error {
 				return nil
 			}).
 		AddTimeStampRange(
-			lb.DefaultListOption_DefaultListOptionCreatedAt,
+			DefaultListOption_DefaultListOptionCreatedAt,
 			func(begin, end uint32) error {
 				db.Between("created_at", begin, end)
 				return nil
 			}).
 		AddUint32List(
-			lb.DefaultListOption_DefaultListOptionCreatorIdList,
+			DefaultListOption_DefaultListOptionCreatorIdList,
 			func(valList []uint32) error {
 				db.In("creator_id", valList)
 				return nil

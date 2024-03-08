@@ -10,7 +10,7 @@ usage() {
   echo "gt | gents 根据 proto 生成 ts 代码"
   echo "ap | addproto 新增 proto 文件"
   echo "ar | addrpc 新增 rpc 方法"
-  echo "ac | addCurdRpc 新增 curd rpc 方法以及 message"
+  echo "ac | addCurdRpc 新增 curd rpc 方法以及 message. 示例 sh bin.sh addCurdRpc lbbill.proto ModelBill,ModelBillCategory true"
   exit 1
 }
 

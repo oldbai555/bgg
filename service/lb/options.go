@@ -42,8 +42,8 @@ type OptionsHandler struct {
 	ignoreZeroValue  bool
 }
 type OptionsProcessor struct {
-	options  *Options
-	handlers map[int32]*OptionsHandler
+	listOption *ListOption
+	handlers   map[int32]*OptionsHandler
 }
 
 func toInt32(i interface{}) int32 {
@@ -66,10 +66,10 @@ func toInt32(i interface{}) int32 {
 	return 0
 }
 
-func NewOptionsProcessor(options *Options) *OptionsProcessor {
+func NewOptionsProcessor(listOption *ListOption) *OptionsProcessor {
 	return &OptionsProcessor{
-		options:  options,
-		handlers: make(map[int32]*OptionsHandler),
+		listOption: listOption,
+		handlers:   make(map[int32]*OptionsHandler),
 	}
 }
 
@@ -178,11 +178,11 @@ func (p *OptionsProcessor) AddBool(typ interface{}, cb func(val bool) error) *Op
 }
 
 func (p *OptionsProcessor) Process() error {
-	if p.options == nil || p.handlers == nil || len(p.handlers) == 0 {
+	if p.listOption == nil || p.handlers == nil || len(p.handlers) == 0 {
 		return nil
 	}
 	var err error
-	for _, v := range p.options.OptList {
+	for _, v := range p.listOption.Options {
 		h := p.handlers[v.Key]
 		if h == nil {
 			continue
@@ -389,11 +389,11 @@ func toStr(i interface{}) string {
 	return fmt.Sprintf("%v", i)
 }
 
-func NewOptions(opts ...interface{}) *Options {
+func NewOptions(opts ...interface{}) *ListOption {
 	if len(opts)%2 != 0 {
 		log.Panicf("invalid number of opts argument %d", len(opts))
 	}
-	l := &Options{
+	l := &ListOption{
 		Size:      defaultSize,
 		Page:      0,
 		SkipTotal: false,
@@ -404,7 +404,7 @@ func NewOptions(opts ...interface{}) *Options {
 	return l
 }
 
-func NewListOptionByPage(limit, offset string) *Options {
+func NewListOptionByPage(limit, offset string) *ListOption {
 	newLimit, _ := strconv.ParseUint(limit, 10, 64)
 	if newLimit == 0 {
 		newLimit = defaultSize
@@ -413,17 +413,17 @@ func NewListOptionByPage(limit, offset string) *Options {
 	return NewOptions().SetSize(uint32(newLimit)).SetPage(uint32(newOffset))
 }
 
-func (p *Options) SetSize(size uint32) *Options {
+func (p *ListOption) SetSize(size uint32) *ListOption {
 	p.Size = size
 	return p
 }
 
-func (p *Options) SetPage(page uint32) *Options {
+func (p *ListOption) SetPage(page uint32) *ListOption {
 	p.Page = page
 	return p
 }
 
-func (p *Options) IsOptExist(typ interface{}) bool {
+func (p *ListOption) IsOptExist(typ interface{}) bool {
 	var typInt int32
 	if reflect.TypeOf(typ).Kind() == reflect.Uint32 {
 		typInt = int32(reflect.ValueOf(typ).Uint())
@@ -434,7 +434,7 @@ func (p *Options) IsOptExist(typ interface{}) bool {
 		log.Panicf("invalid type %d", typ)
 	}
 
-	for _, opt := range p.OptList {
+	for _, opt := range p.Options {
 		if opt.Key == typInt {
 			return true
 		}
@@ -443,7 +443,7 @@ func (p *Options) IsOptExist(typ interface{}) bool {
 	return false
 }
 
-func (p *Options) GetOptValue(typ interface{}) (string, bool) {
+func (p *ListOption) GetOptValue(typ interface{}) (string, bool) {
 	var typInt int32
 	if reflect.TypeOf(typ).Kind() == reflect.Uint32 {
 		typInt = int32(reflect.ValueOf(typ).Uint())
@@ -454,7 +454,7 @@ func (p *Options) GetOptValue(typ interface{}) (string, bool) {
 		log.Panicf("invalid type %d", typ)
 	}
 
-	for _, opt := range p.OptList {
+	for _, opt := range p.Options {
 		if opt.Key == typInt {
 			return opt.Value, true
 		}
@@ -463,7 +463,7 @@ func (p *Options) GetOptValue(typ interface{}) (string, bool) {
 	return "", false
 }
 
-func (p *Options) AddOptIf(flag bool, typ, val interface{}) *Options {
+func (p *ListOption) AddOptIf(flag bool, typ, val interface{}) *ListOption {
 	if flag {
 		p.AddOpt(typ, val)
 	}
@@ -471,7 +471,7 @@ func (p *Options) AddOptIf(flag bool, typ, val interface{}) *Options {
 	return p
 }
 
-func (p *Options) AddOpt(typ, val interface{}) *Options {
+func (p *ListOption) AddOpt(typ, val interface{}) *ListOption {
 	var typInt int32
 	if reflect.TypeOf(typ).Kind() == reflect.Uint32 {
 		typInt = int32(reflect.ValueOf(typ).Uint())
@@ -499,17 +499,17 @@ func (p *Options) AddOpt(typ, val interface{}) *Options {
 			strVal = toStr(val)
 		}
 	}
-	p.OptList = append(p.OptList,
-		&Options_Opt{Key: typInt, Value: strVal})
+	p.Options = append(p.Options,
+		&ListOption_Option{Key: typInt, Value: strVal})
 	return p
 }
 
-func (p *Options) SetSkipTotal() *Options {
+func (p *ListOption) SetSkipTotal() *ListOption {
 	p.SkipTotal = true
 	return p
 }
 
-func (p *Options) CloneSkipOpts() *Options {
+func (p *ListOption) CloneSkipOpts() *ListOption {
 	l := NewOptions().SetPage(p.GetPage()).SetSize(p.GetSize())
 	if l.GetSkipTotal() {
 		l.SetSkipTotal()
@@ -530,7 +530,7 @@ func getOptTypeFromInterface(typ interface{}) uint32 {
 	return 0
 }
 
-func (p *Options) CloneChangeOptTypes(optPairs ...interface{}) *Options {
+func (p *ListOption) CloneChangeOptTypes(optPairs ...interface{}) *ListOption {
 	l := p.CloneSkipOpts()
 	if len(optPairs)%2 != 0 {
 		log.Panicf("invalid number of opts argument %d", len(optPairs))
@@ -541,7 +541,7 @@ func (p *Options) CloneChangeOptTypes(optPairs ...interface{}) *Options {
 		val := optPairs[i+1]
 		kv[getOptTypeFromInterface(typ)] = getOptTypeFromInterface(val)
 	}
-	for _, v := range p.OptList {
+	for _, v := range p.Options {
 		t := uint32(v.Key)
 		if vv, ok := kv[t]; ok {
 			l.AddOpt(vv, v.Value)
