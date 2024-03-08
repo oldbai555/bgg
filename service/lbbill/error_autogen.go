@@ -3,11 +3,12 @@
 package lbbill
 
 import (
-	"github.com/oldbai555/lbtool/pkg/lberr"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 var (
-	Success             = lberr.NewErr(int32(ErrCode_Success), "Success")
-	ErrBillNotFound     = lberr.NewErr(int32(ErrCode_ErrBillNotFound), "ErrBillNotFound")
-	ErrCategoryNotFound = lberr.NewErr(int32(ErrCode_ErrCategoryNotFound), "ErrCategoryNotFound")
+	Success             = status.Error(codes.Code(int32(ErrCode_Success)), "Success")
+	ErrBillNotFound     = status.Error(codes.Code(int32(ErrCode_ErrBillNotFound)), "ErrBillNotFound")
+	ErrCategoryNotFound = status.Error(codes.Code(int32(ErrCode_ErrCategoryNotFound)), "ErrCategoryNotFound")
 )

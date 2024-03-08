@@ -268,31 +268,31 @@ var _ interface {
 	ErrorName() string
 } = ModelBillCategoryValidationError{}
 
-// Validate checks the field values on AddBillReq with the rules defined in the
-// proto definition for this message. If any rules are violated, the first
+// Validate checks the field values on AddBillSysReq with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
-func (m *AddBillReq) Validate() error {
+func (m *AddBillSysReq) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on AddBillReq with the rules defined in
-// the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in AddBillReqMultiError, or
+// ValidateAll checks the field values on AddBillSysReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in AddBillSysReqMultiError, or
 // nil if none found.
-func (m *AddBillReq) ValidateAll() error {
+func (m *AddBillSysReq) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *AddBillReq) validate(all bool) error {
+func (m *AddBillSysReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
 	var errors []error
 
-	if m.GetBill() == nil {
-		err := AddBillReqValidationError{
-			field:  "Bill",
+	if m.GetData() == nil {
+		err := AddBillSysReqValidationError{
+			field:  "Data",
 			reason: "value is required",
 		}
 		if !all {
@@ -302,28 +302,28 @@ func (m *AddBillReq) validate(all bool) error {
 	}
 
 	if all {
-		switch v := interface{}(m.GetBill()).(type) {
+		switch v := interface{}(m.GetData()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AddBillReqValidationError{
-					field:  "Bill",
+				errors = append(errors, AddBillSysReqValidationError{
+					field:  "Data",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, AddBillReqValidationError{
-					field:  "Bill",
+				errors = append(errors, AddBillSysReqValidationError{
+					field:  "Data",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetBill()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return AddBillReqValidationError{
-				field:  "Bill",
+			return AddBillSysReqValidationError{
+				field:  "Data",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -331,18 +331,19 @@ func (m *AddBillReq) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return AddBillReqMultiError(errors)
+		return AddBillSysReqMultiError(errors)
 	}
 
 	return nil
 }
 
-// AddBillReqMultiError is an error wrapping multiple validation errors
-// returned by AddBillReq.ValidateAll() if the designated constraints aren't met.
-type AddBillReqMultiError []error
+// AddBillSysReqMultiError is an error wrapping multiple validation errors
+// returned by AddBillSysReq.ValidateAll() if the designated constraints
+// aren't met.
+type AddBillSysReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m AddBillReqMultiError) Error() string {
+func (m AddBillSysReqMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -351,11 +352,11 @@ func (m AddBillReqMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m AddBillReqMultiError) AllErrors() []error { return m }
+func (m AddBillSysReqMultiError) AllErrors() []error { return m }
 
-// AddBillReqValidationError is the validation error returned by
-// AddBillReq.Validate if the designated constraints aren't met.
-type AddBillReqValidationError struct {
+// AddBillSysReqValidationError is the validation error returned by
+// AddBillSysReq.Validate if the designated constraints aren't met.
+type AddBillSysReqValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -363,22 +364,22 @@ type AddBillReqValidationError struct {
 }
 
 // Field function returns field value.
-func (e AddBillReqValidationError) Field() string { return e.field }
+func (e AddBillSysReqValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e AddBillReqValidationError) Reason() string { return e.reason }
+func (e AddBillSysReqValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e AddBillReqValidationError) Cause() error { return e.cause }
+func (e AddBillSysReqValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e AddBillReqValidationError) Key() bool { return e.key }
+func (e AddBillSysReqValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e AddBillReqValidationError) ErrorName() string { return "AddBillReqValidationError" }
+func (e AddBillSysReqValidationError) ErrorName() string { return "AddBillSysReqValidationError" }
 
 // Error satisfies the builtin error interface
-func (e AddBillReqValidationError) Error() string {
+func (e AddBillSysReqValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -390,14 +391,14 @@ func (e AddBillReqValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sAddBillReq.%s: %s%s",
+		"invalid %sAddBillSysReq.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = AddBillReqValidationError{}
+var _ error = AddBillSysReqValidationError{}
 
 var _ interface {
 	Field() string
@@ -405,24 +406,24 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = AddBillReqValidationError{}
+} = AddBillSysReqValidationError{}
 
-// Validate checks the field values on AddBillRsp with the rules defined in the
-// proto definition for this message. If any rules are violated, the first
+// Validate checks the field values on AddBillSysRsp with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
-func (m *AddBillRsp) Validate() error {
+func (m *AddBillSysRsp) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on AddBillRsp with the rules defined in
-// the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in AddBillRspMultiError, or
+// ValidateAll checks the field values on AddBillSysRsp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in AddBillSysRspMultiError, or
 // nil if none found.
-func (m *AddBillRsp) ValidateAll() error {
+func (m *AddBillSysRsp) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *AddBillRsp) validate(all bool) error {
+func (m *AddBillSysRsp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -430,28 +431,28 @@ func (m *AddBillRsp) validate(all bool) error {
 	var errors []error
 
 	if all {
-		switch v := interface{}(m.GetBill()).(type) {
+		switch v := interface{}(m.GetData()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AddBillRspValidationError{
-					field:  "Bill",
+				errors = append(errors, AddBillSysRspValidationError{
+					field:  "Data",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, AddBillRspValidationError{
-					field:  "Bill",
+				errors = append(errors, AddBillSysRspValidationError{
+					field:  "Data",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetBill()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return AddBillRspValidationError{
-				field:  "Bill",
+			return AddBillSysRspValidationError{
+				field:  "Data",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -459,18 +460,19 @@ func (m *AddBillRsp) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return AddBillRspMultiError(errors)
+		return AddBillSysRspMultiError(errors)
 	}
 
 	return nil
 }
 
-// AddBillRspMultiError is an error wrapping multiple validation errors
-// returned by AddBillRsp.ValidateAll() if the designated constraints aren't met.
-type AddBillRspMultiError []error
+// AddBillSysRspMultiError is an error wrapping multiple validation errors
+// returned by AddBillSysRsp.ValidateAll() if the designated constraints
+// aren't met.
+type AddBillSysRspMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m AddBillRspMultiError) Error() string {
+func (m AddBillSysRspMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -479,11 +481,11 @@ func (m AddBillRspMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m AddBillRspMultiError) AllErrors() []error { return m }
+func (m AddBillSysRspMultiError) AllErrors() []error { return m }
 
-// AddBillRspValidationError is the validation error returned by
-// AddBillRsp.Validate if the designated constraints aren't met.
-type AddBillRspValidationError struct {
+// AddBillSysRspValidationError is the validation error returned by
+// AddBillSysRsp.Validate if the designated constraints aren't met.
+type AddBillSysRspValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -491,22 +493,22 @@ type AddBillRspValidationError struct {
 }
 
 // Field function returns field value.
-func (e AddBillRspValidationError) Field() string { return e.field }
+func (e AddBillSysRspValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e AddBillRspValidationError) Reason() string { return e.reason }
+func (e AddBillSysRspValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e AddBillRspValidationError) Cause() error { return e.cause }
+func (e AddBillSysRspValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e AddBillRspValidationError) Key() bool { return e.key }
+func (e AddBillSysRspValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e AddBillRspValidationError) ErrorName() string { return "AddBillRspValidationError" }
+func (e AddBillSysRspValidationError) ErrorName() string { return "AddBillSysRspValidationError" }
 
 // Error satisfies the builtin error interface
-func (e AddBillRspValidationError) Error() string {
+func (e AddBillSysRspValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -518,14 +520,14 @@ func (e AddBillRspValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sAddBillRsp.%s: %s%s",
+		"invalid %sAddBillSysRsp.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = AddBillRspValidationError{}
+var _ error = AddBillSysRspValidationError{}
 
 var _ interface {
 	Field() string
@@ -533,24 +535,508 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = AddBillRspValidationError{}
+} = AddBillSysRspValidationError{}
 
-// Validate checks the field values on DelBillReq with the rules defined in the
-// proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *DelBillReq) Validate() error {
+// Validate checks the field values on UpdateBillSysReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *UpdateBillSysReq) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on DelBillReq with the rules defined in
-// the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in DelBillReqMultiError, or
-// nil if none found.
-func (m *DelBillReq) ValidateAll() error {
+// ValidateAll checks the field values on UpdateBillSysReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpdateBillSysReqMultiError, or nil if none found.
+func (m *UpdateBillSysReq) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *DelBillReq) validate(all bool) error {
+func (m *UpdateBillSysReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetData() == nil {
+		err := UpdateBillSysReqValidationError{
+			field:  "Data",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UpdateBillSysReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UpdateBillSysReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpdateBillSysReqValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return UpdateBillSysReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpdateBillSysReqMultiError is an error wrapping multiple validation errors
+// returned by UpdateBillSysReq.ValidateAll() if the designated constraints
+// aren't met.
+type UpdateBillSysReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdateBillSysReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdateBillSysReqMultiError) AllErrors() []error { return m }
+
+// UpdateBillSysReqValidationError is the validation error returned by
+// UpdateBillSysReq.Validate if the designated constraints aren't met.
+type UpdateBillSysReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateBillSysReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateBillSysReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateBillSysReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateBillSysReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateBillSysReqValidationError) ErrorName() string { return "UpdateBillSysReqValidationError" }
+
+// Error satisfies the builtin error interface
+func (e UpdateBillSysReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateBillSysReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateBillSysReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateBillSysReqValidationError{}
+
+// Validate checks the field values on UpdateBillSysRsp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *UpdateBillSysRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdateBillSysRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpdateBillSysRspMultiError, or nil if none found.
+func (m *UpdateBillSysRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdateBillSysRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return UpdateBillSysRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpdateBillSysRspMultiError is an error wrapping multiple validation errors
+// returned by UpdateBillSysRsp.ValidateAll() if the designated constraints
+// aren't met.
+type UpdateBillSysRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdateBillSysRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdateBillSysRspMultiError) AllErrors() []error { return m }
+
+// UpdateBillSysRspValidationError is the validation error returned by
+// UpdateBillSysRsp.Validate if the designated constraints aren't met.
+type UpdateBillSysRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateBillSysRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateBillSysRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateBillSysRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateBillSysRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateBillSysRspValidationError) ErrorName() string { return "UpdateBillSysRspValidationError" }
+
+// Error satisfies the builtin error interface
+func (e UpdateBillSysRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateBillSysRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateBillSysRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateBillSysRspValidationError{}
+
+// Validate checks the field values on DelBillSysListReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *DelBillSysListReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DelBillSysListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DelBillSysListReqMultiError, or nil if none found.
+func (m *DelBillSysListReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DelBillSysListReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetListOption() == nil {
+		err := DelBillSysListReqValidationError{
+			field:  "ListOption",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetListOption()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DelBillSysListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DelBillSysListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetListOption()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DelBillSysListReqValidationError{
+				field:  "ListOption",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return DelBillSysListReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// DelBillSysListReqMultiError is an error wrapping multiple validation errors
+// returned by DelBillSysListReq.ValidateAll() if the designated constraints
+// aren't met.
+type DelBillSysListReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DelBillSysListReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DelBillSysListReqMultiError) AllErrors() []error { return m }
+
+// DelBillSysListReqValidationError is the validation error returned by
+// DelBillSysListReq.Validate if the designated constraints aren't met.
+type DelBillSysListReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DelBillSysListReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DelBillSysListReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DelBillSysListReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DelBillSysListReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DelBillSysListReqValidationError) ErrorName() string {
+	return "DelBillSysListReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DelBillSysListReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDelBillSysListReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DelBillSysListReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DelBillSysListReqValidationError{}
+
+// Validate checks the field values on DelBillSysListRsp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *DelBillSysListRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DelBillSysListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DelBillSysListRspMultiError, or nil if none found.
+func (m *DelBillSysListRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DelBillSysListRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return DelBillSysListRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// DelBillSysListRspMultiError is an error wrapping multiple validation errors
+// returned by DelBillSysListRsp.ValidateAll() if the designated constraints
+// aren't met.
+type DelBillSysListRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DelBillSysListRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DelBillSysListRspMultiError) AllErrors() []error { return m }
+
+// DelBillSysListRspValidationError is the validation error returned by
+// DelBillSysListRsp.Validate if the designated constraints aren't met.
+type DelBillSysListRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DelBillSysListRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DelBillSysListRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DelBillSysListRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DelBillSysListRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DelBillSysListRspValidationError) ErrorName() string {
+	return "DelBillSysListRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DelBillSysListRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDelBillSysListRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DelBillSysListRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DelBillSysListRspValidationError{}
+
+// Validate checks the field values on GetBillSysReq with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *GetBillSysReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetBillSysReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in GetBillSysReqMultiError, or
+// nil if none found.
+func (m *GetBillSysReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetBillSysReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -558,7 +1044,7 @@ func (m *DelBillReq) validate(all bool) error {
 	var errors []error
 
 	if m.GetId() <= 0 {
-		err := DelBillReqValidationError{
+		err := GetBillSysReqValidationError{
 			field:  "Id",
 			reason: "value must be greater than 0",
 		}
@@ -569,18 +1055,19 @@ func (m *DelBillReq) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return DelBillReqMultiError(errors)
+		return GetBillSysReqMultiError(errors)
 	}
 
 	return nil
 }
 
-// DelBillReqMultiError is an error wrapping multiple validation errors
-// returned by DelBillReq.ValidateAll() if the designated constraints aren't met.
-type DelBillReqMultiError []error
+// GetBillSysReqMultiError is an error wrapping multiple validation errors
+// returned by GetBillSysReq.ValidateAll() if the designated constraints
+// aren't met.
+type GetBillSysReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m DelBillReqMultiError) Error() string {
+func (m GetBillSysReqMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -589,11 +1076,11 @@ func (m DelBillReqMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m DelBillReqMultiError) AllErrors() []error { return m }
+func (m GetBillSysReqMultiError) AllErrors() []error { return m }
 
-// DelBillReqValidationError is the validation error returned by
-// DelBillReq.Validate if the designated constraints aren't met.
-type DelBillReqValidationError struct {
+// GetBillSysReqValidationError is the validation error returned by
+// GetBillSysReq.Validate if the designated constraints aren't met.
+type GetBillSysReqValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -601,22 +1088,22 @@ type DelBillReqValidationError struct {
 }
 
 // Field function returns field value.
-func (e DelBillReqValidationError) Field() string { return e.field }
+func (e GetBillSysReqValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e DelBillReqValidationError) Reason() string { return e.reason }
+func (e GetBillSysReqValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e DelBillReqValidationError) Cause() error { return e.cause }
+func (e GetBillSysReqValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e DelBillReqValidationError) Key() bool { return e.key }
+func (e GetBillSysReqValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e DelBillReqValidationError) ErrorName() string { return "DelBillReqValidationError" }
+func (e GetBillSysReqValidationError) ErrorName() string { return "GetBillSysReqValidationError" }
 
 // Error satisfies the builtin error interface
-func (e DelBillReqValidationError) Error() string {
+func (e GetBillSysReqValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -628,14 +1115,14 @@ func (e DelBillReqValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sDelBillReq.%s: %s%s",
+		"invalid %sGetBillSysReq.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = DelBillReqValidationError{}
+var _ error = GetBillSysReqValidationError{}
 
 var _ interface {
 	Field() string
@@ -643,132 +1130,162 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = DelBillReqValidationError{}
+} = GetBillSysReqValidationError{}
 
-// Validate checks the field values on DelBillRsp with the rules defined in the
-// proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *DelBillRsp) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on DelBillRsp with the rules defined in
-// the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in DelBillRspMultiError, or
-// nil if none found.
-func (m *DelBillRsp) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *DelBillRsp) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if len(errors) > 0 {
-		return DelBillRspMultiError(errors)
-	}
-
-	return nil
-}
-
-// DelBillRspMultiError is an error wrapping multiple validation errors
-// returned by DelBillRsp.ValidateAll() if the designated constraints aren't met.
-type DelBillRspMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m DelBillRspMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m DelBillRspMultiError) AllErrors() []error { return m }
-
-// DelBillRspValidationError is the validation error returned by
-// DelBillRsp.Validate if the designated constraints aren't met.
-type DelBillRspValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e DelBillRspValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e DelBillRspValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e DelBillRspValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e DelBillRspValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e DelBillRspValidationError) ErrorName() string { return "DelBillRspValidationError" }
-
-// Error satisfies the builtin error interface
-func (e DelBillRspValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sDelBillRsp.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = DelBillRspValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = DelBillRspValidationError{}
-
-// Validate checks the field values on UpdateBillReq with the rules defined in
+// Validate checks the field values on GetBillSysRsp with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
-func (m *UpdateBillReq) Validate() error {
+func (m *GetBillSysRsp) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on UpdateBillReq with the rules defined
+// ValidateAll checks the field values on GetBillSysRsp with the rules defined
 // in the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in UpdateBillReqMultiError, or
+// result is a list of violation errors wrapped in GetBillSysRspMultiError, or
 // nil if none found.
-func (m *UpdateBillReq) ValidateAll() error {
+func (m *GetBillSysRsp) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *UpdateBillReq) validate(all bool) error {
+func (m *GetBillSysRsp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
 	var errors []error
 
-	if m.GetBill() == nil {
-		err := UpdateBillReqValidationError{
-			field:  "Bill",
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetBillSysRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetBillSysRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetBillSysRspValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetBillSysRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetBillSysRspMultiError is an error wrapping multiple validation errors
+// returned by GetBillSysRsp.ValidateAll() if the designated constraints
+// aren't met.
+type GetBillSysRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetBillSysRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetBillSysRspMultiError) AllErrors() []error { return m }
+
+// GetBillSysRspValidationError is the validation error returned by
+// GetBillSysRsp.Validate if the designated constraints aren't met.
+type GetBillSysRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetBillSysRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetBillSysRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetBillSysRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetBillSysRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetBillSysRspValidationError) ErrorName() string { return "GetBillSysRspValidationError" }
+
+// Error satisfies the builtin error interface
+func (e GetBillSysRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetBillSysRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetBillSysRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetBillSysRspValidationError{}
+
+// Validate checks the field values on GetBillSysListReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *GetBillSysListReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetBillSysListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetBillSysListReqMultiError, or nil if none found.
+func (m *GetBillSysListReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetBillSysListReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetListOption() == nil {
+		err := GetBillSysListReqValidationError{
+			field:  "ListOption",
 			reason: "value is required",
 		}
 		if !all {
@@ -778,28 +1295,28 @@ func (m *UpdateBillReq) validate(all bool) error {
 	}
 
 	if all {
-		switch v := interface{}(m.GetBill()).(type) {
+		switch v := interface{}(m.GetListOption()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, UpdateBillReqValidationError{
-					field:  "Bill",
+				errors = append(errors, GetBillSysListReqValidationError{
+					field:  "ListOption",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, UpdateBillReqValidationError{
-					field:  "Bill",
+				errors = append(errors, GetBillSysListReqValidationError{
+					field:  "ListOption",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetBill()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetListOption()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return UpdateBillReqValidationError{
-				field:  "Bill",
+			return GetBillSysListReqValidationError{
+				field:  "ListOption",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -807,19 +1324,19 @@ func (m *UpdateBillReq) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return UpdateBillReqMultiError(errors)
+		return GetBillSysListReqMultiError(errors)
 	}
 
 	return nil
 }
 
-// UpdateBillReqMultiError is an error wrapping multiple validation errors
-// returned by UpdateBillReq.ValidateAll() if the designated constraints
+// GetBillSysListReqMultiError is an error wrapping multiple validation errors
+// returned by GetBillSysListReq.ValidateAll() if the designated constraints
 // aren't met.
-type UpdateBillReqMultiError []error
+type GetBillSysListReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m UpdateBillReqMultiError) Error() string {
+func (m GetBillSysListReqMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -828,11 +1345,11 @@ func (m UpdateBillReqMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m UpdateBillReqMultiError) AllErrors() []error { return m }
+func (m GetBillSysListReqMultiError) AllErrors() []error { return m }
 
-// UpdateBillReqValidationError is the validation error returned by
-// UpdateBillReq.Validate if the designated constraints aren't met.
-type UpdateBillReqValidationError struct {
+// GetBillSysListReqValidationError is the validation error returned by
+// GetBillSysListReq.Validate if the designated constraints aren't met.
+type GetBillSysListReqValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -840,22 +1357,24 @@ type UpdateBillReqValidationError struct {
 }
 
 // Field function returns field value.
-func (e UpdateBillReqValidationError) Field() string { return e.field }
+func (e GetBillSysListReqValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e UpdateBillReqValidationError) Reason() string { return e.reason }
+func (e GetBillSysListReqValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e UpdateBillReqValidationError) Cause() error { return e.cause }
+func (e GetBillSysListReqValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e UpdateBillReqValidationError) Key() bool { return e.key }
+func (e GetBillSysListReqValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e UpdateBillReqValidationError) ErrorName() string { return "UpdateBillReqValidationError" }
+func (e GetBillSysListReqValidationError) ErrorName() string {
+	return "GetBillSysListReqValidationError"
+}
 
 // Error satisfies the builtin error interface
-func (e UpdateBillReqValidationError) Error() string {
+func (e GetBillSysListReqValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -867,14 +1386,14 @@ func (e UpdateBillReqValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sUpdateBillReq.%s: %s%s",
+		"invalid %sGetBillSysListReq.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = UpdateBillReqValidationError{}
+var _ error = GetBillSysListReqValidationError{}
 
 var _ interface {
 	Field() string
@@ -882,531 +1401,24 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = UpdateBillReqValidationError{}
+} = GetBillSysListReqValidationError{}
 
-// Validate checks the field values on UpdateBillRsp with the rules defined in
-// the proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *UpdateBillRsp) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on UpdateBillRsp with the rules defined
+// Validate checks the field values on GetBillSysListRsp with the rules defined
 // in the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in UpdateBillRspMultiError, or
-// nil if none found.
-func (m *UpdateBillRsp) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *UpdateBillRsp) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if len(errors) > 0 {
-		return UpdateBillRspMultiError(errors)
-	}
-
-	return nil
-}
-
-// UpdateBillRspMultiError is an error wrapping multiple validation errors
-// returned by UpdateBillRsp.ValidateAll() if the designated constraints
-// aren't met.
-type UpdateBillRspMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m UpdateBillRspMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m UpdateBillRspMultiError) AllErrors() []error { return m }
-
-// UpdateBillRspValidationError is the validation error returned by
-// UpdateBillRsp.Validate if the designated constraints aren't met.
-type UpdateBillRspValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e UpdateBillRspValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e UpdateBillRspValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e UpdateBillRspValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e UpdateBillRspValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e UpdateBillRspValidationError) ErrorName() string { return "UpdateBillRspValidationError" }
-
-// Error satisfies the builtin error interface
-func (e UpdateBillRspValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sUpdateBillRsp.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = UpdateBillRspValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = UpdateBillRspValidationError{}
-
-// Validate checks the field values on GetBillReq with the rules defined in the
-// proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *GetBillReq) Validate() error {
+// first error encountered is returned, or nil if there are no violations.
+func (m *GetBillSysListRsp) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on GetBillReq with the rules defined in
-// the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in GetBillReqMultiError, or
-// nil if none found.
-func (m *GetBillReq) ValidateAll() error {
+// ValidateAll checks the field values on GetBillSysListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetBillSysListRspMultiError, or nil if none found.
+func (m *GetBillSysListRsp) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *GetBillReq) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if m.GetId() <= 0 {
-		err := GetBillReqValidationError{
-			field:  "Id",
-			reason: "value must be greater than 0",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if len(errors) > 0 {
-		return GetBillReqMultiError(errors)
-	}
-
-	return nil
-}
-
-// GetBillReqMultiError is an error wrapping multiple validation errors
-// returned by GetBillReq.ValidateAll() if the designated constraints aren't met.
-type GetBillReqMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m GetBillReqMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m GetBillReqMultiError) AllErrors() []error { return m }
-
-// GetBillReqValidationError is the validation error returned by
-// GetBillReq.Validate if the designated constraints aren't met.
-type GetBillReqValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e GetBillReqValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e GetBillReqValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e GetBillReqValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e GetBillReqValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e GetBillReqValidationError) ErrorName() string { return "GetBillReqValidationError" }
-
-// Error satisfies the builtin error interface
-func (e GetBillReqValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sGetBillReq.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = GetBillReqValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = GetBillReqValidationError{}
-
-// Validate checks the field values on GetBillRsp with the rules defined in the
-// proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *GetBillRsp) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on GetBillRsp with the rules defined in
-// the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in GetBillRspMultiError, or
-// nil if none found.
-func (m *GetBillRsp) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *GetBillRsp) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if all {
-		switch v := interface{}(m.GetBill()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, GetBillRspValidationError{
-					field:  "Bill",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, GetBillRspValidationError{
-					field:  "Bill",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetBill()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return GetBillRspValidationError{
-				field:  "Bill",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetCategory()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, GetBillRspValidationError{
-					field:  "Category",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, GetBillRspValidationError{
-					field:  "Category",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetCategory()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return GetBillRspValidationError{
-				field:  "Category",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if len(errors) > 0 {
-		return GetBillRspMultiError(errors)
-	}
-
-	return nil
-}
-
-// GetBillRspMultiError is an error wrapping multiple validation errors
-// returned by GetBillRsp.ValidateAll() if the designated constraints aren't met.
-type GetBillRspMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m GetBillRspMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m GetBillRspMultiError) AllErrors() []error { return m }
-
-// GetBillRspValidationError is the validation error returned by
-// GetBillRsp.Validate if the designated constraints aren't met.
-type GetBillRspValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e GetBillRspValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e GetBillRspValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e GetBillRspValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e GetBillRspValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e GetBillRspValidationError) ErrorName() string { return "GetBillRspValidationError" }
-
-// Error satisfies the builtin error interface
-func (e GetBillRspValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sGetBillRsp.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = GetBillRspValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = GetBillRspValidationError{}
-
-// Validate checks the field values on GetBillListReq with the rules defined in
-// the proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *GetBillListReq) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on GetBillListReq with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in GetBillListReqMultiError,
-// or nil if none found.
-func (m *GetBillListReq) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *GetBillListReq) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if m.GetOptions() == nil {
-		err := GetBillListReqValidationError{
-			field:  "Options",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if all {
-		switch v := interface{}(m.GetOptions()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, GetBillListReqValidationError{
-					field:  "Options",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, GetBillListReqValidationError{
-					field:  "Options",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetOptions()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return GetBillListReqValidationError{
-				field:  "Options",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if len(errors) > 0 {
-		return GetBillListReqMultiError(errors)
-	}
-
-	return nil
-}
-
-// GetBillListReqMultiError is an error wrapping multiple validation errors
-// returned by GetBillListReq.ValidateAll() if the designated constraints
-// aren't met.
-type GetBillListReqMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m GetBillListReqMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m GetBillListReqMultiError) AllErrors() []error { return m }
-
-// GetBillListReqValidationError is the validation error returned by
-// GetBillListReq.Validate if the designated constraints aren't met.
-type GetBillListReqValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e GetBillListReqValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e GetBillListReqValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e GetBillListReqValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e GetBillListReqValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e GetBillListReqValidationError) ErrorName() string { return "GetBillListReqValidationError" }
-
-// Error satisfies the builtin error interface
-func (e GetBillListReqValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sGetBillListReq.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = GetBillListReqValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = GetBillListReqValidationError{}
-
-// Validate checks the field values on GetBillListRsp with the rules defined in
-// the proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *GetBillListRsp) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on GetBillListRsp with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in GetBillListRspMultiError,
-// or nil if none found.
-func (m *GetBillListRsp) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *GetBillListRsp) validate(all bool) error {
+func (m *GetBillSysListRsp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -1417,7 +1429,7 @@ func (m *GetBillListRsp) validate(all bool) error {
 		switch v := interface{}(m.GetPaginate()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, GetBillListRspValidationError{
+				errors = append(errors, GetBillSysListRspValidationError{
 					field:  "Paginate",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -1425,7 +1437,7 @@ func (m *GetBillListRsp) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, GetBillListRspValidationError{
+				errors = append(errors, GetBillSysListRspValidationError{
 					field:  "Paginate",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -1434,7 +1446,7 @@ func (m *GetBillListRsp) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetPaginate()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return GetBillListRspValidationError{
+			return GetBillSysListRspValidationError{
 				field:  "Paginate",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -1449,7 +1461,7 @@ func (m *GetBillListRsp) validate(all bool) error {
 			switch v := interface{}(item).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, GetBillListRspValidationError{
+					errors = append(errors, GetBillSysListRspValidationError{
 						field:  fmt.Sprintf("List[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
@@ -1457,7 +1469,7 @@ func (m *GetBillListRsp) validate(all bool) error {
 				}
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
-					errors = append(errors, GetBillListRspValidationError{
+					errors = append(errors, GetBillSysListRspValidationError{
 						field:  fmt.Sprintf("List[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
@@ -1466,7 +1478,7 @@ func (m *GetBillListRsp) validate(all bool) error {
 			}
 		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				return GetBillListRspValidationError{
+				return GetBillSysListRspValidationError{
 					field:  fmt.Sprintf("List[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -1476,66 +1488,20 @@ func (m *GetBillListRsp) validate(all bool) error {
 
 	}
 
-	{
-		sorted_keys := make([]uint64, len(m.GetCategoryMap()))
-		i := 0
-		for key := range m.GetCategoryMap() {
-			sorted_keys[i] = key
-			i++
-		}
-		sort.Slice(sorted_keys, func(i, j int) bool { return sorted_keys[i] < sorted_keys[j] })
-		for _, key := range sorted_keys {
-			val := m.GetCategoryMap()[key]
-			_ = val
-
-			// no validation rules for CategoryMap[key]
-
-			if all {
-				switch v := interface{}(val).(type) {
-				case interface{ ValidateAll() error }:
-					if err := v.ValidateAll(); err != nil {
-						errors = append(errors, GetBillListRspValidationError{
-							field:  fmt.Sprintf("CategoryMap[%v]", key),
-							reason: "embedded message failed validation",
-							cause:  err,
-						})
-					}
-				case interface{ Validate() error }:
-					if err := v.Validate(); err != nil {
-						errors = append(errors, GetBillListRspValidationError{
-							field:  fmt.Sprintf("CategoryMap[%v]", key),
-							reason: "embedded message failed validation",
-							cause:  err,
-						})
-					}
-				}
-			} else if v, ok := interface{}(val).(interface{ Validate() error }); ok {
-				if err := v.Validate(); err != nil {
-					return GetBillListRspValidationError{
-						field:  fmt.Sprintf("CategoryMap[%v]", key),
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
-				}
-			}
-
-		}
-	}
-
 	if len(errors) > 0 {
-		return GetBillListRspMultiError(errors)
+		return GetBillSysListRspMultiError(errors)
 	}
 
 	return nil
 }
 
-// GetBillListRspMultiError is an error wrapping multiple validation errors
-// returned by GetBillListRsp.ValidateAll() if the designated constraints
+// GetBillSysListRspMultiError is an error wrapping multiple validation errors
+// returned by GetBillSysListRsp.ValidateAll() if the designated constraints
 // aren't met.
-type GetBillListRspMultiError []error
+type GetBillSysListRspMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m GetBillListRspMultiError) Error() string {
+func (m GetBillSysListRspMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -1544,11 +1510,11 @@ func (m GetBillListRspMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m GetBillListRspMultiError) AllErrors() []error { return m }
+func (m GetBillSysListRspMultiError) AllErrors() []error { return m }
 
-// GetBillListRspValidationError is the validation error returned by
-// GetBillListRsp.Validate if the designated constraints aren't met.
-type GetBillListRspValidationError struct {
+// GetBillSysListRspValidationError is the validation error returned by
+// GetBillSysListRsp.Validate if the designated constraints aren't met.
+type GetBillSysListRspValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -1556,22 +1522,24 @@ type GetBillListRspValidationError struct {
 }
 
 // Field function returns field value.
-func (e GetBillListRspValidationError) Field() string { return e.field }
+func (e GetBillSysListRspValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e GetBillListRspValidationError) Reason() string { return e.reason }
+func (e GetBillSysListRspValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e GetBillListRspValidationError) Cause() error { return e.cause }
+func (e GetBillSysListRspValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e GetBillListRspValidationError) Key() bool { return e.key }
+func (e GetBillSysListRspValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e GetBillListRspValidationError) ErrorName() string { return "GetBillListRspValidationError" }
+func (e GetBillSysListRspValidationError) ErrorName() string {
+	return "GetBillSysListRspValidationError"
+}
 
 // Error satisfies the builtin error interface
-func (e GetBillListRspValidationError) Error() string {
+func (e GetBillSysListRspValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -1583,14 +1551,14 @@ func (e GetBillListRspValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sGetBillListRsp.%s: %s%s",
+		"invalid %sGetBillSysListRsp.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = GetBillListRspValidationError{}
+var _ error = GetBillSysListRspValidationError{}
 
 var _ interface {
 	Field() string
@@ -1598,33 +1566,33 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = GetBillListRspValidationError{}
+} = GetBillSysListRspValidationError{}
 
-// Validate checks the field values on AddBillCategoryReq with the rules
+// Validate checks the field values on AddBillCategorySysReq with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
-func (m *AddBillCategoryReq) Validate() error {
+func (m *AddBillCategorySysReq) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on AddBillCategoryReq with the rules
+// ValidateAll checks the field values on AddBillCategorySysReq with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// AddBillCategoryReqMultiError, or nil if none found.
-func (m *AddBillCategoryReq) ValidateAll() error {
+// AddBillCategorySysReqMultiError, or nil if none found.
+func (m *AddBillCategorySysReq) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *AddBillCategoryReq) validate(all bool) error {
+func (m *AddBillCategorySysReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
 	var errors []error
 
-	if m.GetCategory() == nil {
-		err := AddBillCategoryReqValidationError{
-			field:  "Category",
+	if m.GetData() == nil {
+		err := AddBillCategorySysReqValidationError{
+			field:  "Data",
 			reason: "value is required",
 		}
 		if !all {
@@ -1634,28 +1602,28 @@ func (m *AddBillCategoryReq) validate(all bool) error {
 	}
 
 	if all {
-		switch v := interface{}(m.GetCategory()).(type) {
+		switch v := interface{}(m.GetData()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AddBillCategoryReqValidationError{
-					field:  "Category",
+				errors = append(errors, AddBillCategorySysReqValidationError{
+					field:  "Data",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, AddBillCategoryReqValidationError{
-					field:  "Category",
+				errors = append(errors, AddBillCategorySysReqValidationError{
+					field:  "Data",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetCategory()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return AddBillCategoryReqValidationError{
-				field:  "Category",
+			return AddBillCategorySysReqValidationError{
+				field:  "Data",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -1663,19 +1631,19 @@ func (m *AddBillCategoryReq) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return AddBillCategoryReqMultiError(errors)
+		return AddBillCategorySysReqMultiError(errors)
 	}
 
 	return nil
 }
 
-// AddBillCategoryReqMultiError is an error wrapping multiple validation errors
-// returned by AddBillCategoryReq.ValidateAll() if the designated constraints
-// aren't met.
-type AddBillCategoryReqMultiError []error
+// AddBillCategorySysReqMultiError is an error wrapping multiple validation
+// errors returned by AddBillCategorySysReq.ValidateAll() if the designated
+// constraints aren't met.
+type AddBillCategorySysReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m AddBillCategoryReqMultiError) Error() string {
+func (m AddBillCategorySysReqMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -1684,11 +1652,11 @@ func (m AddBillCategoryReqMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m AddBillCategoryReqMultiError) AllErrors() []error { return m }
+func (m AddBillCategorySysReqMultiError) AllErrors() []error { return m }
 
-// AddBillCategoryReqValidationError is the validation error returned by
-// AddBillCategoryReq.Validate if the designated constraints aren't met.
-type AddBillCategoryReqValidationError struct {
+// AddBillCategorySysReqValidationError is the validation error returned by
+// AddBillCategorySysReq.Validate if the designated constraints aren't met.
+type AddBillCategorySysReqValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -1696,24 +1664,24 @@ type AddBillCategoryReqValidationError struct {
 }
 
 // Field function returns field value.
-func (e AddBillCategoryReqValidationError) Field() string { return e.field }
+func (e AddBillCategorySysReqValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e AddBillCategoryReqValidationError) Reason() string { return e.reason }
+func (e AddBillCategorySysReqValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e AddBillCategoryReqValidationError) Cause() error { return e.cause }
+func (e AddBillCategorySysReqValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e AddBillCategoryReqValidationError) Key() bool { return e.key }
+func (e AddBillCategorySysReqValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e AddBillCategoryReqValidationError) ErrorName() string {
-	return "AddBillCategoryReqValidationError"
+func (e AddBillCategorySysReqValidationError) ErrorName() string {
+	return "AddBillCategorySysReqValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e AddBillCategoryReqValidationError) Error() string {
+func (e AddBillCategorySysReqValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -1725,14 +1693,14 @@ func (e AddBillCategoryReqValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sAddBillCategoryReq.%s: %s%s",
+		"invalid %sAddBillCategorySysReq.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = AddBillCategoryReqValidationError{}
+var _ error = AddBillCategorySysReqValidationError{}
 
 var _ interface {
 	Field() string
@@ -1740,24 +1708,24 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = AddBillCategoryReqValidationError{}
+} = AddBillCategorySysReqValidationError{}
 
-// Validate checks the field values on AddBillCategoryRsp with the rules
+// Validate checks the field values on AddBillCategorySysRsp with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
-func (m *AddBillCategoryRsp) Validate() error {
+func (m *AddBillCategorySysRsp) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on AddBillCategoryRsp with the rules
+// ValidateAll checks the field values on AddBillCategorySysRsp with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// AddBillCategoryRspMultiError, or nil if none found.
-func (m *AddBillCategoryRsp) ValidateAll() error {
+// AddBillCategorySysRspMultiError, or nil if none found.
+func (m *AddBillCategorySysRsp) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *AddBillCategoryRsp) validate(all bool) error {
+func (m *AddBillCategorySysRsp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -1765,28 +1733,28 @@ func (m *AddBillCategoryRsp) validate(all bool) error {
 	var errors []error
 
 	if all {
-		switch v := interface{}(m.GetCategory()).(type) {
+		switch v := interface{}(m.GetData()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AddBillCategoryRspValidationError{
-					field:  "Category",
+				errors = append(errors, AddBillCategorySysRspValidationError{
+					field:  "Data",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, AddBillCategoryRspValidationError{
-					field:  "Category",
+				errors = append(errors, AddBillCategorySysRspValidationError{
+					field:  "Data",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetCategory()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return AddBillCategoryRspValidationError{
-				field:  "Category",
+			return AddBillCategorySysRspValidationError{
+				field:  "Data",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -1794,19 +1762,19 @@ func (m *AddBillCategoryRsp) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return AddBillCategoryRspMultiError(errors)
+		return AddBillCategorySysRspMultiError(errors)
 	}
 
 	return nil
 }
 
-// AddBillCategoryRspMultiError is an error wrapping multiple validation errors
-// returned by AddBillCategoryRsp.ValidateAll() if the designated constraints
-// aren't met.
-type AddBillCategoryRspMultiError []error
+// AddBillCategorySysRspMultiError is an error wrapping multiple validation
+// errors returned by AddBillCategorySysRsp.ValidateAll() if the designated
+// constraints aren't met.
+type AddBillCategorySysRspMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m AddBillCategoryRspMultiError) Error() string {
+func (m AddBillCategorySysRspMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -1815,11 +1783,11 @@ func (m AddBillCategoryRspMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m AddBillCategoryRspMultiError) AllErrors() []error { return m }
+func (m AddBillCategorySysRspMultiError) AllErrors() []error { return m }
 
-// AddBillCategoryRspValidationError is the validation error returned by
-// AddBillCategoryRsp.Validate if the designated constraints aren't met.
-type AddBillCategoryRspValidationError struct {
+// AddBillCategorySysRspValidationError is the validation error returned by
+// AddBillCategorySysRsp.Validate if the designated constraints aren't met.
+type AddBillCategorySysRspValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -1827,24 +1795,24 @@ type AddBillCategoryRspValidationError struct {
 }
 
 // Field function returns field value.
-func (e AddBillCategoryRspValidationError) Field() string { return e.field }
+func (e AddBillCategorySysRspValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e AddBillCategoryRspValidationError) Reason() string { return e.reason }
+func (e AddBillCategorySysRspValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e AddBillCategoryRspValidationError) Cause() error { return e.cause }
+func (e AddBillCategorySysRspValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e AddBillCategoryRspValidationError) Key() bool { return e.key }
+func (e AddBillCategorySysRspValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e AddBillCategoryRspValidationError) ErrorName() string {
-	return "AddBillCategoryRspValidationError"
+func (e AddBillCategorySysRspValidationError) ErrorName() string {
+	return "AddBillCategorySysRspValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e AddBillCategoryRspValidationError) Error() string {
+func (e AddBillCategorySysRspValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -1856,14 +1824,14 @@ func (e AddBillCategoryRspValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sAddBillCategoryRsp.%s: %s%s",
+		"invalid %sAddBillCategorySysRsp.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = AddBillCategoryRspValidationError{}
+var _ error = AddBillCategorySysRspValidationError{}
 
 var _ interface {
 	Field() string
@@ -1871,24 +1839,512 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = AddBillCategoryRspValidationError{}
+} = AddBillCategorySysRspValidationError{}
 
-// Validate checks the field values on DelBillCategoryReq with the rules
+// Validate checks the field values on UpdateBillCategorySysReq with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
-func (m *DelBillCategoryReq) Validate() error {
+func (m *UpdateBillCategorySysReq) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on DelBillCategoryReq with the rules
-// defined in the proto definition for this message. If any rules are
+// ValidateAll checks the field values on UpdateBillCategorySysReq with the
+// rules defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// DelBillCategoryReqMultiError, or nil if none found.
-func (m *DelBillCategoryReq) ValidateAll() error {
+// UpdateBillCategorySysReqMultiError, or nil if none found.
+func (m *UpdateBillCategorySysReq) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *DelBillCategoryReq) validate(all bool) error {
+func (m *UpdateBillCategorySysReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetData() == nil {
+		err := UpdateBillCategorySysReqValidationError{
+			field:  "Data",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UpdateBillCategorySysReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UpdateBillCategorySysReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpdateBillCategorySysReqValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return UpdateBillCategorySysReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpdateBillCategorySysReqMultiError is an error wrapping multiple validation
+// errors returned by UpdateBillCategorySysReq.ValidateAll() if the designated
+// constraints aren't met.
+type UpdateBillCategorySysReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdateBillCategorySysReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdateBillCategorySysReqMultiError) AllErrors() []error { return m }
+
+// UpdateBillCategorySysReqValidationError is the validation error returned by
+// UpdateBillCategorySysReq.Validate if the designated constraints aren't met.
+type UpdateBillCategorySysReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateBillCategorySysReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateBillCategorySysReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateBillCategorySysReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateBillCategorySysReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateBillCategorySysReqValidationError) ErrorName() string {
+	return "UpdateBillCategorySysReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateBillCategorySysReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateBillCategorySysReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateBillCategorySysReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateBillCategorySysReqValidationError{}
+
+// Validate checks the field values on UpdateBillCategorySysRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *UpdateBillCategorySysRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdateBillCategorySysRsp with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpdateBillCategorySysRspMultiError, or nil if none found.
+func (m *UpdateBillCategorySysRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdateBillCategorySysRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return UpdateBillCategorySysRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpdateBillCategorySysRspMultiError is an error wrapping multiple validation
+// errors returned by UpdateBillCategorySysRsp.ValidateAll() if the designated
+// constraints aren't met.
+type UpdateBillCategorySysRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdateBillCategorySysRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdateBillCategorySysRspMultiError) AllErrors() []error { return m }
+
+// UpdateBillCategorySysRspValidationError is the validation error returned by
+// UpdateBillCategorySysRsp.Validate if the designated constraints aren't met.
+type UpdateBillCategorySysRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateBillCategorySysRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateBillCategorySysRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateBillCategorySysRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateBillCategorySysRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateBillCategorySysRspValidationError) ErrorName() string {
+	return "UpdateBillCategorySysRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateBillCategorySysRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateBillCategorySysRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateBillCategorySysRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateBillCategorySysRspValidationError{}
+
+// Validate checks the field values on DelBillCategorySysListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DelBillCategorySysListReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DelBillCategorySysListReq with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DelBillCategorySysListReqMultiError, or nil if none found.
+func (m *DelBillCategorySysListReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DelBillCategorySysListReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetListOption() == nil {
+		err := DelBillCategorySysListReqValidationError{
+			field:  "ListOption",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetListOption()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DelBillCategorySysListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DelBillCategorySysListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetListOption()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DelBillCategorySysListReqValidationError{
+				field:  "ListOption",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return DelBillCategorySysListReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// DelBillCategorySysListReqMultiError is an error wrapping multiple validation
+// errors returned by DelBillCategorySysListReq.ValidateAll() if the
+// designated constraints aren't met.
+type DelBillCategorySysListReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DelBillCategorySysListReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DelBillCategorySysListReqMultiError) AllErrors() []error { return m }
+
+// DelBillCategorySysListReqValidationError is the validation error returned by
+// DelBillCategorySysListReq.Validate if the designated constraints aren't met.
+type DelBillCategorySysListReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DelBillCategorySysListReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DelBillCategorySysListReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DelBillCategorySysListReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DelBillCategorySysListReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DelBillCategorySysListReqValidationError) ErrorName() string {
+	return "DelBillCategorySysListReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DelBillCategorySysListReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDelBillCategorySysListReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DelBillCategorySysListReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DelBillCategorySysListReqValidationError{}
+
+// Validate checks the field values on DelBillCategorySysListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DelBillCategorySysListRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DelBillCategorySysListRsp with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DelBillCategorySysListRspMultiError, or nil if none found.
+func (m *DelBillCategorySysListRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DelBillCategorySysListRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return DelBillCategorySysListRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// DelBillCategorySysListRspMultiError is an error wrapping multiple validation
+// errors returned by DelBillCategorySysListRsp.ValidateAll() if the
+// designated constraints aren't met.
+type DelBillCategorySysListRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DelBillCategorySysListRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DelBillCategorySysListRspMultiError) AllErrors() []error { return m }
+
+// DelBillCategorySysListRspValidationError is the validation error returned by
+// DelBillCategorySysListRsp.Validate if the designated constraints aren't met.
+type DelBillCategorySysListRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DelBillCategorySysListRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DelBillCategorySysListRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DelBillCategorySysListRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DelBillCategorySysListRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DelBillCategorySysListRspValidationError) ErrorName() string {
+	return "DelBillCategorySysListRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DelBillCategorySysListRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDelBillCategorySysListRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DelBillCategorySysListRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DelBillCategorySysListRspValidationError{}
+
+// Validate checks the field values on GetBillCategorySysReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetBillCategorySysReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetBillCategorySysReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetBillCategorySysReqMultiError, or nil if none found.
+func (m *GetBillCategorySysReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetBillCategorySysReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -1896,7 +2352,7 @@ func (m *DelBillCategoryReq) validate(all bool) error {
 	var errors []error
 
 	if m.GetId() <= 0 {
-		err := DelBillCategoryReqValidationError{
+		err := GetBillCategorySysReqValidationError{
 			field:  "Id",
 			reason: "value must be greater than 0",
 		}
@@ -1907,19 +2363,19 @@ func (m *DelBillCategoryReq) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return DelBillCategoryReqMultiError(errors)
+		return GetBillCategorySysReqMultiError(errors)
 	}
 
 	return nil
 }
 
-// DelBillCategoryReqMultiError is an error wrapping multiple validation errors
-// returned by DelBillCategoryReq.ValidateAll() if the designated constraints
-// aren't met.
-type DelBillCategoryReqMultiError []error
+// GetBillCategorySysReqMultiError is an error wrapping multiple validation
+// errors returned by GetBillCategorySysReq.ValidateAll() if the designated
+// constraints aren't met.
+type GetBillCategorySysReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m DelBillCategoryReqMultiError) Error() string {
+func (m GetBillCategorySysReqMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -1928,11 +2384,11 @@ func (m DelBillCategoryReqMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m DelBillCategoryReqMultiError) AllErrors() []error { return m }
+func (m GetBillCategorySysReqMultiError) AllErrors() []error { return m }
 
-// DelBillCategoryReqValidationError is the validation error returned by
-// DelBillCategoryReq.Validate if the designated constraints aren't met.
-type DelBillCategoryReqValidationError struct {
+// GetBillCategorySysReqValidationError is the validation error returned by
+// GetBillCategorySysReq.Validate if the designated constraints aren't met.
+type GetBillCategorySysReqValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -1940,24 +2396,24 @@ type DelBillCategoryReqValidationError struct {
 }
 
 // Field function returns field value.
-func (e DelBillCategoryReqValidationError) Field() string { return e.field }
+func (e GetBillCategorySysReqValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e DelBillCategoryReqValidationError) Reason() string { return e.reason }
+func (e GetBillCategorySysReqValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e DelBillCategoryReqValidationError) Cause() error { return e.cause }
+func (e GetBillCategorySysReqValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e DelBillCategoryReqValidationError) Key() bool { return e.key }
+func (e GetBillCategorySysReqValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e DelBillCategoryReqValidationError) ErrorName() string {
-	return "DelBillCategoryReqValidationError"
+func (e GetBillCategorySysReqValidationError) ErrorName() string {
+	return "GetBillCategorySysReqValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e DelBillCategoryReqValidationError) Error() string {
+func (e GetBillCategorySysReqValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -1969,14 +2425,14 @@ func (e DelBillCategoryReqValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sDelBillCategoryReq.%s: %s%s",
+		"invalid %sGetBillCategorySysReq.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = DelBillCategoryReqValidationError{}
+var _ error = GetBillCategorySysReqValidationError{}
 
 var _ interface {
 	Field() string
@@ -1984,44 +2440,73 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = DelBillCategoryReqValidationError{}
+} = GetBillCategorySysReqValidationError{}
 
-// Validate checks the field values on DelBillCategoryRsp with the rules
+// Validate checks the field values on GetBillCategorySysRsp with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
-func (m *DelBillCategoryRsp) Validate() error {
+func (m *GetBillCategorySysRsp) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on DelBillCategoryRsp with the rules
+// ValidateAll checks the field values on GetBillCategorySysRsp with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// DelBillCategoryRspMultiError, or nil if none found.
-func (m *DelBillCategoryRsp) ValidateAll() error {
+// GetBillCategorySysRspMultiError, or nil if none found.
+func (m *GetBillCategorySysRsp) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *DelBillCategoryRsp) validate(all bool) error {
+func (m *GetBillCategorySysRsp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
 	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetBillCategorySysRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetBillCategorySysRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetBillCategorySysRspValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	if len(errors) > 0 {
-		return DelBillCategoryRspMultiError(errors)
+		return GetBillCategorySysRspMultiError(errors)
 	}
 
 	return nil
 }
 
-// DelBillCategoryRspMultiError is an error wrapping multiple validation errors
-// returned by DelBillCategoryRsp.ValidateAll() if the designated constraints
-// aren't met.
-type DelBillCategoryRspMultiError []error
+// GetBillCategorySysRspMultiError is an error wrapping multiple validation
+// errors returned by GetBillCategorySysRsp.ValidateAll() if the designated
+// constraints aren't met.
+type GetBillCategorySysRspMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m DelBillCategoryRspMultiError) Error() string {
+func (m GetBillCategorySysRspMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -2030,11 +2515,11 @@ func (m DelBillCategoryRspMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m DelBillCategoryRspMultiError) AllErrors() []error { return m }
+func (m GetBillCategorySysRspMultiError) AllErrors() []error { return m }
 
-// DelBillCategoryRspValidationError is the validation error returned by
-// DelBillCategoryRsp.Validate if the designated constraints aren't met.
-type DelBillCategoryRspValidationError struct {
+// GetBillCategorySysRspValidationError is the validation error returned by
+// GetBillCategorySysRsp.Validate if the designated constraints aren't met.
+type GetBillCategorySysRspValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -2042,24 +2527,24 @@ type DelBillCategoryRspValidationError struct {
 }
 
 // Field function returns field value.
-func (e DelBillCategoryRspValidationError) Field() string { return e.field }
+func (e GetBillCategorySysRspValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e DelBillCategoryRspValidationError) Reason() string { return e.reason }
+func (e GetBillCategorySysRspValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e DelBillCategoryRspValidationError) Cause() error { return e.cause }
+func (e GetBillCategorySysRspValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e DelBillCategoryRspValidationError) Key() bool { return e.key }
+func (e GetBillCategorySysRspValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e DelBillCategoryRspValidationError) ErrorName() string {
-	return "DelBillCategoryRspValidationError"
+func (e GetBillCategorySysRspValidationError) ErrorName() string {
+	return "GetBillCategorySysRspValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e DelBillCategoryRspValidationError) Error() string {
+func (e GetBillCategorySysRspValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -2071,14 +2556,14 @@ func (e DelBillCategoryRspValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sDelBillCategoryRsp.%s: %s%s",
+		"invalid %sGetBillCategorySysRsp.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = DelBillCategoryRspValidationError{}
+var _ error = GetBillCategorySysRspValidationError{}
 
 var _ interface {
 	Field() string
@@ -2086,33 +2571,33 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = DelBillCategoryRspValidationError{}
+} = GetBillCategorySysRspValidationError{}
 
-// Validate checks the field values on UpdateBillCategoryReq with the rules
+// Validate checks the field values on GetBillCategorySysListReq with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
-func (m *UpdateBillCategoryReq) Validate() error {
+func (m *GetBillCategorySysListReq) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on UpdateBillCategoryReq with the rules
-// defined in the proto definition for this message. If any rules are
+// ValidateAll checks the field values on GetBillCategorySysListReq with the
+// rules defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// UpdateBillCategoryReqMultiError, or nil if none found.
-func (m *UpdateBillCategoryReq) ValidateAll() error {
+// GetBillCategorySysListReqMultiError, or nil if none found.
+func (m *GetBillCategorySysListReq) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *UpdateBillCategoryReq) validate(all bool) error {
+func (m *GetBillCategorySysListReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
 	var errors []error
 
-	if m.GetCategory() == nil {
-		err := UpdateBillCategoryReqValidationError{
-			field:  "Category",
+	if m.GetListOption() == nil {
+		err := GetBillCategorySysListReqValidationError{
+			field:  "ListOption",
 			reason: "value is required",
 		}
 		if !all {
@@ -2122,28 +2607,28 @@ func (m *UpdateBillCategoryReq) validate(all bool) error {
 	}
 
 	if all {
-		switch v := interface{}(m.GetCategory()).(type) {
+		switch v := interface{}(m.GetListOption()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, UpdateBillCategoryReqValidationError{
-					field:  "Category",
+				errors = append(errors, GetBillCategorySysListReqValidationError{
+					field:  "ListOption",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, UpdateBillCategoryReqValidationError{
-					field:  "Category",
+				errors = append(errors, GetBillCategorySysListReqValidationError{
+					field:  "ListOption",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetCategory()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetListOption()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return UpdateBillCategoryReqValidationError{
-				field:  "Category",
+			return GetBillCategorySysListReqValidationError{
+				field:  "ListOption",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -2151,19 +2636,19 @@ func (m *UpdateBillCategoryReq) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return UpdateBillCategoryReqMultiError(errors)
+		return GetBillCategorySysListReqMultiError(errors)
 	}
 
 	return nil
 }
 
-// UpdateBillCategoryReqMultiError is an error wrapping multiple validation
-// errors returned by UpdateBillCategoryReq.ValidateAll() if the designated
-// constraints aren't met.
-type UpdateBillCategoryReqMultiError []error
+// GetBillCategorySysListReqMultiError is an error wrapping multiple validation
+// errors returned by GetBillCategorySysListReq.ValidateAll() if the
+// designated constraints aren't met.
+type GetBillCategorySysListReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m UpdateBillCategoryReqMultiError) Error() string {
+func (m GetBillCategorySysListReqMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -2172,11 +2657,11 @@ func (m UpdateBillCategoryReqMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m UpdateBillCategoryReqMultiError) AllErrors() []error { return m }
+func (m GetBillCategorySysListReqMultiError) AllErrors() []error { return m }
 
-// UpdateBillCategoryReqValidationError is the validation error returned by
-// UpdateBillCategoryReq.Validate if the designated constraints aren't met.
-type UpdateBillCategoryReqValidationError struct {
+// GetBillCategorySysListReqValidationError is the validation error returned by
+// GetBillCategorySysListReq.Validate if the designated constraints aren't met.
+type GetBillCategorySysListReqValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -2184,24 +2669,24 @@ type UpdateBillCategoryReqValidationError struct {
 }
 
 // Field function returns field value.
-func (e UpdateBillCategoryReqValidationError) Field() string { return e.field }
+func (e GetBillCategorySysListReqValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e UpdateBillCategoryReqValidationError) Reason() string { return e.reason }
+func (e GetBillCategorySysListReqValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e UpdateBillCategoryReqValidationError) Cause() error { return e.cause }
+func (e GetBillCategorySysListReqValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e UpdateBillCategoryReqValidationError) Key() bool { return e.key }
+func (e GetBillCategorySysListReqValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e UpdateBillCategoryReqValidationError) ErrorName() string {
-	return "UpdateBillCategoryReqValidationError"
+func (e GetBillCategorySysListReqValidationError) ErrorName() string {
+	return "GetBillCategorySysListReqValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e UpdateBillCategoryReqValidationError) Error() string {
+func (e GetBillCategorySysListReqValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -2213,14 +2698,14 @@ func (e UpdateBillCategoryReqValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sUpdateBillCategoryReq.%s: %s%s",
+		"invalid %sGetBillCategorySysListReq.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = UpdateBillCategoryReqValidationError{}
+var _ error = GetBillCategorySysListReqValidationError{}
 
 var _ interface {
 	Field() string
@@ -2228,512 +2713,24 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = UpdateBillCategoryReqValidationError{}
+} = GetBillCategorySysListReqValidationError{}
 
-// Validate checks the field values on UpdateBillCategoryRsp with the rules
+// Validate checks the field values on GetBillCategorySysListRsp with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
-func (m *UpdateBillCategoryRsp) Validate() error {
+func (m *GetBillCategorySysListRsp) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on UpdateBillCategoryRsp with the rules
-// defined in the proto definition for this message. If any rules are
+// ValidateAll checks the field values on GetBillCategorySysListRsp with the
+// rules defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// UpdateBillCategoryRspMultiError, or nil if none found.
-func (m *UpdateBillCategoryRsp) ValidateAll() error {
+// GetBillCategorySysListRspMultiError, or nil if none found.
+func (m *GetBillCategorySysListRsp) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *UpdateBillCategoryRsp) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if len(errors) > 0 {
-		return UpdateBillCategoryRspMultiError(errors)
-	}
-
-	return nil
-}
-
-// UpdateBillCategoryRspMultiError is an error wrapping multiple validation
-// errors returned by UpdateBillCategoryRsp.ValidateAll() if the designated
-// constraints aren't met.
-type UpdateBillCategoryRspMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m UpdateBillCategoryRspMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m UpdateBillCategoryRspMultiError) AllErrors() []error { return m }
-
-// UpdateBillCategoryRspValidationError is the validation error returned by
-// UpdateBillCategoryRsp.Validate if the designated constraints aren't met.
-type UpdateBillCategoryRspValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e UpdateBillCategoryRspValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e UpdateBillCategoryRspValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e UpdateBillCategoryRspValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e UpdateBillCategoryRspValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e UpdateBillCategoryRspValidationError) ErrorName() string {
-	return "UpdateBillCategoryRspValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e UpdateBillCategoryRspValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sUpdateBillCategoryRsp.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = UpdateBillCategoryRspValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = UpdateBillCategoryRspValidationError{}
-
-// Validate checks the field values on GetBillCategoryReq with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *GetBillCategoryReq) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on GetBillCategoryReq with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// GetBillCategoryReqMultiError, or nil if none found.
-func (m *GetBillCategoryReq) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *GetBillCategoryReq) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if m.GetId() <= 0 {
-		err := GetBillCategoryReqValidationError{
-			field:  "Id",
-			reason: "value must be greater than 0",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if len(errors) > 0 {
-		return GetBillCategoryReqMultiError(errors)
-	}
-
-	return nil
-}
-
-// GetBillCategoryReqMultiError is an error wrapping multiple validation errors
-// returned by GetBillCategoryReq.ValidateAll() if the designated constraints
-// aren't met.
-type GetBillCategoryReqMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m GetBillCategoryReqMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m GetBillCategoryReqMultiError) AllErrors() []error { return m }
-
-// GetBillCategoryReqValidationError is the validation error returned by
-// GetBillCategoryReq.Validate if the designated constraints aren't met.
-type GetBillCategoryReqValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e GetBillCategoryReqValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e GetBillCategoryReqValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e GetBillCategoryReqValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e GetBillCategoryReqValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e GetBillCategoryReqValidationError) ErrorName() string {
-	return "GetBillCategoryReqValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e GetBillCategoryReqValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sGetBillCategoryReq.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = GetBillCategoryReqValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = GetBillCategoryReqValidationError{}
-
-// Validate checks the field values on GetBillCategoryRsp with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *GetBillCategoryRsp) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on GetBillCategoryRsp with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// GetBillCategoryRspMultiError, or nil if none found.
-func (m *GetBillCategoryRsp) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *GetBillCategoryRsp) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if all {
-		switch v := interface{}(m.GetCategory()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, GetBillCategoryRspValidationError{
-					field:  "Category",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, GetBillCategoryRspValidationError{
-					field:  "Category",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetCategory()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return GetBillCategoryRspValidationError{
-				field:  "Category",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if len(errors) > 0 {
-		return GetBillCategoryRspMultiError(errors)
-	}
-
-	return nil
-}
-
-// GetBillCategoryRspMultiError is an error wrapping multiple validation errors
-// returned by GetBillCategoryRsp.ValidateAll() if the designated constraints
-// aren't met.
-type GetBillCategoryRspMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m GetBillCategoryRspMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m GetBillCategoryRspMultiError) AllErrors() []error { return m }
-
-// GetBillCategoryRspValidationError is the validation error returned by
-// GetBillCategoryRsp.Validate if the designated constraints aren't met.
-type GetBillCategoryRspValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e GetBillCategoryRspValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e GetBillCategoryRspValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e GetBillCategoryRspValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e GetBillCategoryRspValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e GetBillCategoryRspValidationError) ErrorName() string {
-	return "GetBillCategoryRspValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e GetBillCategoryRspValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sGetBillCategoryRsp.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = GetBillCategoryRspValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = GetBillCategoryRspValidationError{}
-
-// Validate checks the field values on GetBillCategoryListReq with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *GetBillCategoryListReq) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on GetBillCategoryListReq with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// GetBillCategoryListReqMultiError, or nil if none found.
-func (m *GetBillCategoryListReq) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *GetBillCategoryListReq) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if m.GetOptions() == nil {
-		err := GetBillCategoryListReqValidationError{
-			field:  "Options",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if all {
-		switch v := interface{}(m.GetOptions()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, GetBillCategoryListReqValidationError{
-					field:  "Options",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, GetBillCategoryListReqValidationError{
-					field:  "Options",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetOptions()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return GetBillCategoryListReqValidationError{
-				field:  "Options",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if len(errors) > 0 {
-		return GetBillCategoryListReqMultiError(errors)
-	}
-
-	return nil
-}
-
-// GetBillCategoryListReqMultiError is an error wrapping multiple validation
-// errors returned by GetBillCategoryListReq.ValidateAll() if the designated
-// constraints aren't met.
-type GetBillCategoryListReqMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m GetBillCategoryListReqMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m GetBillCategoryListReqMultiError) AllErrors() []error { return m }
-
-// GetBillCategoryListReqValidationError is the validation error returned by
-// GetBillCategoryListReq.Validate if the designated constraints aren't met.
-type GetBillCategoryListReqValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e GetBillCategoryListReqValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e GetBillCategoryListReqValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e GetBillCategoryListReqValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e GetBillCategoryListReqValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e GetBillCategoryListReqValidationError) ErrorName() string {
-	return "GetBillCategoryListReqValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e GetBillCategoryListReqValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sGetBillCategoryListReq.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = GetBillCategoryListReqValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = GetBillCategoryListReqValidationError{}
-
-// Validate checks the field values on GetBillCategoryListRsp with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *GetBillCategoryListRsp) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on GetBillCategoryListRsp with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// GetBillCategoryListRspMultiError, or nil if none found.
-func (m *GetBillCategoryListRsp) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *GetBillCategoryListRsp) validate(all bool) error {
+func (m *GetBillCategorySysListRsp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -2744,7 +2741,7 @@ func (m *GetBillCategoryListRsp) validate(all bool) error {
 		switch v := interface{}(m.GetPaginate()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, GetBillCategoryListRspValidationError{
+				errors = append(errors, GetBillCategorySysListRspValidationError{
 					field:  "Paginate",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -2752,7 +2749,7 @@ func (m *GetBillCategoryListRsp) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, GetBillCategoryListRspValidationError{
+				errors = append(errors, GetBillCategorySysListRspValidationError{
 					field:  "Paginate",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -2761,7 +2758,7 @@ func (m *GetBillCategoryListRsp) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetPaginate()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return GetBillCategoryListRspValidationError{
+			return GetBillCategorySysListRspValidationError{
 				field:  "Paginate",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -2776,7 +2773,7 @@ func (m *GetBillCategoryListRsp) validate(all bool) error {
 			switch v := interface{}(item).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, GetBillCategoryListRspValidationError{
+					errors = append(errors, GetBillCategorySysListRspValidationError{
 						field:  fmt.Sprintf("List[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
@@ -2784,7 +2781,7 @@ func (m *GetBillCategoryListRsp) validate(all bool) error {
 				}
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
-					errors = append(errors, GetBillCategoryListRspValidationError{
+					errors = append(errors, GetBillCategorySysListRspValidationError{
 						field:  fmt.Sprintf("List[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
@@ -2793,7 +2790,7 @@ func (m *GetBillCategoryListRsp) validate(all bool) error {
 			}
 		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				return GetBillCategoryListRspValidationError{
+				return GetBillCategorySysListRspValidationError{
 					field:  fmt.Sprintf("List[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -2804,19 +2801,19 @@ func (m *GetBillCategoryListRsp) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return GetBillCategoryListRspMultiError(errors)
+		return GetBillCategorySysListRspMultiError(errors)
 	}
 
 	return nil
 }
 
-// GetBillCategoryListRspMultiError is an error wrapping multiple validation
-// errors returned by GetBillCategoryListRsp.ValidateAll() if the designated
-// constraints aren't met.
-type GetBillCategoryListRspMultiError []error
+// GetBillCategorySysListRspMultiError is an error wrapping multiple validation
+// errors returned by GetBillCategorySysListRsp.ValidateAll() if the
+// designated constraints aren't met.
+type GetBillCategorySysListRspMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m GetBillCategoryListRspMultiError) Error() string {
+func (m GetBillCategorySysListRspMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -2825,11 +2822,11 @@ func (m GetBillCategoryListRspMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m GetBillCategoryListRspMultiError) AllErrors() []error { return m }
+func (m GetBillCategorySysListRspMultiError) AllErrors() []error { return m }
 
-// GetBillCategoryListRspValidationError is the validation error returned by
-// GetBillCategoryListRsp.Validate if the designated constraints aren't met.
-type GetBillCategoryListRspValidationError struct {
+// GetBillCategorySysListRspValidationError is the validation error returned by
+// GetBillCategorySysListRsp.Validate if the designated constraints aren't met.
+type GetBillCategorySysListRspValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -2837,24 +2834,24 @@ type GetBillCategoryListRspValidationError struct {
 }
 
 // Field function returns field value.
-func (e GetBillCategoryListRspValidationError) Field() string { return e.field }
+func (e GetBillCategorySysListRspValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e GetBillCategoryListRspValidationError) Reason() string { return e.reason }
+func (e GetBillCategorySysListRspValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e GetBillCategoryListRspValidationError) Cause() error { return e.cause }
+func (e GetBillCategorySysListRspValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e GetBillCategoryListRspValidationError) Key() bool { return e.key }
+func (e GetBillCategorySysListRspValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e GetBillCategoryListRspValidationError) ErrorName() string {
-	return "GetBillCategoryListRspValidationError"
+func (e GetBillCategorySysListRspValidationError) ErrorName() string {
+	return "GetBillCategorySysListRspValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e GetBillCategoryListRspValidationError) Error() string {
+func (e GetBillCategorySysListRspValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -2866,14 +2863,14 @@ func (e GetBillCategoryListRspValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sGetBillCategoryListRsp.%s: %s%s",
+		"invalid %sGetBillCategorySysListRsp.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = GetBillCategoryListRspValidationError{}
+var _ error = GetBillCategorySysListRspValidationError{}
 
 var _ interface {
 	Field() string
@@ -2881,4 +2878,4 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = GetBillCategoryListRspValidationError{}
+} = GetBillCategorySysListRspValidationError{}
