@@ -32,7 +32,7 @@ func (f *Model) NewScope(ctx context.Context) *Scope {
 	}
 }
 
-func (f *Model) NewList(ctx context.Context, listOption *lb.Options) *Scope {
+func (f *Model) NewList(ctx context.Context, listOption *lb.ListOption) *Scope {
 	return &Scope{
 		Scope: f.Model.NewScope(ctx),
 

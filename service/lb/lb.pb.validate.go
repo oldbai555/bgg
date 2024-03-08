@@ -140,44 +140,45 @@ var _ interface {
 	ErrorName() string
 } = PaginateValidationError{}
 
-// Validate checks the field values on Options with the rules defined in the
+// Validate checks the field values on ListOption with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
-func (m *Options) Validate() error {
+func (m *ListOption) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on Options with the rules defined in the
-// proto definition for this message. If any rules are violated, the result is
-// a list of violation errors wrapped in OptionsMultiError, or nil if none found.
-func (m *Options) ValidateAll() error {
+// ValidateAll checks the field values on ListOption with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ListOptionMultiError, or
+// nil if none found.
+func (m *ListOption) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *Options) validate(all bool) error {
+func (m *ListOption) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
 	var errors []error
 
-	for idx, item := range m.GetOptList() {
+	for idx, item := range m.GetOptions() {
 		_, _ = idx, item
 
 		if all {
 			switch v := interface{}(item).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, OptionsValidationError{
-						field:  fmt.Sprintf("OptList[%v]", idx),
+					errors = append(errors, ListOptionValidationError{
+						field:  fmt.Sprintf("Options[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
 				}
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
-					errors = append(errors, OptionsValidationError{
-						field:  fmt.Sprintf("OptList[%v]", idx),
+					errors = append(errors, ListOptionValidationError{
+						field:  fmt.Sprintf("Options[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
@@ -185,8 +186,8 @@ func (m *Options) validate(all bool) error {
 			}
 		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				return OptionsValidationError{
-					field:  fmt.Sprintf("OptList[%v]", idx),
+				return ListOptionValidationError{
+					field:  fmt.Sprintf("Options[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -202,18 +203,18 @@ func (m *Options) validate(all bool) error {
 	// no validation rules for SkipTotal
 
 	if len(errors) > 0 {
-		return OptionsMultiError(errors)
+		return ListOptionMultiError(errors)
 	}
 
 	return nil
 }
 
-// OptionsMultiError is an error wrapping multiple validation errors returned
-// by Options.ValidateAll() if the designated constraints aren't met.
-type OptionsMultiError []error
+// ListOptionMultiError is an error wrapping multiple validation errors
+// returned by ListOption.ValidateAll() if the designated constraints aren't met.
+type ListOptionMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m OptionsMultiError) Error() string {
+func (m ListOptionMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -222,11 +223,11 @@ func (m OptionsMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m OptionsMultiError) AllErrors() []error { return m }
+func (m ListOptionMultiError) AllErrors() []error { return m }
 
-// OptionsValidationError is the validation error returned by Options.Validate
-// if the designated constraints aren't met.
-type OptionsValidationError struct {
+// ListOptionValidationError is the validation error returned by
+// ListOption.Validate if the designated constraints aren't met.
+type ListOptionValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -234,22 +235,22 @@ type OptionsValidationError struct {
 }
 
 // Field function returns field value.
-func (e OptionsValidationError) Field() string { return e.field }
+func (e ListOptionValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e OptionsValidationError) Reason() string { return e.reason }
+func (e ListOptionValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e OptionsValidationError) Cause() error { return e.cause }
+func (e ListOptionValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e OptionsValidationError) Key() bool { return e.key }
+func (e ListOptionValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e OptionsValidationError) ErrorName() string { return "OptionsValidationError" }
+func (e ListOptionValidationError) ErrorName() string { return "ListOptionValidationError" }
 
 // Error satisfies the builtin error interface
-func (e OptionsValidationError) Error() string {
+func (e ListOptionValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -261,14 +262,14 @@ func (e OptionsValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sOptions.%s: %s%s",
+		"invalid %sListOption.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = OptionsValidationError{}
+var _ error = ListOptionValidationError{}
 
 var _ interface {
 	Field() string
@@ -276,7 +277,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = OptionsValidationError{}
+} = ListOptionValidationError{}
 
 // Validate checks the field values on RawReq with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
@@ -480,22 +481,22 @@ var _ interface {
 	ErrorName() string
 } = RawRspValidationError{}
 
-// Validate checks the field values on Options_Opt with the rules defined in
-// the proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *Options_Opt) Validate() error {
+// Validate checks the field values on ListOption_Option with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *ListOption_Option) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on Options_Opt with the rules defined in
-// the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in Options_OptMultiError, or
-// nil if none found.
-func (m *Options_Opt) ValidateAll() error {
+// ValidateAll checks the field values on ListOption_Option with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ListOption_OptionMultiError, or nil if none found.
+func (m *ListOption_Option) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *Options_Opt) validate(all bool) error {
+func (m *ListOption_Option) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -507,18 +508,19 @@ func (m *Options_Opt) validate(all bool) error {
 	// no validation rules for Value
 
 	if len(errors) > 0 {
-		return Options_OptMultiError(errors)
+		return ListOption_OptionMultiError(errors)
 	}
 
 	return nil
 }
 
-// Options_OptMultiError is an error wrapping multiple validation errors
-// returned by Options_Opt.ValidateAll() if the designated constraints aren't met.
-type Options_OptMultiError []error
+// ListOption_OptionMultiError is an error wrapping multiple validation errors
+// returned by ListOption_Option.ValidateAll() if the designated constraints
+// aren't met.
+type ListOption_OptionMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m Options_OptMultiError) Error() string {
+func (m ListOption_OptionMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -527,11 +529,11 @@ func (m Options_OptMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m Options_OptMultiError) AllErrors() []error { return m }
+func (m ListOption_OptionMultiError) AllErrors() []error { return m }
 
-// Options_OptValidationError is the validation error returned by
-// Options_Opt.Validate if the designated constraints aren't met.
-type Options_OptValidationError struct {
+// ListOption_OptionValidationError is the validation error returned by
+// ListOption_Option.Validate if the designated constraints aren't met.
+type ListOption_OptionValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -539,22 +541,24 @@ type Options_OptValidationError struct {
 }
 
 // Field function returns field value.
-func (e Options_OptValidationError) Field() string { return e.field }
+func (e ListOption_OptionValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e Options_OptValidationError) Reason() string { return e.reason }
+func (e ListOption_OptionValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e Options_OptValidationError) Cause() error { return e.cause }
+func (e ListOption_OptionValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e Options_OptValidationError) Key() bool { return e.key }
+func (e ListOption_OptionValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e Options_OptValidationError) ErrorName() string { return "Options_OptValidationError" }
+func (e ListOption_OptionValidationError) ErrorName() string {
+	return "ListOption_OptionValidationError"
+}
 
 // Error satisfies the builtin error interface
-func (e Options_OptValidationError) Error() string {
+func (e ListOption_OptionValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -566,14 +570,14 @@ func (e Options_OptValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sOptions_Opt.%s: %s%s",
+		"invalid %sListOption_Option.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = Options_OptValidationError{}
+var _ error = ListOption_OptionValidationError{}
 
 var _ interface {
 	Field() string
@@ -581,4 +585,4 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = Options_OptValidationError{}
+} = ListOption_OptionValidationError{}
