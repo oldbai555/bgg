@@ -2,145 +2,206 @@ package service
 
 import (
 	"context"
+	"github.com/oldbai555/bgg/service/lb"
 	"github.com/oldbai555/bgg/service/lbbill"
-	"github.com/oldbai555/bgg/service/lbbillserver/impl/dao/impl/mysql"
+	"github.com/oldbai555/bgg/service/lbbillserver/impl/mysql"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/utils"
 )
 
-var ServerImpl LbbillServer
+var OnceSvrImpl = &LbbillServer{}
 
 type LbbillServer struct {
-	*lbbill.UnimplementedLbbillServer
+	lbbill.UnimplementedLbbillServer
 }
 
-func (a *LbbillServer) AddBill(ctx context.Context, req *lbbill.AddBillReq) (*lbbill.AddBillRsp, error) {
-	var rsp lbbill.AddBillRsp
+func (a *LbbillServer) AddBillSys(ctx context.Context, req *lbbill.AddBillSysReq) (*lbbill.AddBillSysRsp, error) {
+	var rsp lbbill.AddBillSysRsp
 	var err error
 
-	req.Bill.DateUnix = utils.TimeNow()
-	_, err = mysql.BillOrm.Create(ctx, req.Bill)
+	_, err = mysql.Bill.NewScope(ctx).Create(req.Data)
 	if err != nil {
-		log.Errorf("err is %v", err)
+		log.Errorf("err:%v", err)
 		return nil, err
 	}
-	rsp.Bill = req.Bill
+	rsp.Data = req.Data
 
 	return &rsp, err
 }
-func (a *LbbillServer) DelBill(ctx context.Context, req *lbbill.DelBillReq) (*lbbill.DelBillRsp, error) {
-	var rsp lbbill.DelBillRsp
+func (a *LbbillServer) DelBillSysList(ctx context.Context, req *lbbill.DelBillSysListReq) (*lbbill.DelBillSysListRsp, error) {
+	var rsp lbbill.DelBillSysListRsp
 	var err error
 
-	_, err = mysql.BillOrm.DeleteById(ctx, req.Id)
+	listRsp, err := a.GetBillSysList(ctx, &lbbill.GetBillSysListReq{
+		ListOption: req.ListOption.
+			SetSkipTotal().
+			AddOpt(lb.DefaultListOption_DefaultListOptionSelect, lbbill.FieldId_),
+	})
 	if err != nil {
-		log.Errorf("err is %v", err)
+		log.Errorf("err:%v", err)
 		return nil, err
 	}
 
-	return &rsp, err
-}
-func (a *LbbillServer) UpdateBill(ctx context.Context, req *lbbill.UpdateBillReq) (*lbbill.UpdateBillRsp, error) {
-	var rsp lbbill.UpdateBillRsp
-	var err error
-
-	_, err = mysql.BillOrm.UpdateById(ctx, req.Bill.Id, utils.OrmStruct2Map(req.Bill))
-	if err != nil {
-		log.Errorf("err is %v", err)
-		return nil, err
+	if len(listRsp.List) == 0 {
+		log.Infof("list is empty")
+		return &rsp, nil
 	}
 
-	return &rsp, err
-}
-func (a *LbbillServer) GetBill(ctx context.Context, req *lbbill.GetBillReq) (*lbbill.GetBillRsp, error) {
-	var rsp lbbill.GetBillRsp
-	var err error
-
-	rsp.Bill, err = mysql.BillOrm.GetById(ctx, req.Id)
+	idList := utils.PluckUint64List(listRsp.List, lbbill.FieldId)
+	_, err = mysql.Bill.NewScope(ctx).In(lbbill.FieldId, idList).Delete(&lbbill.ModelBill{})
 	if err != nil {
-		log.Errorf("err is %v", err)
+		log.Errorf("err:%v", err)
 		return nil, err
 	}
 
 	return &rsp, err
 }
-func (a *LbbillServer) GetBillList(ctx context.Context, req *lbbill.GetBillListReq) (*lbbill.GetBillListRsp, error) {
-	var rsp lbbill.GetBillListRsp
+func (a *LbbillServer) UpdateBillSys(ctx context.Context, req *lbbill.UpdateBillSysReq) (*lbbill.UpdateBillSysRsp, error) {
+	var rsp lbbill.UpdateBillSysRsp
 	var err error
 
-	rsp.List, rsp.Paginate, err = mysql.BillOrm.FindPaginate(ctx, req.Options)
+	var data lbbill.ModelBill
+	err = mysql.Bill.NewScope(ctx).Where(lbbill.FieldId_, req.Data.Id).First(&data)
 	if err != nil {
-		log.Errorf("err is %v", err)
+		log.Errorf("err:%v", err)
 		return nil, err
 	}
 
-	categoryIdList := utils.PluckUint64List(rsp.List, lbbill.FieldCategoryId)
-	billCategories, err := mysql.BillCategoryOrm.GetByIdList(ctx, categoryIdList)
+	_, err = mysql.Bill.NewScope(ctx).Where(lbbill.FieldId_, data.Id).Update(utils.OrmStruct2Map(req.Data))
 	if err != nil {
-		log.Errorf("err is %v", err)
-		return nil, err
-	}
-	rsp.CategoryMap = utils.Slice2MapKeyByStructField(billCategories, lbbill.FieldId).(map[uint64]*lbbill.ModelBillCategory)
-
-	return &rsp, err
-}
-func (a *LbbillServer) AddBillCategory(ctx context.Context, req *lbbill.AddBillCategoryReq) (*lbbill.AddBillCategoryRsp, error) {
-	var rsp lbbill.AddBillCategoryRsp
-	var err error
-
-	_, err = mysql.BillCategoryOrm.Create(ctx, req.Category)
-	if err != nil {
-		log.Errorf("err is %v", err)
-		return nil, err
-	}
-
-	rsp.Category = req.Category
-
-	return &rsp, err
-}
-func (a *LbbillServer) DelBillCategory(ctx context.Context, req *lbbill.DelBillCategoryReq) (*lbbill.DelBillCategoryRsp, error) {
-	var rsp lbbill.DelBillCategoryRsp
-	var err error
-
-	_, err = mysql.BillCategoryOrm.DeleteById(ctx, req.Id)
-	if err != nil {
-		log.Errorf("err is %v", err)
+		log.Errorf("err:%v", err)
 		return nil, err
 	}
 
 	return &rsp, err
 }
-func (a *LbbillServer) UpdateBillCategory(ctx context.Context, req *lbbill.UpdateBillCategoryReq) (*lbbill.UpdateBillCategoryRsp, error) {
-	var rsp lbbill.UpdateBillCategoryRsp
+func (a *LbbillServer) GetBillSys(ctx context.Context, req *lbbill.GetBillSysReq) (*lbbill.GetBillSysRsp, error) {
+	var rsp lbbill.GetBillSysRsp
 	var err error
 
-	_, err = mysql.BillCategoryOrm.UpdateById(ctx, req.Category.Id, utils.OrmStruct2Map(req.Category))
+	var data lbbill.ModelBill
+	err = mysql.Bill.NewScope(ctx).Where(lbbill.FieldId_, req.Id).First(&data)
 	if err != nil {
-		log.Errorf("err is %v", err)
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = &data
+
+	return &rsp, err
+}
+func (a *LbbillServer) GetBillSysList(ctx context.Context, req *lbbill.GetBillSysListReq) (*lbbill.GetBillSysListRsp, error) {
+	var rsp lbbill.GetBillSysListRsp
+	var err error
+
+	db := mysql.Bill.NewList(ctx, req.ListOption)
+	err = lb.ProcessDefaultOptions(req.ListOption, db)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = lb.NewOptionsProcessor(req.ListOption).
+		Process()
+
+	rsp.Paginate, err = db.FindPaginate(&rsp.List)
+	if err != nil {
+		log.Errorf("err:%v", err)
 		return nil, err
 	}
 
 	return &rsp, err
 }
-func (a *LbbillServer) GetBillCategory(ctx context.Context, req *lbbill.GetBillCategoryReq) (*lbbill.GetBillCategoryRsp, error) {
-	var rsp lbbill.GetBillCategoryRsp
+func (a *LbbillServer) AddBillCategorySys(ctx context.Context, req *lbbill.AddBillCategorySysReq) (*lbbill.AddBillCategorySysRsp, error) {
+	var rsp lbbill.AddBillCategorySysRsp
 	var err error
 
-	rsp.Category, err = mysql.BillCategoryOrm.GetById(ctx, req.Id)
+	_, err = mysql.BillCategory.NewScope(ctx).Create(req.Data)
 	if err != nil {
-		log.Errorf("err is %v", err)
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = req.Data
+
+	return &rsp, err
+}
+func (a *LbbillServer) DelBillCategorySysList(ctx context.Context, req *lbbill.DelBillCategorySysListReq) (*lbbill.DelBillCategorySysListRsp, error) {
+	var rsp lbbill.DelBillCategorySysListRsp
+	var err error
+
+	listRsp, err := a.GetBillCategorySysList(ctx, &lbbill.GetBillCategorySysListReq{
+		ListOption: req.ListOption.
+			SetSkipTotal().
+			AddOpt(lb.DefaultListOption_DefaultListOptionSelect, lbbill.FieldId_),
+	})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	if len(listRsp.List) == 0 {
+		log.Infof("list is empty")
+		return &rsp, nil
+	}
+
+	idList := utils.PluckUint64List(listRsp.List, lbbill.FieldId)
+	_, err = mysql.BillCategory.NewScope(ctx).In(lbbill.FieldId, idList).Delete(&lbbill.ModelBillCategory{})
+	if err != nil {
+		log.Errorf("err:%v", err)
 		return nil, err
 	}
 
 	return &rsp, err
 }
-func (a *LbbillServer) GetBillCategoryList(ctx context.Context, req *lbbill.GetBillCategoryListReq) (*lbbill.GetBillCategoryListRsp, error) {
-	var rsp lbbill.GetBillCategoryListRsp
+func (a *LbbillServer) UpdateBillCategorySys(ctx context.Context, req *lbbill.UpdateBillCategorySysReq) (*lbbill.UpdateBillCategorySysRsp, error) {
+	var rsp lbbill.UpdateBillCategorySysRsp
 	var err error
 
-	rsp.List, rsp.Paginate, err = mysql.BillCategoryOrm.FindPaginate(ctx, req.Options)
+	var data lbbill.ModelBillCategory
+	err = mysql.BillCategory.NewScope(ctx).Where(lbbill.FieldId_, req.Data.Id).First(&data)
 	if err != nil {
-		log.Errorf("err is %v", err)
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	_, err = mysql.BillCategory.NewScope(ctx).Where(lbbill.FieldId_, data.Id).Update(utils.OrmStruct2Map(req.Data))
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+func (a *LbbillServer) GetBillCategorySys(ctx context.Context, req *lbbill.GetBillCategorySysReq) (*lbbill.GetBillCategorySysRsp, error) {
+	var rsp lbbill.GetBillCategorySysRsp
+	var err error
+
+	var data lbbill.ModelBillCategory
+	err = mysql.BillCategory.NewScope(ctx).Where(lbbill.FieldId_, req.Id).First(&data)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = &data
+
+	return &rsp, err
+}
+func (a *LbbillServer) GetBillCategorySysList(ctx context.Context, req *lbbill.GetBillCategorySysListReq) (*lbbill.GetBillCategorySysListRsp, error) {
+	var rsp lbbill.GetBillCategorySysListRsp
+	var err error
+
+	db := mysql.BillCategory.NewList(ctx, req.ListOption)
+	err = lb.ProcessDefaultOptions(req.ListOption, db)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = lb.NewOptionsProcessor(req.ListOption).
+		Process()
+
+	rsp.Paginate, err = db.FindPaginate(&rsp.List)
+	if err != nil {
+		log.Errorf("err:%v", err)
 		return nil, err
 	}
 

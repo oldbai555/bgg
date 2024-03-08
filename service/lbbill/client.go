@@ -3,76 +3,89 @@ package lbbill
 
 import (
 	"context"
+	"github.com/oldbai555/bgg/internal/_const"
+	"github.com/oldbai555/bgg/internal/bhttp"
+	"net/http"
 )
 
 const ClientName = "lbbill"
 
-func AddBill(ctx context.Context, req *AddBillReq) (*AddBillRsp, error) {
+func AddBillSys(ctx context.Context, req *AddBillSysReq) (*AddBillSysRsp, error) {
+	var rsp AddBillSysRsp
 	if cliMgr.conn == nil {
-		return nil, cliMgr.Err
+		return &rsp, bhttp.DoRequest(ctx, ServerName, AddBillSysCMDPath, http.MethodPost, _const.PROTO_TYPE_PROTO3, req, &rsp)
 	}
-	return cliMgr.cli.AddBill(ctx, req)
+	return cliMgr.cli.AddBillSys(ctx, req)
 }
 
-func DelBill(ctx context.Context, req *DelBillReq) (*DelBillRsp, error) {
+func DelBillSysList(ctx context.Context, req *DelBillSysListReq) (*DelBillSysListRsp, error) {
+	var rsp DelBillSysListRsp
 	if cliMgr.conn == nil {
-		return nil, cliMgr.Err
+		return &rsp, bhttp.DoRequest(ctx, ServerName, DelBillSysListCMDPath, http.MethodPost, _const.PROTO_TYPE_PROTO3, req, &rsp)
 	}
-	return cliMgr.cli.DelBill(ctx, req)
+	return cliMgr.cli.DelBillSysList(ctx, req)
 }
 
-func UpdateBill(ctx context.Context, req *UpdateBillReq) (*UpdateBillRsp, error) {
+func UpdateBillSys(ctx context.Context, req *UpdateBillSysReq) (*UpdateBillSysRsp, error) {
+	var rsp UpdateBillSysRsp
 	if cliMgr.conn == nil {
-		return nil, cliMgr.Err
+		return &rsp, bhttp.DoRequest(ctx, ServerName, UpdateBillSysCMDPath, http.MethodPost, _const.PROTO_TYPE_PROTO3, req, &rsp)
 	}
-	return cliMgr.cli.UpdateBill(ctx, req)
+	return cliMgr.cli.UpdateBillSys(ctx, req)
 }
 
-func GetBill(ctx context.Context, req *GetBillReq) (*GetBillRsp, error) {
+func GetBillSys(ctx context.Context, req *GetBillSysReq) (*GetBillSysRsp, error) {
+	var rsp GetBillSysRsp
 	if cliMgr.conn == nil {
-		return nil, cliMgr.Err
+		return &rsp, bhttp.DoRequest(ctx, ServerName, GetBillSysCMDPath, http.MethodPost, _const.PROTO_TYPE_PROTO3, req, &rsp)
 	}
-	return cliMgr.cli.GetBill(ctx, req)
+	return cliMgr.cli.GetBillSys(ctx, req)
 }
 
-func GetBillList(ctx context.Context, req *GetBillListReq) (*GetBillListRsp, error) {
+func GetBillSysList(ctx context.Context, req *GetBillSysListReq) (*GetBillSysListRsp, error) {
+	var rsp GetBillSysListRsp
 	if cliMgr.conn == nil {
-		return nil, cliMgr.Err
+		return &rsp, bhttp.DoRequest(ctx, ServerName, GetBillSysListCMDPath, http.MethodPost, _const.PROTO_TYPE_PROTO3, req, &rsp)
 	}
-	return cliMgr.cli.GetBillList(ctx, req)
+	return cliMgr.cli.GetBillSysList(ctx, req)
 }
 
-func AddBillCategory(ctx context.Context, req *AddBillCategoryReq) (*AddBillCategoryRsp, error) {
+func AddBillCategorySys(ctx context.Context, req *AddBillCategorySysReq) (*AddBillCategorySysRsp, error) {
+	var rsp AddBillCategorySysRsp
 	if cliMgr.conn == nil {
-		return nil, cliMgr.Err
+		return &rsp, bhttp.DoRequest(ctx, ServerName, AddBillCategorySysCMDPath, http.MethodPost, _const.PROTO_TYPE_PROTO3, req, &rsp)
 	}
-	return cliMgr.cli.AddBillCategory(ctx, req)
+	return cliMgr.cli.AddBillCategorySys(ctx, req)
 }
 
-func DelBillCategory(ctx context.Context, req *DelBillCategoryReq) (*DelBillCategoryRsp, error) {
+func DelBillCategorySysList(ctx context.Context, req *DelBillCategorySysListReq) (*DelBillCategorySysListRsp, error) {
+	var rsp DelBillCategorySysListRsp
 	if cliMgr.conn == nil {
-		return nil, cliMgr.Err
+		return &rsp, bhttp.DoRequest(ctx, ServerName, DelBillCategorySysListCMDPath, http.MethodPost, _const.PROTO_TYPE_PROTO3, req, &rsp)
 	}
-	return cliMgr.cli.DelBillCategory(ctx, req)
+	return cliMgr.cli.DelBillCategorySysList(ctx, req)
 }
 
-func UpdateBillCategory(ctx context.Context, req *UpdateBillCategoryReq) (*UpdateBillCategoryRsp, error) {
+func UpdateBillCategorySys(ctx context.Context, req *UpdateBillCategorySysReq) (*UpdateBillCategorySysRsp, error) {
+	var rsp UpdateBillCategorySysRsp
 	if cliMgr.conn == nil {
-		return nil, cliMgr.Err
+		return &rsp, bhttp.DoRequest(ctx, ServerName, UpdateBillCategorySysCMDPath, http.MethodPost, _const.PROTO_TYPE_PROTO3, req, &rsp)
 	}
-	return cliMgr.cli.UpdateBillCategory(ctx, req)
+	return cliMgr.cli.UpdateBillCategorySys(ctx, req)
 }
 
-func GetBillCategory(ctx context.Context, req *GetBillCategoryReq) (*GetBillCategoryRsp, error) {
+func GetBillCategorySys(ctx context.Context, req *GetBillCategorySysReq) (*GetBillCategorySysRsp, error) {
+	var rsp GetBillCategorySysRsp
 	if cliMgr.conn == nil {
-		return nil, cliMgr.Err
+		return &rsp, bhttp.DoRequest(ctx, ServerName, GetBillCategorySysCMDPath, http.MethodPost, _const.PROTO_TYPE_PROTO3, req, &rsp)
 	}
-	return cliMgr.cli.GetBillCategory(ctx, req)
+	return cliMgr.cli.GetBillCategorySys(ctx, req)
 }
 
-func GetBillCategoryList(ctx context.Context, req *GetBillCategoryListReq) (*GetBillCategoryListRsp, error) {
+func GetBillCategorySysList(ctx context.Context, req *GetBillCategorySysListReq) (*GetBillCategorySysListRsp, error) {
+	var rsp GetBillCategorySysListRsp
 	if cliMgr.conn == nil {
-		return nil, cliMgr.Err
+		return &rsp, bhttp.DoRequest(ctx, ServerName, GetBillCategorySysListCMDPath, http.MethodPost, _const.PROTO_TYPE_PROTO3, req, &rsp)
 	}
-	return cliMgr.cli.GetBillCategoryList(ctx, req)
+	return cliMgr.cli.GetBillCategorySysList(ctx, req)
 }

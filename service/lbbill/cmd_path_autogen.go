@@ -2,23 +2,23 @@
 package lbbill
 
 const (
-	AddBillCMDPath = "/lbbill/AddBill"
+	AddBillSysCMDPath = "/lbbill/AddBillSys"
 
-	DelBillCMDPath = "/lbbill/DelBill"
+	DelBillSysListCMDPath = "/lbbill/DelBillSysList"
 
-	UpdateBillCMDPath = "/lbbill/UpdateBill"
+	UpdateBillSysCMDPath = "/lbbill/UpdateBillSys"
 
-	GetBillCMDPath = "/lbbill/GetBill"
+	GetBillSysCMDPath = "/lbbill/GetBillSys"
 
-	GetBillListCMDPath = "/lbbill/GetBillList"
+	GetBillSysListCMDPath = "/lbbill/GetBillSysList"
 
-	AddBillCategoryCMDPath = "/lbbill/AddBillCategory"
+	AddBillCategorySysCMDPath = "/lbbill/AddBillCategorySys"
 
-	DelBillCategoryCMDPath = "/lbbill/DelBillCategory"
+	DelBillCategorySysListCMDPath = "/lbbill/DelBillCategorySysList"
 
-	UpdateBillCategoryCMDPath = "/lbbill/UpdateBillCategory"
+	UpdateBillCategorySysCMDPath = "/lbbill/UpdateBillCategorySys"
 
-	GetBillCategoryCMDPath = "/lbbill/GetBillCategory"
+	GetBillCategorySysCMDPath = "/lbbill/GetBillCategorySys"
 
-	GetBillCategoryListCMDPath = "/lbbill/GetBillCategoryList"
+	GetBillCategorySysListCMDPath = "/lbbill/GetBillCategorySysList"
 )
