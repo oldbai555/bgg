@@ -3,83 +3,105 @@ package lbuser
 
 import (
 	"context"
+	"github.com/oldbai555/bgg/internal/_const"
+	"github.com/oldbai555/bgg/internal/bhttp"
+	"net/http"
 )
 
 const ClientName = "lbuser"
 
 func Login(ctx context.Context, req *LoginReq) (*LoginRsp, error) {
+	var rsp LoginRsp
 	if cliMgr.conn == nil {
-		return nil, cliMgr.Err
+		return &rsp, bhttp.DoRequest(ctx, ServerName, LoginCMDPath, http.MethodPost, _const.PROTO_TYPE_PROTO3, req, &rsp)
 	}
 	return cliMgr.cli.Login(ctx, req)
 }
 
 func Logout(ctx context.Context, req *LogoutReq) (*LogoutRsp, error) {
+	var rsp LogoutRsp
 	if cliMgr.conn == nil {
-		return nil, cliMgr.Err
+		return &rsp, bhttp.DoRequest(ctx, ServerName, LogoutCMDPath, http.MethodPost, _const.PROTO_TYPE_PROTO3, req, &rsp)
 	}
 	return cliMgr.cli.Logout(ctx, req)
 }
 
 func GetLoginUser(ctx context.Context, req *GetLoginUserReq) (*GetLoginUserRsp, error) {
+	var rsp GetLoginUserRsp
 	if cliMgr.conn == nil {
-		return nil, cliMgr.Err
+		return &rsp, bhttp.DoRequest(ctx, ServerName, GetLoginUserCMDPath, http.MethodPost, _const.PROTO_TYPE_PROTO3, req, &rsp)
 	}
 	return cliMgr.cli.GetLoginUser(ctx, req)
 }
 
 func UpdateLoginUserInfo(ctx context.Context, req *UpdateLoginUserInfoReq) (*UpdateLoginUserInfoRsp, error) {
+	var rsp UpdateLoginUserInfoRsp
 	if cliMgr.conn == nil {
-		return nil, cliMgr.Err
+		return &rsp, bhttp.DoRequest(ctx, ServerName, UpdateLoginUserInfoCMDPath, http.MethodPost, _const.PROTO_TYPE_PROTO3, req, &rsp)
 	}
 	return cliMgr.cli.UpdateLoginUserInfo(ctx, req)
 }
 
-func AddUser(ctx context.Context, req *AddUserReq) (*AddUserRsp, error) {
-	if cliMgr.conn == nil {
-		return nil, cliMgr.Err
-	}
-	return cliMgr.cli.AddUser(ctx, req)
-}
-
-func GetUserList(ctx context.Context, req *GetUserListReq) (*GetUserListRsp, error) {
-	if cliMgr.conn == nil {
-		return nil, cliMgr.Err
-	}
-	return cliMgr.cli.GetUserList(ctx, req)
-}
-
-func DelUser(ctx context.Context, req *DelUserReq) (*DelUserRsp, error) {
-	if cliMgr.conn == nil {
-		return nil, cliMgr.Err
-	}
-	return cliMgr.cli.DelUser(ctx, req)
-}
-
-func GetUser(ctx context.Context, req *GetUserReq) (*GetUserRsp, error) {
-	if cliMgr.conn == nil {
-		return nil, cliMgr.Err
-	}
-	return cliMgr.cli.GetUser(ctx, req)
-}
-
 func UpdateUserNameWithRole(ctx context.Context, req *UpdateUserNameWithRoleReq) (*UpdateUserNameWithRoleRsp, error) {
+	var rsp UpdateUserNameWithRoleRsp
 	if cliMgr.conn == nil {
-		return nil, cliMgr.Err
+		return &rsp, bhttp.DoRequest(ctx, ServerName, UpdateUserNameWithRoleCMDPath, http.MethodPost, _const.PROTO_TYPE_PROTO3, req, &rsp)
 	}
 	return cliMgr.cli.UpdateUserNameWithRole(ctx, req)
 }
 
 func ResetPassword(ctx context.Context, req *ResetPasswordReq) (*ResetPasswordRsp, error) {
+	var rsp ResetPasswordRsp
 	if cliMgr.conn == nil {
-		return nil, cliMgr.Err
+		return &rsp, bhttp.DoRequest(ctx, ServerName, ResetPasswordCMDPath, http.MethodPost, _const.PROTO_TYPE_PROTO3, req, &rsp)
 	}
 	return cliMgr.cli.ResetPassword(ctx, req)
 }
 
 func GetFrontUser(ctx context.Context, req *GetFrontUserReq) (*GetLoginUserRsp, error) {
+	var rsp GetLoginUserRsp
 	if cliMgr.conn == nil {
-		return nil, cliMgr.Err
+		return &rsp, bhttp.DoRequest(ctx, ServerName, GetFrontUserCMDPath, http.MethodPost, _const.PROTO_TYPE_PROTO3, req, &rsp)
 	}
 	return cliMgr.cli.GetFrontUser(ctx, req)
+}
+
+func AddUser(ctx context.Context, req *AddUserReq) (*AddUserRsp, error) {
+	var rsp AddUserRsp
+	if cliMgr.conn == nil {
+		return &rsp, bhttp.DoRequest(ctx, ServerName, AddUserCMDPath, http.MethodPost, _const.PROTO_TYPE_PROTO3, req, &rsp)
+	}
+	return cliMgr.cli.AddUser(ctx, req)
+}
+
+func DelUserList(ctx context.Context, req *DelUserListReq) (*DelUserListRsp, error) {
+	var rsp DelUserListRsp
+	if cliMgr.conn == nil {
+		return &rsp, bhttp.DoRequest(ctx, ServerName, DelUserListCMDPath, http.MethodPost, _const.PROTO_TYPE_PROTO3, req, &rsp)
+	}
+	return cliMgr.cli.DelUserList(ctx, req)
+}
+
+func UpdateUser(ctx context.Context, req *UpdateUserReq) (*UpdateUserRsp, error) {
+	var rsp UpdateUserRsp
+	if cliMgr.conn == nil {
+		return &rsp, bhttp.DoRequest(ctx, ServerName, UpdateUserCMDPath, http.MethodPost, _const.PROTO_TYPE_PROTO3, req, &rsp)
+	}
+	return cliMgr.cli.UpdateUser(ctx, req)
+}
+
+func GetUser(ctx context.Context, req *GetUserReq) (*GetUserRsp, error) {
+	var rsp GetUserRsp
+	if cliMgr.conn == nil {
+		return &rsp, bhttp.DoRequest(ctx, ServerName, GetUserCMDPath, http.MethodPost, _const.PROTO_TYPE_PROTO3, req, &rsp)
+	}
+	return cliMgr.cli.GetUser(ctx, req)
+}
+
+func GetUserList(ctx context.Context, req *GetUserListReq) (*GetUserListRsp, error) {
+	var rsp GetUserListRsp
+	if cliMgr.conn == nil {
+		return &rsp, bhttp.DoRequest(ctx, ServerName, GetUserListCMDPath, http.MethodPost, _const.PROTO_TYPE_PROTO3, req, &rsp)
+	}
+	return cliMgr.cli.GetUserList(ctx, req)
 }

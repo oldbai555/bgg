@@ -10,17 +10,19 @@ const (
 
 	UpdateLoginUserInfoCMDPath = "/lbuser/UpdateLoginUserInfo"
 
-	AddUserCMDPath = "/lbuser/AddUser"
-
-	GetUserListCMDPath = "/lbuser/GetUserList"
-
-	DelUserCMDPath = "/lbuser/DelUser"
-
-	GetUserCMDPath = "/lbuser/GetUser"
-
 	UpdateUserNameWithRoleCMDPath = "/lbuser/UpdateUserNameWithRole"
 
 	ResetPasswordCMDPath = "/lbuser/ResetPassword"
 
 	GetFrontUserCMDPath = "/lbuser/GetFrontUser"
+
+	AddUserCMDPath = "/lbuser/AddUser"
+
+	DelUserListCMDPath = "/lbuser/DelUserList"
+
+	UpdateUserCMDPath = "/lbuser/UpdateUser"
+
+	GetUserCMDPath = "/lbuser/GetUser"
+
+	GetUserListCMDPath = "/lbuser/GetUserList"
 )

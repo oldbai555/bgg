@@ -3,41 +3,49 @@ package lbstore
 
 import (
 	"context"
+	"github.com/oldbai555/bgg/internal/_const"
+	"github.com/oldbai555/bgg/internal/bhttp"
+	"net/http"
 )
 
 const ClientName = "lbstore"
 
 func Upload(ctx context.Context, req *UploadReq) (*UploadRsp, error) {
+	var rsp UploadRsp
 	if cliMgr.conn == nil {
-		return nil, cliMgr.Err
+		return &rsp, bhttp.DoRequest(ctx, ServerName, UploadCMDPath, http.MethodPost, _const.PROTO_TYPE_PROTO3, req, &rsp)
 	}
 	return cliMgr.cli.Upload(ctx, req)
 }
 
 func GetFileList(ctx context.Context, req *GetFileListReq) (*GetFileListRsp, error) {
+	var rsp GetFileListRsp
 	if cliMgr.conn == nil {
-		return nil, cliMgr.Err
+		return &rsp, bhttp.DoRequest(ctx, ServerName, GetFileListCMDPath, http.MethodPost, _const.PROTO_TYPE_PROTO3, req, &rsp)
 	}
 	return cliMgr.cli.GetFileList(ctx, req)
 }
 
 func RefreshFileSignedUrl(ctx context.Context, req *RefreshFileSignedUrlReq) (*RefreshFileSignedUrlRsp, error) {
+	var rsp RefreshFileSignedUrlRsp
 	if cliMgr.conn == nil {
-		return nil, cliMgr.Err
+		return &rsp, bhttp.DoRequest(ctx, ServerName, RefreshFileSignedUrlCMDPath, http.MethodPost, _const.PROTO_TYPE_PROTO3, req, &rsp)
 	}
 	return cliMgr.cli.RefreshFileSignedUrl(ctx, req)
 }
 
 func GetSignature(ctx context.Context, req *GetSignatureReq) (*GetSignatureRsp, error) {
+	var rsp GetSignatureRsp
 	if cliMgr.conn == nil {
-		return nil, cliMgr.Err
+		return &rsp, bhttp.DoRequest(ctx, ServerName, GetSignatureCMDPath, http.MethodPost, _const.PROTO_TYPE_PROTO3, req, &rsp)
 	}
 	return cliMgr.cli.GetSignature(ctx, req)
 }
 
 func ReportUploadFile(ctx context.Context, req *ReportUploadFileReq) (*ReportUploadFileRsp, error) {
+	var rsp ReportUploadFileRsp
 	if cliMgr.conn == nil {
-		return nil, cliMgr.Err
+		return &rsp, bhttp.DoRequest(ctx, ServerName, ReportUploadFileCMDPath, http.MethodPost, _const.PROTO_TYPE_PROTO3, req, &rsp)
 	}
 	return cliMgr.cli.ReportUploadFile(ctx, req)
 }

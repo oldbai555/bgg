@@ -3,9 +3,11 @@
 package lbstore
 
 import (
-	"github.com/oldbai555/lbtool/pkg/lberr"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 var (
-	Success = lberr.NewErr(int32(ErrCode_Success), "Success")
+	Success         = status.Error(codes.Code(int32(ErrCode_Success)), "Success")
+	ErrFileNotFound = status.Error(codes.Code(int32(ErrCode_ErrFileNotFound)), "文件不存在")
 )

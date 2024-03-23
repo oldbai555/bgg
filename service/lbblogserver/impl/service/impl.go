@@ -4,230 +4,302 @@ import (
 	"context"
 	"github.com/oldbai555/bgg/service/lb"
 	"github.com/oldbai555/bgg/service/lbblog"
-	"github.com/oldbai555/bgg/service/lbblogserver/impl/dao/impl/mysql"
-	"github.com/oldbai555/bgg/service/lbuser"
+	"github.com/oldbai555/bgg/service/lbblogserver/impl/mysql"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/utils"
 )
 
-var ServerImpl LbblogServer
+var OnceSvrImpl = &LbblogServer{}
 
 type LbblogServer struct {
-	*lbblog.UnimplementedLbblogServer
-}
-
-func (a *LbblogServer) GetArticleList(ctx context.Context, req *lbblog.GetArticleListReq) (*lbblog.GetArticleListRsp, error) {
-	var rsp lbblog.GetArticleListRsp
-	var err error
-
-	rsp.List, rsp.Paginate, err = mysql.ArticleOrm.FindPaginate(ctx, req.Options)
-	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
-	}
-	if len(rsp.List) == 0 {
-		return &rsp, nil
-	}
-
-	categoryIdList := utils.PluckUint64List(rsp.List, lbblog.FieldCategoryId)
-	categoryList, err := mysql.CategoryOrm.GetByIdList(ctx, categoryIdList)
-	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
-	}
-	rsp.CategoryMap = utils.Slice2MapKeyByStructField(categoryList, lbblog.FieldId).(map[uint64]*lbblog.ModelCategory)
-	return &rsp, nil
-}
-
-func (a *LbblogServer) GetArticle(ctx context.Context, req *lbblog.GetArticleReq) (*lbblog.GetArticleRsp, error) {
-	var rsp lbblog.GetArticleRsp
-	var err error
-
-	rsp.Article, err = mysql.ArticleOrm.GetById(ctx, req.Id)
-	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
-	}
-
-	return &rsp, nil
-}
-
-func (a *LbblogServer) UpdateArticle(ctx context.Context, req *lbblog.UpdateArticleReq) (*lbblog.UpdateArticleRsp, error) {
-	var rsp lbblog.UpdateArticleRsp
-
-	_, err := mysql.ArticleOrm.UpdateById(ctx, req.Article.Id, utils.OrmStruct2Map(req.Article))
-	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
-	}
-
-	return &rsp, nil
-}
-
-func (a *LbblogServer) DelArticle(ctx context.Context, req *lbblog.DelArticleReq) (*lbblog.DelArticleRsp, error) {
-	var rsp lbblog.DelArticleRsp
-
-	_, err := mysql.ArticleOrm.DeleteById(ctx, req.Id)
-	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
-	}
-
-	return &rsp, nil
+	lbblog.UnimplementedLbblogServer
 }
 
 func (a *LbblogServer) AddArticle(ctx context.Context, req *lbblog.AddArticleReq) (*lbblog.AddArticleRsp, error) {
 	var rsp lbblog.AddArticleRsp
-
-	_, err := mysql.ArticleOrm.Create(ctx, req.Article)
-	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
-	}
-
-	return &rsp, nil
-}
-
-func (a *LbblogServer) GetCategoryList(ctx context.Context, req *lbblog.GetCategoryListReq) (*lbblog.GetCategoryListRsp, error) {
-	var rsp lbblog.GetCategoryListRsp
 	var err error
 
-	rsp.List, rsp.Paginate, err = mysql.CategoryOrm.FindPaginate(ctx, req.Options)
+	_, err = mysql.Article.NewScope(ctx).Create(req.Data)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
 	}
+	rsp.Data = req.Data
 
-	return &rsp, nil
+	return &rsp, err
 }
-
-func (a *LbblogServer) GetCategory(ctx context.Context, req *lbblog.GetCategoryReq) (*lbblog.GetCategoryRsp, error) {
-	var rsp lbblog.GetCategoryRsp
+func (a *LbblogServer) DelArticleList(ctx context.Context, req *lbblog.DelArticleListReq) (*lbblog.DelArticleListRsp, error) {
+	var rsp lbblog.DelArticleListRsp
 	var err error
 
-	rsp.Category, err = mysql.CategoryOrm.GetById(ctx, req.Id)
-	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
-	}
-
-	return &rsp, nil
-}
-
-func (a *LbblogServer) UpdateCategory(ctx context.Context, req *lbblog.UpdateCategoryReq) (*lbblog.UpdateCategoryRsp, error) {
-	var rsp lbblog.UpdateCategoryRsp
-
-	_, err := mysql.CategoryOrm.UpdateById(ctx, req.Category.Id, utils.OrmStruct2Map(req.Category))
-	if err != nil {
-		log.Errorf("err is %v", err)
-		return nil, err
-	}
-
-	return &rsp, nil
-}
-
-func (a *LbblogServer) DelCategory(ctx context.Context, req *lbblog.DelCategoryReq) (*lbblog.DelCategoryRsp, error) {
-	var rsp lbblog.DelCategoryRsp
-
-	_, err := mysql.CategoryOrm.DeleteById(ctx, req.Id)
-	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
-	}
-
-	return &rsp, nil
-}
-
-func (a *LbblogServer) AddCategory(ctx context.Context, req *lbblog.AddCategoryReq) (*lbblog.AddCategoryRsp, error) {
-	var rsp lbblog.AddCategoryRsp
-
-	_, err := mysql.CategoryOrm.Create(ctx, req.Category)
-	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
-	}
-
-	rsp.Category = req.Category
-	return &rsp, nil
-}
-
-func (a *LbblogServer) GetCommentList(ctx context.Context, req *lbblog.GetCommentListReq) (*lbblog.GetCommentListRsp, error) {
-	var rsp lbblog.GetCommentListRsp
-	var err error
-
-	rsp.List, rsp.Paginate, err = mysql.CommentOrm.FindPaginate(ctx, req.Options)
-	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
-	}
-
-	articleIdList := utils.PluckUint64List(rsp.List, lbblog.FieldArticleId)
-	articleList, err := mysql.ArticleOrm.GetByIdList(ctx, articleIdList)
-	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
-	}
-	rsp.ArticleMap = utils.Slice2MapKeyByStructField(articleList, lbblog.FieldId).(map[uint64]*lbblog.ModelArticle)
-
-	userIdList := utils.PluckUint64List(rsp.List, lbblog.FieldUserId)
-	listRsp, err := lbuser.GetUserList(ctx, &lbuser.GetUserListReq{
-		Options: lb.NewOptions().AddOpt(lb.DefaultListOption_DefaultListOptionIdList, userIdList).SetSkipTotal(),
+	listRsp, err := a.GetArticleList(ctx, &lbblog.GetArticleListReq{
+		ListOption: req.ListOption.
+			SetSkipTotal().
+			AddOpt(lb.DefaultListOption_DefaultListOptionSelect, lbblog.FieldId_),
 	})
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
 	}
 
-	rsp.UserMap = utils.Slice2MapKeyByStructField(listRsp.List, lbuser.FieldId).(map[uint64]*lbuser.ModelUser)
+	if len(listRsp.List) == 0 {
+		log.Infof("list is empty")
+		return &rsp, nil
+	}
 
-	return &rsp, nil
+	idList := utils.PluckUint64List(listRsp.List, lbblog.FieldId)
+	_, err = mysql.Article.NewScope(ctx).In(lbblog.FieldId, idList).Delete(&lbblog.ModelArticle{})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
 }
+func (a *LbblogServer) UpdateArticle(ctx context.Context, req *lbblog.UpdateArticleReq) (*lbblog.UpdateArticleRsp, error) {
+	var rsp lbblog.UpdateArticleRsp
+	var err error
 
+	var data lbblog.ModelArticle
+	err = mysql.Article.NewScope(ctx).Where(lbblog.FieldId_, req.Data.Id).First(&data)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	_, err = mysql.Article.NewScope(ctx).Where(lbblog.FieldId_, data.Id).Update(utils.OrmStruct2Map(req.Data))
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+func (a *LbblogServer) GetArticle(ctx context.Context, req *lbblog.GetArticleReq) (*lbblog.GetArticleRsp, error) {
+	var rsp lbblog.GetArticleRsp
+	var err error
+
+	var data lbblog.ModelArticle
+	err = mysql.Article.NewScope(ctx).Where(lbblog.FieldId_, req.Id).First(&data)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = &data
+
+	return &rsp, err
+}
+func (a *LbblogServer) GetArticleList(ctx context.Context, req *lbblog.GetArticleListReq) (*lbblog.GetArticleListRsp, error) {
+	var rsp lbblog.GetArticleListRsp
+	var err error
+
+	db := mysql.Article.NewList(ctx, req.ListOption)
+	err = lb.ProcessDefaultOptions(req.ListOption, db)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = lb.NewOptionsProcessor(req.ListOption).
+		Process()
+
+	rsp.Paginate, err = db.FindPaginate(&rsp.List)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+func (a *LbblogServer) AddCategory(ctx context.Context, req *lbblog.AddCategoryReq) (*lbblog.AddCategoryRsp, error) {
+	var rsp lbblog.AddCategoryRsp
+	var err error
+
+	_, err = mysql.Category.NewScope(ctx).Create(req.Data)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = req.Data
+
+	return &rsp, err
+}
+func (a *LbblogServer) DelCategoryList(ctx context.Context, req *lbblog.DelCategoryListReq) (*lbblog.DelCategoryListRsp, error) {
+	var rsp lbblog.DelCategoryListRsp
+	var err error
+
+	listRsp, err := a.GetCategoryList(ctx, &lbblog.GetCategoryListReq{
+		ListOption: req.ListOption.
+			SetSkipTotal().
+			AddOpt(lb.DefaultListOption_DefaultListOptionSelect, lbblog.FieldId_),
+	})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	if len(listRsp.List) == 0 {
+		log.Infof("list is empty")
+		return &rsp, nil
+	}
+
+	idList := utils.PluckUint64List(listRsp.List, lbblog.FieldId)
+	_, err = mysql.Category.NewScope(ctx).In(lbblog.FieldId, idList).Delete(&lbblog.ModelCategory{})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+func (a *LbblogServer) UpdateCategory(ctx context.Context, req *lbblog.UpdateCategoryReq) (*lbblog.UpdateCategoryRsp, error) {
+	var rsp lbblog.UpdateCategoryRsp
+	var err error
+
+	var data lbblog.ModelCategory
+	err = mysql.Category.NewScope(ctx).Where(lbblog.FieldId_, req.Data.Id).First(&data)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	_, err = mysql.Category.NewScope(ctx).Where(lbblog.FieldId_, data.Id).Update(utils.OrmStruct2Map(req.Data))
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+func (a *LbblogServer) GetCategory(ctx context.Context, req *lbblog.GetCategoryReq) (*lbblog.GetCategoryRsp, error) {
+	var rsp lbblog.GetCategoryRsp
+	var err error
+
+	var data lbblog.ModelCategory
+	err = mysql.Category.NewScope(ctx).Where(lbblog.FieldId_, req.Id).First(&data)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = &data
+
+	return &rsp, err
+}
+func (a *LbblogServer) GetCategoryList(ctx context.Context, req *lbblog.GetCategoryListReq) (*lbblog.GetCategoryListRsp, error) {
+	var rsp lbblog.GetCategoryListRsp
+	var err error
+
+	db := mysql.Category.NewList(ctx, req.ListOption)
+	err = lb.ProcessDefaultOptions(req.ListOption, db)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = lb.NewOptionsProcessor(req.ListOption).
+		Process()
+
+	rsp.Paginate, err = db.FindPaginate(&rsp.List)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+func (a *LbblogServer) AddComment(ctx context.Context, req *lbblog.AddCommentReq) (*lbblog.AddCommentRsp, error) {
+	var rsp lbblog.AddCommentRsp
+	var err error
+
+	_, err = mysql.Comment.NewScope(ctx).Create(req.Data)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = req.Data
+
+	return &rsp, err
+}
+func (a *LbblogServer) DelCommentList(ctx context.Context, req *lbblog.DelCommentListReq) (*lbblog.DelCommentListRsp, error) {
+	var rsp lbblog.DelCommentListRsp
+	var err error
+
+	listRsp, err := a.GetCommentList(ctx, &lbblog.GetCommentListReq{
+		ListOption: req.ListOption.
+			SetSkipTotal().
+			AddOpt(lb.DefaultListOption_DefaultListOptionSelect, lbblog.FieldId_),
+	})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	if len(listRsp.List) == 0 {
+		log.Infof("list is empty")
+		return &rsp, nil
+	}
+
+	idList := utils.PluckUint64List(listRsp.List, lbblog.FieldId)
+	_, err = mysql.Comment.NewScope(ctx).In(lbblog.FieldId, idList).Delete(&lbblog.ModelComment{})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+func (a *LbblogServer) UpdateComment(ctx context.Context, req *lbblog.UpdateCommentReq) (*lbblog.UpdateCommentRsp, error) {
+	var rsp lbblog.UpdateCommentRsp
+	var err error
+
+	var data lbblog.ModelComment
+	err = mysql.Comment.NewScope(ctx).Where(lbblog.FieldId_, req.Data.Id).First(&data)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	_, err = mysql.Comment.NewScope(ctx).Where(lbblog.FieldId_, data.Id).Update(utils.OrmStruct2Map(req.Data))
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
 func (a *LbblogServer) GetComment(ctx context.Context, req *lbblog.GetCommentReq) (*lbblog.GetCommentRsp, error) {
 	var rsp lbblog.GetCommentRsp
 	var err error
 
-	rsp.Comment, err = mysql.CommentOrm.GetById(ctx, req.Id)
+	var data lbblog.ModelComment
+	err = mysql.Comment.NewScope(ctx).Where(lbblog.FieldId_, req.Id).First(&data)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
 	}
+	rsp.Data = &data
 
-	return &rsp, nil
+	return &rsp, err
 }
+func (a *LbblogServer) GetCommentList(ctx context.Context, req *lbblog.GetCommentListReq) (*lbblog.GetCommentListRsp, error) {
+	var rsp lbblog.GetCommentListRsp
+	var err error
 
-func (a *LbblogServer) UpdateComment(ctx context.Context, req *lbblog.UpdateCommentReq) (*lbblog.UpdateCommentRsp, error) {
-	var rsp lbblog.UpdateCommentRsp
-
-	_, err := mysql.CommentOrm.UpdateById(ctx, req.Comment.Id, utils.OrmStruct2Map(req.Comment))
+	db := mysql.Comment.NewList(ctx, req.ListOption)
+	err = lb.ProcessDefaultOptions(req.ListOption, db)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
 	}
 
-	return &rsp, nil
-}
+	err = lb.NewOptionsProcessor(req.ListOption).
+		Process()
 
-func (a *LbblogServer) DelComment(ctx context.Context, req *lbblog.DelCommentReq) (*lbblog.DelCommentRsp, error) {
-	var rsp lbblog.DelCommentRsp
-
-	_, err := mysql.CommentOrm.DeleteById(ctx, req.Id)
+	rsp.Paginate, err = db.FindPaginate(&rsp.List)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
 	}
 
-	return &rsp, nil
-}
-
-func (a *LbblogServer) AddComment(ctx context.Context, req *lbblog.AddCommentReq) (*lbblog.AddCommentRsp, error) {
-	var rsp lbblog.AddCommentRsp
-
-	_, err := mysql.CommentOrm.Create(ctx, req.Comment)
-	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
-	}
-
-	return &rsp, nil
+	return &rsp, err
 }

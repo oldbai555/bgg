@@ -5,7 +5,7 @@ import (
 	"github.com/oldbai555/lbtool/log"
 )
 
-func ProcessDefaultOptions(listOption *Options, db *bgorm.Scope) error {
+func ProcessDefaultOptions(listOption *ListOption, db *bgorm.Scope) error {
 	err := NewOptionsProcessor(listOption).
 		AddStringList(
 			DefaultListOption_DefaultListOptionSelect,
@@ -61,16 +61,16 @@ func ProcessDefaultOptions(listOption *Options, db *bgorm.Scope) error {
 				db.In("creator_id", valList)
 				return nil
 			}).
-		//AddUint64List(
-		//	lb.DefaultListOption_DefaultListOptionCorpIdList,
-		//	func(valList []uint64) error {
-		//		if len(valList) == 1 {
-		//			db.Eq("corp_id", valList[0])
-		//		} else {
-		//			db.In("corp_id", valList)
-		//		}
-		//		return nil
-		//	}).
+		AddUint64List(
+			DefaultListOption_DefaultListOptionCorpIdList,
+			func(valList []uint64) error {
+				if len(valList) == 1 {
+					db.Eq("corp_id", valList[0])
+				} else {
+					db.In("corp_id", valList)
+				}
+				return nil
+			}).
 		Process()
 	if err != nil {
 		log.Errorf("err:%v", err)

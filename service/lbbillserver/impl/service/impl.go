@@ -48,7 +48,7 @@ func (a *LbbillServer) DelBillSysList(ctx context.Context, req *lbbill.DelBillSy
 	}
 
 	idList := utils.PluckUint64List(listRsp.List, lbbill.FieldId)
-	_, err = mysql.Bill.NewScope(ctx).In(lbbill.FieldId, idList).Delete(&lbbill.ModelBill{})
+	_, err = mysql.Bill.NewScope(ctx).In(lbbill.FieldId_, idList).Delete(&lbbill.ModelBill{})
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
@@ -144,7 +144,7 @@ func (a *LbbillServer) DelBillCategorySysList(ctx context.Context, req *lbbill.D
 	}
 
 	idList := utils.PluckUint64List(listRsp.List, lbbill.FieldId)
-	_, err = mysql.BillCategory.NewScope(ctx).In(lbbill.FieldId, idList).Delete(&lbbill.ModelBillCategory{})
+	_, err = mysql.BillCategory.NewScope(ctx).In(lbbill.FieldId_, idList).Delete(&lbbill.ModelBillCategory{})
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
