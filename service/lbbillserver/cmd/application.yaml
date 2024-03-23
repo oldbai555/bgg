@@ -1,4 +1,4 @@
 server:
   name: "lbbill"
-  port: 
+  port: 20006
   ip: "0.0.0.0"

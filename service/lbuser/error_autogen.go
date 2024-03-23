@@ -3,14 +3,15 @@
 package lbuser
 
 import (
-	"github.com/oldbai555/lbtool/pkg/lberr"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 var (
-	Nil                     = lberr.NewErr(int32(ErrCode_Nil), "Nil")
-	ErrUserNotFound         = lberr.NewErr(int32(ErrCode_ErrUserNotFound), "用户找不到")
-	ErrPasswordInvalid      = lberr.NewErr(int32(ErrCode_ErrPasswordInvalid), "密码无效")
-	ErrUserExit             = lberr.NewErr(int32(ErrCode_ErrUserExit), "用户重复存在")
-	ErrUserLoginExpired     = lberr.NewErr(int32(ErrCode_ErrUserLoginExpired), "登陆信息过期")
-	ErrGrpcParseContextFail = lberr.NewErr(int32(ErrCode_ErrGrpcParseContextFail), "无效请求")
+	Nil                     = status.Error(codes.Code(int32(ErrCode_Nil)), "Nil")
+	ErrUserNotFound         = status.Error(codes.Code(int32(ErrCode_ErrUserNotFound)), "用户找不到")
+	ErrPasswordInvalid      = status.Error(codes.Code(int32(ErrCode_ErrPasswordInvalid)), "密码无效")
+	ErrUserExit             = status.Error(codes.Code(int32(ErrCode_ErrUserExit)), "用户重复存在")
+	ErrUserLoginExpired     = status.Error(codes.Code(int32(ErrCode_ErrUserLoginExpired)), "登陆信息过期")
+	ErrGrpcParseContextFail = status.Error(codes.Code(int32(ErrCode_ErrGrpcParseContextFail)), "无效请求")
 )

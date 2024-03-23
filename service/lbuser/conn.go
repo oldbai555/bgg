@@ -3,20 +3,7 @@ package lbuser
 
 import (
 	"errors"
-	"fmt"
-
-	"github.com/oldbai555/bgg/pkg/grpc_tool"
-
-	"github.com/oldbai555/lbtool/log"
-
-	"github.com/oldbai555/lbtool/pkg/signal"
-	eclient "go.etcd.io/etcd/client/v3"
-	eresolver "go.etcd.io/etcd/client/v3/naming/resolver"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/balancer/roundrobin"
-	"google.golang.org/grpc/credentials/insecure"
-	"os"
-	"time"
 )
 
 type CliMgr struct {
@@ -29,49 +16,8 @@ var cliMgr = &CliMgr{
 	Err: errors.New("init conn failed"),
 }
 
-func init() {
-	// 创建 etcd 客户端
-	config := grpc_tool.GetConfig()
-	etcdClient, _ := eclient.New(eclient.Config{
-		Endpoints:   config.GetEndpointList(),
-		DialTimeout: 5 * time.Second,
-	})
-
-	// 创建 etcd 实现的 grpc 服务注册发现模块 resolver
-	etcdResolverBuilder, _ := eresolver.NewBuilder(etcdClient)
-
-	// 拼接服务名称，需要固定义 etcd:/// 作为前缀
-	etcdTarget := fmt.Sprintf("etcd:///%s", ServerName)
-
-	// 创建 grpc 连接代理
-	conn, err := grpc.Dial(
-		// 服务名称
-		etcdTarget,
-		// 注入 etcd resolver
-		grpc.WithResolvers(etcdResolverBuilder),
-		// 声明使用的负载均衡策略为 round robin
-		grpc.WithDefaultServiceConfig(fmt.Sprintf(`{"LoadBalancingPolicy": "%s"}`, roundrobin.Name)),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
-	if err != nil {
-		log.Errorf("err:%v", err)
-		return
-	}
-
+func Init(conn *grpc.ClientConn) {
 	// 创建 grpc 客户端
 	cliMgr.cli = NewLbuserClient(conn)
 	cliMgr.conn = conn
-
-	signal.Reg(func(signal os.Signal) error {
-		log.Warnf("exit: close %s client connect, signal [%v]", ServerName, signal)
-		if err = conn.Close(); err != nil {
-			log.Errorf("err:%v", err)
-			return err
-		}
-		return nil
-	})
-}
-
-func CloseConn() error {
-	return cliMgr.conn.Close()
 }

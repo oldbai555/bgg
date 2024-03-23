@@ -2,33 +2,33 @@
 package lbblog
 
 const (
-	GetArticleListCMDPath = "/lbblog/GetArticleList"
+	AddArticleCMDPath = "/lbblog/AddArticle"
 
-	GetArticleCMDPath = "/lbblog/GetArticle"
+	DelArticleListCMDPath = "/lbblog/DelArticleList"
 
 	UpdateArticleCMDPath = "/lbblog/UpdateArticle"
 
-	DelArticleCMDPath = "/lbblog/DelArticle"
+	GetArticleCMDPath = "/lbblog/GetArticle"
 
-	AddArticleCMDPath = "/lbblog/AddArticle"
-
-	GetCategoryListCMDPath = "/lbblog/GetCategoryList"
-
-	GetCategoryCMDPath = "/lbblog/GetCategory"
-
-	UpdateCategoryCMDPath = "/lbblog/UpdateCategory"
-
-	DelCategoryCMDPath = "/lbblog/DelCategory"
+	GetArticleListCMDPath = "/lbblog/GetArticleList"
 
 	AddCategoryCMDPath = "/lbblog/AddCategory"
 
-	GetCommentListCMDPath = "/lbblog/GetCommentList"
+	DelCategoryListCMDPath = "/lbblog/DelCategoryList"
 
-	GetCommentCMDPath = "/lbblog/GetComment"
+	UpdateCategoryCMDPath = "/lbblog/UpdateCategory"
+
+	GetCategoryCMDPath = "/lbblog/GetCategory"
+
+	GetCategoryListCMDPath = "/lbblog/GetCategoryList"
+
+	AddCommentCMDPath = "/lbblog/AddComment"
+
+	DelCommentListCMDPath = "/lbblog/DelCommentList"
 
 	UpdateCommentCMDPath = "/lbblog/UpdateComment"
 
-	DelCommentCMDPath = "/lbblog/DelComment"
+	GetCommentCMDPath = "/lbblog/GetComment"
 
-	AddCommentCMDPath = "/lbblog/AddComment"
+	GetCommentListCMDPath = "/lbblog/GetCommentList"
 )

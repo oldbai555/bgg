@@ -3,12 +3,13 @@
 package lbblog
 
 import (
-	"github.com/oldbai555/lbtool/pkg/lberr"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 var (
-	Nil                 = lberr.NewErr(int32(ErrCode_Nil), "Nil")
-	ErrArticleNotFound  = lberr.NewErr(int32(ErrCode_ErrArticleNotFound), "ErrArticleNotFound")
-	ErrCategoryNotFound = lberr.NewErr(int32(ErrCode_ErrCategoryNotFound), "ErrCategoryNotFound")
-	ErrCommentNotFound  = lberr.NewErr(int32(ErrCode_ErrCommentNotFound), "ErrCommentNotFound")
+	Nil                 = status.Error(codes.Code(int32(ErrCode_Nil)), "Nil")
+	ErrArticleNotFound  = status.Error(codes.Code(int32(ErrCode_ErrArticleNotFound)), "ErrArticleNotFound")
+	ErrCategoryNotFound = status.Error(codes.Code(int32(ErrCode_ErrCategoryNotFound)), "ErrCategoryNotFound")
+	ErrCommentNotFound  = status.Error(codes.Code(int32(ErrCode_ErrCommentNotFound)), "ErrCommentNotFound")
 )
