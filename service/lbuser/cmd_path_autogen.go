@@ -10,8 +10,6 @@ const (
 
 	UpdateLoginUserInfoCMDPath = "/lbuser/UpdateLoginUserInfo"
 
-	UpdateUserNameWithRoleCMDPath = "/lbuser/UpdateUserNameWithRole"
-
 	ResetPasswordCMDPath = "/lbuser/ResetPassword"
 
 	GetFrontUserCMDPath = "/lbuser/GetFrontUser"

@@ -10,6 +10,7 @@ require (
 	github.com/envoyproxy/protoc-gen-validate v0.9.1
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-redis/redis/v8 v8.11.5
+	github.com/go-xman/go.emoji v0.1.2
 	github.com/golang/protobuf v1.5.2
 	github.com/oldbai555/driver-mysql v0.0.0-20221011051826-9dcf64ef2d7b
 	github.com/oldbai555/gorm v0.0.0-20221011044346-e65800014b93

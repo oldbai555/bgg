@@ -37,11 +37,6 @@ type LbuserClient interface {
 	// @name:
 	// @desc:
 	// @error:
-	UpdateUserNameWithRole(ctx context.Context, in *UpdateUserNameWithRoleReq, opts ...grpc.CallOption) (*UpdateUserNameWithRoleRsp, error)
-	// @cat:
-	// @name:
-	// @desc:
-	// @error:
 	ResetPassword(ctx context.Context, in *ResetPasswordReq, opts ...grpc.CallOption) (*ResetPasswordRsp, error)
 	// @cat: front
 	// @name:
@@ -113,15 +108,6 @@ func (c *lbuserClient) GetLoginUser(ctx context.Context, in *GetLoginUserReq, op
 func (c *lbuserClient) UpdateLoginUserInfo(ctx context.Context, in *UpdateLoginUserInfoReq, opts ...grpc.CallOption) (*UpdateLoginUserInfoRsp, error) {
 	out := new(UpdateLoginUserInfoRsp)
 	err := c.cc.Invoke(ctx, "/lbuser.lbuser/UpdateLoginUserInfo", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *lbuserClient) UpdateUserNameWithRole(ctx context.Context, in *UpdateUserNameWithRoleReq, opts ...grpc.CallOption) (*UpdateUserNameWithRoleRsp, error) {
-	out := new(UpdateUserNameWithRoleRsp)
-	err := c.cc.Invoke(ctx, "/lbuser.lbuser/UpdateUserNameWithRole", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -210,11 +196,6 @@ type LbuserServer interface {
 	// @name:
 	// @desc:
 	// @error:
-	UpdateUserNameWithRole(context.Context, *UpdateUserNameWithRoleReq) (*UpdateUserNameWithRoleRsp, error)
-	// @cat:
-	// @name:
-	// @desc:
-	// @error:
 	ResetPassword(context.Context, *ResetPasswordReq) (*ResetPasswordRsp, error)
 	// @cat: front
 	// @name:
@@ -264,9 +245,6 @@ func (UnimplementedLbuserServer) GetLoginUser(context.Context, *GetLoginUserReq)
 }
 func (UnimplementedLbuserServer) UpdateLoginUserInfo(context.Context, *UpdateLoginUserInfoReq) (*UpdateLoginUserInfoRsp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateLoginUserInfo not implemented")
-}
-func (UnimplementedLbuserServer) UpdateUserNameWithRole(context.Context, *UpdateUserNameWithRoleReq) (*UpdateUserNameWithRoleRsp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserNameWithRole not implemented")
 }
 func (UnimplementedLbuserServer) ResetPassword(context.Context, *ResetPasswordReq) (*ResetPasswordRsp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ResetPassword not implemented")
@@ -370,24 +348,6 @@ func _Lbuser_UpdateLoginUserInfo_Handler(srv interface{}, ctx context.Context, d
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(LbuserServer).UpdateLoginUserInfo(ctx, req.(*UpdateLoginUserInfoReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Lbuser_UpdateUserNameWithRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateUserNameWithRoleReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(LbuserServer).UpdateUserNameWithRole(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/lbuser.lbuser/UpdateUserNameWithRole",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LbuserServer).UpdateUserNameWithRole(ctx, req.(*UpdateUserNameWithRoleReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -540,10 +500,6 @@ var Lbuser_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateLoginUserInfo",
 			Handler:    _Lbuser_UpdateLoginUserInfo_Handler,
-		},
-		{
-			MethodName: "UpdateUserNameWithRole",
-			Handler:    _Lbuser_UpdateUserNameWithRole_Handler,
 		},
 		{
 			MethodName: "ResetPassword",

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"github.com/oldbai555/bgg/service/lb"
 	"github.com/oldbai555/bgg/service/lbblog"
 	"github.com/oldbai555/bgg/service/lbblogserver/impl/mysql"
@@ -101,7 +102,19 @@ func (a *LbblogServer) GetArticleList(ctx context.Context, req *lbblog.GetArticl
 	}
 
 	err = lb.NewOptionsProcessor(req.ListOption).
+		AddUint64(lbblog.GetArticleListReq_ListOptionCategoryId, func(val uint64) error {
+			db.Eq(lbblog.FieldCategoryId_, val)
+			return nil
+		}).
+		AddString(lbblog.GetArticleListReq_ListOptionLikeTitle, func(val string) error {
+			db.Like(lbblog.FieldTitle_, fmt.Sprintf("%%%v%%", val))
+			return nil
+		}).
 		Process()
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
 
 	rsp.Paginate, err = db.FindPaginate(&rsp.List)
 	if err != nil {
@@ -197,6 +210,10 @@ func (a *LbblogServer) GetCategoryList(ctx context.Context, req *lbblog.GetCateg
 	}
 
 	err = lb.NewOptionsProcessor(req.ListOption).
+		AddString(lbblog.GetCategoryListReq_ListOptionLikeName, func(val string) error {
+			db.Like(lbblog.FieldName_, fmt.Sprintf("%%%v%%", val))
+			return nil
+		}).
 		Process()
 
 	rsp.Paginate, err = db.FindPaginate(&rsp.List)
@@ -293,6 +310,26 @@ func (a *LbblogServer) GetCommentList(ctx context.Context, req *lbblog.GetCommen
 	}
 
 	err = lb.NewOptionsProcessor(req.ListOption).
+		AddString(lbblog.GetCommentListReq_ListOptionLikeContent, func(val string) error {
+			db.Like(lbblog.FieldContent_, fmt.Sprintf("%%%v%%", val))
+			return nil
+		}).
+		AddUint32(lbblog.GetCommentListReq_ListOptionStatus, func(val uint32) error {
+			db.Eq(lbblog.FieldStatus_, val)
+			return nil
+		}).
+		AddString(lbblog.GetCommentListReq_ListOptionLikeUserEmail, func(val string) error {
+			db.Like(lbblog.FieldUserEmail_, fmt.Sprintf("%%%v%%", val))
+			return nil
+		}).
+		AddUint64List(lbblog.GetCommentListReq_ListOptionArticleIdList, func(valList []uint64) error {
+			if len(valList) == 1 {
+				db.Eq(lbblog.FieldArticleId_, valList[0])
+			} else {
+				db.In(lbblog.FieldArticleId_, valList)
+			}
+			return nil
+		}).
 		Process()
 
 	rsp.Paginate, err = db.FindPaginate(&rsp.List)
