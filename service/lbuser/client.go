@@ -42,14 +42,6 @@ func UpdateLoginUserInfo(ctx context.Context, req *UpdateLoginUserInfoReq) (*Upd
 	return cliMgr.cli.UpdateLoginUserInfo(ctx, req)
 }
 
-func UpdateUserNameWithRole(ctx context.Context, req *UpdateUserNameWithRoleReq) (*UpdateUserNameWithRoleRsp, error) {
-	var rsp UpdateUserNameWithRoleRsp
-	if cliMgr.conn == nil {
-		return &rsp, bhttp.DoRequest(ctx, ServerName, UpdateUserNameWithRoleCMDPath, http.MethodPost, _const.PROTO_TYPE_PROTO3, req, &rsp)
-	}
-	return cliMgr.cli.UpdateUserNameWithRole(ctx, req)
-}
-
 func ResetPassword(ctx context.Context, req *ResetPasswordReq) (*ResetPasswordRsp, error) {
 	var rsp ResetPasswordRsp
 	if cliMgr.conn == nil {

@@ -14,15 +14,13 @@ var cmdList = []*_cmd.Cmd{
 
 	{Server: lbuser.ServerName, Path: lbuser.LogoutCMDPath, GRpcFunc: service.OnceSvrImpl.Logout, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
 
-	{Server: lbuser.ServerName, Path: lbuser.GetLoginUserCMDPath, GRpcFunc: service.OnceSvrImpl.GetLoginUser, OptionMap: map[string]string{"ApiMethod": "GET", "AuthType": "user"}},
+	{Server: lbuser.ServerName, Path: lbuser.GetLoginUserCMDPath, GRpcFunc: service.OnceSvrImpl.GetLoginUser, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
 
 	{Server: lbuser.ServerName, Path: lbuser.UpdateLoginUserInfoCMDPath, GRpcFunc: service.OnceSvrImpl.UpdateLoginUserInfo, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
 
-	{Server: lbuser.ServerName, Path: lbuser.UpdateUserNameWithRoleCMDPath, GRpcFunc: service.OnceSvrImpl.UpdateUserNameWithRole, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
-
 	{Server: lbuser.ServerName, Path: lbuser.ResetPasswordCMDPath, GRpcFunc: service.OnceSvrImpl.ResetPassword, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
 
-	{Server: lbuser.ServerName, Path: lbuser.GetFrontUserCMDPath, GRpcFunc: service.OnceSvrImpl.GetFrontUser, OptionMap: map[string]string{"ApiMethod": "GET", "AuthType": "public"}},
+	{Server: lbuser.ServerName, Path: lbuser.GetFrontUserCMDPath, GRpcFunc: service.OnceSvrImpl.GetFrontUser, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "public"}},
 
 	{Server: lbuser.ServerName, Path: lbuser.AddUserCMDPath, GRpcFunc: service.OnceSvrImpl.AddUser, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
 
