@@ -1,16 +1,17 @@
 package mysql
 
 import (
-	"github.com/oldbai555/bgg/internal/bgorm"
 	"github.com/oldbai555/bgg/pkg/syscfg"
+	"github.com/oldbai555/bgg/service/lb"
 	"github.com/oldbai555/bgg/service/lbblog"
 	"github.com/oldbai555/lbtool/log"
+	"github.com/oldbai555/micro/bdb"
 )
 
 var (
-	Article  *bgorm.Model
-	Category *bgorm.Model
-	Comment  *bgorm.Model
+	Article  *lb.Model
+	Category *lb.Model
+	Comment  *lb.Model
 )
 
 func RegisterOrm() (err error) {
@@ -18,19 +19,20 @@ func RegisterOrm() (err error) {
 	mysqlConf := syscfg.NewGormMysqlConf("")
 
 	// 注册表
-	bgorm.RegisterModel()
+	bdb.RegisterModel(
+	// ...
+	)
 
-	err = bgorm.InitMasterOrm(mysqlConf.Dsn())
+	err = bdb.InitMasterOrm(mysqlConf.Dsn())
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return err
 	}
 
-	bgorm.AutoMigrate()
-
-	Article = bgorm.NewModel(bgorm.MasterOrm, &lbblog.ModelArticle{}, lbblog.ErrArticleNotFound)
-	Category = bgorm.NewModel(bgorm.MasterOrm, &lbblog.ModelCategory{}, lbblog.ErrCategoryNotFound)
-	Comment = bgorm.NewModel(bgorm.MasterOrm, &lbblog.ModelComment{}, lbblog.ErrCommentNotFound)
+	bdb.AutoMigrate()
+	Article = lb.NewModel(bdb.MasterOrm, &lbblog.ModelArticle{}, lbblog.ErrArticleNotFound)
+	Category = lb.NewModel(bdb.MasterOrm, &lbblog.ModelCategory{}, lbblog.ErrCategoryNotFound)
+	Comment = lb.NewModel(bdb.MasterOrm, &lbblog.ModelComment{}, lbblog.ErrCommentNotFound)
 
 	log.Infof("end init db orm......")
 	return

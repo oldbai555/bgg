@@ -1,11 +1,10 @@
-package ptuser
+package lbuser
 
 import (
 	"context"
 	"github.com/oldbai555/bgg/internal/_cmd"
 	"github.com/oldbai555/bgg/internal/_const"
 	"github.com/oldbai555/bgg/internal/bgrpc/srv"
-	"github.com/oldbai555/bgg/service/lbuser"
 	"github.com/oldbai555/lbtool/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -26,7 +25,7 @@ func NewCheckUserInterceptor(cmdList []*_cmd.Cmd) grpc.UnaryServerInterceptor {
 		nCtx := srv.NewGrpcUCtx(ctx)
 		md, ok := metadata.FromIncomingContext(ctx)
 		if !ok {
-			return nil, lbuser.ErrGrpcParseContextFail
+			return nil, ErrGrpcParseContextFail
 		}
 
 		// 设置 traceId
@@ -66,7 +65,7 @@ func NewCheckUserInterceptor(cmdList []*_cmd.Cmd) grpc.UnaryServerInterceptor {
 			return handler(nCtx, req)
 		}
 
-		userRsp, err := lbuser.GetLoginUser(ctx, &lbuser.GetLoginUserReq{
+		userRsp, err := GetLoginUser(ctx, &GetLoginUserReq{
 			Sid: nCtx.Sid(),
 		})
 		if err != nil {
@@ -83,7 +82,7 @@ func NewCheckUserInterceptor(cmdList []*_cmd.Cmd) grpc.UnaryServerInterceptor {
 }
 
 func CheckLoginUser(ctx context.Context, sid string) (interface{}, error) {
-	userSysRsp, err := lbuser.GetLoginUser(ctx, &lbuser.GetLoginUserReq{
+	userSysRsp, err := GetLoginUser(ctx, &GetLoginUserReq{
 		Sid: sid,
 	})
 	if err != nil {

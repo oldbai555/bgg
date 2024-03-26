@@ -1,14 +1,15 @@
 package mysql
 
 import (
-	"github.com/oldbai555/bgg/internal/bgorm"
 	"github.com/oldbai555/bgg/pkg/syscfg"
+	"github.com/oldbai555/bgg/service/lb"
 	"github.com/oldbai555/bgg/service/lbuser"
 	"github.com/oldbai555/lbtool/log"
+	"github.com/oldbai555/micro/bdb"
 )
 
 var (
-	User *bgorm.Model
+	User *lb.Model
 )
 
 func RegisterOrm() (err error) {
@@ -16,19 +17,19 @@ func RegisterOrm() (err error) {
 	mysqlConf := syscfg.NewGormMysqlConf("")
 
 	// 注册表
-	bgorm.RegisterModel(
+	bdb.RegisterModel(
+		// ...
 		&lbuser.ModelUser{},
 	)
 
-	err = bgorm.InitMasterOrm(mysqlConf.Dsn())
+	err = bdb.InitMasterOrm(mysqlConf.Dsn())
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return err
 	}
 
-	bgorm.AutoMigrate()
-
-	User = bgorm.NewModel(bgorm.MasterOrm, &lbuser.ModelUser{}, lbuser.ErrUserNotFound)
+	bdb.AutoMigrate()
+	User = lb.NewModel(bdb.MasterOrm, &lbuser.ModelUser{}, lbuser.ErrUserNotFound)
 
 	log.Infof("end init db orm......")
 	return

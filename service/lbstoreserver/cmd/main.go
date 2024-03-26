@@ -2,14 +2,13 @@ package main
 
 import (
 	"context"
-	"github.com/oldbai555/bgg/pkg/micro"
 	"github.com/oldbai555/bgg/pkg/syscfg"
 	"github.com/oldbai555/bgg/service/lbstore"
 	"github.com/oldbai555/bgg/service/lbstoreserver/impl"
 	"github.com/oldbai555/bgg/service/lbstoreserver/impl/service"
-	"github.com/oldbai555/bgg/service/ptuser"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/utils"
+	"github.com/oldbai555/micro"
 	"google.golang.org/grpc"
 )
 
@@ -42,10 +41,10 @@ func main() {
 			lbstore.RegisterLbstoreServer(server, service.OnceSvrImpl)
 			return nil
 		}),
-		micro.WithUnaryServerInterceptors(ptuser.NewCheckUserInterceptor(cmdList)),
 		micro.WithCmdList(cmdList),
-		micro.WithCheckAuthFunc(ptuser.CheckLoginUser),
 		micro.WithUseDefaultSrvReg(),
+		//micro.WithUnaryServerInterceptors(lbuser.NewCheckUserInterceptor(cmdList)),
+		//micro.WithCheckAuthFunc(lbuser.CheckLoginUser),
 	).Start(context.Background())
 	if err != nil {
 		log.Errorf("err:%v", err)

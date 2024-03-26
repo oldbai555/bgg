@@ -45,6 +45,9 @@ function addCurdRpc() {
 function addCurdSysRpc() {
   ./baixctl genAddCurdRpc -p $1 -m $2 -s true
 }
+function addproto() {
+  ./baixctl genAddProto -p $1
+}
 
 case "$1" in
 "gc" | "genclient")

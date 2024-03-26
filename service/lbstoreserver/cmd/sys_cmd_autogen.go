@@ -3,12 +3,12 @@
 package main
 
 import (
-	"github.com/oldbai555/bgg/internal/_cmd"
 	"github.com/oldbai555/bgg/service/lbstore"
 	"github.com/oldbai555/bgg/service/lbstoreserver/impl/service"
+	"github.com/oldbai555/micro/bcmd"
 )
 
-var cmdList = []*_cmd.Cmd{
+var cmdList = []*bcmd.Cmd{
 
 	{Server: lbstore.ServerName, Path: lbstore.UploadCMDPath, GRpcFunc: service.OnceSvrImpl.Upload, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
 
