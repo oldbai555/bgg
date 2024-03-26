@@ -1,8 +1,7 @@
-package bgorm
+package lb
 
 import (
 	"context"
-	"github.com/oldbai555/bgg/service/lb"
 	"github.com/oldbai555/gorm"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/gormx"
@@ -32,7 +31,7 @@ func (f *Model) NewScope(ctx context.Context) *Scope {
 	}
 }
 
-func (f *Model) NewList(ctx context.Context, listOption *lb.ListOption) *Scope {
+func (f *Model) NewList(ctx context.Context, listOption *ListOption) *Scope {
 	return &Scope{
 		Scope: f.Model.NewScope(ctx),
 
@@ -48,7 +47,7 @@ func (p *Scope) Corp(corpId uint32) *Scope {
 }
 
 // FindPaginate 分页查找
-func (p *Scope) FindPaginate(list interface{}) (*lb.Paginate, error) {
+func (p *Scope) FindPaginate(list interface{}) (*Paginate, error) {
 	var total int64
 	if !p.skipTotal {
 		err := p.DB().Count(&total).Error
@@ -69,7 +68,7 @@ func (p *Scope) FindPaginate(list interface{}) (*lb.Paginate, error) {
 		return nil, err
 	}
 
-	return &lb.Paginate{
+	return &Paginate{
 		Total: uint64(total),
 		Size:  p.size,
 		Page:  p.page,

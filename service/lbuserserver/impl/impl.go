@@ -2,11 +2,12 @@ package impl
 
 import (
 	"context"
-	"github.com/oldbai555/bgg/internal/bgrpc/bresolver"
 	"github.com/oldbai555/bgg/service/lbuser"
 	"github.com/oldbai555/bgg/service/lbuserserver/impl/cache"
 	"github.com/oldbai555/bgg/service/lbuserserver/impl/mysql"
 	"github.com/oldbai555/lbtool/log"
+	"github.com/oldbai555/micro/brpc/bresolver"
+	"github.com/oldbai555/micro/brpc/discover"
 	"google.golang.org/grpc/resolver"
 )
 
@@ -44,5 +45,12 @@ func InitClient() error {
 		return err
 	}
 	resolver.Register(builder)
+
+	//err = discover.V2(ptuser.ServerName, ptuser.Init)
+	//if err != nil {
+	//	log.Errorf("err:%v", err)
+	//	return err
+	//}
+
 	return nil
 }

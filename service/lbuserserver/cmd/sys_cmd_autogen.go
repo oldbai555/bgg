@@ -3,12 +3,12 @@
 package main
 
 import (
-	"github.com/oldbai555/bgg/internal/_cmd"
 	"github.com/oldbai555/bgg/service/lbuser"
 	"github.com/oldbai555/bgg/service/lbuserserver/impl/service"
+	"github.com/oldbai555/micro/bcmd"
 )
 
-var cmdList = []*_cmd.Cmd{
+var cmdList = []*bcmd.Cmd{
 
 	{Server: lbuser.ServerName, Path: lbuser.LoginCMDPath, GRpcFunc: service.OnceSvrImpl.Login, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "public"}},
 

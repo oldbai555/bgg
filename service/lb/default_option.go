@@ -1,11 +1,10 @@
 package lb
 
 import (
-	"github.com/oldbai555/bgg/internal/bgorm"
 	"github.com/oldbai555/lbtool/log"
 )
 
-func ProcessDefaultOptions(listOption *ListOption, db *bgorm.Scope) error {
+func ProcessDefaultOptions(listOption *ListOption, db *Scope) error {
 	err := NewOptionsProcessor(listOption).
 		AddStringList(
 			DefaultListOption_DefaultListOptionSelect,

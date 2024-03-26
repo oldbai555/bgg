@@ -3,12 +3,12 @@
 package main
 
 import (
-	"github.com/oldbai555/bgg/internal/_cmd"
 	"github.com/oldbai555/bgg/service/lbbill"
 	"github.com/oldbai555/bgg/service/lbbillserver/impl/service"
+	"github.com/oldbai555/micro/bcmd"
 )
 
-var cmdList = []*_cmd.Cmd{
+var cmdList = []*bcmd.Cmd{
 
 	{Server: lbbill.ServerName, Path: lbbill.AddBillSysCMDPath, GRpcFunc: service.OnceSvrImpl.AddBillSys, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
 

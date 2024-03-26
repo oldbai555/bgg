@@ -1,15 +1,16 @@
 package mysql
 
 import (
-	"github.com/oldbai555/bgg/internal/bgorm"
 	"github.com/oldbai555/bgg/pkg/syscfg"
+	"github.com/oldbai555/bgg/service/lb"
 	"github.com/oldbai555/bgg/service/lbbill"
 	"github.com/oldbai555/lbtool/log"
+	"github.com/oldbai555/micro/bdb"
 )
 
 var (
-	Bill         *bgorm.Model
-	BillCategory *bgorm.Model
+	Bill         *lb.Model
+	BillCategory *lb.Model
 )
 
 func RegisterOrm() (err error) {
@@ -17,21 +18,21 @@ func RegisterOrm() (err error) {
 	mysqlConf := syscfg.NewGormMysqlConf("")
 
 	// 注册表
-	bgorm.RegisterModel(
+	bdb.RegisterModel(
 		&lbbill.ModelBill{},
 		&lbbill.ModelBillCategory{},
 	)
 
-	err = bgorm.InitMasterOrm(mysqlConf.Dsn())
+	err = bdb.InitMasterOrm(mysqlConf.Dsn())
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return err
 	}
 
-	bgorm.AutoMigrate()
+	bdb.AutoMigrate()
 
-	Bill = bgorm.NewModel(bgorm.MasterOrm, &lbbill.ModelBill{}, lbbill.ErrBillNotFound)
-	BillCategory = bgorm.NewModel(bgorm.MasterOrm, &lbbill.ModelBillCategory{}, lbbill.ErrCategoryNotFound)
+	Bill = lb.NewModel(bdb.MasterOrm, &lbbill.ModelBill{}, lbbill.ErrBillNotFound)
+	BillCategory = lb.NewModel(bdb.MasterOrm, &lbbill.ModelBillCategory{}, lbbill.ErrCategoryNotFound)
 
 	log.Infof("end init db orm......")
 	return
