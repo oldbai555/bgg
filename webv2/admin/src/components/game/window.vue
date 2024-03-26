@@ -130,7 +130,7 @@ const onEvent = (data: lbddz.Event) => {
 
 const onMatch = () => {
   onEvent({
-    type: Event_Type.TypeMatchPlayer,
+    type: lbddz.Event_Type.TypeMatchPlayer,
     match_player: {
       player_id: playerId.value,
     },

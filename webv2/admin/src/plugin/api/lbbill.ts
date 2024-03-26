@@ -1,95 +1,89 @@
-import type * as lbbill from "./model/lbbill";
 import api from "./config/api";
 
-async function addBill(req: lbbill.AddBillReq): Promise<lbbill.AddBillRsp> {
-    const response = await api.post<lbbill.AddBillRsp>("/lbbill/AddBill", req);
-    if (response.code !== 200) {
-        return Promise.reject(response.message);
+export default class lbbillApi {
+    async addBillSys(req: lbbill.AddBillSysReq): Promise<lbbill.AddBillSysRsp> {
+        const response = await api.post<lbbill.AddBillSysRsp>("/lbbill/AddBillSys", req);
+        if (response.code !== 200) {
+            return Promise.reject(response.message);
+        }
+        return response.data;
     }
-    return response.data;
-}
 
-async function delBill(req: lbbill.DelBillReq): Promise<lbbill.DelBillRsp> {
-    const response = await api.post<lbbill.DelBillRsp>("/lbbill/DelBill", req);
-    if (response.code !== 200) {
-        return Promise.reject(response.message);
+    async delBillSysList(req: lbbill.DelBillSysListReq): Promise<lbbill.DelBillSysListRsp> {
+        const response = await api.post<lbbill.DelBillSysListRsp>("/lbbill/DelBillSysList", req);
+        if (response.code !== 200) {
+            return Promise.reject(response.message);
+        }
+        return response.data;
     }
-    return response.data;
-}
 
-async function updateBill(req: lbbill.UpdateBillReq): Promise<lbbill.UpdateBillRsp> {
-    const response = await api.post<lbbill.UpdateBillRsp>("/lbbill/UpdateBill", req);
-    if (response.code !== 200) {
-        return Promise.reject(response.message);
+    async updateBillSys(req: lbbill.UpdateBillSysReq): Promise<lbbill.UpdateBillSysRsp> {
+        const response = await api.post<lbbill.UpdateBillSysRsp>("/lbbill/UpdateBillSys", req);
+        if (response.code !== 200) {
+            return Promise.reject(response.message);
+        }
+        return response.data;
     }
-    return response.data;
-}
 
-async function getBill(req: lbbill.GetBillReq): Promise<lbbill.GetBillRsp> {
-    const response = await api.post<lbbill.GetBillRsp>("/lbbill/GetBill", req);
-    if (response.code !== 200) {
-        return Promise.reject(response.message);
+    async getBillSys(req: lbbill.GetBillSysReq): Promise<lbbill.GetBillSysRsp> {
+        const response = await api.post<lbbill.GetBillSysRsp>("/lbbill/GetBillSys", req);
+        if (response.code !== 200) {
+            return Promise.reject(response.message);
+        }
+        return response.data;
     }
-    return response.data;
-}
 
-async function getBillList(req: lbbill.GetBillListReq): Promise<lbbill.GetBillListRsp> {
-    const response = await api.post<lbbill.GetBillListRsp>("/lbbill/GetBillList", req);
-    if (response.code !== 200) {
-        return Promise.reject(response.message);
+    async getBillSysList(req: lbbill.GetBillSysListReq): Promise<lbbill.GetBillSysListRsp> {
+        const response = await api.post<lbbill.GetBillSysListRsp>("/lbbill/GetBillSysList", req);
+        if (response.code !== 200) {
+            return Promise.reject(response.message);
+        }
+        return response.data;
     }
-    return response.data;
-}
 
-async function addBillCategory(req: lbbill.AddBillCategoryReq): Promise<lbbill.AddBillCategoryRsp> {
-    const response = await api.post<lbbill.AddBillCategoryRsp>("/lbbill/AddBillCategory", req);
-    if (response.code !== 200) {
-        return Promise.reject(response.message);
+    async addBillCategorySys(req: lbbill.AddBillCategorySysReq): Promise<lbbill.AddBillCategorySysRsp> {
+        const response = await api.post<lbbill.AddBillCategorySysRsp>("/lbbill/AddBillCategorySys", req);
+        if (response.code !== 200) {
+            return Promise.reject(response.message);
+        }
+        return response.data;
     }
-    return response.data;
-}
 
-async function delBillCategory(req: lbbill.DelBillCategoryReq): Promise<lbbill.DelBillCategoryRsp> {
-    const response = await api.post<lbbill.DelBillCategoryRsp>("/lbbill/DelBillCategory", req);
-    if (response.code !== 200) {
-        return Promise.reject(response.message);
+    async delBillCategorySysList(req: lbbill.DelBillCategorySysListReq): Promise<lbbill.DelBillCategorySysListRsp> {
+        const response = await api.post<lbbill.DelBillCategorySysListRsp>("/lbbill/DelBillCategorySysList", req);
+        if (response.code !== 200) {
+            return Promise.reject(response.message);
+        }
+        return response.data;
     }
-    return response.data;
-}
 
-async function updateBillCategory(req: lbbill.UpdateBillCategoryReq): Promise<lbbill.UpdateBillCategoryRsp> {
-    const response = await api.post<lbbill.UpdateBillCategoryRsp>("/lbbill/UpdateBillCategory", req);
-    if (response.code !== 200) {
-        return Promise.reject(response.message);
+    async updateBillCategorySys(req: lbbill.UpdateBillCategorySysReq): Promise<lbbill.UpdateBillCategorySysRsp> {
+        const response = await api.post<lbbill.UpdateBillCategorySysRsp>("/lbbill/UpdateBillCategorySys", req);
+        if (response.code !== 200) {
+            return Promise.reject(response.message);
+        }
+        return response.data;
     }
-    return response.data;
-}
 
-async function getBillCategory(req: lbbill.GetBillCategoryReq): Promise<lbbill.GetBillCategoryRsp> {
-    const response = await api.post<lbbill.GetBillCategoryRsp>("/lbbill/GetBillCategory", req);
-    if (response.code !== 200) {
-        return Promise.reject(response.message);
+    async getBillCategorySys(req: lbbill.GetBillCategorySysReq): Promise<lbbill.GetBillCategorySysRsp> {
+        const response = await api.post<lbbill.GetBillCategorySysRsp>("/lbbill/GetBillCategorySys", req);
+        if (response.code !== 200) {
+            return Promise.reject(response.message);
+        }
+        return response.data;
     }
-    return response.data;
-}
 
-async function getBillCategoryList(req: lbbill.GetBillCategoryListReq): Promise<lbbill.GetBillCategoryListRsp> {
-    const response = await api.post<lbbill.GetBillCategoryListRsp>("/lbbill/GetBillCategoryList", req);
-    if (response.code !== 200) {
-        return Promise.reject(response.message);
+    async getBillCategorySysList(req: lbbill.GetBillCategorySysListReq): Promise<lbbill.GetBillCategorySysListRsp> {
+        const response = await api.post<lbbill.GetBillCategorySysListRsp>("/lbbill/GetBillCategorySysList", req);
+        if (response.code !== 200) {
+            return Promise.reject(response.message);
+        }
+        return response.data;
     }
-    return response.data;
-}
 
-export default {
-	addBill,
-	delBill,
-	updateBill,
-	getBill,
-	getBillList,
-	addBillCategory,
-	delBillCategory,
-	updateBillCategory,
-	getBillCategory,
-	getBillCategoryList
+}
+const lbbillSingle = new lbbillApi();
+
+export {
+    lbbillSingle
 }

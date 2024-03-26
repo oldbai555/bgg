@@ -13,6 +13,7 @@ usage() {
   echo "ar | addrpc 新增 rpc 方法"
   echo "ac | addCurdRpc 新增 curd rpc 方法以及 message. 示例 sh bin.sh addCurdRpc lbbill.proto Bill,BillCategory"
   echo "asc | addCurdSysRpc 新增系统 curd rpc 方法以及 message. 示例 sh bin.sh addCurdRpc lbbill.proto Bill,BillCategory"
+  echo "gts 生成 ts 代码"
   exit 1
 }
 
@@ -49,6 +50,10 @@ function addproto() {
   ./baixctl genAddProto -p $1
 }
 
+function genTs() {
+  ./baixctl gen_ts_vue  -p $1 -o "/e/bgg/github.com/oldbai555/bgg/webv2/admin"
+}
+
 case "$1" in
 "gc" | "genclient")
   genclient "$2"
@@ -76,6 +81,9 @@ case "$1" in
   ;;
 "asc" | "addCurdSysRpc")
   addCurdSysRpc "$2" "$3"
+  ;;
+"gts")
+  genTs "$2"
   ;;
 *)
   usage
