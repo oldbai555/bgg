@@ -3,21 +3,20 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/oldbai555/bgg/internal/_const"
-	tool2 "github.com/oldbai555/bgg/internal/bgin/tool"
-	grpctool "github.com/oldbai555/bgg/internal/bgrpc/tool"
-	limiter2 "github.com/oldbai555/bgg/pkg/limiter"
-
 	"github.com/didip/tollbooth"
 	"github.com/didip/tollbooth_gin"
-	"github.com/oldbai555/bgg/pkg/prometheus_tool"
+	"github.com/gin-gonic/gin"
 	"github.com/oldbai555/bgg/pkg/syscfg"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/dispatch"
 	"github.com/oldbai555/lbtool/pkg/routine"
 	"github.com/oldbai555/lbtool/pkg/signal"
 	"github.com/oldbai555/lbtool/utils"
+	"github.com/oldbai555/micro/bconst"
+	"github.com/oldbai555/micro/bgin"
+	"github.com/oldbai555/micro/blimiter"
+	"github.com/oldbai555/micro/bprometheus"
+	"github.com/oldbai555/micro/brpc/dispatchimpl"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -30,7 +29,7 @@ func Server(ctx context.Context) error {
 
 	log.SetModuleName(syscfg.Global.ServerConf.Name)
 
-	d, err := grpctool.New()
+	d, err := dispatchimpl.New()
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return err
@@ -43,13 +42,13 @@ func Server(ctx context.Context) error {
 	router := gin.Default()
 
 	// Create a limiter struct.
-	limiter := tollbooth.NewLimiter(limiter2.Max, limiter2.DefaultExpiredAbleOptions())
+	limiter := tollbooth.NewLimiter(blimiter.Max, blimiter.DefaultExpiredAbleOptions())
 
 	router.Use(
 		gin.Recovery(),
-		gin.LoggerWithFormatter(tool2.NewLogFormatter(syscfg.Global.ServerConf.Name)),
-		tool2.Cors(),
-		tool2.RegisterUuidTrace(),
+		gin.LoggerWithFormatter(bgin.NewLogFormatter(syscfg.Global.ServerConf.Name)),
+		bgin.Cors(),
+		bgin.RegisterUuidTrace(),
 		tollbooth_gin.LimitHandler(limiter),
 	)
 
@@ -61,7 +60,7 @@ func Server(ctx context.Context) error {
 	}
 
 	routine.GoV2(func() error {
-		err := prometheus_tool.StartPrometheusMonitor(syscfg.Global.PrometheusConf.Ip, syscfg.Global.PrometheusConf.Port)
+		err := bprometheus.StartPrometheusMonitor(syscfg.Global.PrometheusConf.Ip, syscfg.Global.PrometheusConf.Port)
 		if err != nil {
 			log.Errorf("err:%v", err)
 			return err
@@ -90,7 +89,7 @@ func Server(ctx context.Context) error {
 
 func handleRevProxy(d dispatch.IDispatch) func(ctx *gin.Context) {
 	return func(ctx *gin.Context) {
-		handler := tool2.NewHandler(ctx)
+		handler := bgin.NewHandler(ctx)
 		param := ctx.Param("path")
 		var srv = param
 		paths := strings.Split(strings.TrimPrefix(param, "/"), "/")
@@ -115,15 +114,15 @@ func handleRevProxy(d dispatch.IDispatch) func(ctx *gin.Context) {
 
 		// 重置 path
 		ctx.Request.URL.Path = strings.Join(paths, "/")
-		ctx.Request.Header.Set(_const.ProtocolType, _const.PROTO_TYPE_API_JSON)
+		ctx.Request.Header.Set(bconst.ProtocolType, bconst.PROTO_TYPE_API_JSON)
 
 		// todo 过滤一下请求
 		proxy := httputil.NewSingleHostReverseProxy(proxyUrl)
 
 		// todo 过滤一下响应
 		proxy.ModifyResponse = func(resp *http.Response) error {
-			resp.Header.Del(_const.HeaderAccessControlAllowOrigin)
-			resp.Header.Del(_const.HeaderAccessControlAllowCredentials)
+			resp.Header.Del(bconst.HeaderAccessControlAllowOrigin)
+			resp.Header.Del(bconst.HeaderAccessControlAllowCredentials)
 			return nil
 		}
 

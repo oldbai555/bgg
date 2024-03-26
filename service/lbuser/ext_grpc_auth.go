@@ -2,18 +2,18 @@ package lbuser
 
 import (
 	"context"
-	"github.com/oldbai555/bgg/internal/_cmd"
-	"github.com/oldbai555/bgg/internal/_const"
-	"github.com/oldbai555/bgg/internal/bgrpc/srv"
 	"github.com/oldbai555/lbtool/log"
+	"github.com/oldbai555/micro/bcmd"
+	"github.com/oldbai555/micro/bconst"
+	"github.com/oldbai555/micro/brpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 	"strings"
 )
 
-func NewCheckUserInterceptor(cmdList []*_cmd.Cmd) grpc.UnaryServerInterceptor {
+func NewCheckUserInterceptor(cmdList []*bcmd.Cmd) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		var inCmd *_cmd.Cmd
+		var inCmd *bcmd.Cmd
 		for _, cc := range cmdList {
 			if !strings.HasSuffix(strings.ToLower(info.FullMethod), strings.ToLower(strings.TrimPrefix(cc.Path, "/"))) {
 				continue
@@ -22,33 +22,33 @@ func NewCheckUserInterceptor(cmdList []*_cmd.Cmd) grpc.UnaryServerInterceptor {
 			break
 		}
 
-		nCtx := srv.NewGrpcUCtx(ctx)
+		nCtx := brpc.NewGrpcUCtx(ctx)
 		md, ok := metadata.FromIncomingContext(ctx)
 		if !ok {
 			return nil, ErrGrpcParseContextFail
 		}
 
 		// 设置 traceId
-		val := md.Get(_const.GrpcHeaderTraceId)
+		val := md.Get(bconst.GrpcHeaderTraceId)
 		if len(val) > 0 {
 			nCtx.SetTraceId(val[0])
 			log.SetLogHint(val[0])
 		}
 
 		// 设置设备 ID
-		val = md.Get(_const.GrpcHeaderDeviceId)
+		val = md.Get(bconst.GrpcHeaderDeviceId)
 		if len(val) > 0 {
 			nCtx.SetDeviceId(val[0])
 		}
 
 		// 设置 Sid
-		val = md.Get(_const.GrpcHeaderSid)
+		val = md.Get(bconst.GrpcHeaderSid)
 		if len(val) > 0 {
 			nCtx.SetSid(val[0])
 		}
 
 		// 设置调用人
-		val = md.Get(_const.GrpcHeaderAuthType)
+		val = md.Get(bconst.GrpcHeaderAuthType)
 		if len(val) > 0 {
 			nCtx.SetAuthType(val[0])
 		} else {
@@ -56,12 +56,12 @@ func NewCheckUserInterceptor(cmdList []*_cmd.Cmd) grpc.UnaryServerInterceptor {
 			if inCmd != nil {
 				nCtx.SetAuthType(inCmd.GetAuthType())
 			} else {
-				nCtx.SetAuthType(_cmd.AuthTypeSystem)
+				nCtx.SetAuthType(bcmd.AuthTypeSystem)
 			}
 		}
 
 		// 不需要校验 直接走
-		if nCtx.AuthType() == _cmd.AuthTypeSystem || nCtx.AuthType() == _cmd.AuthTypePublic {
+		if nCtx.AuthType() == bcmd.AuthTypeSystem || nCtx.AuthType() == bcmd.AuthTypePublic {
 			return handler(nCtx, req)
 		}
 
