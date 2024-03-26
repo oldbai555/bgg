@@ -1,4 +1,4 @@
-import axiosInstance from './axios-instance';
+import axiosInstance from '@/plugin/api/config/axios-instance';
 
 export interface ApiResult<T> {
     code: number;

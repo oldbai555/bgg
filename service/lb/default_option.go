@@ -15,9 +15,9 @@ func ProcessDefaultOptions(listOption *ListOption, db *Scope) error {
 		AddUint32(
 			DefaultListOption_DefaultListOptionOrderBy,
 			func(val uint32) error {
-				if val == uint32(DefaultOrderBy_DefaultOrderByCreatedDesc) {
+				if val == uint32(DefaultOrderBy_DefaultOrderByCreatedAtDesc) {
 					db.OrderByDesc("created_at")
-				} else if val == uint32(DefaultOrderBy_DefaultOrderByCreatedAcs) {
+				} else if val == uint32(DefaultOrderBy_DefaultOrderByCreatedAtAcs) {
 					db.OrderByAsc("created_at")
 				} else if val == uint32(DefaultOrderBy_DefaultOrderByIdDesc) {
 					db.OrderByDesc("id")

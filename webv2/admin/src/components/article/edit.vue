@@ -63,8 +63,6 @@
 import type {FormInstance} from 'ant-design-vue';
 import {message} from "ant-design-vue";
 import {ref, shallowRef} from 'vue';
-import type {ModelArticle} from '@/plugin/api/model/lbblog';
-import lbblog from "@/plugin/api/lbblog";
 import type {Rule} from 'ant-design-vue/es/form';
 import {useRouter} from "vue-router";
 import {getToken} from "@/plugin/utils/cache";
@@ -72,21 +70,12 @@ import "@wangeditor/editor/dist/css/style.css"
 import {Editor, Toolbar} from "@wangeditor/editor-for-vue"
 import ArticleCategorySelect from "../global_components/article_category_select.vue"
 import FileUpload from "../global_components/file_upload.vue"
+import {lbblogOnece} from "@/plugin/api/lbbill";
 
 // 路由声明
 const router = useRouter()
 
-const artInfo = ref<ModelArticle | undefined>({
-  id: 0,
-  created_at: undefined,
-  updated_at: undefined,
-  deleted_at: undefined,
-  title: "",
-  desc: "",
-  category_id: undefined,
-  img: "",
-  content: "",
-});
+const artInfo = ref<lbblog.ModelArticle>({});
 
 const rules: Record<string, Rule[]> = {
   title: [{required: true, message: '请输入文章标题', trigger: 'change'}],
@@ -106,7 +95,7 @@ const getArticle = async (id: number | undefined) => {
     return
   }
   try {
-    const resp = await lbblog.getArticle({
+    const resp = await lbblogOnece.getArticle({
       id: id,
     })
     artInfo.value = resp.article
@@ -123,11 +112,11 @@ const uploadChange = async (data: string) => {
 const addArticle = async (id: number | undefined) => {
   try {
     if (id) {
-      await lbblog.updateArticle({
+      await lbblogOnece.updateArticle({
         article: artInfo.value,
       })
     } else {
-      await lbblog.addArticle({
+      await lbblogOnece.addArticle({
         article: artInfo.value,
       })
     }

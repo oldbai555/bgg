@@ -65,17 +65,14 @@
     </a-table>
   </div>
 </template>
+
 <script lang="ts" setup>
 import {reactive, ref} from 'vue';
 import type {TableProps} from 'ant-design-vue';
 import {message} from 'ant-design-vue';
-import blogApi from "../../plugin/api/lbblog"
-import lbblog from "../../plugin/api/lbblog"
+import blogApi from "@/plugin/api/lbblog";
 import router from "@/router";
-import type {Options, Paginate} from "@/plugin/api/model/lb";
-import {DefaultOption, DefaultOrderBy} from "@/plugin/api/model/lb";
 import {replaceOps} from "@/plugin/utils/option_opt";
-import {GetArticleListReq_Option} from "@/plugin/api/model/lbblog";
 import {format} from "date-fns";
 import ArticleCategorySelect from "../global_components/article_category_select.vue"
 
@@ -134,11 +131,11 @@ const pagination = reactive({
 });
 
 // 条件构造器
-const opts = reactive<Options>({
-  opt_list: [
+const opts = reactive<lb.ListOption>({
+  Options: [
     {
-      key: DefaultOption.DefaultOptionOrderBy,
-      value: DefaultOrderBy.DefaultOrderByCreatedAtDesc.toString(),
+      key: lb.DefaultListOption.DefaultListOptionOrderBy,
+      value: lb.DefaultOrderBy.DefaultOrderByCreatedAtDesc.toString(),
     }
   ],
   size: defaultSize,
@@ -154,13 +151,13 @@ const categoryMap = ref({})
 const searchValue = ref<string>("")
 
 // 更新分页
-const changePagination = (paginate: Paginate | undefined) => {
+const changePagination = (paginate: lb.Paginate | undefined) => {
   pagination.current = Number(paginate?.page);
   pagination.pageSize = Number(paginate?.size);
   pagination.total = Number(paginate?.total);
 }
 
-const getArticleList = async (listOption: Options) => {
+const getArticleList = async (listOption: lb.ListOption) => {
   loading.value = true
   try {
     const resp = await blogApi.getArticleList({
@@ -200,7 +197,7 @@ const gotoEdit = async (id: number | undefined) => {
 
 const deleteArticle = async (id: number | undefined) => {
   try {
-    const resp = await lbblog.delArticle({
+    const resp = await blogApi.delArticle({
       id: id,
     })
     console.log(resp)
@@ -212,8 +209,8 @@ const deleteArticle = async (id: number | undefined) => {
 
 // 执行搜索
 const handleSearch = (searchValue: string) => {
-  opts.opt_list = replaceOps(opts.opt_list, {
-    key: GetArticleListReq_Option.OptionLikeTitle,
+  opts.Options = replaceOps(opts.Options, {
+    key: lbblog.GetArticleListReq_ListOption.ListOptionLikeTitle,
     value: searchValue
   })
   getArticleList(opts)
@@ -225,10 +222,10 @@ const resetSearch = () => {
   opts.size = defaultSize;
   opts.page = defaultPage;
   opts.skip_total = false;
-  opts.opt_list = [
+  opts.Options = [
     {
-      key: DefaultOption.DefaultOptionOrderBy,
-      value: DefaultOrderBy.DefaultOrderByCreatedAtDesc.toString(),
+      key: lb.DefaultListOption.DefaultListOptionOrderBy,
+      value: lb.DefaultOrderBy.DefaultOrderByCreatedAtDesc.toString(),
     }
   ];
 
@@ -238,13 +235,13 @@ const resetSearch = () => {
 
 const categoryChange = (value: number | undefined) => {
   if (value) {
-    opts.opt_list = replaceOps(opts.opt_list, {
-      key: GetArticleListReq_Option.OptionCategoryId,
+    opts.Options = replaceOps(opts.Options, {
+      key: lbblog.GetArticleListReq_ListOption.ListOptionCategoryId,
       value: String(value)
     })
   } else {
-    opts.opt_list = replaceOps(opts.opt_list, {
-      key: GetArticleListReq_Option.OptionCategoryId,
+    opts.Options = replaceOps(opts.Options, {
+      key: lbblog.GetArticleListReq_ListOption.ListOptionCategoryId,
       value: '',
     })
   }
