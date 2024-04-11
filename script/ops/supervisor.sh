@@ -77,7 +77,7 @@ deploySupervisorService() {
 
   cd "$supervisorDir"
   rm -rf "$appName"
-  tar -xvf "$packOutputDir/$appName.tar" -C "$supervisorDir"
+  tar -xvf "$packOutputDir/$appName.tar" -C "$supervisorDir/$appName"
   chmod +x -R "$supervisorDir/$appName"
   cp "$supervisorDir/$appName/$appName.ini" /etc/supervisord.d/
 
