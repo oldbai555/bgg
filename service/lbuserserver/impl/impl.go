@@ -7,7 +7,6 @@ import (
 	"github.com/oldbai555/bgg/service/lbuserserver/impl/mysql"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/micro/brpc/bresolver"
-	"github.com/oldbai555/micro/brpc/discover"
 	"google.golang.org/grpc/resolver"
 )
 
