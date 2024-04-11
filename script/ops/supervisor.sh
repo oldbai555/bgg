@@ -64,8 +64,8 @@ localPackServer() {
   local outputDir="$packOutputDir/$appName"
   mkdir -p "$outputDir"
 
-  outputSupervisorConf "$appName" "$outputDir" "cmd"
-  goBuild "$outputDir/cmd" "$projectRootDir/service/$appName/server/cmd" $appName
+  outputSupervisorConf "$appName" "$outputDir" "$appName"
+  goBuild "$outputDir" "$projectRootDir/service/${appName}server/cmd" $appName
   cp "$projectRootDir/service/${appName}server/cmd/application.yaml" "$outputDir"
   tar -cvf "$outputDir.tar" -C "$outputDir" .
 
