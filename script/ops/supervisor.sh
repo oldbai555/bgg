@@ -66,7 +66,7 @@ localPackServer() {
 
   outputSupervisorConf "$appName" "$outputDir" "cmd"
   goBuild "$outputDir/cmd" "$projectRootDir/service/$appName/server/cmd" $appName
-  cp "$projectRootDir/service/$appName/server/cmd/application.yaml" "$outputDir"
+  cp "$projectRootDir/service/${appName}server/cmd/application.yaml" "$outputDir"
   tar -cvf "$outputDir.tar" -C "$outputDir" .
 
   deploySupervisorService "$appName"
