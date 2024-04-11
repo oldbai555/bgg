@@ -64,7 +64,7 @@ localPackServer() {
   mkdir -p "$outputDir"
 
   outputSupervisorConf "$appName" "$outputDir" "cmd"
-  goBuild "$outputDir/cmd" "$projectRootDir/service/$appName/server/cmd"
+  goBuild "$outputDir/cmd" "$projectRootDir/service/$appName/server/cmd" $appName
   cp "$projectRootDir/service/$appName/server/cmd/application.yaml" "$outputDir"
   tar -cvf "$outputDir.tar" -C "$outputDir" .
 
@@ -93,10 +93,11 @@ deploySupervisorService() {
 goBuild() {
   local outputDir=$1
   local appPath=$2
+  local appName=$3
 
   export GOOS=linux
   export GOARCH=amd64
-  go build -o "$outputDir/app" "$appPath"
+  go build -o "$outputDir/$appName" "$appPath"
   unset GOOS
   unset GOARCH
 }
