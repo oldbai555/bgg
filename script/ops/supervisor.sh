@@ -80,7 +80,7 @@ deploySupervisorService() {
   mkdir -p "$appName"
   tar -xvf "$packOutputDir/$appName.tar" -C "$supervisorDir/$appName"
   chmod +x -R "$supervisorDir/$appName"
-  cp "$supervisorDir/$appName/$appName.ini" /etc/supervisord.d/
+  cp "$supervisorDir/$appName/$appName.ini" /etc/supervisor/conf.d
 
   # 更新并重启 Supervisor 服务
   supervisorctl update
