@@ -27,7 +27,7 @@ outputSupervisorConf() {
   local outputDir=$2
   local appName=$3
 
-  cat >"$outputDir/$programName.ini" <<EOF
+  cat >"$outputDir/$programName.conf" <<EOF
 [program:$programName]
 directory=$supervisorDir/$programName
 command=$supervisorDir/$programName/$appName
@@ -38,6 +38,7 @@ startretries=3
 user=root
 redirect_stderr=true
 stdout_logfile=$supervisorLogDir/${programName}_stdout.log
+stderr_logfile=$supervisorLogDir/${programName}_stderr.log
 stdout_logfile_maxbytes=20MB
 stdout_logfile_backups=20
 EOF
@@ -80,7 +81,7 @@ deploySupervisorService() {
   mkdir -p "$appName"
   tar -xvf "$packOutputDir/$appName.tar" -C "$supervisorDir/$appName"
   chmod +x -R "$supervisorDir/$appName"
-  cp "$supervisorDir/$appName/$appName.ini" /etc/supervisor/conf.d
+  cp "$supervisorDir/$appName/$appName.conf" /etc/supervisor/conf.d
 
   # 更新并重启 Supervisor 服务
   supervisorctl update
