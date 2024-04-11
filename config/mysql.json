@@ -1,6 +1,6 @@
 {
-  "addr": "192.168.226.12",
-  "port": 3306,
-  "username": "root",
+  "addr": "127.0.0.1",
+  "port": 3309,
+  "username": "oldbai",
   "password": "123456"
 }
