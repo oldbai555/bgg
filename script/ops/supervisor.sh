@@ -75,8 +75,9 @@ localPackServer() {
 deploySupervisorService() {
   local appName=$1
 
-  cd "$supervisorDir"
+  cd "$supervisorDir" || exit
   rm -rf "$appName"
+  mkdir -p "$appName"
   tar -xvf "$packOutputDir/$appName.tar" -C "$supervisorDir/$appName"
   chmod +x -R "$supervisorDir/$appName"
   cp "$supervisorDir/$appName/$appName.ini" /etc/supervisord.d/
