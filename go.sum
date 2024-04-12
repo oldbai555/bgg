@@ -323,10 +323,10 @@ github.com/oldbai555/driver-mysql v0.0.0-20221011051826-9dcf64ef2d7b h1:uOwlZEwT
 github.com/oldbai555/driver-mysql v0.0.0-20221011051826-9dcf64ef2d7b/go.mod h1:JN8xnb/1VQVE4ppvSMjd0pbcg2Kq7x7kw9B3zSd0oS4=
 github.com/oldbai555/gorm v0.0.0-20221011044346-e65800014b93 h1:dsnisfvCBhh9HEKB+xSxNk/Wox3vcwXSY43SnPDcXZI=
 github.com/oldbai555/gorm v0.0.0-20221011044346-e65800014b93/go.mod h1:fpKBwqWdOF0xr5eRQsNkma/JtzbsDCVmKi0mhvWCoIY=
-github.com/oldbai555/lbtool v0.0.3-0.20231006045214-75b32c212291 h1:6+GJkQBILdpTX75SBxoIkImhtT53GYvrVL800Adi60E=
-github.com/oldbai555/lbtool v0.0.3-0.20231006045214-75b32c212291/go.mod h1:mhZgVgdQQkY9FC7aaOlF1RWRuKOo8FFNdkmTKjGxD1Y=
-github.com/oldbai555/micro v0.0.0-20240326075805-a36f00cbc565 h1:janH7Q+rPzYmJ2n23i9yIfha42wti2xvPibUEDJG8AE=
-github.com/oldbai555/micro v0.0.0-20240326075805-a36f00cbc565/go.mod h1:uEjBTAAsabaDMl2sV3QqP4ZJjeSru+0zE2dkQ8KL6MI=
+github.com/oldbai555/lbtool v0.0.3-0.20240412034103-54308e666411 h1:uFfaJEHMLBVwboQ4gd6/IN/+jgIdMhRds/G46nw7Gg8=
+github.com/oldbai555/lbtool v0.0.3-0.20240412034103-54308e666411/go.mod h1:SACs1klKyblKkp6kcPWcZVcDex6Q3oHUWjj7t7ZbpCg=
+github.com/oldbai555/micro v0.0.0-20240412034305-809e9496bf83 h1:E93bnAxBph4FbhMVM5geEa5JB9CH0315FugSDAYg76g=
+github.com/oldbai555/micro v0.0.0-20240412034305-809e9496bf83/go.mod h1:sRLS+tNVacSlmzRONw+W/3xzr7d6JMUoGCrKGwlxo2s=
 github.com/onsi/ginkgo v1.16.5 h1:8xi0RTUf59SOSfEtZMvwTvXYMzG4gV23XVHOZiXNtnE=
 github.com/onsi/gomega v1.21.1 h1:OB/euWYIExnPBohllTicTHmGTrMaqJ67nIu80j0/uEM=
 github.com/onsi/gomega v1.21.1/go.mod h1:iYAIXgPSaDHak0LCMA+AWBpIKBr8WZicMxnE8luStNc=

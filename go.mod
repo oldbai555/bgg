@@ -10,8 +10,8 @@ require (
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-xman/go.emoji v0.1.2
 	github.com/oldbai555/gorm v0.0.0-20221011044346-e65800014b93
-	github.com/oldbai555/lbtool v0.0.3-0.20231006045214-75b32c212291
-	github.com/oldbai555/micro v0.0.0-20240326075805-a36f00cbc565
+	github.com/oldbai555/lbtool v0.0.3-0.20240412034103-54308e666411
+	github.com/oldbai555/micro v0.0.0-20240412034305-809e9496bf83
 	github.com/spf13/viper v1.9.0
 	google.golang.org/grpc v1.43.0
 	google.golang.org/protobuf v1.28.1
