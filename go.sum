@@ -330,8 +330,8 @@ github.com/oldbai555/gorm v0.0.0-20221011044346-e65800014b93 h1:dsnisfvCBhh9HEKB
 github.com/oldbai555/gorm v0.0.0-20221011044346-e65800014b93/go.mod h1:fpKBwqWdOF0xr5eRQsNkma/JtzbsDCVmKi0mhvWCoIY=
 github.com/oldbai555/lbtool v0.0.3-0.20240412034103-54308e666411 h1:uFfaJEHMLBVwboQ4gd6/IN/+jgIdMhRds/G46nw7Gg8=
 github.com/oldbai555/lbtool v0.0.3-0.20240412034103-54308e666411/go.mod h1:SACs1klKyblKkp6kcPWcZVcDex6Q3oHUWjj7t7ZbpCg=
-github.com/oldbai555/micro v0.0.0-20240507102723-3cb14aa2b899 h1:XpZUZBgF9obGVqnHDqziE44V97Bc4G6vRd61luX4dX4=
-github.com/oldbai555/micro v0.0.0-20240507102723-3cb14aa2b899/go.mod h1:sRLS+tNVacSlmzRONw+W/3xzr7d6JMUoGCrKGwlxo2s=
+github.com/oldbai555/micro v0.0.0-20240507124744-f090936e4892 h1:Qn4RHtunLt72IkH8g8svXZSTFXcX3PmHex9gUbZmCtg=
+github.com/oldbai555/micro v0.0.0-20240507124744-f090936e4892/go.mod h1:sRLS+tNVacSlmzRONw+W/3xzr7d6JMUoGCrKGwlxo2s=
 github.com/onsi/ginkgo v1.6.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=
 github.com/onsi/ginkgo v1.7.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=
 github.com/onsi/ginkgo v1.16.5 h1:8xi0RTUf59SOSfEtZMvwTvXYMzG4gV23XVHOZiXNtnE=

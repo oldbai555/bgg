@@ -11,7 +11,7 @@ require (
 	github.com/go-xman/go.emoji v0.1.2
 	github.com/oldbai555/gorm v0.0.0-20221011044346-e65800014b93
 	github.com/oldbai555/lbtool v0.0.3-0.20240412034103-54308e666411
-	github.com/oldbai555/micro v0.0.0-20240507102723-3cb14aa2b899
+	github.com/oldbai555/micro v0.0.0-20240507124744-f090936e4892
 	github.com/spf13/viper v1.9.0
 	github.com/syndtr/goleveldb v1.0.0
 	google.golang.org/grpc v1.43.0

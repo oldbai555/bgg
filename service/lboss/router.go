@@ -25,8 +25,7 @@ import (
 func registerRouter(r *gin.Engine) {
 	r.MaxMultipartMemory = MaxMultipartMemory
 
-	//r.StaticFS("/files", http.Dir(BaseStoragePath))
-	r.StaticFS("/js", http.Dir(BaseJsPath))
+	r.StaticFS("/storage", http.Dir(BaseStoragePath))
 	r.LoadHTMLGlob(BaseTemplatesPath)
 	r.GET("/", func(ctx *gin.Context) {
 		ctx.Request.URL.Path = "/view/index"

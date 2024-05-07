@@ -13,6 +13,7 @@ import (
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/json"
 	"github.com/oldbai555/lbtool/utils"
+	"github.com/syndtr/goleveldb/leveldb"
 	"io"
 	"os"
 	"path"
@@ -56,11 +57,13 @@ func listFile(baseFolder string, handleFile func(path string, info os.FileInfo))
 func syncFileIndex() ([]string, error) {
 	var sUrlList []string
 	err := listFile(BaseStoragePath, func(path string, info os.FileInfo) {
+		file, _ := os.Open(path)
 		path = ToSlash(path)
 		var fileInfo File
 		fileInfo.Name = info.Name()
 		fileInfo.ReName = info.Name()
 		fileInfo.Path = path
+		fileInfo.Md5 = GetFileMd5(file)
 		fileInfo.Size = info.Size()
 		fileInfo.TimeStamp = time.Now().UnixNano() / 1e6
 		fileInfoJson, err := json.Marshal(fileInfo)
@@ -68,13 +71,25 @@ func syncFileIndex() ([]string, error) {
 			log.Errorf("err:%v", err)
 			return
 		}
+		var exist bool
 		sUrl := compress.GenShortUrl(compress.CharsetRandomAlphanumeric, path, func(url, keyword string) bool {
-			data, _ := dbConn.Get([]byte(keyword), nil)
-			if data == nil {
+			data, err := dbConn.Get([]byte(keyword), nil)
+			if err != nil && err != leveldb.ErrNotFound {
+				log.Errorf("err:%v", err)
 				return true
 			}
+			if data == nil || len(data) == 0 {
+				return true
+			}
+			exist = true
 			return false
 		})
+		if exist {
+			return
+		}
+		if sUrl == "" {
+			return
+		}
 		err = dbConn.Put([]byte(sUrl), fileInfoJson, nil)
 		sUrlList = append(sUrlList, sUrl)
 	})
