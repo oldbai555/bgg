@@ -11,8 +11,9 @@ require (
 	github.com/go-xman/go.emoji v0.1.2
 	github.com/oldbai555/gorm v0.0.0-20221011044346-e65800014b93
 	github.com/oldbai555/lbtool v0.0.3-0.20240412034103-54308e666411
-	github.com/oldbai555/micro v0.0.0-20240412034305-809e9496bf83
+	github.com/oldbai555/micro v0.0.0-20240507102723-3cb14aa2b899
 	github.com/spf13/viper v1.9.0
+	github.com/syndtr/goleveldb v1.0.0
 	google.golang.org/grpc v1.43.0
 	google.golang.org/protobuf v1.28.1
 )
@@ -37,6 +38,7 @@ require (
 	github.com/goccy/go-json v0.9.7 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/golang/snappy v0.0.4 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect

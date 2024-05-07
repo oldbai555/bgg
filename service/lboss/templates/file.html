@@ -5,15 +5,17 @@
     <title>测试上传文件</title>
 </head>
 <body>
-<form action="/lboss/upload" method="post" enctype="multipart/form-data">
-    <label>项目名称（必填）:
-        <input type="text" name="project"/>
-    </label>
-    <label>模块名称（非必填）:
-        <input type="text" name="module"/>
-    </label>
+<form action="/api/upload" method="post" enctype="multipart/form-data">
     <input type="file" name="file"/>
     <input type="submit" value="上传"/>
 </form>
+<!-- 点击按钮下载 请求 /download/*sUrl 下载文件-->
+<button onclick="download('hello')">下载</button>
 </body>
 </html>
+
+<script>
+    function download(sUrl) {
+        window.location.href = "/api/download/" + sUrl;
+    }
+</script>
