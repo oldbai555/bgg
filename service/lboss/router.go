@@ -8,7 +8,6 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/oldbai555/bgg/pkg/ginhelper"
 	"github.com/oldbai555/bgg/service/lboss/compress"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/json"
@@ -27,6 +26,7 @@ func registerRouter(r *gin.Engine) {
 	r.MaxMultipartMemory = MaxMultipartMemory
 
 	//r.StaticFS("/files", http.Dir(BaseStoragePath))
+	r.StaticFS("/js", http.Dir(BaseJsPath))
 	r.LoadHTMLGlob(BaseTemplatesPath)
 	r.GET("/", func(ctx *gin.Context) {
 		ctx.Request.URL.Path = "/view/index"
@@ -47,7 +47,7 @@ func registerRouter(r *gin.Engine) {
 }
 
 func handleUpload(ctx *gin.Context) {
-	handler := ginhelper.NewTemplateHelper(ctx)
+	handler := bgin.NewHandler(ctx)
 
 	// 1.获取文件信息
 	file, err := ctx.FormFile("file")
@@ -124,7 +124,7 @@ func handleUpload(ctx *gin.Context) {
 	err = dbConn.Put([]byte(sUrl), fileInfoJson, nil)
 
 	// 7.返回文件唯一索引
-	//handler.HttpJson(sUrl)
+	handler.HttpJson(sUrl)
 }
 
 func handleDownload(ctx *gin.Context) {

@@ -10,18 +10,21 @@ import (
 	"crypto/md5"
 	"fmt"
 	"github.com/oldbai555/bgg/service/lboss/compress"
+	"github.com/oldbai555/lbtool/log"
+	"github.com/oldbai555/lbtool/pkg/json"
 	"github.com/oldbai555/lbtool/utils"
 	"io"
 	"os"
 	"path"
 	"path/filepath"
-	"strings"
+	"time"
 	"unsafe"
 )
 
 var (
 	BaseStoragePath   = path.Join(utils.GetCurDir(), "storage")
 	BaseTemplatesPath = path.Join(utils.GetCurDir(), "templates", "*")
+	BaseJsPath        = path.Join(utils.GetCurDir(), "templates")
 )
 
 const (
@@ -41,35 +44,41 @@ func Bytes2Str(b []byte) string {
 	return *(*string)(unsafe.Pointer(&b))
 }
 
-func listFile(baseFolder string) (fileList []string, err error) {
-	err = filepath.Walk(baseFolder, func(path string, info os.FileInfo, err error) error {
+func listFile(baseFolder string, handleFile func(path string, info os.FileInfo)) error {
+	return filepath.Walk(baseFolder, func(path string, info os.FileInfo, err error) error {
 		if info != nil && !info.IsDir() {
-			fileList = append(fileList, strings.Replace(path, "\\", "/", -1))
+			handleFile(path, info)
 		}
 		return nil
 	})
-	return fileList, err
 }
 
 func syncFileIndex() ([]string, error) {
-	fileList, err := listFile(BaseStoragePath)
-	if err != nil {
-		return nil, err
-	}
 	var sUrlList []string
-	for i := 0; i < len(fileList); i++ {
-		savePath := fileList[i]
-		sUrl := compress.GenShortUrl(compress.CharsetRandomAlphanumeric, savePath, func(url, keyword string) bool {
+	err := listFile(BaseStoragePath, func(path string, info os.FileInfo) {
+		path = ToSlash(path)
+		var fileInfo File
+		fileInfo.Name = info.Name()
+		fileInfo.ReName = info.Name()
+		fileInfo.Path = path
+		fileInfo.Size = info.Size()
+		fileInfo.TimeStamp = time.Now().UnixNano() / 1e6
+		fileInfoJson, err := json.Marshal(fileInfo)
+		if err != nil {
+			log.Errorf("err:%v", err)
+			return
+		}
+		sUrl := compress.GenShortUrl(compress.CharsetRandomAlphanumeric, path, func(url, keyword string) bool {
 			data, _ := dbConn.Get([]byte(keyword), nil)
 			if data == nil {
 				return true
 			}
 			return false
 		})
-		err = dbConn.Put([]byte(sUrl), []byte(savePath), nil)
+		err = dbConn.Put([]byte(sUrl), fileInfoJson, nil)
 		sUrlList = append(sUrlList, sUrl)
-	}
-	return sUrlList, nil
+	})
+	return sUrlList, err
 }
 
 func GetFileMd5(file *os.File) string {
