@@ -8,6 +8,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/oldbai555/bgg/pkg/ginhelper"
 	"github.com/oldbai555/bgg/service/lboss/compress"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/json"
@@ -27,11 +28,17 @@ func registerRouter(r *gin.Engine) {
 
 	//r.StaticFS("/files", http.Dir(BaseStoragePath))
 	r.LoadHTMLGlob(BaseTemplatesPath)
-	r.GET("index.html", func(ctx *gin.Context) {
-		ctx.HTML(http.StatusOK, "file.html", nil)
+	r.GET("/", func(ctx *gin.Context) {
+		ctx.Request.URL.Path = "/view/index"
+		r.HandleContext(ctx)
 	})
 
-	group := r.Group("/api")
+	group := r.Group("view")
+	group.GET("index", func(ctx *gin.Context) {
+		ctx.HTML(http.StatusOK, "index.html", nil)
+	})
+
+	group = r.Group("/api")
 	group.POST("/upload", handleUpload)
 	group.GET("/download/*sUrl", handleDownload)
 	group.GET("/syncfileindex", handleSyncFileIndex)
@@ -40,7 +47,7 @@ func registerRouter(r *gin.Engine) {
 }
 
 func handleUpload(ctx *gin.Context) {
-	handler := bgin.NewHandler(ctx)
+	handler := ginhelper.NewTemplateHelper(ctx)
 
 	// 1.获取文件信息
 	file, err := ctx.FormFile("file")
@@ -49,21 +56,15 @@ func handleUpload(ctx *gin.Context) {
 		handler.Error(err)
 		return
 	}
-	openFile, err := file.Open()
-	if err != nil {
-		log.Errorf("err:%v", err)
-		handler.Error(err)
-		return
-	}
 
 	// 2.构造文件存储路径, 可以很方便的按照天进行数据同步
-	fileName := utils.Md5(openFile) + path.Ext(file.Filename)
+	fileName := utils.Md5(utils.GenUUID()) + path.Ext(file.Filename)
 	timeFmt := time.Unix(time.Now().Unix(), 0).Format("20060102")
 	filePath := path.Join(BaseStoragePath, timeFmt)
 	savePath := path.Join(filePath, fileName)
 
 	// 判断如果是windows环境 则需要将 savePath FromSlash
-	savePath = FormSlash(savePath)
+	savePath = ToSlash(savePath)
 
 	// 3.判断文件是否存在
 	if _, err = os.Stat(savePath); err == nil {
@@ -89,12 +90,19 @@ func handleUpload(ctx *gin.Context) {
 		return
 	}
 
+	saveFile, err := os.Open(savePath)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		handler.Error(err)
+		return
+	}
+
 	// 6.构造保存结构
 	var fileInfo File
 	fileInfo.Name = file.Filename
 	fileInfo.ReName = fileName
 	fileInfo.Path = savePath
-	fileInfo.Md5 = utils.Md5(openFile)
+	fileInfo.Md5 = GetFileMd5(saveFile)
 	fileInfo.Size = file.Size
 	fileInfo.TimeStamp = time.Now().UnixNano() / 1e6
 
@@ -116,7 +124,7 @@ func handleUpload(ctx *gin.Context) {
 	err = dbConn.Put([]byte(sUrl), fileInfoJson, nil)
 
 	// 7.返回文件唯一索引
-	handler.RespByJson(http.StatusOK, 0, sUrl, "")
+	//handler.HttpJson(sUrl)
 }
 
 func handleDownload(ctx *gin.Context) {
@@ -156,15 +164,9 @@ func handleSyncFileIndex(ctx *gin.Context) {
 		return
 	}
 
-	bytes, err := json.Marshal(map[string]interface{}{
+	handler.HttpJson(map[string]interface{}{
 		"sortKeys": sUrlList,
 	})
-	if err != nil {
-		log.Errorf("err:%v", err)
-		handler.Error(err)
-		return
-	}
-	handler.RespByJson(http.StatusOK, 0, string(bytes), "")
 }
 
 func handleSortUrlList(ctx *gin.Context) {
@@ -189,13 +191,7 @@ func handleSortUrlList(ctx *gin.Context) {
 		handler.Error(err)
 		return
 	}
-	bytes, err := json.Marshal(retMap)
-	if err != nil {
-		log.Errorf("err:%v", err)
-		handler.Error(err)
-		return
-	}
-	handler.RespByJson(http.StatusOK, 0, string(bytes), "")
+	handler.HttpJson(retMap)
 }
 
 func handleClean(ctx *gin.Context) {
@@ -216,5 +212,5 @@ func handleClean(ctx *gin.Context) {
 		handler.Error(err)
 		return
 	}
-	handler.RespByJson(http.StatusOK, 0, "", "")
+	handler.HttpJson("")
 }

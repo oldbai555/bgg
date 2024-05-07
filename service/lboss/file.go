@@ -7,8 +7,11 @@
 package main
 
 import (
+	"crypto/md5"
+	"fmt"
 	"github.com/oldbai555/bgg/service/lboss/compress"
 	"github.com/oldbai555/lbtool/utils"
+	"io"
 	"os"
 	"path"
 	"path/filepath"
@@ -67,6 +70,14 @@ func syncFileIndex() ([]string, error) {
 		sUrlList = append(sUrlList, sUrl)
 	}
 	return sUrlList, nil
+}
+
+func GetFileMd5(file *os.File) string {
+	_, _ = file.Seek(0, 0)
+	md5h := md5.New()
+	_, _ = io.Copy(md5h, file)
+	sum := fmt.Sprintf("%x", md5h.Sum(nil))
+	return sum
 }
 
 func ToSlash(path string) string {
