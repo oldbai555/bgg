@@ -3,88 +3,33 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/didip/tollbooth"
-	"github.com/didip/tollbooth_gin"
 	"github.com/gin-gonic/gin"
+	"github.com/oldbai555/bgg/pkg/ginhelper"
 	"github.com/oldbai555/bgg/pkg/syscfg"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/dispatch"
-	"github.com/oldbai555/lbtool/pkg/routine"
-	"github.com/oldbai555/lbtool/pkg/signal"
 	"github.com/oldbai555/lbtool/utils"
 	"github.com/oldbai555/micro/bconst"
 	"github.com/oldbai555/micro/bgin"
-	"github.com/oldbai555/micro/blimiter"
-	"github.com/oldbai555/micro/bprometheus"
 	"github.com/oldbai555/micro/brpc/dispatchimpl"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-	"os"
 	"strings"
 )
 
 func Server(ctx context.Context) error {
-	syscfg.InitGlobal("", utils.GetCurDir(), syscfg.OptionWithServer(), syscfg.OptionWithPrometheus())
-
-	log.SetModuleName(syscfg.Global.ServerConf.Name)
-
+	syscfg.InitGlobal("", utils.GetCurDir(), syscfg.OptionWithServer())
+	srvName := syscfg.Global.ServerConf.Name
+	log.SetModuleName(srvName)
 	d, err := dispatchimpl.New()
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return err
 	}
-
-	gin.DefaultWriter = log.GetWriter()
-	gin.DebugPrintRouteFunc = func(httpMethod, absolutePath, handlerName string, nuHandlers int) {
-		log.Infof("%-6s %-25s --> %s (%d handlers)", httpMethod, absolutePath, handlerName, nuHandlers)
-	}
-	router := gin.Default()
-
-	// Create a limiter struct.
-	limiter := tollbooth.NewLimiter(blimiter.Max, blimiter.DefaultExpiredAbleOptions())
-
-	router.Use(
-		gin.Recovery(),
-		gin.LoggerWithFormatter(bgin.NewLogFormatter(syscfg.Global.ServerConf.Name)),
-		bgin.Cors(),
-		bgin.RegisterUuidTrace(),
-		tollbooth_gin.LimitHandler(limiter),
-	)
-
-	router.POST("/gateway/*path", handleRevProxy(d))
-
-	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%d", syscfg.Global.ServerConf.Port),
-		Handler: router,
-	}
-
-	routine.GoV2(func() error {
-		err := bprometheus.StartPrometheusMonitor(syscfg.Global.PrometheusConf.Ip, syscfg.Global.PrometheusConf.Port)
-		if err != nil {
-			log.Errorf("err:%v", err)
-			return err
-		}
-		return nil
+	return ginhelper.QuickStart(ctx, srvName, syscfg.Global.ServerConf.Port, func(router *gin.Engine) {
+		router.POST("/gateway/*path", handleRevProxy(d))
 	})
-
-	signal.RegV2(func(signal os.Signal) error {
-		log.Warnf("exit: close gateway server connect , signal[%v]", signal)
-		err := srv.Shutdown(ctx)
-		if err != nil {
-			log.Errorf("err:%v", err)
-			return err
-		}
-		return nil
-	})
-
-	// 启动服务
-	err = srv.ListenAndServe()
-	if err != nil {
-		log.Warnf("err is %v", err)
-		return err
-	}
-	return nil
 }
 
 func handleRevProxy(d dispatch.IDispatch) func(ctx *gin.Context) {

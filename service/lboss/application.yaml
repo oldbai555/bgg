@@ -1,0 +1,6 @@
+server:
+  name: "lboss"
+  port: 20003
+prometheus:
+  ip: ""
+  port: 2113

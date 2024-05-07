@@ -13,9 +13,3 @@ func OptionWithServer() Option {
 		tool.ServerConf = NewServerConf(tool.V)
 	}
 }
-
-func OptionWithPrometheus() Option {
-	return func(tool *SysCfg) {
-		tool.PrometheusConf = NewPrometheusConf(tool.V)
-	}
-}
