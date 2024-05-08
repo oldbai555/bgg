@@ -9,6 +9,7 @@ require (
 	github.com/envoyproxy/protoc-gen-validate v0.9.1
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-xman/go.emoji v0.1.2
+	github.com/judwhite/go-svc v1.2.1
 	github.com/oldbai555/gorm v0.0.0-20221011044346-e65800014b93
 	github.com/oldbai555/lbtool v0.0.3-0.20240412034103-54308e666411
 	github.com/oldbai555/micro v0.0.0-20240507124744-f090936e4892

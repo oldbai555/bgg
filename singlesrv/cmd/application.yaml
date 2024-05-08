@@ -1,0 +1,3 @@
+server:
+  name: "singlesrv"
+  port: 20011

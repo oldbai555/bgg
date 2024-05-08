@@ -53,6 +53,7 @@ function usage() {
   echo "ac | addCurdRpc 新增 curd rpc 方法以及 message. 示例 sh bin.sh addCurdRpc lbbill.proto Bill,BillCategory"
   echo "asc | addCurdSysRpc 新增系统 curd rpc 方法以及 message. 示例 sh bin.sh addCurdRpc lbbill.proto Bill,BillCategory"
   echo "gts 生成 ts 代码"
+  echo "gsg 生成 单体应用 代码"
   exit 1
 }
 
@@ -98,6 +99,10 @@ function gen_ts_admin() {
   safe_exec_baixctl gen_ts_vue  -p "$1" -o "/e/bgg/github.com/oldbai555/bgg/webv2/admin"
 }
 
+function gen_single() {
+  safe_exec_baixctl gensingle  -p "$1"
+}
+
 # 主逻辑部分
 sed_i_backup
 safe_process_env
@@ -132,6 +137,9 @@ case "$1" in
     ;;
   "gts")
     gen_ts_admin "$2"
+    ;;
+  "gsg")
+    gen_single "$2"
     ;;
   *)
     usage
