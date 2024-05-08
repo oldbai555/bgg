@@ -43,8 +43,8 @@ func QuickStart(ctx context.Context, srvName string, port uint32, registerRouter
 			Formatter: newLogFormatter(srvName),
 			Output:    log.GetWriter(),
 		}),
-		bgin.Cors(),
 		bgin.RegisterUuidTrace(),
+		bgin.Cors(),
 		tollbooth_gin.LimitHandler(limiter),
 	)
 
@@ -123,7 +123,10 @@ func newLogFormatter(svr string) func(param gin.LogFormatterParams) string {
 			param.Latency = param.Latency.Truncate(time.Second)
 		}
 		hint := param.Keys[bconst.LogWithHint]
-		v := fmt.Sprintf("[%s] [GIN] <%s> %v |%s %3d %s| %13v | %15s |%s %-7s %s %#v\n%s",
+		if hint == nil {
+			hint = "none"
+		}
+		v := fmt.Sprintf("[%s] [GIN] <%v> %v |%s %3d %s| %13v | %15s |%s %-7s %s %#v\n%s",
 			svr,
 			hint,
 			param.TimeStamp.Format("2006/01/02 - 15:04:05"),
