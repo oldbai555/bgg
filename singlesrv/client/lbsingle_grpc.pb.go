@@ -47,6 +47,22 @@ type LbsingleClient interface {
 	// @desc: 获取文件列表
 	// @error:
 	GetFileList(ctx context.Context, in *GetFileListReq, opts ...grpc.CallOption) (*GetFileListRsp, error)
+	// @desc: 登录
+	Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginRsp, error)
+	// @desc: 登出
+	Logout(ctx context.Context, in *LogoutReq, opts ...grpc.CallOption) (*LogoutRsp, error)
+	// @desc: 获取登录用户的信息
+	GetLoginUser(ctx context.Context, in *GetLoginUserReq, opts ...grpc.CallOption) (*GetLoginUserRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error: 更新登陆的用户信息
+	UpdateLoginUserInfo(ctx context.Context, in *UpdateLoginUserInfoReq, opts ...grpc.CallOption) (*UpdateLoginUserInfoRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	ResetPassword(ctx context.Context, in *ResetPasswordReq, opts ...grpc.CallOption) (*ResetPasswordRsp, error)
 }
 
 type lbsingleClient struct {
@@ -102,6 +118,51 @@ func (c *lbsingleClient) GetFileList(ctx context.Context, in *GetFileListReq, op
 	return out, nil
 }
 
+func (c *lbsingleClient) Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginRsp, error) {
+	out := new(LoginRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/Login", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) Logout(ctx context.Context, in *LogoutReq, opts ...grpc.CallOption) (*LogoutRsp, error) {
+	out := new(LogoutRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/Logout", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetLoginUser(ctx context.Context, in *GetLoginUserReq, opts ...grpc.CallOption) (*GetLoginUserRsp, error) {
+	out := new(GetLoginUserRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetLoginUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) UpdateLoginUserInfo(ctx context.Context, in *UpdateLoginUserInfoReq, opts ...grpc.CallOption) (*UpdateLoginUserInfoRsp, error) {
+	out := new(UpdateLoginUserInfoRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateLoginUserInfo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) ResetPassword(ctx context.Context, in *ResetPasswordReq, opts ...grpc.CallOption) (*ResetPasswordRsp, error) {
+	out := new(ResetPasswordRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/ResetPassword", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // LbsingleServer is the server API for Lbsingle service.
 // All implementations must embed UnimplementedLbsingleServer
 // for forward compatibility
@@ -131,6 +192,22 @@ type LbsingleServer interface {
 	// @desc: 获取文件列表
 	// @error:
 	GetFileList(context.Context, *GetFileListReq) (*GetFileListRsp, error)
+	// @desc: 登录
+	Login(context.Context, *LoginReq) (*LoginRsp, error)
+	// @desc: 登出
+	Logout(context.Context, *LogoutReq) (*LogoutRsp, error)
+	// @desc: 获取登录用户的信息
+	GetLoginUser(context.Context, *GetLoginUserReq) (*GetLoginUserRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error: 更新登陆的用户信息
+	UpdateLoginUserInfo(context.Context, *UpdateLoginUserInfoReq) (*UpdateLoginUserInfoRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	ResetPassword(context.Context, *ResetPasswordReq) (*ResetPasswordRsp, error)
 	mustEmbedUnimplementedLbsingleServer()
 }
 
@@ -152,6 +229,21 @@ func (UnimplementedLbsingleServer) GetFile(context.Context, *GetFileReq) (*GetFi
 }
 func (UnimplementedLbsingleServer) GetFileList(context.Context, *GetFileListReq) (*GetFileListRsp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFileList not implemented")
+}
+func (UnimplementedLbsingleServer) Login(context.Context, *LoginReq) (*LoginRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
+}
+func (UnimplementedLbsingleServer) Logout(context.Context, *LogoutReq) (*LogoutRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Logout not implemented")
+}
+func (UnimplementedLbsingleServer) GetLoginUser(context.Context, *GetLoginUserReq) (*GetLoginUserRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetLoginUser not implemented")
+}
+func (UnimplementedLbsingleServer) UpdateLoginUserInfo(context.Context, *UpdateLoginUserInfoReq) (*UpdateLoginUserInfoRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateLoginUserInfo not implemented")
+}
+func (UnimplementedLbsingleServer) ResetPassword(context.Context, *ResetPasswordReq) (*ResetPasswordRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ResetPassword not implemented")
 }
 func (UnimplementedLbsingleServer) mustEmbedUnimplementedLbsingleServer() {}
 
@@ -256,6 +348,96 @@ func _Lbsingle_GetFileList_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Lbsingle_Login_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LoginReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).Login(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/Login",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).Login(ctx, req.(*LoginReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_Logout_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LogoutReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).Logout(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/Logout",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).Logout(ctx, req.(*LogoutReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetLoginUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetLoginUserReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetLoginUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetLoginUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetLoginUser(ctx, req.(*GetLoginUserReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_UpdateLoginUserInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateLoginUserInfoReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).UpdateLoginUserInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/UpdateLoginUserInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).UpdateLoginUserInfo(ctx, req.(*UpdateLoginUserInfoReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_ResetPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResetPasswordReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).ResetPassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/ResetPassword",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).ResetPassword(ctx, req.(*ResetPasswordReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Lbsingle_ServiceDesc is the grpc.ServiceDesc for Lbsingle service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -282,6 +464,26 @@ var Lbsingle_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetFileList",
 			Handler:    _Lbsingle_GetFileList_Handler,
+		},
+		{
+			MethodName: "Login",
+			Handler:    _Lbsingle_Login_Handler,
+		},
+		{
+			MethodName: "Logout",
+			Handler:    _Lbsingle_Logout_Handler,
+		},
+		{
+			MethodName: "GetLoginUser",
+			Handler:    _Lbsingle_GetLoginUser_Handler,
+		},
+		{
+			MethodName: "UpdateLoginUserInfo",
+			Handler:    _Lbsingle_UpdateLoginUserInfo_Handler,
+		},
+		{
+			MethodName: "ResetPassword",
+			Handler:    _Lbsingle_ResetPassword_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

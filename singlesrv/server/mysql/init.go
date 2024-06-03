@@ -10,6 +10,7 @@ import (
 
 var (
 	File *lb.Model
+	User *lb.Model
 )
 
 func Init() (err error) {
@@ -18,7 +19,9 @@ func Init() (err error) {
 
 	// 注册表
 	bdb.RegisterModel(
+
 		&client.ModelFile{},
+		&client.ModelUser{},
 	)
 
 	err = bdb.InitMasterOrm(mysqlConf.Dsn())
@@ -28,7 +31,9 @@ func Init() (err error) {
 	}
 
 	bdb.AutoMigrate()
+
 	File = lb.NewModel(bdb.MasterOrm, &client.ModelFile{}, client.ErrFileNotFound)
+	User = lb.NewModel(bdb.MasterOrm, &client.ModelUser{}, client.ErrUserNotFound)
 	log.Infof("end init db orm......")
 	return
 }

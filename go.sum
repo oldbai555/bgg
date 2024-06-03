@@ -337,6 +337,8 @@ github.com/oldbai555/micro v0.0.0-20240507124744-f090936e4892 h1:Qn4RHtunLt72IkH
 github.com/oldbai555/micro v0.0.0-20240507124744-f090936e4892/go.mod h1:sRLS+tNVacSlmzRONw+W/3xzr7d6JMUoGCrKGwlxo2s=
 github.com/oldbai555/micro v0.0.0-20240508130114-0319247e4eca h1:PW73fkFZ2MLa0k5j/7ynf+h3Hqa5ixViIN+CUMfbHg8=
 github.com/oldbai555/micro v0.0.0-20240508130114-0319247e4eca/go.mod h1:sRLS+tNVacSlmzRONw+W/3xzr7d6JMUoGCrKGwlxo2s=
+github.com/oldbai555/micro v0.0.0-20240603094712-ab7f5aa57f65 h1:+WD0i3u4hUQif82NSLfTjZjs3cl782XUoPRsEnJ1I/A=
+github.com/oldbai555/micro v0.0.0-20240603094712-ab7f5aa57f65/go.mod h1:sRLS+tNVacSlmzRONw+W/3xzr7d6JMUoGCrKGwlxo2s=
 github.com/onsi/ginkgo v1.6.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=
 github.com/onsi/ginkgo v1.7.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=
 github.com/onsi/ginkgo v1.16.5 h1:8xi0RTUf59SOSfEtZMvwTvXYMzG4gV23XVHOZiXNtnE=

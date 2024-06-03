@@ -2,6 +2,7 @@ package lb
 
 import (
 	"context"
+	"github.com/mitchellh/mapstructure"
 	"github.com/oldbai555/gorm"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/gormx"
@@ -73,4 +74,30 @@ func (p *Scope) FindPaginate(list interface{}) (*Paginate, error) {
 		Size:  p.size,
 		Page:  p.page,
 	}, nil
+}
+
+func (f *Model) FirstOrCreate(ctx context.Context, candMap map[string]interface{}, out interface{}) error {
+	err := f.NewScope(ctx).AndMap(candMap).First(out)
+	if err != nil && !f.IsNotFoundErr(err) {
+		log.Errorf("err:%v", err)
+		return err
+	}
+
+	optDb := f.NewScope(ctx)
+	if f.IsNotFoundErr(err) {
+		err = mapstructure.Decode(candMap, out)
+		if err != nil {
+			log.Errorf("err is : %v", err)
+			return err
+		}
+
+		_, err := optDb.Create(out)
+		if err != nil {
+			log.Errorf("err is %v", err)
+			return err
+		}
+		return nil
+	}
+
+	return nil
 }

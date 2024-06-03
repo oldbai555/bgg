@@ -2,8 +2,10 @@ package server
 
 import (
 	"context"
+	"github.com/oldbai555/bgg/pkg/jwt"
 	"github.com/oldbai555/bgg/service/lb"
 	"github.com/oldbai555/bgg/singlesrv/client"
+	"github.com/oldbai555/bgg/singlesrv/server/cache"
 	"github.com/oldbai555/bgg/singlesrv/server/mysql"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/utils"
@@ -112,6 +114,66 @@ func (a *LbsingleServer) GetFileList(ctx context.Context, req *client.GetFileLis
 		log.Errorf("err:%v", err)
 		return nil, err
 	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) Login(ctx context.Context, req *client.LoginReq) (*client.LoginRsp, error) {
+	var rsp client.LoginRsp
+	var err error
+
+	var user client.ModelUser
+	err = mysql.User.NewScope(ctx).AndMap(map[string]interface{}{
+		client.FieldUsername_: req.Username,
+		client.FieldPassword_: req.Password,
+	}).First(&user)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	sid := utils.GenUUID()
+	token, err := jwt.GenToken(ctx, user.Id, sid)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	err = cache.SetLoginInfo(sid, user.ToBaseUser())
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Uuid = user.Id
+	rsp.Token = token
+	rsp.Name = user.Nickname
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) Logout(ctx context.Context, req *client.LogoutReq) (*client.LogoutRsp, error) {
+	var rsp client.LogoutRsp
+	var err error
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetLoginUser(ctx context.Context, req *client.GetLoginUserReq) (*client.GetLoginUserRsp, error) {
+	var rsp client.GetLoginUserRsp
+	var err error
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) UpdateLoginUserInfo(ctx context.Context, req *client.UpdateLoginUserInfoReq) (*client.UpdateLoginUserInfoRsp, error) {
+	var rsp client.UpdateLoginUserInfoRsp
+	var err error
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) ResetPassword(ctx context.Context, req *client.ResetPasswordReq) (*client.ResetPasswordRsp, error) {
+	var rsp client.ResetPasswordRsp
+	var err error
 
 	return &rsp, err
 }

@@ -19,4 +19,14 @@ var cmdList = []*bcmd.Cmd{
 	{Server: client.ServerName, Path: client.GetFileCMDPath, GRpcFunc: server.OnceSvrImpl.GetFile, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
 
 	{Server: client.ServerName, Path: client.GetFileListCMDPath, GRpcFunc: server.OnceSvrImpl.GetFileList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: client.ServerName, Path: client.LoginCMDPath, GRpcFunc: server.OnceSvrImpl.Login, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "public"}},
+
+	{Server: client.ServerName, Path: client.LogoutCMDPath, GRpcFunc: server.OnceSvrImpl.Logout, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: client.ServerName, Path: client.GetLoginUserCMDPath, GRpcFunc: server.OnceSvrImpl.GetLoginUser, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: client.ServerName, Path: client.UpdateLoginUserInfoCMDPath, GRpcFunc: server.OnceSvrImpl.UpdateLoginUserInfo, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: client.ServerName, Path: client.ResetPasswordCMDPath, GRpcFunc: server.OnceSvrImpl.ResetPassword, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
 }

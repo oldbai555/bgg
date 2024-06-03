@@ -10,4 +10,5 @@ import (
 var (
 	Success         = status.Error(codes.Code(int32(ErrCode_Success)), "Success")
 	ErrFileNotFound = status.Error(codes.Code(int32(ErrCode_ErrFileNotFound)), "文件不存在")
+	ErrUserNotFound = status.Error(codes.Code(int32(ErrCode_ErrUserNotFound)), "用户不存在")
 )

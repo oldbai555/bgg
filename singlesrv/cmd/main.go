@@ -2,11 +2,14 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"github.com/didip/tollbooth"
+	"github.com/didip/tollbooth_gin"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/protobuf/proto"
 	"github.com/judwhite/go-svc"
-	"github.com/oldbai555/bgg/pkg/ginhelper"
 	"github.com/oldbai555/bgg/pkg/syscfg"
+	"github.com/oldbai555/bgg/pkg/tool"
 	"github.com/oldbai555/bgg/singlesrv/server/cache"
 	"github.com/oldbai555/bgg/singlesrv/server/mysql"
 	"github.com/oldbai555/lbtool/log"
@@ -17,20 +20,24 @@ import (
 	"github.com/oldbai555/micro/bcmd"
 	"github.com/oldbai555/micro/bgin"
 	"github.com/oldbai555/micro/bgin/gate"
+	"github.com/oldbai555/micro/blimiter"
+	"github.com/oldbai555/micro/brpc/middleware"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"net/http"
-	"os"
 	"reflect"
 	"sync"
 	"syscall"
 )
 
 type program struct {
-	once    sync.Once
-	port    uint32
-	srvName string
+	once       sync.Once
+	port       uint32
+	srvName    string
+	prometheus *http.Server
+	ginSrv     *http.Server
 }
 
-func (p *program) Init(env svc.Environment) error {
+func (p *program) Init(_ svc.Environment) error {
 	syscfg.InitGlobal("", utils.GetCurDir(), syscfg.OptionWithServer())
 	conf, err := syscfg.GetServerConf()
 	if err != nil {
@@ -67,25 +74,41 @@ func (p *program) Init(env svc.Environment) error {
 }
 
 func (p *program) Start() error {
+	var err error
 	routine.GoV2(func() error {
-		err := ginhelper.QuickStart(context.Background(), p.srvName, p.port, func(router *gin.Engine) {
-			for _, cmd := range cmdList {
-				p.registerCmd(router, cmd)
-			}
-		})
-		if err != nil {
-			log.Errorf("err:%v", err)
-			err = p.Stop()
-			os.Exit(1)
-			return err
-		}
+		err = p.startPrometheusMonitor()
 		return nil
 	})
+	if err != nil {
+		panic(err)
+	}
+	routine.GoV2(func() error {
+		err = p.startGinHttpServer()
+		return nil
+	})
+	if err != nil {
+		panic(err)
+	}
+	mysql.InitDefaultAccount()
 	return nil
 }
 
 func (p *program) Stop() error {
-	log.Infof("stop srv %s", p.srvName)
+	if p.prometheus != nil {
+		log.Infof("stop prometheus")
+		err := p.prometheus.Shutdown(context.Background())
+		if err != nil {
+			log.Errorf("stop prometheus err:%v", err)
+		}
+	}
+	if p.ginSrv != nil {
+		log.Infof("stop gin server")
+		err := p.ginSrv.Shutdown(context.Background())
+		if err != nil {
+			log.Errorf("err:%v", err)
+			return err
+		}
+	}
 	return nil
 }
 
@@ -107,6 +130,16 @@ func (p *program) registerCmd(r *gin.Engine, cmd *bcmd.Cmd) {
 			handler.Error(err)
 			return
 		}
+
+		if validator, ok := reqV.Interface().(middleware.Validator); ok {
+			err := validator.Validate()
+			if err != nil {
+				log.Errorf("err:%v", err)
+				handler.Error(err)
+				return
+			}
+		}
+
 		log.Infof("req:[%s]", msg.String())
 
 		handlerRet := v.Call([]reflect.Value{reflect.ValueOf(c), reqV})
@@ -141,6 +174,69 @@ func (p *program) registerCmd(r *gin.Engine, cmd *bcmd.Cmd) {
 	})
 }
 
+func (p *program) startPrometheusMonitor() error {
+	onePort := tool.GetOnePort()
+	if onePort == 0 {
+		log.Warnf("获取到无效端口,无法开启 Prometheus")
+		return nil
+	}
+	srv := http.NewServeMux()
+	srv.Handle("/metrics", promhttp.Handler())
+	p.prometheus = &http.Server{
+		Addr:    fmt.Sprintf(":%d", onePort),
+		Handler: srv,
+	}
+	log.Infof("====== start prometheus monitor, port is %d ======", onePort)
+	err := p.prometheus.ListenAndServe()
+	if err != nil {
+		log.Warnf("err:%v", err)
+		return err
+	}
+
+	return nil
+}
+
+func (p *program) startGinHttpServer() error {
+	gin.SetMode(gin.ReleaseMode)
+	gin.DefaultWriter = log.GetWriter()
+	gin.DefaultErrorWriter = log.GetWriter()
+	gin.DebugPrintRouteFunc = func(httpMethod, absolutePath, handlerName string, nuHandlers int) {
+		log.Infof("%-6s %-25s --> %s (%d handlers)", httpMethod, absolutePath, handlerName, nuHandlers)
+	}
+	router := gin.New()
+
+	limiter := tollbooth.NewLimiter(blimiter.Max, blimiter.DefaultExpiredAbleOptions())
+
+	router.Use(
+		gin.Recovery(),
+		gin.LoggerWithConfig(gin.LoggerConfig{
+			Formatter: tool.NewLogFormatter(p.srvName),
+			Output:    log.GetWriter(),
+		}),
+		bgin.RegisterUuidTrace(),
+		bgin.Cors(),
+		tollbooth_gin.LimitHandler(limiter),
+	)
+
+	for _, cmd := range cmdList {
+		p.registerCmd(router, cmd)
+	}
+
+	p.ginSrv = &http.Server{
+		Addr:    fmt.Sprintf(":%d", p.port),
+		Handler: router,
+	}
+
+	// 启动服务
+	log.Infof("====== start gin %s server, port is %d ======", p.srvName, p.port)
+	err := p.ginSrv.ListenAndServe()
+	if err != nil {
+		log.Warnf("err is %v", err)
+		return err
+	}
+	return nil
+}
+
 func main() {
 	prg := &program{}
 	err := svc.Run(prg,
@@ -152,5 +248,6 @@ func main() {
 	)
 	if err != nil {
 		log.Errorf("err:%v", err)
+		return
 	}
 }

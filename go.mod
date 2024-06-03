@@ -12,7 +12,7 @@ require (
 	github.com/judwhite/go-svc v1.2.1
 	github.com/oldbai555/gorm v0.0.0-20221011044346-e65800014b93
 	github.com/oldbai555/lbtool v0.0.3-0.20240412034103-54308e666411
-	github.com/oldbai555/micro v0.0.0-20240508130114-0319247e4eca
+	github.com/oldbai555/micro v0.0.0-20240603094712-ab7f5aa57f65
 	github.com/spf13/viper v1.9.0
 	github.com/syndtr/goleveldb v1.0.0
 	google.golang.org/grpc v1.43.0
