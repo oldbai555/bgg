@@ -5,7 +5,6 @@ package client
 const (
 	ServerName       = "lbsingle"
 	FieldAvatar      = "Avatar"
-	FieldBaseUser    = "BaseUser"
 	FieldCreatedAt   = "CreatedAt"
 	FieldCreatorId   = "CreatorId"
 	FieldData        = "Data"
@@ -16,7 +15,6 @@ const (
 	FieldId          = "Id"
 	FieldList        = "List"
 	FieldListOption  = "ListOption"
-	FieldName        = "Name"
 	FieldNewPassword = "NewPassword"
 	FieldNickname    = "Nickname"
 	FieldOldPassword = "OldPassword"
@@ -28,10 +26,8 @@ const (
 	FieldUpdatedAt   = "UpdatedAt"
 	FieldUser        = "User"
 	FieldUsername    = "Username"
-	FieldUuid        = "Uuid"
 
 	FieldAvatar_      = "avatar"
-	FieldBaseUser_    = "base_user"
 	FieldCreatedAt_   = "created_at"
 	FieldCreatorId_   = "creator_id"
 	FieldData_        = "data"
@@ -42,7 +38,6 @@ const (
 	FieldId_          = "id"
 	FieldList_        = "list"
 	FieldListOption_  = "list_option"
-	FieldName_        = "name"
 	FieldNewPassword_ = "new_password"
 	FieldNickname_    = "nickname"
 	FieldOldPassword_ = "old_password"
@@ -54,5 +49,4 @@ const (
 	FieldUpdatedAt_   = "updated_at"
 	FieldUser_        = "user"
 	FieldUsername_    = "username"
-	FieldUuid_        = "uuid"
 )

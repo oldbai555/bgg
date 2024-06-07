@@ -12,14 +12,14 @@ import (
 	"time"
 )
 
-func SetLoginInfo(k string, user *client.BaseUser) error {
+func SetLoginInfo(sid string, user *client.BaseUser) error {
 	rdb, err := Rdb()
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return err
 	}
 
-	err = rdb.SetPb(k, user, time.Hour*24)
+	err = rdb.SetPb(sid, user, time.Hour*24)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return err
@@ -28,7 +28,7 @@ func SetLoginInfo(k string, user *client.BaseUser) error {
 	return nil
 }
 
-func GetLoginInfo(k string) (*client.BaseUser, error) {
+func GetLoginInfo(sid string) (*client.BaseUser, error) {
 	var info client.BaseUser
 	rdb, err := Rdb()
 	if err != nil {
@@ -36,7 +36,7 @@ func GetLoginInfo(k string) (*client.BaseUser, error) {
 		return nil, err
 	}
 
-	err = rdb.GetPb(k, &info)
+	err = rdb.GetPb(sid, &info)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
@@ -45,14 +45,14 @@ func GetLoginInfo(k string) (*client.BaseUser, error) {
 	return &info, nil
 }
 
-func DelLoginInfo(k string) error {
+func DelLoginInfo(sid string) error {
 	rdb, err := Rdb()
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return err
 	}
 
-	err = rdb.Del(k)
+	err = rdb.Del(sid)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return err

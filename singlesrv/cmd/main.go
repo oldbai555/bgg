@@ -10,7 +10,9 @@ import (
 	"github.com/judwhite/go-svc"
 	"github.com/oldbai555/bgg/pkg/syscfg"
 	"github.com/oldbai555/bgg/pkg/tool"
+	"github.com/oldbai555/bgg/singlesrv/server"
 	"github.com/oldbai555/bgg/singlesrv/server/cache"
+	"github.com/oldbai555/bgg/singlesrv/server/ctx"
 	"github.com/oldbai555/bgg/singlesrv/server/mysql"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/jsonpb"
@@ -140,9 +142,26 @@ func (p *program) registerCmd(r *gin.Engine, cmd *bcmd.Cmd) {
 			}
 		}
 
+		nCtx := ctx.NewCtx(
+			c,
+			ctx.WithGinHeaderSid(c),
+			ctx.WithGinHeaderAuthType(c, cmd),
+		)
+
+		// 需要校验
+		if cmd.IsUserAuthType() {
+			info, err := server.CheckAuth(nCtx)
+			if err != nil {
+				log.Errorf("err:%v", err)
+				handler.Error(err)
+				return
+			}
+			nCtx.SetExtInfo(info)
+		}
+
 		log.Infof("req:[%s]", msg.String())
 
-		handlerRet := v.Call([]reflect.Value{reflect.ValueOf(c), reqV})
+		handlerRet := v.Call([]reflect.Value{reflect.ValueOf(nCtx), reqV})
 
 		// 检查是否有误
 		var callRes error

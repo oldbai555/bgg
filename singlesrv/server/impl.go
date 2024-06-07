@@ -2,13 +2,13 @@ package server
 
 import (
 	"context"
-	"github.com/oldbai555/bgg/pkg/jwt"
 	"github.com/oldbai555/bgg/service/lb"
 	"github.com/oldbai555/bgg/singlesrv/client"
 	"github.com/oldbai555/bgg/singlesrv/server/cache"
 	"github.com/oldbai555/bgg/singlesrv/server/mysql"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/utils"
+	"github.com/oldbai555/micro/uctx"
 )
 
 var OnceSvrImpl = &LbsingleServer{}
@@ -133,19 +133,13 @@ func (a *LbsingleServer) Login(ctx context.Context, req *client.LoginReq) (*clie
 	}
 
 	sid := utils.GenUUID()
-	token, err := jwt.GenToken(ctx, user.Id, sid)
-	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
-	}
 	err = cache.SetLoginInfo(sid, user.ToBaseUser())
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
 	}
-	rsp.Uuid = user.Id
-	rsp.Token = token
-	rsp.Name = user.Nickname
+	rsp.Token = sid
+	rsp.User = user.ToBaseUser()
 
 	return &rsp, err
 }
@@ -154,12 +148,37 @@ func (a *LbsingleServer) Logout(ctx context.Context, req *client.LogoutReq) (*cl
 	var rsp client.LogoutRsp
 	var err error
 
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = cache.DelLoginInfo(uCtx.Sid())
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
 	return &rsp, err
 }
 
 func (a *LbsingleServer) GetLoginUser(ctx context.Context, req *client.GetLoginUserReq) (*client.GetLoginUserRsp, error) {
 	var rsp client.GetLoginUserRsp
 	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	info, err := cache.GetLoginInfo(uCtx.Sid())
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.User = info
 
 	return &rsp, err
 }

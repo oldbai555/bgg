@@ -1815,9 +1815,34 @@ func (m *LoginRsp) validate(all bool) error {
 
 	// no validation rules for Token
 
-	// no validation rules for Uuid
-
-	// no validation rules for Name
+	if all {
+		switch v := interface{}(m.GetUser()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoginRspValidationError{
+					field:  "User",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoginRspValidationError{
+					field:  "User",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetUser()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoginRspValidationError{
+				field:  "User",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	if len(errors) > 0 {
 		return LoginRspMultiError(errors)
@@ -2118,8 +2143,6 @@ func (m *GetLoginUserReq) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for Sid
-
 	if len(errors) > 0 {
 		return GetLoginUserReqMultiError(errors)
 	}
@@ -2221,11 +2244,11 @@ func (m *GetLoginUserRsp) validate(all bool) error {
 	var errors []error
 
 	if all {
-		switch v := interface{}(m.GetBaseUser()).(type) {
+		switch v := interface{}(m.GetUser()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, GetLoginUserRspValidationError{
-					field:  "BaseUser",
+					field:  "User",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -2233,16 +2256,16 @@ func (m *GetLoginUserRsp) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, GetLoginUserRspValidationError{
-					field:  "BaseUser",
+					field:  "User",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetBaseUser()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetUser()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return GetLoginUserRspValidationError{
-				field:  "BaseUser",
+				field:  "User",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
