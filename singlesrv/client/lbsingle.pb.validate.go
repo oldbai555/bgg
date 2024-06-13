@@ -67,6 +67,18 @@ func (m *ModelFile) validate(all bool) error {
 
 	// no validation rules for CreatorId
 
+	// no validation rules for Size
+
+	// no validation rules for Name
+
+	// no validation rules for Rename
+
+	// no validation rules for Path
+
+	// no validation rules for Md5
+
+	// no validation rules for SortUrl
+
 	if len(errors) > 0 {
 		return ModelFileMultiError(errors)
 	}
@@ -1703,10 +1715,10 @@ func (m *LoginReq) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	if l := utf8.RuneCountInString(m.GetPassword()); l < 6 || l > 20 {
+	if l := utf8.RuneCountInString(m.GetPassword()); l < 6 || l > 16 {
 		err := LoginReqValidationError{
 			field:  "Password",
-			reason: "value length must be between 6 and 20 runes, inclusive",
+			reason: "value length must be between 6 and 16 runes, inclusive",
 		}
 		if !all {
 			return err

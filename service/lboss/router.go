@@ -8,7 +8,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/oldbai555/bgg/service/lboss/compress"
+	"github.com/oldbai555/bgg/pkg/compress"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/json"
 	"github.com/oldbai555/lbtool/pkg/lberr"

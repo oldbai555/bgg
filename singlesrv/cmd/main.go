@@ -13,6 +13,7 @@ import (
 	"github.com/oldbai555/bgg/singlesrv/server"
 	"github.com/oldbai555/bgg/singlesrv/server/cache"
 	"github.com/oldbai555/bgg/singlesrv/server/ctx"
+	"github.com/oldbai555/bgg/singlesrv/server/mq"
 	"github.com/oldbai555/bgg/singlesrv/server/mysql"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/jsonpb"
@@ -84,6 +85,7 @@ func (p *program) Start() error {
 	if err != nil {
 		panic(err)
 	}
+
 	routine.GoV2(func() error {
 		err = p.startGinHttpServer()
 		return nil
@@ -91,6 +93,22 @@ func (p *program) Start() error {
 	if err != nil {
 		panic(err)
 	}
+
+	err = server.InitTopic()
+	if err != nil {
+		panic(err)
+	}
+
+	err = mq.Start()
+	if err != nil {
+		panic(err)
+	}
+
+	err = server.SyncFileIndex()
+	if err != nil {
+		panic(err)
+	}
+
 	mysql.InitDefaultAccount()
 	return nil
 }
@@ -111,6 +129,7 @@ func (p *program) Stop() error {
 			return err
 		}
 	}
+	mq.Stop()
 	return nil
 }
 

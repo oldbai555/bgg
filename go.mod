@@ -3,16 +3,19 @@ module github.com/oldbai555/bgg
 go 1.20
 
 require (
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/didip/tollbooth v4.0.2+incompatible
 	github.com/didip/tollbooth_gin v0.0.0-20170928041415-5752492be505
 	github.com/envoyproxy/protoc-gen-validate v0.9.1
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-xman/go.emoji v0.1.2
+	github.com/golang/protobuf v1.5.2
 	github.com/judwhite/go-svc v1.2.1
+	github.com/mitchellh/mapstructure v1.4.3
+	github.com/nsqio/go-nsq v1.1.0
 	github.com/oldbai555/gorm v0.0.0-20221011044346-e65800014b93
 	github.com/oldbai555/lbtool v0.0.3-0.20240412034103-54308e666411
 	github.com/oldbai555/micro v0.0.0-20240603094712-ab7f5aa57f65
+	github.com/prometheus/client_golang v1.11.1
 	github.com/spf13/viper v1.9.0
 	github.com/syndtr/goleveldb v1.0.0
 	google.golang.org/grpc v1.43.0
@@ -38,7 +41,6 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/goccy/go-json v0.9.7 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
@@ -47,7 +49,6 @@ require (
 	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
-	github.com/mitchellh/mapstructure v1.4.3 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/oldbai555/driver-mysql v0.0.0-20221011051826-9dcf64ef2d7b // indirect
@@ -57,7 +58,6 @@ require (
 	github.com/pelletier/go-toml/v2 v2.0.1 // indirect
 	github.com/petermattis/goid v0.0.0-20220824145935-af5520614cb6 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/prometheus/client_golang v1.11.1 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.26.0 // indirect
 	github.com/prometheus/procfs v0.6.0 // indirect

@@ -91,8 +91,6 @@ github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ3
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/dgrijalva/jwt-go v3.2.0+incompatible h1:7qlOGliEKZXTDg6OTjfoBKDXWrumCAMpl/TFQ4/5kLM=
-github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
 github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f h1:lO4WD4F/rVNCu3HqELle0jiPLLBs70cWOduZpkS1E78=
 github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f/go.mod h1:cuUVRXasLTGF7a8hSLbxyZXjz+1KgoB3wDUb6vlszIc=
 github.com/didip/tollbooth v4.0.2+incompatible h1:fVSa33JzSz0hoh2NxpwZtksAzAgd7zjmGO20HCZtF4M=
@@ -189,6 +187,7 @@ github.com/golang/protobuf v1.5.1/go.mod h1:DopwsBzvsk0Fs44TXzsVbJyPhcCPeIwnvohx
 github.com/golang/protobuf v1.5.2 h1:ROPKBNFfQgOUMifHyP+KYbvpjbdoFNs+aK7DXlji0Tw=
 github.com/golang/protobuf v1.5.2/go.mod h1:XVQd3VNwM+JqD3oG2Ue2ip4fOMUkwXdXDdiuN0vRsmY=
 github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db/go.mod h1:/XxbfmMg8lxefKM7IXC3fBNl/7bRcc72aCRzEWrmP2Q=
+github.com/golang/snappy v0.0.1/go.mod h1:/XxbfmMg8lxefKM7IXC3fBNl/7bRcc72aCRzEWrmP2Q=
 github.com/golang/snappy v0.0.3/go.mod h1:/XxbfmMg8lxefKM7IXC3fBNl/7bRcc72aCRzEWrmP2Q=
 github.com/golang/snappy v0.0.4 h1:yAGX7huGHXlcLOEtBnF4w7FQwA26wojNCwOYAEhLjQM=
 github.com/golang/snappy v0.0.4/go.mod h1:/XxbfmMg8lxefKM7IXC3fBNl/7bRcc72aCRzEWrmP2Q=
@@ -325,18 +324,15 @@ github.com/modern-go/reflect2 v1.0.2 h1:xBagoLtFs94CBntxluKeaWgTMpvLxC4ur3nMaC9G
 github.com/modern-go/reflect2 v1.0.2/go.mod h1:yWuevngMOJpCy52FWWMvUC8ws7m/LJsjYzDa0/r8luk=
 github.com/mwitkow/go-conntrack v0.0.0-20161129095857-cc309e4a2223/go.mod h1:qRWi+5nqEBWmkhHvq77mSJWrCKwh8bxhgT7d/eI7P4U=
 github.com/mwitkow/go-conntrack v0.0.0-20190716064945-2f068394615f/go.mod h1:qRWi+5nqEBWmkhHvq77mSJWrCKwh8bxhgT7d/eI7P4U=
+github.com/nsqio/go-nsq v1.1.0 h1:PQg+xxiUjA7V+TLdXw7nVrJ5Jbl3sN86EhGCQj4+FYE=
+github.com/nsqio/go-nsq v1.1.0/go.mod h1:vKq36oyeVXgsS5Q8YEO7WghqidAVXQlcFxzQbQTuDEY=
 github.com/nxadm/tail v1.4.8 h1:nPr65rt6Y5JFSKQO7qToXr7pePgD6Gwiw05lkbyAQTE=
-github.com/nxadm/tail v1.4.8/go.mod h1:+ncqLTQzXmGhMZNUePPaPqPvBxHAIsmXswZKocGu+AU=
 github.com/oldbai555/driver-mysql v0.0.0-20221011051826-9dcf64ef2d7b h1:uOwlZEwT/1CWV4EhzNAjb8qE9YWEKlZNHeAncBNH6SI=
 github.com/oldbai555/driver-mysql v0.0.0-20221011051826-9dcf64ef2d7b/go.mod h1:JN8xnb/1VQVE4ppvSMjd0pbcg2Kq7x7kw9B3zSd0oS4=
 github.com/oldbai555/gorm v0.0.0-20221011044346-e65800014b93 h1:dsnisfvCBhh9HEKB+xSxNk/Wox3vcwXSY43SnPDcXZI=
 github.com/oldbai555/gorm v0.0.0-20221011044346-e65800014b93/go.mod h1:fpKBwqWdOF0xr5eRQsNkma/JtzbsDCVmKi0mhvWCoIY=
 github.com/oldbai555/lbtool v0.0.3-0.20240412034103-54308e666411 h1:uFfaJEHMLBVwboQ4gd6/IN/+jgIdMhRds/G46nw7Gg8=
 github.com/oldbai555/lbtool v0.0.3-0.20240412034103-54308e666411/go.mod h1:SACs1klKyblKkp6kcPWcZVcDex6Q3oHUWjj7t7ZbpCg=
-github.com/oldbai555/micro v0.0.0-20240507124744-f090936e4892 h1:Qn4RHtunLt72IkH8g8svXZSTFXcX3PmHex9gUbZmCtg=
-github.com/oldbai555/micro v0.0.0-20240507124744-f090936e4892/go.mod h1:sRLS+tNVacSlmzRONw+W/3xzr7d6JMUoGCrKGwlxo2s=
-github.com/oldbai555/micro v0.0.0-20240508130114-0319247e4eca h1:PW73fkFZ2MLa0k5j/7ynf+h3Hqa5ixViIN+CUMfbHg8=
-github.com/oldbai555/micro v0.0.0-20240508130114-0319247e4eca/go.mod h1:sRLS+tNVacSlmzRONw+W/3xzr7d6JMUoGCrKGwlxo2s=
 github.com/oldbai555/micro v0.0.0-20240603094712-ab7f5aa57f65 h1:+WD0i3u4hUQif82NSLfTjZjs3cl782XUoPRsEnJ1I/A=
 github.com/oldbai555/micro v0.0.0-20240603094712-ab7f5aa57f65/go.mod h1:sRLS+tNVacSlmzRONw+W/3xzr7d6JMUoGCrKGwlxo2s=
 github.com/onsi/ginkgo v1.6.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=

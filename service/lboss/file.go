@@ -9,7 +9,7 @@ package main
 import (
 	"crypto/md5"
 	"fmt"
-	"github.com/oldbai555/bgg/service/lboss/compress"
+	"github.com/oldbai555/bgg/pkg/compress"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/json"
 	"github.com/oldbai555/lbtool/utils"

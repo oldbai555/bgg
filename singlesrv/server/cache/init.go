@@ -25,3 +25,11 @@ func InitCache() (err error) {
 	}
 	return nil
 }
+
+func IsNotFound(err error) bool {
+	rdb, err1 := Rdb()
+	if err1 != nil {
+		return false
+	}
+	return rdb.IsNotFound(err)
+}

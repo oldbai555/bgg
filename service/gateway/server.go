@@ -4,14 +4,12 @@ import (
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/oldbai555/bgg/pkg/ginhelper"
 	"github.com/oldbai555/bgg/pkg/syscfg"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/dispatch"
 	"github.com/oldbai555/lbtool/utils"
 	"github.com/oldbai555/micro/bconst"
 	"github.com/oldbai555/micro/bgin"
-	"github.com/oldbai555/micro/brpc/dispatchimpl"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -22,14 +20,15 @@ func Server(ctx context.Context) error {
 	syscfg.InitGlobal("", utils.GetCurDir(), syscfg.OptionWithServer())
 	srvName := syscfg.Global.ServerConf.Name
 	log.SetModuleName(srvName)
-	d, err := dispatchimpl.New()
-	if err != nil {
-		log.Errorf("err:%v", err)
-		return err
-	}
-	return ginhelper.QuickStart(ctx, srvName, syscfg.Global.ServerConf.Port, func(router *gin.Engine) {
-		router.POST("/gateway/*path", handleRevProxy(d))
-	})
+	//d, err := dispatchimpl.New()
+	//if err != nil {
+	//	log.Errorf("err:%v", err)
+	//	return err
+	//}
+	//return ginhelper.QuickStart(ctx, srvName, syscfg.Global.ServerConf.Port, func(router *gin.Engine) {
+	//	router.POST("/gateway/*path", handleRevProxy(d))
+	//})
+	return nil
 }
 
 func handleRevProxy(d dispatch.IDispatch) func(ctx *gin.Context) {

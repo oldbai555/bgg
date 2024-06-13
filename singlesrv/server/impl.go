@@ -125,7 +125,7 @@ func (a *LbsingleServer) Login(ctx context.Context, req *client.LoginReq) (*clie
 	var user client.ModelUser
 	err = mysql.User.NewScope(ctx).AndMap(map[string]interface{}{
 		client.FieldUsername_: req.Username,
-		client.FieldPassword_: req.Password,
+		client.FieldPassword_: utils.StrMd5(req.Password),
 	}).First(&user)
 	if err != nil {
 		log.Errorf("err:%v", err)
@@ -173,12 +173,7 @@ func (a *LbsingleServer) GetLoginUser(ctx context.Context, req *client.GetLoginU
 		return nil, err
 	}
 
-	info, err := cache.GetLoginInfo(uCtx.Sid())
-	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
-	}
-	rsp.User = info
+	rsp.User = uCtx.ExtInfo().(*client.BaseUser)
 
 	return &rsp, err
 }
@@ -187,12 +182,76 @@ func (a *LbsingleServer) UpdateLoginUserInfo(ctx context.Context, req *client.Up
 	var rsp client.UpdateLoginUserInfoRsp
 	var err error
 
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	baseUser := uCtx.ExtInfo().(*client.BaseUser)
+
+	err = mysql.User.NewScope(ctx).Eq(client.FieldId_, baseUser.Id).First(&client.ModelUser{})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	_, err = mysql.User.NewScope(ctx).Eq(client.FieldId_, baseUser.Id).Update(utils.OrmStruct2Map(req.User, client.FieldRole))
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = cache.SetLoginInfo(uCtx.Sid(), req.User)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
 	return &rsp, err
 }
 
 func (a *LbsingleServer) ResetPassword(ctx context.Context, req *client.ResetPasswordReq) (*client.ResetPasswordRsp, error) {
 	var rsp client.ResetPasswordRsp
 	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	baseUser := uCtx.ExtInfo().(*client.BaseUser)
+
+	oldPsw := utils.Md5(req.OldPassword)
+	newPsw := utils.Md5(req.NewPassword)
+
+	err = mysql.User.NewScope(ctx).AndMap(map[string]interface{}{
+		client.FieldId_:       baseUser.Id,
+		client.FieldPassword_: oldPsw,
+	}).First(&client.ModelUser{})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, client.ErrOldPasswordNotEqual
+	}
+
+	if oldPsw == newPsw {
+		return nil, client.ErrOldPwdEqualNewPwd
+	}
+
+	_, err = mysql.User.NewScope(ctx).AndMap(map[string]interface{}{
+		client.FieldId_: baseUser.Id,
+	}).Update(map[string]interface{}{
+		client.FieldPassword_: newPsw,
+	})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = cache.DelLoginInfo(uCtx.Sid())
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
 
 	return &rsp, err
 }

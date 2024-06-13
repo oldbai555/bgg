@@ -66,7 +66,7 @@ func generator8(charset, url, hexMd5 string, sectionNum int, cb func(url, keywor
 // GenShortUrl
 // 生成6-8字符的短链接，参数t表示字符集类型，回调函数(cb)用于检测短链接是否重复
 // 起初生成6位的短链接，当四组6位短链接都重复时，再生成8位的短链接
-func GenShortUrl(t int, url string, cb func(url, keyword string) bool) (shortUrl string) {
+func GenShortUrl(t int, url string, cb func(url, keyword string) (canUse bool)) (shortUrl string) {
 	if url == "" || cb == nil {
 		return
 	}
