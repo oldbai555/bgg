@@ -93,7 +93,8 @@ func MqTopicBySyncFileHandler(msg *nsq.Message) error {
 			return err
 		}
 		if err == nil {
-			return client.ErrFileMd5Already
+			// 重新存一下缓存
+			return cache.SetFileBySortUrl(data.SortUrl, string(buf))
 		}
 		_, err = mysql.File.NewScope(context.Background()).Create(&data)
 		if err != nil {

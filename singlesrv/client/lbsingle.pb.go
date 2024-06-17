@@ -260,14 +260,15 @@ type ModelFile struct {
 	Id        uint64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	CreatedAt uint32 `protobuf:"varint,2,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt uint32 `protobuf:"varint,3,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	DeletedAt uint32 `protobuf:"varint,4,opt,name=deleted_at,json=deletedAt,proto3" json:"deleted_at,omitempty"`
+	// @gotags: gorm:"type:varchar(32);uniqueIndex:idx_deleted_at_md5"
+	DeletedAt uint32 `protobuf:"varint,4,opt,name=deleted_at,json=deletedAt,proto3" json:"deleted_at,omitempty" gorm:"type:varchar(32);uniqueIndex:idx_deleted_at_md5"`
 	CreatorId uint64 `protobuf:"varint,5,opt,name=creator_id,json=creatorId,proto3" json:"creator_id,omitempty"`
 	Size      int64  `protobuf:"varint,6,opt,name=size,proto3" json:"size,omitempty"`
 	Name      string `protobuf:"bytes,7,opt,name=name,proto3" json:"name,omitempty"`
 	Rename    string `protobuf:"bytes,8,opt,name=rename,proto3" json:"rename,omitempty"`
 	Path      string `protobuf:"bytes,9,opt,name=path,proto3" json:"path,omitempty"`
-	// @gotags: gorm:"primaryKey"
-	Md5     string `protobuf:"bytes,10,opt,name=md5,proto3" json:"md5,omitempty" gorm:"primaryKey"`
+	// @gotags: gorm:"type:varchar(32);uniqueIndex:idx_deleted_at_md5"
+	Md5     string `protobuf:"bytes,10,opt,name=md5,proto3" json:"md5,omitempty" gorm:"type:varchar(32);uniqueIndex:idx_deleted_at_md5"`
 	SortUrl string `protobuf:"bytes,11,opt,name=sort_url,json=sortUrl,proto3" json:"sort_url,omitempty"`
 }
 

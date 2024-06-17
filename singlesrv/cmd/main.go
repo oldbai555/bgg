@@ -163,7 +163,7 @@ func (p *program) registerCmd(r *gin.Engine, cmd *bcmd.Cmd) {
 
 		nCtx := ctx.NewCtx(
 			c,
-			ctx.WithGinHeaderSid(c),
+			ctx.WithGinHeaderAuthorization(c),
 			ctx.WithGinHeaderAuthType(c, cmd),
 		)
 
@@ -172,7 +172,7 @@ func (p *program) registerCmd(r *gin.Engine, cmd *bcmd.Cmd) {
 			info, err := server.CheckAuth(nCtx)
 			if err != nil {
 				log.Errorf("err:%v", err)
-				handler.Error(err)
+				handler.RespByJson(http.StatusUnauthorized, http.StatusUnauthorized, "", "unauthorized")
 				return
 			}
 			nCtx.SetExtInfo(info)
