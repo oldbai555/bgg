@@ -10,11 +10,7 @@ import (
 
 var cmdList = []*bcmd.Cmd{
 
-	{Server: client.ServerName, Path: client.AddFileCMDPath, GRpcFunc: server.OnceSvrImpl.AddFile, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
-
 	{Server: client.ServerName, Path: client.DelFileListCMDPath, GRpcFunc: server.OnceSvrImpl.DelFileList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
-
-	{Server: client.ServerName, Path: client.UpdateFileCMDPath, GRpcFunc: server.OnceSvrImpl.UpdateFile, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
 
 	{Server: client.ServerName, Path: client.GetFileCMDPath, GRpcFunc: server.OnceSvrImpl.GetFile, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
 

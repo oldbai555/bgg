@@ -24,19 +24,9 @@ const _ = grpc.SupportPackageIsVersion7
 type LbsingleClient interface {
 	// @cat:
 	// @name:
-	// @desc: 新增文件
-	// @error:
-	AddFile(ctx context.Context, in *AddFileReq, opts ...grpc.CallOption) (*AddFileRsp, error)
-	// @cat:
-	// @name:
 	// @desc: 删除文件
 	// @error:
 	DelFileList(ctx context.Context, in *DelFileListReq, opts ...grpc.CallOption) (*DelFileListRsp, error)
-	// @cat:
-	// @name:
-	// @desc: 更新文件
-	// @error:
-	UpdateFile(ctx context.Context, in *UpdateFileReq, opts ...grpc.CallOption) (*UpdateFileRsp, error)
 	// @cat:
 	// @name:
 	// @desc: 获取单个文件
@@ -73,27 +63,9 @@ func NewLbsingleClient(cc grpc.ClientConnInterface) LbsingleClient {
 	return &lbsingleClient{cc}
 }
 
-func (c *lbsingleClient) AddFile(ctx context.Context, in *AddFileReq, opts ...grpc.CallOption) (*AddFileRsp, error) {
-	out := new(AddFileRsp)
-	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddFile", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *lbsingleClient) DelFileList(ctx context.Context, in *DelFileListReq, opts ...grpc.CallOption) (*DelFileListRsp, error) {
 	out := new(DelFileListRsp)
 	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelFileList", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *lbsingleClient) UpdateFile(ctx context.Context, in *UpdateFileReq, opts ...grpc.CallOption) (*UpdateFileRsp, error) {
-	out := new(UpdateFileRsp)
-	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateFile", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -169,19 +141,9 @@ func (c *lbsingleClient) ResetPassword(ctx context.Context, in *ResetPasswordReq
 type LbsingleServer interface {
 	// @cat:
 	// @name:
-	// @desc: 新增文件
-	// @error:
-	AddFile(context.Context, *AddFileReq) (*AddFileRsp, error)
-	// @cat:
-	// @name:
 	// @desc: 删除文件
 	// @error:
 	DelFileList(context.Context, *DelFileListReq) (*DelFileListRsp, error)
-	// @cat:
-	// @name:
-	// @desc: 更新文件
-	// @error:
-	UpdateFile(context.Context, *UpdateFileReq) (*UpdateFileRsp, error)
 	// @cat:
 	// @name:
 	// @desc: 获取单个文件
@@ -215,14 +177,8 @@ type LbsingleServer interface {
 type UnimplementedLbsingleServer struct {
 }
 
-func (UnimplementedLbsingleServer) AddFile(context.Context, *AddFileReq) (*AddFileRsp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddFile not implemented")
-}
 func (UnimplementedLbsingleServer) DelFileList(context.Context, *DelFileListReq) (*DelFileListRsp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DelFileList not implemented")
-}
-func (UnimplementedLbsingleServer) UpdateFile(context.Context, *UpdateFileReq) (*UpdateFileRsp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateFile not implemented")
 }
 func (UnimplementedLbsingleServer) GetFile(context.Context, *GetFileReq) (*GetFileRsp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFile not implemented")
@@ -258,24 +214,6 @@ func RegisterLbsingleServer(s grpc.ServiceRegistrar, srv LbsingleServer) {
 	s.RegisterService(&Lbsingle_ServiceDesc, srv)
 }
 
-func _Lbsingle_AddFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AddFileReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(LbsingleServer).AddFile(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/lbsingle.lbsingle/AddFile",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LbsingleServer).AddFile(ctx, req.(*AddFileReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _Lbsingle_DelFileList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DelFileListReq)
 	if err := dec(in); err != nil {
@@ -290,24 +228,6 @@ func _Lbsingle_DelFileList_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(LbsingleServer).DelFileList(ctx, req.(*DelFileListReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Lbsingle_UpdateFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateFileReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(LbsingleServer).UpdateFile(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/lbsingle.lbsingle/UpdateFile",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LbsingleServer).UpdateFile(ctx, req.(*UpdateFileReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -446,16 +366,8 @@ var Lbsingle_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*LbsingleServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "AddFile",
-			Handler:    _Lbsingle_AddFile_Handler,
-		},
-		{
 			MethodName: "DelFileList",
 			Handler:    _Lbsingle_DelFileList_Handler,
-		},
-		{
-			MethodName: "UpdateFile",
-			Handler:    _Lbsingle_UpdateFile_Handler,
 		},
 		{
 			MethodName: "GetFile",

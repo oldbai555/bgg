@@ -7,33 +7,31 @@
 package mq
 
 import (
+	"bytes"
 	"github.com/nsqio/go-nsq"
+	"github.com/oldbai555/bgg/singlesrv/client"
 	"github.com/oldbai555/lbtool/log"
-	"github.com/oldbai555/lbtool/pkg/json"
+	"github.com/oldbai555/lbtool/pkg/jsonpb"
 )
 
-type Msg struct {
-	ReqId  string
-	CorpId uint32
-	Data   []byte
-}
-
 func EncodeMsg(reqId string, corpId uint32, msg []byte) ([]byte, error) {
-	info := &Msg{
+	info := &client.NsqMsg{
 		ReqId:  reqId,
 		CorpId: corpId,
 		Data:   msg,
 	}
-	b, err := json.Marshal(info)
+	var buf bytes.Buffer
+	err := jsonpb.Marshal(&buf, info)
 	if err != nil {
 		return nil, err
 	}
-	return b, nil
+	return buf.Bytes(), nil
 }
 
-func DecodeMsg(msg []byte) (*Msg, error) {
-	m := new(Msg)
-	err := json.Unmarshal(msg, m)
+func DecodeMsg(msg []byte) (*client.NsqMsg, error) {
+	m := new(client.NsqMsg)
+	var reader = bytes.NewReader(msg)
+	err := jsonpb.Unmarshal(reader, m)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +53,7 @@ func Process(msg *nsq.Message, doLogic func(buf []byte) error) error {
 		return nil
 	}
 
-	log.Infof("process mq msg %v", msg)
+	log.Infof("process mq msg %s", string(msg.Body))
 
 	err = doLogic(info.Data)
 	if err != nil {

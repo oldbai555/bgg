@@ -256,9 +256,13 @@ func (p *program) startGinHttpServer() error {
 		tollbooth_gin.LimitHandler(limiter),
 	)
 
+	// proto 生成的路由
 	for _, cmd := range cmdList {
 		p.registerCmd(router, cmd)
 	}
+
+	// 注册自定义路由
+	server.RegisterCustomRouter(router)
 
 	p.ginSrv = &http.Server{
 		Addr:    fmt.Sprintf(":%d", p.port),

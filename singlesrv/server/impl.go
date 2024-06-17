@@ -17,20 +17,6 @@ type LbsingleServer struct {
 	client.UnimplementedLbsingleServer
 }
 
-func (a *LbsingleServer) AddFile(ctx context.Context, req *client.AddFileReq) (*client.AddFileRsp, error) {
-	var rsp client.AddFileRsp
-	var err error
-
-	_, err = mysql.File.NewScope(ctx).Create(req.Data)
-	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
-	}
-	rsp.Data = req.Data
-
-	return &rsp, err
-}
-
 func (a *LbsingleServer) DelFileList(ctx context.Context, req *client.DelFileListReq) (*client.DelFileListRsp, error) {
 	var rsp client.DelFileListRsp
 	var err error
@@ -38,7 +24,7 @@ func (a *LbsingleServer) DelFileList(ctx context.Context, req *client.DelFileLis
 	listRsp, err := a.GetFileList(ctx, &client.GetFileListReq{
 		ListOption: req.ListOption.
 			SetSkipTotal().
-			AddOpt(lb.DefaultListOption_DefaultListOptionSelect, client.FieldId_),
+			AddOpt(lb.DefaultListOption_DefaultListOptionSelect, []string{client.FieldId_, client.FieldSortUrl_}),
 	})
 	if err != nil {
 		log.Errorf("err:%v", err)
@@ -57,24 +43,12 @@ func (a *LbsingleServer) DelFileList(ctx context.Context, req *client.DelFileLis
 		return nil, err
 	}
 
-	return &rsp, err
-}
-
-func (a *LbsingleServer) UpdateFile(ctx context.Context, req *client.UpdateFileReq) (*client.UpdateFileRsp, error) {
-	var rsp client.UpdateFileRsp
-	var err error
-
-	var data client.ModelFile
-	err = mysql.File.NewScope(ctx).Where(client.FieldId_, req.Data.Id).First(&data)
-	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
-	}
-
-	_, err = mysql.File.NewScope(ctx).Where(client.FieldId_, data.Id).Update(utils.OrmStruct2Map(req.Data))
-	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+	// 清缓存
+	for _, val := range listRsp.List {
+		err = cache.DelFileBySortUrl(val.SortUrl)
+		if err != nil {
+			log.Errorf("del %s cache failed err:%v", val.SortUrl, err)
+		}
 	}
 
 	return &rsp, err

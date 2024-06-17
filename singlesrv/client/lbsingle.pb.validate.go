@@ -35,6 +35,110 @@ var (
 	_ = sort.Sort
 )
 
+// Validate checks the field values on NsqMsg with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *NsqMsg) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on NsqMsg with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in NsqMsgMultiError, or nil if none found.
+func (m *NsqMsg) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *NsqMsg) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for CorpId
+
+	// no validation rules for ReqId
+
+	// no validation rules for Data
+
+	if len(errors) > 0 {
+		return NsqMsgMultiError(errors)
+	}
+
+	return nil
+}
+
+// NsqMsgMultiError is an error wrapping multiple validation errors returned by
+// NsqMsg.ValidateAll() if the designated constraints aren't met.
+type NsqMsgMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m NsqMsgMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m NsqMsgMultiError) AllErrors() []error { return m }
+
+// NsqMsgValidationError is the validation error returned by NsqMsg.Validate if
+// the designated constraints aren't met.
+type NsqMsgValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e NsqMsgValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e NsqMsgValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e NsqMsgValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e NsqMsgValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e NsqMsgValidationError) ErrorName() string { return "NsqMsgValidationError" }
+
+// Error satisfies the builtin error interface
+func (e NsqMsgValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sNsqMsg.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = NsqMsgValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = NsqMsgValidationError{}
+
 // Validate checks the field values on ModelFile with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -393,513 +497,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = BaseUserValidationError{}
-
-// Validate checks the field values on AddFileReq with the rules defined in the
-// proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *AddFileReq) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on AddFileReq with the rules defined in
-// the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in AddFileReqMultiError, or
-// nil if none found.
-func (m *AddFileReq) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *AddFileReq) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if m.GetData() == nil {
-		err := AddFileReqValidationError{
-			field:  "Data",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if all {
-		switch v := interface{}(m.GetData()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AddFileReqValidationError{
-					field:  "Data",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, AddFileReqValidationError{
-					field:  "Data",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return AddFileReqValidationError{
-				field:  "Data",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if len(errors) > 0 {
-		return AddFileReqMultiError(errors)
-	}
-
-	return nil
-}
-
-// AddFileReqMultiError is an error wrapping multiple validation errors
-// returned by AddFileReq.ValidateAll() if the designated constraints aren't met.
-type AddFileReqMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m AddFileReqMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m AddFileReqMultiError) AllErrors() []error { return m }
-
-// AddFileReqValidationError is the validation error returned by
-// AddFileReq.Validate if the designated constraints aren't met.
-type AddFileReqValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e AddFileReqValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e AddFileReqValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e AddFileReqValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e AddFileReqValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e AddFileReqValidationError) ErrorName() string { return "AddFileReqValidationError" }
-
-// Error satisfies the builtin error interface
-func (e AddFileReqValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sAddFileReq.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = AddFileReqValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = AddFileReqValidationError{}
-
-// Validate checks the field values on AddFileRsp with the rules defined in the
-// proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *AddFileRsp) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on AddFileRsp with the rules defined in
-// the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in AddFileRspMultiError, or
-// nil if none found.
-func (m *AddFileRsp) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *AddFileRsp) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if all {
-		switch v := interface{}(m.GetData()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AddFileRspValidationError{
-					field:  "Data",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, AddFileRspValidationError{
-					field:  "Data",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return AddFileRspValidationError{
-				field:  "Data",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if len(errors) > 0 {
-		return AddFileRspMultiError(errors)
-	}
-
-	return nil
-}
-
-// AddFileRspMultiError is an error wrapping multiple validation errors
-// returned by AddFileRsp.ValidateAll() if the designated constraints aren't met.
-type AddFileRspMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m AddFileRspMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m AddFileRspMultiError) AllErrors() []error { return m }
-
-// AddFileRspValidationError is the validation error returned by
-// AddFileRsp.Validate if the designated constraints aren't met.
-type AddFileRspValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e AddFileRspValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e AddFileRspValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e AddFileRspValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e AddFileRspValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e AddFileRspValidationError) ErrorName() string { return "AddFileRspValidationError" }
-
-// Error satisfies the builtin error interface
-func (e AddFileRspValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sAddFileRsp.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = AddFileRspValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = AddFileRspValidationError{}
-
-// Validate checks the field values on UpdateFileReq with the rules defined in
-// the proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *UpdateFileReq) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on UpdateFileReq with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in UpdateFileReqMultiError, or
-// nil if none found.
-func (m *UpdateFileReq) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *UpdateFileReq) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if m.GetData() == nil {
-		err := UpdateFileReqValidationError{
-			field:  "Data",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if all {
-		switch v := interface{}(m.GetData()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, UpdateFileReqValidationError{
-					field:  "Data",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, UpdateFileReqValidationError{
-					field:  "Data",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return UpdateFileReqValidationError{
-				field:  "Data",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if len(errors) > 0 {
-		return UpdateFileReqMultiError(errors)
-	}
-
-	return nil
-}
-
-// UpdateFileReqMultiError is an error wrapping multiple validation errors
-// returned by UpdateFileReq.ValidateAll() if the designated constraints
-// aren't met.
-type UpdateFileReqMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m UpdateFileReqMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m UpdateFileReqMultiError) AllErrors() []error { return m }
-
-// UpdateFileReqValidationError is the validation error returned by
-// UpdateFileReq.Validate if the designated constraints aren't met.
-type UpdateFileReqValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e UpdateFileReqValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e UpdateFileReqValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e UpdateFileReqValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e UpdateFileReqValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e UpdateFileReqValidationError) ErrorName() string { return "UpdateFileReqValidationError" }
-
-// Error satisfies the builtin error interface
-func (e UpdateFileReqValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sUpdateFileReq.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = UpdateFileReqValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = UpdateFileReqValidationError{}
-
-// Validate checks the field values on UpdateFileRsp with the rules defined in
-// the proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *UpdateFileRsp) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on UpdateFileRsp with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in UpdateFileRspMultiError, or
-// nil if none found.
-func (m *UpdateFileRsp) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *UpdateFileRsp) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if len(errors) > 0 {
-		return UpdateFileRspMultiError(errors)
-	}
-
-	return nil
-}
-
-// UpdateFileRspMultiError is an error wrapping multiple validation errors
-// returned by UpdateFileRsp.ValidateAll() if the designated constraints
-// aren't met.
-type UpdateFileRspMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m UpdateFileRspMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m UpdateFileRspMultiError) AllErrors() []error { return m }
-
-// UpdateFileRspValidationError is the validation error returned by
-// UpdateFileRsp.Validate if the designated constraints aren't met.
-type UpdateFileRspValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e UpdateFileRspValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e UpdateFileRspValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e UpdateFileRspValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e UpdateFileRspValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e UpdateFileRspValidationError) ErrorName() string { return "UpdateFileRspValidationError" }
-
-// Error satisfies the builtin error interface
-func (e UpdateFileRspValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sUpdateFileRsp.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = UpdateFileRspValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = UpdateFileRspValidationError{}
 
 // Validate checks the field values on DelFileListReq with the rules defined in
 // the proto definition for this message. If any rules are violated, the first

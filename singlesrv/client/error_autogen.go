@@ -17,4 +17,6 @@ var (
 	ErrNsqTopicAlready           = status.Error(codes.Code(int32(ErrCode_ErrNsqTopicAlready)), "nsq topic 已经存在")
 	ErrFileMd5IsEmpty            = status.Error(codes.Code(int32(ErrCode_ErrFileMd5IsEmpty)), "文件 md5 不能为空")
 	ErrFileMd5Already            = status.Error(codes.Code(int32(ErrCode_ErrFileMd5Already)), "文件 md5 已经存在")
+	ErrFileUploadFailure         = status.Error(codes.Code(int32(ErrCode_ErrFileUploadFailure)), "文件上传失败")
+	ErrFileAlreadyExist          = status.Error(codes.Code(int32(ErrCode_ErrFileAlreadyExist)), "保存文件失败，文件重复")
 )
