@@ -6,6 +6,7 @@ import (
 	"github.com/oldbai555/gorm"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/gormx"
+	"reflect"
 )
 
 type Scope struct {
@@ -53,7 +54,6 @@ func (p *Scope) FindPaginate(list interface{}) (*Paginate, error) {
 	if !p.skipTotal {
 		err := p.DB().Count(&total).Error
 		if err != nil {
-			log.Errorf("err is %v", err)
 			return nil, err
 		}
 	}
@@ -65,7 +65,6 @@ func (p *Scope) FindPaginate(list interface{}) (*Paginate, error) {
 
 	err := p.DB().Limit(int(p.size)).Offset(int(page * p.size)).Find(list).Error
 	if err != nil {
-		log.Errorf("err is %v", err)
 		return nil, err
 	}
 
@@ -74,6 +73,54 @@ func (p *Scope) FindPaginate(list interface{}) (*Paginate, error) {
 		Size:  p.size,
 		Page:  p.page,
 	}, nil
+}
+
+func (p *Scope) Chunk(limit int, list interface{}, cb func() (stop bool)) error {
+	if cb == nil {
+		return nil
+	}
+
+	var total int64
+	err := p.DB().Count(&total).Error
+	if err != nil {
+		return err
+	}
+	maxPage := total / int64(limit)
+	if total%int64(limit) != 0 {
+		maxPage += 1
+	}
+
+	var page = 0
+	ClearSlice(list)
+	for maxPage > int64(page) {
+		ClearSlice(list)
+		err = p.DB().Limit(limit).Offset(page * limit).Find(list).Error
+		if err != nil {
+			return err
+		}
+		if cb() {
+			return nil
+		}
+		page++
+	}
+	return nil
+}
+
+func ClearSlice(ptr interface{}) {
+	if ptr == nil {
+		return
+	}
+	vo := reflect.ValueOf(ptr)
+	if vo.Kind() != reflect.Ptr {
+		panic("required ptr to slice type")
+	}
+	for vo.Kind() == reflect.Ptr {
+		vo = vo.Elem()
+	}
+	if vo.Kind() != reflect.Slice {
+		panic("required ptr to slice type")
+	}
+	vo.Set(reflect.MakeSlice(vo.Type(), 0, 0))
 }
 
 func (f *Model) FirstOrCreate(ctx context.Context, candMap map[string]interface{}, out interface{}) error {
@@ -87,13 +134,11 @@ func (f *Model) FirstOrCreate(ctx context.Context, candMap map[string]interface{
 	if f.IsNotFoundErr(err) {
 		err = mapstructure.Decode(candMap, out)
 		if err != nil {
-			log.Errorf("err is : %v", err)
 			return err
 		}
 
 		_, err := optDb.Create(out)
 		if err != nil {
-			log.Errorf("err is %v", err)
 			return err
 		}
 		return nil

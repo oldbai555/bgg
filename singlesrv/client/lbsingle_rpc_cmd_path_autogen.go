@@ -10,5 +10,6 @@ const (
 	LoginCMDPath               = "/lbsingle/Login"
 	LogoutCMDPath              = "/lbsingle/Logout"
 	ResetPasswordCMDPath       = "/lbsingle/ResetPassword"
+	SyncFileCMDPath            = "/lbsingle/SyncFile"
 	UpdateLoginUserInfoCMDPath = "/lbsingle/UpdateLoginUserInfo"
 )

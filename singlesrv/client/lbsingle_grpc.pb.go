@@ -53,6 +53,11 @@ type LbsingleClient interface {
 	// @desc:
 	// @error:
 	ResetPassword(ctx context.Context, in *ResetPasswordReq, opts ...grpc.CallOption) (*ResetPasswordRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	SyncFile(ctx context.Context, in *SyncFileReq, opts ...grpc.CallOption) (*SyncFileRsp, error)
 }
 
 type lbsingleClient struct {
@@ -135,6 +140,15 @@ func (c *lbsingleClient) ResetPassword(ctx context.Context, in *ResetPasswordReq
 	return out, nil
 }
 
+func (c *lbsingleClient) SyncFile(ctx context.Context, in *SyncFileReq, opts ...grpc.CallOption) (*SyncFileRsp, error) {
+	out := new(SyncFileRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/SyncFile", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // LbsingleServer is the server API for Lbsingle service.
 // All implementations must embed UnimplementedLbsingleServer
 // for forward compatibility
@@ -170,6 +184,11 @@ type LbsingleServer interface {
 	// @desc:
 	// @error:
 	ResetPassword(context.Context, *ResetPasswordReq) (*ResetPasswordRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	SyncFile(context.Context, *SyncFileReq) (*SyncFileRsp, error)
 	mustEmbedUnimplementedLbsingleServer()
 }
 
@@ -200,6 +219,9 @@ func (UnimplementedLbsingleServer) UpdateLoginUserInfo(context.Context, *UpdateL
 }
 func (UnimplementedLbsingleServer) ResetPassword(context.Context, *ResetPasswordReq) (*ResetPasswordRsp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ResetPassword not implemented")
+}
+func (UnimplementedLbsingleServer) SyncFile(context.Context, *SyncFileReq) (*SyncFileRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SyncFile not implemented")
 }
 func (UnimplementedLbsingleServer) mustEmbedUnimplementedLbsingleServer() {}
 
@@ -358,6 +380,24 @@ func _Lbsingle_ResetPassword_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Lbsingle_SyncFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SyncFileReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).SyncFile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/SyncFile",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).SyncFile(ctx, req.(*SyncFileReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Lbsingle_ServiceDesc is the grpc.ServiceDesc for Lbsingle service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -396,6 +436,10 @@ var Lbsingle_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ResetPassword",
 			Handler:    _Lbsingle_ResetPassword_Handler,
+		},
+		{
+			MethodName: "SyncFile",
+			Handler:    _Lbsingle_SyncFile_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -14,7 +14,6 @@ import (
 func GetFileBySortUrl(sortUrl string) (string, error) {
 	rdb, err := Rdb()
 	if err != nil {
-		log.Errorf("err:%v", err)
 		return "", err
 	}
 	val, err := rdb.HGet(constant.FileCachePrefix, sortUrl)
@@ -27,7 +26,6 @@ func GetFileBySortUrl(sortUrl string) (string, error) {
 func SetFileBySortUrl(sortUrl string, fileJsonStr string) error {
 	rdb, err := Rdb()
 	if err != nil {
-		log.Errorf("err:%v", err)
 		return err
 	}
 	err = rdb.HSet(constant.FileCachePrefix, sortUrl, fileJsonStr)
@@ -40,12 +38,29 @@ func SetFileBySortUrl(sortUrl string, fileJsonStr string) error {
 func DelFileBySortUrl(sortUrl string) error {
 	rdb, err := Rdb()
 	if err != nil {
-		log.Errorf("err:%v", err)
 		return err
 	}
 	_, err = rdb.HDel(constant.FileCachePrefix, sortUrl)
 	if err != nil {
 		return err
+	}
+	return nil
+}
+
+func DelAllFileCache() error {
+	rdb, err := Rdb()
+	if err != nil {
+		return err
+	}
+	all, err := rdb.HGetAll(constant.FileCachePrefix)
+	if err != nil {
+		return err
+	}
+	for sortUrl := range all {
+		err = DelFileBySortUrl(sortUrl)
+		if err != nil {
+			log.Errorf("del all file cache: %s,err:%v", sortUrl, err)
+		}
 	}
 	return nil
 }

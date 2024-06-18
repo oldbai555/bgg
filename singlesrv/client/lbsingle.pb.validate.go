@@ -139,6 +139,239 @@ var _ interface {
 	ErrorName() string
 } = NsqMsgValidationError{}
 
+// Validate checks the field values on MqSyncFile with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *MqSyncFile) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MqSyncFile with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in MqSyncFileMultiError, or
+// nil if none found.
+func (m *MqSyncFile) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MqSyncFile) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetFileList() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, MqSyncFileValidationError{
+						field:  fmt.Sprintf("FileList[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, MqSyncFileValidationError{
+						field:  fmt.Sprintf("FileList[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return MqSyncFileValidationError{
+					field:  fmt.Sprintf("FileList[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return MqSyncFileMultiError(errors)
+	}
+
+	return nil
+}
+
+// MqSyncFileMultiError is an error wrapping multiple validation errors
+// returned by MqSyncFile.ValidateAll() if the designated constraints aren't met.
+type MqSyncFileMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MqSyncFileMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MqSyncFileMultiError) AllErrors() []error { return m }
+
+// MqSyncFileValidationError is the validation error returned by
+// MqSyncFile.Validate if the designated constraints aren't met.
+type MqSyncFileValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MqSyncFileValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MqSyncFileValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MqSyncFileValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MqSyncFileValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MqSyncFileValidationError) ErrorName() string { return "MqSyncFileValidationError" }
+
+// Error satisfies the builtin error interface
+func (e MqSyncFileValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMqSyncFile.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MqSyncFileValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MqSyncFileValidationError{}
+
+// Validate checks the field values on MqCacheAllFile with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *MqCacheAllFile) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MqCacheAllFile with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in MqCacheAllFileMultiError,
+// or nil if none found.
+func (m *MqCacheAllFile) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MqCacheAllFile) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MqCacheAllFileMultiError(errors)
+	}
+
+	return nil
+}
+
+// MqCacheAllFileMultiError is an error wrapping multiple validation errors
+// returned by MqCacheAllFile.ValidateAll() if the designated constraints
+// aren't met.
+type MqCacheAllFileMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MqCacheAllFileMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MqCacheAllFileMultiError) AllErrors() []error { return m }
+
+// MqCacheAllFileValidationError is the validation error returned by
+// MqCacheAllFile.Validate if the designated constraints aren't met.
+type MqCacheAllFileValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MqCacheAllFileValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MqCacheAllFileValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MqCacheAllFileValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MqCacheAllFileValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MqCacheAllFileValidationError) ErrorName() string { return "MqCacheAllFileValidationError" }
+
+// Error satisfies the builtin error interface
+func (e MqCacheAllFileValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMqCacheAllFile.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MqCacheAllFileValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MqCacheAllFileValidationError{}
+
 // Validate checks the field values on ModelFile with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -182,6 +415,8 @@ func (m *ModelFile) validate(all bool) error {
 	// no validation rules for Md5
 
 	// no validation rules for SortUrl
+
+	// no validation rules for State
 
 	if len(errors) > 0 {
 		return ModelFileMultiError(errors)
@@ -2524,3 +2759,201 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = GetFrontUserReqValidationError{}
+
+// Validate checks the field values on SyncFileReq with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *SyncFileReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SyncFileReq with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in SyncFileReqMultiError, or
+// nil if none found.
+func (m *SyncFileReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SyncFileReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return SyncFileReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// SyncFileReqMultiError is an error wrapping multiple validation errors
+// returned by SyncFileReq.ValidateAll() if the designated constraints aren't met.
+type SyncFileReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SyncFileReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SyncFileReqMultiError) AllErrors() []error { return m }
+
+// SyncFileReqValidationError is the validation error returned by
+// SyncFileReq.Validate if the designated constraints aren't met.
+type SyncFileReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SyncFileReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SyncFileReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SyncFileReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SyncFileReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SyncFileReqValidationError) ErrorName() string { return "SyncFileReqValidationError" }
+
+// Error satisfies the builtin error interface
+func (e SyncFileReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSyncFileReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SyncFileReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SyncFileReqValidationError{}
+
+// Validate checks the field values on SyncFileRsp with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *SyncFileRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SyncFileRsp with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in SyncFileRspMultiError, or
+// nil if none found.
+func (m *SyncFileRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SyncFileRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return SyncFileRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// SyncFileRspMultiError is an error wrapping multiple validation errors
+// returned by SyncFileRsp.ValidateAll() if the designated constraints aren't met.
+type SyncFileRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SyncFileRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SyncFileRspMultiError) AllErrors() []error { return m }
+
+// SyncFileRspValidationError is the validation error returned by
+// SyncFileRsp.Validate if the designated constraints aren't met.
+type SyncFileRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SyncFileRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SyncFileRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SyncFileRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SyncFileRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SyncFileRspValidationError) ErrorName() string { return "SyncFileRspValidationError" }
+
+// Error satisfies the builtin error interface
+func (e SyncFileRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSyncFileRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SyncFileRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SyncFileRspValidationError{}

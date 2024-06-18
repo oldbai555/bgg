@@ -104,7 +104,7 @@ func (p *program) Start() error {
 		panic(err)
 	}
 
-	err = server.SyncFileIndex()
+	err = server.SyncFileIndex(context.Background(), true)
 	if err != nil {
 		panic(err)
 	}
@@ -130,6 +130,7 @@ func (p *program) Stop() error {
 		}
 	}
 	mq.Stop()
+	cache.Stop()
 	return nil
 }
 

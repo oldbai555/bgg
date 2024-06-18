@@ -29,33 +29,69 @@ import (
 	"time"
 )
 
-func SyncFileIndex() error {
-	err := tool.ListFile(constant.BaseStoragePath, func(path string, info os.FileInfo) {
-		file, _ := os.Open(path)
-		path = tool.ToSlash(path)
-		var exist bool
-		sUrl := compress.GenShortUrl(compress.CharsetRandomAlphanumeric, path, func(url, keyword string) bool {
-			if exist {
-				return false
+// SyncFileIndex 同步最新文件索引 - 先临时冗余设计 后续在解耦优化
+func SyncFileIndex(ctx context.Context, cacheAllFile bool) error {
+	var filePathMap = make(map[string]string)
+	var sortUrlMap = make(map[string]struct{})
+
+	var list []*client.ModelFile
+	err := mysql.File.NewScope(ctx).Chunk(2000, &list, func() (stop bool) {
+		for _, file := range list {
+			filePathMap[file.Path] = file.Md5
+			sortUrlMap[file.SortUrl] = struct{}{}
+		}
+		return
+	})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return err
+	}
+
+	var newFileList []*client.ModelFile
+
+	// 同步本地文件
+	err = tool.ListFile(constant.BaseStoragePath, func(path string, info os.FileInfo) {
+		file, err := os.Open(path)
+		if err != nil {
+			log.Errorf("err:%v", err)
+			return
+		}
+		defer func() {
+			if file == nil {
+				return
 			}
-			_, err := cache.GetFileBySortUrl(keyword)
-			if err != nil && !cache.IsNotFound(err) {
+			err := file.Close()
+			if err != nil {
 				log.Errorf("err:%v", err)
-				return true
+				return
 			}
-			if cache.IsNotFound(err) {
-				return true
+		}()
+		path = tool.ToSlash(path)
+
+		// 校验文件是否在文件夹中
+		_, ok := filePathMap[path]
+		if ok {
+			delete(filePathMap, path)
+			return
+		}
+
+		var canUse bool
+		sUrl := compress.GenShortUrl(compress.CharsetRandomAlphanumeric, path, func(url, keyword string) bool {
+			_, ok := sortUrlMap[keyword]
+			if ok {
+				canUse = false
+				return canUse
 			}
-			exist = true
-			return false
+			canUse = true
+			return canUse
 		})
-		if exist {
+		if !canUse {
 			return
 		}
 		if sUrl == "" {
 			return
 		}
-		pubErr := MqTopicBySyncFile.Pub(uctx.NewBaseUCtx(), &client.ModelFile{
+		newFileList = append(newFileList, &client.ModelFile{
 			Size:    info.Size(),
 			Name:    info.Name(),
 			Rename:  info.Name(),
@@ -63,49 +99,150 @@ func SyncFileIndex() error {
 			Md5:     tool.GetFileMd5(file),
 			SortUrl: sUrl,
 		})
-		if pubErr != nil {
-			log.Errorf("err:%v", pubErr)
-		}
 	})
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return err
 	}
 
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		uCtx = uctx.NewBaseUCtx()
+	}
+	if len(newFileList) != 0 {
+		pubErr := MqTopicSyncFile.Pub(uCtx, &client.MqSyncFile{
+			FileList: newFileList,
+		})
+		if pubErr != nil {
+			log.Errorf("err:%v", pubErr)
+		}
+	}
+
+	// 打上标记
+	if len(filePathMap) != 0 {
+		var md5List []string
+		for _, md5 := range filePathMap {
+			md5List = append(md5List, md5)
+		}
+		_, err = mysql.File.NewScope(ctx).
+			Eq(client.FieldState_, uint32(client.ModelFile_StateNil)).
+			In(client.FieldMd5_, md5List).
+			Update(map[string]interface{}{
+				client.FieldState_: uint32(client.ModelFile_StateNotFoundInLocalDir),
+			})
+		if err != nil {
+			log.Errorf("err:%v", err)
+			return err
+		}
+		_, err = mysql.File.NewScope(ctx).
+			Eq(client.FieldState_, uint32(client.ModelFile_StateNotFoundInLocalDir)).
+			NotIn(client.FieldMd5_, md5List).
+			Update(map[string]interface{}{
+				client.FieldState_: uint32(client.ModelFile_StateNil),
+			})
+		if err != nil {
+			log.Errorf("err:%v", err)
+			return err
+		}
+	}
+
+	if cacheAllFile {
+		// 避免报错 传个空值
+		err = MqTopicCacheAllFile.DeferredPublish(uCtx, time.Second*3, &client.MqCacheAllFile{})
+		if err != nil {
+			panic(err)
+		}
+	}
+
 	return nil
 }
 
 func MqTopicBySyncFileHandler(msg *nsq.Message) error {
-	return mq.Process(msg, func(buf []byte) error {
-		var data client.ModelFile
-		err := MqTopicBySyncFile.Unmarshal(buf, &data)
-		if err != nil {
-			log.Errorf("err:%v", err)
-			return err
+	var doSingleFileLogic = func(file *client.ModelFile) error {
+		if file == nil {
+			log.Errorf("unmarshal file is nil")
+			return nil
 		}
-		if data.Md5 == "" {
+
+		if file.Md5 == "" {
 			return client.ErrFileMd5IsEmpty
 		}
+
 		db := mysql.File.NewScope(context.Background())
-		err = db.Eq(client.FieldMd5_, data.Md5).First(&client.ModelFile{})
+		err := db.Eq(client.FieldMd5_, file.Md5).First(&client.ModelFile{})
 		if err != nil && !mysql.File.IsNotFoundErr(err) {
 			log.Errorf("err:%v", err)
 			return err
 		}
+
+		// 重新存一下缓存
 		if err == nil {
-			// 重新存一下缓存
-			return cache.SetFileBySortUrl(data.SortUrl, string(buf))
+			buf, err := MqTopicSyncFile.Marshal(file)
+			if err != nil {
+				log.Errorf("err:%v", err)
+				return err
+			}
+			return cache.SetFileBySortUrl(file.SortUrl, string(buf))
 		}
-		_, err = mysql.File.NewScope(context.Background()).Create(&data)
+
+		_, err = mysql.File.NewScope(context.Background()).Create(&file)
 		if err != nil {
 			log.Errorf("err:%v", err)
 			return err
 		}
-		err = cache.SetFileBySortUrl(data.SortUrl, string(buf))
+
+		buf, err := MqTopicSyncFile.Marshal(file)
 		if err != nil {
 			log.Errorf("err:%v", err)
 			return err
 		}
+
+		err = cache.SetFileBySortUrl(file.SortUrl, string(buf))
+		if err != nil {
+			log.Errorf("err:%v", err)
+			return err
+		}
+		return nil
+	}
+
+	return mq.Process(msg, func(buf []byte) error {
+		var data client.MqSyncFile
+		err := MqTopicSyncFile.Unmarshal(buf, &data)
+		if err != nil {
+			log.Errorf("err:%v", err)
+			return err
+		}
+
+		for _, file := range data.FileList {
+			err = doSingleFileLogic(file)
+			if err != nil {
+				log.Errorf("err:%v", err)
+			}
+		}
+
+		return nil
+	})
+}
+
+func MqTopicByCacheAllFileHandler(msg *nsq.Message) error {
+	return mq.Process(msg, func(buf []byte) error {
+		var list []*client.ModelFile
+		err := mysql.File.NewScope(context.Background()).Chunk(2000, &list, func() (stop bool) {
+			for _, file := range list {
+				bytes, err := MqTopicCacheAllFile.Marshal(file)
+				if err != nil {
+					log.Errorf("err:%v", err)
+				} else {
+					err = cache.SetFileBySortUrl(file.SortUrl, string(bytes))
+				}
+			}
+			return
+		})
+		if err != nil {
+			log.Errorf("err:%v", err)
+			return err
+		}
+
 		return nil
 	})
 }
@@ -189,7 +326,7 @@ func handleUploadFile(ctx *gin.Context) {
 	fileInfo.SortUrl = sUrl
 
 	// 7.交给MQ去保存
-	err = MqTopicBySyncFile.Pub(uctx.NewBaseUCtx(), fileInfo)
+	err = MqTopicSyncFile.Pub(uctx.NewBaseUCtx(), fileInfo)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		handler.Error(err)
@@ -217,7 +354,7 @@ func handleDownloadFile(ctx *gin.Context) {
 	}
 
 	var fileInfo client.ModelFile
-	if err = MqTopicBySyncFile.Unmarshal([]byte(fileInfoStr), &fileInfo); err != nil {
+	if err = MqTopicSyncFile.Unmarshal([]byte(fileInfoStr), &fileInfo); err != nil {
 		log.Errorf("err:%v", err)
 		handler.Error(err)
 		return

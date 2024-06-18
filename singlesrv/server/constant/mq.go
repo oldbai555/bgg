@@ -9,10 +9,6 @@ package constant
 import "time"
 
 const (
-	MqTopicBySyncFile = "topic_sync_file"
-)
-
-const (
 	MqTimeOut = 5 * time.Second
 )
 

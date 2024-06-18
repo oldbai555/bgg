@@ -9,12 +9,14 @@ import (
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/utils"
 	"github.com/oldbai555/micro/uctx"
+	"golang.org/x/sync/singleflight"
 )
 
 var OnceSvrImpl = &LbsingleServer{}
 
 type LbsingleServer struct {
 	client.UnimplementedLbsingleServer
+	singleGroup singleflight.Group
 }
 
 func (a *LbsingleServer) DelFileList(ctx context.Context, req *client.DelFileListReq) (*client.DelFileListRsp, error) {
@@ -36,19 +38,19 @@ func (a *LbsingleServer) DelFileList(ctx context.Context, req *client.DelFileLis
 		return &rsp, nil
 	}
 
-	idList := utils.PluckUint64List(listRsp.List, client.FieldId)
-	_, err = mysql.File.NewScope(ctx).In(client.FieldId_, idList).Delete(&client.ModelFile{})
-	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
-	}
-
 	// 清缓存
 	for _, val := range listRsp.List {
 		err = cache.DelFileBySortUrl(val.SortUrl)
 		if err != nil {
 			log.Errorf("del %s cache failed err:%v", val.SortUrl, err)
 		}
+	}
+
+	idList := utils.PluckUint64List(listRsp.List, client.FieldId)
+	_, err = mysql.File.NewScope(ctx).In(client.FieldId_, idList).Delete(&client.ModelFile{})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
 	}
 
 	return &rsp, err
@@ -222,6 +224,26 @@ func (a *LbsingleServer) ResetPassword(ctx context.Context, req *client.ResetPas
 	}
 
 	err = cache.DelLoginInfo(uCtx.Sid())
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+func (a *LbsingleServer) SyncFile(ctx context.Context, req *client.SyncFileReq) (*client.SyncFileRsp, error) {
+	var rsp client.SyncFileRsp
+	var err error
+
+	// 单体环境 直接用单机的 singleflight 防并发
+	_, err, _ = a.singleGroup.Do("syncfile", func() (interface{}, error) {
+		err := SyncFileIndex(ctx, true)
+		if err != nil {
+			log.Errorf("err:%v", err)
+			return nil, err
+		}
+		return nil, nil
+	})
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err

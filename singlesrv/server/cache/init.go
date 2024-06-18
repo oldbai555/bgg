@@ -20,7 +20,6 @@ func InitCache() (err error) {
 	r := syscfg.NewRedisConf("")
 	rdb, err = bredis.New(r.Host, r.Port, r.Password)
 	if err != nil {
-		log.Errorf("err:%v", err)
 		return err
 	}
 	return nil
@@ -32,4 +31,11 @@ func IsNotFound(err error) bool {
 		return false
 	}
 	return rdb.IsNotFound(err)
+}
+
+func Stop() {
+	err := DelAllFileCache()
+	if err != nil {
+		log.Errorf("err:%v", err)
+	}
 }

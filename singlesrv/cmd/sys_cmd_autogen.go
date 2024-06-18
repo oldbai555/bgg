@@ -25,4 +25,6 @@ var cmdList = []*bcmd.Cmd{
 	{Server: client.ServerName, Path: client.UpdateLoginUserInfoCMDPath, GRpcFunc: server.OnceSvrImpl.UpdateLoginUserInfo, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
 
 	{Server: client.ServerName, Path: client.ResetPasswordCMDPath, GRpcFunc: server.OnceSvrImpl.ResetPassword, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: client.ServerName, Path: client.SyncFileCMDPath, GRpcFunc: server.OnceSvrImpl.SyncFile, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
 }

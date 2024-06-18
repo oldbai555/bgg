@@ -14,6 +14,7 @@ import (
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/jsonpb"
 	"github.com/oldbai555/micro/uctx"
+	"time"
 )
 
 var topicMgr = make(map[string]*TopicSt)
@@ -54,6 +55,29 @@ func (t TopicSt) Pub(ctx uctx.IUCtx, obj proto.Message) error {
 
 	log.Infof("publish mq msg %s data: %s", t.topic, string(marshal))
 	return producer.Publish(t.topic, b)
+}
+
+func (t TopicSt) DeferredPublish(ctx uctx.IUCtx, delay time.Duration, obj proto.Message) error {
+	if producer == nil {
+		return client.ErrNsqProducerConnectFailure
+	}
+
+	err := producer.Ping()
+	if err != nil {
+		return err
+	}
+
+	marshal, err := t.Marshal(obj)
+	if err != nil {
+		return err
+	}
+
+	b, err := EncodeMsg(ctx.TraceId(), 0, marshal)
+	if err != nil {
+		return err
+	}
+	log.Infof("deferred publish mq msg %s data: %s", t.topic, string(marshal))
+	return producer.DeferredPublish(t.topic, delay, b)
 }
 
 func (t TopicSt) Marshal(obj proto.Message) ([]byte, error) {
