@@ -7,13 +7,12 @@
 package mq
 
 import (
-	"bytes"
-	"github.com/golang/protobuf/proto"
 	"github.com/nsqio/go-nsq"
 	"github.com/oldbai555/bgg/singlesrv/client"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/jsonpb"
 	"github.com/oldbai555/micro/uctx"
+	"google.golang.org/protobuf/proto"
 	"time"
 )
 
@@ -81,17 +80,15 @@ func (t TopicSt) DeferredPublish(ctx uctx.IUCtx, delay time.Duration, obj proto.
 }
 
 func (t TopicSt) Marshal(obj proto.Message) ([]byte, error) {
-	var buf bytes.Buffer
-	err := jsonpb.Marshal(&buf, obj)
+	buf, err := jsonpb.Marshal(obj)
 	if err != nil {
 		return nil, err
 	}
-	return buf.Bytes(), nil
+	return buf, nil
 }
 
 func (t TopicSt) Unmarshal(buf []byte, obj proto.Message) error {
-	var reader = bytes.NewReader(buf)
-	err := jsonpb.Unmarshal(reader, obj)
+	err := jsonpb.Unmarshal(buf, obj)
 	if err != nil {
 		return err
 	}

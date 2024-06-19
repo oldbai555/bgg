@@ -7,7 +7,6 @@
 package mq
 
 import (
-	"bytes"
 	"github.com/nsqio/go-nsq"
 	"github.com/oldbai555/bgg/singlesrv/client"
 	"github.com/oldbai555/lbtool/log"
@@ -21,18 +20,16 @@ func EncodeMsg(reqId string, corpId uint32, msg []byte) ([]byte, error) {
 		CorpId: corpId,
 		Data:   msg,
 	}
-	var buf bytes.Buffer
-	err := jsonpb.Marshal(&buf, info)
+	buf, err := jsonpb.Marshal(info)
 	if err != nil {
 		return nil, err
 	}
-	return buf.Bytes(), nil
+	return buf, nil
 }
 
 func DecodeMsg(msg []byte) (*client.NsqMsg, error) {
 	m := new(client.NsqMsg)
-	var reader = bytes.NewReader(msg)
-	err := jsonpb.Unmarshal(reader, m)
+	err := jsonpb.Unmarshal(msg, m)
 	if err != nil {
 		return nil, err
 	}

@@ -27,7 +27,7 @@ func TestInit(t *testing.T) {
 		NotFoundErrCode: int32(client.ErrCode_ErrFileNotFound),
 		Db:              "biz",
 	})
-	find, err := OrmFile.NewBaseScope().First(uctx.NewBaseUCtx())
+	find, err := OrmFile.NewBaseScope().Where(client.FieldId_, 1).First(uctx.NewBaseUCtx())
 	if err != nil {
 		t.Errorf("err:%v", err)
 		return

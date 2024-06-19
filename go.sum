@@ -338,8 +338,10 @@ github.com/mwitkow/go-conntrack v0.0.0-20190716064945-2f068394615f/go.mod h1:qRW
 github.com/nsqio/go-nsq v1.1.0 h1:PQg+xxiUjA7V+TLdXw7nVrJ5Jbl3sN86EhGCQj4+FYE=
 github.com/nsqio/go-nsq v1.1.0/go.mod h1:vKq36oyeVXgsS5Q8YEO7WghqidAVXQlcFxzQbQTuDEY=
 github.com/nxadm/tail v1.4.8 h1:nPr65rt6Y5JFSKQO7qToXr7pePgD6Gwiw05lkbyAQTE=
-github.com/oldbai555/lbtool v0.0.4-0.20240618053524-98eec42aa2f8 h1:lM5fULaMLanLxiMclhsbJAOjZyiHsQEI9+zN3ACJIK8=
-github.com/oldbai555/lbtool v0.0.4-0.20240618053524-98eec42aa2f8/go.mod h1:ct4fxWjg0GB13g2bnJ+UQ1iBxdCyY0okyu8v/b7D5r0=
+github.com/oldbai555/lbtool v0.0.4-0.20240619075006-d890bfa855fd h1:njnBYtMQcrlGOEtnigiI78fil51ZAnXgjvgfsdW/dOk=
+github.com/oldbai555/lbtool v0.0.4-0.20240619075006-d890bfa855fd/go.mod h1:kuAjq3HCaTvreEtYhdRcebVFeOAZn9xje2TO0OqSn1Y=
+github.com/oldbai555/micro v0.0.2-0.20240619081202-96ef1b64d393 h1:ymbBe7pWQcX/csiD18blVp8VZLoG+UxyBT2WUtLk4Tw=
+github.com/oldbai555/micro v0.0.2-0.20240619081202-96ef1b64d393/go.mod h1:unQDPQ2Xyq4oopNd0ZXB+XofUDZSo4HSdOEd3YenvJc=
 github.com/onsi/ginkgo v1.16.5 h1:8xi0RTUf59SOSfEtZMvwTvXYMzG4gV23XVHOZiXNtnE=
 github.com/onsi/gomega v1.21.1 h1:OB/euWYIExnPBohllTicTHmGTrMaqJ67nIu80j0/uEM=
 github.com/pascaldekloe/goe v0.0.0-20180627143212-57f6aae5913c/go.mod h1:lzWF7FIEvWOWxwDKqyGYQf6ZUaNfKdP144TG7ZOy1lc=
