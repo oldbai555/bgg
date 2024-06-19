@@ -2,12 +2,12 @@ package server
 
 import (
 	"context"
-	"github.com/oldbai555/bgg/service/lb"
 	"github.com/oldbai555/bgg/singlesrv/client"
 	"github.com/oldbai555/bgg/singlesrv/server/cache"
-	"github.com/oldbai555/bgg/singlesrv/server/mysql"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/utils"
+	"github.com/oldbai555/micro/core"
+	"github.com/oldbai555/micro/gormx"
 	"github.com/oldbai555/micro/uctx"
 	"golang.org/x/sync/singleflight"
 )
@@ -22,11 +22,16 @@ type LbsingleServer struct {
 func (a *LbsingleServer) DelFileList(ctx context.Context, req *client.DelFileListReq) (*client.DelFileListRsp, error) {
 	var rsp client.DelFileListRsp
 	var err error
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
 
 	listRsp, err := a.GetFileList(ctx, &client.GetFileListReq{
 		ListOption: req.ListOption.
 			SetSkipTotal().
-			AddOpt(lb.DefaultListOption_DefaultListOptionSelect, []string{client.FieldId_, client.FieldSortUrl_}),
+			AddOpt(core.DefaultListOption_DefaultListOptionSelect, []string{client.FieldId_, client.FieldSortUrl_}),
 	})
 	if err != nil {
 		log.Errorf("err:%v", err)
@@ -47,7 +52,7 @@ func (a *LbsingleServer) DelFileList(ctx context.Context, req *client.DelFileLis
 	}
 
 	idList := utils.PluckUint64List(listRsp.List, client.FieldId)
-	_, err = mysql.File.NewScope(ctx).In(client.FieldId_, idList).Delete(&client.ModelFile{})
+	_, err = OrmFile.NewBaseScope().WhereIn(client.FieldId_, idList).Delete(uCtx)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
@@ -59,14 +64,18 @@ func (a *LbsingleServer) DelFileList(ctx context.Context, req *client.DelFileLis
 func (a *LbsingleServer) GetFile(ctx context.Context, req *client.GetFileReq) (*client.GetFileRsp, error) {
 	var rsp client.GetFileRsp
 	var err error
-
-	var data client.ModelFile
-	err = mysql.File.NewScope(ctx).Where(client.FieldId_, req.Id).First(&data)
+	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
 	}
-	rsp.Data = &data
+
+	data, err := OrmFile.NewBaseScope().Where(client.FieldId_, req.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = data
 
 	return &rsp, err
 }
@@ -74,18 +83,23 @@ func (a *LbsingleServer) GetFile(ctx context.Context, req *client.GetFileReq) (*
 func (a *LbsingleServer) GetFileList(ctx context.Context, req *client.GetFileListReq) (*client.GetFileListRsp, error) {
 	var rsp client.GetFileListRsp
 	var err error
-
-	db := mysql.File.NewList(ctx, req.ListOption)
-	err = lb.ProcessDefaultOptions(req.ListOption, db)
+	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
 	}
 
-	err = lb.NewOptionsProcessor(req.ListOption).
+	db := OrmFile.NewList(req.ListOption)
+	err = gormx.ProcessDefaultOptions[*client.ModelFile](req.ListOption, db)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = core.NewOptionsProcessor(req.ListOption).
 		Process()
 
-	rsp.Paginate, err = db.FindPaginate(&rsp.List)
+	rsp.Paginate, err = db.FindPaginate(uCtx, &rsp.List)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
@@ -97,12 +111,17 @@ func (a *LbsingleServer) GetFileList(ctx context.Context, req *client.GetFileLis
 func (a *LbsingleServer) Login(ctx context.Context, req *client.LoginReq) (*client.LoginRsp, error) {
 	var rsp client.LoginRsp
 	var err error
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
 
-	var user client.ModelUser
-	err = mysql.User.NewScope(ctx).AndMap(map[string]interface{}{
+	var user *client.ModelUser
+	user, err = OrmUser.NewBaseScope().Where(map[string]interface{}{
 		client.FieldUsername_: req.Username,
 		client.FieldPassword_: utils.StrMd5(req.Password),
-	}).First(&user)
+	}).First(uCtx)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
@@ -165,13 +184,13 @@ func (a *LbsingleServer) UpdateLoginUserInfo(ctx context.Context, req *client.Up
 	}
 	baseUser := uCtx.ExtInfo().(*client.BaseUser)
 
-	err = mysql.User.NewScope(ctx).Eq(client.FieldId_, baseUser.Id).First(&client.ModelUser{})
+	_, err = OrmUser.NewBaseScope().Where(client.FieldId_, baseUser.Id).First(uCtx)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
 	}
 
-	_, err = mysql.User.NewScope(ctx).Eq(client.FieldId_, baseUser.Id).Update(utils.OrmStruct2Map(req.User, client.FieldRole))
+	_, err = OrmUser.NewBaseScope().Where(client.FieldId_, baseUser.Id).Update(uCtx, utils.OrmStruct2Map(req.User, client.FieldRole))
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
@@ -200,10 +219,10 @@ func (a *LbsingleServer) ResetPassword(ctx context.Context, req *client.ResetPas
 	oldPsw := utils.Md5(req.OldPassword)
 	newPsw := utils.Md5(req.NewPassword)
 
-	err = mysql.User.NewScope(ctx).AndMap(map[string]interface{}{
+	_, err = OrmUser.NewBaseScope().Where(map[string]interface{}{
 		client.FieldId_:       baseUser.Id,
 		client.FieldPassword_: oldPsw,
-	}).First(&client.ModelUser{})
+	}).First(uCtx)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, client.ErrOldPasswordNotEqual
@@ -213,9 +232,9 @@ func (a *LbsingleServer) ResetPassword(ctx context.Context, req *client.ResetPas
 		return nil, client.ErrOldPwdEqualNewPwd
 	}
 
-	_, err = mysql.User.NewScope(ctx).AndMap(map[string]interface{}{
+	_, err = OrmUser.NewBaseScope().Where(map[string]interface{}{
 		client.FieldId_: baseUser.Id,
-	}).Update(map[string]interface{}{
+	}).Update(uCtx, map[string]interface{}{
 		client.FieldPassword_: newPsw,
 	})
 	if err != nil {

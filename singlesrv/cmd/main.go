@@ -14,7 +14,6 @@ import (
 	"github.com/oldbai555/bgg/singlesrv/server/cache"
 	"github.com/oldbai555/bgg/singlesrv/server/ctx"
 	"github.com/oldbai555/bgg/singlesrv/server/mq"
-	"github.com/oldbai555/bgg/singlesrv/server/mysql"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/jsonpb"
 	"github.com/oldbai555/lbtool/pkg/lberr"
@@ -56,7 +55,7 @@ func (p *program) Init(_ svc.Environment) error {
 	gate.CheckCmdList(cmdList)
 
 	// 初始化mysql
-	err = mysql.Init()
+	err = server.Init()
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return err
@@ -109,7 +108,6 @@ func (p *program) Start() error {
 		panic(err)
 	}
 
-	mysql.InitDefaultAccount()
 	return nil
 }
 

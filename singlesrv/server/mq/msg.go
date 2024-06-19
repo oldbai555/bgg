@@ -12,6 +12,7 @@ import (
 	"github.com/oldbai555/bgg/singlesrv/client"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/jsonpb"
+	"github.com/oldbai555/micro/uctx"
 )
 
 func EncodeMsg(reqId string, corpId uint32, msg []byte) ([]byte, error) {
@@ -38,7 +39,7 @@ func DecodeMsg(msg []byte) (*client.NsqMsg, error) {
 	return m, nil
 }
 
-func Process(msg *nsq.Message, doLogic func(buf []byte) error) error {
+func Process(msg *nsq.Message, doLogic func(uCtx uctx.IUCtx, buf []byte) error) error {
 	info, err := DecodeMsg(msg.Body)
 	if err != nil {
 		log.Errorf("process err:%v, msg %v", err, msg)
@@ -54,8 +55,9 @@ func Process(msg *nsq.Message, doLogic func(buf []byte) error) error {
 	}
 
 	log.Infof("process mq msg %s", string(msg.Body))
-
-	err = doLogic(info.Data)
+	ctx := uctx.NewBaseUCtx()
+	ctx.SetTraceId(info.ReqId)
+	err = doLogic(ctx, info.Data)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return err

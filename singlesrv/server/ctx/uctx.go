@@ -17,9 +17,10 @@ import (
 )
 
 func NewCtx(ctx context.Context, options ...Option) *Ctx {
+	baseUCtx := uctx.NewBaseUCtx()
+	baseUCtx.Context = ctx
 	c := &Ctx{
-		Context:  ctx,
-		BaseUCtx: uctx.NewBaseUCtx(),
+		BaseUCtx: baseUCtx,
 	}
 	for _, option := range options {
 		option(c)
@@ -28,7 +29,6 @@ func NewCtx(ctx context.Context, options ...Option) *Ctx {
 }
 
 type Ctx struct {
-	context.Context
 	*uctx.BaseUCtx
 }
 

@@ -1,6 +1,0 @@
-server:
-  name: "gateway"
-  port: 20000
-prometheus:
-  ip: ""
-  port: 2112

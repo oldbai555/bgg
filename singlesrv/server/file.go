@@ -16,7 +16,6 @@ import (
 	"github.com/oldbai555/bgg/singlesrv/server/cache"
 	"github.com/oldbai555/bgg/singlesrv/server/constant"
 	"github.com/oldbai555/bgg/singlesrv/server/mq"
-	"github.com/oldbai555/bgg/singlesrv/server/mysql"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/lberr"
 	"github.com/oldbai555/lbtool/utils"
@@ -34,13 +33,17 @@ func SyncFileIndex(ctx context.Context, cacheAllFile bool) error {
 	var filePathMap = make(map[string]string)
 	var sortUrlMap = make(map[string]struct{})
 
-	var list []*client.ModelFile
-	err := mysql.File.NewScope(ctx).Chunk(2000, &list, func() (stop bool) {
-		for _, file := range list {
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		uCtx = uctx.NewBaseUCtx()
+	}
+
+	err = OrmFile.NewBaseScope().Chunk(uCtx, 2000, func(out []*client.ModelFile) error {
+		for _, file := range out {
 			filePathMap[file.Path] = file.Md5
 			sortUrlMap[file.SortUrl] = struct{}{}
 		}
-		return
+		return nil
 	})
 	if err != nil {
 		log.Errorf("err:%v", err)
@@ -105,10 +108,6 @@ func SyncFileIndex(ctx context.Context, cacheAllFile bool) error {
 		return err
 	}
 
-	uCtx, err := uctx.ToUCtx(ctx)
-	if err != nil {
-		uCtx = uctx.NewBaseUCtx()
-	}
 	if len(newFileList) != 0 {
 		pubErr := MqTopicSyncFile.Pub(uCtx, &client.MqSyncFile{
 			FileList: newFileList,
@@ -124,20 +123,20 @@ func SyncFileIndex(ctx context.Context, cacheAllFile bool) error {
 		for _, md5 := range filePathMap {
 			md5List = append(md5List, md5)
 		}
-		_, err = mysql.File.NewScope(ctx).
-			Eq(client.FieldState_, uint32(client.ModelFile_StateNil)).
-			In(client.FieldMd5_, md5List).
-			Update(map[string]interface{}{
+		_, err = OrmFile.NewBaseScope().
+			Where(client.FieldState_, uint32(client.ModelFile_StateNil)).
+			WhereIn(client.FieldMd5_, md5List).
+			Update(uCtx, map[string]interface{}{
 				client.FieldState_: uint32(client.ModelFile_StateNotFoundInLocalDir),
 			})
 		if err != nil {
 			log.Errorf("err:%v", err)
 			return err
 		}
-		_, err = mysql.File.NewScope(ctx).
-			Eq(client.FieldState_, uint32(client.ModelFile_StateNotFoundInLocalDir)).
-			NotIn(client.FieldMd5_, md5List).
-			Update(map[string]interface{}{
+		_, err = OrmFile.NewBaseScope().
+			Where(client.FieldState_, uint32(client.ModelFile_StateNotFoundInLocalDir)).
+			WhereNotIn(client.FieldMd5_, md5List).
+			Update(uCtx, map[string]interface{}{
 				client.FieldState_: uint32(client.ModelFile_StateNil),
 			})
 		if err != nil {
@@ -158,7 +157,7 @@ func SyncFileIndex(ctx context.Context, cacheAllFile bool) error {
 }
 
 func MqTopicBySyncFileHandler(msg *nsq.Message) error {
-	var doSingleFileLogic = func(file *client.ModelFile) error {
+	var doSingleFileLogic = func(ctx uctx.IUCtx, file *client.ModelFile) error {
 		if file == nil {
 			log.Errorf("unmarshal file is nil")
 			return nil
@@ -167,10 +166,9 @@ func MqTopicBySyncFileHandler(msg *nsq.Message) error {
 		if file.Md5 == "" {
 			return client.ErrFileMd5IsEmpty
 		}
-
-		db := mysql.File.NewScope(context.Background())
-		err := db.Eq(client.FieldMd5_, file.Md5).First(&client.ModelFile{})
-		if err != nil && !mysql.File.IsNotFoundErr(err) {
+		db := OrmFile.NewBaseScope()
+		_, err := db.Where(client.FieldMd5_, file.Md5).First(ctx)
+		if err != nil && !OrmFile.IsNotFoundErr(err) {
 			log.Errorf("err:%v", err)
 			return err
 		}
@@ -185,7 +183,7 @@ func MqTopicBySyncFileHandler(msg *nsq.Message) error {
 			return cache.SetFileBySortUrl(file.SortUrl, string(buf))
 		}
 
-		_, err = mysql.File.NewScope(context.Background()).Create(&file)
+		err = OrmFile.NewBaseScope().Create(ctx, &file)
 		if err != nil {
 			log.Errorf("err:%v", err)
 			return err
@@ -205,7 +203,7 @@ func MqTopicBySyncFileHandler(msg *nsq.Message) error {
 		return nil
 	}
 
-	return mq.Process(msg, func(buf []byte) error {
+	return mq.Process(msg, func(ctx uctx.IUCtx, buf []byte) error {
 		var data client.MqSyncFile
 		err := MqTopicSyncFile.Unmarshal(buf, &data)
 		if err != nil {
@@ -214,7 +212,7 @@ func MqTopicBySyncFileHandler(msg *nsq.Message) error {
 		}
 
 		for _, file := range data.FileList {
-			err = doSingleFileLogic(file)
+			err = doSingleFileLogic(ctx, file)
 			if err != nil {
 				log.Errorf("err:%v", err)
 			}
@@ -225,9 +223,9 @@ func MqTopicBySyncFileHandler(msg *nsq.Message) error {
 }
 
 func MqTopicByCacheAllFileHandler(msg *nsq.Message) error {
-	return mq.Process(msg, func(buf []byte) error {
+	return mq.Process(msg, func(ctx uctx.IUCtx, buf []byte) error {
 		var list []*client.ModelFile
-		err := mysql.File.NewScope(context.Background()).Chunk(2000, &list, func() (stop bool) {
+		err := OrmFile.NewBaseScope().Chunk(ctx, 2000, func(out []*client.ModelFile) error {
 			for _, file := range list {
 				bytes, err := MqTopicCacheAllFile.Marshal(file)
 				if err != nil {
@@ -236,7 +234,7 @@ func MqTopicByCacheAllFileHandler(msg *nsq.Message) error {
 					err = cache.SetFileBySortUrl(file.SortUrl, string(bytes))
 				}
 			}
-			return
+			return nil
 		})
 		if err != nil {
 			log.Errorf("err:%v", err)
