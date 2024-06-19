@@ -25,25 +25,27 @@ func Init() (err error) {
 
 	// 注册表
 	gormEngine.AutoMigrate([]interface{}{
+
 		&client.ModelFile{},
 		&client.ModelUser{},
 	},
 	)
-
 	// 注入结构
 	gormEngine.RegObjectType(
+
 		lbsingledb.ModelFile,
 		lbsingledb.ModelUser,
 	)
 
 	OrmFile = gormx.NewBaseModel[*client.ModelFile](gormx.ModelConfig{
 		NotFoundErrCode: int32(client.ErrCode_ErrFileNotFound),
-		Db:              "",
+		Db:              "biz",
 	})
 	OrmUser = gormx.NewBaseModel[*client.ModelUser](gormx.ModelConfig{
 		NotFoundErrCode: int32(client.ErrCode_ErrUserNotFound),
-		Db:              "",
+		Db:              "biz",
 	})
+
 	log.Infof("end init db orm......")
 	return
 }

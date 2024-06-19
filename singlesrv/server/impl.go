@@ -57,7 +57,7 @@ func (a *LbsingleServer) DelFileList(ctx context.Context, req *client.DelFileLis
 		log.Errorf("err:%v", err)
 		return nil, err
 	}
-
+	OrmFile.NewBaseScope().Where(client.FieldId_, idList).First(uCtx)
 	return &rsp, err
 }
 

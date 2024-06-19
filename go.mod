@@ -2,7 +2,7 @@ module github.com/oldbai555/bgg
 
 go 1.20
 
-replace github.com/oldbai555/micro v0.0.2-0.20240618072528-a334f8d26eed => E:\bgg\github.com\oldbai555\micro
+//replace github.com/oldbai555/micro v0.0.2-0.20240618072528-a334f8d26eed => E:\bgg\github.com\oldbai555\micro
 
 require (
 	github.com/didip/tollbooth v4.0.2+incompatible
