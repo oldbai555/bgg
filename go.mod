@@ -12,7 +12,7 @@ require (
 	github.com/judwhite/go-svc v1.2.1
 	github.com/nsqio/go-nsq v1.1.0
 	github.com/oldbai555/lbtool v0.0.4-0.20240619075006-d890bfa855fd
-	github.com/oldbai555/micro v0.0.2-0.20240619081202-96ef1b64d393
+	github.com/oldbai555/micro v0.0.2-0.20240815044600-73c3498dd35a
 	github.com/prometheus/client_golang v1.11.1
 	github.com/spf13/viper v1.9.0
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
