@@ -144,7 +144,13 @@ func (p *program) registerCmd(r *gin.Engine, cmd *bcmd.Cmd) {
 		reqT := t.In(1).Elem()
 		reqV := reflect.New(reqT)
 		msg := reqV.Interface().(proto.Message)
-		err := jsonpb.Unmarshal(c.Request.Body, msg)
+		var buff []byte
+		_, err := c.Request.Body.Read(buff)
+		if err != nil {
+			log.Errorf("read err:%v", err)
+			return
+		}
+		err = jsonpb.Unmarshal(buff, msg)
 		if err != nil {
 			log.Errorf("err:%v", err)
 			handler.Error(err)
@@ -177,7 +183,7 @@ func (p *program) registerCmd(r *gin.Engine, cmd *bcmd.Cmd) {
 			nCtx.SetExtInfo(info)
 		}
 
-		log.Infof("req:[%s]", msg.String())
+		log.Infof("req:[%s]", string(buff))
 
 		handlerRet := v.Call([]reflect.Value{reflect.ValueOf(nCtx), reqV})
 
