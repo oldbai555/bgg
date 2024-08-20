@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"github.com/oldbai555/bgg/singlesrv/client"
 	"github.com/oldbai555/bgg/singlesrv/server/cache"
 	"github.com/oldbai555/lbtool/log"
@@ -97,6 +98,10 @@ func (a *LbsingleServer) GetFileList(ctx context.Context, req *client.GetFileLis
 	}
 
 	err = core.NewOptionsProcessor(req.ListOption).
+		AddString(client.GetFileListReq_ListOptionLikeName, func(val string) error {
+			db.WhereLike(client.FieldName_, fmt.Sprintf("%%%s%%", val))
+			return nil
+		}).
 		Process()
 
 	rsp.Paginate, err = db.FindPaginate(uCtx, &rsp.List)
