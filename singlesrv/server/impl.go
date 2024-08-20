@@ -57,7 +57,7 @@ func (a *LbsingleServer) DelFileList(ctx context.Context, req *client.DelFileLis
 		log.Errorf("err:%v", err)
 		return nil, err
 	}
-	OrmFile.NewBaseScope().Where(client.FieldId_, idList).First(uCtx)
+
 	return &rsp, err
 }
 
@@ -250,7 +250,7 @@ func (a *LbsingleServer) ResetPassword(ctx context.Context, req *client.ResetPas
 
 	return &rsp, err
 }
-func (a *LbsingleServer) SyncFile(ctx context.Context, req *client.SyncFileReq) (*client.SyncFileRsp, error) {
+func (a *LbsingleServer) SyncFile(ctx context.Context, _ *client.SyncFileReq) (*client.SyncFileRsp, error) {
 	var rsp client.SyncFileRsp
 	var err error
 

@@ -25,6 +25,7 @@ import (
 	"github.com/oldbai555/micro/brpc/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/protobuf/proto"
+	"io"
 	"net/http"
 	"reflect"
 	"sync"
@@ -144,8 +145,7 @@ func (p *program) registerCmd(r *gin.Engine, cmd *bcmd.Cmd) {
 		reqT := t.In(1).Elem()
 		reqV := reflect.New(reqT)
 		msg := reqV.Interface().(proto.Message)
-		var buff []byte
-		_, err := c.Request.Body.Read(buff)
+		buff, err := io.ReadAll(c.Request.Body)
 		if err != nil {
 			log.Errorf("read err:%v", err)
 			return

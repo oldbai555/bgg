@@ -15,6 +15,7 @@ import (
 	"github.com/oldbai555/bgg/singlesrv/client"
 	"github.com/oldbai555/bgg/singlesrv/server/cache"
 	"github.com/oldbai555/bgg/singlesrv/server/constant"
+	"github.com/oldbai555/bgg/singlesrv/server/ctx"
 	"github.com/oldbai555/bgg/singlesrv/server/mq"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/lberr"
@@ -245,11 +246,21 @@ func MqTopicByCacheAllFileHandler(msg *nsq.Message) error {
 	})
 }
 
-func handleUploadFile(ctx *gin.Context) {
-	handler := bgin.NewHandler(ctx)
+func handleUploadFile(c *gin.Context) {
+	handler := bgin.NewHandler(c)
+	nCtx := ctx.NewCtx(
+		c,
+		ctx.WithGinHeaderAuthorization(c),
+	)
+	_, err := CheckAuth(nCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		handler.Error(err)
+		return
+	}
 
 	// 1.获取文件信息
-	file, err := ctx.FormFile("file")
+	file, err := c.FormFile("file")
 	if err != nil {
 		log.Errorf("err:%v", err)
 		handler.Error(err)
@@ -282,7 +293,7 @@ func handleUploadFile(ctx *gin.Context) {
 	}
 
 	// 5.保存文件到本地目录
-	err = ctx.SaveUploadedFile(file, savePath)
+	err = c.SaveUploadedFile(file, savePath)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		handler.Error(err)
@@ -324,7 +335,9 @@ func handleUploadFile(ctx *gin.Context) {
 	fileInfo.SortUrl = sUrl
 
 	// 7.交给MQ去保存
-	err = MqTopicSyncFile.Pub(uctx.NewBaseUCtx(), fileInfo)
+	err = MqTopicSyncFile.Pub(uctx.NewBaseUCtx(), &client.MqSyncFile{
+		FileList: []*client.ModelFile{fileInfo},
+	})
 	if err != nil {
 		log.Errorf("err:%v", err)
 		handler.Error(err)
