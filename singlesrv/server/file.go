@@ -225,9 +225,8 @@ func MqTopicBySyncFileHandler(msg *nsq.Message) error {
 
 func MqTopicByCacheAllFileHandler(msg *nsq.Message) error {
 	return mq.Process(msg, func(ctx uctx.IUCtx, buf []byte) error {
-		var list []*client.ModelFile
 		err := OrmFile.NewBaseScope().Chunk(ctx, 2000, func(out []*client.ModelFile) error {
-			for _, file := range list {
+			for _, file := range out {
 				bytes, err := MqTopicCacheAllFile.Marshal(file)
 				if err != nil {
 					log.Errorf("err:%v", err)
