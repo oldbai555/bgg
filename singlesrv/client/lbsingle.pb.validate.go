@@ -163,12 +163,16 @@ func (m *WebsocketMsg) validate(all bool) error {
 
 	// no validation rules for Type
 
+	// no validation rules for Sid
+
+	// no validation rules for ErrMsg
+
 	if all {
-		switch v := interface{}(m.GetMessage()).(type) {
+		switch v := interface{}(m.GetChatMessage()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, WebsocketMsgValidationError{
-					field:  "Message",
+					field:  "ChatMessage",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -176,16 +180,16 @@ func (m *WebsocketMsg) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, WebsocketMsgValidationError{
-					field:  "Message",
+					field:  "ChatMessage",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetMessage()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetChatMessage()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return WebsocketMsgValidationError{
-				field:  "Message",
+				field:  "ChatMessage",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

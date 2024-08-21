@@ -113,6 +113,7 @@ func (p *program) Start() error {
 }
 
 func (p *program) Stop() error {
+	server.CloseAllWsConn()
 	if p.prometheus != nil {
 		log.Infof("stop prometheus")
 		err := p.prometheus.Shutdown(context.Background())
