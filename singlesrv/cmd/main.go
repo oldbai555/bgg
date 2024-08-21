@@ -6,7 +6,6 @@ import (
 	"github.com/didip/tollbooth"
 	"github.com/didip/tollbooth_gin"
 	"github.com/gin-gonic/gin"
-	"github.com/gorilla/mux"
 	"github.com/judwhite/go-svc"
 	"github.com/oldbai555/bgg/pkg/syscfg"
 	"github.com/oldbai555/bgg/pkg/tool"
@@ -281,24 +280,6 @@ func (p *program) startGinHttpServer() error {
 	if err != nil {
 		log.Warnf("err is %v", err)
 		return err
-	}
-	return nil
-}
-
-func (p *program) startWebsocket() error {
-	router := mux.NewRouter()
-	routine.GoV2(func() error {
-		server.WsHub.Run()
-		return nil
-	})
-	router.HandleFunc("/ws", server.HandleWs)
-	onePort := tool.GetOnePort()
-	if onePort == 0 {
-		log.Warnf("获取到无效端口,无法开启 websocket")
-		return nil
-	}
-	if err := http.ListenAndServe(fmt.Sprintf(":%d", onePort), router); err != nil {
-		fmt.Println("err:", err)
 	}
 	return nil
 }

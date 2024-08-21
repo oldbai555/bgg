@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/gin-gonic/gin"
 	"github.com/oldbai555/bgg/singlesrv/client"
 	"github.com/oldbai555/lbtool/pkg/jsonpb"
 	"github.com/oldbai555/lbtool/pkg/routine"
@@ -11,8 +12,8 @@ import (
 )
 
 type wsConn struct {
-	ws       *websocket.Conn
-	dataChan chan []byte
+	ws         *websocket.Conn
+	writerChan chan []byte
 }
 
 var upgrader = &websocket.Upgrader{
@@ -23,16 +24,18 @@ var upgrader = &websocket.Upgrader{
 	},
 }
 
-// HandleWs 处理WebSocket升级和管理连接。
-func HandleWs(w http.ResponseWriter, r *http.Request) {
+// 处理WebSocket升级和管理连接。
+func handleWs(ctx *gin.Context) {
+	w := ctx.Writer
+	r := ctx.Request
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Errorf("WebSocket升级错误: %v", err)
+		log.Errorf("up grade err:%v", err)
 		return
 	}
 	c := &wsConn{
-		dataChan: make(chan []byte, 512),
-		ws:       ws,
+		writerChan: make(chan []byte, 512),
+		ws:         ws,
 	}
 	routine.GoV2(func() error {
 		c.writer()
@@ -43,15 +46,15 @@ func HandleWs(w http.ResponseWriter, r *http.Request) {
 
 // writer 向客户端发送消息。
 func (c *wsConn) writer() {
-	for data := range c.dataChan {
+	for data := range c.writerChan {
 		if err := c.ws.WriteMessage(websocket.TextMessage, data); err != nil {
-			log.Errorf("写入错误: %v", err)
+			log.Errorf("writer err:%v", err)
 			return
 		}
 	}
 	err := c.ws.Close()
 	if err != nil {
-		log.Errorf("关闭错误: %v", err)
+		log.Errorf("close err: %v", err)
 	}
 }
 
@@ -60,12 +63,12 @@ func (c *wsConn) reader() {
 	for {
 		_, message, err := c.ws.ReadMessage()
 		if err != nil {
-			log.Errorf("读取错误: %v", err)
+			log.Errorf("read message err:%v", err)
 			break
 		}
-		var data client.WebsocketData
+		var data client.WebsocketMsg
 		if err := jsonpb.Unmarshal(message, &data); err != nil {
-			log.Errorf("反序列化错误: %v", err)
+			log.Errorf("unmarshal err:%v", err)
 			continue
 		}
 		handleMessage(c, &data)
@@ -73,15 +76,20 @@ func (c *wsConn) reader() {
 }
 
 // handleMessageType 处理不同类型的传入消息。
-func handleMessage(c *wsConn, data *client.WebsocketData) {
+func handleMessage(c *wsConn, data *client.WebsocketMsg) {
 	switch data.Type {
 	case uint32(client.WebsocketDataType_WebsocketDataTypeLogin):
 
 	case uint32(client.WebsocketDataType_WebsocketDataTypeLogout):
 
 	case uint32(client.WebsocketDataType_WebsocketDataTypeChat):
-
+		bytes, err := jsonpb.Marshal(data)
+		if err != nil {
+			log.Errorf("unmarshal err:%v", err)
+			return
+		}
+		c.writerChan <- bytes
 	default:
-		log.Errorf("无法识别消息类型%d", data.Type)
+		log.Errorf("unknown message type:%d", data.Type)
 	}
 }
