@@ -11,8 +11,10 @@ import (
 )
 
 var (
-	OrmFile *gormx.BaseModel[*client.ModelFile]
-	OrmUser *gormx.BaseModel[*client.ModelUser]
+	OrmFile    *gormx.BaseModel[*client.ModelFile]
+	OrmUser    *gormx.BaseModel[*client.ModelUser]
+	OrmChat    *gormx.BaseModel[*client.ModelChat]
+	OrmMessage *gormx.BaseModel[*client.ModelMessage]
 )
 
 func Init() (err error) {
@@ -28,6 +30,8 @@ func Init() (err error) {
 
 		&client.ModelFile{},
 		&client.ModelUser{},
+		&client.ModelChat{},
+		&client.ModelMessage{},
 	},
 	)
 	// 注入结构
@@ -35,6 +39,8 @@ func Init() (err error) {
 
 		lbsingledb.ModelFile,
 		lbsingledb.ModelUser,
+		lbsingledb.ModelChat,
+		lbsingledb.ModelMessage,
 	)
 
 	OrmFile = gormx.NewBaseModel[*client.ModelFile](gormx.ModelConfig{
@@ -43,6 +49,14 @@ func Init() (err error) {
 	})
 	OrmUser = gormx.NewBaseModel[*client.ModelUser](gormx.ModelConfig{
 		NotFoundErrCode: int32(client.ErrCode_ErrUserNotFound),
+		Db:              "biz",
+	})
+	OrmChat = gormx.NewBaseModel[*client.ModelChat](gormx.ModelConfig{
+		NotFoundErrCode: int32(client.ErrCode_ErrChatNotFound),
+		Db:              "biz",
+	})
+	OrmMessage = gormx.NewBaseModel[*client.ModelMessage](gormx.ModelConfig{
+		NotFoundErrCode: int32(client.ErrCode_ErrMessageNotFound),
 		Db:              "biz",
 	})
 

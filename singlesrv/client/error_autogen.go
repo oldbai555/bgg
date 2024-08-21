@@ -19,4 +19,6 @@ var (
 	ErrFileMd5Already            = status.Error(codes.Code(int32(ErrCode_ErrFileMd5Already)), "文件 md5 已经存在")
 	ErrFileUploadFailure         = status.Error(codes.Code(int32(ErrCode_ErrFileUploadFailure)), "文件上传失败")
 	ErrFileAlreadyExist          = status.Error(codes.Code(int32(ErrCode_ErrFileAlreadyExist)), "保存文件失败，文件重复")
+	ErrChatNotFound              = status.Error(codes.Code(int32(ErrCode_ErrChatNotFound)), "会话不存在")
+	ErrMessageNotFound           = status.Error(codes.Code(int32(ErrCode_ErrMessageNotFound)), "消息不存在")
 )

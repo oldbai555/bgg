@@ -103,6 +103,10 @@ function gen_single() {
   safe_exec_baixctl gensingle  -p "$1"
 }
 
+function gen_single_pb() {
+  safe_exec_baixctl gensinglepb  -p "$1"
+}
+
 # 主逻辑部分
 sed_i_backup
 safe_process_env
@@ -140,6 +144,9 @@ case "$1" in
     ;;
   "gsg")
     gen_single "$2"
+    ;;
+  "gspb")
+    gen_single_pb "$2"
     ;;
   *)
     usage

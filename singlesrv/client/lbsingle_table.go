@@ -8,3 +8,9 @@ func (*ModelFile) TableName() string {
 func (*ModelUser) TableName() string {
 	return "lbsingle_user"
 }
+func (*ModelChat) TableName() string {
+	return "lbsingle_chat"
+}
+func (*ModelMessage) TableName() string {
+	return "lbsingle_message"
+}

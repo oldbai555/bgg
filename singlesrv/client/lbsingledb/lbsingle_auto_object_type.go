@@ -139,3 +139,124 @@ var ModelUser = &engine.ModelObjectType{
 		},
 	},
 }
+
+var ModelChat = &engine.ModelObjectType{
+	Name: "lbsingle.ModelChat",
+	FieldList: &engine.ObjectFieldList{
+		List: []*engine.ObjectField{
+			{
+				FieldName: "id",
+				Type:      "uint64",
+				IsArray:   false,
+			},
+			{
+				FieldName: "created_at",
+				Type:      "int32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "updated_at",
+				Type:      "int32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "deleted_at",
+				Type:      "int32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "type",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "account_sn",
+				Type:      "string",
+				IsArray:   false,
+			},
+			{
+				FieldName: "customer_sn",
+				Type:      "string",
+				IsArray:   false,
+			},
+		},
+	},
+}
+
+var ModelMessage = &engine.ModelObjectType{
+	Name: "lbsingle.ModelMessage",
+	FieldList: &engine.ObjectFieldList{
+		List: []*engine.ObjectField{
+			{
+				FieldName: "id",
+				Type:      "uint64",
+				IsArray:   false,
+			},
+			{
+				FieldName: "created_at",
+				Type:      "int32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "updated_at",
+				Type:      "int32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "deleted_at",
+				Type:      "int32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "server_msg_id",
+				Type:      "string",
+				IsArray:   false,
+			},
+			{
+				FieldName: "sys_msg_id",
+				Type:      "string",
+				IsArray:   false,
+			},
+			{
+				FieldName: "send_at",
+				Type:      "uint64",
+				IsArray:   false,
+			},
+			{
+				FieldName: "from",
+				Type:      "string",
+				IsArray:   false,
+			},
+			{
+				FieldName: "to",
+				Type:      "string",
+				IsArray:   false,
+			},
+			{
+				FieldName: "content",
+				Type:      "object",
+				IsArray:   false,
+			},
+			{
+				FieldName: "source",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "type",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "status",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "chat_id",
+				Type:      "uint64",
+				IsArray:   false,
+			},
+		},
+	},
+}
