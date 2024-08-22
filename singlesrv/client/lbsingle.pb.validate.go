@@ -163,8 +163,6 @@ func (m *WebsocketMsg) validate(all bool) error {
 
 	// no validation rules for Type
 
-	// no validation rules for Sid
-
 	// no validation rules for ErrMsg
 
 	if all {
@@ -190,6 +188,93 @@ func (m *WebsocketMsg) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return WebsocketMsgValidationError{
 				field:  "ChatMessage",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetLogin()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, WebsocketMsgValidationError{
+					field:  "Login",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, WebsocketMsgValidationError{
+					field:  "Login",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetLogin()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return WebsocketMsgValidationError{
+				field:  "Login",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetJoinChatRoom()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, WebsocketMsgValidationError{
+					field:  "JoinChatRoom",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, WebsocketMsgValidationError{
+					field:  "JoinChatRoom",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetJoinChatRoom()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return WebsocketMsgValidationError{
+				field:  "JoinChatRoom",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetLeaveChatRoom()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, WebsocketMsgValidationError{
+					field:  "LeaveChatRoom",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, WebsocketMsgValidationError{
+					field:  "LeaveChatRoom",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetLeaveChatRoom()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return WebsocketMsgValidationError{
+				field:  "LeaveChatRoom",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

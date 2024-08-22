@@ -13,6 +13,7 @@ import (
 	"github.com/oldbai555/bgg/singlesrv/server/cache"
 	"github.com/oldbai555/bgg/singlesrv/server/ctx"
 	"github.com/oldbai555/bgg/singlesrv/server/mq"
+	"github.com/oldbai555/bgg/singlesrv/server/wsmgr"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/jsonpb"
 	"github.com/oldbai555/lbtool/pkg/lberr"
@@ -113,7 +114,7 @@ func (p *program) Start() error {
 }
 
 func (p *program) Stop() error {
-	server.CloseAllWsConn()
+	wsmgr.CloseAllWsConn()
 	if p.prometheus != nil {
 		log.Infof("stop prometheus")
 		err := p.prometheus.Shutdown(context.Background())

@@ -8,46 +8,100 @@ package server
 
 import (
 	"github.com/oldbai555/bgg/singlesrv/client"
+	"github.com/oldbai555/bgg/singlesrv/server/iface"
+	"github.com/oldbai555/bgg/singlesrv/server/roommgr"
+	"github.com/oldbai555/bgg/singlesrv/server/wsmgr"
+	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/micro/uctx"
 	"google.golang.org/protobuf/proto"
 )
 
-func handleWebsocketDataTypeLogin(ctx uctx.IUCtx, msg *client.WebsocketMsg) (proto.Message, error) {
-	ctx.SetSid(msg.Sid)
-	_, err := CheckAuth(ctx)
+func handleWebsocketDataTypeLogin(ctx uctx.IUCtx, msg *client.WebsocketMsg) (ret proto.Message, err error) {
+	conn := ctx.ExtInfo().(iface.IWsConn)
+	if conn.IsLogin() {
+		return
+	}
+
+	login := msg.Login
+	ctx.SetSid(login.Sid)
+
+	// 鉴权
+	info, err := CheckAuth(ctx)
 	if err != nil {
 		return nil, err
 	}
-	wsConnMgr.bindUser2Conn(msg.Sid, ctx.ExtInfo().(string))
-	return msg, nil
+
+	uid := info.Id
+
+	// 绑定用户和链接
+	wsmgr.BindUser2Conn(uid, conn.GetConnId())
+
+	// 加入全局房间
+	chatRoomSt := roommgr.GetSingleChatRoom()
+	chatRoomSt.AddUser(uid)
+
+	login.Uid = uid
+
+	// 回复登陆成功
+	wsmgr.WriteProtoMsg(uid, msg)
+
+	// 广播有人加入房间
+	msg = wsmgr.PacketWebsocketDataByJoinChatRoom(&client.JoinChatRoom{RoomId: 1, Member: &client.ChatRoomMember{Uid: uid, Username: info.Username}})
+	err = chatRoomSt.Broadcast(msg)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return
+	}
+	return
 }
 
-func handleWebsocketDataTypeLogout(ctx uctx.IUCtx, msg *client.WebsocketMsg) (proto.Message, error) {
-	return msg, nil
+func handleWebsocketDataTypeLogout(ctx uctx.IUCtx, msg *client.WebsocketMsg) (ret proto.Message, err error) {
+	conn := ctx.ExtInfo().(iface.IWsConn)
+	if !conn.IsLogin() {
+		return
+	}
+	uid := conn.GetUid()
+
+	msg = wsmgr.PacketWebsocketDataByLeaveChatRoom(&client.LeaveChatRoom{RoomId: 1, Member: &client.ChatRoomMember{Uid: uid}})
+	err = roommgr.GetSingleChatRoom().Broadcast(msg)
+	if err != nil {
+		return
+	}
+
+	// 绑定用户和链接
+	wsmgr.UnBindUser2Conn(uid)
+	wsmgr.WriteProtoMsg(uid, msg)
+	roommgr.GetSingleChatRoom().DelUser(uid)
+	return
 }
 
-func handleWebsocketDataTypeChat(ctx uctx.IUCtx, msg *client.WebsocketMsg) (proto.Message, error) {
-	return msg, nil
+func handleWebsocketDataTypeChat(ctx uctx.IUCtx, msg *client.WebsocketMsg) (ret proto.Message, err error) {
+	ret = msg
+	return
 }
 
-func handleWebsocketDataTypeHeartBeat(_ uctx.IUCtx, msg *client.WebsocketMsg) (proto.Message, error) {
-	return msg, nil
+func handleWebsocketDataTypeHeartBeat(_ uctx.IUCtx, msg *client.WebsocketMsg) (ret proto.Message, err error) {
+	ret = msg
+	return
 }
 
-func handleWebsocketDataTypeConnect(_ uctx.IUCtx, msg *client.WebsocketMsg) (proto.Message, error) {
-	return msg, nil
+func handleWebsocketDataTypeConnect(_ uctx.IUCtx, msg *client.WebsocketMsg) (ret proto.Message, err error) {
+	ret = msg
+	return
 }
 
-func handleWebsocketDataTypeDisConnect(ctx uctx.IUCtx, msg *client.WebsocketMsg) (proto.Message, error) {
-	wsConnMgr.delConn(ctx.ExtInfo().(string))
-	return msg, nil
+func handleWebsocketDataTypeDisConnect(ctx uctx.IUCtx, msg *client.WebsocketMsg) (ret proto.Message, err error) {
+	conn := ctx.ExtInfo().(iface.IWsConn)
+	wsmgr.DelConn(conn.GetConnId())
+	ret = msg
+	return
 }
 
 func init() {
-	regWsMsgTypeHandler(uint32(client.WebsocketDataType_WebsocketDataTypeConnect), handleWebsocketDataTypeConnect)
-	regWsMsgTypeHandler(uint32(client.WebsocketDataType_WebsocketDataTypeDisConnect), handleWebsocketDataTypeDisConnect)
-	regWsMsgTypeHandler(uint32(client.WebsocketDataType_WebsocketDataTypeHeartBeat), handleWebsocketDataTypeHeartBeat)
-	regWsMsgTypeHandler(uint32(client.WebsocketDataType_WebsocketDataTypeLogin), handleWebsocketDataTypeLogin)
-	regWsMsgTypeHandler(uint32(client.WebsocketDataType_WebsocketDataTypeLogout), handleWebsocketDataTypeLogout)
-	regWsMsgTypeHandler(uint32(client.WebsocketDataType_WebsocketDataTypeChat), handleWebsocketDataTypeChat)
+	wsmgr.RegWsMsgTypeHandler(uint32(client.WebsocketDataType_WebsocketDataTypeConnect), handleWebsocketDataTypeConnect)
+	wsmgr.RegWsMsgTypeHandler(uint32(client.WebsocketDataType_WebsocketDataTypeDisConnect), handleWebsocketDataTypeDisConnect)
+	wsmgr.RegWsMsgTypeHandler(uint32(client.WebsocketDataType_WebsocketDataTypeHeartBeat), handleWebsocketDataTypeHeartBeat)
+	wsmgr.RegWsMsgTypeHandler(uint32(client.WebsocketDataType_WebsocketDataTypeLogin), handleWebsocketDataTypeLogin)
+	wsmgr.RegWsMsgTypeHandler(uint32(client.WebsocketDataType_WebsocketDataTypeLogout), handleWebsocketDataTypeLogout)
+	wsmgr.RegWsMsgTypeHandler(uint32(client.WebsocketDataType_WebsocketDataTypeChat), handleWebsocketDataTypeChat)
 }

@@ -422,6 +422,473 @@ var _ interface {
 	ErrorName() string
 } = BaseUserValidationError{}
 
+// Validate checks the field values on Login with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *Login) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Login with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in LoginMultiError, or nil if none found.
+func (m *Login) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Login) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Sid
+
+	// no validation rules for Uid
+
+	if len(errors) > 0 {
+		return LoginMultiError(errors)
+	}
+
+	return nil
+}
+
+// LoginMultiError is an error wrapping multiple validation errors returned by
+// Login.ValidateAll() if the designated constraints aren't met.
+type LoginMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LoginMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LoginMultiError) AllErrors() []error { return m }
+
+// LoginValidationError is the validation error returned by Login.Validate if
+// the designated constraints aren't met.
+type LoginValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LoginValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LoginValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LoginValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LoginValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LoginValidationError) ErrorName() string { return "LoginValidationError" }
+
+// Error satisfies the builtin error interface
+func (e LoginValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLogin.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LoginValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LoginValidationError{}
+
+// Validate checks the field values on JoinChatRoom with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *JoinChatRoom) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on JoinChatRoom with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in JoinChatRoomMultiError, or
+// nil if none found.
+func (m *JoinChatRoom) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *JoinChatRoom) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for RoomId
+
+	if all {
+		switch v := interface{}(m.GetMember()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, JoinChatRoomValidationError{
+					field:  "Member",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, JoinChatRoomValidationError{
+					field:  "Member",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetMember()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return JoinChatRoomValidationError{
+				field:  "Member",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return JoinChatRoomMultiError(errors)
+	}
+
+	return nil
+}
+
+// JoinChatRoomMultiError is an error wrapping multiple validation errors
+// returned by JoinChatRoom.ValidateAll() if the designated constraints aren't met.
+type JoinChatRoomMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m JoinChatRoomMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m JoinChatRoomMultiError) AllErrors() []error { return m }
+
+// JoinChatRoomValidationError is the validation error returned by
+// JoinChatRoom.Validate if the designated constraints aren't met.
+type JoinChatRoomValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e JoinChatRoomValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e JoinChatRoomValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e JoinChatRoomValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e JoinChatRoomValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e JoinChatRoomValidationError) ErrorName() string { return "JoinChatRoomValidationError" }
+
+// Error satisfies the builtin error interface
+func (e JoinChatRoomValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sJoinChatRoom.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = JoinChatRoomValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = JoinChatRoomValidationError{}
+
+// Validate checks the field values on LeaveChatRoom with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *LeaveChatRoom) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on LeaveChatRoom with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in LeaveChatRoomMultiError, or
+// nil if none found.
+func (m *LeaveChatRoom) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *LeaveChatRoom) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for RoomId
+
+	if all {
+		switch v := interface{}(m.GetMember()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LeaveChatRoomValidationError{
+					field:  "Member",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LeaveChatRoomValidationError{
+					field:  "Member",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetMember()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LeaveChatRoomValidationError{
+				field:  "Member",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return LeaveChatRoomMultiError(errors)
+	}
+
+	return nil
+}
+
+// LeaveChatRoomMultiError is an error wrapping multiple validation errors
+// returned by LeaveChatRoom.ValidateAll() if the designated constraints
+// aren't met.
+type LeaveChatRoomMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LeaveChatRoomMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LeaveChatRoomMultiError) AllErrors() []error { return m }
+
+// LeaveChatRoomValidationError is the validation error returned by
+// LeaveChatRoom.Validate if the designated constraints aren't met.
+type LeaveChatRoomValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LeaveChatRoomValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LeaveChatRoomValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LeaveChatRoomValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LeaveChatRoomValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LeaveChatRoomValidationError) ErrorName() string { return "LeaveChatRoomValidationError" }
+
+// Error satisfies the builtin error interface
+func (e LeaveChatRoomValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLeaveChatRoom.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LeaveChatRoomValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LeaveChatRoomValidationError{}
+
+// Validate checks the field values on ChatRoomMember with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *ChatRoomMember) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ChatRoomMember with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ChatRoomMemberMultiError,
+// or nil if none found.
+func (m *ChatRoomMember) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ChatRoomMember) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Uid
+
+	// no validation rules for Username
+
+	if len(errors) > 0 {
+		return ChatRoomMemberMultiError(errors)
+	}
+
+	return nil
+}
+
+// ChatRoomMemberMultiError is an error wrapping multiple validation errors
+// returned by ChatRoomMember.ValidateAll() if the designated constraints
+// aren't met.
+type ChatRoomMemberMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ChatRoomMemberMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ChatRoomMemberMultiError) AllErrors() []error { return m }
+
+// ChatRoomMemberValidationError is the validation error returned by
+// ChatRoomMember.Validate if the designated constraints aren't met.
+type ChatRoomMemberValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ChatRoomMemberValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ChatRoomMemberValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ChatRoomMemberValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ChatRoomMemberValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ChatRoomMemberValidationError) ErrorName() string { return "ChatRoomMemberValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ChatRoomMemberValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sChatRoomMember.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ChatRoomMemberValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ChatRoomMemberValidationError{}
+
 // Validate checks the field values on Content_Text with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.

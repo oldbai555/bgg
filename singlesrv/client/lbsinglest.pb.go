@@ -216,6 +216,226 @@ func (x *BaseUser) GetRole() uint32 {
 	return 0
 }
 
+type Login struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Sid string `protobuf:"bytes,1,opt,name=sid,proto3" json:"sid,omitempty"`
+	Uid uint64 `protobuf:"varint,2,opt,name=uid,proto3" json:"uid,omitempty"`
+}
+
+func (x *Login) Reset() {
+	*x = Login{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lbsinglest_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Login) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Login) ProtoMessage() {}
+
+func (x *Login) ProtoReflect() protoreflect.Message {
+	mi := &file_lbsinglest_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Login.ProtoReflect.Descriptor instead.
+func (*Login) Descriptor() ([]byte, []int) {
+	return file_lbsinglest_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *Login) GetSid() string {
+	if x != nil {
+		return x.Sid
+	}
+	return ""
+}
+
+func (x *Login) GetUid() uint64 {
+	if x != nil {
+		return x.Uid
+	}
+	return 0
+}
+
+type JoinChatRoom struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	RoomId uint64          `protobuf:"varint,1,opt,name=roomId,proto3" json:"roomId,omitempty"`
+	Member *ChatRoomMember `protobuf:"bytes,2,opt,name=member,proto3" json:"member,omitempty"`
+}
+
+func (x *JoinChatRoom) Reset() {
+	*x = JoinChatRoom{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lbsinglest_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *JoinChatRoom) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*JoinChatRoom) ProtoMessage() {}
+
+func (x *JoinChatRoom) ProtoReflect() protoreflect.Message {
+	mi := &file_lbsinglest_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use JoinChatRoom.ProtoReflect.Descriptor instead.
+func (*JoinChatRoom) Descriptor() ([]byte, []int) {
+	return file_lbsinglest_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *JoinChatRoom) GetRoomId() uint64 {
+	if x != nil {
+		return x.RoomId
+	}
+	return 0
+}
+
+func (x *JoinChatRoom) GetMember() *ChatRoomMember {
+	if x != nil {
+		return x.Member
+	}
+	return nil
+}
+
+type LeaveChatRoom struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	RoomId uint64          `protobuf:"varint,1,opt,name=roomId,proto3" json:"roomId,omitempty"`
+	Member *ChatRoomMember `protobuf:"bytes,2,opt,name=member,proto3" json:"member,omitempty"`
+}
+
+func (x *LeaveChatRoom) Reset() {
+	*x = LeaveChatRoom{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lbsinglest_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *LeaveChatRoom) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LeaveChatRoom) ProtoMessage() {}
+
+func (x *LeaveChatRoom) ProtoReflect() protoreflect.Message {
+	mi := &file_lbsinglest_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LeaveChatRoom.ProtoReflect.Descriptor instead.
+func (*LeaveChatRoom) Descriptor() ([]byte, []int) {
+	return file_lbsinglest_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *LeaveChatRoom) GetRoomId() uint64 {
+	if x != nil {
+		return x.RoomId
+	}
+	return 0
+}
+
+func (x *LeaveChatRoom) GetMember() *ChatRoomMember {
+	if x != nil {
+		return x.Member
+	}
+	return nil
+}
+
+type ChatRoomMember struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Uid      uint64 `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`
+	Username string `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+}
+
+func (x *ChatRoomMember) Reset() {
+	*x = ChatRoomMember{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lbsinglest_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ChatRoomMember) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ChatRoomMember) ProtoMessage() {}
+
+func (x *ChatRoomMember) ProtoReflect() protoreflect.Message {
+	mi := &file_lbsinglest_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ChatRoomMember.ProtoReflect.Descriptor instead.
+func (*ChatRoomMember) Descriptor() ([]byte, []int) {
+	return file_lbsinglest_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *ChatRoomMember) GetUid() uint64 {
+	if x != nil {
+		return x.Uid
+	}
+	return 0
+}
+
+func (x *ChatRoomMember) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
 type Content_Text struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -229,7 +449,7 @@ type Content_Text struct {
 func (x *Content_Text) Reset() {
 	*x = Content_Text{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lbsinglest_proto_msgTypes[2]
+		mi := &file_lbsinglest_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -242,7 +462,7 @@ func (x *Content_Text) String() string {
 func (*Content_Text) ProtoMessage() {}
 
 func (x *Content_Text) ProtoReflect() protoreflect.Message {
-	mi := &file_lbsinglest_proto_msgTypes[2]
+	mi := &file_lbsinglest_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -289,7 +509,7 @@ type Content_Image struct {
 func (x *Content_Image) Reset() {
 	*x = Content_Image{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lbsinglest_proto_msgTypes[3]
+		mi := &file_lbsinglest_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -302,7 +522,7 @@ func (x *Content_Image) String() string {
 func (*Content_Image) ProtoMessage() {}
 
 func (x *Content_Image) ProtoReflect() protoreflect.Message {
-	mi := &file_lbsinglest_proto_msgTypes[3]
+	mi := &file_lbsinglest_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -365,7 +585,7 @@ type Content_Video struct {
 func (x *Content_Video) Reset() {
 	*x = Content_Video{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lbsinglest_proto_msgTypes[4]
+		mi := &file_lbsinglest_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -378,7 +598,7 @@ func (x *Content_Video) String() string {
 func (*Content_Video) ProtoMessage() {}
 
 func (x *Content_Video) ProtoReflect() protoreflect.Message {
-	mi := &file_lbsinglest_proto_msgTypes[4]
+	mi := &file_lbsinglest_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -448,7 +668,7 @@ type Content_Voice struct {
 func (x *Content_Voice) Reset() {
 	*x = Content_Voice{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lbsinglest_proto_msgTypes[5]
+		mi := &file_lbsinglest_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -461,7 +681,7 @@ func (x *Content_Voice) String() string {
 func (*Content_Voice) ProtoMessage() {}
 
 func (x *Content_Voice) ProtoReflect() protoreflect.Message {
-	mi := &file_lbsinglest_proto_msgTypes[5]
+	mi := &file_lbsinglest_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -529,7 +749,7 @@ type Content_Document struct {
 func (x *Content_Document) Reset() {
 	*x = Content_Document{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lbsinglest_proto_msgTypes[6]
+		mi := &file_lbsinglest_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -542,7 +762,7 @@ func (x *Content_Document) String() string {
 func (*Content_Document) ProtoMessage() {}
 
 func (x *Content_Document) ProtoReflect() protoreflect.Message {
-	mi := &file_lbsinglest_proto_msgTypes[6]
+	mi := &file_lbsinglest_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -604,7 +824,7 @@ type Content_Location struct {
 func (x *Content_Location) Reset() {
 	*x = Content_Location{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lbsinglest_proto_msgTypes[7]
+		mi := &file_lbsinglest_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -617,7 +837,7 @@ func (x *Content_Location) String() string {
 func (*Content_Location) ProtoMessage() {}
 
 func (x *Content_Location) ProtoReflect() protoreflect.Message {
-	mi := &file_lbsinglest_proto_msgTypes[7]
+	mi := &file_lbsinglest_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -738,11 +958,29 @@ var file_lbsinglest_proto_rawDesc = []byte{
 	0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x12, 0x12, 0x0a, 0x04,
 	0x64, 0x65, 0x73, 0x63, 0x18, 0x07, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x64, 0x65, 0x73, 0x63,
 	0x12, 0x12, 0x0a, 0x04, 0x72, 0x6f, 0x6c, 0x65, 0x18, 0x08, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x04,
-	0x72, 0x6f, 0x6c, 0x65, 0x32, 0x0c, 0x0a, 0x0a, 0x6c, 0x62, 0x73, 0x69, 0x6e, 0x67, 0x6c, 0x65,
-	0x73, 0x74, 0x42, 0x2b, 0x5a, 0x29, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d,
-	0x2f, 0x6f, 0x6c, 0x64, 0x62, 0x61, 0x69, 0x35, 0x35, 0x35, 0x2f, 0x62, 0x67, 0x67, 0x2f, 0x73,
-	0x69, 0x6e, 0x67, 0x6c, 0x65, 0x73, 0x72, 0x76, 0x2f, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x62,
-	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x72, 0x6f, 0x6c, 0x65, 0x22, 0x2b, 0x0a, 0x05, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x12, 0x10, 0x0a,
+	0x03, 0x73, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x73, 0x69, 0x64, 0x12,
+	0x10, 0x0a, 0x03, 0x75, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x04, 0x52, 0x03, 0x75, 0x69,
+	0x64, 0x22, 0x5a, 0x0a, 0x0c, 0x4a, 0x6f, 0x69, 0x6e, 0x43, 0x68, 0x61, 0x74, 0x52, 0x6f, 0x6f,
+	0x6d, 0x12, 0x16, 0x0a, 0x06, 0x72, 0x6f, 0x6f, 0x6d, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x04, 0x52, 0x06, 0x72, 0x6f, 0x6f, 0x6d, 0x49, 0x64, 0x12, 0x32, 0x0a, 0x06, 0x6d, 0x65, 0x6d,
+	0x62, 0x65, 0x72, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x6c, 0x62, 0x73, 0x69,
+	0x6e, 0x67, 0x6c, 0x65, 0x73, 0x74, 0x2e, 0x43, 0x68, 0x61, 0x74, 0x52, 0x6f, 0x6f, 0x6d, 0x4d,
+	0x65, 0x6d, 0x62, 0x65, 0x72, 0x52, 0x06, 0x6d, 0x65, 0x6d, 0x62, 0x65, 0x72, 0x22, 0x5b, 0x0a,
+	0x0d, 0x4c, 0x65, 0x61, 0x76, 0x65, 0x43, 0x68, 0x61, 0x74, 0x52, 0x6f, 0x6f, 0x6d, 0x12, 0x16,
+	0x0a, 0x06, 0x72, 0x6f, 0x6f, 0x6d, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x06,
+	0x72, 0x6f, 0x6f, 0x6d, 0x49, 0x64, 0x12, 0x32, 0x0a, 0x06, 0x6d, 0x65, 0x6d, 0x62, 0x65, 0x72,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x6c, 0x62, 0x73, 0x69, 0x6e, 0x67, 0x6c,
+	0x65, 0x73, 0x74, 0x2e, 0x43, 0x68, 0x61, 0x74, 0x52, 0x6f, 0x6f, 0x6d, 0x4d, 0x65, 0x6d, 0x62,
+	0x65, 0x72, 0x52, 0x06, 0x6d, 0x65, 0x6d, 0x62, 0x65, 0x72, 0x22, 0x3e, 0x0a, 0x0e, 0x43, 0x68,
+	0x61, 0x74, 0x52, 0x6f, 0x6f, 0x6d, 0x4d, 0x65, 0x6d, 0x62, 0x65, 0x72, 0x12, 0x10, 0x0a, 0x03,
+	0x75, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x03, 0x75, 0x69, 0x64, 0x12, 0x1a,
+	0x0a, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x32, 0x0c, 0x0a, 0x0a, 0x6c, 0x62,
+	0x73, 0x69, 0x6e, 0x67, 0x6c, 0x65, 0x73, 0x74, 0x42, 0x2b, 0x5a, 0x29, 0x67, 0x69, 0x74, 0x68,
+	0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x6f, 0x6c, 0x64, 0x62, 0x61, 0x69, 0x35, 0x35, 0x35,
+	0x2f, 0x62, 0x67, 0x67, 0x2f, 0x73, 0x69, 0x6e, 0x67, 0x6c, 0x65, 0x73, 0x72, 0x76, 0x2f, 0x63,
+	0x6c, 0x69, 0x65, 0x6e, 0x74, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -757,29 +995,35 @@ func file_lbsinglest_proto_rawDescGZIP() []byte {
 	return file_lbsinglest_proto_rawDescData
 }
 
-var file_lbsinglest_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_lbsinglest_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_lbsinglest_proto_goTypes = []interface{}{
 	(*Content)(nil),          // 0: lbsinglest.Content
 	(*BaseUser)(nil),         // 1: lbsinglest.BaseUser
-	(*Content_Text)(nil),     // 2: lbsinglest.Content.Text
-	(*Content_Image)(nil),    // 3: lbsinglest.Content.Image
-	(*Content_Video)(nil),    // 4: lbsinglest.Content.Video
-	(*Content_Voice)(nil),    // 5: lbsinglest.Content.Voice
-	(*Content_Document)(nil), // 6: lbsinglest.Content.Document
-	(*Content_Location)(nil), // 7: lbsinglest.Content.Location
+	(*Login)(nil),            // 2: lbsinglest.Login
+	(*JoinChatRoom)(nil),     // 3: lbsinglest.JoinChatRoom
+	(*LeaveChatRoom)(nil),    // 4: lbsinglest.LeaveChatRoom
+	(*ChatRoomMember)(nil),   // 5: lbsinglest.ChatRoomMember
+	(*Content_Text)(nil),     // 6: lbsinglest.Content.Text
+	(*Content_Image)(nil),    // 7: lbsinglest.Content.Image
+	(*Content_Video)(nil),    // 8: lbsinglest.Content.Video
+	(*Content_Voice)(nil),    // 9: lbsinglest.Content.Voice
+	(*Content_Document)(nil), // 10: lbsinglest.Content.Document
+	(*Content_Location)(nil), // 11: lbsinglest.Content.Location
 }
 var file_lbsinglest_proto_depIdxs = []int32{
-	2, // 0: lbsinglest.Content.text:type_name -> lbsinglest.Content.Text
-	3, // 1: lbsinglest.Content.image:type_name -> lbsinglest.Content.Image
-	4, // 2: lbsinglest.Content.video:type_name -> lbsinglest.Content.Video
-	5, // 3: lbsinglest.Content.voice:type_name -> lbsinglest.Content.Voice
-	6, // 4: lbsinglest.Content.document:type_name -> lbsinglest.Content.Document
-	7, // 5: lbsinglest.Content.location:type_name -> lbsinglest.Content.Location
-	6, // [6:6] is the sub-list for method output_type
-	6, // [6:6] is the sub-list for method input_type
-	6, // [6:6] is the sub-list for extension type_name
-	6, // [6:6] is the sub-list for extension extendee
-	0, // [0:6] is the sub-list for field type_name
+	6,  // 0: lbsinglest.Content.text:type_name -> lbsinglest.Content.Text
+	7,  // 1: lbsinglest.Content.image:type_name -> lbsinglest.Content.Image
+	8,  // 2: lbsinglest.Content.video:type_name -> lbsinglest.Content.Video
+	9,  // 3: lbsinglest.Content.voice:type_name -> lbsinglest.Content.Voice
+	10, // 4: lbsinglest.Content.document:type_name -> lbsinglest.Content.Document
+	11, // 5: lbsinglest.Content.location:type_name -> lbsinglest.Content.Location
+	5,  // 6: lbsinglest.JoinChatRoom.member:type_name -> lbsinglest.ChatRoomMember
+	5,  // 7: lbsinglest.LeaveChatRoom.member:type_name -> lbsinglest.ChatRoomMember
+	8,  // [8:8] is the sub-list for method output_type
+	8,  // [8:8] is the sub-list for method input_type
+	8,  // [8:8] is the sub-list for extension type_name
+	8,  // [8:8] is the sub-list for extension extendee
+	0,  // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_lbsinglest_proto_init() }
@@ -813,7 +1057,7 @@ func file_lbsinglest_proto_init() {
 			}
 		}
 		file_lbsinglest_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Content_Text); i {
+			switch v := v.(*Login); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -825,7 +1069,7 @@ func file_lbsinglest_proto_init() {
 			}
 		}
 		file_lbsinglest_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Content_Image); i {
+			switch v := v.(*JoinChatRoom); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -837,7 +1081,7 @@ func file_lbsinglest_proto_init() {
 			}
 		}
 		file_lbsinglest_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Content_Video); i {
+			switch v := v.(*LeaveChatRoom); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -849,7 +1093,7 @@ func file_lbsinglest_proto_init() {
 			}
 		}
 		file_lbsinglest_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Content_Voice); i {
+			switch v := v.(*ChatRoomMember); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -861,7 +1105,7 @@ func file_lbsinglest_proto_init() {
 			}
 		}
 		file_lbsinglest_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Content_Document); i {
+			switch v := v.(*Content_Text); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -873,6 +1117,54 @@ func file_lbsinglest_proto_init() {
 			}
 		}
 		file_lbsinglest_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Content_Image); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lbsinglest_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Content_Video); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lbsinglest_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Content_Voice); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lbsinglest_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Content_Document); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lbsinglest_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Content_Location); i {
 			case 0:
 				return &v.state
@@ -891,7 +1183,7 @@ func file_lbsinglest_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_lbsinglest_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
