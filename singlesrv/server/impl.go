@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/oldbai555/bgg/singlesrv/client"
 	"github.com/oldbai555/bgg/singlesrv/server/cache"
+	"github.com/oldbai555/bgg/singlesrv/server/ctx"
+	"github.com/oldbai555/bgg/singlesrv/server/wsmgr"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/utils"
 	"github.com/oldbai555/micro/core"
@@ -144,20 +146,31 @@ func (a *LbsingleServer) Login(ctx context.Context, req *client.LoginReq) (*clie
 	return &rsp, err
 }
 
-func (a *LbsingleServer) Logout(ctx context.Context, req *client.LogoutReq) (*client.LogoutRsp, error) {
+func (a *LbsingleServer) Logout(c context.Context, req *client.LogoutReq) (*client.LogoutRsp, error) {
 	var rsp client.LogoutRsp
 	var err error
-
-	uCtx, err := uctx.ToUCtx(ctx)
+	uCtx, err := uctx.ToUCtx(c)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
 	}
+	baseUser := uCtx.ExtInfo().(*client.BaseUser)
 
 	err = cache.DelLoginInfo(uCtx.Sid())
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
+	}
+
+	conn := wsmgr.GetConnByUid(baseUser.Id)
+	if conn != nil {
+		newCtx := ctx.NewCtx(context.Background())
+		newCtx.SetExtInfo(conn)
+		_, err = handleWebsocketDataTypeLogout(newCtx, wsmgr.PacketWebsocketDataByLogout())
+		if err != nil {
+			log.Errorf("err:%v", err)
+			return nil, err
+		}
 	}
 
 	return &rsp, err

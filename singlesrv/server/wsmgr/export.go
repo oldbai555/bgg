@@ -19,6 +19,8 @@ var (
 	UnBindUser2Conn = wsConnMgr.unBindUser2Conn
 	WriteProtoMsg   = wsConnMgr.writeProtoMsg
 	WriteBytes      = wsConnMgr.writeBytes
+	CloseConnByUid  = wsConnMgr.closeConnByUid
+	GetConnByUid    = wsConnMgr.getConnByUid
 )
 
 // HandleWs 处理WebSocket升级和管理连接。

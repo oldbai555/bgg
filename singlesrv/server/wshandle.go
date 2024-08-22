@@ -46,8 +46,8 @@ func handleWebsocketDataTypeLogin(ctx uctx.IUCtx, msg *client.WebsocketMsg) (ret
 	wsmgr.WriteProtoMsg(uid, msg)
 
 	// 广播有人加入房间
-	msg = wsmgr.PacketWebsocketDataByJoinChatRoom(&client.JoinChatRoom{RoomId: 1, Member: &client.ChatRoomMember{Uid: uid, Username: info.Username}})
-	err = chatRoomSt.Broadcast(msg)
+	newMsg := wsmgr.PacketWebsocketDataByJoinChatRoom(&client.JoinChatRoom{RoomId: 1, Member: &client.ChatRoomMember{Uid: uid, Username: info.Username}})
+	err = chatRoomSt.Broadcast(newMsg)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return
@@ -62,8 +62,8 @@ func handleWebsocketDataTypeLogout(ctx uctx.IUCtx, msg *client.WebsocketMsg) (re
 	}
 	uid := conn.GetUid()
 
-	msg = wsmgr.PacketWebsocketDataByLeaveChatRoom(&client.LeaveChatRoom{RoomId: 1, Member: &client.ChatRoomMember{Uid: uid}})
-	err = roommgr.GetSingleChatRoom().Broadcast(msg)
+	newMsg := wsmgr.PacketWebsocketDataByLeaveChatRoom(&client.LeaveChatRoom{RoomId: 1, Member: &client.ChatRoomMember{Uid: uid}})
+	err = roommgr.GetSingleChatRoom().Broadcast(newMsg)
 	if err != nil {
 		return
 	}
@@ -76,6 +76,11 @@ func handleWebsocketDataTypeLogout(ctx uctx.IUCtx, msg *client.WebsocketMsg) (re
 }
 
 func handleWebsocketDataTypeChat(ctx uctx.IUCtx, msg *client.WebsocketMsg) (ret proto.Message, err error) {
+	conn := ctx.ExtInfo().(iface.IWsConn)
+	if !conn.IsLogin() {
+		return
+	}
+
 	ret = msg
 	return
 }

@@ -14,6 +14,13 @@ func PacketWebsocketDataByChatMessage(chatMsg *client.ModelMessage) *client.Webs
 		ChatMessage: chatMsg,
 	}
 }
+
+func PacketWebsocketDataByLogout() *client.WebsocketMsg {
+	return &client.WebsocketMsg{
+		Type: uint32(client.WebsocketDataType_WebsocketDataTypeLogout),
+	}
+}
+
 func PacketWebsocketDataByJoinChatRoom(data *client.JoinChatRoom) *client.WebsocketMsg {
 	return &client.WebsocketMsg{
 		Type:         uint32(client.WebsocketDataType_WebsocketDataTypeJoinChatRoom),

@@ -3,6 +3,7 @@ package wsmgr
 import (
 	"github.com/gorilla/websocket"
 	"github.com/oldbai555/bgg/singlesrv/client"
+	"github.com/oldbai555/bgg/singlesrv/server/iface"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/jsonpb"
 	"google.golang.org/protobuf/proto"
@@ -60,6 +61,7 @@ func (s *wsConnMgrSt) delConn(connId string) {
 	}
 	delete(s.user2Conn, conn.uid)
 	delete(s.connMgr, conn.connId)
+	conn.uid = 0
 	conn.close.Store(true)
 }
 
@@ -89,6 +91,28 @@ func (s *wsConnMgrSt) writeBytes(uid uint64, bytes []byte) {
 		log.Errorf("write err:%v", err)
 		return
 	}
+}
+
+func (s *wsConnMgrSt) closeConnByUid(uid uint64) {
+	s.rwLock.RLock()
+	conn, ok := s.user2Conn[uid]
+	s.rwLock.RUnlock()
+	if !ok {
+		return
+	}
+	conn.writeDisConnectMsg()
+	conn.close.Store(true)
+	wsConnMgr.delConn(conn.connId)
+}
+
+func (s *wsConnMgrSt) getConnByUid(uid uint64) iface.IWsConn {
+	s.rwLock.RLock()
+	conn, ok := s.user2Conn[uid]
+	s.rwLock.RUnlock()
+	if !ok {
+		return nil
+	}
+	return conn
 }
 
 var wsConnMgr = &wsConnMgrSt{

@@ -49,10 +49,7 @@ func (c *wsConn) writer() {
 
 // reader 从客户端读取消息。
 func (c *wsConn) reader() {
-	for {
-		if c.close.Load() {
-			break
-		}
+	for !c.close.Load() {
 		_, message, err := c.ws.ReadMessage()
 		if err != nil {
 			log.Errorf("read err:%v", err)
