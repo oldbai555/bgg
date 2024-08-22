@@ -81,7 +81,11 @@ func handleWebsocketDataTypeChat(ctx uctx.IUCtx, msg *client.WebsocketMsg) (ret 
 		return
 	}
 
-	ret = msg
+	err = roommgr.GetSingleChatRoom().Broadcast(msg)
+	if err != nil {
+		return
+	}
+
 	return
 }
 

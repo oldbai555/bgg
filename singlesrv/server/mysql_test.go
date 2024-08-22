@@ -72,3 +72,26 @@ func TestInit(t *testing.T) {
 	t.Log(file)
 	t.Log(file1)
 }
+func TestAddUser(t *testing.T) {
+	mysqlConf := syscfg.NewGormMysqlConf("")
+	gormEngine := egimpl.NewGormEngine(mysqlConf.Dsn())
+	engine.SetOrmEngine(gormEngine)
+	gormEngine.AutoMigrate([]interface{}{&client.ModelUser{}})
+	gormEngine.RegObjectType(lbsingledb.ModelUser)
+	OrmUser = gormx.NewBaseModel[*client.ModelUser](gormx.ModelConfig{
+		NotFoundErrCode: int32(client.ErrCode_ErrUserNotFound),
+		Db:              "biz",
+	})
+
+	var user = &client.ModelUser{
+		Username: "bigbai003",
+		Password: "123456",
+		Nickname: "大白3号",
+	}
+
+	err := OrmUser.NewBaseScope().Create(uctx.NewBaseUCtx(), user)
+	if err != nil {
+		t.Errorf("err:%v", err)
+		return
+	}
+}

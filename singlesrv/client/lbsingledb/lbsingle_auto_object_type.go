@@ -83,17 +83,17 @@ var ModelUser = &engine.ModelObjectType{
 			},
 			{
 				FieldName: "created_at",
-				Type:      "int32",
+				Type:      "uint32",
 				IsArray:   false,
 			},
 			{
 				FieldName: "updated_at",
-				Type:      "int32",
+				Type:      "uint32",
 				IsArray:   false,
 			},
 			{
 				FieldName: "deleted_at",
-				Type:      "int32",
+				Type:      "uint32",
 				IsArray:   false,
 			},
 			{
@@ -151,17 +151,17 @@ var ModelChat = &engine.ModelObjectType{
 			},
 			{
 				FieldName: "created_at",
-				Type:      "int32",
+				Type:      "uint32",
 				IsArray:   false,
 			},
 			{
 				FieldName: "updated_at",
-				Type:      "int32",
+				Type:      "uint32",
 				IsArray:   false,
 			},
 			{
 				FieldName: "deleted_at",
-				Type:      "int32",
+				Type:      "uint32",
 				IsArray:   false,
 			},
 			{
@@ -194,17 +194,17 @@ var ModelMessage = &engine.ModelObjectType{
 			},
 			{
 				FieldName: "created_at",
-				Type:      "int32",
+				Type:      "uint32",
 				IsArray:   false,
 			},
 			{
 				FieldName: "updated_at",
-				Type:      "int32",
+				Type:      "uint32",
 				IsArray:   false,
 			},
 			{
 				FieldName: "deleted_at",
-				Type:      "int32",
+				Type:      "uint32",
 				IsArray:   false,
 			},
 			{
