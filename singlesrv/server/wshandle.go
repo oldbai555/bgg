@@ -30,7 +30,23 @@ func handleWebsocketDataTypeChat(ctx uctx.IUCtx, msg *client.WebsocketMsg) (prot
 	return msg, nil
 }
 
+func handleWebsocketDataTypeHeartBeat(_ uctx.IUCtx, msg *client.WebsocketMsg) (proto.Message, error) {
+	return msg, nil
+}
+
+func handleWebsocketDataTypeConnect(_ uctx.IUCtx, msg *client.WebsocketMsg) (proto.Message, error) {
+	return msg, nil
+}
+
+func handleWebsocketDataTypeDisConnect(ctx uctx.IUCtx, msg *client.WebsocketMsg) (proto.Message, error) {
+	wsConnMgr.delConn(ctx.ExtInfo().(string))
+	return msg, nil
+}
+
 func init() {
+	regWsMsgTypeHandler(uint32(client.WebsocketDataType_WebsocketDataTypeConnect), handleWebsocketDataTypeConnect)
+	regWsMsgTypeHandler(uint32(client.WebsocketDataType_WebsocketDataTypeDisConnect), handleWebsocketDataTypeDisConnect)
+	regWsMsgTypeHandler(uint32(client.WebsocketDataType_WebsocketDataTypeHeartBeat), handleWebsocketDataTypeHeartBeat)
 	regWsMsgTypeHandler(uint32(client.WebsocketDataType_WebsocketDataTypeLogin), handleWebsocketDataTypeLogin)
 	regWsMsgTypeHandler(uint32(client.WebsocketDataType_WebsocketDataTypeLogout), handleWebsocketDataTypeLogout)
 	regWsMsgTypeHandler(uint32(client.WebsocketDataType_WebsocketDataTypeChat), handleWebsocketDataTypeChat)

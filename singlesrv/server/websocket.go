@@ -12,6 +12,7 @@ import (
 	"github.com/oldbai555/micro/uctx"
 	"google.golang.org/protobuf/proto"
 	"net/http"
+	"sync"
 	"sync/atomic"
 
 	"github.com/gorilla/websocket"
@@ -54,6 +55,13 @@ func handleWs(ctx *gin.Context) {
 		return nil
 	})
 	c.reader()
+
+	// 读取失败后就开始关闭连接
+	wsConnMgr.delConn(c.connId)
+	err = c.ws.Close()
+	if err != nil {
+		log.Errorf("up grade err:%v", err)
+	}
 }
 
 // writer 向客户端发送消息。
@@ -67,15 +75,14 @@ func (c *wsConn) writer() {
 			break
 		}
 	}
-	err := c.ws.Close()
-	if err != nil {
-		log.Errorf("close err: %v", err)
-	}
 }
 
 // reader 从客户端读取消息。
 func (c *wsConn) reader() {
 	for {
+		if c.close.Load() {
+			break
+		}
 		_, message, err := c.ws.ReadMessage()
 		if err != nil {
 			log.Errorf("read err:%v", err)
@@ -130,6 +137,7 @@ func regWsMsgTypeHandler(msgType uint32, handler wsMsgTypeHandleFunc) {
 type wsConnMgrSt struct {
 	connMgr   map[string]*wsConn // key by connId
 	user2Conn map[string]*wsConn // key by sid
+	rwLock    sync.RWMutex
 }
 
 func (s *wsConnMgrSt) bindUser2Conn(sid string, connId string) {
@@ -158,6 +166,8 @@ func (c *wsConn) writeDisConnectMsg() {
 }
 
 func (s *wsConnMgrSt) delConn(connId string) {
+	wsConnMgr.rwLock.Lock()
+	defer wsConnMgr.rwLock.Unlock()
 	if len(connId) == 0 {
 		return
 	}
@@ -176,27 +186,15 @@ var wsConnMgr = &wsConnMgrSt{
 }
 
 func CloseAllWsConn() {
+	var connIdsToDelete []string
+	wsConnMgr.rwLock.RLock()
 	for _, conn := range wsConnMgr.connMgr {
-		wsConnMgr.delConn(conn.connId)
 		conn.writeDisConnectMsg()
+		conn.close.Store(true)
+		connIdsToDelete = append(connIdsToDelete, conn.connId)
 	}
-}
-
-func init() {
-	regWsMsgTypeHandler(uint32(client.WebsocketDataType_WebsocketDataTypeConnect), handleWebsocketDataTypeConnect)
-	regWsMsgTypeHandler(uint32(client.WebsocketDataType_WebsocketDataTypeDisConnect), handleWebsocketDataTypeDisConnect)
-	regWsMsgTypeHandler(uint32(client.WebsocketDataType_WebsocketDataTypeHeartBeat), handleWebsocketDataTypeHeartBeat)
-}
-
-func handleWebsocketDataTypeHeartBeat(_ uctx.IUCtx, msg *client.WebsocketMsg) (proto.Message, error) {
-	return msg, nil
-}
-
-func handleWebsocketDataTypeConnect(_ uctx.IUCtx, msg *client.WebsocketMsg) (proto.Message, error) {
-	return msg, nil
-}
-
-func handleWebsocketDataTypeDisConnect(ctx uctx.IUCtx, msg *client.WebsocketMsg) (proto.Message, error) {
-	wsConnMgr.delConn(ctx.ExtInfo().(string))
-	return msg, nil
+	wsConnMgr.rwLock.RUnlock()
+	for _, connId := range connIdsToDelete {
+		wsConnMgr.delConn(connId)
+	}
 }
