@@ -23,7 +23,6 @@ func handleWebsocketDataTypeLogin(ctx uctx.IUCtx, msg *client.WebsocketMsg) (pro
 }
 
 func handleWebsocketDataTypeLogout(ctx uctx.IUCtx, msg *client.WebsocketMsg) (proto.Message, error) {
-	wsConnMgr.delConn(ctx.ExtInfo().(string))
 	return msg, nil
 }
 

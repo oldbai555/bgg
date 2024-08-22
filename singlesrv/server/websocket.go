@@ -78,7 +78,7 @@ func (c *wsConn) reader() {
 	for {
 		_, message, err := c.ws.ReadMessage()
 		if err != nil {
-			log.Errorf("read message err:%v", err)
+			log.Errorf("read err:%v", err)
 			break
 		}
 		var data client.WebsocketMsg
@@ -100,6 +100,9 @@ func handleMessage(c *wsConn, data *client.WebsocketMsg) {
 	nCtx := ctx.NewCtx(context.Background())
 	nCtx.SetExtInfo(c.connId)
 	val, err := f(nCtx, data)
+	if val == nil && err == nil {
+		return
+	}
 	if err != nil {
 		val = &client.WebsocketMsg{ErrMsg: err.Error()}
 	}
@@ -141,8 +144,8 @@ func (s *wsConnMgrSt) bindUser2Conn(sid string, connId string) {
 	s.user2Conn[sid] = conn
 }
 
-func (c *wsConn) writeCloseMsg() {
-	val := &client.WebsocketMsg{Type: uint32(client.WebsocketDataType_WebsocketDataTypeLogout)}
+func (c *wsConn) writeDisConnectMsg() {
+	val := &client.WebsocketMsg{Type: uint32(client.WebsocketDataType_WebsocketDataTypeDisConnect)}
 	bytes, err := jsonpb.Marshal(val)
 	if err != nil {
 		log.Errorf("unmarshal err:%v", err)
@@ -150,7 +153,7 @@ func (c *wsConn) writeCloseMsg() {
 	}
 	err = c.ws.WriteMessage(websocket.TextMessage, bytes)
 	if err != nil {
-		log.Errorf("unmarshal err:%v", err)
+		log.Errorf("write err:%v", err)
 	}
 }
 
@@ -175,6 +178,25 @@ var wsConnMgr = &wsConnMgrSt{
 func CloseAllWsConn() {
 	for _, conn := range wsConnMgr.connMgr {
 		wsConnMgr.delConn(conn.connId)
-		conn.writeCloseMsg()
+		conn.writeDisConnectMsg()
 	}
+}
+
+func init() {
+	regWsMsgTypeHandler(uint32(client.WebsocketDataType_WebsocketDataTypeConnect), handleWebsocketDataTypeConnect)
+	regWsMsgTypeHandler(uint32(client.WebsocketDataType_WebsocketDataTypeDisConnect), handleWebsocketDataTypeDisConnect)
+	regWsMsgTypeHandler(uint32(client.WebsocketDataType_WebsocketDataTypeHeartBeat), handleWebsocketDataTypeHeartBeat)
+}
+
+func handleWebsocketDataTypeHeartBeat(_ uctx.IUCtx, msg *client.WebsocketMsg) (proto.Message, error) {
+	return msg, nil
+}
+
+func handleWebsocketDataTypeConnect(_ uctx.IUCtx, msg *client.WebsocketMsg) (proto.Message, error) {
+	return msg, nil
+}
+
+func handleWebsocketDataTypeDisConnect(ctx uctx.IUCtx, msg *client.WebsocketMsg) (proto.Message, error) {
+	wsConnMgr.delConn(ctx.ExtInfo().(string))
+	return msg, nil
 }
