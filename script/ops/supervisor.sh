@@ -8,7 +8,7 @@ echo "脚本目录 shDir:"$sh_dir
 
 # 项目目录
 pro_dir=$(dirname ${sh_dir})
-echo "项目目录 proDir:"${pro_dir}
+echo "脚本根目录 proDir:"${pro_dir}
 
 # 项目根目录
 proRootDir=$(dirname ${pro_dir})
@@ -50,6 +50,7 @@ EOF
 # 函数：部署 Supervisor 服务
 deploySupervisorService() {
   local appName=$1
+  echo "====== 开始部署 $appName ======"
 
   cd "$supervisorDir" || exit
 
@@ -70,6 +71,7 @@ deploySupervisorService() {
 
   # 检查服务状态
   supervisorctl status "$appName"
+  echo "====== 完成部署 $appName ======"
 }
 
 # 函数：构建 Go 应用
@@ -77,18 +79,21 @@ goBuild() {
   local outputDir=$1
   local appPath=$2
   local appName=$3
+  echo "====== 开始编译 $appName ======"
 
   export GOOS=linux
   export GOARCH=amd64
   go build -o "$outputDir/$appName" "$appPath"
   unset GOOS
   unset GOARCH
+  echo "====== 完成编译 $appName ======"
 }
 
 # 函数：打包并部署服务
 localPackSrv() {
   # 服务名称
   local appName=$1
+  echo "====== 开始打包 $appName ======"
 
   # 打包路径
   local proSrvPath=$2
@@ -105,6 +110,7 @@ localPackSrv() {
   cp "${proSrvPath}/application.yaml" ${outputDir}
 
   tar -cvf ${packOutputDir}"/"${appName}".tar" -C ${outputDir} . --remove-files
+  echo "====== 完成打包 $appName ======"
 }
 
 # 使用说明
