@@ -80,6 +80,8 @@ goBuild() {
   local appPath=$2
   local appName=$3
   echo "====== 开始编译 $appName ======"
+  echo "====== appPath: $appPath ======"
+  echo "====== outputDir: $outputDir ======"
 
   export GOOS=linux
   export GOARCH=amd64
@@ -105,7 +107,7 @@ localPackSrv() {
 
   outputSupervisorConf ${appName} ${outputDir}
 
-  goBuild ${outputDir} ${proSrvPath}
+  goBuild ${outputDir} ${proSrvPath} ${appName}
 
   cp "${proSrvPath}/application.yaml" ${outputDir}
 
