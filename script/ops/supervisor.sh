@@ -94,7 +94,7 @@ localPackSrv() {
   local proSrvPath=$2
 
   # 输出目录
-  local outputDir="$packOutputDir/$appName"
+  local outputDir=${packOutputDir}"/"${appName}
 
   mkdir -p ${outputDir}
 
@@ -104,7 +104,7 @@ localPackSrv() {
 
   cp "${proSrvPath}/application.yaml" ${outputDir}
 
-  tar -cvf "${appName}.tar" -C "$outputDir" . --remove-files
+  tar -cvf ${packOutputDir}"/"${appName}".tar" -C ${outputDir} . --remove-files
 }
 
 # 使用说明
