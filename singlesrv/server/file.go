@@ -272,7 +272,7 @@ func handleUploadFile(c *gin.Context) {
 	filePath := path.Join(constant.BaseStoragePath, timeFmt)
 	savePath := path.Join(filePath, fileName)
 
-	// 判断如果是windows环境 则需要将 savePath FromSlash
+	// 判断如果是windows环境 则需要将 savePath ToSlash
 	savePath = tool.ToSlash(savePath)
 
 	// 3.判断文件是否存在

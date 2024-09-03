@@ -13,3 +13,9 @@ func OptionWithServer() Option {
 		tool.ServerConf = NewServerConf(tool.V)
 	}
 }
+
+func OptionWithProxyConf() Option {
+	return func(tool *SysCfg) {
+		tool.Proxys = NewProxys(tool.V)
+	}
+}

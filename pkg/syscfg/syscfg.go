@@ -11,6 +11,7 @@ type SysCfg struct {
 
 	StorageConf *StorageConf
 	ServerConf  *ServerConf
+	Proxys      *Proxys
 }
 
 var sc *SysCfg

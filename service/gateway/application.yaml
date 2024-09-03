@@ -1,0 +1,6 @@
+server:
+  name: "gateway"
+  port: 20000
+proxys:
+  map:
+    "lbsingle": "http://127.0.0.1:20011"
