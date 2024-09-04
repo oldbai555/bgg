@@ -59,7 +59,7 @@ func handleRevProxy(ctx *gin.Context) {
 	param := ctx.Param("path")
 	var srv = param
 	paths := strings.Split(strings.TrimPrefix(param, "/"), "/")
-	if len(paths) == 2 || len(paths) == 1 {
+	if len(paths) > 1 {
 		srv = paths[0]
 	}
 
