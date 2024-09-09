@@ -13,6 +13,7 @@ import (
 	"github.com/oldbai555/micro/gormx"
 	"github.com/oldbai555/micro/uctx"
 	"golang.org/x/sync/singleflight"
+	"os"
 	"strings"
 )
 
@@ -35,7 +36,7 @@ func (a *LbsingleServer) DelFileList(ctx context.Context, req *client.DelFileLis
 	listRsp, err := a.GetFileList(ctx, &client.GetFileListReq{
 		ListOption: req.ListOption.
 			SetSkipTotal().
-			AddOpt(core.DefaultListOption_DefaultListOptionSelect, []string{client.FieldId_, client.FieldSortUrl_}),
+			AddOpt(core.DefaultListOption_DefaultListOptionSelect, []string{client.FieldId_, client.FieldSortUrl_, client.FieldPath_}),
 	})
 	if err != nil {
 		log.Errorf("err:%v", err)
@@ -47,11 +48,15 @@ func (a *LbsingleServer) DelFileList(ctx context.Context, req *client.DelFileLis
 		return &rsp, nil
 	}
 
-	// 清缓存
+	// 清缓存 和 文件
 	for _, val := range listRsp.List {
 		err = cache.DelFileBySortUrl(val.SortUrl)
 		if err != nil {
 			log.Errorf("del %s cache failed err:%v", val.SortUrl, err)
+		}
+		err := os.Remove(val.Path)
+		if err != nil {
+			log.Errorf("remove file %s failed err:%v", val.Path, err)
 		}
 	}
 
