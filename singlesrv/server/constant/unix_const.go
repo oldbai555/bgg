@@ -10,5 +10,5 @@
 package constant
 
 const (
-	BaseStoragePath = "/etc/work/storage/"
+	BaseStoragePath = "/home/work/storage/"
 )
