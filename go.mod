@@ -9,11 +9,10 @@ require (
 	github.com/didip/tollbooth_gin v0.0.0-20170928041415-5752492be505
 	github.com/envoyproxy/protoc-gen-validate v0.9.1
 	github.com/gin-gonic/gin v1.8.1
-	github.com/gorilla/mux v1.8.1
 	github.com/gorilla/websocket v1.5.3
 	github.com/judwhite/go-svc v1.2.1
 	github.com/nsqio/go-nsq v1.1.0
-	github.com/oldbai555/lbtool v0.0.4-0.20240619075006-d890bfa855fd
+	github.com/oldbai555/lbtool v0.0.4-0.20240909113824-908ca165eb8a
 	github.com/oldbai555/micro v0.0.2-0.20240815050200-f4bcddb3db4e
 	github.com/prometheus/client_golang v1.11.1
 	github.com/spf13/viper v1.9.0

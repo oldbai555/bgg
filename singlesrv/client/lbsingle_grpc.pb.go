@@ -58,6 +58,31 @@ type LbsingleClient interface {
 	// @desc:
 	// @error:
 	SyncFile(ctx context.Context, in *SyncFileReq, opts ...grpc.CallOption) (*SyncFileRsp, error)
+	// @cat: User
+	// @name:
+	// @desc:
+	// @error:
+	AddUser(ctx context.Context, in *AddUserReq, opts ...grpc.CallOption) (*AddUserRsp, error)
+	// @cat: User
+	// @name:
+	// @desc:
+	// @error:
+	DelUserList(ctx context.Context, in *DelUserListReq, opts ...grpc.CallOption) (*DelUserListRsp, error)
+	// @cat: User
+	// @name:
+	// @desc:
+	// @error:
+	UpdateUser(ctx context.Context, in *UpdateUserReq, opts ...grpc.CallOption) (*UpdateUserRsp, error)
+	// @cat: User
+	// @name:
+	// @desc:
+	// @error:
+	GetUser(ctx context.Context, in *GetUserReq, opts ...grpc.CallOption) (*GetUserRsp, error)
+	// @cat: User
+	// @name:
+	// @desc:
+	// @error:
+	GetUserList(ctx context.Context, in *GetUserListReq, opts ...grpc.CallOption) (*GetUserListRsp, error)
 }
 
 type lbsingleClient struct {
@@ -149,6 +174,51 @@ func (c *lbsingleClient) SyncFile(ctx context.Context, in *SyncFileReq, opts ...
 	return out, nil
 }
 
+func (c *lbsingleClient) AddUser(ctx context.Context, in *AddUserReq, opts ...grpc.CallOption) (*AddUserRsp, error) {
+	out := new(AddUserRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) DelUserList(ctx context.Context, in *DelUserListReq, opts ...grpc.CallOption) (*DelUserListRsp, error) {
+	out := new(DelUserListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelUserList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) UpdateUser(ctx context.Context, in *UpdateUserReq, opts ...grpc.CallOption) (*UpdateUserRsp, error) {
+	out := new(UpdateUserRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetUser(ctx context.Context, in *GetUserReq, opts ...grpc.CallOption) (*GetUserRsp, error) {
+	out := new(GetUserRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetUserList(ctx context.Context, in *GetUserListReq, opts ...grpc.CallOption) (*GetUserListRsp, error) {
+	out := new(GetUserListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetUserList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // LbsingleServer is the server API for Lbsingle service.
 // All implementations must embed UnimplementedLbsingleServer
 // for forward compatibility
@@ -189,6 +259,31 @@ type LbsingleServer interface {
 	// @desc:
 	// @error:
 	SyncFile(context.Context, *SyncFileReq) (*SyncFileRsp, error)
+	// @cat: User
+	// @name:
+	// @desc:
+	// @error:
+	AddUser(context.Context, *AddUserReq) (*AddUserRsp, error)
+	// @cat: User
+	// @name:
+	// @desc:
+	// @error:
+	DelUserList(context.Context, *DelUserListReq) (*DelUserListRsp, error)
+	// @cat: User
+	// @name:
+	// @desc:
+	// @error:
+	UpdateUser(context.Context, *UpdateUserReq) (*UpdateUserRsp, error)
+	// @cat: User
+	// @name:
+	// @desc:
+	// @error:
+	GetUser(context.Context, *GetUserReq) (*GetUserRsp, error)
+	// @cat: User
+	// @name:
+	// @desc:
+	// @error:
+	GetUserList(context.Context, *GetUserListReq) (*GetUserListRsp, error)
 	mustEmbedUnimplementedLbsingleServer()
 }
 
@@ -222,6 +317,21 @@ func (UnimplementedLbsingleServer) ResetPassword(context.Context, *ResetPassword
 }
 func (UnimplementedLbsingleServer) SyncFile(context.Context, *SyncFileReq) (*SyncFileRsp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SyncFile not implemented")
+}
+func (UnimplementedLbsingleServer) AddUser(context.Context, *AddUserReq) (*AddUserRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddUser not implemented")
+}
+func (UnimplementedLbsingleServer) DelUserList(context.Context, *DelUserListReq) (*DelUserListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelUserList not implemented")
+}
+func (UnimplementedLbsingleServer) UpdateUser(context.Context, *UpdateUserReq) (*UpdateUserRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
+}
+func (UnimplementedLbsingleServer) GetUser(context.Context, *GetUserReq) (*GetUserRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
+}
+func (UnimplementedLbsingleServer) GetUserList(context.Context, *GetUserListReq) (*GetUserListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserList not implemented")
 }
 func (UnimplementedLbsingleServer) mustEmbedUnimplementedLbsingleServer() {}
 
@@ -398,6 +508,96 @@ func _Lbsingle_SyncFile_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Lbsingle_AddUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddUserReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).AddUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/AddUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).AddUser(ctx, req.(*AddUserReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_DelUserList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelUserListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).DelUserList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/DelUserList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).DelUserList(ctx, req.(*DelUserListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_UpdateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateUserReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).UpdateUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/UpdateUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).UpdateUser(ctx, req.(*UpdateUserReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetUser(ctx, req.(*GetUserReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetUserList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetUserList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetUserList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetUserList(ctx, req.(*GetUserListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Lbsingle_ServiceDesc is the grpc.ServiceDesc for Lbsingle service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -440,6 +640,26 @@ var Lbsingle_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SyncFile",
 			Handler:    _Lbsingle_SyncFile_Handler,
+		},
+		{
+			MethodName: "AddUser",
+			Handler:    _Lbsingle_AddUser_Handler,
+		},
+		{
+			MethodName: "DelUserList",
+			Handler:    _Lbsingle_DelUserList_Handler,
+		},
+		{
+			MethodName: "UpdateUser",
+			Handler:    _Lbsingle_UpdateUser_Handler,
+		},
+		{
+			MethodName: "GetUser",
+			Handler:    _Lbsingle_GetUser_Handler,
+		},
+		{
+			MethodName: "GetUserList",
+			Handler:    _Lbsingle_GetUserList_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

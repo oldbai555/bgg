@@ -69,10 +69,6 @@ func (p *program) Init(_ svc.Environment) error {
 		log.Errorf("err:%v", err)
 		return err
 	}
-	if err != nil {
-		log.Errorf("err:%v", err)
-		return err
-	}
 
 	return nil
 }
@@ -84,7 +80,8 @@ func (p *program) Start() error {
 		return nil
 	})
 	if err != nil {
-		panic(err)
+		log.Errorf("err:%v", err)
+		return err
 	}
 
 	routine.GoV2(func() error {
@@ -92,22 +89,26 @@ func (p *program) Start() error {
 		return nil
 	})
 	if err != nil {
-		panic(err)
+		log.Errorf("err:%v", err)
+		return err
 	}
 
 	err = server.InitTopic()
 	if err != nil {
-		panic(err)
+		log.Errorf("err:%v", err)
+		return err
 	}
 
 	err = mq.Start()
 	if err != nil {
-		panic(err)
+		log.Errorf("err:%v", err)
+		return err
 	}
 
 	err = server.SyncFileIndex(context.Background(), true)
 	if err != nil {
-		panic(err)
+		log.Errorf("err:%v", err)
+		return err
 	}
 
 	return nil

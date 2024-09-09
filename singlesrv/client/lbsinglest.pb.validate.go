@@ -345,6 +345,8 @@ func (m *BaseUser) validate(all bool) error {
 
 	// no validation rules for Role
 
+	// no validation rules for CreatedAt
+
 	if len(errors) > 0 {
 		return BaseUserMultiError(errors)
 	}

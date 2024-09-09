@@ -235,8 +235,6 @@ github.com/googleapis/gax-go/v2 v2.0.4/go.mod h1:0Wqv26UfaUD9n4G6kQubkQ+KchISgw+
 github.com/googleapis/gax-go/v2 v2.0.5/go.mod h1:DWXyrwAJ9X0FpwwEdw+IPEYBICEFu5mhpdKc/us6bOk=
 github.com/googleapis/gax-go/v2 v2.1.0/go.mod h1:Q3nei7sK6ybPYH7twZdmQpAd1MKb7pfu6SK+H1/DsU0=
 github.com/googleapis/google-cloud-go-testing v0.0.0-20200911160855-bcd43fbb19e8/go.mod h1:dvDLG8qkwmyD9a/MJJN3XJcT3xFxOKAvTZGvuZmac9g=
-github.com/gorilla/mux v1.8.1 h1:TuBL49tXwgrFYWhqrNgrUNEY92u81SPhu7sTdzQEiWY=
-github.com/gorilla/mux v1.8.1/go.mod h1:AKf9I4AEqPTmMytcMc0KkNouC66V3BtZ4qD5fmWSiMQ=
 github.com/gorilla/websocket v1.5.3 h1:saDtZ6Pbx/0u+bgYQ3q96pZgCzfhKXGPqt7kZ72aNNg=
 github.com/gorilla/websocket v1.5.3/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
 github.com/grpc-ecosystem/grpc-gateway v1.16.0/go.mod h1:BDjrQk3hbvj6Nolgz8mAMFbcEtjT1g+wF4CSlocrBnw=
@@ -342,8 +340,8 @@ github.com/mwitkow/go-conntrack v0.0.0-20190716064945-2f068394615f/go.mod h1:qRW
 github.com/nsqio/go-nsq v1.1.0 h1:PQg+xxiUjA7V+TLdXw7nVrJ5Jbl3sN86EhGCQj4+FYE=
 github.com/nsqio/go-nsq v1.1.0/go.mod h1:vKq36oyeVXgsS5Q8YEO7WghqidAVXQlcFxzQbQTuDEY=
 github.com/nxadm/tail v1.4.8 h1:nPr65rt6Y5JFSKQO7qToXr7pePgD6Gwiw05lkbyAQTE=
-github.com/oldbai555/lbtool v0.0.4-0.20240619075006-d890bfa855fd h1:njnBYtMQcrlGOEtnigiI78fil51ZAnXgjvgfsdW/dOk=
-github.com/oldbai555/lbtool v0.0.4-0.20240619075006-d890bfa855fd/go.mod h1:kuAjq3HCaTvreEtYhdRcebVFeOAZn9xje2TO0OqSn1Y=
+github.com/oldbai555/lbtool v0.0.4-0.20240909113824-908ca165eb8a h1:vrjGnd87FPTS+5uuB5G4r2tS8ChQgjnz3no4VOV3mjI=
+github.com/oldbai555/lbtool v0.0.4-0.20240909113824-908ca165eb8a/go.mod h1:kuAjq3HCaTvreEtYhdRcebVFeOAZn9xje2TO0OqSn1Y=
 github.com/oldbai555/micro v0.0.2-0.20240815050200-f4bcddb3db4e h1:eaFAC3e8mXn7ntC589Py7BNyyuhG7zMmuUtm5CXHkKo=
 github.com/oldbai555/micro v0.0.2-0.20240815050200-f4bcddb3db4e/go.mod h1:unQDPQ2Xyq4oopNd0ZXB+XofUDZSo4HSdOEd3YenvJc=
 github.com/onsi/ginkgo v1.16.5 h1:8xi0RTUf59SOSfEtZMvwTvXYMzG4gV23XVHOZiXNtnE=

@@ -3,13 +3,18 @@
 package client
 
 const (
+	AddUserCMDPath             = "/lbsingle/AddUser"
 	DelFileListCMDPath         = "/lbsingle/DelFileList"
+	DelUserListCMDPath         = "/lbsingle/DelUserList"
 	GetFileCMDPath             = "/lbsingle/GetFile"
 	GetFileListCMDPath         = "/lbsingle/GetFileList"
 	GetLoginUserCMDPath        = "/lbsingle/GetLoginUser"
+	GetUserCMDPath             = "/lbsingle/GetUser"
+	GetUserListCMDPath         = "/lbsingle/GetUserList"
 	LoginCMDPath               = "/lbsingle/Login"
 	LogoutCMDPath              = "/lbsingle/Logout"
 	ResetPasswordCMDPath       = "/lbsingle/ResetPassword"
 	SyncFileCMDPath            = "/lbsingle/SyncFile"
 	UpdateLoginUserInfoCMDPath = "/lbsingle/UpdateLoginUserInfo"
+	UpdateUserCMDPath          = "/lbsingle/UpdateUser"
 )
