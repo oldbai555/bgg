@@ -1,0 +1,27 @@
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    # Add index.php to the list if you are using PHP
+    index index.html index.htm index.nginx-debian.html;
+
+    server_name _;
+
+    location ^~ /gateway/ {
+        proxy_pass http://localhost:20000/gateway/;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forward-For $remote_addr;
+    }
+
+    location / {  # Vue应用的访问路径
+        root /home/ubuntu/web/dist;
+        index index.html index.htm;
+        try_files $uri $uri/ /index.html =404;
+    }
+
+    location ^~ /syncthing/ {
+        proxy_pass http://localhost:8384/;
+    }
+
+}
+
