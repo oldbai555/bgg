@@ -1,4 +1,0 @@
-server:
-  name: "lbblog"
-  port: 20002
-  ip: "0.0.0.0"

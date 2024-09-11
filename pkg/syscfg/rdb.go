@@ -8,7 +8,6 @@ import (
 )
 
 const defaultApolloRedisPrefix = "redis"
-const defaultRedisConfPath = "/etc/work/"
 
 type RedisConf struct {
 	Database int    `json:"database"`
