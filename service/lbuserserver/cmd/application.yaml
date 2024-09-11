@@ -1,4 +1,0 @@
-server:
-  name: "lbuser"
-  port: 20001
-  ip: "0.0.0.0"

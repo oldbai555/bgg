@@ -14,8 +14,8 @@ func OptionWithServer() Option {
 	}
 }
 
-func OptionWithPrometheus() Option {
+func OptionWithProxyConf() Option {
 	return func(tool *SysCfg) {
-		tool.PrometheusConf = NewPrometheusConf(tool.V)
+		tool.Proxys = NewProxys(tool.V)
 	}
 }

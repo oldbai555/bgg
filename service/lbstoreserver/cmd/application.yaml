@@ -1,4 +1,0 @@
-server:
-  name: "lbstore"
-  port: 20008
-  ip: "0.0.0.0"

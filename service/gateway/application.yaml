@@ -1,6 +1,6 @@
 server:
   name: "gateway"
   port: 20000
-prometheus:
-  ip: ""
-  port: 2112
+proxys:
+  map:
+    "lbsingle": "http://127.0.0.1:20011"

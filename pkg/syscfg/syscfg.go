@@ -9,9 +9,9 @@ import (
 type SysCfg struct {
 	V *viper.Viper
 
-	StorageConf    *StorageConf
-	ServerConf     *ServerConf
-	PrometheusConf *PrometheusConf
+	StorageConf *StorageConf
+	ServerConf  *ServerConf
+	Proxys      *Proxys
 }
 
 var sc *SysCfg

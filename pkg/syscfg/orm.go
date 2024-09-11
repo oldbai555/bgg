@@ -10,7 +10,6 @@ import (
 
 const defaultApolloMysqlPrefix = "mysql"
 const defaultDatabase = "biz"
-const defaultMysqlConfPath = "/etc/work/"
 
 type MysqlConf struct {
 	Addr     string `json:"addr"`
