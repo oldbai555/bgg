@@ -51,7 +51,7 @@ func (n *Consumer) Start() (err error) {
 			return
 		}
 		n.clis = append(n.clis, cli)
-		log.Infof("NewConsumer Success Topic:%s, channel:%s, addressList:%v ", e.topic, n.channel, n.addressList)
+		log.Infof("new consumer Success Topic:%s, channel:%s, addressList:%v ", e.topic, n.channel, n.addressList)
 	}
 	return
 }

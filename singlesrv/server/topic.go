@@ -8,12 +8,13 @@ package server
 
 import (
 	"github.com/oldbai555/bgg/singlesrv/client"
+	"github.com/oldbai555/bgg/singlesrv/server/iface"
 	"github.com/oldbai555/bgg/singlesrv/server/mq"
 )
 
 var (
-	MqTopicSyncFile     *mq.TopicSt
-	MqTopicCacheAllFile *mq.TopicSt
+	MqTopicSyncFile     iface.ITopic
+	MqTopicCacheAllFile iface.ITopic
 )
 
 func InitTopic() error {

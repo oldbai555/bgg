@@ -47,7 +47,7 @@ func (t TopicSt) Pub(ctx uctx.IUCtx, obj proto.Message) error {
 		return err
 	}
 
-	b, err := EncodeMsg(ctx.TraceId(), 0, marshal)
+	b, err := encodeMsg(ctx.TraceId(), marshal)
 	if err != nil {
 		return err
 	}
@@ -71,7 +71,7 @@ func (t TopicSt) DeferredPublish(ctx uctx.IUCtx, delay time.Duration, obj proto.
 		return err
 	}
 
-	b, err := EncodeMsg(ctx.TraceId(), 0, marshal)
+	b, err := encodeMsg(ctx.TraceId(), marshal)
 	if err != nil {
 		return err
 	}

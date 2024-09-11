@@ -10,26 +10,25 @@ import (
 	"github.com/nsqio/go-nsq"
 	"github.com/oldbai555/bgg/singlesrv/client"
 	"github.com/oldbai555/lbtool/log"
-	"github.com/oldbai555/lbtool/pkg/jsonpb"
 	"github.com/oldbai555/micro/uctx"
+	"google.golang.org/protobuf/proto"
 )
 
-func EncodeMsg(reqId string, corpId uint32, msg []byte) ([]byte, error) {
+func encodeMsg(reqId string, msg []byte) ([]byte, error) {
 	info := &client.NsqMsg{
-		ReqId:  reqId,
-		CorpId: corpId,
-		Data:   msg,
+		ReqId: reqId,
+		Data:  msg,
 	}
-	buf, err := jsonpb.Marshal(info)
+	buf, err := proto.Marshal(info)
 	if err != nil {
 		return nil, err
 	}
 	return buf, nil
 }
 
-func DecodeMsg(msg []byte) (*client.NsqMsg, error) {
+func decodeMsg(msg []byte) (*client.NsqMsg, error) {
 	m := new(client.NsqMsg)
-	err := jsonpb.Unmarshal(msg, m)
+	err := proto.Unmarshal(msg, m)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +36,7 @@ func DecodeMsg(msg []byte) (*client.NsqMsg, error) {
 }
 
 func Process(msg *nsq.Message, doLogic func(uCtx uctx.IUCtx, buf []byte) error) error {
-	info, err := DecodeMsg(msg.Body)
+	info, err := decodeMsg(msg.Body)
 	if err != nil {
 		log.Errorf("process err:%v, msg %v", err, msg)
 		return err
