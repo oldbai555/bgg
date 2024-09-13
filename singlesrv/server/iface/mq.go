@@ -15,6 +15,4 @@ import (
 type ITopic interface {
 	Pub(ctx uctx.IUCtx, obj proto.Message) error
 	DeferredPublish(ctx uctx.IUCtx, delay time.Duration, obj proto.Message) error
-	Marshal(obj proto.Message) ([]byte, error)
-	Unmarshal(buf []byte, obj proto.Message) error
 }

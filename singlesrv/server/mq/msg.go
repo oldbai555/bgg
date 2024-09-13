@@ -8,10 +8,12 @@ package mq
 
 import (
 	"github.com/nsqio/go-nsq"
+	"github.com/oldbai555/bgg/pkg/marshal"
 	"github.com/oldbai555/bgg/singlesrv/client"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/micro/uctx"
 	"google.golang.org/protobuf/proto"
+	"reflect"
 )
 
 func encodeMsg(reqId string, msg []byte) ([]byte, error) {
@@ -19,7 +21,7 @@ func encodeMsg(reqId string, msg []byte) ([]byte, error) {
 		ReqId: reqId,
 		Data:  msg,
 	}
-	buf, err := proto.Marshal(info)
+	buf, err := marshal.PbMarshal(info)
 	if err != nil {
 		return nil, err
 	}
@@ -28,32 +30,42 @@ func encodeMsg(reqId string, msg []byte) ([]byte, error) {
 
 func decodeMsg(msg []byte) (*client.NsqMsg, error) {
 	m := new(client.NsqMsg)
-	err := proto.Unmarshal(msg, m)
+	err := marshal.PbUnmarshal(msg, m)
 	if err != nil {
 		return nil, err
 	}
 	return m, nil
 }
 
-func Process(msg *nsq.Message, doLogic func(uCtx uctx.IUCtx, buf []byte) error) error {
+func Process[M proto.Message](msg *nsq.Message, doLogic func(uCtx uctx.IUCtx, msg M) error) error {
 	info, err := decodeMsg(msg.Body)
 	if err != nil {
-		log.Errorf("process err:%v, msg %v", err, msg)
+		log.Errorf("process err:%v", err)
 		return err
 	}
 
 	log.SetLogHint(info.ReqId)
 
 	if msg.Attempts > 3 {
-		log.Errorf("exceeding maximum limit %s", string(info.Data))
+		log.Errorf("exceeding maximum limit")
 		msg.Finish()
 		return nil
 	}
 
-	log.Infof("process mq msg %s", string(msg.Body))
 	ctx := uctx.NewBaseUCtx()
 	ctx.SetTraceId(info.ReqId)
-	err = doLogic(ctx, info.Data)
+
+	var obj M
+	if reflect.TypeOf(obj).Kind() == reflect.Ptr {
+		obj = reflect.New(reflect.TypeOf(obj).Elem()).Interface().(M)
+	}
+
+	err = marshal.PbUnmarshal(info.Data, obj)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return err
+	}
+	err = doLogic(ctx, obj)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return err

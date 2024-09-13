@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/nsqio/go-nsq"
 	"github.com/oldbai555/bgg/pkg/compress"
+	"github.com/oldbai555/bgg/pkg/marshal"
 	"github.com/oldbai555/bgg/pkg/tool"
 	"github.com/oldbai555/bgg/singlesrv/client"
 	"github.com/oldbai555/bgg/singlesrv/server/cache"
@@ -37,6 +38,7 @@ func SyncFileIndex(ctx context.Context, cacheAllFile bool) error {
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
 		uCtx = uctx.NewBaseUCtx()
+		uCtx.SetTraceId(utils.GenUUID())
 	}
 
 	err = OrmFile.NewBaseScope().Chunk(uCtx, 2000, func(out []*client.ModelFile) error {
@@ -157,63 +159,57 @@ func SyncFileIndex(ctx context.Context, cacheAllFile bool) error {
 	return nil
 }
 
-func MqTopicBySyncFileHandler(msg *nsq.Message) error {
-	var doSingleFileLogic = func(ctx uctx.IUCtx, file *client.ModelFile) error {
-		if file == nil {
-			log.Errorf("unmarshal file is nil")
-			return nil
-		}
-
-		if file.Md5 == "" {
-			return client.ErrFileMd5IsEmpty
-		}
-		db := OrmFile.NewBaseScope()
-		_, err := db.Where(client.FieldMd5_, file.Md5).First(ctx)
-		if err != nil && !OrmFile.IsNotFoundErr(err) {
-			log.Errorf("err:%v", err)
-			return err
-		}
-
-		// 重新存一下缓存
-		if err == nil {
-			buf, err := MqTopicSyncFile.Marshal(file)
-			if err != nil {
-				log.Errorf("err:%v", err)
-				return err
-			}
-			return cache.SetFileBySortUrl(file.SortUrl, string(buf))
-		}
-
-		err = OrmFile.NewBaseScope().Create(ctx, &file)
-		if err != nil {
-			log.Errorf("err:%v", err)
-			return err
-		}
-
-		buf, err := MqTopicSyncFile.Marshal(file)
-		if err != nil {
-			log.Errorf("err:%v", err)
-			return err
-		}
-
-		err = cache.SetFileBySortUrl(file.SortUrl, string(buf))
-		if err != nil {
-			log.Errorf("err:%v", err)
-			return err
-		}
+func doSingleFileLogic(ctx uctx.IUCtx, file *client.ModelFile) error {
+	if file == nil {
+		log.Errorf("unmarshal file is nil")
 		return nil
 	}
 
-	return mq.Process(msg, func(ctx uctx.IUCtx, buf []byte) error {
-		var data client.MqSyncFile
-		err := MqTopicSyncFile.Unmarshal(buf, &data)
+	if file.Md5 == "" {
+		return client.ErrFileMd5IsEmpty
+	}
+	db := OrmFile.NewBaseScope()
+	_, err := db.Where(client.FieldMd5_, file.Md5).First(ctx)
+	if err != nil && !OrmFile.IsNotFoundErr(err) {
+		log.Errorf("err:%v", err)
+		return err
+	}
+
+	// 重新存一下缓存
+	if err == nil {
+		buf, err := marshal.PbMarshal(file)
 		if err != nil {
 			log.Errorf("err:%v", err)
 			return err
 		}
+		return cache.SetFileBySortUrl(file.SortUrl, string(buf))
+	}
 
+	err = OrmFile.NewBaseScope().Create(ctx, &file)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return err
+	}
+
+	buf, err := marshal.PbMarshal(file)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return err
+	}
+
+	err = cache.SetFileBySortUrl(file.SortUrl, string(buf))
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return err
+	}
+	return nil
+}
+
+func MqTopicBySyncFileHandler(msg *nsq.Message) error {
+
+	return mq.Process[*client.MqSyncFile](msg, func(ctx uctx.IUCtx, data *client.MqSyncFile) error {
 		for _, file := range data.FileList {
-			err = doSingleFileLogic(ctx, file)
+			err := doSingleFileLogic(ctx, file)
 			if err != nil {
 				log.Errorf("err:%v", err)
 			}
@@ -224,10 +220,10 @@ func MqTopicBySyncFileHandler(msg *nsq.Message) error {
 }
 
 func MqTopicByCacheAllFileHandler(msg *nsq.Message) error {
-	return mq.Process(msg, func(ctx uctx.IUCtx, buf []byte) error {
+	return mq.Process[*client.MqCacheAllFile](msg, func(ctx uctx.IUCtx, _ *client.MqCacheAllFile) error {
 		err := OrmFile.NewBaseScope().Chunk(ctx, 2000, func(out []*client.ModelFile) error {
 			for _, file := range out {
-				bytes, err := MqTopicCacheAllFile.Marshal(file)
+				bytes, err := marshal.PbMarshal(file)
 				if err != nil {
 					log.Errorf("err:%v", err)
 				} else {
@@ -333,10 +329,16 @@ func handleUploadFile(c *gin.Context) {
 	}
 	fileInfo.SortUrl = sUrl
 
-	// 7.交给MQ去保存
-	err = MqTopicSyncFile.Pub(uctx.NewBaseUCtx(), &client.MqSyncFile{
-		FileList: []*client.ModelFile{fileInfo},
-	})
+	// 7.保存
+	var aSync = c.GetHeader(constant.HEADER_LBSINGLE_ASYNC)
+	var fileList = []*client.ModelFile{fileInfo}
+	if aSync != "" {
+		err = MqTopicSyncFile.Pub(nCtx, &client.MqSyncFile{
+			FileList: fileList,
+		})
+	} else {
+		err = doSingleFileLogic(nCtx, fileInfo)
+	}
 	if err != nil {
 		log.Errorf("err:%v", err)
 		handler.Error(err)
@@ -364,7 +366,7 @@ func handleDownloadFile(ctx *gin.Context) {
 	}
 
 	var fileInfo client.ModelFile
-	if err = MqTopicSyncFile.Unmarshal([]byte(fileInfoStr), &fileInfo); err != nil {
+	if err = marshal.PbUnmarshal([]byte(fileInfoStr), &fileInfo); err != nil {
 		log.Errorf("err:%v", err)
 		handler.Error(err)
 		return
