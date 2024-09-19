@@ -1,4 +1,5 @@
 bindPort = 9847
+vhostHTTPPort = 9848
 auth.token = 'mypass@123'
 
 webServer.addr = "0.0.0.0"
