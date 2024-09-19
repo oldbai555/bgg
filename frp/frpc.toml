@@ -1,0 +1,10 @@
+serverAddr = "frps的IP地址"
+serverPort = 9847
+auth.token = "mypass@123"
+
+[[proxies]]
+name = "test-tcp"
+type = "tcp"
+localIP = "本机的IPV4地址"
+localPort = 要映射本机的端口
+remotePort = 对外映射的端口
