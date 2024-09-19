@@ -1,10 +1,10 @@
-serverAddr = "frps的IP地址"
-serverPort = 9847
-auth.token = "mypass@123"
+serverAddr = "" // 公网服务器 IP 访问地址
+serverPort = 9847 // 与远程绑定的端口相同
+auth.token = ""
 
 [[proxies]]
-name = "test-tcp"
-type = "tcp"
-localIP = "本机的IPV4地址"
-localPort = 要映射本机的端口
-remotePort = 对外映射的端口
+name = "test-tcp" // 代理名称(随便填)
+type = "tcp" // 代理类型
+localIP = "" // 代理地址, 要转发到哪个地址(本地服务地址)
+localPort =  // 代理端口, 要转发到哪个端口(本地服务端口)
+remotePort = // 远程代理到公网的端口，服务端与客户端连接的桥梁(此端口记得进行端口开放，避免连接不上)
