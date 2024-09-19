@@ -1,0 +1,7 @@
+bindPort = 9847
+auth.token = 'mypass@123'
+
+webServer.addr = "0.0.0.0"
+webServer.user = "myFrp"
+webServer.password = "mypass@123"
+webServer.port = 9488
