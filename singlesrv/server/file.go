@@ -111,12 +111,10 @@ func SyncFileIndex(ctx context.Context, cacheAllFile bool) error {
 		return err
 	}
 
-	if len(newFileList) != 0 {
-		pubErr := MqTopicSyncFile.Pub(uCtx, &client.MqSyncFile{
-			FileList: newFileList,
-		})
-		if pubErr != nil {
-			log.Errorf("err:%v", pubErr)
+	for _, file := range newFileList {
+		err := doSingleFileLogic(uCtx, file)
+		if err != nil {
+			log.Errorf("save file failed %s", file.Name)
 		}
 	}
 
