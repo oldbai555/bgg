@@ -1,1 +1,2 @@
+*baixctl.exe filter=lfs diff=lfs merge=lfs -text
 admin-server/scripts/sqlgen/sqlgen.exe filter=lfs diff=lfs merge=lfs -text
