@@ -37,4 +37,24 @@ var cmdList = []*bcmd.Cmd{
 	{Server: client.ServerName, Path: client.GetUserCMDPath, GRpcFunc: server.OnceSvrImpl.GetUser, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
 
 	{Server: client.ServerName, Path: client.GetUserListCMDPath, GRpcFunc: server.OnceSvrImpl.GetUserList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: client.ServerName, Path: client.AddFoodMenuCMDPath, GRpcFunc: server.OnceSvrImpl.AddFoodMenu, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: client.ServerName, Path: client.DelFoodMenuListCMDPath, GRpcFunc: server.OnceSvrImpl.DelFoodMenuList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: client.ServerName, Path: client.UpdateFoodMenuCMDPath, GRpcFunc: server.OnceSvrImpl.UpdateFoodMenu, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: client.ServerName, Path: client.GetFoodMenuCMDPath, GRpcFunc: server.OnceSvrImpl.GetFoodMenu, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: client.ServerName, Path: client.GetFoodMenuListCMDPath, GRpcFunc: server.OnceSvrImpl.GetFoodMenuList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: client.ServerName, Path: client.AddFoodMenuElemCMDPath, GRpcFunc: server.OnceSvrImpl.AddFoodMenuElem, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: client.ServerName, Path: client.DelFoodMenuElemListCMDPath, GRpcFunc: server.OnceSvrImpl.DelFoodMenuElemList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: client.ServerName, Path: client.UpdateFoodMenuElemCMDPath, GRpcFunc: server.OnceSvrImpl.UpdateFoodMenuElem, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: client.ServerName, Path: client.GetFoodMenuElemCMDPath, GRpcFunc: server.OnceSvrImpl.GetFoodMenuElem, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: client.ServerName, Path: client.GetFoodMenuElemListCMDPath, GRpcFunc: server.OnceSvrImpl.GetFoodMenuElemList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
 }

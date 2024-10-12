@@ -14,3 +14,9 @@ func (*ModelChat) TableName() string {
 func (*ModelMessage) TableName() string {
 	return "lbsingle_message"
 }
+func (*ModelFoodMenu) TableName() string {
+	return "lbsingle_food_menu"
+}
+func (*ModelFoodMenuElem) TableName() string {
+	return "lbsingle_food_menu_elem"
+}

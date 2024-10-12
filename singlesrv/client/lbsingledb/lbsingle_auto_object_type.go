@@ -260,3 +260,99 @@ var ModelMessage = &engine.ModelObjectType{
 		},
 	},
 }
+
+var ModelFoodMenu = &engine.ModelObjectType{
+	Name: "lbsingle.ModelFoodMenu",
+	FieldList: &engine.ObjectFieldList{
+		List: []*engine.ObjectField{
+			{
+				FieldName: "id",
+				Type:      "uint64",
+				IsArray:   false,
+			},
+			{
+				FieldName: "created_at",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "updated_at",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "deleted_at",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "creator_id",
+				Type:      "uint64",
+				IsArray:   false,
+			},
+			{
+				FieldName: "name",
+				Type:      "string",
+				IsArray:   false,
+			},
+		},
+	},
+}
+
+var ModelFoodMenuElem = &engine.ModelObjectType{
+	Name: "lbsingle.ModelFoodMenuElem",
+	FieldList: &engine.ObjectFieldList{
+		List: []*engine.ObjectField{
+			{
+				FieldName: "id",
+				Type:      "uint64",
+				IsArray:   false,
+			},
+			{
+				FieldName: "created_at",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "updated_at",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "deleted_at",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "creator_id",
+				Type:      "uint64",
+				IsArray:   false,
+			},
+			{
+				FieldName: "menu_id",
+				Type:      "uint64",
+				IsArray:   false,
+			},
+			{
+				FieldName: "name",
+				Type:      "string",
+				IsArray:   false,
+			},
+			{
+				FieldName: "img_url",
+				Type:      "string",
+				IsArray:   false,
+			},
+			{
+				FieldName: "carousel_img_url",
+				Type:      "string",
+				IsArray:   true,
+			},
+			{
+				FieldName: "desc",
+				Type:      "string",
+				IsArray:   false,
+			},
+		},
+	},
+}

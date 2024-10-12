@@ -1104,6 +1104,238 @@ var _ interface {
 	ErrorName() string
 } = ModelMessageValidationError{}
 
+// Validate checks the field values on ModelFoodMenu with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *ModelFoodMenu) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ModelFoodMenu with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ModelFoodMenuMultiError, or
+// nil if none found.
+func (m *ModelFoodMenu) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ModelFoodMenu) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Id
+
+	// no validation rules for CreatedAt
+
+	// no validation rules for UpdatedAt
+
+	// no validation rules for DeletedAt
+
+	// no validation rules for CreatorId
+
+	// no validation rules for Name
+
+	if len(errors) > 0 {
+		return ModelFoodMenuMultiError(errors)
+	}
+
+	return nil
+}
+
+// ModelFoodMenuMultiError is an error wrapping multiple validation errors
+// returned by ModelFoodMenu.ValidateAll() if the designated constraints
+// aren't met.
+type ModelFoodMenuMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ModelFoodMenuMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ModelFoodMenuMultiError) AllErrors() []error { return m }
+
+// ModelFoodMenuValidationError is the validation error returned by
+// ModelFoodMenu.Validate if the designated constraints aren't met.
+type ModelFoodMenuValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ModelFoodMenuValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ModelFoodMenuValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ModelFoodMenuValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ModelFoodMenuValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ModelFoodMenuValidationError) ErrorName() string { return "ModelFoodMenuValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ModelFoodMenuValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sModelFoodMenu.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ModelFoodMenuValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ModelFoodMenuValidationError{}
+
+// Validate checks the field values on ModelFoodMenuElem with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *ModelFoodMenuElem) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ModelFoodMenuElem with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ModelFoodMenuElemMultiError, or nil if none found.
+func (m *ModelFoodMenuElem) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ModelFoodMenuElem) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Id
+
+	// no validation rules for CreatedAt
+
+	// no validation rules for UpdatedAt
+
+	// no validation rules for DeletedAt
+
+	// no validation rules for CreatorId
+
+	// no validation rules for MenuId
+
+	// no validation rules for Name
+
+	// no validation rules for ImgUrl
+
+	// no validation rules for Desc
+
+	if len(errors) > 0 {
+		return ModelFoodMenuElemMultiError(errors)
+	}
+
+	return nil
+}
+
+// ModelFoodMenuElemMultiError is an error wrapping multiple validation errors
+// returned by ModelFoodMenuElem.ValidateAll() if the designated constraints
+// aren't met.
+type ModelFoodMenuElemMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ModelFoodMenuElemMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ModelFoodMenuElemMultiError) AllErrors() []error { return m }
+
+// ModelFoodMenuElemValidationError is the validation error returned by
+// ModelFoodMenuElem.Validate if the designated constraints aren't met.
+type ModelFoodMenuElemValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ModelFoodMenuElemValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ModelFoodMenuElemValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ModelFoodMenuElemValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ModelFoodMenuElemValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ModelFoodMenuElemValidationError) ErrorName() string {
+	return "ModelFoodMenuElemValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ModelFoodMenuElemValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sModelFoodMenuElem.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ModelFoodMenuElemValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ModelFoodMenuElemValidationError{}
+
 // Validate checks the field values on DelFileListReq with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -4616,3 +4848,2619 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = GetUserListRspValidationError{}
+
+// Validate checks the field values on AddFoodMenuReq with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *AddFoodMenuReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddFoodMenuReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in AddFoodMenuReqMultiError,
+// or nil if none found.
+func (m *AddFoodMenuReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddFoodMenuReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetData() == nil {
+		err := AddFoodMenuReqValidationError{
+			field:  "Data",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AddFoodMenuReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AddFoodMenuReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AddFoodMenuReqValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return AddFoodMenuReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// AddFoodMenuReqMultiError is an error wrapping multiple validation errors
+// returned by AddFoodMenuReq.ValidateAll() if the designated constraints
+// aren't met.
+type AddFoodMenuReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddFoodMenuReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddFoodMenuReqMultiError) AllErrors() []error { return m }
+
+// AddFoodMenuReqValidationError is the validation error returned by
+// AddFoodMenuReq.Validate if the designated constraints aren't met.
+type AddFoodMenuReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddFoodMenuReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddFoodMenuReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddFoodMenuReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddFoodMenuReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddFoodMenuReqValidationError) ErrorName() string { return "AddFoodMenuReqValidationError" }
+
+// Error satisfies the builtin error interface
+func (e AddFoodMenuReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddFoodMenuReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddFoodMenuReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddFoodMenuReqValidationError{}
+
+// Validate checks the field values on AddFoodMenuRsp with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *AddFoodMenuRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddFoodMenuRsp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in AddFoodMenuRspMultiError,
+// or nil if none found.
+func (m *AddFoodMenuRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddFoodMenuRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AddFoodMenuRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AddFoodMenuRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AddFoodMenuRspValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return AddFoodMenuRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// AddFoodMenuRspMultiError is an error wrapping multiple validation errors
+// returned by AddFoodMenuRsp.ValidateAll() if the designated constraints
+// aren't met.
+type AddFoodMenuRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddFoodMenuRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddFoodMenuRspMultiError) AllErrors() []error { return m }
+
+// AddFoodMenuRspValidationError is the validation error returned by
+// AddFoodMenuRsp.Validate if the designated constraints aren't met.
+type AddFoodMenuRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddFoodMenuRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddFoodMenuRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddFoodMenuRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddFoodMenuRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddFoodMenuRspValidationError) ErrorName() string { return "AddFoodMenuRspValidationError" }
+
+// Error satisfies the builtin error interface
+func (e AddFoodMenuRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddFoodMenuRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddFoodMenuRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddFoodMenuRspValidationError{}
+
+// Validate checks the field values on UpdateFoodMenuReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *UpdateFoodMenuReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdateFoodMenuReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpdateFoodMenuReqMultiError, or nil if none found.
+func (m *UpdateFoodMenuReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdateFoodMenuReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetData() == nil {
+		err := UpdateFoodMenuReqValidationError{
+			field:  "Data",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UpdateFoodMenuReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UpdateFoodMenuReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpdateFoodMenuReqValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return UpdateFoodMenuReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpdateFoodMenuReqMultiError is an error wrapping multiple validation errors
+// returned by UpdateFoodMenuReq.ValidateAll() if the designated constraints
+// aren't met.
+type UpdateFoodMenuReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdateFoodMenuReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdateFoodMenuReqMultiError) AllErrors() []error { return m }
+
+// UpdateFoodMenuReqValidationError is the validation error returned by
+// UpdateFoodMenuReq.Validate if the designated constraints aren't met.
+type UpdateFoodMenuReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateFoodMenuReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateFoodMenuReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateFoodMenuReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateFoodMenuReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateFoodMenuReqValidationError) ErrorName() string {
+	return "UpdateFoodMenuReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateFoodMenuReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateFoodMenuReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateFoodMenuReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateFoodMenuReqValidationError{}
+
+// Validate checks the field values on UpdateFoodMenuRsp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *UpdateFoodMenuRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdateFoodMenuRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpdateFoodMenuRspMultiError, or nil if none found.
+func (m *UpdateFoodMenuRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdateFoodMenuRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return UpdateFoodMenuRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpdateFoodMenuRspMultiError is an error wrapping multiple validation errors
+// returned by UpdateFoodMenuRsp.ValidateAll() if the designated constraints
+// aren't met.
+type UpdateFoodMenuRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdateFoodMenuRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdateFoodMenuRspMultiError) AllErrors() []error { return m }
+
+// UpdateFoodMenuRspValidationError is the validation error returned by
+// UpdateFoodMenuRsp.Validate if the designated constraints aren't met.
+type UpdateFoodMenuRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateFoodMenuRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateFoodMenuRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateFoodMenuRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateFoodMenuRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateFoodMenuRspValidationError) ErrorName() string {
+	return "UpdateFoodMenuRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateFoodMenuRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateFoodMenuRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateFoodMenuRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateFoodMenuRspValidationError{}
+
+// Validate checks the field values on DelFoodMenuListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DelFoodMenuListReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DelFoodMenuListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DelFoodMenuListReqMultiError, or nil if none found.
+func (m *DelFoodMenuListReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DelFoodMenuListReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetListOption() == nil {
+		err := DelFoodMenuListReqValidationError{
+			field:  "ListOption",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetListOption()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DelFoodMenuListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DelFoodMenuListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetListOption()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DelFoodMenuListReqValidationError{
+				field:  "ListOption",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return DelFoodMenuListReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// DelFoodMenuListReqMultiError is an error wrapping multiple validation errors
+// returned by DelFoodMenuListReq.ValidateAll() if the designated constraints
+// aren't met.
+type DelFoodMenuListReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DelFoodMenuListReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DelFoodMenuListReqMultiError) AllErrors() []error { return m }
+
+// DelFoodMenuListReqValidationError is the validation error returned by
+// DelFoodMenuListReq.Validate if the designated constraints aren't met.
+type DelFoodMenuListReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DelFoodMenuListReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DelFoodMenuListReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DelFoodMenuListReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DelFoodMenuListReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DelFoodMenuListReqValidationError) ErrorName() string {
+	return "DelFoodMenuListReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DelFoodMenuListReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDelFoodMenuListReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DelFoodMenuListReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DelFoodMenuListReqValidationError{}
+
+// Validate checks the field values on DelFoodMenuListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DelFoodMenuListRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DelFoodMenuListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DelFoodMenuListRspMultiError, or nil if none found.
+func (m *DelFoodMenuListRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DelFoodMenuListRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return DelFoodMenuListRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// DelFoodMenuListRspMultiError is an error wrapping multiple validation errors
+// returned by DelFoodMenuListRsp.ValidateAll() if the designated constraints
+// aren't met.
+type DelFoodMenuListRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DelFoodMenuListRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DelFoodMenuListRspMultiError) AllErrors() []error { return m }
+
+// DelFoodMenuListRspValidationError is the validation error returned by
+// DelFoodMenuListRsp.Validate if the designated constraints aren't met.
+type DelFoodMenuListRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DelFoodMenuListRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DelFoodMenuListRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DelFoodMenuListRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DelFoodMenuListRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DelFoodMenuListRspValidationError) ErrorName() string {
+	return "DelFoodMenuListRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DelFoodMenuListRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDelFoodMenuListRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DelFoodMenuListRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DelFoodMenuListRspValidationError{}
+
+// Validate checks the field values on GetFoodMenuReq with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *GetFoodMenuReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetFoodMenuReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in GetFoodMenuReqMultiError,
+// or nil if none found.
+func (m *GetFoodMenuReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetFoodMenuReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetId() <= 0 {
+		err := GetFoodMenuReqValidationError{
+			field:  "Id",
+			reason: "value must be greater than 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return GetFoodMenuReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetFoodMenuReqMultiError is an error wrapping multiple validation errors
+// returned by GetFoodMenuReq.ValidateAll() if the designated constraints
+// aren't met.
+type GetFoodMenuReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetFoodMenuReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetFoodMenuReqMultiError) AllErrors() []error { return m }
+
+// GetFoodMenuReqValidationError is the validation error returned by
+// GetFoodMenuReq.Validate if the designated constraints aren't met.
+type GetFoodMenuReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetFoodMenuReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetFoodMenuReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetFoodMenuReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetFoodMenuReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetFoodMenuReqValidationError) ErrorName() string { return "GetFoodMenuReqValidationError" }
+
+// Error satisfies the builtin error interface
+func (e GetFoodMenuReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetFoodMenuReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetFoodMenuReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetFoodMenuReqValidationError{}
+
+// Validate checks the field values on GetFoodMenuRsp with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *GetFoodMenuRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetFoodMenuRsp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in GetFoodMenuRspMultiError,
+// or nil if none found.
+func (m *GetFoodMenuRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetFoodMenuRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetFoodMenuRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetFoodMenuRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetFoodMenuRspValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetFoodMenuRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetFoodMenuRspMultiError is an error wrapping multiple validation errors
+// returned by GetFoodMenuRsp.ValidateAll() if the designated constraints
+// aren't met.
+type GetFoodMenuRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetFoodMenuRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetFoodMenuRspMultiError) AllErrors() []error { return m }
+
+// GetFoodMenuRspValidationError is the validation error returned by
+// GetFoodMenuRsp.Validate if the designated constraints aren't met.
+type GetFoodMenuRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetFoodMenuRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetFoodMenuRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetFoodMenuRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetFoodMenuRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetFoodMenuRspValidationError) ErrorName() string { return "GetFoodMenuRspValidationError" }
+
+// Error satisfies the builtin error interface
+func (e GetFoodMenuRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetFoodMenuRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetFoodMenuRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetFoodMenuRspValidationError{}
+
+// Validate checks the field values on GetFoodMenuListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetFoodMenuListReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetFoodMenuListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetFoodMenuListReqMultiError, or nil if none found.
+func (m *GetFoodMenuListReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetFoodMenuListReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetListOption() == nil {
+		err := GetFoodMenuListReqValidationError{
+			field:  "ListOption",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetListOption()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetFoodMenuListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetFoodMenuListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetListOption()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetFoodMenuListReqValidationError{
+				field:  "ListOption",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetFoodMenuListReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetFoodMenuListReqMultiError is an error wrapping multiple validation errors
+// returned by GetFoodMenuListReq.ValidateAll() if the designated constraints
+// aren't met.
+type GetFoodMenuListReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetFoodMenuListReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetFoodMenuListReqMultiError) AllErrors() []error { return m }
+
+// GetFoodMenuListReqValidationError is the validation error returned by
+// GetFoodMenuListReq.Validate if the designated constraints aren't met.
+type GetFoodMenuListReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetFoodMenuListReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetFoodMenuListReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetFoodMenuListReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetFoodMenuListReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetFoodMenuListReqValidationError) ErrorName() string {
+	return "GetFoodMenuListReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetFoodMenuListReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetFoodMenuListReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetFoodMenuListReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetFoodMenuListReqValidationError{}
+
+// Validate checks the field values on GetFoodMenuListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetFoodMenuListRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetFoodMenuListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetFoodMenuListRspMultiError, or nil if none found.
+func (m *GetFoodMenuListRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetFoodMenuListRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetPaginate()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetFoodMenuListRspValidationError{
+					field:  "Paginate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetFoodMenuListRspValidationError{
+					field:  "Paginate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPaginate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetFoodMenuListRspValidationError{
+				field:  "Paginate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	for idx, item := range m.GetList() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, GetFoodMenuListRspValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, GetFoodMenuListRspValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return GetFoodMenuListRspValidationError{
+					field:  fmt.Sprintf("List[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return GetFoodMenuListRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetFoodMenuListRspMultiError is an error wrapping multiple validation errors
+// returned by GetFoodMenuListRsp.ValidateAll() if the designated constraints
+// aren't met.
+type GetFoodMenuListRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetFoodMenuListRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetFoodMenuListRspMultiError) AllErrors() []error { return m }
+
+// GetFoodMenuListRspValidationError is the validation error returned by
+// GetFoodMenuListRsp.Validate if the designated constraints aren't met.
+type GetFoodMenuListRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetFoodMenuListRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetFoodMenuListRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetFoodMenuListRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetFoodMenuListRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetFoodMenuListRspValidationError) ErrorName() string {
+	return "GetFoodMenuListRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetFoodMenuListRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetFoodMenuListRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetFoodMenuListRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetFoodMenuListRspValidationError{}
+
+// Validate checks the field values on AddFoodMenuElemReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *AddFoodMenuElemReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddFoodMenuElemReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AddFoodMenuElemReqMultiError, or nil if none found.
+func (m *AddFoodMenuElemReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddFoodMenuElemReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetData() == nil {
+		err := AddFoodMenuElemReqValidationError{
+			field:  "Data",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AddFoodMenuElemReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AddFoodMenuElemReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AddFoodMenuElemReqValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return AddFoodMenuElemReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// AddFoodMenuElemReqMultiError is an error wrapping multiple validation errors
+// returned by AddFoodMenuElemReq.ValidateAll() if the designated constraints
+// aren't met.
+type AddFoodMenuElemReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddFoodMenuElemReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddFoodMenuElemReqMultiError) AllErrors() []error { return m }
+
+// AddFoodMenuElemReqValidationError is the validation error returned by
+// AddFoodMenuElemReq.Validate if the designated constraints aren't met.
+type AddFoodMenuElemReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddFoodMenuElemReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddFoodMenuElemReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddFoodMenuElemReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddFoodMenuElemReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddFoodMenuElemReqValidationError) ErrorName() string {
+	return "AddFoodMenuElemReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AddFoodMenuElemReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddFoodMenuElemReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddFoodMenuElemReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddFoodMenuElemReqValidationError{}
+
+// Validate checks the field values on AddFoodMenuElemRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *AddFoodMenuElemRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddFoodMenuElemRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AddFoodMenuElemRspMultiError, or nil if none found.
+func (m *AddFoodMenuElemRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddFoodMenuElemRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AddFoodMenuElemRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AddFoodMenuElemRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AddFoodMenuElemRspValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return AddFoodMenuElemRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// AddFoodMenuElemRspMultiError is an error wrapping multiple validation errors
+// returned by AddFoodMenuElemRsp.ValidateAll() if the designated constraints
+// aren't met.
+type AddFoodMenuElemRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddFoodMenuElemRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddFoodMenuElemRspMultiError) AllErrors() []error { return m }
+
+// AddFoodMenuElemRspValidationError is the validation error returned by
+// AddFoodMenuElemRsp.Validate if the designated constraints aren't met.
+type AddFoodMenuElemRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddFoodMenuElemRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddFoodMenuElemRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddFoodMenuElemRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddFoodMenuElemRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddFoodMenuElemRspValidationError) ErrorName() string {
+	return "AddFoodMenuElemRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AddFoodMenuElemRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddFoodMenuElemRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddFoodMenuElemRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddFoodMenuElemRspValidationError{}
+
+// Validate checks the field values on UpdateFoodMenuElemReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *UpdateFoodMenuElemReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdateFoodMenuElemReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpdateFoodMenuElemReqMultiError, or nil if none found.
+func (m *UpdateFoodMenuElemReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdateFoodMenuElemReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetData() == nil {
+		err := UpdateFoodMenuElemReqValidationError{
+			field:  "Data",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UpdateFoodMenuElemReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UpdateFoodMenuElemReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpdateFoodMenuElemReqValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return UpdateFoodMenuElemReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpdateFoodMenuElemReqMultiError is an error wrapping multiple validation
+// errors returned by UpdateFoodMenuElemReq.ValidateAll() if the designated
+// constraints aren't met.
+type UpdateFoodMenuElemReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdateFoodMenuElemReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdateFoodMenuElemReqMultiError) AllErrors() []error { return m }
+
+// UpdateFoodMenuElemReqValidationError is the validation error returned by
+// UpdateFoodMenuElemReq.Validate if the designated constraints aren't met.
+type UpdateFoodMenuElemReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateFoodMenuElemReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateFoodMenuElemReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateFoodMenuElemReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateFoodMenuElemReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateFoodMenuElemReqValidationError) ErrorName() string {
+	return "UpdateFoodMenuElemReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateFoodMenuElemReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateFoodMenuElemReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateFoodMenuElemReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateFoodMenuElemReqValidationError{}
+
+// Validate checks the field values on UpdateFoodMenuElemRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *UpdateFoodMenuElemRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdateFoodMenuElemRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpdateFoodMenuElemRspMultiError, or nil if none found.
+func (m *UpdateFoodMenuElemRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdateFoodMenuElemRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return UpdateFoodMenuElemRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpdateFoodMenuElemRspMultiError is an error wrapping multiple validation
+// errors returned by UpdateFoodMenuElemRsp.ValidateAll() if the designated
+// constraints aren't met.
+type UpdateFoodMenuElemRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdateFoodMenuElemRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdateFoodMenuElemRspMultiError) AllErrors() []error { return m }
+
+// UpdateFoodMenuElemRspValidationError is the validation error returned by
+// UpdateFoodMenuElemRsp.Validate if the designated constraints aren't met.
+type UpdateFoodMenuElemRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateFoodMenuElemRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateFoodMenuElemRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateFoodMenuElemRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateFoodMenuElemRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateFoodMenuElemRspValidationError) ErrorName() string {
+	return "UpdateFoodMenuElemRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateFoodMenuElemRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateFoodMenuElemRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateFoodMenuElemRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateFoodMenuElemRspValidationError{}
+
+// Validate checks the field values on DelFoodMenuElemListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DelFoodMenuElemListReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DelFoodMenuElemListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DelFoodMenuElemListReqMultiError, or nil if none found.
+func (m *DelFoodMenuElemListReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DelFoodMenuElemListReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetListOption() == nil {
+		err := DelFoodMenuElemListReqValidationError{
+			field:  "ListOption",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetListOption()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DelFoodMenuElemListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DelFoodMenuElemListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetListOption()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DelFoodMenuElemListReqValidationError{
+				field:  "ListOption",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return DelFoodMenuElemListReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// DelFoodMenuElemListReqMultiError is an error wrapping multiple validation
+// errors returned by DelFoodMenuElemListReq.ValidateAll() if the designated
+// constraints aren't met.
+type DelFoodMenuElemListReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DelFoodMenuElemListReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DelFoodMenuElemListReqMultiError) AllErrors() []error { return m }
+
+// DelFoodMenuElemListReqValidationError is the validation error returned by
+// DelFoodMenuElemListReq.Validate if the designated constraints aren't met.
+type DelFoodMenuElemListReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DelFoodMenuElemListReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DelFoodMenuElemListReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DelFoodMenuElemListReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DelFoodMenuElemListReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DelFoodMenuElemListReqValidationError) ErrorName() string {
+	return "DelFoodMenuElemListReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DelFoodMenuElemListReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDelFoodMenuElemListReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DelFoodMenuElemListReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DelFoodMenuElemListReqValidationError{}
+
+// Validate checks the field values on DelFoodMenuElemListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DelFoodMenuElemListRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DelFoodMenuElemListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DelFoodMenuElemListRspMultiError, or nil if none found.
+func (m *DelFoodMenuElemListRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DelFoodMenuElemListRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return DelFoodMenuElemListRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// DelFoodMenuElemListRspMultiError is an error wrapping multiple validation
+// errors returned by DelFoodMenuElemListRsp.ValidateAll() if the designated
+// constraints aren't met.
+type DelFoodMenuElemListRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DelFoodMenuElemListRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DelFoodMenuElemListRspMultiError) AllErrors() []error { return m }
+
+// DelFoodMenuElemListRspValidationError is the validation error returned by
+// DelFoodMenuElemListRsp.Validate if the designated constraints aren't met.
+type DelFoodMenuElemListRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DelFoodMenuElemListRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DelFoodMenuElemListRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DelFoodMenuElemListRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DelFoodMenuElemListRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DelFoodMenuElemListRspValidationError) ErrorName() string {
+	return "DelFoodMenuElemListRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DelFoodMenuElemListRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDelFoodMenuElemListRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DelFoodMenuElemListRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DelFoodMenuElemListRspValidationError{}
+
+// Validate checks the field values on GetFoodMenuElemReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetFoodMenuElemReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetFoodMenuElemReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetFoodMenuElemReqMultiError, or nil if none found.
+func (m *GetFoodMenuElemReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetFoodMenuElemReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetId() <= 0 {
+		err := GetFoodMenuElemReqValidationError{
+			field:  "Id",
+			reason: "value must be greater than 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return GetFoodMenuElemReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetFoodMenuElemReqMultiError is an error wrapping multiple validation errors
+// returned by GetFoodMenuElemReq.ValidateAll() if the designated constraints
+// aren't met.
+type GetFoodMenuElemReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetFoodMenuElemReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetFoodMenuElemReqMultiError) AllErrors() []error { return m }
+
+// GetFoodMenuElemReqValidationError is the validation error returned by
+// GetFoodMenuElemReq.Validate if the designated constraints aren't met.
+type GetFoodMenuElemReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetFoodMenuElemReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetFoodMenuElemReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetFoodMenuElemReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetFoodMenuElemReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetFoodMenuElemReqValidationError) ErrorName() string {
+	return "GetFoodMenuElemReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetFoodMenuElemReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetFoodMenuElemReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetFoodMenuElemReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetFoodMenuElemReqValidationError{}
+
+// Validate checks the field values on GetFoodMenuElemRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetFoodMenuElemRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetFoodMenuElemRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetFoodMenuElemRspMultiError, or nil if none found.
+func (m *GetFoodMenuElemRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetFoodMenuElemRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetFoodMenuElemRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetFoodMenuElemRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetFoodMenuElemRspValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetFoodMenuElemRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetFoodMenuElemRspMultiError is an error wrapping multiple validation errors
+// returned by GetFoodMenuElemRsp.ValidateAll() if the designated constraints
+// aren't met.
+type GetFoodMenuElemRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetFoodMenuElemRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetFoodMenuElemRspMultiError) AllErrors() []error { return m }
+
+// GetFoodMenuElemRspValidationError is the validation error returned by
+// GetFoodMenuElemRsp.Validate if the designated constraints aren't met.
+type GetFoodMenuElemRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetFoodMenuElemRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetFoodMenuElemRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetFoodMenuElemRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetFoodMenuElemRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetFoodMenuElemRspValidationError) ErrorName() string {
+	return "GetFoodMenuElemRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetFoodMenuElemRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetFoodMenuElemRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetFoodMenuElemRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetFoodMenuElemRspValidationError{}
+
+// Validate checks the field values on GetFoodMenuElemListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetFoodMenuElemListReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetFoodMenuElemListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetFoodMenuElemListReqMultiError, or nil if none found.
+func (m *GetFoodMenuElemListReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetFoodMenuElemListReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetListOption() == nil {
+		err := GetFoodMenuElemListReqValidationError{
+			field:  "ListOption",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetListOption()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetFoodMenuElemListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetFoodMenuElemListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetListOption()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetFoodMenuElemListReqValidationError{
+				field:  "ListOption",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetFoodMenuElemListReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetFoodMenuElemListReqMultiError is an error wrapping multiple validation
+// errors returned by GetFoodMenuElemListReq.ValidateAll() if the designated
+// constraints aren't met.
+type GetFoodMenuElemListReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetFoodMenuElemListReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetFoodMenuElemListReqMultiError) AllErrors() []error { return m }
+
+// GetFoodMenuElemListReqValidationError is the validation error returned by
+// GetFoodMenuElemListReq.Validate if the designated constraints aren't met.
+type GetFoodMenuElemListReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetFoodMenuElemListReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetFoodMenuElemListReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetFoodMenuElemListReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetFoodMenuElemListReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetFoodMenuElemListReqValidationError) ErrorName() string {
+	return "GetFoodMenuElemListReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetFoodMenuElemListReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetFoodMenuElemListReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetFoodMenuElemListReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetFoodMenuElemListReqValidationError{}
+
+// Validate checks the field values on GetFoodMenuElemListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetFoodMenuElemListRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetFoodMenuElemListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetFoodMenuElemListRspMultiError, or nil if none found.
+func (m *GetFoodMenuElemListRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetFoodMenuElemListRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetPaginate()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetFoodMenuElemListRspValidationError{
+					field:  "Paginate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetFoodMenuElemListRspValidationError{
+					field:  "Paginate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPaginate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetFoodMenuElemListRspValidationError{
+				field:  "Paginate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	for idx, item := range m.GetList() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, GetFoodMenuElemListRspValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, GetFoodMenuElemListRspValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return GetFoodMenuElemListRspValidationError{
+					field:  fmt.Sprintf("List[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return GetFoodMenuElemListRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetFoodMenuElemListRspMultiError is an error wrapping multiple validation
+// errors returned by GetFoodMenuElemListRsp.ValidateAll() if the designated
+// constraints aren't met.
+type GetFoodMenuElemListRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetFoodMenuElemListRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetFoodMenuElemListRspMultiError) AllErrors() []error { return m }
+
+// GetFoodMenuElemListRspValidationError is the validation error returned by
+// GetFoodMenuElemListRsp.Validate if the designated constraints aren't met.
+type GetFoodMenuElemListRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetFoodMenuElemListRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetFoodMenuElemListRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetFoodMenuElemListRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetFoodMenuElemListRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetFoodMenuElemListRspValidationError) ErrorName() string {
+	return "GetFoodMenuElemListRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetFoodMenuElemListRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetFoodMenuElemListRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetFoodMenuElemListRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetFoodMenuElemListRspValidationError{}

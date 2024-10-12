@@ -11,10 +11,12 @@ import (
 )
 
 var (
-	OrmFile    *gormx.BaseModel[*client.ModelFile]
-	OrmUser    *gormx.BaseModel[*client.ModelUser]
-	OrmChat    *gormx.BaseModel[*client.ModelChat]
-	OrmMessage *gormx.BaseModel[*client.ModelMessage]
+	OrmFile         *gormx.BaseModel[*client.ModelFile]
+	OrmUser         *gormx.BaseModel[*client.ModelUser]
+	OrmChat         *gormx.BaseModel[*client.ModelChat]
+	OrmMessage      *gormx.BaseModel[*client.ModelMessage]
+	OrmFoodMenu     *gormx.BaseModel[*client.ModelFoodMenu]
+	OrmFoodMenuElem *gormx.BaseModel[*client.ModelFoodMenuElem]
 )
 
 func Init() (err error) {
@@ -32,6 +34,8 @@ func Init() (err error) {
 		&client.ModelUser{},
 		&client.ModelChat{},
 		&client.ModelMessage{},
+		&client.ModelFoodMenu{},
+		&client.ModelFoodMenuElem{},
 	},
 	)
 	// 注入结构
@@ -41,6 +45,8 @@ func Init() (err error) {
 		lbsingledb.ModelUser,
 		lbsingledb.ModelChat,
 		lbsingledb.ModelMessage,
+		lbsingledb.ModelFoodMenu,
+		lbsingledb.ModelFoodMenuElem,
 	)
 
 	OrmFile = gormx.NewBaseModel[*client.ModelFile](gormx.ModelConfig{
@@ -57,6 +63,14 @@ func Init() (err error) {
 	})
 	OrmMessage = gormx.NewBaseModel[*client.ModelMessage](gormx.ModelConfig{
 		NotFoundErrCode: int32(client.ErrCode_ErrMessageNotFound),
+		Db:              "biz",
+	})
+	OrmFoodMenu = gormx.NewBaseModel[*client.ModelFoodMenu](gormx.ModelConfig{
+		NotFoundErrCode: int32(client.ErrCode_ErrFoodMenuNotFound),
+		Db:              "biz",
+	})
+	OrmFoodMenuElem = gormx.NewBaseModel[*client.ModelFoodMenuElem](gormx.ModelConfig{
+		NotFoundErrCode: int32(client.ErrCode_ErrFoodMenuElemNotFound),
 		Db:              "biz",
 	})
 

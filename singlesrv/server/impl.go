@@ -439,3 +439,260 @@ func (a *LbsingleServer) GetUserList(ctx context.Context, req *client.GetUserLis
 
 	return &rsp, err
 }
+func (a *LbsingleServer) AddFoodMenu(ctx context.Context, req *client.AddFoodMenuReq) (*client.AddFoodMenuRsp, error) {
+	var rsp client.AddFoodMenuRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = OrmFoodMenu.NewBaseScope().Create(uCtx, req.Data)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = req.Data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) DelFoodMenuList(ctx context.Context, req *client.DelFoodMenuListReq) (*client.DelFoodMenuListRsp, error) {
+	var rsp client.DelFoodMenuListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	listRsp, err := a.GetFoodMenuList(ctx, &client.GetFoodMenuListReq{
+		ListOption: req.ListOption.
+			SetSkipTotal().
+			AddOpt(core.DefaultListOption_DefaultListOptionSelect, client.FieldId_),
+	})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	if len(listRsp.List) == 0 {
+		log.Infof("list is empty")
+		return &rsp, nil
+	}
+
+	idList := utils.PluckUint64List(listRsp.List, client.FieldId)
+	_, err = OrmFoodMenu.NewBaseScope().WhereIn(client.FieldId_, idList).Delete(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) UpdateFoodMenu(ctx context.Context, req *client.UpdateFoodMenuReq) (*client.UpdateFoodMenuRsp, error) {
+	var rsp client.UpdateFoodMenuRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmFoodMenu.NewBaseScope().Where(client.FieldId_, req.Data.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	_, err = OrmFoodMenu.NewBaseScope().Where(client.FieldId_, data.Id).Update(uCtx, utils.OrmStruct2Map(req.Data))
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetFoodMenu(ctx context.Context, req *client.GetFoodMenuReq) (*client.GetFoodMenuRsp, error) {
+	var rsp client.GetFoodMenuRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmFoodMenu.NewBaseScope().Where(client.FieldId_, req.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetFoodMenuList(ctx context.Context, req *client.GetFoodMenuListReq) (*client.GetFoodMenuListRsp, error) {
+	var rsp client.GetFoodMenuListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	db := OrmFoodMenu.NewList(req.ListOption)
+	err = gormx.ProcessDefaultOptions[*client.ModelFoodMenu](req.ListOption, db)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = core.NewOptionsProcessor(req.ListOption).
+		Process()
+
+	rsp.Paginate, err = db.FindPaginate(uCtx, &rsp.List)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) AddFoodMenuElem(ctx context.Context, req *client.AddFoodMenuElemReq) (*client.AddFoodMenuElemRsp, error) {
+	var rsp client.AddFoodMenuElemRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = OrmFoodMenuElem.NewBaseScope().Create(uCtx, req.Data)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = req.Data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) DelFoodMenuElemList(ctx context.Context, req *client.DelFoodMenuElemListReq) (*client.DelFoodMenuElemListRsp, error) {
+	var rsp client.DelFoodMenuElemListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	listRsp, err := a.GetFoodMenuElemList(ctx, &client.GetFoodMenuElemListReq{
+		ListOption: req.ListOption.
+			SetSkipTotal().
+			AddOpt(core.DefaultListOption_DefaultListOptionSelect, client.FieldId_),
+	})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	if len(listRsp.List) == 0 {
+		log.Infof("list is empty")
+		return &rsp, nil
+	}
+
+	idList := utils.PluckUint64List(listRsp.List, client.FieldId)
+	_, err = OrmFoodMenuElem.NewBaseScope().WhereIn(client.FieldId_, idList).Delete(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) UpdateFoodMenuElem(ctx context.Context, req *client.UpdateFoodMenuElemReq) (*client.UpdateFoodMenuElemRsp, error) {
+	var rsp client.UpdateFoodMenuElemRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmFoodMenuElem.NewBaseScope().Where(client.FieldId_, req.Data.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	_, err = OrmFoodMenuElem.NewBaseScope().Where(client.FieldId_, data.Id).Update(uCtx, utils.OrmStruct2Map(req.Data))
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetFoodMenuElem(ctx context.Context, req *client.GetFoodMenuElemReq) (*client.GetFoodMenuElemRsp, error) {
+	var rsp client.GetFoodMenuElemRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmFoodMenuElem.NewBaseScope().Where(client.FieldId_, req.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetFoodMenuElemList(ctx context.Context, req *client.GetFoodMenuElemListReq) (*client.GetFoodMenuElemListRsp, error) {
+	var rsp client.GetFoodMenuElemListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	db := OrmFoodMenuElem.NewList(req.ListOption)
+	err = gormx.ProcessDefaultOptions[*client.ModelFoodMenuElem](req.ListOption, db)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = core.NewOptionsProcessor(req.ListOption).
+		Process()
+
+	rsp.Paginate, err = db.FindPaginate(uCtx, &rsp.List)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}

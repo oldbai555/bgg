@@ -83,6 +83,56 @@ type LbsingleClient interface {
 	// @desc:
 	// @error:
 	GetUserList(ctx context.Context, in *GetUserListReq, opts ...grpc.CallOption) (*GetUserListRsp, error)
+	// @cat: FoodMenu
+	// @name: 菜单
+	// @desc:
+	// @error:
+	AddFoodMenu(ctx context.Context, in *AddFoodMenuReq, opts ...grpc.CallOption) (*AddFoodMenuRsp, error)
+	// @cat: FoodMenu
+	// @name: 菜单
+	// @desc:
+	// @error:
+	DelFoodMenuList(ctx context.Context, in *DelFoodMenuListReq, opts ...grpc.CallOption) (*DelFoodMenuListRsp, error)
+	// @cat: FoodMenu
+	// @name: 菜单
+	// @desc:
+	// @error:
+	UpdateFoodMenu(ctx context.Context, in *UpdateFoodMenuReq, opts ...grpc.CallOption) (*UpdateFoodMenuRsp, error)
+	// @cat: FoodMenu
+	// @name: 菜单
+	// @desc:
+	// @error:
+	GetFoodMenu(ctx context.Context, in *GetFoodMenuReq, opts ...grpc.CallOption) (*GetFoodMenuRsp, error)
+	// @cat: FoodMenu
+	// @name: 菜单
+	// @desc:
+	// @error:
+	GetFoodMenuList(ctx context.Context, in *GetFoodMenuListReq, opts ...grpc.CallOption) (*GetFoodMenuListRsp, error)
+	// @cat: FoodMenuElem
+	// @name: 菜单选项
+	// @desc:
+	// @error:
+	AddFoodMenuElem(ctx context.Context, in *AddFoodMenuElemReq, opts ...grpc.CallOption) (*AddFoodMenuElemRsp, error)
+	// @cat: FoodMenuElem
+	// @name: 菜单选项
+	// @desc:
+	// @error:
+	DelFoodMenuElemList(ctx context.Context, in *DelFoodMenuElemListReq, opts ...grpc.CallOption) (*DelFoodMenuElemListRsp, error)
+	// @cat: FoodMenuElem
+	// @name: 菜单选项
+	// @desc:
+	// @error:
+	UpdateFoodMenuElem(ctx context.Context, in *UpdateFoodMenuElemReq, opts ...grpc.CallOption) (*UpdateFoodMenuElemRsp, error)
+	// @cat: FoodMenuElem
+	// @name: 菜单选项
+	// @desc:
+	// @error:
+	GetFoodMenuElem(ctx context.Context, in *GetFoodMenuElemReq, opts ...grpc.CallOption) (*GetFoodMenuElemRsp, error)
+	// @cat: FoodMenuElem
+	// @name: 菜单选项
+	// @desc:
+	// @error:
+	GetFoodMenuElemList(ctx context.Context, in *GetFoodMenuElemListReq, opts ...grpc.CallOption) (*GetFoodMenuElemListRsp, error)
 }
 
 type lbsingleClient struct {
@@ -219,6 +269,96 @@ func (c *lbsingleClient) GetUserList(ctx context.Context, in *GetUserListReq, op
 	return out, nil
 }
 
+func (c *lbsingleClient) AddFoodMenu(ctx context.Context, in *AddFoodMenuReq, opts ...grpc.CallOption) (*AddFoodMenuRsp, error) {
+	out := new(AddFoodMenuRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddFoodMenu", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) DelFoodMenuList(ctx context.Context, in *DelFoodMenuListReq, opts ...grpc.CallOption) (*DelFoodMenuListRsp, error) {
+	out := new(DelFoodMenuListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelFoodMenuList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) UpdateFoodMenu(ctx context.Context, in *UpdateFoodMenuReq, opts ...grpc.CallOption) (*UpdateFoodMenuRsp, error) {
+	out := new(UpdateFoodMenuRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateFoodMenu", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetFoodMenu(ctx context.Context, in *GetFoodMenuReq, opts ...grpc.CallOption) (*GetFoodMenuRsp, error) {
+	out := new(GetFoodMenuRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetFoodMenu", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetFoodMenuList(ctx context.Context, in *GetFoodMenuListReq, opts ...grpc.CallOption) (*GetFoodMenuListRsp, error) {
+	out := new(GetFoodMenuListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetFoodMenuList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) AddFoodMenuElem(ctx context.Context, in *AddFoodMenuElemReq, opts ...grpc.CallOption) (*AddFoodMenuElemRsp, error) {
+	out := new(AddFoodMenuElemRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddFoodMenuElem", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) DelFoodMenuElemList(ctx context.Context, in *DelFoodMenuElemListReq, opts ...grpc.CallOption) (*DelFoodMenuElemListRsp, error) {
+	out := new(DelFoodMenuElemListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelFoodMenuElemList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) UpdateFoodMenuElem(ctx context.Context, in *UpdateFoodMenuElemReq, opts ...grpc.CallOption) (*UpdateFoodMenuElemRsp, error) {
+	out := new(UpdateFoodMenuElemRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateFoodMenuElem", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetFoodMenuElem(ctx context.Context, in *GetFoodMenuElemReq, opts ...grpc.CallOption) (*GetFoodMenuElemRsp, error) {
+	out := new(GetFoodMenuElemRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetFoodMenuElem", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetFoodMenuElemList(ctx context.Context, in *GetFoodMenuElemListReq, opts ...grpc.CallOption) (*GetFoodMenuElemListRsp, error) {
+	out := new(GetFoodMenuElemListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetFoodMenuElemList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // LbsingleServer is the server API for Lbsingle service.
 // All implementations must embed UnimplementedLbsingleServer
 // for forward compatibility
@@ -284,6 +424,56 @@ type LbsingleServer interface {
 	// @desc:
 	// @error:
 	GetUserList(context.Context, *GetUserListReq) (*GetUserListRsp, error)
+	// @cat: FoodMenu
+	// @name: 菜单
+	// @desc:
+	// @error:
+	AddFoodMenu(context.Context, *AddFoodMenuReq) (*AddFoodMenuRsp, error)
+	// @cat: FoodMenu
+	// @name: 菜单
+	// @desc:
+	// @error:
+	DelFoodMenuList(context.Context, *DelFoodMenuListReq) (*DelFoodMenuListRsp, error)
+	// @cat: FoodMenu
+	// @name: 菜单
+	// @desc:
+	// @error:
+	UpdateFoodMenu(context.Context, *UpdateFoodMenuReq) (*UpdateFoodMenuRsp, error)
+	// @cat: FoodMenu
+	// @name: 菜单
+	// @desc:
+	// @error:
+	GetFoodMenu(context.Context, *GetFoodMenuReq) (*GetFoodMenuRsp, error)
+	// @cat: FoodMenu
+	// @name: 菜单
+	// @desc:
+	// @error:
+	GetFoodMenuList(context.Context, *GetFoodMenuListReq) (*GetFoodMenuListRsp, error)
+	// @cat: FoodMenuElem
+	// @name: 菜单选项
+	// @desc:
+	// @error:
+	AddFoodMenuElem(context.Context, *AddFoodMenuElemReq) (*AddFoodMenuElemRsp, error)
+	// @cat: FoodMenuElem
+	// @name: 菜单选项
+	// @desc:
+	// @error:
+	DelFoodMenuElemList(context.Context, *DelFoodMenuElemListReq) (*DelFoodMenuElemListRsp, error)
+	// @cat: FoodMenuElem
+	// @name: 菜单选项
+	// @desc:
+	// @error:
+	UpdateFoodMenuElem(context.Context, *UpdateFoodMenuElemReq) (*UpdateFoodMenuElemRsp, error)
+	// @cat: FoodMenuElem
+	// @name: 菜单选项
+	// @desc:
+	// @error:
+	GetFoodMenuElem(context.Context, *GetFoodMenuElemReq) (*GetFoodMenuElemRsp, error)
+	// @cat: FoodMenuElem
+	// @name: 菜单选项
+	// @desc:
+	// @error:
+	GetFoodMenuElemList(context.Context, *GetFoodMenuElemListReq) (*GetFoodMenuElemListRsp, error)
 	mustEmbedUnimplementedLbsingleServer()
 }
 
@@ -332,6 +522,36 @@ func (UnimplementedLbsingleServer) GetUser(context.Context, *GetUserReq) (*GetUs
 }
 func (UnimplementedLbsingleServer) GetUserList(context.Context, *GetUserListReq) (*GetUserListRsp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserList not implemented")
+}
+func (UnimplementedLbsingleServer) AddFoodMenu(context.Context, *AddFoodMenuReq) (*AddFoodMenuRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddFoodMenu not implemented")
+}
+func (UnimplementedLbsingleServer) DelFoodMenuList(context.Context, *DelFoodMenuListReq) (*DelFoodMenuListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelFoodMenuList not implemented")
+}
+func (UnimplementedLbsingleServer) UpdateFoodMenu(context.Context, *UpdateFoodMenuReq) (*UpdateFoodMenuRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateFoodMenu not implemented")
+}
+func (UnimplementedLbsingleServer) GetFoodMenu(context.Context, *GetFoodMenuReq) (*GetFoodMenuRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFoodMenu not implemented")
+}
+func (UnimplementedLbsingleServer) GetFoodMenuList(context.Context, *GetFoodMenuListReq) (*GetFoodMenuListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFoodMenuList not implemented")
+}
+func (UnimplementedLbsingleServer) AddFoodMenuElem(context.Context, *AddFoodMenuElemReq) (*AddFoodMenuElemRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddFoodMenuElem not implemented")
+}
+func (UnimplementedLbsingleServer) DelFoodMenuElemList(context.Context, *DelFoodMenuElemListReq) (*DelFoodMenuElemListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelFoodMenuElemList not implemented")
+}
+func (UnimplementedLbsingleServer) UpdateFoodMenuElem(context.Context, *UpdateFoodMenuElemReq) (*UpdateFoodMenuElemRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateFoodMenuElem not implemented")
+}
+func (UnimplementedLbsingleServer) GetFoodMenuElem(context.Context, *GetFoodMenuElemReq) (*GetFoodMenuElemRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFoodMenuElem not implemented")
+}
+func (UnimplementedLbsingleServer) GetFoodMenuElemList(context.Context, *GetFoodMenuElemListReq) (*GetFoodMenuElemListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFoodMenuElemList not implemented")
 }
 func (UnimplementedLbsingleServer) mustEmbedUnimplementedLbsingleServer() {}
 
@@ -598,6 +818,186 @@ func _Lbsingle_GetUserList_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Lbsingle_AddFoodMenu_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddFoodMenuReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).AddFoodMenu(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/AddFoodMenu",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).AddFoodMenu(ctx, req.(*AddFoodMenuReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_DelFoodMenuList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelFoodMenuListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).DelFoodMenuList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/DelFoodMenuList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).DelFoodMenuList(ctx, req.(*DelFoodMenuListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_UpdateFoodMenu_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateFoodMenuReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).UpdateFoodMenu(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/UpdateFoodMenu",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).UpdateFoodMenu(ctx, req.(*UpdateFoodMenuReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetFoodMenu_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetFoodMenuReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetFoodMenu(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetFoodMenu",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetFoodMenu(ctx, req.(*GetFoodMenuReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetFoodMenuList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetFoodMenuListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetFoodMenuList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetFoodMenuList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetFoodMenuList(ctx, req.(*GetFoodMenuListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_AddFoodMenuElem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddFoodMenuElemReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).AddFoodMenuElem(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/AddFoodMenuElem",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).AddFoodMenuElem(ctx, req.(*AddFoodMenuElemReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_DelFoodMenuElemList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelFoodMenuElemListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).DelFoodMenuElemList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/DelFoodMenuElemList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).DelFoodMenuElemList(ctx, req.(*DelFoodMenuElemListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_UpdateFoodMenuElem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateFoodMenuElemReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).UpdateFoodMenuElem(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/UpdateFoodMenuElem",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).UpdateFoodMenuElem(ctx, req.(*UpdateFoodMenuElemReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetFoodMenuElem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetFoodMenuElemReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetFoodMenuElem(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetFoodMenuElem",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetFoodMenuElem(ctx, req.(*GetFoodMenuElemReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetFoodMenuElemList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetFoodMenuElemListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetFoodMenuElemList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetFoodMenuElemList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetFoodMenuElemList(ctx, req.(*GetFoodMenuElemListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Lbsingle_ServiceDesc is the grpc.ServiceDesc for Lbsingle service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -660,6 +1060,46 @@ var Lbsingle_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUserList",
 			Handler:    _Lbsingle_GetUserList_Handler,
+		},
+		{
+			MethodName: "AddFoodMenu",
+			Handler:    _Lbsingle_AddFoodMenu_Handler,
+		},
+		{
+			MethodName: "DelFoodMenuList",
+			Handler:    _Lbsingle_DelFoodMenuList_Handler,
+		},
+		{
+			MethodName: "UpdateFoodMenu",
+			Handler:    _Lbsingle_UpdateFoodMenu_Handler,
+		},
+		{
+			MethodName: "GetFoodMenu",
+			Handler:    _Lbsingle_GetFoodMenu_Handler,
+		},
+		{
+			MethodName: "GetFoodMenuList",
+			Handler:    _Lbsingle_GetFoodMenuList_Handler,
+		},
+		{
+			MethodName: "AddFoodMenuElem",
+			Handler:    _Lbsingle_AddFoodMenuElem_Handler,
+		},
+		{
+			MethodName: "DelFoodMenuElemList",
+			Handler:    _Lbsingle_DelFoodMenuElemList_Handler,
+		},
+		{
+			MethodName: "UpdateFoodMenuElem",
+			Handler:    _Lbsingle_UpdateFoodMenuElem_Handler,
+		},
+		{
+			MethodName: "GetFoodMenuElem",
+			Handler:    _Lbsingle_GetFoodMenuElem_Handler,
+		},
+		{
+			MethodName: "GetFoodMenuElemList",
+			Handler:    _Lbsingle_GetFoodMenuElemList_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

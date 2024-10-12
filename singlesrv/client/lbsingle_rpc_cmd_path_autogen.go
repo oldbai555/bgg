@@ -3,11 +3,19 @@
 package client
 
 const (
+	AddFoodMenuCMDPath         = "/lbsingle/AddFoodMenu"
+	AddFoodMenuElemCMDPath     = "/lbsingle/AddFoodMenuElem"
 	AddUserCMDPath             = "/lbsingle/AddUser"
 	DelFileListCMDPath         = "/lbsingle/DelFileList"
+	DelFoodMenuElemListCMDPath = "/lbsingle/DelFoodMenuElemList"
+	DelFoodMenuListCMDPath     = "/lbsingle/DelFoodMenuList"
 	DelUserListCMDPath         = "/lbsingle/DelUserList"
 	GetFileCMDPath             = "/lbsingle/GetFile"
 	GetFileListCMDPath         = "/lbsingle/GetFileList"
+	GetFoodMenuCMDPath         = "/lbsingle/GetFoodMenu"
+	GetFoodMenuElemCMDPath     = "/lbsingle/GetFoodMenuElem"
+	GetFoodMenuElemListCMDPath = "/lbsingle/GetFoodMenuElemList"
+	GetFoodMenuListCMDPath     = "/lbsingle/GetFoodMenuList"
 	GetLoginUserCMDPath        = "/lbsingle/GetLoginUser"
 	GetUserCMDPath             = "/lbsingle/GetUser"
 	GetUserListCMDPath         = "/lbsingle/GetUserList"
@@ -15,6 +23,8 @@ const (
 	LogoutCMDPath              = "/lbsingle/Logout"
 	ResetPasswordCMDPath       = "/lbsingle/ResetPassword"
 	SyncFileCMDPath            = "/lbsingle/SyncFile"
+	UpdateFoodMenuCMDPath      = "/lbsingle/UpdateFoodMenu"
+	UpdateFoodMenuElemCMDPath  = "/lbsingle/UpdateFoodMenuElem"
 	UpdateLoginUserInfoCMDPath = "/lbsingle/UpdateLoginUserInfo"
 	UpdateUserCMDPath          = "/lbsingle/UpdateUser"
 )

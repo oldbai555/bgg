@@ -22,4 +22,6 @@ var (
 	ErrChatNotFound              = status.Error(codes.Code(int32(ErrCode_ErrChatNotFound)), "会话不存在")
 	ErrMessageNotFound           = status.Error(codes.Code(int32(ErrCode_ErrMessageNotFound)), "消息不存在")
 	ErrPasswordLength            = status.Error(codes.Code(int32(ErrCode_ErrPasswordLength)), "密码长度在6-16位")
+	ErrFoodMenuNotFound          = status.Error(codes.Code(int32(ErrCode_ErrFoodMenuNotFound)), "菜单不存在")
+	ErrFoodMenuElemNotFound      = status.Error(codes.Code(int32(ErrCode_ErrFoodMenuElemNotFound)), "菜单选项不存在")
 )
