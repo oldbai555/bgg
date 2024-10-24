@@ -9,9 +9,10 @@ import (
 type SysCfg struct {
 	V *viper.Viper
 
-	StorageConf *StorageConf
-	ServerConf  *ServerConf
-	Proxys      *Proxys
+	StorageConf       *StorageConf
+	ServerConf        *ServerConf
+	WxMiniProgramConf *WxMiniProgramConf
+	Proxys            *Proxys
 }
 
 var sc *SysCfg
