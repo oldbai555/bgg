@@ -19,3 +19,14 @@ func (x *ModelUser) ToBaseUser() *BaseUser {
 		CreatedAt: x.CreatedAt,
 	}
 }
+
+func (x *ModelMpMemberUser) ToBaseUser() *BaseUser {
+	return &BaseUser{
+		Id:        x.Id,
+		Username:  x.Mobile,
+		Avatar:    x.Avatar,
+		Nickname:  x.Nickname,
+		CreatedAt: x.CreatedAt,
+		Type:      1,
+	}
+}

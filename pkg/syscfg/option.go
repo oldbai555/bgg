@@ -14,6 +14,12 @@ func OptionWithServer() Option {
 	}
 }
 
+func OptionWithWxMiniProgram() Option {
+	return func(tool *SysCfg) {
+		tool.WxMiniProgramConf = NewWxMiniProgramConf(tool.V)
+	}
+}
+
 func OptionWithProxyConf() Option {
 	return func(tool *SysCfg) {
 		tool.Proxys = NewProxys(tool.V)

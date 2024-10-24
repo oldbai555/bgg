@@ -3,10 +3,12 @@ package server
 import (
 	"context"
 	"fmt"
+	"github.com/oldbai555/bgg/pkg/syscfg"
 	"github.com/oldbai555/bgg/singlesrv/client"
 	"github.com/oldbai555/bgg/singlesrv/server/cache"
 	"github.com/oldbai555/bgg/singlesrv/server/ctx"
 	"github.com/oldbai555/bgg/singlesrv/server/wsmgr"
+	"github.com/oldbai555/bgg/singlesrv/server/wxminiprogram"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/utils"
 	"github.com/oldbai555/micro/core"
@@ -274,6 +276,7 @@ func (a *LbsingleServer) ResetPassword(ctx context.Context, req *client.ResetPas
 
 	return &rsp, err
 }
+
 func (a *LbsingleServer) SyncFile(ctx context.Context, _ *client.SyncFileReq) (*client.SyncFileRsp, error) {
 	var rsp client.SyncFileRsp
 	var err error
@@ -439,8 +442,9 @@ func (a *LbsingleServer) GetUserList(ctx context.Context, req *client.GetUserLis
 
 	return &rsp, err
 }
-func (a *LbsingleServer) AddFoodMenu(ctx context.Context, req *client.AddFoodMenuReq) (*client.AddFoodMenuRsp, error) {
-	var rsp client.AddFoodMenuRsp
+
+func (a *LbsingleServer) AddMpMerchantDetails(ctx context.Context, req *client.AddMpMerchantDetailsReq) (*client.AddMpMerchantDetailsRsp, error) {
+	var rsp client.AddMpMerchantDetailsRsp
 	var err error
 
 	uCtx, err := uctx.ToUCtx(ctx)
@@ -449,7 +453,7 @@ func (a *LbsingleServer) AddFoodMenu(ctx context.Context, req *client.AddFoodMen
 		return nil, err
 	}
 
-	err = OrmFoodMenu.NewBaseScope().Create(uCtx, req.Data)
+	err = OrmMpMerchantDetails.NewBaseScope().Create(uCtx, req.Data)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
@@ -459,8 +463,8 @@ func (a *LbsingleServer) AddFoodMenu(ctx context.Context, req *client.AddFoodMen
 	return &rsp, err
 }
 
-func (a *LbsingleServer) DelFoodMenuList(ctx context.Context, req *client.DelFoodMenuListReq) (*client.DelFoodMenuListRsp, error) {
-	var rsp client.DelFoodMenuListRsp
+func (a *LbsingleServer) DelMpMerchantDetailsList(ctx context.Context, req *client.DelMpMerchantDetailsListReq) (*client.DelMpMerchantDetailsListRsp, error) {
+	var rsp client.DelMpMerchantDetailsListRsp
 	var err error
 
 	uCtx, err := uctx.ToUCtx(ctx)
@@ -469,7 +473,7 @@ func (a *LbsingleServer) DelFoodMenuList(ctx context.Context, req *client.DelFoo
 		return nil, err
 	}
 
-	listRsp, err := a.GetFoodMenuList(ctx, &client.GetFoodMenuListReq{
+	listRsp, err := a.GetMpMerchantDetailsList(ctx, &client.GetMpMerchantDetailsListReq{
 		ListOption: req.ListOption.
 			SetSkipTotal().
 			AddOpt(core.DefaultListOption_DefaultListOptionSelect, client.FieldId_),
@@ -485,7 +489,7 @@ func (a *LbsingleServer) DelFoodMenuList(ctx context.Context, req *client.DelFoo
 	}
 
 	idList := utils.PluckUint64List(listRsp.List, client.FieldId)
-	_, err = OrmFoodMenu.NewBaseScope().WhereIn(client.FieldId_, idList).Delete(uCtx)
+	_, err = OrmMpMerchantDetails.NewBaseScope().WhereIn(client.FieldId_, idList).Delete(uCtx)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
@@ -494,8 +498,8 @@ func (a *LbsingleServer) DelFoodMenuList(ctx context.Context, req *client.DelFoo
 	return &rsp, err
 }
 
-func (a *LbsingleServer) UpdateFoodMenu(ctx context.Context, req *client.UpdateFoodMenuReq) (*client.UpdateFoodMenuRsp, error) {
-	var rsp client.UpdateFoodMenuRsp
+func (a *LbsingleServer) UpdateMpMerchantDetails(ctx context.Context, req *client.UpdateMpMerchantDetailsReq) (*client.UpdateMpMerchantDetailsRsp, error) {
+	var rsp client.UpdateMpMerchantDetailsRsp
 	var err error
 
 	uCtx, err := uctx.ToUCtx(ctx)
@@ -504,13 +508,13 @@ func (a *LbsingleServer) UpdateFoodMenu(ctx context.Context, req *client.UpdateF
 		return nil, err
 	}
 
-	data, err := OrmFoodMenu.NewBaseScope().Where(client.FieldId_, req.Data.Id).First(uCtx)
+	data, err := OrmMpMerchantDetails.NewBaseScope().Where(client.FieldId_, req.Data.Id).First(uCtx)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
 	}
 
-	_, err = OrmFoodMenu.NewBaseScope().Where(client.FieldId_, data.Id).Update(uCtx, utils.OrmStruct2Map(req.Data))
+	_, err = OrmMpMerchantDetails.NewBaseScope().Where(client.FieldId_, data.Id).Update(uCtx, utils.OrmStruct2Map(req.Data))
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
@@ -519,8 +523,8 @@ func (a *LbsingleServer) UpdateFoodMenu(ctx context.Context, req *client.UpdateF
 	return &rsp, err
 }
 
-func (a *LbsingleServer) GetFoodMenu(ctx context.Context, req *client.GetFoodMenuReq) (*client.GetFoodMenuRsp, error) {
-	var rsp client.GetFoodMenuRsp
+func (a *LbsingleServer) GetMpMerchantDetails(ctx context.Context, req *client.GetMpMerchantDetailsReq) (*client.GetMpMerchantDetailsRsp, error) {
+	var rsp client.GetMpMerchantDetailsRsp
 	var err error
 
 	uCtx, err := uctx.ToUCtx(ctx)
@@ -529,7 +533,7 @@ func (a *LbsingleServer) GetFoodMenu(ctx context.Context, req *client.GetFoodMen
 		return nil, err
 	}
 
-	data, err := OrmFoodMenu.NewBaseScope().Where(client.FieldId_, req.Id).First(uCtx)
+	data, err := OrmMpMerchantDetails.NewBaseScope().Where(client.FieldId_, req.Id).First(uCtx)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
@@ -539,8 +543,8 @@ func (a *LbsingleServer) GetFoodMenu(ctx context.Context, req *client.GetFoodMen
 	return &rsp, err
 }
 
-func (a *LbsingleServer) GetFoodMenuList(ctx context.Context, req *client.GetFoodMenuListReq) (*client.GetFoodMenuListRsp, error) {
-	var rsp client.GetFoodMenuListRsp
+func (a *LbsingleServer) GetMpMerchantDetailsList(ctx context.Context, req *client.GetMpMerchantDetailsListReq) (*client.GetMpMerchantDetailsListRsp, error) {
+	var rsp client.GetMpMerchantDetailsListRsp
 	var err error
 
 	uCtx, err := uctx.ToUCtx(ctx)
@@ -549,8 +553,8 @@ func (a *LbsingleServer) GetFoodMenuList(ctx context.Context, req *client.GetFoo
 		return nil, err
 	}
 
-	db := OrmFoodMenu.NewList(req.ListOption)
-	err = gormx.ProcessDefaultOptions[*client.ModelFoodMenu](req.ListOption, db)
+	db := OrmMpMerchantDetails.NewList(req.ListOption)
+	err = gormx.ProcessDefaultOptions[*client.ModelMpMerchantDetails](req.ListOption, db)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
@@ -568,8 +572,8 @@ func (a *LbsingleServer) GetFoodMenuList(ctx context.Context, req *client.GetFoo
 	return &rsp, err
 }
 
-func (a *LbsingleServer) AddFoodMenuElem(ctx context.Context, req *client.AddFoodMenuElemReq) (*client.AddFoodMenuElemRsp, error) {
-	var rsp client.AddFoodMenuElemRsp
+func (a *LbsingleServer) AddMpMemberUser(ctx context.Context, req *client.AddMpMemberUserReq) (*client.AddMpMemberUserRsp, error) {
+	var rsp client.AddMpMemberUserRsp
 	var err error
 
 	uCtx, err := uctx.ToUCtx(ctx)
@@ -578,7 +582,7 @@ func (a *LbsingleServer) AddFoodMenuElem(ctx context.Context, req *client.AddFoo
 		return nil, err
 	}
 
-	err = OrmFoodMenuElem.NewBaseScope().Create(uCtx, req.Data)
+	err = OrmMpMemberUser.NewBaseScope().Create(uCtx, req.Data)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
@@ -588,8 +592,8 @@ func (a *LbsingleServer) AddFoodMenuElem(ctx context.Context, req *client.AddFoo
 	return &rsp, err
 }
 
-func (a *LbsingleServer) DelFoodMenuElemList(ctx context.Context, req *client.DelFoodMenuElemListReq) (*client.DelFoodMenuElemListRsp, error) {
-	var rsp client.DelFoodMenuElemListRsp
+func (a *LbsingleServer) DelMpMemberUserList(ctx context.Context, req *client.DelMpMemberUserListReq) (*client.DelMpMemberUserListRsp, error) {
+	var rsp client.DelMpMemberUserListRsp
 	var err error
 
 	uCtx, err := uctx.ToUCtx(ctx)
@@ -598,7 +602,7 @@ func (a *LbsingleServer) DelFoodMenuElemList(ctx context.Context, req *client.De
 		return nil, err
 	}
 
-	listRsp, err := a.GetFoodMenuElemList(ctx, &client.GetFoodMenuElemListReq{
+	listRsp, err := a.GetMpMemberUserList(ctx, &client.GetMpMemberUserListReq{
 		ListOption: req.ListOption.
 			SetSkipTotal().
 			AddOpt(core.DefaultListOption_DefaultListOptionSelect, client.FieldId_),
@@ -614,7 +618,7 @@ func (a *LbsingleServer) DelFoodMenuElemList(ctx context.Context, req *client.De
 	}
 
 	idList := utils.PluckUint64List(listRsp.List, client.FieldId)
-	_, err = OrmFoodMenuElem.NewBaseScope().WhereIn(client.FieldId_, idList).Delete(uCtx)
+	_, err = OrmMpMemberUser.NewBaseScope().WhereIn(client.FieldId_, idList).Delete(uCtx)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
@@ -623,8 +627,8 @@ func (a *LbsingleServer) DelFoodMenuElemList(ctx context.Context, req *client.De
 	return &rsp, err
 }
 
-func (a *LbsingleServer) UpdateFoodMenuElem(ctx context.Context, req *client.UpdateFoodMenuElemReq) (*client.UpdateFoodMenuElemRsp, error) {
-	var rsp client.UpdateFoodMenuElemRsp
+func (a *LbsingleServer) UpdateMpMemberUser(ctx context.Context, req *client.UpdateMpMemberUserReq) (*client.UpdateMpMemberUserRsp, error) {
+	var rsp client.UpdateMpMemberUserRsp
 	var err error
 
 	uCtx, err := uctx.ToUCtx(ctx)
@@ -633,13 +637,13 @@ func (a *LbsingleServer) UpdateFoodMenuElem(ctx context.Context, req *client.Upd
 		return nil, err
 	}
 
-	data, err := OrmFoodMenuElem.NewBaseScope().Where(client.FieldId_, req.Data.Id).First(uCtx)
+	data, err := OrmMpMemberUser.NewBaseScope().Where(client.FieldId_, req.Data.Id).First(uCtx)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
 	}
 
-	_, err = OrmFoodMenuElem.NewBaseScope().Where(client.FieldId_, data.Id).Update(uCtx, utils.OrmStruct2Map(req.Data))
+	_, err = OrmMpMemberUser.NewBaseScope().Where(client.FieldId_, data.Id).Update(uCtx, utils.OrmStruct2Map(req.Data))
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
@@ -648,8 +652,8 @@ func (a *LbsingleServer) UpdateFoodMenuElem(ctx context.Context, req *client.Upd
 	return &rsp, err
 }
 
-func (a *LbsingleServer) GetFoodMenuElem(ctx context.Context, req *client.GetFoodMenuElemReq) (*client.GetFoodMenuElemRsp, error) {
-	var rsp client.GetFoodMenuElemRsp
+func (a *LbsingleServer) GetMpMemberUser(ctx context.Context, req *client.GetMpMemberUserReq) (*client.GetMpMemberUserRsp, error) {
+	var rsp client.GetMpMemberUserRsp
 	var err error
 
 	uCtx, err := uctx.ToUCtx(ctx)
@@ -658,7 +662,7 @@ func (a *LbsingleServer) GetFoodMenuElem(ctx context.Context, req *client.GetFoo
 		return nil, err
 	}
 
-	data, err := OrmFoodMenuElem.NewBaseScope().Where(client.FieldId_, req.Id).First(uCtx)
+	data, err := OrmMpMemberUser.NewBaseScope().Where(client.FieldId_, req.Id).First(uCtx)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
@@ -668,8 +672,8 @@ func (a *LbsingleServer) GetFoodMenuElem(ctx context.Context, req *client.GetFoo
 	return &rsp, err
 }
 
-func (a *LbsingleServer) GetFoodMenuElemList(ctx context.Context, req *client.GetFoodMenuElemListReq) (*client.GetFoodMenuElemListRsp, error) {
-	var rsp client.GetFoodMenuElemListRsp
+func (a *LbsingleServer) GetMpMemberUserList(ctx context.Context, req *client.GetMpMemberUserListReq) (*client.GetMpMemberUserListRsp, error) {
+	var rsp client.GetMpMemberUserListRsp
 	var err error
 
 	uCtx, err := uctx.ToUCtx(ctx)
@@ -678,8 +682,8 @@ func (a *LbsingleServer) GetFoodMenuElemList(ctx context.Context, req *client.Ge
 		return nil, err
 	}
 
-	db := OrmFoodMenuElem.NewList(req.ListOption)
-	err = gormx.ProcessDefaultOptions[*client.ModelFoodMenuElem](req.ListOption, db)
+	db := OrmMpMemberUser.NewList(req.ListOption)
+	err = gormx.ProcessDefaultOptions[*client.ModelMpMemberUser](req.ListOption, db)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
@@ -692,6 +696,2656 @@ func (a *LbsingleServer) GetFoodMenuElemList(ctx context.Context, req *client.Ge
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) AddMpUserAddress(ctx context.Context, req *client.AddMpUserAddressReq) (*client.AddMpUserAddressRsp, error) {
+	var rsp client.AddMpUserAddressRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = OrmMpUserAddress.NewBaseScope().Create(uCtx, req.Data)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = req.Data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) DelMpUserAddressList(ctx context.Context, req *client.DelMpUserAddressListReq) (*client.DelMpUserAddressListRsp, error) {
+	var rsp client.DelMpUserAddressListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	listRsp, err := a.GetMpUserAddressList(ctx, &client.GetMpUserAddressListReq{
+		ListOption: req.ListOption.
+			SetSkipTotal().
+			AddOpt(core.DefaultListOption_DefaultListOptionSelect, client.FieldId_),
+	})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	if len(listRsp.List) == 0 {
+		log.Infof("list is empty")
+		return &rsp, nil
+	}
+
+	idList := utils.PluckUint64List(listRsp.List, client.FieldId)
+	_, err = OrmMpUserAddress.NewBaseScope().WhereIn(client.FieldId_, idList).Delete(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) UpdateMpUserAddress(ctx context.Context, req *client.UpdateMpUserAddressReq) (*client.UpdateMpUserAddressRsp, error) {
+	var rsp client.UpdateMpUserAddressRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpUserAddress.NewBaseScope().Where(client.FieldId_, req.Data.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	_, err = OrmMpUserAddress.NewBaseScope().Where(client.FieldId_, data.Id).Update(uCtx, utils.OrmStruct2Map(req.Data))
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpUserAddress(ctx context.Context, req *client.GetMpUserAddressReq) (*client.GetMpUserAddressRsp, error) {
+	var rsp client.GetMpUserAddressRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpUserAddress.NewBaseScope().Where(client.FieldId_, req.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpUserAddressList(ctx context.Context, req *client.GetMpUserAddressListReq) (*client.GetMpUserAddressListRsp, error) {
+	var rsp client.GetMpUserAddressListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	db := OrmMpUserAddress.NewList(req.ListOption)
+	err = gormx.ProcessDefaultOptions[*client.ModelMpUserAddress](req.ListOption, db)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = core.NewOptionsProcessor(req.ListOption).
+		Process()
+
+	rsp.Paginate, err = db.FindPaginate(uCtx, &rsp.List)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) AddMpUserBill(ctx context.Context, req *client.AddMpUserBillReq) (*client.AddMpUserBillRsp, error) {
+	var rsp client.AddMpUserBillRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = OrmMpUserBill.NewBaseScope().Create(uCtx, req.Data)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = req.Data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) DelMpUserBillList(ctx context.Context, req *client.DelMpUserBillListReq) (*client.DelMpUserBillListRsp, error) {
+	var rsp client.DelMpUserBillListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	listRsp, err := a.GetMpUserBillList(ctx, &client.GetMpUserBillListReq{
+		ListOption: req.ListOption.
+			SetSkipTotal().
+			AddOpt(core.DefaultListOption_DefaultListOptionSelect, client.FieldId_),
+	})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	if len(listRsp.List) == 0 {
+		log.Infof("list is empty")
+		return &rsp, nil
+	}
+
+	idList := utils.PluckUint64List(listRsp.List, client.FieldId)
+	_, err = OrmMpUserBill.NewBaseScope().WhereIn(client.FieldId_, idList).Delete(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) UpdateMpUserBill(ctx context.Context, req *client.UpdateMpUserBillReq) (*client.UpdateMpUserBillRsp, error) {
+	var rsp client.UpdateMpUserBillRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpUserBill.NewBaseScope().Where(client.FieldId_, req.Data.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	_, err = OrmMpUserBill.NewBaseScope().Where(client.FieldId_, data.Id).Update(uCtx, utils.OrmStruct2Map(req.Data))
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpUserBill(ctx context.Context, req *client.GetMpUserBillReq) (*client.GetMpUserBillRsp, error) {
+	var rsp client.GetMpUserBillRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpUserBill.NewBaseScope().Where(client.FieldId_, req.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpUserBillList(ctx context.Context, req *client.GetMpUserBillListReq) (*client.GetMpUserBillListRsp, error) {
+	var rsp client.GetMpUserBillListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	db := OrmMpUserBill.NewList(req.ListOption)
+	err = gormx.ProcessDefaultOptions[*client.ModelMpUserBill](req.ListOption, db)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = core.NewOptionsProcessor(req.ListOption).
+		Process()
+
+	rsp.Paginate, err = db.FindPaginate(uCtx, &rsp.List)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) AddMpProductCategory(ctx context.Context, req *client.AddMpProductCategoryReq) (*client.AddMpProductCategoryRsp, error) {
+	var rsp client.AddMpProductCategoryRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = OrmMpProductCategory.NewBaseScope().Create(uCtx, req.Data)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = req.Data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) DelMpProductCategoryList(ctx context.Context, req *client.DelMpProductCategoryListReq) (*client.DelMpProductCategoryListRsp, error) {
+	var rsp client.DelMpProductCategoryListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	listRsp, err := a.GetMpProductCategoryList(ctx, &client.GetMpProductCategoryListReq{
+		ListOption: req.ListOption.
+			SetSkipTotal().
+			AddOpt(core.DefaultListOption_DefaultListOptionSelect, client.FieldId_),
+	})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	if len(listRsp.List) == 0 {
+		log.Infof("list is empty")
+		return &rsp, nil
+	}
+
+	idList := utils.PluckUint64List(listRsp.List, client.FieldId)
+	_, err = OrmMpProductCategory.NewBaseScope().WhereIn(client.FieldId_, idList).Delete(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) UpdateMpProductCategory(ctx context.Context, req *client.UpdateMpProductCategoryReq) (*client.UpdateMpProductCategoryRsp, error) {
+	var rsp client.UpdateMpProductCategoryRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpProductCategory.NewBaseScope().Where(client.FieldId_, req.Data.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	_, err = OrmMpProductCategory.NewBaseScope().Where(client.FieldId_, data.Id).Update(uCtx, utils.OrmStruct2Map(req.Data))
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpProductCategory(ctx context.Context, req *client.GetMpProductCategoryReq) (*client.GetMpProductCategoryRsp, error) {
+	var rsp client.GetMpProductCategoryRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpProductCategory.NewBaseScope().Where(client.FieldId_, req.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpProductCategoryList(ctx context.Context, req *client.GetMpProductCategoryListReq) (*client.GetMpProductCategoryListRsp, error) {
+	var rsp client.GetMpProductCategoryListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	db := OrmMpProductCategory.NewList(req.ListOption)
+	err = gormx.ProcessDefaultOptions[*client.ModelMpProductCategory](req.ListOption, db)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = core.NewOptionsProcessor(req.ListOption).
+		Process()
+
+	rsp.Paginate, err = db.FindPaginate(uCtx, &rsp.List)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) AddMpStoreProduct(ctx context.Context, req *client.AddMpStoreProductReq) (*client.AddMpStoreProductRsp, error) {
+	var rsp client.AddMpStoreProductRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = OrmMpStoreProduct.NewBaseScope().Create(uCtx, req.Data)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = req.Data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) DelMpStoreProductList(ctx context.Context, req *client.DelMpStoreProductListReq) (*client.DelMpStoreProductListRsp, error) {
+	var rsp client.DelMpStoreProductListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	listRsp, err := a.GetMpStoreProductList(ctx, &client.GetMpStoreProductListReq{
+		ListOption: req.ListOption.
+			SetSkipTotal().
+			AddOpt(core.DefaultListOption_DefaultListOptionSelect, client.FieldId_),
+	})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	if len(listRsp.List) == 0 {
+		log.Infof("list is empty")
+		return &rsp, nil
+	}
+
+	idList := utils.PluckUint64List(listRsp.List, client.FieldId)
+	_, err = OrmMpStoreProduct.NewBaseScope().WhereIn(client.FieldId_, idList).Delete(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) UpdateMpStoreProduct(ctx context.Context, req *client.UpdateMpStoreProductReq) (*client.UpdateMpStoreProductRsp, error) {
+	var rsp client.UpdateMpStoreProductRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpStoreProduct.NewBaseScope().Where(client.FieldId_, req.Data.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	_, err = OrmMpStoreProduct.NewBaseScope().Where(client.FieldId_, data.Id).Update(uCtx, utils.OrmStruct2Map(req.Data))
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpStoreProduct(ctx context.Context, req *client.GetMpStoreProductReq) (*client.GetMpStoreProductRsp, error) {
+	var rsp client.GetMpStoreProductRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpStoreProduct.NewBaseScope().Where(client.FieldId_, req.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpStoreProductList(ctx context.Context, req *client.GetMpStoreProductListReq) (*client.GetMpStoreProductListRsp, error) {
+	var rsp client.GetMpStoreProductListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	db := OrmMpStoreProduct.NewList(req.ListOption)
+	err = gormx.ProcessDefaultOptions[*client.ModelMpStoreProduct](req.ListOption, db)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = core.NewOptionsProcessor(req.ListOption).
+		Process()
+
+	rsp.Paginate, err = db.FindPaginate(uCtx, &rsp.List)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) AddMpStoreProductAttr(ctx context.Context, req *client.AddMpStoreProductAttrReq) (*client.AddMpStoreProductAttrRsp, error) {
+	var rsp client.AddMpStoreProductAttrRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = OrmMpStoreProductAttr.NewBaseScope().Create(uCtx, req.Data)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = req.Data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) DelMpStoreProductAttrList(ctx context.Context, req *client.DelMpStoreProductAttrListReq) (*client.DelMpStoreProductAttrListRsp, error) {
+	var rsp client.DelMpStoreProductAttrListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	listRsp, err := a.GetMpStoreProductAttrList(ctx, &client.GetMpStoreProductAttrListReq{
+		ListOption: req.ListOption.
+			SetSkipTotal().
+			AddOpt(core.DefaultListOption_DefaultListOptionSelect, client.FieldId_),
+	})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	if len(listRsp.List) == 0 {
+		log.Infof("list is empty")
+		return &rsp, nil
+	}
+
+	idList := utils.PluckUint64List(listRsp.List, client.FieldId)
+	_, err = OrmMpStoreProductAttr.NewBaseScope().WhereIn(client.FieldId_, idList).Delete(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) UpdateMpStoreProductAttr(ctx context.Context, req *client.UpdateMpStoreProductAttrReq) (*client.UpdateMpStoreProductAttrRsp, error) {
+	var rsp client.UpdateMpStoreProductAttrRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpStoreProductAttr.NewBaseScope().Where(client.FieldId_, req.Data.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	_, err = OrmMpStoreProductAttr.NewBaseScope().Where(client.FieldId_, data.Id).Update(uCtx, utils.OrmStruct2Map(req.Data))
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpStoreProductAttr(ctx context.Context, req *client.GetMpStoreProductAttrReq) (*client.GetMpStoreProductAttrRsp, error) {
+	var rsp client.GetMpStoreProductAttrRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpStoreProductAttr.NewBaseScope().Where(client.FieldId_, req.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpStoreProductAttrList(ctx context.Context, req *client.GetMpStoreProductAttrListReq) (*client.GetMpStoreProductAttrListRsp, error) {
+	var rsp client.GetMpStoreProductAttrListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	db := OrmMpStoreProductAttr.NewList(req.ListOption)
+	err = gormx.ProcessDefaultOptions[*client.ModelMpStoreProductAttr](req.ListOption, db)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = core.NewOptionsProcessor(req.ListOption).
+		Process()
+
+	rsp.Paginate, err = db.FindPaginate(uCtx, &rsp.List)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) AddMpStoreProductAttrResult(ctx context.Context, req *client.AddMpStoreProductAttrResultReq) (*client.AddMpStoreProductAttrResultRsp, error) {
+	var rsp client.AddMpStoreProductAttrResultRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = OrmMpStoreProductAttrResult.NewBaseScope().Create(uCtx, req.Data)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = req.Data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) DelMpStoreProductAttrResultList(ctx context.Context, req *client.DelMpStoreProductAttrResultListReq) (*client.DelMpStoreProductAttrResultListRsp, error) {
+	var rsp client.DelMpStoreProductAttrResultListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	listRsp, err := a.GetMpStoreProductAttrResultList(ctx, &client.GetMpStoreProductAttrResultListReq{
+		ListOption: req.ListOption.
+			SetSkipTotal().
+			AddOpt(core.DefaultListOption_DefaultListOptionSelect, client.FieldId_),
+	})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	if len(listRsp.List) == 0 {
+		log.Infof("list is empty")
+		return &rsp, nil
+	}
+
+	idList := utils.PluckUint64List(listRsp.List, client.FieldId)
+	_, err = OrmMpStoreProductAttrResult.NewBaseScope().WhereIn(client.FieldId_, idList).Delete(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) UpdateMpStoreProductAttrResult(ctx context.Context, req *client.UpdateMpStoreProductAttrResultReq) (*client.UpdateMpStoreProductAttrResultRsp, error) {
+	var rsp client.UpdateMpStoreProductAttrResultRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpStoreProductAttrResult.NewBaseScope().Where(client.FieldId_, req.Data.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	_, err = OrmMpStoreProductAttrResult.NewBaseScope().Where(client.FieldId_, data.Id).Update(uCtx, utils.OrmStruct2Map(req.Data))
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpStoreProductAttrResult(ctx context.Context, req *client.GetMpStoreProductAttrResultReq) (*client.GetMpStoreProductAttrResultRsp, error) {
+	var rsp client.GetMpStoreProductAttrResultRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpStoreProductAttrResult.NewBaseScope().Where(client.FieldId_, req.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpStoreProductAttrResultList(ctx context.Context, req *client.GetMpStoreProductAttrResultListReq) (*client.GetMpStoreProductAttrResultListRsp, error) {
+	var rsp client.GetMpStoreProductAttrResultListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	db := OrmMpStoreProductAttrResult.NewList(req.ListOption)
+	err = gormx.ProcessDefaultOptions[*client.ModelMpStoreProductAttrResult](req.ListOption, db)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = core.NewOptionsProcessor(req.ListOption).
+		Process()
+
+	rsp.Paginate, err = db.FindPaginate(uCtx, &rsp.List)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) AddMpStoreProductAttrValue(ctx context.Context, req *client.AddMpStoreProductAttrValueReq) (*client.AddMpStoreProductAttrValueRsp, error) {
+	var rsp client.AddMpStoreProductAttrValueRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = OrmMpStoreProductAttrValue.NewBaseScope().Create(uCtx, req.Data)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = req.Data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) DelMpStoreProductAttrValueList(ctx context.Context, req *client.DelMpStoreProductAttrValueListReq) (*client.DelMpStoreProductAttrValueListRsp, error) {
+	var rsp client.DelMpStoreProductAttrValueListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	listRsp, err := a.GetMpStoreProductAttrValueList(ctx, &client.GetMpStoreProductAttrValueListReq{
+		ListOption: req.ListOption.
+			SetSkipTotal().
+			AddOpt(core.DefaultListOption_DefaultListOptionSelect, client.FieldId_),
+	})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	if len(listRsp.List) == 0 {
+		log.Infof("list is empty")
+		return &rsp, nil
+	}
+
+	idList := utils.PluckUint64List(listRsp.List, client.FieldId)
+	_, err = OrmMpStoreProductAttrValue.NewBaseScope().WhereIn(client.FieldId_, idList).Delete(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) UpdateMpStoreProductAttrValue(ctx context.Context, req *client.UpdateMpStoreProductAttrValueReq) (*client.UpdateMpStoreProductAttrValueRsp, error) {
+	var rsp client.UpdateMpStoreProductAttrValueRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpStoreProductAttrValue.NewBaseScope().Where(client.FieldId_, req.Data.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	_, err = OrmMpStoreProductAttrValue.NewBaseScope().Where(client.FieldId_, data.Id).Update(uCtx, utils.OrmStruct2Map(req.Data))
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpStoreProductAttrValue(ctx context.Context, req *client.GetMpStoreProductAttrValueReq) (*client.GetMpStoreProductAttrValueRsp, error) {
+	var rsp client.GetMpStoreProductAttrValueRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpStoreProductAttrValue.NewBaseScope().Where(client.FieldId_, req.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpStoreProductAttrValueList(ctx context.Context, req *client.GetMpStoreProductAttrValueListReq) (*client.GetMpStoreProductAttrValueListRsp, error) {
+	var rsp client.GetMpStoreProductAttrValueListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	db := OrmMpStoreProductAttrValue.NewList(req.ListOption)
+	err = gormx.ProcessDefaultOptions[*client.ModelMpStoreProductAttrValue](req.ListOption, db)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = core.NewOptionsProcessor(req.ListOption).
+		Process()
+
+	rsp.Paginate, err = db.FindPaginate(uCtx, &rsp.List)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) AddMpStoreProductReply(ctx context.Context, req *client.AddMpStoreProductReplyReq) (*client.AddMpStoreProductReplyRsp, error) {
+	var rsp client.AddMpStoreProductReplyRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = OrmMpStoreProductReply.NewBaseScope().Create(uCtx, req.Data)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = req.Data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) DelMpStoreProductReplyList(ctx context.Context, req *client.DelMpStoreProductReplyListReq) (*client.DelMpStoreProductReplyListRsp, error) {
+	var rsp client.DelMpStoreProductReplyListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	listRsp, err := a.GetMpStoreProductReplyList(ctx, &client.GetMpStoreProductReplyListReq{
+		ListOption: req.ListOption.
+			SetSkipTotal().
+			AddOpt(core.DefaultListOption_DefaultListOptionSelect, client.FieldId_),
+	})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	if len(listRsp.List) == 0 {
+		log.Infof("list is empty")
+		return &rsp, nil
+	}
+
+	idList := utils.PluckUint64List(listRsp.List, client.FieldId)
+	_, err = OrmMpStoreProductReply.NewBaseScope().WhereIn(client.FieldId_, idList).Delete(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) UpdateMpStoreProductReply(ctx context.Context, req *client.UpdateMpStoreProductReplyReq) (*client.UpdateMpStoreProductReplyRsp, error) {
+	var rsp client.UpdateMpStoreProductReplyRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpStoreProductReply.NewBaseScope().Where(client.FieldId_, req.Data.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	_, err = OrmMpStoreProductReply.NewBaseScope().Where(client.FieldId_, data.Id).Update(uCtx, utils.OrmStruct2Map(req.Data))
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpStoreProductReply(ctx context.Context, req *client.GetMpStoreProductReplyReq) (*client.GetMpStoreProductReplyRsp, error) {
+	var rsp client.GetMpStoreProductReplyRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpStoreProductReply.NewBaseScope().Where(client.FieldId_, req.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpStoreProductReplyList(ctx context.Context, req *client.GetMpStoreProductReplyListReq) (*client.GetMpStoreProductReplyListRsp, error) {
+	var rsp client.GetMpStoreProductReplyListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	db := OrmMpStoreProductReply.NewList(req.ListOption)
+	err = gormx.ProcessDefaultOptions[*client.ModelMpStoreProductReply](req.ListOption, db)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = core.NewOptionsProcessor(req.ListOption).
+		Process()
+
+	rsp.Paginate, err = db.FindPaginate(uCtx, &rsp.List)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) AddMpStoreProductRule(ctx context.Context, req *client.AddMpStoreProductRuleReq) (*client.AddMpStoreProductRuleRsp, error) {
+	var rsp client.AddMpStoreProductRuleRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = OrmMpStoreProductRule.NewBaseScope().Create(uCtx, req.Data)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = req.Data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) DelMpStoreProductRuleList(ctx context.Context, req *client.DelMpStoreProductRuleListReq) (*client.DelMpStoreProductRuleListRsp, error) {
+	var rsp client.DelMpStoreProductRuleListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	listRsp, err := a.GetMpStoreProductRuleList(ctx, &client.GetMpStoreProductRuleListReq{
+		ListOption: req.ListOption.
+			SetSkipTotal().
+			AddOpt(core.DefaultListOption_DefaultListOptionSelect, client.FieldId_),
+	})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	if len(listRsp.List) == 0 {
+		log.Infof("list is empty")
+		return &rsp, nil
+	}
+
+	idList := utils.PluckUint64List(listRsp.List, client.FieldId)
+	_, err = OrmMpStoreProductRule.NewBaseScope().WhereIn(client.FieldId_, idList).Delete(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) UpdateMpStoreProductRule(ctx context.Context, req *client.UpdateMpStoreProductRuleReq) (*client.UpdateMpStoreProductRuleRsp, error) {
+	var rsp client.UpdateMpStoreProductRuleRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpStoreProductRule.NewBaseScope().Where(client.FieldId_, req.Data.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	_, err = OrmMpStoreProductRule.NewBaseScope().Where(client.FieldId_, data.Id).Update(uCtx, utils.OrmStruct2Map(req.Data))
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpStoreProductRule(ctx context.Context, req *client.GetMpStoreProductRuleReq) (*client.GetMpStoreProductRuleRsp, error) {
+	var rsp client.GetMpStoreProductRuleRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpStoreProductRule.NewBaseScope().Where(client.FieldId_, req.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpStoreProductRuleList(ctx context.Context, req *client.GetMpStoreProductRuleListReq) (*client.GetMpStoreProductRuleListRsp, error) {
+	var rsp client.GetMpStoreProductRuleListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	db := OrmMpStoreProductRule.NewList(req.ListOption)
+	err = gormx.ProcessDefaultOptions[*client.ModelMpStoreProductRule](req.ListOption, db)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = core.NewOptionsProcessor(req.ListOption).
+		Process()
+
+	rsp.Paginate, err = db.FindPaginate(uCtx, &rsp.List)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) AddMpStoreShop(ctx context.Context, req *client.AddMpStoreShopReq) (*client.AddMpStoreShopRsp, error) {
+	var rsp client.AddMpStoreShopRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = OrmMpStoreShop.NewBaseScope().Create(uCtx, req.Data)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = req.Data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) DelMpStoreShopList(ctx context.Context, req *client.DelMpStoreShopListReq) (*client.DelMpStoreShopListRsp, error) {
+	var rsp client.DelMpStoreShopListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	listRsp, err := a.GetMpStoreShopList(ctx, &client.GetMpStoreShopListReq{
+		ListOption: req.ListOption.
+			SetSkipTotal().
+			AddOpt(core.DefaultListOption_DefaultListOptionSelect, client.FieldId_),
+	})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	if len(listRsp.List) == 0 {
+		log.Infof("list is empty")
+		return &rsp, nil
+	}
+
+	idList := utils.PluckUint64List(listRsp.List, client.FieldId)
+	_, err = OrmMpStoreShop.NewBaseScope().WhereIn(client.FieldId_, idList).Delete(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) UpdateMpStoreShop(ctx context.Context, req *client.UpdateMpStoreShopReq) (*client.UpdateMpStoreShopRsp, error) {
+	var rsp client.UpdateMpStoreShopRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpStoreShop.NewBaseScope().Where(client.FieldId_, req.Data.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	_, err = OrmMpStoreShop.NewBaseScope().Where(client.FieldId_, data.Id).Update(uCtx, utils.OrmStruct2Map(req.Data))
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpStoreShop(ctx context.Context, req *client.GetMpStoreShopReq) (*client.GetMpStoreShopRsp, error) {
+	var rsp client.GetMpStoreShopRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpStoreShop.NewBaseScope().Where(client.FieldId_, req.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpStoreShopList(ctx context.Context, req *client.GetMpStoreShopListReq) (*client.GetMpStoreShopListRsp, error) {
+	var rsp client.GetMpStoreShopListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	db := OrmMpStoreShop.NewList(req.ListOption)
+	err = gormx.ProcessDefaultOptions[*client.ModelMpStoreShop](req.ListOption, db)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = core.NewOptionsProcessor(req.ListOption).
+		Process()
+
+	rsp.Paginate, err = db.FindPaginate(uCtx, &rsp.List)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) AddMpCoupon(ctx context.Context, req *client.AddMpCouponReq) (*client.AddMpCouponRsp, error) {
+	var rsp client.AddMpCouponRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = OrmMpCoupon.NewBaseScope().Create(uCtx, req.Data)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = req.Data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) DelMpCouponList(ctx context.Context, req *client.DelMpCouponListReq) (*client.DelMpCouponListRsp, error) {
+	var rsp client.DelMpCouponListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	listRsp, err := a.GetMpCouponList(ctx, &client.GetMpCouponListReq{
+		ListOption: req.ListOption.
+			SetSkipTotal().
+			AddOpt(core.DefaultListOption_DefaultListOptionSelect, client.FieldId_),
+	})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	if len(listRsp.List) == 0 {
+		log.Infof("list is empty")
+		return &rsp, nil
+	}
+
+	idList := utils.PluckUint64List(listRsp.List, client.FieldId)
+	_, err = OrmMpCoupon.NewBaseScope().WhereIn(client.FieldId_, idList).Delete(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) UpdateMpCoupon(ctx context.Context, req *client.UpdateMpCouponReq) (*client.UpdateMpCouponRsp, error) {
+	var rsp client.UpdateMpCouponRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpCoupon.NewBaseScope().Where(client.FieldId_, req.Data.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	_, err = OrmMpCoupon.NewBaseScope().Where(client.FieldId_, data.Id).Update(uCtx, utils.OrmStruct2Map(req.Data))
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpCoupon(ctx context.Context, req *client.GetMpCouponReq) (*client.GetMpCouponRsp, error) {
+	var rsp client.GetMpCouponRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpCoupon.NewBaseScope().Where(client.FieldId_, req.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpCouponList(ctx context.Context, req *client.GetMpCouponListReq) (*client.GetMpCouponListRsp, error) {
+	var rsp client.GetMpCouponListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	db := OrmMpCoupon.NewList(req.ListOption)
+	err = gormx.ProcessDefaultOptions[*client.ModelMpCoupon](req.ListOption, db)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = core.NewOptionsProcessor(req.ListOption).
+		Process()
+
+	rsp.Paginate, err = db.FindPaginate(uCtx, &rsp.List)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) AddMpCouponUser(ctx context.Context, req *client.AddMpCouponUserReq) (*client.AddMpCouponUserRsp, error) {
+	var rsp client.AddMpCouponUserRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = OrmMpCouponUser.NewBaseScope().Create(uCtx, req.Data)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = req.Data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) DelMpCouponUserList(ctx context.Context, req *client.DelMpCouponUserListReq) (*client.DelMpCouponUserListRsp, error) {
+	var rsp client.DelMpCouponUserListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	listRsp, err := a.GetMpCouponUserList(ctx, &client.GetMpCouponUserListReq{
+		ListOption: req.ListOption.
+			SetSkipTotal().
+			AddOpt(core.DefaultListOption_DefaultListOptionSelect, client.FieldId_),
+	})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	if len(listRsp.List) == 0 {
+		log.Infof("list is empty")
+		return &rsp, nil
+	}
+
+	idList := utils.PluckUint64List(listRsp.List, client.FieldId)
+	_, err = OrmMpCouponUser.NewBaseScope().WhereIn(client.FieldId_, idList).Delete(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) UpdateMpCouponUser(ctx context.Context, req *client.UpdateMpCouponUserReq) (*client.UpdateMpCouponUserRsp, error) {
+	var rsp client.UpdateMpCouponUserRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpCouponUser.NewBaseScope().Where(client.FieldId_, req.Data.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	_, err = OrmMpCouponUser.NewBaseScope().Where(client.FieldId_, data.Id).Update(uCtx, utils.OrmStruct2Map(req.Data))
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpCouponUser(ctx context.Context, req *client.GetMpCouponUserReq) (*client.GetMpCouponUserRsp, error) {
+	var rsp client.GetMpCouponUserRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpCouponUser.NewBaseScope().Where(client.FieldId_, req.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpCouponUserList(ctx context.Context, req *client.GetMpCouponUserListReq) (*client.GetMpCouponUserListRsp, error) {
+	var rsp client.GetMpCouponUserListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	db := OrmMpCouponUser.NewList(req.ListOption)
+	err = gormx.ProcessDefaultOptions[*client.ModelMpCouponUser](req.ListOption, db)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = core.NewOptionsProcessor(req.ListOption).
+		Process()
+
+	rsp.Paginate, err = db.FindPaginate(uCtx, &rsp.List)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) AddMpOrderNumber(ctx context.Context, req *client.AddMpOrderNumberReq) (*client.AddMpOrderNumberRsp, error) {
+	var rsp client.AddMpOrderNumberRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = OrmMpOrderNumber.NewBaseScope().Create(uCtx, req.Data)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = req.Data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) DelMpOrderNumberList(ctx context.Context, req *client.DelMpOrderNumberListReq) (*client.DelMpOrderNumberListRsp, error) {
+	var rsp client.DelMpOrderNumberListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	listRsp, err := a.GetMpOrderNumberList(ctx, &client.GetMpOrderNumberListReq{
+		ListOption: req.ListOption.
+			SetSkipTotal().
+			AddOpt(core.DefaultListOption_DefaultListOptionSelect, client.FieldId_),
+	})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	if len(listRsp.List) == 0 {
+		log.Infof("list is empty")
+		return &rsp, nil
+	}
+
+	idList := utils.PluckUint64List(listRsp.List, client.FieldId)
+	_, err = OrmMpOrderNumber.NewBaseScope().WhereIn(client.FieldId_, idList).Delete(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) UpdateMpOrderNumber(ctx context.Context, req *client.UpdateMpOrderNumberReq) (*client.UpdateMpOrderNumberRsp, error) {
+	var rsp client.UpdateMpOrderNumberRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpOrderNumber.NewBaseScope().Where(client.FieldId_, req.Data.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	_, err = OrmMpOrderNumber.NewBaseScope().Where(client.FieldId_, data.Id).Update(uCtx, utils.OrmStruct2Map(req.Data))
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpOrderNumber(ctx context.Context, req *client.GetMpOrderNumberReq) (*client.GetMpOrderNumberRsp, error) {
+	var rsp client.GetMpOrderNumberRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpOrderNumber.NewBaseScope().Where(client.FieldId_, req.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpOrderNumberList(ctx context.Context, req *client.GetMpOrderNumberListReq) (*client.GetMpOrderNumberListRsp, error) {
+	var rsp client.GetMpOrderNumberListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	db := OrmMpOrderNumber.NewList(req.ListOption)
+	err = gormx.ProcessDefaultOptions[*client.ModelMpOrderNumber](req.ListOption, db)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = core.NewOptionsProcessor(req.ListOption).
+		Process()
+
+	rsp.Paginate, err = db.FindPaginate(uCtx, &rsp.List)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) AddMpStoreOrder(ctx context.Context, req *client.AddMpStoreOrderReq) (*client.AddMpStoreOrderRsp, error) {
+	var rsp client.AddMpStoreOrderRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = OrmMpStoreOrder.NewBaseScope().Create(uCtx, req.Data)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = req.Data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) DelMpStoreOrderList(ctx context.Context, req *client.DelMpStoreOrderListReq) (*client.DelMpStoreOrderListRsp, error) {
+	var rsp client.DelMpStoreOrderListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	listRsp, err := a.GetMpStoreOrderList(ctx, &client.GetMpStoreOrderListReq{
+		ListOption: req.ListOption.
+			SetSkipTotal().
+			AddOpt(core.DefaultListOption_DefaultListOptionSelect, client.FieldId_),
+	})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	if len(listRsp.List) == 0 {
+		log.Infof("list is empty")
+		return &rsp, nil
+	}
+
+	idList := utils.PluckUint64List(listRsp.List, client.FieldId)
+	_, err = OrmMpStoreOrder.NewBaseScope().WhereIn(client.FieldId_, idList).Delete(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) UpdateMpStoreOrder(ctx context.Context, req *client.UpdateMpStoreOrderReq) (*client.UpdateMpStoreOrderRsp, error) {
+	var rsp client.UpdateMpStoreOrderRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpStoreOrder.NewBaseScope().Where(client.FieldId_, req.Data.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	_, err = OrmMpStoreOrder.NewBaseScope().Where(client.FieldId_, data.Id).Update(uCtx, utils.OrmStruct2Map(req.Data))
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpStoreOrder(ctx context.Context, req *client.GetMpStoreOrderReq) (*client.GetMpStoreOrderRsp, error) {
+	var rsp client.GetMpStoreOrderRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpStoreOrder.NewBaseScope().Where(client.FieldId_, req.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpStoreOrderList(ctx context.Context, req *client.GetMpStoreOrderListReq) (*client.GetMpStoreOrderListRsp, error) {
+	var rsp client.GetMpStoreOrderListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	db := OrmMpStoreOrder.NewList(req.ListOption)
+	err = gormx.ProcessDefaultOptions[*client.ModelMpStoreOrder](req.ListOption, db)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = core.NewOptionsProcessor(req.ListOption).
+		Process()
+
+	rsp.Paginate, err = db.FindPaginate(uCtx, &rsp.List)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) AddMpStoreOrderCartInfo(ctx context.Context, req *client.AddMpStoreOrderCartInfoReq) (*client.AddMpStoreOrderCartInfoRsp, error) {
+	var rsp client.AddMpStoreOrderCartInfoRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = OrmMpStoreOrderCartInfo.NewBaseScope().Create(uCtx, req.Data)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = req.Data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) DelMpStoreOrderCartInfoList(ctx context.Context, req *client.DelMpStoreOrderCartInfoListReq) (*client.DelMpStoreOrderCartInfoListRsp, error) {
+	var rsp client.DelMpStoreOrderCartInfoListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	listRsp, err := a.GetMpStoreOrderCartInfoList(ctx, &client.GetMpStoreOrderCartInfoListReq{
+		ListOption: req.ListOption.
+			SetSkipTotal().
+			AddOpt(core.DefaultListOption_DefaultListOptionSelect, client.FieldId_),
+	})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	if len(listRsp.List) == 0 {
+		log.Infof("list is empty")
+		return &rsp, nil
+	}
+
+	idList := utils.PluckUint64List(listRsp.List, client.FieldId)
+	_, err = OrmMpStoreOrderCartInfo.NewBaseScope().WhereIn(client.FieldId_, idList).Delete(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) UpdateMpStoreOrderCartInfo(ctx context.Context, req *client.UpdateMpStoreOrderCartInfoReq) (*client.UpdateMpStoreOrderCartInfoRsp, error) {
+	var rsp client.UpdateMpStoreOrderCartInfoRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpStoreOrderCartInfo.NewBaseScope().Where(client.FieldId_, req.Data.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	_, err = OrmMpStoreOrderCartInfo.NewBaseScope().Where(client.FieldId_, data.Id).Update(uCtx, utils.OrmStruct2Map(req.Data))
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpStoreOrderCartInfo(ctx context.Context, req *client.GetMpStoreOrderCartInfoReq) (*client.GetMpStoreOrderCartInfoRsp, error) {
+	var rsp client.GetMpStoreOrderCartInfoRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpStoreOrderCartInfo.NewBaseScope().Where(client.FieldId_, req.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpStoreOrderCartInfoList(ctx context.Context, req *client.GetMpStoreOrderCartInfoListReq) (*client.GetMpStoreOrderCartInfoListRsp, error) {
+	var rsp client.GetMpStoreOrderCartInfoListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	db := OrmMpStoreOrderCartInfo.NewList(req.ListOption)
+	err = gormx.ProcessDefaultOptions[*client.ModelMpStoreOrderCartInfo](req.ListOption, db)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = core.NewOptionsProcessor(req.ListOption).
+		Process()
+
+	rsp.Paginate, err = db.FindPaginate(uCtx, &rsp.List)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) AddMpStoreOrderStatus(ctx context.Context, req *client.AddMpStoreOrderStatusReq) (*client.AddMpStoreOrderStatusRsp, error) {
+	var rsp client.AddMpStoreOrderStatusRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = OrmMpStoreOrderStatus.NewBaseScope().Create(uCtx, req.Data)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = req.Data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) DelMpStoreOrderStatusList(ctx context.Context, req *client.DelMpStoreOrderStatusListReq) (*client.DelMpStoreOrderStatusListRsp, error) {
+	var rsp client.DelMpStoreOrderStatusListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	listRsp, err := a.GetMpStoreOrderStatusList(ctx, &client.GetMpStoreOrderStatusListReq{
+		ListOption: req.ListOption.
+			SetSkipTotal().
+			AddOpt(core.DefaultListOption_DefaultListOptionSelect, client.FieldId_),
+	})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	if len(listRsp.List) == 0 {
+		log.Infof("list is empty")
+		return &rsp, nil
+	}
+
+	idList := utils.PluckUint64List(listRsp.List, client.FieldId)
+	_, err = OrmMpStoreOrderStatus.NewBaseScope().WhereIn(client.FieldId_, idList).Delete(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) UpdateMpStoreOrderStatus(ctx context.Context, req *client.UpdateMpStoreOrderStatusReq) (*client.UpdateMpStoreOrderStatusRsp, error) {
+	var rsp client.UpdateMpStoreOrderStatusRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpStoreOrderStatus.NewBaseScope().Where(client.FieldId_, req.Data.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	_, err = OrmMpStoreOrderStatus.NewBaseScope().Where(client.FieldId_, data.Id).Update(uCtx, utils.OrmStruct2Map(req.Data))
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpStoreOrderStatus(ctx context.Context, req *client.GetMpStoreOrderStatusReq) (*client.GetMpStoreOrderStatusRsp, error) {
+	var rsp client.GetMpStoreOrderStatusRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpStoreOrderStatus.NewBaseScope().Where(client.FieldId_, req.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpStoreOrderStatusList(ctx context.Context, req *client.GetMpStoreOrderStatusListReq) (*client.GetMpStoreOrderStatusListRsp, error) {
+	var rsp client.GetMpStoreOrderStatusListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	db := OrmMpStoreOrderStatus.NewList(req.ListOption)
+	err = gormx.ProcessDefaultOptions[*client.ModelMpStoreOrderStatus](req.ListOption, db)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = core.NewOptionsProcessor(req.ListOption).
+		Process()
+
+	rsp.Paginate, err = db.FindPaginate(uCtx, &rsp.List)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) AddMpMaterial(ctx context.Context, req *client.AddMpMaterialReq) (*client.AddMpMaterialRsp, error) {
+	var rsp client.AddMpMaterialRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = OrmMpMaterial.NewBaseScope().Create(uCtx, req.Data)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = req.Data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) DelMpMaterialList(ctx context.Context, req *client.DelMpMaterialListReq) (*client.DelMpMaterialListRsp, error) {
+	var rsp client.DelMpMaterialListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	listRsp, err := a.GetMpMaterialList(ctx, &client.GetMpMaterialListReq{
+		ListOption: req.ListOption.
+			SetSkipTotal().
+			AddOpt(core.DefaultListOption_DefaultListOptionSelect, client.FieldId_),
+	})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	if len(listRsp.List) == 0 {
+		log.Infof("list is empty")
+		return &rsp, nil
+	}
+
+	idList := utils.PluckUint64List(listRsp.List, client.FieldId)
+	_, err = OrmMpMaterial.NewBaseScope().WhereIn(client.FieldId_, idList).Delete(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) UpdateMpMaterial(ctx context.Context, req *client.UpdateMpMaterialReq) (*client.UpdateMpMaterialRsp, error) {
+	var rsp client.UpdateMpMaterialRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpMaterial.NewBaseScope().Where(client.FieldId_, req.Data.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	_, err = OrmMpMaterial.NewBaseScope().Where(client.FieldId_, data.Id).Update(uCtx, utils.OrmStruct2Map(req.Data))
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpMaterial(ctx context.Context, req *client.GetMpMaterialReq) (*client.GetMpMaterialRsp, error) {
+	var rsp client.GetMpMaterialRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpMaterial.NewBaseScope().Where(client.FieldId_, req.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpMaterialList(ctx context.Context, req *client.GetMpMaterialListReq) (*client.GetMpMaterialListRsp, error) {
+	var rsp client.GetMpMaterialListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	db := OrmMpMaterial.NewList(req.ListOption)
+	err = gormx.ProcessDefaultOptions[*client.ModelMpMaterial](req.ListOption, db)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = core.NewOptionsProcessor(req.ListOption).
+		Process()
+
+	rsp.Paginate, err = db.FindPaginate(uCtx, &rsp.List)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) AddMpMaterialGroup(ctx context.Context, req *client.AddMpMaterialGroupReq) (*client.AddMpMaterialGroupRsp, error) {
+	var rsp client.AddMpMaterialGroupRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = OrmMpMaterialGroup.NewBaseScope().Create(uCtx, req.Data)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = req.Data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) DelMpMaterialGroupList(ctx context.Context, req *client.DelMpMaterialGroupListReq) (*client.DelMpMaterialGroupListRsp, error) {
+	var rsp client.DelMpMaterialGroupListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	listRsp, err := a.GetMpMaterialGroupList(ctx, &client.GetMpMaterialGroupListReq{
+		ListOption: req.ListOption.
+			SetSkipTotal().
+			AddOpt(core.DefaultListOption_DefaultListOptionSelect, client.FieldId_),
+	})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	if len(listRsp.List) == 0 {
+		log.Infof("list is empty")
+		return &rsp, nil
+	}
+
+	idList := utils.PluckUint64List(listRsp.List, client.FieldId)
+	_, err = OrmMpMaterialGroup.NewBaseScope().WhereIn(client.FieldId_, idList).Delete(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) UpdateMpMaterialGroup(ctx context.Context, req *client.UpdateMpMaterialGroupReq) (*client.UpdateMpMaterialGroupRsp, error) {
+	var rsp client.UpdateMpMaterialGroupRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpMaterialGroup.NewBaseScope().Where(client.FieldId_, req.Data.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	_, err = OrmMpMaterialGroup.NewBaseScope().Where(client.FieldId_, data.Id).Update(uCtx, utils.OrmStruct2Map(req.Data))
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpMaterialGroup(ctx context.Context, req *client.GetMpMaterialGroupReq) (*client.GetMpMaterialGroupRsp, error) {
+	var rsp client.GetMpMaterialGroupRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpMaterialGroup.NewBaseScope().Where(client.FieldId_, req.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpMaterialGroupList(ctx context.Context, req *client.GetMpMaterialGroupListReq) (*client.GetMpMaterialGroupListRsp, error) {
+	var rsp client.GetMpMaterialGroupListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	db := OrmMpMaterialGroup.NewList(req.ListOption)
+	err = gormx.ProcessDefaultOptions[*client.ModelMpMaterialGroup](req.ListOption, db)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = core.NewOptionsProcessor(req.ListOption).
+		Process()
+
+	rsp.Paginate, err = db.FindPaginate(uCtx, &rsp.List)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) AddMpService(ctx context.Context, req *client.AddMpServiceReq) (*client.AddMpServiceRsp, error) {
+	var rsp client.AddMpServiceRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = OrmMpService.NewBaseScope().Create(uCtx, req.Data)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = req.Data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) DelMpServiceList(ctx context.Context, req *client.DelMpServiceListReq) (*client.DelMpServiceListRsp, error) {
+	var rsp client.DelMpServiceListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	listRsp, err := a.GetMpServiceList(ctx, &client.GetMpServiceListReq{
+		ListOption: req.ListOption.
+			SetSkipTotal().
+			AddOpt(core.DefaultListOption_DefaultListOptionSelect, client.FieldId_),
+	})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	if len(listRsp.List) == 0 {
+		log.Infof("list is empty")
+		return &rsp, nil
+	}
+
+	idList := utils.PluckUint64List(listRsp.List, client.FieldId)
+	_, err = OrmMpService.NewBaseScope().WhereIn(client.FieldId_, idList).Delete(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) UpdateMpService(ctx context.Context, req *client.UpdateMpServiceReq) (*client.UpdateMpServiceRsp, error) {
+	var rsp client.UpdateMpServiceRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpService.NewBaseScope().Where(client.FieldId_, req.Data.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	_, err = OrmMpService.NewBaseScope().Where(client.FieldId_, data.Id).Update(uCtx, utils.OrmStruct2Map(req.Data))
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpService(ctx context.Context, req *client.GetMpServiceReq) (*client.GetMpServiceRsp, error) {
+	var rsp client.GetMpServiceRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpService.NewBaseScope().Where(client.FieldId_, req.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpServiceList(ctx context.Context, req *client.GetMpServiceListReq) (*client.GetMpServiceListRsp, error) {
+	var rsp client.GetMpServiceListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	db := OrmMpService.NewList(req.ListOption)
+	err = gormx.ProcessDefaultOptions[*client.ModelMpService](req.ListOption, db)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = core.NewOptionsProcessor(req.ListOption).
+		Process()
+
+	rsp.Paginate, err = db.FindPaginate(uCtx, &rsp.List)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) AddMpShopAds(ctx context.Context, req *client.AddMpShopAdsReq) (*client.AddMpShopAdsRsp, error) {
+	var rsp client.AddMpShopAdsRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = OrmMpShopAds.NewBaseScope().Create(uCtx, req.Data)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = req.Data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) DelMpShopAdsList(ctx context.Context, req *client.DelMpShopAdsListReq) (*client.DelMpShopAdsListRsp, error) {
+	var rsp client.DelMpShopAdsListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	listRsp, err := a.GetMpShopAdsList(ctx, &client.GetMpShopAdsListReq{
+		ListOption: req.ListOption.
+			SetSkipTotal().
+			AddOpt(core.DefaultListOption_DefaultListOptionSelect, client.FieldId_),
+	})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	if len(listRsp.List) == 0 {
+		log.Infof("list is empty")
+		return &rsp, nil
+	}
+
+	idList := utils.PluckUint64List(listRsp.List, client.FieldId)
+	_, err = OrmMpShopAds.NewBaseScope().WhereIn(client.FieldId_, idList).Delete(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) UpdateMpShopAds(ctx context.Context, req *client.UpdateMpShopAdsReq) (*client.UpdateMpShopAdsRsp, error) {
+	var rsp client.UpdateMpShopAdsRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpShopAds.NewBaseScope().Where(client.FieldId_, req.Data.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	_, err = OrmMpShopAds.NewBaseScope().Where(client.FieldId_, data.Id).Update(uCtx, utils.OrmStruct2Map(req.Data))
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpShopAds(ctx context.Context, req *client.GetMpShopAdsReq) (*client.GetMpShopAdsRsp, error) {
+	var rsp client.GetMpShopAdsRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmMpShopAds.NewBaseScope().Where(client.FieldId_, req.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = data
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) GetMpShopAdsList(ctx context.Context, req *client.GetMpShopAdsListReq) (*client.GetMpShopAdsListRsp, error) {
+	var rsp client.GetMpShopAdsListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	db := OrmMpShopAds.NewList(req.ListOption)
+	err = gormx.ProcessDefaultOptions[*client.ModelMpShopAds](req.ListOption, db)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = core.NewOptionsProcessor(req.ListOption).
+		Process()
+
+	rsp.Paginate, err = db.FindPaginate(uCtx, &rsp.List)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+func (a *LbsingleServer) GetMpShopAdsListPublic(ctx context.Context, req *client.GetMpShopAdsListPublicReq) (*client.GetMpShopAdsListPublicRsp, error) {
+	var rsp client.GetMpShopAdsListPublicRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	db := OrmMpShopAds.NewList(req.ListOption)
+	err = gormx.ProcessDefaultOptions[*client.ModelMpShopAds](req.ListOption, db)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = core.NewOptionsProcessor(req.ListOption).
+		Process()
+
+	var list []*client.ModelMpShopAds
+	_, err = db.FindPaginate(uCtx, &list)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	if len(rsp.List) == 0 {
+		rsp.List = append(rsp.List, "https://oldbai.top/oss/download/BUOZ74", "https://oldbai.top/oss/download/BUOZ74")
+	}
+	rsp.IsActive = true
+	return &rsp, err
+}
+
+func (a *LbsingleServer) WxMiniProgramAuthSession(c context.Context, req *client.WxMiniProgramAuthSessionReq) (*client.WxMiniProgramAuthSessionRsp, error) {
+	var rsp client.WxMiniProgramAuthSessionRsp
+	var err error
+
+	conf, err := syscfg.GetWxMiniProgramConf()
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	session, err := wxminiprogram.Code2Session(&client.JsCodeToSessionReq{
+		JsCode: req.Code,
+		Appid:  conf.AppId,
+		Secret: conf.Secret,
+	})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	rsp.Openid = session.Openid
+	rsp.UserInfo, err = OrmMpMemberUser.NewBaseScope().Where(client.FieldMpOpenid, session.Openid).First(ctx.NewCtx(c))
+	if err != nil {
+		log.Errorf("err:%v", err)
+	}
+	if rsp.UserInfo != nil {
+		sid := utils.GenUUID()
+		err = cache.SetLoginInfo(sid, rsp.UserInfo.ToBaseUser())
+		if err != nil {
+			log.Errorf("err:%v", err)
+			return nil, err
+		}
+		rsp.AccessToken = sid
 	}
 
 	return &rsp, err

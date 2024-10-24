@@ -83,56 +83,566 @@ type LbsingleClient interface {
 	// @desc:
 	// @error:
 	GetUserList(ctx context.Context, in *GetUserListReq, opts ...grpc.CallOption) (*GetUserListRsp, error)
-	// @cat: FoodMenu
-	// @name: 菜单
+	// @cat: MpMerchantDetails
+	// @name:
 	// @desc:
 	// @error:
-	AddFoodMenu(ctx context.Context, in *AddFoodMenuReq, opts ...grpc.CallOption) (*AddFoodMenuRsp, error)
-	// @cat: FoodMenu
-	// @name: 菜单
+	AddMpMerchantDetails(ctx context.Context, in *AddMpMerchantDetailsReq, opts ...grpc.CallOption) (*AddMpMerchantDetailsRsp, error)
+	// @cat: MpMerchantDetails
+	// @name:
 	// @desc:
 	// @error:
-	DelFoodMenuList(ctx context.Context, in *DelFoodMenuListReq, opts ...grpc.CallOption) (*DelFoodMenuListRsp, error)
-	// @cat: FoodMenu
-	// @name: 菜单
+	DelMpMerchantDetailsList(ctx context.Context, in *DelMpMerchantDetailsListReq, opts ...grpc.CallOption) (*DelMpMerchantDetailsListRsp, error)
+	// @cat: MpMerchantDetails
+	// @name:
 	// @desc:
 	// @error:
-	UpdateFoodMenu(ctx context.Context, in *UpdateFoodMenuReq, opts ...grpc.CallOption) (*UpdateFoodMenuRsp, error)
-	// @cat: FoodMenu
-	// @name: 菜单
+	UpdateMpMerchantDetails(ctx context.Context, in *UpdateMpMerchantDetailsReq, opts ...grpc.CallOption) (*UpdateMpMerchantDetailsRsp, error)
+	// @cat: MpMerchantDetails
+	// @name:
 	// @desc:
 	// @error:
-	GetFoodMenu(ctx context.Context, in *GetFoodMenuReq, opts ...grpc.CallOption) (*GetFoodMenuRsp, error)
-	// @cat: FoodMenu
-	// @name: 菜单
+	GetMpMerchantDetails(ctx context.Context, in *GetMpMerchantDetailsReq, opts ...grpc.CallOption) (*GetMpMerchantDetailsRsp, error)
+	// @cat: MpMerchantDetails
+	// @name:
 	// @desc:
 	// @error:
-	GetFoodMenuList(ctx context.Context, in *GetFoodMenuListReq, opts ...grpc.CallOption) (*GetFoodMenuListRsp, error)
-	// @cat: FoodMenuElem
-	// @name: 菜单选项
+	GetMpMerchantDetailsList(ctx context.Context, in *GetMpMerchantDetailsListReq, opts ...grpc.CallOption) (*GetMpMerchantDetailsListRsp, error)
+	// @cat: MpMemberUser
+	// @name:
 	// @desc:
 	// @error:
-	AddFoodMenuElem(ctx context.Context, in *AddFoodMenuElemReq, opts ...grpc.CallOption) (*AddFoodMenuElemRsp, error)
-	// @cat: FoodMenuElem
-	// @name: 菜单选项
+	AddMpMemberUser(ctx context.Context, in *AddMpMemberUserReq, opts ...grpc.CallOption) (*AddMpMemberUserRsp, error)
+	// @cat: MpMemberUser
+	// @name:
 	// @desc:
 	// @error:
-	DelFoodMenuElemList(ctx context.Context, in *DelFoodMenuElemListReq, opts ...grpc.CallOption) (*DelFoodMenuElemListRsp, error)
-	// @cat: FoodMenuElem
-	// @name: 菜单选项
+	DelMpMemberUserList(ctx context.Context, in *DelMpMemberUserListReq, opts ...grpc.CallOption) (*DelMpMemberUserListRsp, error)
+	// @cat: MpMemberUser
+	// @name:
 	// @desc:
 	// @error:
-	UpdateFoodMenuElem(ctx context.Context, in *UpdateFoodMenuElemReq, opts ...grpc.CallOption) (*UpdateFoodMenuElemRsp, error)
-	// @cat: FoodMenuElem
-	// @name: 菜单选项
+	UpdateMpMemberUser(ctx context.Context, in *UpdateMpMemberUserReq, opts ...grpc.CallOption) (*UpdateMpMemberUserRsp, error)
+	// @cat: MpMemberUser
+	// @name:
 	// @desc:
 	// @error:
-	GetFoodMenuElem(ctx context.Context, in *GetFoodMenuElemReq, opts ...grpc.CallOption) (*GetFoodMenuElemRsp, error)
-	// @cat: FoodMenuElem
-	// @name: 菜单选项
+	GetMpMemberUser(ctx context.Context, in *GetMpMemberUserReq, opts ...grpc.CallOption) (*GetMpMemberUserRsp, error)
+	// @cat: MpMemberUser
+	// @name:
 	// @desc:
 	// @error:
-	GetFoodMenuElemList(ctx context.Context, in *GetFoodMenuElemListReq, opts ...grpc.CallOption) (*GetFoodMenuElemListRsp, error)
+	GetMpMemberUserList(ctx context.Context, in *GetMpMemberUserListReq, opts ...grpc.CallOption) (*GetMpMemberUserListRsp, error)
+	// @cat: MpUserAddress
+	// @name:
+	// @desc:
+	// @error:
+	AddMpUserAddress(ctx context.Context, in *AddMpUserAddressReq, opts ...grpc.CallOption) (*AddMpUserAddressRsp, error)
+	// @cat: MpUserAddress
+	// @name:
+	// @desc:
+	// @error:
+	DelMpUserAddressList(ctx context.Context, in *DelMpUserAddressListReq, opts ...grpc.CallOption) (*DelMpUserAddressListRsp, error)
+	// @cat: MpUserAddress
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpUserAddress(ctx context.Context, in *UpdateMpUserAddressReq, opts ...grpc.CallOption) (*UpdateMpUserAddressRsp, error)
+	// @cat: MpUserAddress
+	// @name:
+	// @desc:
+	// @error:
+	GetMpUserAddress(ctx context.Context, in *GetMpUserAddressReq, opts ...grpc.CallOption) (*GetMpUserAddressRsp, error)
+	// @cat: MpUserAddress
+	// @name:
+	// @desc:
+	// @error:
+	GetMpUserAddressList(ctx context.Context, in *GetMpUserAddressListReq, opts ...grpc.CallOption) (*GetMpUserAddressListRsp, error)
+	// @cat: MpUserBill
+	// @name:
+	// @desc:
+	// @error:
+	AddMpUserBill(ctx context.Context, in *AddMpUserBillReq, opts ...grpc.CallOption) (*AddMpUserBillRsp, error)
+	// @cat: MpUserBill
+	// @name:
+	// @desc:
+	// @error:
+	DelMpUserBillList(ctx context.Context, in *DelMpUserBillListReq, opts ...grpc.CallOption) (*DelMpUserBillListRsp, error)
+	// @cat: MpUserBill
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpUserBill(ctx context.Context, in *UpdateMpUserBillReq, opts ...grpc.CallOption) (*UpdateMpUserBillRsp, error)
+	// @cat: MpUserBill
+	// @name:
+	// @desc:
+	// @error:
+	GetMpUserBill(ctx context.Context, in *GetMpUserBillReq, opts ...grpc.CallOption) (*GetMpUserBillRsp, error)
+	// @cat: MpUserBill
+	// @name:
+	// @desc:
+	// @error:
+	GetMpUserBillList(ctx context.Context, in *GetMpUserBillListReq, opts ...grpc.CallOption) (*GetMpUserBillListRsp, error)
+	// @cat: MpProductCategory
+	// @name:
+	// @desc:
+	// @error:
+	AddMpProductCategory(ctx context.Context, in *AddMpProductCategoryReq, opts ...grpc.CallOption) (*AddMpProductCategoryRsp, error)
+	// @cat: MpProductCategory
+	// @name:
+	// @desc:
+	// @error:
+	DelMpProductCategoryList(ctx context.Context, in *DelMpProductCategoryListReq, opts ...grpc.CallOption) (*DelMpProductCategoryListRsp, error)
+	// @cat: MpProductCategory
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpProductCategory(ctx context.Context, in *UpdateMpProductCategoryReq, opts ...grpc.CallOption) (*UpdateMpProductCategoryRsp, error)
+	// @cat: MpProductCategory
+	// @name:
+	// @desc:
+	// @error:
+	GetMpProductCategory(ctx context.Context, in *GetMpProductCategoryReq, opts ...grpc.CallOption) (*GetMpProductCategoryRsp, error)
+	// @cat: MpProductCategory
+	// @name:
+	// @desc:
+	// @error:
+	GetMpProductCategoryList(ctx context.Context, in *GetMpProductCategoryListReq, opts ...grpc.CallOption) (*GetMpProductCategoryListRsp, error)
+	// @cat: MpStoreProduct
+	// @name:
+	// @desc:
+	// @error:
+	AddMpStoreProduct(ctx context.Context, in *AddMpStoreProductReq, opts ...grpc.CallOption) (*AddMpStoreProductRsp, error)
+	// @cat: MpStoreProduct
+	// @name:
+	// @desc:
+	// @error:
+	DelMpStoreProductList(ctx context.Context, in *DelMpStoreProductListReq, opts ...grpc.CallOption) (*DelMpStoreProductListRsp, error)
+	// @cat: MpStoreProduct
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpStoreProduct(ctx context.Context, in *UpdateMpStoreProductReq, opts ...grpc.CallOption) (*UpdateMpStoreProductRsp, error)
+	// @cat: MpStoreProduct
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreProduct(ctx context.Context, in *GetMpStoreProductReq, opts ...grpc.CallOption) (*GetMpStoreProductRsp, error)
+	// @cat: MpStoreProduct
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreProductList(ctx context.Context, in *GetMpStoreProductListReq, opts ...grpc.CallOption) (*GetMpStoreProductListRsp, error)
+	// @cat: MpStoreProductAttr
+	// @name:
+	// @desc:
+	// @error:
+	AddMpStoreProductAttr(ctx context.Context, in *AddMpStoreProductAttrReq, opts ...grpc.CallOption) (*AddMpStoreProductAttrRsp, error)
+	// @cat: MpStoreProductAttr
+	// @name:
+	// @desc:
+	// @error:
+	DelMpStoreProductAttrList(ctx context.Context, in *DelMpStoreProductAttrListReq, opts ...grpc.CallOption) (*DelMpStoreProductAttrListRsp, error)
+	// @cat: MpStoreProductAttr
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpStoreProductAttr(ctx context.Context, in *UpdateMpStoreProductAttrReq, opts ...grpc.CallOption) (*UpdateMpStoreProductAttrRsp, error)
+	// @cat: MpStoreProductAttr
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreProductAttr(ctx context.Context, in *GetMpStoreProductAttrReq, opts ...grpc.CallOption) (*GetMpStoreProductAttrRsp, error)
+	// @cat: MpStoreProductAttr
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreProductAttrList(ctx context.Context, in *GetMpStoreProductAttrListReq, opts ...grpc.CallOption) (*GetMpStoreProductAttrListRsp, error)
+	// @cat: MpStoreProductAttrResult
+	// @name:
+	// @desc:
+	// @error:
+	AddMpStoreProductAttrResult(ctx context.Context, in *AddMpStoreProductAttrResultReq, opts ...grpc.CallOption) (*AddMpStoreProductAttrResultRsp, error)
+	// @cat: MpStoreProductAttrResult
+	// @name:
+	// @desc:
+	// @error:
+	DelMpStoreProductAttrResultList(ctx context.Context, in *DelMpStoreProductAttrResultListReq, opts ...grpc.CallOption) (*DelMpStoreProductAttrResultListRsp, error)
+	// @cat: MpStoreProductAttrResult
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpStoreProductAttrResult(ctx context.Context, in *UpdateMpStoreProductAttrResultReq, opts ...grpc.CallOption) (*UpdateMpStoreProductAttrResultRsp, error)
+	// @cat: MpStoreProductAttrResult
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreProductAttrResult(ctx context.Context, in *GetMpStoreProductAttrResultReq, opts ...grpc.CallOption) (*GetMpStoreProductAttrResultRsp, error)
+	// @cat: MpStoreProductAttrResult
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreProductAttrResultList(ctx context.Context, in *GetMpStoreProductAttrResultListReq, opts ...grpc.CallOption) (*GetMpStoreProductAttrResultListRsp, error)
+	// @cat: MpStoreProductAttrValue
+	// @name:
+	// @desc:
+	// @error:
+	AddMpStoreProductAttrValue(ctx context.Context, in *AddMpStoreProductAttrValueReq, opts ...grpc.CallOption) (*AddMpStoreProductAttrValueRsp, error)
+	// @cat: MpStoreProductAttrValue
+	// @name:
+	// @desc:
+	// @error:
+	DelMpStoreProductAttrValueList(ctx context.Context, in *DelMpStoreProductAttrValueListReq, opts ...grpc.CallOption) (*DelMpStoreProductAttrValueListRsp, error)
+	// @cat: MpStoreProductAttrValue
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpStoreProductAttrValue(ctx context.Context, in *UpdateMpStoreProductAttrValueReq, opts ...grpc.CallOption) (*UpdateMpStoreProductAttrValueRsp, error)
+	// @cat: MpStoreProductAttrValue
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreProductAttrValue(ctx context.Context, in *GetMpStoreProductAttrValueReq, opts ...grpc.CallOption) (*GetMpStoreProductAttrValueRsp, error)
+	// @cat: MpStoreProductAttrValue
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreProductAttrValueList(ctx context.Context, in *GetMpStoreProductAttrValueListReq, opts ...grpc.CallOption) (*GetMpStoreProductAttrValueListRsp, error)
+	// @cat: MpStoreProductReply
+	// @name:
+	// @desc:
+	// @error:
+	AddMpStoreProductReply(ctx context.Context, in *AddMpStoreProductReplyReq, opts ...grpc.CallOption) (*AddMpStoreProductReplyRsp, error)
+	// @cat: MpStoreProductReply
+	// @name:
+	// @desc:
+	// @error:
+	DelMpStoreProductReplyList(ctx context.Context, in *DelMpStoreProductReplyListReq, opts ...grpc.CallOption) (*DelMpStoreProductReplyListRsp, error)
+	// @cat: MpStoreProductReply
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpStoreProductReply(ctx context.Context, in *UpdateMpStoreProductReplyReq, opts ...grpc.CallOption) (*UpdateMpStoreProductReplyRsp, error)
+	// @cat: MpStoreProductReply
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreProductReply(ctx context.Context, in *GetMpStoreProductReplyReq, opts ...grpc.CallOption) (*GetMpStoreProductReplyRsp, error)
+	// @cat: MpStoreProductReply
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreProductReplyList(ctx context.Context, in *GetMpStoreProductReplyListReq, opts ...grpc.CallOption) (*GetMpStoreProductReplyListRsp, error)
+	// @cat: MpStoreProductRule
+	// @name:
+	// @desc:
+	// @error:
+	AddMpStoreProductRule(ctx context.Context, in *AddMpStoreProductRuleReq, opts ...grpc.CallOption) (*AddMpStoreProductRuleRsp, error)
+	// @cat: MpStoreProductRule
+	// @name:
+	// @desc:
+	// @error:
+	DelMpStoreProductRuleList(ctx context.Context, in *DelMpStoreProductRuleListReq, opts ...grpc.CallOption) (*DelMpStoreProductRuleListRsp, error)
+	// @cat: MpStoreProductRule
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpStoreProductRule(ctx context.Context, in *UpdateMpStoreProductRuleReq, opts ...grpc.CallOption) (*UpdateMpStoreProductRuleRsp, error)
+	// @cat: MpStoreProductRule
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreProductRule(ctx context.Context, in *GetMpStoreProductRuleReq, opts ...grpc.CallOption) (*GetMpStoreProductRuleRsp, error)
+	// @cat: MpStoreProductRule
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreProductRuleList(ctx context.Context, in *GetMpStoreProductRuleListReq, opts ...grpc.CallOption) (*GetMpStoreProductRuleListRsp, error)
+	// @cat: MpStoreShop
+	// @name:
+	// @desc:
+	// @error:
+	AddMpStoreShop(ctx context.Context, in *AddMpStoreShopReq, opts ...grpc.CallOption) (*AddMpStoreShopRsp, error)
+	// @cat: MpStoreShop
+	// @name:
+	// @desc:
+	// @error:
+	DelMpStoreShopList(ctx context.Context, in *DelMpStoreShopListReq, opts ...grpc.CallOption) (*DelMpStoreShopListRsp, error)
+	// @cat: MpStoreShop
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpStoreShop(ctx context.Context, in *UpdateMpStoreShopReq, opts ...grpc.CallOption) (*UpdateMpStoreShopRsp, error)
+	// @cat: MpStoreShop
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreShop(ctx context.Context, in *GetMpStoreShopReq, opts ...grpc.CallOption) (*GetMpStoreShopRsp, error)
+	// @cat: MpStoreShop
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreShopList(ctx context.Context, in *GetMpStoreShopListReq, opts ...grpc.CallOption) (*GetMpStoreShopListRsp, error)
+	// @cat: MpCoupon
+	// @name:
+	// @desc:
+	// @error:
+	AddMpCoupon(ctx context.Context, in *AddMpCouponReq, opts ...grpc.CallOption) (*AddMpCouponRsp, error)
+	// @cat: MpCoupon
+	// @name:
+	// @desc:
+	// @error:
+	DelMpCouponList(ctx context.Context, in *DelMpCouponListReq, opts ...grpc.CallOption) (*DelMpCouponListRsp, error)
+	// @cat: MpCoupon
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpCoupon(ctx context.Context, in *UpdateMpCouponReq, opts ...grpc.CallOption) (*UpdateMpCouponRsp, error)
+	// @cat: MpCoupon
+	// @name:
+	// @desc:
+	// @error:
+	GetMpCoupon(ctx context.Context, in *GetMpCouponReq, opts ...grpc.CallOption) (*GetMpCouponRsp, error)
+	// @cat: MpCoupon
+	// @name:
+	// @desc:
+	// @error:
+	GetMpCouponList(ctx context.Context, in *GetMpCouponListReq, opts ...grpc.CallOption) (*GetMpCouponListRsp, error)
+	// @cat: MpCouponUser
+	// @name:
+	// @desc:
+	// @error:
+	AddMpCouponUser(ctx context.Context, in *AddMpCouponUserReq, opts ...grpc.CallOption) (*AddMpCouponUserRsp, error)
+	// @cat: MpCouponUser
+	// @name:
+	// @desc:
+	// @error:
+	DelMpCouponUserList(ctx context.Context, in *DelMpCouponUserListReq, opts ...grpc.CallOption) (*DelMpCouponUserListRsp, error)
+	// @cat: MpCouponUser
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpCouponUser(ctx context.Context, in *UpdateMpCouponUserReq, opts ...grpc.CallOption) (*UpdateMpCouponUserRsp, error)
+	// @cat: MpCouponUser
+	// @name:
+	// @desc:
+	// @error:
+	GetMpCouponUser(ctx context.Context, in *GetMpCouponUserReq, opts ...grpc.CallOption) (*GetMpCouponUserRsp, error)
+	// @cat: MpCouponUser
+	// @name:
+	// @desc:
+	// @error:
+	GetMpCouponUserList(ctx context.Context, in *GetMpCouponUserListReq, opts ...grpc.CallOption) (*GetMpCouponUserListRsp, error)
+	// @cat: MpOrderNumber
+	// @name:
+	// @desc:
+	// @error:
+	AddMpOrderNumber(ctx context.Context, in *AddMpOrderNumberReq, opts ...grpc.CallOption) (*AddMpOrderNumberRsp, error)
+	// @cat: MpOrderNumber
+	// @name:
+	// @desc:
+	// @error:
+	DelMpOrderNumberList(ctx context.Context, in *DelMpOrderNumberListReq, opts ...grpc.CallOption) (*DelMpOrderNumberListRsp, error)
+	// @cat: MpOrderNumber
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpOrderNumber(ctx context.Context, in *UpdateMpOrderNumberReq, opts ...grpc.CallOption) (*UpdateMpOrderNumberRsp, error)
+	// @cat: MpOrderNumber
+	// @name:
+	// @desc:
+	// @error:
+	GetMpOrderNumber(ctx context.Context, in *GetMpOrderNumberReq, opts ...grpc.CallOption) (*GetMpOrderNumberRsp, error)
+	// @cat: MpOrderNumber
+	// @name:
+	// @desc:
+	// @error:
+	GetMpOrderNumberList(ctx context.Context, in *GetMpOrderNumberListReq, opts ...grpc.CallOption) (*GetMpOrderNumberListRsp, error)
+	// @cat: MpStoreOrder
+	// @name:
+	// @desc:
+	// @error:
+	AddMpStoreOrder(ctx context.Context, in *AddMpStoreOrderReq, opts ...grpc.CallOption) (*AddMpStoreOrderRsp, error)
+	// @cat: MpStoreOrder
+	// @name:
+	// @desc:
+	// @error:
+	DelMpStoreOrderList(ctx context.Context, in *DelMpStoreOrderListReq, opts ...grpc.CallOption) (*DelMpStoreOrderListRsp, error)
+	// @cat: MpStoreOrder
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpStoreOrder(ctx context.Context, in *UpdateMpStoreOrderReq, opts ...grpc.CallOption) (*UpdateMpStoreOrderRsp, error)
+	// @cat: MpStoreOrder
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreOrder(ctx context.Context, in *GetMpStoreOrderReq, opts ...grpc.CallOption) (*GetMpStoreOrderRsp, error)
+	// @cat: MpStoreOrder
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreOrderList(ctx context.Context, in *GetMpStoreOrderListReq, opts ...grpc.CallOption) (*GetMpStoreOrderListRsp, error)
+	// @cat: MpStoreOrderCartInfo
+	// @name:
+	// @desc:
+	// @error:
+	AddMpStoreOrderCartInfo(ctx context.Context, in *AddMpStoreOrderCartInfoReq, opts ...grpc.CallOption) (*AddMpStoreOrderCartInfoRsp, error)
+	// @cat: MpStoreOrderCartInfo
+	// @name:
+	// @desc:
+	// @error:
+	DelMpStoreOrderCartInfoList(ctx context.Context, in *DelMpStoreOrderCartInfoListReq, opts ...grpc.CallOption) (*DelMpStoreOrderCartInfoListRsp, error)
+	// @cat: MpStoreOrderCartInfo
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpStoreOrderCartInfo(ctx context.Context, in *UpdateMpStoreOrderCartInfoReq, opts ...grpc.CallOption) (*UpdateMpStoreOrderCartInfoRsp, error)
+	// @cat: MpStoreOrderCartInfo
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreOrderCartInfo(ctx context.Context, in *GetMpStoreOrderCartInfoReq, opts ...grpc.CallOption) (*GetMpStoreOrderCartInfoRsp, error)
+	// @cat: MpStoreOrderCartInfo
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreOrderCartInfoList(ctx context.Context, in *GetMpStoreOrderCartInfoListReq, opts ...grpc.CallOption) (*GetMpStoreOrderCartInfoListRsp, error)
+	// @cat: MpStoreOrderStatus
+	// @name:
+	// @desc:
+	// @error:
+	AddMpStoreOrderStatus(ctx context.Context, in *AddMpStoreOrderStatusReq, opts ...grpc.CallOption) (*AddMpStoreOrderStatusRsp, error)
+	// @cat: MpStoreOrderStatus
+	// @name:
+	// @desc:
+	// @error:
+	DelMpStoreOrderStatusList(ctx context.Context, in *DelMpStoreOrderStatusListReq, opts ...grpc.CallOption) (*DelMpStoreOrderStatusListRsp, error)
+	// @cat: MpStoreOrderStatus
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpStoreOrderStatus(ctx context.Context, in *UpdateMpStoreOrderStatusReq, opts ...grpc.CallOption) (*UpdateMpStoreOrderStatusRsp, error)
+	// @cat: MpStoreOrderStatus
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreOrderStatus(ctx context.Context, in *GetMpStoreOrderStatusReq, opts ...grpc.CallOption) (*GetMpStoreOrderStatusRsp, error)
+	// @cat: MpStoreOrderStatus
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreOrderStatusList(ctx context.Context, in *GetMpStoreOrderStatusListReq, opts ...grpc.CallOption) (*GetMpStoreOrderStatusListRsp, error)
+	// @cat: MpMaterial
+	// @name:
+	// @desc:
+	// @error:
+	AddMpMaterial(ctx context.Context, in *AddMpMaterialReq, opts ...grpc.CallOption) (*AddMpMaterialRsp, error)
+	// @cat: MpMaterial
+	// @name:
+	// @desc:
+	// @error:
+	DelMpMaterialList(ctx context.Context, in *DelMpMaterialListReq, opts ...grpc.CallOption) (*DelMpMaterialListRsp, error)
+	// @cat: MpMaterial
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpMaterial(ctx context.Context, in *UpdateMpMaterialReq, opts ...grpc.CallOption) (*UpdateMpMaterialRsp, error)
+	// @cat: MpMaterial
+	// @name:
+	// @desc:
+	// @error:
+	GetMpMaterial(ctx context.Context, in *GetMpMaterialReq, opts ...grpc.CallOption) (*GetMpMaterialRsp, error)
+	// @cat: MpMaterial
+	// @name:
+	// @desc:
+	// @error:
+	GetMpMaterialList(ctx context.Context, in *GetMpMaterialListReq, opts ...grpc.CallOption) (*GetMpMaterialListRsp, error)
+	// @cat: MpMaterialGroup
+	// @name:
+	// @desc:
+	// @error:
+	AddMpMaterialGroup(ctx context.Context, in *AddMpMaterialGroupReq, opts ...grpc.CallOption) (*AddMpMaterialGroupRsp, error)
+	// @cat: MpMaterialGroup
+	// @name:
+	// @desc:
+	// @error:
+	DelMpMaterialGroupList(ctx context.Context, in *DelMpMaterialGroupListReq, opts ...grpc.CallOption) (*DelMpMaterialGroupListRsp, error)
+	// @cat: MpMaterialGroup
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpMaterialGroup(ctx context.Context, in *UpdateMpMaterialGroupReq, opts ...grpc.CallOption) (*UpdateMpMaterialGroupRsp, error)
+	// @cat: MpMaterialGroup
+	// @name:
+	// @desc:
+	// @error:
+	GetMpMaterialGroup(ctx context.Context, in *GetMpMaterialGroupReq, opts ...grpc.CallOption) (*GetMpMaterialGroupRsp, error)
+	// @cat: MpMaterialGroup
+	// @name:
+	// @desc:
+	// @error:
+	GetMpMaterialGroupList(ctx context.Context, in *GetMpMaterialGroupListReq, opts ...grpc.CallOption) (*GetMpMaterialGroupListRsp, error)
+	// @cat: MpService
+	// @name:
+	// @desc:
+	// @error:
+	AddMpService(ctx context.Context, in *AddMpServiceReq, opts ...grpc.CallOption) (*AddMpServiceRsp, error)
+	// @cat: MpService
+	// @name:
+	// @desc:
+	// @error:
+	DelMpServiceList(ctx context.Context, in *DelMpServiceListReq, opts ...grpc.CallOption) (*DelMpServiceListRsp, error)
+	// @cat: MpService
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpService(ctx context.Context, in *UpdateMpServiceReq, opts ...grpc.CallOption) (*UpdateMpServiceRsp, error)
+	// @cat: MpService
+	// @name:
+	// @desc:
+	// @error:
+	GetMpService(ctx context.Context, in *GetMpServiceReq, opts ...grpc.CallOption) (*GetMpServiceRsp, error)
+	// @cat: MpService
+	// @name:
+	// @desc:
+	// @error:
+	GetMpServiceList(ctx context.Context, in *GetMpServiceListReq, opts ...grpc.CallOption) (*GetMpServiceListRsp, error)
+	// @cat: MpShopAds
+	// @name:
+	// @desc:
+	// @error:
+	AddMpShopAds(ctx context.Context, in *AddMpShopAdsReq, opts ...grpc.CallOption) (*AddMpShopAdsRsp, error)
+	// @cat: MpShopAds
+	// @name:
+	// @desc:
+	// @error:
+	DelMpShopAdsList(ctx context.Context, in *DelMpShopAdsListReq, opts ...grpc.CallOption) (*DelMpShopAdsListRsp, error)
+	// @cat: MpShopAds
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpShopAds(ctx context.Context, in *UpdateMpShopAdsReq, opts ...grpc.CallOption) (*UpdateMpShopAdsRsp, error)
+	// @cat: MpShopAds
+	// @name:
+	// @desc:
+	// @error:
+	GetMpShopAds(ctx context.Context, in *GetMpShopAdsReq, opts ...grpc.CallOption) (*GetMpShopAdsRsp, error)
+	// @cat: MpShopAds
+	// @name:
+	// @desc:
+	// @error:
+	GetMpShopAdsList(ctx context.Context, in *GetMpShopAdsListReq, opts ...grpc.CallOption) (*GetMpShopAdsListRsp, error)
+	// @cat: MpShopAds
+	// @name:
+	// @desc:
+	// @error:
+	GetMpShopAdsListPublic(ctx context.Context, in *GetMpShopAdsListPublicReq, opts ...grpc.CallOption) (*GetMpShopAdsListPublicRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	WxMiniProgramAuthSession(ctx context.Context, in *WxMiniProgramAuthSessionReq, opts ...grpc.CallOption) (*WxMiniProgramAuthSessionRsp, error)
 }
 
 type lbsingleClient struct {
@@ -269,90 +779,1008 @@ func (c *lbsingleClient) GetUserList(ctx context.Context, in *GetUserListReq, op
 	return out, nil
 }
 
-func (c *lbsingleClient) AddFoodMenu(ctx context.Context, in *AddFoodMenuReq, opts ...grpc.CallOption) (*AddFoodMenuRsp, error) {
-	out := new(AddFoodMenuRsp)
-	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddFoodMenu", in, out, opts...)
+func (c *lbsingleClient) AddMpMerchantDetails(ctx context.Context, in *AddMpMerchantDetailsReq, opts ...grpc.CallOption) (*AddMpMerchantDetailsRsp, error) {
+	out := new(AddMpMerchantDetailsRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddMpMerchantDetails", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *lbsingleClient) DelFoodMenuList(ctx context.Context, in *DelFoodMenuListReq, opts ...grpc.CallOption) (*DelFoodMenuListRsp, error) {
-	out := new(DelFoodMenuListRsp)
-	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelFoodMenuList", in, out, opts...)
+func (c *lbsingleClient) DelMpMerchantDetailsList(ctx context.Context, in *DelMpMerchantDetailsListReq, opts ...grpc.CallOption) (*DelMpMerchantDetailsListRsp, error) {
+	out := new(DelMpMerchantDetailsListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelMpMerchantDetailsList", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *lbsingleClient) UpdateFoodMenu(ctx context.Context, in *UpdateFoodMenuReq, opts ...grpc.CallOption) (*UpdateFoodMenuRsp, error) {
-	out := new(UpdateFoodMenuRsp)
-	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateFoodMenu", in, out, opts...)
+func (c *lbsingleClient) UpdateMpMerchantDetails(ctx context.Context, in *UpdateMpMerchantDetailsReq, opts ...grpc.CallOption) (*UpdateMpMerchantDetailsRsp, error) {
+	out := new(UpdateMpMerchantDetailsRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateMpMerchantDetails", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *lbsingleClient) GetFoodMenu(ctx context.Context, in *GetFoodMenuReq, opts ...grpc.CallOption) (*GetFoodMenuRsp, error) {
-	out := new(GetFoodMenuRsp)
-	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetFoodMenu", in, out, opts...)
+func (c *lbsingleClient) GetMpMerchantDetails(ctx context.Context, in *GetMpMerchantDetailsReq, opts ...grpc.CallOption) (*GetMpMerchantDetailsRsp, error) {
+	out := new(GetMpMerchantDetailsRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpMerchantDetails", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *lbsingleClient) GetFoodMenuList(ctx context.Context, in *GetFoodMenuListReq, opts ...grpc.CallOption) (*GetFoodMenuListRsp, error) {
-	out := new(GetFoodMenuListRsp)
-	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetFoodMenuList", in, out, opts...)
+func (c *lbsingleClient) GetMpMerchantDetailsList(ctx context.Context, in *GetMpMerchantDetailsListReq, opts ...grpc.CallOption) (*GetMpMerchantDetailsListRsp, error) {
+	out := new(GetMpMerchantDetailsListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpMerchantDetailsList", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *lbsingleClient) AddFoodMenuElem(ctx context.Context, in *AddFoodMenuElemReq, opts ...grpc.CallOption) (*AddFoodMenuElemRsp, error) {
-	out := new(AddFoodMenuElemRsp)
-	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddFoodMenuElem", in, out, opts...)
+func (c *lbsingleClient) AddMpMemberUser(ctx context.Context, in *AddMpMemberUserReq, opts ...grpc.CallOption) (*AddMpMemberUserRsp, error) {
+	out := new(AddMpMemberUserRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddMpMemberUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *lbsingleClient) DelFoodMenuElemList(ctx context.Context, in *DelFoodMenuElemListReq, opts ...grpc.CallOption) (*DelFoodMenuElemListRsp, error) {
-	out := new(DelFoodMenuElemListRsp)
-	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelFoodMenuElemList", in, out, opts...)
+func (c *lbsingleClient) DelMpMemberUserList(ctx context.Context, in *DelMpMemberUserListReq, opts ...grpc.CallOption) (*DelMpMemberUserListRsp, error) {
+	out := new(DelMpMemberUserListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelMpMemberUserList", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *lbsingleClient) UpdateFoodMenuElem(ctx context.Context, in *UpdateFoodMenuElemReq, opts ...grpc.CallOption) (*UpdateFoodMenuElemRsp, error) {
-	out := new(UpdateFoodMenuElemRsp)
-	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateFoodMenuElem", in, out, opts...)
+func (c *lbsingleClient) UpdateMpMemberUser(ctx context.Context, in *UpdateMpMemberUserReq, opts ...grpc.CallOption) (*UpdateMpMemberUserRsp, error) {
+	out := new(UpdateMpMemberUserRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateMpMemberUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *lbsingleClient) GetFoodMenuElem(ctx context.Context, in *GetFoodMenuElemReq, opts ...grpc.CallOption) (*GetFoodMenuElemRsp, error) {
-	out := new(GetFoodMenuElemRsp)
-	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetFoodMenuElem", in, out, opts...)
+func (c *lbsingleClient) GetMpMemberUser(ctx context.Context, in *GetMpMemberUserReq, opts ...grpc.CallOption) (*GetMpMemberUserRsp, error) {
+	out := new(GetMpMemberUserRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpMemberUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *lbsingleClient) GetFoodMenuElemList(ctx context.Context, in *GetFoodMenuElemListReq, opts ...grpc.CallOption) (*GetFoodMenuElemListRsp, error) {
-	out := new(GetFoodMenuElemListRsp)
-	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetFoodMenuElemList", in, out, opts...)
+func (c *lbsingleClient) GetMpMemberUserList(ctx context.Context, in *GetMpMemberUserListReq, opts ...grpc.CallOption) (*GetMpMemberUserListRsp, error) {
+	out := new(GetMpMemberUserListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpMemberUserList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) AddMpUserAddress(ctx context.Context, in *AddMpUserAddressReq, opts ...grpc.CallOption) (*AddMpUserAddressRsp, error) {
+	out := new(AddMpUserAddressRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddMpUserAddress", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) DelMpUserAddressList(ctx context.Context, in *DelMpUserAddressListReq, opts ...grpc.CallOption) (*DelMpUserAddressListRsp, error) {
+	out := new(DelMpUserAddressListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelMpUserAddressList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) UpdateMpUserAddress(ctx context.Context, in *UpdateMpUserAddressReq, opts ...grpc.CallOption) (*UpdateMpUserAddressRsp, error) {
+	out := new(UpdateMpUserAddressRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateMpUserAddress", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpUserAddress(ctx context.Context, in *GetMpUserAddressReq, opts ...grpc.CallOption) (*GetMpUserAddressRsp, error) {
+	out := new(GetMpUserAddressRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpUserAddress", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpUserAddressList(ctx context.Context, in *GetMpUserAddressListReq, opts ...grpc.CallOption) (*GetMpUserAddressListRsp, error) {
+	out := new(GetMpUserAddressListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpUserAddressList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) AddMpUserBill(ctx context.Context, in *AddMpUserBillReq, opts ...grpc.CallOption) (*AddMpUserBillRsp, error) {
+	out := new(AddMpUserBillRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddMpUserBill", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) DelMpUserBillList(ctx context.Context, in *DelMpUserBillListReq, opts ...grpc.CallOption) (*DelMpUserBillListRsp, error) {
+	out := new(DelMpUserBillListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelMpUserBillList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) UpdateMpUserBill(ctx context.Context, in *UpdateMpUserBillReq, opts ...grpc.CallOption) (*UpdateMpUserBillRsp, error) {
+	out := new(UpdateMpUserBillRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateMpUserBill", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpUserBill(ctx context.Context, in *GetMpUserBillReq, opts ...grpc.CallOption) (*GetMpUserBillRsp, error) {
+	out := new(GetMpUserBillRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpUserBill", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpUserBillList(ctx context.Context, in *GetMpUserBillListReq, opts ...grpc.CallOption) (*GetMpUserBillListRsp, error) {
+	out := new(GetMpUserBillListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpUserBillList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) AddMpProductCategory(ctx context.Context, in *AddMpProductCategoryReq, opts ...grpc.CallOption) (*AddMpProductCategoryRsp, error) {
+	out := new(AddMpProductCategoryRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddMpProductCategory", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) DelMpProductCategoryList(ctx context.Context, in *DelMpProductCategoryListReq, opts ...grpc.CallOption) (*DelMpProductCategoryListRsp, error) {
+	out := new(DelMpProductCategoryListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelMpProductCategoryList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) UpdateMpProductCategory(ctx context.Context, in *UpdateMpProductCategoryReq, opts ...grpc.CallOption) (*UpdateMpProductCategoryRsp, error) {
+	out := new(UpdateMpProductCategoryRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateMpProductCategory", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpProductCategory(ctx context.Context, in *GetMpProductCategoryReq, opts ...grpc.CallOption) (*GetMpProductCategoryRsp, error) {
+	out := new(GetMpProductCategoryRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpProductCategory", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpProductCategoryList(ctx context.Context, in *GetMpProductCategoryListReq, opts ...grpc.CallOption) (*GetMpProductCategoryListRsp, error) {
+	out := new(GetMpProductCategoryListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpProductCategoryList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) AddMpStoreProduct(ctx context.Context, in *AddMpStoreProductReq, opts ...grpc.CallOption) (*AddMpStoreProductRsp, error) {
+	out := new(AddMpStoreProductRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddMpStoreProduct", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) DelMpStoreProductList(ctx context.Context, in *DelMpStoreProductListReq, opts ...grpc.CallOption) (*DelMpStoreProductListRsp, error) {
+	out := new(DelMpStoreProductListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelMpStoreProductList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) UpdateMpStoreProduct(ctx context.Context, in *UpdateMpStoreProductReq, opts ...grpc.CallOption) (*UpdateMpStoreProductRsp, error) {
+	out := new(UpdateMpStoreProductRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateMpStoreProduct", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpStoreProduct(ctx context.Context, in *GetMpStoreProductReq, opts ...grpc.CallOption) (*GetMpStoreProductRsp, error) {
+	out := new(GetMpStoreProductRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpStoreProduct", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpStoreProductList(ctx context.Context, in *GetMpStoreProductListReq, opts ...grpc.CallOption) (*GetMpStoreProductListRsp, error) {
+	out := new(GetMpStoreProductListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpStoreProductList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) AddMpStoreProductAttr(ctx context.Context, in *AddMpStoreProductAttrReq, opts ...grpc.CallOption) (*AddMpStoreProductAttrRsp, error) {
+	out := new(AddMpStoreProductAttrRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddMpStoreProductAttr", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) DelMpStoreProductAttrList(ctx context.Context, in *DelMpStoreProductAttrListReq, opts ...grpc.CallOption) (*DelMpStoreProductAttrListRsp, error) {
+	out := new(DelMpStoreProductAttrListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelMpStoreProductAttrList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) UpdateMpStoreProductAttr(ctx context.Context, in *UpdateMpStoreProductAttrReq, opts ...grpc.CallOption) (*UpdateMpStoreProductAttrRsp, error) {
+	out := new(UpdateMpStoreProductAttrRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateMpStoreProductAttr", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpStoreProductAttr(ctx context.Context, in *GetMpStoreProductAttrReq, opts ...grpc.CallOption) (*GetMpStoreProductAttrRsp, error) {
+	out := new(GetMpStoreProductAttrRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpStoreProductAttr", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpStoreProductAttrList(ctx context.Context, in *GetMpStoreProductAttrListReq, opts ...grpc.CallOption) (*GetMpStoreProductAttrListRsp, error) {
+	out := new(GetMpStoreProductAttrListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpStoreProductAttrList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) AddMpStoreProductAttrResult(ctx context.Context, in *AddMpStoreProductAttrResultReq, opts ...grpc.CallOption) (*AddMpStoreProductAttrResultRsp, error) {
+	out := new(AddMpStoreProductAttrResultRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddMpStoreProductAttrResult", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) DelMpStoreProductAttrResultList(ctx context.Context, in *DelMpStoreProductAttrResultListReq, opts ...grpc.CallOption) (*DelMpStoreProductAttrResultListRsp, error) {
+	out := new(DelMpStoreProductAttrResultListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelMpStoreProductAttrResultList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) UpdateMpStoreProductAttrResult(ctx context.Context, in *UpdateMpStoreProductAttrResultReq, opts ...grpc.CallOption) (*UpdateMpStoreProductAttrResultRsp, error) {
+	out := new(UpdateMpStoreProductAttrResultRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateMpStoreProductAttrResult", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpStoreProductAttrResult(ctx context.Context, in *GetMpStoreProductAttrResultReq, opts ...grpc.CallOption) (*GetMpStoreProductAttrResultRsp, error) {
+	out := new(GetMpStoreProductAttrResultRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpStoreProductAttrResult", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpStoreProductAttrResultList(ctx context.Context, in *GetMpStoreProductAttrResultListReq, opts ...grpc.CallOption) (*GetMpStoreProductAttrResultListRsp, error) {
+	out := new(GetMpStoreProductAttrResultListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpStoreProductAttrResultList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) AddMpStoreProductAttrValue(ctx context.Context, in *AddMpStoreProductAttrValueReq, opts ...grpc.CallOption) (*AddMpStoreProductAttrValueRsp, error) {
+	out := new(AddMpStoreProductAttrValueRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddMpStoreProductAttrValue", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) DelMpStoreProductAttrValueList(ctx context.Context, in *DelMpStoreProductAttrValueListReq, opts ...grpc.CallOption) (*DelMpStoreProductAttrValueListRsp, error) {
+	out := new(DelMpStoreProductAttrValueListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelMpStoreProductAttrValueList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) UpdateMpStoreProductAttrValue(ctx context.Context, in *UpdateMpStoreProductAttrValueReq, opts ...grpc.CallOption) (*UpdateMpStoreProductAttrValueRsp, error) {
+	out := new(UpdateMpStoreProductAttrValueRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateMpStoreProductAttrValue", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpStoreProductAttrValue(ctx context.Context, in *GetMpStoreProductAttrValueReq, opts ...grpc.CallOption) (*GetMpStoreProductAttrValueRsp, error) {
+	out := new(GetMpStoreProductAttrValueRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpStoreProductAttrValue", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpStoreProductAttrValueList(ctx context.Context, in *GetMpStoreProductAttrValueListReq, opts ...grpc.CallOption) (*GetMpStoreProductAttrValueListRsp, error) {
+	out := new(GetMpStoreProductAttrValueListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpStoreProductAttrValueList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) AddMpStoreProductReply(ctx context.Context, in *AddMpStoreProductReplyReq, opts ...grpc.CallOption) (*AddMpStoreProductReplyRsp, error) {
+	out := new(AddMpStoreProductReplyRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddMpStoreProductReply", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) DelMpStoreProductReplyList(ctx context.Context, in *DelMpStoreProductReplyListReq, opts ...grpc.CallOption) (*DelMpStoreProductReplyListRsp, error) {
+	out := new(DelMpStoreProductReplyListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelMpStoreProductReplyList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) UpdateMpStoreProductReply(ctx context.Context, in *UpdateMpStoreProductReplyReq, opts ...grpc.CallOption) (*UpdateMpStoreProductReplyRsp, error) {
+	out := new(UpdateMpStoreProductReplyRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateMpStoreProductReply", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpStoreProductReply(ctx context.Context, in *GetMpStoreProductReplyReq, opts ...grpc.CallOption) (*GetMpStoreProductReplyRsp, error) {
+	out := new(GetMpStoreProductReplyRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpStoreProductReply", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpStoreProductReplyList(ctx context.Context, in *GetMpStoreProductReplyListReq, opts ...grpc.CallOption) (*GetMpStoreProductReplyListRsp, error) {
+	out := new(GetMpStoreProductReplyListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpStoreProductReplyList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) AddMpStoreProductRule(ctx context.Context, in *AddMpStoreProductRuleReq, opts ...grpc.CallOption) (*AddMpStoreProductRuleRsp, error) {
+	out := new(AddMpStoreProductRuleRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddMpStoreProductRule", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) DelMpStoreProductRuleList(ctx context.Context, in *DelMpStoreProductRuleListReq, opts ...grpc.CallOption) (*DelMpStoreProductRuleListRsp, error) {
+	out := new(DelMpStoreProductRuleListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelMpStoreProductRuleList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) UpdateMpStoreProductRule(ctx context.Context, in *UpdateMpStoreProductRuleReq, opts ...grpc.CallOption) (*UpdateMpStoreProductRuleRsp, error) {
+	out := new(UpdateMpStoreProductRuleRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateMpStoreProductRule", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpStoreProductRule(ctx context.Context, in *GetMpStoreProductRuleReq, opts ...grpc.CallOption) (*GetMpStoreProductRuleRsp, error) {
+	out := new(GetMpStoreProductRuleRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpStoreProductRule", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpStoreProductRuleList(ctx context.Context, in *GetMpStoreProductRuleListReq, opts ...grpc.CallOption) (*GetMpStoreProductRuleListRsp, error) {
+	out := new(GetMpStoreProductRuleListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpStoreProductRuleList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) AddMpStoreShop(ctx context.Context, in *AddMpStoreShopReq, opts ...grpc.CallOption) (*AddMpStoreShopRsp, error) {
+	out := new(AddMpStoreShopRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddMpStoreShop", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) DelMpStoreShopList(ctx context.Context, in *DelMpStoreShopListReq, opts ...grpc.CallOption) (*DelMpStoreShopListRsp, error) {
+	out := new(DelMpStoreShopListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelMpStoreShopList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) UpdateMpStoreShop(ctx context.Context, in *UpdateMpStoreShopReq, opts ...grpc.CallOption) (*UpdateMpStoreShopRsp, error) {
+	out := new(UpdateMpStoreShopRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateMpStoreShop", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpStoreShop(ctx context.Context, in *GetMpStoreShopReq, opts ...grpc.CallOption) (*GetMpStoreShopRsp, error) {
+	out := new(GetMpStoreShopRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpStoreShop", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpStoreShopList(ctx context.Context, in *GetMpStoreShopListReq, opts ...grpc.CallOption) (*GetMpStoreShopListRsp, error) {
+	out := new(GetMpStoreShopListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpStoreShopList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) AddMpCoupon(ctx context.Context, in *AddMpCouponReq, opts ...grpc.CallOption) (*AddMpCouponRsp, error) {
+	out := new(AddMpCouponRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddMpCoupon", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) DelMpCouponList(ctx context.Context, in *DelMpCouponListReq, opts ...grpc.CallOption) (*DelMpCouponListRsp, error) {
+	out := new(DelMpCouponListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelMpCouponList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) UpdateMpCoupon(ctx context.Context, in *UpdateMpCouponReq, opts ...grpc.CallOption) (*UpdateMpCouponRsp, error) {
+	out := new(UpdateMpCouponRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateMpCoupon", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpCoupon(ctx context.Context, in *GetMpCouponReq, opts ...grpc.CallOption) (*GetMpCouponRsp, error) {
+	out := new(GetMpCouponRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpCoupon", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpCouponList(ctx context.Context, in *GetMpCouponListReq, opts ...grpc.CallOption) (*GetMpCouponListRsp, error) {
+	out := new(GetMpCouponListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpCouponList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) AddMpCouponUser(ctx context.Context, in *AddMpCouponUserReq, opts ...grpc.CallOption) (*AddMpCouponUserRsp, error) {
+	out := new(AddMpCouponUserRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddMpCouponUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) DelMpCouponUserList(ctx context.Context, in *DelMpCouponUserListReq, opts ...grpc.CallOption) (*DelMpCouponUserListRsp, error) {
+	out := new(DelMpCouponUserListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelMpCouponUserList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) UpdateMpCouponUser(ctx context.Context, in *UpdateMpCouponUserReq, opts ...grpc.CallOption) (*UpdateMpCouponUserRsp, error) {
+	out := new(UpdateMpCouponUserRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateMpCouponUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpCouponUser(ctx context.Context, in *GetMpCouponUserReq, opts ...grpc.CallOption) (*GetMpCouponUserRsp, error) {
+	out := new(GetMpCouponUserRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpCouponUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpCouponUserList(ctx context.Context, in *GetMpCouponUserListReq, opts ...grpc.CallOption) (*GetMpCouponUserListRsp, error) {
+	out := new(GetMpCouponUserListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpCouponUserList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) AddMpOrderNumber(ctx context.Context, in *AddMpOrderNumberReq, opts ...grpc.CallOption) (*AddMpOrderNumberRsp, error) {
+	out := new(AddMpOrderNumberRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddMpOrderNumber", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) DelMpOrderNumberList(ctx context.Context, in *DelMpOrderNumberListReq, opts ...grpc.CallOption) (*DelMpOrderNumberListRsp, error) {
+	out := new(DelMpOrderNumberListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelMpOrderNumberList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) UpdateMpOrderNumber(ctx context.Context, in *UpdateMpOrderNumberReq, opts ...grpc.CallOption) (*UpdateMpOrderNumberRsp, error) {
+	out := new(UpdateMpOrderNumberRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateMpOrderNumber", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpOrderNumber(ctx context.Context, in *GetMpOrderNumberReq, opts ...grpc.CallOption) (*GetMpOrderNumberRsp, error) {
+	out := new(GetMpOrderNumberRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpOrderNumber", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpOrderNumberList(ctx context.Context, in *GetMpOrderNumberListReq, opts ...grpc.CallOption) (*GetMpOrderNumberListRsp, error) {
+	out := new(GetMpOrderNumberListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpOrderNumberList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) AddMpStoreOrder(ctx context.Context, in *AddMpStoreOrderReq, opts ...grpc.CallOption) (*AddMpStoreOrderRsp, error) {
+	out := new(AddMpStoreOrderRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddMpStoreOrder", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) DelMpStoreOrderList(ctx context.Context, in *DelMpStoreOrderListReq, opts ...grpc.CallOption) (*DelMpStoreOrderListRsp, error) {
+	out := new(DelMpStoreOrderListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelMpStoreOrderList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) UpdateMpStoreOrder(ctx context.Context, in *UpdateMpStoreOrderReq, opts ...grpc.CallOption) (*UpdateMpStoreOrderRsp, error) {
+	out := new(UpdateMpStoreOrderRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateMpStoreOrder", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpStoreOrder(ctx context.Context, in *GetMpStoreOrderReq, opts ...grpc.CallOption) (*GetMpStoreOrderRsp, error) {
+	out := new(GetMpStoreOrderRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpStoreOrder", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpStoreOrderList(ctx context.Context, in *GetMpStoreOrderListReq, opts ...grpc.CallOption) (*GetMpStoreOrderListRsp, error) {
+	out := new(GetMpStoreOrderListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpStoreOrderList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) AddMpStoreOrderCartInfo(ctx context.Context, in *AddMpStoreOrderCartInfoReq, opts ...grpc.CallOption) (*AddMpStoreOrderCartInfoRsp, error) {
+	out := new(AddMpStoreOrderCartInfoRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddMpStoreOrderCartInfo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) DelMpStoreOrderCartInfoList(ctx context.Context, in *DelMpStoreOrderCartInfoListReq, opts ...grpc.CallOption) (*DelMpStoreOrderCartInfoListRsp, error) {
+	out := new(DelMpStoreOrderCartInfoListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelMpStoreOrderCartInfoList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) UpdateMpStoreOrderCartInfo(ctx context.Context, in *UpdateMpStoreOrderCartInfoReq, opts ...grpc.CallOption) (*UpdateMpStoreOrderCartInfoRsp, error) {
+	out := new(UpdateMpStoreOrderCartInfoRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateMpStoreOrderCartInfo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpStoreOrderCartInfo(ctx context.Context, in *GetMpStoreOrderCartInfoReq, opts ...grpc.CallOption) (*GetMpStoreOrderCartInfoRsp, error) {
+	out := new(GetMpStoreOrderCartInfoRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpStoreOrderCartInfo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpStoreOrderCartInfoList(ctx context.Context, in *GetMpStoreOrderCartInfoListReq, opts ...grpc.CallOption) (*GetMpStoreOrderCartInfoListRsp, error) {
+	out := new(GetMpStoreOrderCartInfoListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpStoreOrderCartInfoList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) AddMpStoreOrderStatus(ctx context.Context, in *AddMpStoreOrderStatusReq, opts ...grpc.CallOption) (*AddMpStoreOrderStatusRsp, error) {
+	out := new(AddMpStoreOrderStatusRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddMpStoreOrderStatus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) DelMpStoreOrderStatusList(ctx context.Context, in *DelMpStoreOrderStatusListReq, opts ...grpc.CallOption) (*DelMpStoreOrderStatusListRsp, error) {
+	out := new(DelMpStoreOrderStatusListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelMpStoreOrderStatusList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) UpdateMpStoreOrderStatus(ctx context.Context, in *UpdateMpStoreOrderStatusReq, opts ...grpc.CallOption) (*UpdateMpStoreOrderStatusRsp, error) {
+	out := new(UpdateMpStoreOrderStatusRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateMpStoreOrderStatus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpStoreOrderStatus(ctx context.Context, in *GetMpStoreOrderStatusReq, opts ...grpc.CallOption) (*GetMpStoreOrderStatusRsp, error) {
+	out := new(GetMpStoreOrderStatusRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpStoreOrderStatus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpStoreOrderStatusList(ctx context.Context, in *GetMpStoreOrderStatusListReq, opts ...grpc.CallOption) (*GetMpStoreOrderStatusListRsp, error) {
+	out := new(GetMpStoreOrderStatusListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpStoreOrderStatusList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) AddMpMaterial(ctx context.Context, in *AddMpMaterialReq, opts ...grpc.CallOption) (*AddMpMaterialRsp, error) {
+	out := new(AddMpMaterialRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddMpMaterial", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) DelMpMaterialList(ctx context.Context, in *DelMpMaterialListReq, opts ...grpc.CallOption) (*DelMpMaterialListRsp, error) {
+	out := new(DelMpMaterialListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelMpMaterialList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) UpdateMpMaterial(ctx context.Context, in *UpdateMpMaterialReq, opts ...grpc.CallOption) (*UpdateMpMaterialRsp, error) {
+	out := new(UpdateMpMaterialRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateMpMaterial", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpMaterial(ctx context.Context, in *GetMpMaterialReq, opts ...grpc.CallOption) (*GetMpMaterialRsp, error) {
+	out := new(GetMpMaterialRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpMaterial", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpMaterialList(ctx context.Context, in *GetMpMaterialListReq, opts ...grpc.CallOption) (*GetMpMaterialListRsp, error) {
+	out := new(GetMpMaterialListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpMaterialList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) AddMpMaterialGroup(ctx context.Context, in *AddMpMaterialGroupReq, opts ...grpc.CallOption) (*AddMpMaterialGroupRsp, error) {
+	out := new(AddMpMaterialGroupRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddMpMaterialGroup", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) DelMpMaterialGroupList(ctx context.Context, in *DelMpMaterialGroupListReq, opts ...grpc.CallOption) (*DelMpMaterialGroupListRsp, error) {
+	out := new(DelMpMaterialGroupListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelMpMaterialGroupList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) UpdateMpMaterialGroup(ctx context.Context, in *UpdateMpMaterialGroupReq, opts ...grpc.CallOption) (*UpdateMpMaterialGroupRsp, error) {
+	out := new(UpdateMpMaterialGroupRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateMpMaterialGroup", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpMaterialGroup(ctx context.Context, in *GetMpMaterialGroupReq, opts ...grpc.CallOption) (*GetMpMaterialGroupRsp, error) {
+	out := new(GetMpMaterialGroupRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpMaterialGroup", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpMaterialGroupList(ctx context.Context, in *GetMpMaterialGroupListReq, opts ...grpc.CallOption) (*GetMpMaterialGroupListRsp, error) {
+	out := new(GetMpMaterialGroupListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpMaterialGroupList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) AddMpService(ctx context.Context, in *AddMpServiceReq, opts ...grpc.CallOption) (*AddMpServiceRsp, error) {
+	out := new(AddMpServiceRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddMpService", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) DelMpServiceList(ctx context.Context, in *DelMpServiceListReq, opts ...grpc.CallOption) (*DelMpServiceListRsp, error) {
+	out := new(DelMpServiceListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelMpServiceList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) UpdateMpService(ctx context.Context, in *UpdateMpServiceReq, opts ...grpc.CallOption) (*UpdateMpServiceRsp, error) {
+	out := new(UpdateMpServiceRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateMpService", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpService(ctx context.Context, in *GetMpServiceReq, opts ...grpc.CallOption) (*GetMpServiceRsp, error) {
+	out := new(GetMpServiceRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpService", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpServiceList(ctx context.Context, in *GetMpServiceListReq, opts ...grpc.CallOption) (*GetMpServiceListRsp, error) {
+	out := new(GetMpServiceListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpServiceList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) AddMpShopAds(ctx context.Context, in *AddMpShopAdsReq, opts ...grpc.CallOption) (*AddMpShopAdsRsp, error) {
+	out := new(AddMpShopAdsRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddMpShopAds", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) DelMpShopAdsList(ctx context.Context, in *DelMpShopAdsListReq, opts ...grpc.CallOption) (*DelMpShopAdsListRsp, error) {
+	out := new(DelMpShopAdsListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelMpShopAdsList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) UpdateMpShopAds(ctx context.Context, in *UpdateMpShopAdsReq, opts ...grpc.CallOption) (*UpdateMpShopAdsRsp, error) {
+	out := new(UpdateMpShopAdsRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateMpShopAds", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpShopAds(ctx context.Context, in *GetMpShopAdsReq, opts ...grpc.CallOption) (*GetMpShopAdsRsp, error) {
+	out := new(GetMpShopAdsRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpShopAds", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpShopAdsList(ctx context.Context, in *GetMpShopAdsListReq, opts ...grpc.CallOption) (*GetMpShopAdsListRsp, error) {
+	out := new(GetMpShopAdsListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpShopAdsList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetMpShopAdsListPublic(ctx context.Context, in *GetMpShopAdsListPublicReq, opts ...grpc.CallOption) (*GetMpShopAdsListPublicRsp, error) {
+	out := new(GetMpShopAdsListPublicRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetMpShopAdsListPublic", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) WxMiniProgramAuthSession(ctx context.Context, in *WxMiniProgramAuthSessionReq, opts ...grpc.CallOption) (*WxMiniProgramAuthSessionRsp, error) {
+	out := new(WxMiniProgramAuthSessionRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/WxMiniProgramAuthSession", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -424,56 +1852,566 @@ type LbsingleServer interface {
 	// @desc:
 	// @error:
 	GetUserList(context.Context, *GetUserListReq) (*GetUserListRsp, error)
-	// @cat: FoodMenu
-	// @name: 菜单
+	// @cat: MpMerchantDetails
+	// @name:
 	// @desc:
 	// @error:
-	AddFoodMenu(context.Context, *AddFoodMenuReq) (*AddFoodMenuRsp, error)
-	// @cat: FoodMenu
-	// @name: 菜单
+	AddMpMerchantDetails(context.Context, *AddMpMerchantDetailsReq) (*AddMpMerchantDetailsRsp, error)
+	// @cat: MpMerchantDetails
+	// @name:
 	// @desc:
 	// @error:
-	DelFoodMenuList(context.Context, *DelFoodMenuListReq) (*DelFoodMenuListRsp, error)
-	// @cat: FoodMenu
-	// @name: 菜单
+	DelMpMerchantDetailsList(context.Context, *DelMpMerchantDetailsListReq) (*DelMpMerchantDetailsListRsp, error)
+	// @cat: MpMerchantDetails
+	// @name:
 	// @desc:
 	// @error:
-	UpdateFoodMenu(context.Context, *UpdateFoodMenuReq) (*UpdateFoodMenuRsp, error)
-	// @cat: FoodMenu
-	// @name: 菜单
+	UpdateMpMerchantDetails(context.Context, *UpdateMpMerchantDetailsReq) (*UpdateMpMerchantDetailsRsp, error)
+	// @cat: MpMerchantDetails
+	// @name:
 	// @desc:
 	// @error:
-	GetFoodMenu(context.Context, *GetFoodMenuReq) (*GetFoodMenuRsp, error)
-	// @cat: FoodMenu
-	// @name: 菜单
+	GetMpMerchantDetails(context.Context, *GetMpMerchantDetailsReq) (*GetMpMerchantDetailsRsp, error)
+	// @cat: MpMerchantDetails
+	// @name:
 	// @desc:
 	// @error:
-	GetFoodMenuList(context.Context, *GetFoodMenuListReq) (*GetFoodMenuListRsp, error)
-	// @cat: FoodMenuElem
-	// @name: 菜单选项
+	GetMpMerchantDetailsList(context.Context, *GetMpMerchantDetailsListReq) (*GetMpMerchantDetailsListRsp, error)
+	// @cat: MpMemberUser
+	// @name:
 	// @desc:
 	// @error:
-	AddFoodMenuElem(context.Context, *AddFoodMenuElemReq) (*AddFoodMenuElemRsp, error)
-	// @cat: FoodMenuElem
-	// @name: 菜单选项
+	AddMpMemberUser(context.Context, *AddMpMemberUserReq) (*AddMpMemberUserRsp, error)
+	// @cat: MpMemberUser
+	// @name:
 	// @desc:
 	// @error:
-	DelFoodMenuElemList(context.Context, *DelFoodMenuElemListReq) (*DelFoodMenuElemListRsp, error)
-	// @cat: FoodMenuElem
-	// @name: 菜单选项
+	DelMpMemberUserList(context.Context, *DelMpMemberUserListReq) (*DelMpMemberUserListRsp, error)
+	// @cat: MpMemberUser
+	// @name:
 	// @desc:
 	// @error:
-	UpdateFoodMenuElem(context.Context, *UpdateFoodMenuElemReq) (*UpdateFoodMenuElemRsp, error)
-	// @cat: FoodMenuElem
-	// @name: 菜单选项
+	UpdateMpMemberUser(context.Context, *UpdateMpMemberUserReq) (*UpdateMpMemberUserRsp, error)
+	// @cat: MpMemberUser
+	// @name:
 	// @desc:
 	// @error:
-	GetFoodMenuElem(context.Context, *GetFoodMenuElemReq) (*GetFoodMenuElemRsp, error)
-	// @cat: FoodMenuElem
-	// @name: 菜单选项
+	GetMpMemberUser(context.Context, *GetMpMemberUserReq) (*GetMpMemberUserRsp, error)
+	// @cat: MpMemberUser
+	// @name:
 	// @desc:
 	// @error:
-	GetFoodMenuElemList(context.Context, *GetFoodMenuElemListReq) (*GetFoodMenuElemListRsp, error)
+	GetMpMemberUserList(context.Context, *GetMpMemberUserListReq) (*GetMpMemberUserListRsp, error)
+	// @cat: MpUserAddress
+	// @name:
+	// @desc:
+	// @error:
+	AddMpUserAddress(context.Context, *AddMpUserAddressReq) (*AddMpUserAddressRsp, error)
+	// @cat: MpUserAddress
+	// @name:
+	// @desc:
+	// @error:
+	DelMpUserAddressList(context.Context, *DelMpUserAddressListReq) (*DelMpUserAddressListRsp, error)
+	// @cat: MpUserAddress
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpUserAddress(context.Context, *UpdateMpUserAddressReq) (*UpdateMpUserAddressRsp, error)
+	// @cat: MpUserAddress
+	// @name:
+	// @desc:
+	// @error:
+	GetMpUserAddress(context.Context, *GetMpUserAddressReq) (*GetMpUserAddressRsp, error)
+	// @cat: MpUserAddress
+	// @name:
+	// @desc:
+	// @error:
+	GetMpUserAddressList(context.Context, *GetMpUserAddressListReq) (*GetMpUserAddressListRsp, error)
+	// @cat: MpUserBill
+	// @name:
+	// @desc:
+	// @error:
+	AddMpUserBill(context.Context, *AddMpUserBillReq) (*AddMpUserBillRsp, error)
+	// @cat: MpUserBill
+	// @name:
+	// @desc:
+	// @error:
+	DelMpUserBillList(context.Context, *DelMpUserBillListReq) (*DelMpUserBillListRsp, error)
+	// @cat: MpUserBill
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpUserBill(context.Context, *UpdateMpUserBillReq) (*UpdateMpUserBillRsp, error)
+	// @cat: MpUserBill
+	// @name:
+	// @desc:
+	// @error:
+	GetMpUserBill(context.Context, *GetMpUserBillReq) (*GetMpUserBillRsp, error)
+	// @cat: MpUserBill
+	// @name:
+	// @desc:
+	// @error:
+	GetMpUserBillList(context.Context, *GetMpUserBillListReq) (*GetMpUserBillListRsp, error)
+	// @cat: MpProductCategory
+	// @name:
+	// @desc:
+	// @error:
+	AddMpProductCategory(context.Context, *AddMpProductCategoryReq) (*AddMpProductCategoryRsp, error)
+	// @cat: MpProductCategory
+	// @name:
+	// @desc:
+	// @error:
+	DelMpProductCategoryList(context.Context, *DelMpProductCategoryListReq) (*DelMpProductCategoryListRsp, error)
+	// @cat: MpProductCategory
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpProductCategory(context.Context, *UpdateMpProductCategoryReq) (*UpdateMpProductCategoryRsp, error)
+	// @cat: MpProductCategory
+	// @name:
+	// @desc:
+	// @error:
+	GetMpProductCategory(context.Context, *GetMpProductCategoryReq) (*GetMpProductCategoryRsp, error)
+	// @cat: MpProductCategory
+	// @name:
+	// @desc:
+	// @error:
+	GetMpProductCategoryList(context.Context, *GetMpProductCategoryListReq) (*GetMpProductCategoryListRsp, error)
+	// @cat: MpStoreProduct
+	// @name:
+	// @desc:
+	// @error:
+	AddMpStoreProduct(context.Context, *AddMpStoreProductReq) (*AddMpStoreProductRsp, error)
+	// @cat: MpStoreProduct
+	// @name:
+	// @desc:
+	// @error:
+	DelMpStoreProductList(context.Context, *DelMpStoreProductListReq) (*DelMpStoreProductListRsp, error)
+	// @cat: MpStoreProduct
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpStoreProduct(context.Context, *UpdateMpStoreProductReq) (*UpdateMpStoreProductRsp, error)
+	// @cat: MpStoreProduct
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreProduct(context.Context, *GetMpStoreProductReq) (*GetMpStoreProductRsp, error)
+	// @cat: MpStoreProduct
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreProductList(context.Context, *GetMpStoreProductListReq) (*GetMpStoreProductListRsp, error)
+	// @cat: MpStoreProductAttr
+	// @name:
+	// @desc:
+	// @error:
+	AddMpStoreProductAttr(context.Context, *AddMpStoreProductAttrReq) (*AddMpStoreProductAttrRsp, error)
+	// @cat: MpStoreProductAttr
+	// @name:
+	// @desc:
+	// @error:
+	DelMpStoreProductAttrList(context.Context, *DelMpStoreProductAttrListReq) (*DelMpStoreProductAttrListRsp, error)
+	// @cat: MpStoreProductAttr
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpStoreProductAttr(context.Context, *UpdateMpStoreProductAttrReq) (*UpdateMpStoreProductAttrRsp, error)
+	// @cat: MpStoreProductAttr
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreProductAttr(context.Context, *GetMpStoreProductAttrReq) (*GetMpStoreProductAttrRsp, error)
+	// @cat: MpStoreProductAttr
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreProductAttrList(context.Context, *GetMpStoreProductAttrListReq) (*GetMpStoreProductAttrListRsp, error)
+	// @cat: MpStoreProductAttrResult
+	// @name:
+	// @desc:
+	// @error:
+	AddMpStoreProductAttrResult(context.Context, *AddMpStoreProductAttrResultReq) (*AddMpStoreProductAttrResultRsp, error)
+	// @cat: MpStoreProductAttrResult
+	// @name:
+	// @desc:
+	// @error:
+	DelMpStoreProductAttrResultList(context.Context, *DelMpStoreProductAttrResultListReq) (*DelMpStoreProductAttrResultListRsp, error)
+	// @cat: MpStoreProductAttrResult
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpStoreProductAttrResult(context.Context, *UpdateMpStoreProductAttrResultReq) (*UpdateMpStoreProductAttrResultRsp, error)
+	// @cat: MpStoreProductAttrResult
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreProductAttrResult(context.Context, *GetMpStoreProductAttrResultReq) (*GetMpStoreProductAttrResultRsp, error)
+	// @cat: MpStoreProductAttrResult
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreProductAttrResultList(context.Context, *GetMpStoreProductAttrResultListReq) (*GetMpStoreProductAttrResultListRsp, error)
+	// @cat: MpStoreProductAttrValue
+	// @name:
+	// @desc:
+	// @error:
+	AddMpStoreProductAttrValue(context.Context, *AddMpStoreProductAttrValueReq) (*AddMpStoreProductAttrValueRsp, error)
+	// @cat: MpStoreProductAttrValue
+	// @name:
+	// @desc:
+	// @error:
+	DelMpStoreProductAttrValueList(context.Context, *DelMpStoreProductAttrValueListReq) (*DelMpStoreProductAttrValueListRsp, error)
+	// @cat: MpStoreProductAttrValue
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpStoreProductAttrValue(context.Context, *UpdateMpStoreProductAttrValueReq) (*UpdateMpStoreProductAttrValueRsp, error)
+	// @cat: MpStoreProductAttrValue
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreProductAttrValue(context.Context, *GetMpStoreProductAttrValueReq) (*GetMpStoreProductAttrValueRsp, error)
+	// @cat: MpStoreProductAttrValue
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreProductAttrValueList(context.Context, *GetMpStoreProductAttrValueListReq) (*GetMpStoreProductAttrValueListRsp, error)
+	// @cat: MpStoreProductReply
+	// @name:
+	// @desc:
+	// @error:
+	AddMpStoreProductReply(context.Context, *AddMpStoreProductReplyReq) (*AddMpStoreProductReplyRsp, error)
+	// @cat: MpStoreProductReply
+	// @name:
+	// @desc:
+	// @error:
+	DelMpStoreProductReplyList(context.Context, *DelMpStoreProductReplyListReq) (*DelMpStoreProductReplyListRsp, error)
+	// @cat: MpStoreProductReply
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpStoreProductReply(context.Context, *UpdateMpStoreProductReplyReq) (*UpdateMpStoreProductReplyRsp, error)
+	// @cat: MpStoreProductReply
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreProductReply(context.Context, *GetMpStoreProductReplyReq) (*GetMpStoreProductReplyRsp, error)
+	// @cat: MpStoreProductReply
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreProductReplyList(context.Context, *GetMpStoreProductReplyListReq) (*GetMpStoreProductReplyListRsp, error)
+	// @cat: MpStoreProductRule
+	// @name:
+	// @desc:
+	// @error:
+	AddMpStoreProductRule(context.Context, *AddMpStoreProductRuleReq) (*AddMpStoreProductRuleRsp, error)
+	// @cat: MpStoreProductRule
+	// @name:
+	// @desc:
+	// @error:
+	DelMpStoreProductRuleList(context.Context, *DelMpStoreProductRuleListReq) (*DelMpStoreProductRuleListRsp, error)
+	// @cat: MpStoreProductRule
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpStoreProductRule(context.Context, *UpdateMpStoreProductRuleReq) (*UpdateMpStoreProductRuleRsp, error)
+	// @cat: MpStoreProductRule
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreProductRule(context.Context, *GetMpStoreProductRuleReq) (*GetMpStoreProductRuleRsp, error)
+	// @cat: MpStoreProductRule
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreProductRuleList(context.Context, *GetMpStoreProductRuleListReq) (*GetMpStoreProductRuleListRsp, error)
+	// @cat: MpStoreShop
+	// @name:
+	// @desc:
+	// @error:
+	AddMpStoreShop(context.Context, *AddMpStoreShopReq) (*AddMpStoreShopRsp, error)
+	// @cat: MpStoreShop
+	// @name:
+	// @desc:
+	// @error:
+	DelMpStoreShopList(context.Context, *DelMpStoreShopListReq) (*DelMpStoreShopListRsp, error)
+	// @cat: MpStoreShop
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpStoreShop(context.Context, *UpdateMpStoreShopReq) (*UpdateMpStoreShopRsp, error)
+	// @cat: MpStoreShop
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreShop(context.Context, *GetMpStoreShopReq) (*GetMpStoreShopRsp, error)
+	// @cat: MpStoreShop
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreShopList(context.Context, *GetMpStoreShopListReq) (*GetMpStoreShopListRsp, error)
+	// @cat: MpCoupon
+	// @name:
+	// @desc:
+	// @error:
+	AddMpCoupon(context.Context, *AddMpCouponReq) (*AddMpCouponRsp, error)
+	// @cat: MpCoupon
+	// @name:
+	// @desc:
+	// @error:
+	DelMpCouponList(context.Context, *DelMpCouponListReq) (*DelMpCouponListRsp, error)
+	// @cat: MpCoupon
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpCoupon(context.Context, *UpdateMpCouponReq) (*UpdateMpCouponRsp, error)
+	// @cat: MpCoupon
+	// @name:
+	// @desc:
+	// @error:
+	GetMpCoupon(context.Context, *GetMpCouponReq) (*GetMpCouponRsp, error)
+	// @cat: MpCoupon
+	// @name:
+	// @desc:
+	// @error:
+	GetMpCouponList(context.Context, *GetMpCouponListReq) (*GetMpCouponListRsp, error)
+	// @cat: MpCouponUser
+	// @name:
+	// @desc:
+	// @error:
+	AddMpCouponUser(context.Context, *AddMpCouponUserReq) (*AddMpCouponUserRsp, error)
+	// @cat: MpCouponUser
+	// @name:
+	// @desc:
+	// @error:
+	DelMpCouponUserList(context.Context, *DelMpCouponUserListReq) (*DelMpCouponUserListRsp, error)
+	// @cat: MpCouponUser
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpCouponUser(context.Context, *UpdateMpCouponUserReq) (*UpdateMpCouponUserRsp, error)
+	// @cat: MpCouponUser
+	// @name:
+	// @desc:
+	// @error:
+	GetMpCouponUser(context.Context, *GetMpCouponUserReq) (*GetMpCouponUserRsp, error)
+	// @cat: MpCouponUser
+	// @name:
+	// @desc:
+	// @error:
+	GetMpCouponUserList(context.Context, *GetMpCouponUserListReq) (*GetMpCouponUserListRsp, error)
+	// @cat: MpOrderNumber
+	// @name:
+	// @desc:
+	// @error:
+	AddMpOrderNumber(context.Context, *AddMpOrderNumberReq) (*AddMpOrderNumberRsp, error)
+	// @cat: MpOrderNumber
+	// @name:
+	// @desc:
+	// @error:
+	DelMpOrderNumberList(context.Context, *DelMpOrderNumberListReq) (*DelMpOrderNumberListRsp, error)
+	// @cat: MpOrderNumber
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpOrderNumber(context.Context, *UpdateMpOrderNumberReq) (*UpdateMpOrderNumberRsp, error)
+	// @cat: MpOrderNumber
+	// @name:
+	// @desc:
+	// @error:
+	GetMpOrderNumber(context.Context, *GetMpOrderNumberReq) (*GetMpOrderNumberRsp, error)
+	// @cat: MpOrderNumber
+	// @name:
+	// @desc:
+	// @error:
+	GetMpOrderNumberList(context.Context, *GetMpOrderNumberListReq) (*GetMpOrderNumberListRsp, error)
+	// @cat: MpStoreOrder
+	// @name:
+	// @desc:
+	// @error:
+	AddMpStoreOrder(context.Context, *AddMpStoreOrderReq) (*AddMpStoreOrderRsp, error)
+	// @cat: MpStoreOrder
+	// @name:
+	// @desc:
+	// @error:
+	DelMpStoreOrderList(context.Context, *DelMpStoreOrderListReq) (*DelMpStoreOrderListRsp, error)
+	// @cat: MpStoreOrder
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpStoreOrder(context.Context, *UpdateMpStoreOrderReq) (*UpdateMpStoreOrderRsp, error)
+	// @cat: MpStoreOrder
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreOrder(context.Context, *GetMpStoreOrderReq) (*GetMpStoreOrderRsp, error)
+	// @cat: MpStoreOrder
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreOrderList(context.Context, *GetMpStoreOrderListReq) (*GetMpStoreOrderListRsp, error)
+	// @cat: MpStoreOrderCartInfo
+	// @name:
+	// @desc:
+	// @error:
+	AddMpStoreOrderCartInfo(context.Context, *AddMpStoreOrderCartInfoReq) (*AddMpStoreOrderCartInfoRsp, error)
+	// @cat: MpStoreOrderCartInfo
+	// @name:
+	// @desc:
+	// @error:
+	DelMpStoreOrderCartInfoList(context.Context, *DelMpStoreOrderCartInfoListReq) (*DelMpStoreOrderCartInfoListRsp, error)
+	// @cat: MpStoreOrderCartInfo
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpStoreOrderCartInfo(context.Context, *UpdateMpStoreOrderCartInfoReq) (*UpdateMpStoreOrderCartInfoRsp, error)
+	// @cat: MpStoreOrderCartInfo
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreOrderCartInfo(context.Context, *GetMpStoreOrderCartInfoReq) (*GetMpStoreOrderCartInfoRsp, error)
+	// @cat: MpStoreOrderCartInfo
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreOrderCartInfoList(context.Context, *GetMpStoreOrderCartInfoListReq) (*GetMpStoreOrderCartInfoListRsp, error)
+	// @cat: MpStoreOrderStatus
+	// @name:
+	// @desc:
+	// @error:
+	AddMpStoreOrderStatus(context.Context, *AddMpStoreOrderStatusReq) (*AddMpStoreOrderStatusRsp, error)
+	// @cat: MpStoreOrderStatus
+	// @name:
+	// @desc:
+	// @error:
+	DelMpStoreOrderStatusList(context.Context, *DelMpStoreOrderStatusListReq) (*DelMpStoreOrderStatusListRsp, error)
+	// @cat: MpStoreOrderStatus
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpStoreOrderStatus(context.Context, *UpdateMpStoreOrderStatusReq) (*UpdateMpStoreOrderStatusRsp, error)
+	// @cat: MpStoreOrderStatus
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreOrderStatus(context.Context, *GetMpStoreOrderStatusReq) (*GetMpStoreOrderStatusRsp, error)
+	// @cat: MpStoreOrderStatus
+	// @name:
+	// @desc:
+	// @error:
+	GetMpStoreOrderStatusList(context.Context, *GetMpStoreOrderStatusListReq) (*GetMpStoreOrderStatusListRsp, error)
+	// @cat: MpMaterial
+	// @name:
+	// @desc:
+	// @error:
+	AddMpMaterial(context.Context, *AddMpMaterialReq) (*AddMpMaterialRsp, error)
+	// @cat: MpMaterial
+	// @name:
+	// @desc:
+	// @error:
+	DelMpMaterialList(context.Context, *DelMpMaterialListReq) (*DelMpMaterialListRsp, error)
+	// @cat: MpMaterial
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpMaterial(context.Context, *UpdateMpMaterialReq) (*UpdateMpMaterialRsp, error)
+	// @cat: MpMaterial
+	// @name:
+	// @desc:
+	// @error:
+	GetMpMaterial(context.Context, *GetMpMaterialReq) (*GetMpMaterialRsp, error)
+	// @cat: MpMaterial
+	// @name:
+	// @desc:
+	// @error:
+	GetMpMaterialList(context.Context, *GetMpMaterialListReq) (*GetMpMaterialListRsp, error)
+	// @cat: MpMaterialGroup
+	// @name:
+	// @desc:
+	// @error:
+	AddMpMaterialGroup(context.Context, *AddMpMaterialGroupReq) (*AddMpMaterialGroupRsp, error)
+	// @cat: MpMaterialGroup
+	// @name:
+	// @desc:
+	// @error:
+	DelMpMaterialGroupList(context.Context, *DelMpMaterialGroupListReq) (*DelMpMaterialGroupListRsp, error)
+	// @cat: MpMaterialGroup
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpMaterialGroup(context.Context, *UpdateMpMaterialGroupReq) (*UpdateMpMaterialGroupRsp, error)
+	// @cat: MpMaterialGroup
+	// @name:
+	// @desc:
+	// @error:
+	GetMpMaterialGroup(context.Context, *GetMpMaterialGroupReq) (*GetMpMaterialGroupRsp, error)
+	// @cat: MpMaterialGroup
+	// @name:
+	// @desc:
+	// @error:
+	GetMpMaterialGroupList(context.Context, *GetMpMaterialGroupListReq) (*GetMpMaterialGroupListRsp, error)
+	// @cat: MpService
+	// @name:
+	// @desc:
+	// @error:
+	AddMpService(context.Context, *AddMpServiceReq) (*AddMpServiceRsp, error)
+	// @cat: MpService
+	// @name:
+	// @desc:
+	// @error:
+	DelMpServiceList(context.Context, *DelMpServiceListReq) (*DelMpServiceListRsp, error)
+	// @cat: MpService
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpService(context.Context, *UpdateMpServiceReq) (*UpdateMpServiceRsp, error)
+	// @cat: MpService
+	// @name:
+	// @desc:
+	// @error:
+	GetMpService(context.Context, *GetMpServiceReq) (*GetMpServiceRsp, error)
+	// @cat: MpService
+	// @name:
+	// @desc:
+	// @error:
+	GetMpServiceList(context.Context, *GetMpServiceListReq) (*GetMpServiceListRsp, error)
+	// @cat: MpShopAds
+	// @name:
+	// @desc:
+	// @error:
+	AddMpShopAds(context.Context, *AddMpShopAdsReq) (*AddMpShopAdsRsp, error)
+	// @cat: MpShopAds
+	// @name:
+	// @desc:
+	// @error:
+	DelMpShopAdsList(context.Context, *DelMpShopAdsListReq) (*DelMpShopAdsListRsp, error)
+	// @cat: MpShopAds
+	// @name:
+	// @desc:
+	// @error:
+	UpdateMpShopAds(context.Context, *UpdateMpShopAdsReq) (*UpdateMpShopAdsRsp, error)
+	// @cat: MpShopAds
+	// @name:
+	// @desc:
+	// @error:
+	GetMpShopAds(context.Context, *GetMpShopAdsReq) (*GetMpShopAdsRsp, error)
+	// @cat: MpShopAds
+	// @name:
+	// @desc:
+	// @error:
+	GetMpShopAdsList(context.Context, *GetMpShopAdsListReq) (*GetMpShopAdsListRsp, error)
+	// @cat: MpShopAds
+	// @name:
+	// @desc:
+	// @error:
+	GetMpShopAdsListPublic(context.Context, *GetMpShopAdsListPublicReq) (*GetMpShopAdsListPublicRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	WxMiniProgramAuthSession(context.Context, *WxMiniProgramAuthSessionReq) (*WxMiniProgramAuthSessionRsp, error)
 	mustEmbedUnimplementedLbsingleServer()
 }
 
@@ -523,35 +2461,341 @@ func (UnimplementedLbsingleServer) GetUser(context.Context, *GetUserReq) (*GetUs
 func (UnimplementedLbsingleServer) GetUserList(context.Context, *GetUserListReq) (*GetUserListRsp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserList not implemented")
 }
-func (UnimplementedLbsingleServer) AddFoodMenu(context.Context, *AddFoodMenuReq) (*AddFoodMenuRsp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddFoodMenu not implemented")
+func (UnimplementedLbsingleServer) AddMpMerchantDetails(context.Context, *AddMpMerchantDetailsReq) (*AddMpMerchantDetailsRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddMpMerchantDetails not implemented")
 }
-func (UnimplementedLbsingleServer) DelFoodMenuList(context.Context, *DelFoodMenuListReq) (*DelFoodMenuListRsp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DelFoodMenuList not implemented")
+func (UnimplementedLbsingleServer) DelMpMerchantDetailsList(context.Context, *DelMpMerchantDetailsListReq) (*DelMpMerchantDetailsListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelMpMerchantDetailsList not implemented")
 }
-func (UnimplementedLbsingleServer) UpdateFoodMenu(context.Context, *UpdateFoodMenuReq) (*UpdateFoodMenuRsp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateFoodMenu not implemented")
+func (UnimplementedLbsingleServer) UpdateMpMerchantDetails(context.Context, *UpdateMpMerchantDetailsReq) (*UpdateMpMerchantDetailsRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateMpMerchantDetails not implemented")
 }
-func (UnimplementedLbsingleServer) GetFoodMenu(context.Context, *GetFoodMenuReq) (*GetFoodMenuRsp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetFoodMenu not implemented")
+func (UnimplementedLbsingleServer) GetMpMerchantDetails(context.Context, *GetMpMerchantDetailsReq) (*GetMpMerchantDetailsRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpMerchantDetails not implemented")
 }
-func (UnimplementedLbsingleServer) GetFoodMenuList(context.Context, *GetFoodMenuListReq) (*GetFoodMenuListRsp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetFoodMenuList not implemented")
+func (UnimplementedLbsingleServer) GetMpMerchantDetailsList(context.Context, *GetMpMerchantDetailsListReq) (*GetMpMerchantDetailsListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpMerchantDetailsList not implemented")
 }
-func (UnimplementedLbsingleServer) AddFoodMenuElem(context.Context, *AddFoodMenuElemReq) (*AddFoodMenuElemRsp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddFoodMenuElem not implemented")
+func (UnimplementedLbsingleServer) AddMpMemberUser(context.Context, *AddMpMemberUserReq) (*AddMpMemberUserRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddMpMemberUser not implemented")
 }
-func (UnimplementedLbsingleServer) DelFoodMenuElemList(context.Context, *DelFoodMenuElemListReq) (*DelFoodMenuElemListRsp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DelFoodMenuElemList not implemented")
+func (UnimplementedLbsingleServer) DelMpMemberUserList(context.Context, *DelMpMemberUserListReq) (*DelMpMemberUserListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelMpMemberUserList not implemented")
 }
-func (UnimplementedLbsingleServer) UpdateFoodMenuElem(context.Context, *UpdateFoodMenuElemReq) (*UpdateFoodMenuElemRsp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateFoodMenuElem not implemented")
+func (UnimplementedLbsingleServer) UpdateMpMemberUser(context.Context, *UpdateMpMemberUserReq) (*UpdateMpMemberUserRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateMpMemberUser not implemented")
 }
-func (UnimplementedLbsingleServer) GetFoodMenuElem(context.Context, *GetFoodMenuElemReq) (*GetFoodMenuElemRsp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetFoodMenuElem not implemented")
+func (UnimplementedLbsingleServer) GetMpMemberUser(context.Context, *GetMpMemberUserReq) (*GetMpMemberUserRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpMemberUser not implemented")
 }
-func (UnimplementedLbsingleServer) GetFoodMenuElemList(context.Context, *GetFoodMenuElemListReq) (*GetFoodMenuElemListRsp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetFoodMenuElemList not implemented")
+func (UnimplementedLbsingleServer) GetMpMemberUserList(context.Context, *GetMpMemberUserListReq) (*GetMpMemberUserListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpMemberUserList not implemented")
+}
+func (UnimplementedLbsingleServer) AddMpUserAddress(context.Context, *AddMpUserAddressReq) (*AddMpUserAddressRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddMpUserAddress not implemented")
+}
+func (UnimplementedLbsingleServer) DelMpUserAddressList(context.Context, *DelMpUserAddressListReq) (*DelMpUserAddressListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelMpUserAddressList not implemented")
+}
+func (UnimplementedLbsingleServer) UpdateMpUserAddress(context.Context, *UpdateMpUserAddressReq) (*UpdateMpUserAddressRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateMpUserAddress not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpUserAddress(context.Context, *GetMpUserAddressReq) (*GetMpUserAddressRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpUserAddress not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpUserAddressList(context.Context, *GetMpUserAddressListReq) (*GetMpUserAddressListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpUserAddressList not implemented")
+}
+func (UnimplementedLbsingleServer) AddMpUserBill(context.Context, *AddMpUserBillReq) (*AddMpUserBillRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddMpUserBill not implemented")
+}
+func (UnimplementedLbsingleServer) DelMpUserBillList(context.Context, *DelMpUserBillListReq) (*DelMpUserBillListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelMpUserBillList not implemented")
+}
+func (UnimplementedLbsingleServer) UpdateMpUserBill(context.Context, *UpdateMpUserBillReq) (*UpdateMpUserBillRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateMpUserBill not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpUserBill(context.Context, *GetMpUserBillReq) (*GetMpUserBillRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpUserBill not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpUserBillList(context.Context, *GetMpUserBillListReq) (*GetMpUserBillListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpUserBillList not implemented")
+}
+func (UnimplementedLbsingleServer) AddMpProductCategory(context.Context, *AddMpProductCategoryReq) (*AddMpProductCategoryRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddMpProductCategory not implemented")
+}
+func (UnimplementedLbsingleServer) DelMpProductCategoryList(context.Context, *DelMpProductCategoryListReq) (*DelMpProductCategoryListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelMpProductCategoryList not implemented")
+}
+func (UnimplementedLbsingleServer) UpdateMpProductCategory(context.Context, *UpdateMpProductCategoryReq) (*UpdateMpProductCategoryRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateMpProductCategory not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpProductCategory(context.Context, *GetMpProductCategoryReq) (*GetMpProductCategoryRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpProductCategory not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpProductCategoryList(context.Context, *GetMpProductCategoryListReq) (*GetMpProductCategoryListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpProductCategoryList not implemented")
+}
+func (UnimplementedLbsingleServer) AddMpStoreProduct(context.Context, *AddMpStoreProductReq) (*AddMpStoreProductRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddMpStoreProduct not implemented")
+}
+func (UnimplementedLbsingleServer) DelMpStoreProductList(context.Context, *DelMpStoreProductListReq) (*DelMpStoreProductListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelMpStoreProductList not implemented")
+}
+func (UnimplementedLbsingleServer) UpdateMpStoreProduct(context.Context, *UpdateMpStoreProductReq) (*UpdateMpStoreProductRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateMpStoreProduct not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpStoreProduct(context.Context, *GetMpStoreProductReq) (*GetMpStoreProductRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpStoreProduct not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpStoreProductList(context.Context, *GetMpStoreProductListReq) (*GetMpStoreProductListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpStoreProductList not implemented")
+}
+func (UnimplementedLbsingleServer) AddMpStoreProductAttr(context.Context, *AddMpStoreProductAttrReq) (*AddMpStoreProductAttrRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddMpStoreProductAttr not implemented")
+}
+func (UnimplementedLbsingleServer) DelMpStoreProductAttrList(context.Context, *DelMpStoreProductAttrListReq) (*DelMpStoreProductAttrListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelMpStoreProductAttrList not implemented")
+}
+func (UnimplementedLbsingleServer) UpdateMpStoreProductAttr(context.Context, *UpdateMpStoreProductAttrReq) (*UpdateMpStoreProductAttrRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateMpStoreProductAttr not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpStoreProductAttr(context.Context, *GetMpStoreProductAttrReq) (*GetMpStoreProductAttrRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpStoreProductAttr not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpStoreProductAttrList(context.Context, *GetMpStoreProductAttrListReq) (*GetMpStoreProductAttrListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpStoreProductAttrList not implemented")
+}
+func (UnimplementedLbsingleServer) AddMpStoreProductAttrResult(context.Context, *AddMpStoreProductAttrResultReq) (*AddMpStoreProductAttrResultRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddMpStoreProductAttrResult not implemented")
+}
+func (UnimplementedLbsingleServer) DelMpStoreProductAttrResultList(context.Context, *DelMpStoreProductAttrResultListReq) (*DelMpStoreProductAttrResultListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelMpStoreProductAttrResultList not implemented")
+}
+func (UnimplementedLbsingleServer) UpdateMpStoreProductAttrResult(context.Context, *UpdateMpStoreProductAttrResultReq) (*UpdateMpStoreProductAttrResultRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateMpStoreProductAttrResult not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpStoreProductAttrResult(context.Context, *GetMpStoreProductAttrResultReq) (*GetMpStoreProductAttrResultRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpStoreProductAttrResult not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpStoreProductAttrResultList(context.Context, *GetMpStoreProductAttrResultListReq) (*GetMpStoreProductAttrResultListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpStoreProductAttrResultList not implemented")
+}
+func (UnimplementedLbsingleServer) AddMpStoreProductAttrValue(context.Context, *AddMpStoreProductAttrValueReq) (*AddMpStoreProductAttrValueRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddMpStoreProductAttrValue not implemented")
+}
+func (UnimplementedLbsingleServer) DelMpStoreProductAttrValueList(context.Context, *DelMpStoreProductAttrValueListReq) (*DelMpStoreProductAttrValueListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelMpStoreProductAttrValueList not implemented")
+}
+func (UnimplementedLbsingleServer) UpdateMpStoreProductAttrValue(context.Context, *UpdateMpStoreProductAttrValueReq) (*UpdateMpStoreProductAttrValueRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateMpStoreProductAttrValue not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpStoreProductAttrValue(context.Context, *GetMpStoreProductAttrValueReq) (*GetMpStoreProductAttrValueRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpStoreProductAttrValue not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpStoreProductAttrValueList(context.Context, *GetMpStoreProductAttrValueListReq) (*GetMpStoreProductAttrValueListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpStoreProductAttrValueList not implemented")
+}
+func (UnimplementedLbsingleServer) AddMpStoreProductReply(context.Context, *AddMpStoreProductReplyReq) (*AddMpStoreProductReplyRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddMpStoreProductReply not implemented")
+}
+func (UnimplementedLbsingleServer) DelMpStoreProductReplyList(context.Context, *DelMpStoreProductReplyListReq) (*DelMpStoreProductReplyListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelMpStoreProductReplyList not implemented")
+}
+func (UnimplementedLbsingleServer) UpdateMpStoreProductReply(context.Context, *UpdateMpStoreProductReplyReq) (*UpdateMpStoreProductReplyRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateMpStoreProductReply not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpStoreProductReply(context.Context, *GetMpStoreProductReplyReq) (*GetMpStoreProductReplyRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpStoreProductReply not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpStoreProductReplyList(context.Context, *GetMpStoreProductReplyListReq) (*GetMpStoreProductReplyListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpStoreProductReplyList not implemented")
+}
+func (UnimplementedLbsingleServer) AddMpStoreProductRule(context.Context, *AddMpStoreProductRuleReq) (*AddMpStoreProductRuleRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddMpStoreProductRule not implemented")
+}
+func (UnimplementedLbsingleServer) DelMpStoreProductRuleList(context.Context, *DelMpStoreProductRuleListReq) (*DelMpStoreProductRuleListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelMpStoreProductRuleList not implemented")
+}
+func (UnimplementedLbsingleServer) UpdateMpStoreProductRule(context.Context, *UpdateMpStoreProductRuleReq) (*UpdateMpStoreProductRuleRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateMpStoreProductRule not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpStoreProductRule(context.Context, *GetMpStoreProductRuleReq) (*GetMpStoreProductRuleRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpStoreProductRule not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpStoreProductRuleList(context.Context, *GetMpStoreProductRuleListReq) (*GetMpStoreProductRuleListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpStoreProductRuleList not implemented")
+}
+func (UnimplementedLbsingleServer) AddMpStoreShop(context.Context, *AddMpStoreShopReq) (*AddMpStoreShopRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddMpStoreShop not implemented")
+}
+func (UnimplementedLbsingleServer) DelMpStoreShopList(context.Context, *DelMpStoreShopListReq) (*DelMpStoreShopListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelMpStoreShopList not implemented")
+}
+func (UnimplementedLbsingleServer) UpdateMpStoreShop(context.Context, *UpdateMpStoreShopReq) (*UpdateMpStoreShopRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateMpStoreShop not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpStoreShop(context.Context, *GetMpStoreShopReq) (*GetMpStoreShopRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpStoreShop not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpStoreShopList(context.Context, *GetMpStoreShopListReq) (*GetMpStoreShopListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpStoreShopList not implemented")
+}
+func (UnimplementedLbsingleServer) AddMpCoupon(context.Context, *AddMpCouponReq) (*AddMpCouponRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddMpCoupon not implemented")
+}
+func (UnimplementedLbsingleServer) DelMpCouponList(context.Context, *DelMpCouponListReq) (*DelMpCouponListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelMpCouponList not implemented")
+}
+func (UnimplementedLbsingleServer) UpdateMpCoupon(context.Context, *UpdateMpCouponReq) (*UpdateMpCouponRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateMpCoupon not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpCoupon(context.Context, *GetMpCouponReq) (*GetMpCouponRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpCoupon not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpCouponList(context.Context, *GetMpCouponListReq) (*GetMpCouponListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpCouponList not implemented")
+}
+func (UnimplementedLbsingleServer) AddMpCouponUser(context.Context, *AddMpCouponUserReq) (*AddMpCouponUserRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddMpCouponUser not implemented")
+}
+func (UnimplementedLbsingleServer) DelMpCouponUserList(context.Context, *DelMpCouponUserListReq) (*DelMpCouponUserListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelMpCouponUserList not implemented")
+}
+func (UnimplementedLbsingleServer) UpdateMpCouponUser(context.Context, *UpdateMpCouponUserReq) (*UpdateMpCouponUserRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateMpCouponUser not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpCouponUser(context.Context, *GetMpCouponUserReq) (*GetMpCouponUserRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpCouponUser not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpCouponUserList(context.Context, *GetMpCouponUserListReq) (*GetMpCouponUserListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpCouponUserList not implemented")
+}
+func (UnimplementedLbsingleServer) AddMpOrderNumber(context.Context, *AddMpOrderNumberReq) (*AddMpOrderNumberRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddMpOrderNumber not implemented")
+}
+func (UnimplementedLbsingleServer) DelMpOrderNumberList(context.Context, *DelMpOrderNumberListReq) (*DelMpOrderNumberListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelMpOrderNumberList not implemented")
+}
+func (UnimplementedLbsingleServer) UpdateMpOrderNumber(context.Context, *UpdateMpOrderNumberReq) (*UpdateMpOrderNumberRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateMpOrderNumber not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpOrderNumber(context.Context, *GetMpOrderNumberReq) (*GetMpOrderNumberRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpOrderNumber not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpOrderNumberList(context.Context, *GetMpOrderNumberListReq) (*GetMpOrderNumberListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpOrderNumberList not implemented")
+}
+func (UnimplementedLbsingleServer) AddMpStoreOrder(context.Context, *AddMpStoreOrderReq) (*AddMpStoreOrderRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddMpStoreOrder not implemented")
+}
+func (UnimplementedLbsingleServer) DelMpStoreOrderList(context.Context, *DelMpStoreOrderListReq) (*DelMpStoreOrderListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelMpStoreOrderList not implemented")
+}
+func (UnimplementedLbsingleServer) UpdateMpStoreOrder(context.Context, *UpdateMpStoreOrderReq) (*UpdateMpStoreOrderRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateMpStoreOrder not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpStoreOrder(context.Context, *GetMpStoreOrderReq) (*GetMpStoreOrderRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpStoreOrder not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpStoreOrderList(context.Context, *GetMpStoreOrderListReq) (*GetMpStoreOrderListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpStoreOrderList not implemented")
+}
+func (UnimplementedLbsingleServer) AddMpStoreOrderCartInfo(context.Context, *AddMpStoreOrderCartInfoReq) (*AddMpStoreOrderCartInfoRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddMpStoreOrderCartInfo not implemented")
+}
+func (UnimplementedLbsingleServer) DelMpStoreOrderCartInfoList(context.Context, *DelMpStoreOrderCartInfoListReq) (*DelMpStoreOrderCartInfoListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelMpStoreOrderCartInfoList not implemented")
+}
+func (UnimplementedLbsingleServer) UpdateMpStoreOrderCartInfo(context.Context, *UpdateMpStoreOrderCartInfoReq) (*UpdateMpStoreOrderCartInfoRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateMpStoreOrderCartInfo not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpStoreOrderCartInfo(context.Context, *GetMpStoreOrderCartInfoReq) (*GetMpStoreOrderCartInfoRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpStoreOrderCartInfo not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpStoreOrderCartInfoList(context.Context, *GetMpStoreOrderCartInfoListReq) (*GetMpStoreOrderCartInfoListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpStoreOrderCartInfoList not implemented")
+}
+func (UnimplementedLbsingleServer) AddMpStoreOrderStatus(context.Context, *AddMpStoreOrderStatusReq) (*AddMpStoreOrderStatusRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddMpStoreOrderStatus not implemented")
+}
+func (UnimplementedLbsingleServer) DelMpStoreOrderStatusList(context.Context, *DelMpStoreOrderStatusListReq) (*DelMpStoreOrderStatusListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelMpStoreOrderStatusList not implemented")
+}
+func (UnimplementedLbsingleServer) UpdateMpStoreOrderStatus(context.Context, *UpdateMpStoreOrderStatusReq) (*UpdateMpStoreOrderStatusRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateMpStoreOrderStatus not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpStoreOrderStatus(context.Context, *GetMpStoreOrderStatusReq) (*GetMpStoreOrderStatusRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpStoreOrderStatus not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpStoreOrderStatusList(context.Context, *GetMpStoreOrderStatusListReq) (*GetMpStoreOrderStatusListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpStoreOrderStatusList not implemented")
+}
+func (UnimplementedLbsingleServer) AddMpMaterial(context.Context, *AddMpMaterialReq) (*AddMpMaterialRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddMpMaterial not implemented")
+}
+func (UnimplementedLbsingleServer) DelMpMaterialList(context.Context, *DelMpMaterialListReq) (*DelMpMaterialListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelMpMaterialList not implemented")
+}
+func (UnimplementedLbsingleServer) UpdateMpMaterial(context.Context, *UpdateMpMaterialReq) (*UpdateMpMaterialRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateMpMaterial not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpMaterial(context.Context, *GetMpMaterialReq) (*GetMpMaterialRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpMaterial not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpMaterialList(context.Context, *GetMpMaterialListReq) (*GetMpMaterialListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpMaterialList not implemented")
+}
+func (UnimplementedLbsingleServer) AddMpMaterialGroup(context.Context, *AddMpMaterialGroupReq) (*AddMpMaterialGroupRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddMpMaterialGroup not implemented")
+}
+func (UnimplementedLbsingleServer) DelMpMaterialGroupList(context.Context, *DelMpMaterialGroupListReq) (*DelMpMaterialGroupListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelMpMaterialGroupList not implemented")
+}
+func (UnimplementedLbsingleServer) UpdateMpMaterialGroup(context.Context, *UpdateMpMaterialGroupReq) (*UpdateMpMaterialGroupRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateMpMaterialGroup not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpMaterialGroup(context.Context, *GetMpMaterialGroupReq) (*GetMpMaterialGroupRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpMaterialGroup not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpMaterialGroupList(context.Context, *GetMpMaterialGroupListReq) (*GetMpMaterialGroupListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpMaterialGroupList not implemented")
+}
+func (UnimplementedLbsingleServer) AddMpService(context.Context, *AddMpServiceReq) (*AddMpServiceRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddMpService not implemented")
+}
+func (UnimplementedLbsingleServer) DelMpServiceList(context.Context, *DelMpServiceListReq) (*DelMpServiceListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelMpServiceList not implemented")
+}
+func (UnimplementedLbsingleServer) UpdateMpService(context.Context, *UpdateMpServiceReq) (*UpdateMpServiceRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateMpService not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpService(context.Context, *GetMpServiceReq) (*GetMpServiceRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpService not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpServiceList(context.Context, *GetMpServiceListReq) (*GetMpServiceListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpServiceList not implemented")
+}
+func (UnimplementedLbsingleServer) AddMpShopAds(context.Context, *AddMpShopAdsReq) (*AddMpShopAdsRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddMpShopAds not implemented")
+}
+func (UnimplementedLbsingleServer) DelMpShopAdsList(context.Context, *DelMpShopAdsListReq) (*DelMpShopAdsListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelMpShopAdsList not implemented")
+}
+func (UnimplementedLbsingleServer) UpdateMpShopAds(context.Context, *UpdateMpShopAdsReq) (*UpdateMpShopAdsRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateMpShopAds not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpShopAds(context.Context, *GetMpShopAdsReq) (*GetMpShopAdsRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpShopAds not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpShopAdsList(context.Context, *GetMpShopAdsListReq) (*GetMpShopAdsListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpShopAdsList not implemented")
+}
+func (UnimplementedLbsingleServer) GetMpShopAdsListPublic(context.Context, *GetMpShopAdsListPublicReq) (*GetMpShopAdsListPublicRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMpShopAdsListPublic not implemented")
+}
+func (UnimplementedLbsingleServer) WxMiniProgramAuthSession(context.Context, *WxMiniProgramAuthSessionReq) (*WxMiniProgramAuthSessionRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method WxMiniProgramAuthSession not implemented")
 }
 func (UnimplementedLbsingleServer) mustEmbedUnimplementedLbsingleServer() {}
 
@@ -818,182 +3062,2018 @@ func _Lbsingle_GetUserList_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Lbsingle_AddFoodMenu_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AddFoodMenuReq)
+func _Lbsingle_AddMpMerchantDetails_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddMpMerchantDetailsReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(LbsingleServer).AddFoodMenu(ctx, in)
+		return srv.(LbsingleServer).AddMpMerchantDetails(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/lbsingle.lbsingle/AddFoodMenu",
+		FullMethod: "/lbsingle.lbsingle/AddMpMerchantDetails",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LbsingleServer).AddFoodMenu(ctx, req.(*AddFoodMenuReq))
+		return srv.(LbsingleServer).AddMpMerchantDetails(ctx, req.(*AddMpMerchantDetailsReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Lbsingle_DelFoodMenuList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DelFoodMenuListReq)
+func _Lbsingle_DelMpMerchantDetailsList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelMpMerchantDetailsListReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(LbsingleServer).DelFoodMenuList(ctx, in)
+		return srv.(LbsingleServer).DelMpMerchantDetailsList(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/lbsingle.lbsingle/DelFoodMenuList",
+		FullMethod: "/lbsingle.lbsingle/DelMpMerchantDetailsList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LbsingleServer).DelFoodMenuList(ctx, req.(*DelFoodMenuListReq))
+		return srv.(LbsingleServer).DelMpMerchantDetailsList(ctx, req.(*DelMpMerchantDetailsListReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Lbsingle_UpdateFoodMenu_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateFoodMenuReq)
+func _Lbsingle_UpdateMpMerchantDetails_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateMpMerchantDetailsReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(LbsingleServer).UpdateFoodMenu(ctx, in)
+		return srv.(LbsingleServer).UpdateMpMerchantDetails(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/lbsingle.lbsingle/UpdateFoodMenu",
+		FullMethod: "/lbsingle.lbsingle/UpdateMpMerchantDetails",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LbsingleServer).UpdateFoodMenu(ctx, req.(*UpdateFoodMenuReq))
+		return srv.(LbsingleServer).UpdateMpMerchantDetails(ctx, req.(*UpdateMpMerchantDetailsReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Lbsingle_GetFoodMenu_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetFoodMenuReq)
+func _Lbsingle_GetMpMerchantDetails_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpMerchantDetailsReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(LbsingleServer).GetFoodMenu(ctx, in)
+		return srv.(LbsingleServer).GetMpMerchantDetails(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/lbsingle.lbsingle/GetFoodMenu",
+		FullMethod: "/lbsingle.lbsingle/GetMpMerchantDetails",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LbsingleServer).GetFoodMenu(ctx, req.(*GetFoodMenuReq))
+		return srv.(LbsingleServer).GetMpMerchantDetails(ctx, req.(*GetMpMerchantDetailsReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Lbsingle_GetFoodMenuList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetFoodMenuListReq)
+func _Lbsingle_GetMpMerchantDetailsList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpMerchantDetailsListReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(LbsingleServer).GetFoodMenuList(ctx, in)
+		return srv.(LbsingleServer).GetMpMerchantDetailsList(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/lbsingle.lbsingle/GetFoodMenuList",
+		FullMethod: "/lbsingle.lbsingle/GetMpMerchantDetailsList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LbsingleServer).GetFoodMenuList(ctx, req.(*GetFoodMenuListReq))
+		return srv.(LbsingleServer).GetMpMerchantDetailsList(ctx, req.(*GetMpMerchantDetailsListReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Lbsingle_AddFoodMenuElem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AddFoodMenuElemReq)
+func _Lbsingle_AddMpMemberUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddMpMemberUserReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(LbsingleServer).AddFoodMenuElem(ctx, in)
+		return srv.(LbsingleServer).AddMpMemberUser(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/lbsingle.lbsingle/AddFoodMenuElem",
+		FullMethod: "/lbsingle.lbsingle/AddMpMemberUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LbsingleServer).AddFoodMenuElem(ctx, req.(*AddFoodMenuElemReq))
+		return srv.(LbsingleServer).AddMpMemberUser(ctx, req.(*AddMpMemberUserReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Lbsingle_DelFoodMenuElemList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DelFoodMenuElemListReq)
+func _Lbsingle_DelMpMemberUserList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelMpMemberUserListReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(LbsingleServer).DelFoodMenuElemList(ctx, in)
+		return srv.(LbsingleServer).DelMpMemberUserList(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/lbsingle.lbsingle/DelFoodMenuElemList",
+		FullMethod: "/lbsingle.lbsingle/DelMpMemberUserList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LbsingleServer).DelFoodMenuElemList(ctx, req.(*DelFoodMenuElemListReq))
+		return srv.(LbsingleServer).DelMpMemberUserList(ctx, req.(*DelMpMemberUserListReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Lbsingle_UpdateFoodMenuElem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateFoodMenuElemReq)
+func _Lbsingle_UpdateMpMemberUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateMpMemberUserReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(LbsingleServer).UpdateFoodMenuElem(ctx, in)
+		return srv.(LbsingleServer).UpdateMpMemberUser(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/lbsingle.lbsingle/UpdateFoodMenuElem",
+		FullMethod: "/lbsingle.lbsingle/UpdateMpMemberUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LbsingleServer).UpdateFoodMenuElem(ctx, req.(*UpdateFoodMenuElemReq))
+		return srv.(LbsingleServer).UpdateMpMemberUser(ctx, req.(*UpdateMpMemberUserReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Lbsingle_GetFoodMenuElem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetFoodMenuElemReq)
+func _Lbsingle_GetMpMemberUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpMemberUserReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(LbsingleServer).GetFoodMenuElem(ctx, in)
+		return srv.(LbsingleServer).GetMpMemberUser(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/lbsingle.lbsingle/GetFoodMenuElem",
+		FullMethod: "/lbsingle.lbsingle/GetMpMemberUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LbsingleServer).GetFoodMenuElem(ctx, req.(*GetFoodMenuElemReq))
+		return srv.(LbsingleServer).GetMpMemberUser(ctx, req.(*GetMpMemberUserReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Lbsingle_GetFoodMenuElemList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetFoodMenuElemListReq)
+func _Lbsingle_GetMpMemberUserList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpMemberUserListReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(LbsingleServer).GetFoodMenuElemList(ctx, in)
+		return srv.(LbsingleServer).GetMpMemberUserList(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/lbsingle.lbsingle/GetFoodMenuElemList",
+		FullMethod: "/lbsingle.lbsingle/GetMpMemberUserList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LbsingleServer).GetFoodMenuElemList(ctx, req.(*GetFoodMenuElemListReq))
+		return srv.(LbsingleServer).GetMpMemberUserList(ctx, req.(*GetMpMemberUserListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_AddMpUserAddress_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddMpUserAddressReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).AddMpUserAddress(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/AddMpUserAddress",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).AddMpUserAddress(ctx, req.(*AddMpUserAddressReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_DelMpUserAddressList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelMpUserAddressListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).DelMpUserAddressList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/DelMpUserAddressList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).DelMpUserAddressList(ctx, req.(*DelMpUserAddressListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_UpdateMpUserAddress_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateMpUserAddressReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).UpdateMpUserAddress(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/UpdateMpUserAddress",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).UpdateMpUserAddress(ctx, req.(*UpdateMpUserAddressReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpUserAddress_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpUserAddressReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpUserAddress(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpUserAddress",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpUserAddress(ctx, req.(*GetMpUserAddressReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpUserAddressList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpUserAddressListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpUserAddressList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpUserAddressList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpUserAddressList(ctx, req.(*GetMpUserAddressListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_AddMpUserBill_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddMpUserBillReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).AddMpUserBill(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/AddMpUserBill",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).AddMpUserBill(ctx, req.(*AddMpUserBillReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_DelMpUserBillList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelMpUserBillListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).DelMpUserBillList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/DelMpUserBillList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).DelMpUserBillList(ctx, req.(*DelMpUserBillListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_UpdateMpUserBill_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateMpUserBillReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).UpdateMpUserBill(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/UpdateMpUserBill",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).UpdateMpUserBill(ctx, req.(*UpdateMpUserBillReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpUserBill_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpUserBillReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpUserBill(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpUserBill",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpUserBill(ctx, req.(*GetMpUserBillReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpUserBillList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpUserBillListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpUserBillList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpUserBillList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpUserBillList(ctx, req.(*GetMpUserBillListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_AddMpProductCategory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddMpProductCategoryReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).AddMpProductCategory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/AddMpProductCategory",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).AddMpProductCategory(ctx, req.(*AddMpProductCategoryReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_DelMpProductCategoryList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelMpProductCategoryListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).DelMpProductCategoryList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/DelMpProductCategoryList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).DelMpProductCategoryList(ctx, req.(*DelMpProductCategoryListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_UpdateMpProductCategory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateMpProductCategoryReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).UpdateMpProductCategory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/UpdateMpProductCategory",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).UpdateMpProductCategory(ctx, req.(*UpdateMpProductCategoryReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpProductCategory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpProductCategoryReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpProductCategory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpProductCategory",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpProductCategory(ctx, req.(*GetMpProductCategoryReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpProductCategoryList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpProductCategoryListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpProductCategoryList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpProductCategoryList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpProductCategoryList(ctx, req.(*GetMpProductCategoryListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_AddMpStoreProduct_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddMpStoreProductReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).AddMpStoreProduct(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/AddMpStoreProduct",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).AddMpStoreProduct(ctx, req.(*AddMpStoreProductReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_DelMpStoreProductList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelMpStoreProductListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).DelMpStoreProductList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/DelMpStoreProductList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).DelMpStoreProductList(ctx, req.(*DelMpStoreProductListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_UpdateMpStoreProduct_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateMpStoreProductReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).UpdateMpStoreProduct(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/UpdateMpStoreProduct",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).UpdateMpStoreProduct(ctx, req.(*UpdateMpStoreProductReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpStoreProduct_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpStoreProductReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpStoreProduct(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpStoreProduct",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpStoreProduct(ctx, req.(*GetMpStoreProductReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpStoreProductList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpStoreProductListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpStoreProductList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpStoreProductList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpStoreProductList(ctx, req.(*GetMpStoreProductListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_AddMpStoreProductAttr_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddMpStoreProductAttrReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).AddMpStoreProductAttr(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/AddMpStoreProductAttr",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).AddMpStoreProductAttr(ctx, req.(*AddMpStoreProductAttrReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_DelMpStoreProductAttrList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelMpStoreProductAttrListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).DelMpStoreProductAttrList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/DelMpStoreProductAttrList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).DelMpStoreProductAttrList(ctx, req.(*DelMpStoreProductAttrListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_UpdateMpStoreProductAttr_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateMpStoreProductAttrReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).UpdateMpStoreProductAttr(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/UpdateMpStoreProductAttr",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).UpdateMpStoreProductAttr(ctx, req.(*UpdateMpStoreProductAttrReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpStoreProductAttr_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpStoreProductAttrReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpStoreProductAttr(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpStoreProductAttr",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpStoreProductAttr(ctx, req.(*GetMpStoreProductAttrReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpStoreProductAttrList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpStoreProductAttrListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpStoreProductAttrList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpStoreProductAttrList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpStoreProductAttrList(ctx, req.(*GetMpStoreProductAttrListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_AddMpStoreProductAttrResult_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddMpStoreProductAttrResultReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).AddMpStoreProductAttrResult(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/AddMpStoreProductAttrResult",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).AddMpStoreProductAttrResult(ctx, req.(*AddMpStoreProductAttrResultReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_DelMpStoreProductAttrResultList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelMpStoreProductAttrResultListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).DelMpStoreProductAttrResultList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/DelMpStoreProductAttrResultList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).DelMpStoreProductAttrResultList(ctx, req.(*DelMpStoreProductAttrResultListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_UpdateMpStoreProductAttrResult_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateMpStoreProductAttrResultReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).UpdateMpStoreProductAttrResult(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/UpdateMpStoreProductAttrResult",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).UpdateMpStoreProductAttrResult(ctx, req.(*UpdateMpStoreProductAttrResultReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpStoreProductAttrResult_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpStoreProductAttrResultReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpStoreProductAttrResult(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpStoreProductAttrResult",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpStoreProductAttrResult(ctx, req.(*GetMpStoreProductAttrResultReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpStoreProductAttrResultList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpStoreProductAttrResultListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpStoreProductAttrResultList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpStoreProductAttrResultList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpStoreProductAttrResultList(ctx, req.(*GetMpStoreProductAttrResultListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_AddMpStoreProductAttrValue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddMpStoreProductAttrValueReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).AddMpStoreProductAttrValue(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/AddMpStoreProductAttrValue",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).AddMpStoreProductAttrValue(ctx, req.(*AddMpStoreProductAttrValueReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_DelMpStoreProductAttrValueList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelMpStoreProductAttrValueListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).DelMpStoreProductAttrValueList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/DelMpStoreProductAttrValueList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).DelMpStoreProductAttrValueList(ctx, req.(*DelMpStoreProductAttrValueListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_UpdateMpStoreProductAttrValue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateMpStoreProductAttrValueReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).UpdateMpStoreProductAttrValue(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/UpdateMpStoreProductAttrValue",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).UpdateMpStoreProductAttrValue(ctx, req.(*UpdateMpStoreProductAttrValueReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpStoreProductAttrValue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpStoreProductAttrValueReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpStoreProductAttrValue(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpStoreProductAttrValue",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpStoreProductAttrValue(ctx, req.(*GetMpStoreProductAttrValueReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpStoreProductAttrValueList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpStoreProductAttrValueListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpStoreProductAttrValueList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpStoreProductAttrValueList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpStoreProductAttrValueList(ctx, req.(*GetMpStoreProductAttrValueListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_AddMpStoreProductReply_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddMpStoreProductReplyReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).AddMpStoreProductReply(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/AddMpStoreProductReply",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).AddMpStoreProductReply(ctx, req.(*AddMpStoreProductReplyReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_DelMpStoreProductReplyList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelMpStoreProductReplyListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).DelMpStoreProductReplyList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/DelMpStoreProductReplyList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).DelMpStoreProductReplyList(ctx, req.(*DelMpStoreProductReplyListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_UpdateMpStoreProductReply_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateMpStoreProductReplyReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).UpdateMpStoreProductReply(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/UpdateMpStoreProductReply",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).UpdateMpStoreProductReply(ctx, req.(*UpdateMpStoreProductReplyReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpStoreProductReply_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpStoreProductReplyReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpStoreProductReply(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpStoreProductReply",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpStoreProductReply(ctx, req.(*GetMpStoreProductReplyReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpStoreProductReplyList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpStoreProductReplyListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpStoreProductReplyList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpStoreProductReplyList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpStoreProductReplyList(ctx, req.(*GetMpStoreProductReplyListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_AddMpStoreProductRule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddMpStoreProductRuleReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).AddMpStoreProductRule(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/AddMpStoreProductRule",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).AddMpStoreProductRule(ctx, req.(*AddMpStoreProductRuleReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_DelMpStoreProductRuleList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelMpStoreProductRuleListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).DelMpStoreProductRuleList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/DelMpStoreProductRuleList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).DelMpStoreProductRuleList(ctx, req.(*DelMpStoreProductRuleListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_UpdateMpStoreProductRule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateMpStoreProductRuleReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).UpdateMpStoreProductRule(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/UpdateMpStoreProductRule",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).UpdateMpStoreProductRule(ctx, req.(*UpdateMpStoreProductRuleReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpStoreProductRule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpStoreProductRuleReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpStoreProductRule(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpStoreProductRule",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpStoreProductRule(ctx, req.(*GetMpStoreProductRuleReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpStoreProductRuleList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpStoreProductRuleListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpStoreProductRuleList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpStoreProductRuleList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpStoreProductRuleList(ctx, req.(*GetMpStoreProductRuleListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_AddMpStoreShop_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddMpStoreShopReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).AddMpStoreShop(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/AddMpStoreShop",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).AddMpStoreShop(ctx, req.(*AddMpStoreShopReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_DelMpStoreShopList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelMpStoreShopListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).DelMpStoreShopList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/DelMpStoreShopList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).DelMpStoreShopList(ctx, req.(*DelMpStoreShopListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_UpdateMpStoreShop_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateMpStoreShopReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).UpdateMpStoreShop(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/UpdateMpStoreShop",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).UpdateMpStoreShop(ctx, req.(*UpdateMpStoreShopReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpStoreShop_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpStoreShopReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpStoreShop(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpStoreShop",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpStoreShop(ctx, req.(*GetMpStoreShopReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpStoreShopList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpStoreShopListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpStoreShopList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpStoreShopList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpStoreShopList(ctx, req.(*GetMpStoreShopListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_AddMpCoupon_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddMpCouponReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).AddMpCoupon(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/AddMpCoupon",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).AddMpCoupon(ctx, req.(*AddMpCouponReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_DelMpCouponList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelMpCouponListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).DelMpCouponList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/DelMpCouponList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).DelMpCouponList(ctx, req.(*DelMpCouponListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_UpdateMpCoupon_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateMpCouponReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).UpdateMpCoupon(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/UpdateMpCoupon",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).UpdateMpCoupon(ctx, req.(*UpdateMpCouponReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpCoupon_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpCouponReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpCoupon(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpCoupon",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpCoupon(ctx, req.(*GetMpCouponReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpCouponList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpCouponListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpCouponList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpCouponList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpCouponList(ctx, req.(*GetMpCouponListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_AddMpCouponUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddMpCouponUserReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).AddMpCouponUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/AddMpCouponUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).AddMpCouponUser(ctx, req.(*AddMpCouponUserReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_DelMpCouponUserList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelMpCouponUserListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).DelMpCouponUserList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/DelMpCouponUserList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).DelMpCouponUserList(ctx, req.(*DelMpCouponUserListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_UpdateMpCouponUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateMpCouponUserReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).UpdateMpCouponUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/UpdateMpCouponUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).UpdateMpCouponUser(ctx, req.(*UpdateMpCouponUserReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpCouponUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpCouponUserReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpCouponUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpCouponUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpCouponUser(ctx, req.(*GetMpCouponUserReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpCouponUserList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpCouponUserListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpCouponUserList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpCouponUserList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpCouponUserList(ctx, req.(*GetMpCouponUserListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_AddMpOrderNumber_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddMpOrderNumberReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).AddMpOrderNumber(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/AddMpOrderNumber",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).AddMpOrderNumber(ctx, req.(*AddMpOrderNumberReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_DelMpOrderNumberList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelMpOrderNumberListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).DelMpOrderNumberList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/DelMpOrderNumberList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).DelMpOrderNumberList(ctx, req.(*DelMpOrderNumberListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_UpdateMpOrderNumber_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateMpOrderNumberReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).UpdateMpOrderNumber(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/UpdateMpOrderNumber",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).UpdateMpOrderNumber(ctx, req.(*UpdateMpOrderNumberReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpOrderNumber_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpOrderNumberReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpOrderNumber(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpOrderNumber",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpOrderNumber(ctx, req.(*GetMpOrderNumberReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpOrderNumberList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpOrderNumberListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpOrderNumberList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpOrderNumberList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpOrderNumberList(ctx, req.(*GetMpOrderNumberListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_AddMpStoreOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddMpStoreOrderReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).AddMpStoreOrder(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/AddMpStoreOrder",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).AddMpStoreOrder(ctx, req.(*AddMpStoreOrderReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_DelMpStoreOrderList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelMpStoreOrderListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).DelMpStoreOrderList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/DelMpStoreOrderList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).DelMpStoreOrderList(ctx, req.(*DelMpStoreOrderListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_UpdateMpStoreOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateMpStoreOrderReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).UpdateMpStoreOrder(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/UpdateMpStoreOrder",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).UpdateMpStoreOrder(ctx, req.(*UpdateMpStoreOrderReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpStoreOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpStoreOrderReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpStoreOrder(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpStoreOrder",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpStoreOrder(ctx, req.(*GetMpStoreOrderReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpStoreOrderList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpStoreOrderListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpStoreOrderList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpStoreOrderList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpStoreOrderList(ctx, req.(*GetMpStoreOrderListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_AddMpStoreOrderCartInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddMpStoreOrderCartInfoReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).AddMpStoreOrderCartInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/AddMpStoreOrderCartInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).AddMpStoreOrderCartInfo(ctx, req.(*AddMpStoreOrderCartInfoReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_DelMpStoreOrderCartInfoList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelMpStoreOrderCartInfoListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).DelMpStoreOrderCartInfoList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/DelMpStoreOrderCartInfoList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).DelMpStoreOrderCartInfoList(ctx, req.(*DelMpStoreOrderCartInfoListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_UpdateMpStoreOrderCartInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateMpStoreOrderCartInfoReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).UpdateMpStoreOrderCartInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/UpdateMpStoreOrderCartInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).UpdateMpStoreOrderCartInfo(ctx, req.(*UpdateMpStoreOrderCartInfoReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpStoreOrderCartInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpStoreOrderCartInfoReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpStoreOrderCartInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpStoreOrderCartInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpStoreOrderCartInfo(ctx, req.(*GetMpStoreOrderCartInfoReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpStoreOrderCartInfoList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpStoreOrderCartInfoListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpStoreOrderCartInfoList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpStoreOrderCartInfoList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpStoreOrderCartInfoList(ctx, req.(*GetMpStoreOrderCartInfoListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_AddMpStoreOrderStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddMpStoreOrderStatusReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).AddMpStoreOrderStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/AddMpStoreOrderStatus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).AddMpStoreOrderStatus(ctx, req.(*AddMpStoreOrderStatusReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_DelMpStoreOrderStatusList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelMpStoreOrderStatusListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).DelMpStoreOrderStatusList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/DelMpStoreOrderStatusList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).DelMpStoreOrderStatusList(ctx, req.(*DelMpStoreOrderStatusListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_UpdateMpStoreOrderStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateMpStoreOrderStatusReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).UpdateMpStoreOrderStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/UpdateMpStoreOrderStatus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).UpdateMpStoreOrderStatus(ctx, req.(*UpdateMpStoreOrderStatusReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpStoreOrderStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpStoreOrderStatusReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpStoreOrderStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpStoreOrderStatus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpStoreOrderStatus(ctx, req.(*GetMpStoreOrderStatusReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpStoreOrderStatusList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpStoreOrderStatusListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpStoreOrderStatusList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpStoreOrderStatusList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpStoreOrderStatusList(ctx, req.(*GetMpStoreOrderStatusListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_AddMpMaterial_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddMpMaterialReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).AddMpMaterial(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/AddMpMaterial",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).AddMpMaterial(ctx, req.(*AddMpMaterialReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_DelMpMaterialList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelMpMaterialListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).DelMpMaterialList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/DelMpMaterialList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).DelMpMaterialList(ctx, req.(*DelMpMaterialListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_UpdateMpMaterial_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateMpMaterialReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).UpdateMpMaterial(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/UpdateMpMaterial",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).UpdateMpMaterial(ctx, req.(*UpdateMpMaterialReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpMaterial_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpMaterialReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpMaterial(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpMaterial",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpMaterial(ctx, req.(*GetMpMaterialReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpMaterialList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpMaterialListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpMaterialList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpMaterialList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpMaterialList(ctx, req.(*GetMpMaterialListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_AddMpMaterialGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddMpMaterialGroupReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).AddMpMaterialGroup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/AddMpMaterialGroup",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).AddMpMaterialGroup(ctx, req.(*AddMpMaterialGroupReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_DelMpMaterialGroupList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelMpMaterialGroupListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).DelMpMaterialGroupList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/DelMpMaterialGroupList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).DelMpMaterialGroupList(ctx, req.(*DelMpMaterialGroupListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_UpdateMpMaterialGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateMpMaterialGroupReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).UpdateMpMaterialGroup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/UpdateMpMaterialGroup",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).UpdateMpMaterialGroup(ctx, req.(*UpdateMpMaterialGroupReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpMaterialGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpMaterialGroupReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpMaterialGroup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpMaterialGroup",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpMaterialGroup(ctx, req.(*GetMpMaterialGroupReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpMaterialGroupList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpMaterialGroupListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpMaterialGroupList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpMaterialGroupList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpMaterialGroupList(ctx, req.(*GetMpMaterialGroupListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_AddMpService_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddMpServiceReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).AddMpService(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/AddMpService",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).AddMpService(ctx, req.(*AddMpServiceReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_DelMpServiceList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelMpServiceListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).DelMpServiceList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/DelMpServiceList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).DelMpServiceList(ctx, req.(*DelMpServiceListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_UpdateMpService_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateMpServiceReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).UpdateMpService(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/UpdateMpService",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).UpdateMpService(ctx, req.(*UpdateMpServiceReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpService_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpServiceReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpService(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpService",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpService(ctx, req.(*GetMpServiceReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpServiceList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpServiceListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpServiceList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpServiceList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpServiceList(ctx, req.(*GetMpServiceListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_AddMpShopAds_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddMpShopAdsReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).AddMpShopAds(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/AddMpShopAds",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).AddMpShopAds(ctx, req.(*AddMpShopAdsReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_DelMpShopAdsList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelMpShopAdsListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).DelMpShopAdsList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/DelMpShopAdsList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).DelMpShopAdsList(ctx, req.(*DelMpShopAdsListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_UpdateMpShopAds_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateMpShopAdsReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).UpdateMpShopAds(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/UpdateMpShopAds",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).UpdateMpShopAds(ctx, req.(*UpdateMpShopAdsReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpShopAds_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpShopAdsReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpShopAds(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpShopAds",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpShopAds(ctx, req.(*GetMpShopAdsReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpShopAdsList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpShopAdsListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpShopAdsList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpShopAdsList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpShopAdsList(ctx, req.(*GetMpShopAdsListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetMpShopAdsListPublic_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMpShopAdsListPublicReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetMpShopAdsListPublic(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetMpShopAdsListPublic",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetMpShopAdsListPublic(ctx, req.(*GetMpShopAdsListPublicReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_WxMiniProgramAuthSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WxMiniProgramAuthSessionReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).WxMiniProgramAuthSession(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/WxMiniProgramAuthSession",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).WxMiniProgramAuthSession(ctx, req.(*WxMiniProgramAuthSessionReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1062,44 +5142,452 @@ var Lbsingle_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Lbsingle_GetUserList_Handler,
 		},
 		{
-			MethodName: "AddFoodMenu",
-			Handler:    _Lbsingle_AddFoodMenu_Handler,
+			MethodName: "AddMpMerchantDetails",
+			Handler:    _Lbsingle_AddMpMerchantDetails_Handler,
 		},
 		{
-			MethodName: "DelFoodMenuList",
-			Handler:    _Lbsingle_DelFoodMenuList_Handler,
+			MethodName: "DelMpMerchantDetailsList",
+			Handler:    _Lbsingle_DelMpMerchantDetailsList_Handler,
 		},
 		{
-			MethodName: "UpdateFoodMenu",
-			Handler:    _Lbsingle_UpdateFoodMenu_Handler,
+			MethodName: "UpdateMpMerchantDetails",
+			Handler:    _Lbsingle_UpdateMpMerchantDetails_Handler,
 		},
 		{
-			MethodName: "GetFoodMenu",
-			Handler:    _Lbsingle_GetFoodMenu_Handler,
+			MethodName: "GetMpMerchantDetails",
+			Handler:    _Lbsingle_GetMpMerchantDetails_Handler,
 		},
 		{
-			MethodName: "GetFoodMenuList",
-			Handler:    _Lbsingle_GetFoodMenuList_Handler,
+			MethodName: "GetMpMerchantDetailsList",
+			Handler:    _Lbsingle_GetMpMerchantDetailsList_Handler,
 		},
 		{
-			MethodName: "AddFoodMenuElem",
-			Handler:    _Lbsingle_AddFoodMenuElem_Handler,
+			MethodName: "AddMpMemberUser",
+			Handler:    _Lbsingle_AddMpMemberUser_Handler,
 		},
 		{
-			MethodName: "DelFoodMenuElemList",
-			Handler:    _Lbsingle_DelFoodMenuElemList_Handler,
+			MethodName: "DelMpMemberUserList",
+			Handler:    _Lbsingle_DelMpMemberUserList_Handler,
 		},
 		{
-			MethodName: "UpdateFoodMenuElem",
-			Handler:    _Lbsingle_UpdateFoodMenuElem_Handler,
+			MethodName: "UpdateMpMemberUser",
+			Handler:    _Lbsingle_UpdateMpMemberUser_Handler,
 		},
 		{
-			MethodName: "GetFoodMenuElem",
-			Handler:    _Lbsingle_GetFoodMenuElem_Handler,
+			MethodName: "GetMpMemberUser",
+			Handler:    _Lbsingle_GetMpMemberUser_Handler,
 		},
 		{
-			MethodName: "GetFoodMenuElemList",
-			Handler:    _Lbsingle_GetFoodMenuElemList_Handler,
+			MethodName: "GetMpMemberUserList",
+			Handler:    _Lbsingle_GetMpMemberUserList_Handler,
+		},
+		{
+			MethodName: "AddMpUserAddress",
+			Handler:    _Lbsingle_AddMpUserAddress_Handler,
+		},
+		{
+			MethodName: "DelMpUserAddressList",
+			Handler:    _Lbsingle_DelMpUserAddressList_Handler,
+		},
+		{
+			MethodName: "UpdateMpUserAddress",
+			Handler:    _Lbsingle_UpdateMpUserAddress_Handler,
+		},
+		{
+			MethodName: "GetMpUserAddress",
+			Handler:    _Lbsingle_GetMpUserAddress_Handler,
+		},
+		{
+			MethodName: "GetMpUserAddressList",
+			Handler:    _Lbsingle_GetMpUserAddressList_Handler,
+		},
+		{
+			MethodName: "AddMpUserBill",
+			Handler:    _Lbsingle_AddMpUserBill_Handler,
+		},
+		{
+			MethodName: "DelMpUserBillList",
+			Handler:    _Lbsingle_DelMpUserBillList_Handler,
+		},
+		{
+			MethodName: "UpdateMpUserBill",
+			Handler:    _Lbsingle_UpdateMpUserBill_Handler,
+		},
+		{
+			MethodName: "GetMpUserBill",
+			Handler:    _Lbsingle_GetMpUserBill_Handler,
+		},
+		{
+			MethodName: "GetMpUserBillList",
+			Handler:    _Lbsingle_GetMpUserBillList_Handler,
+		},
+		{
+			MethodName: "AddMpProductCategory",
+			Handler:    _Lbsingle_AddMpProductCategory_Handler,
+		},
+		{
+			MethodName: "DelMpProductCategoryList",
+			Handler:    _Lbsingle_DelMpProductCategoryList_Handler,
+		},
+		{
+			MethodName: "UpdateMpProductCategory",
+			Handler:    _Lbsingle_UpdateMpProductCategory_Handler,
+		},
+		{
+			MethodName: "GetMpProductCategory",
+			Handler:    _Lbsingle_GetMpProductCategory_Handler,
+		},
+		{
+			MethodName: "GetMpProductCategoryList",
+			Handler:    _Lbsingle_GetMpProductCategoryList_Handler,
+		},
+		{
+			MethodName: "AddMpStoreProduct",
+			Handler:    _Lbsingle_AddMpStoreProduct_Handler,
+		},
+		{
+			MethodName: "DelMpStoreProductList",
+			Handler:    _Lbsingle_DelMpStoreProductList_Handler,
+		},
+		{
+			MethodName: "UpdateMpStoreProduct",
+			Handler:    _Lbsingle_UpdateMpStoreProduct_Handler,
+		},
+		{
+			MethodName: "GetMpStoreProduct",
+			Handler:    _Lbsingle_GetMpStoreProduct_Handler,
+		},
+		{
+			MethodName: "GetMpStoreProductList",
+			Handler:    _Lbsingle_GetMpStoreProductList_Handler,
+		},
+		{
+			MethodName: "AddMpStoreProductAttr",
+			Handler:    _Lbsingle_AddMpStoreProductAttr_Handler,
+		},
+		{
+			MethodName: "DelMpStoreProductAttrList",
+			Handler:    _Lbsingle_DelMpStoreProductAttrList_Handler,
+		},
+		{
+			MethodName: "UpdateMpStoreProductAttr",
+			Handler:    _Lbsingle_UpdateMpStoreProductAttr_Handler,
+		},
+		{
+			MethodName: "GetMpStoreProductAttr",
+			Handler:    _Lbsingle_GetMpStoreProductAttr_Handler,
+		},
+		{
+			MethodName: "GetMpStoreProductAttrList",
+			Handler:    _Lbsingle_GetMpStoreProductAttrList_Handler,
+		},
+		{
+			MethodName: "AddMpStoreProductAttrResult",
+			Handler:    _Lbsingle_AddMpStoreProductAttrResult_Handler,
+		},
+		{
+			MethodName: "DelMpStoreProductAttrResultList",
+			Handler:    _Lbsingle_DelMpStoreProductAttrResultList_Handler,
+		},
+		{
+			MethodName: "UpdateMpStoreProductAttrResult",
+			Handler:    _Lbsingle_UpdateMpStoreProductAttrResult_Handler,
+		},
+		{
+			MethodName: "GetMpStoreProductAttrResult",
+			Handler:    _Lbsingle_GetMpStoreProductAttrResult_Handler,
+		},
+		{
+			MethodName: "GetMpStoreProductAttrResultList",
+			Handler:    _Lbsingle_GetMpStoreProductAttrResultList_Handler,
+		},
+		{
+			MethodName: "AddMpStoreProductAttrValue",
+			Handler:    _Lbsingle_AddMpStoreProductAttrValue_Handler,
+		},
+		{
+			MethodName: "DelMpStoreProductAttrValueList",
+			Handler:    _Lbsingle_DelMpStoreProductAttrValueList_Handler,
+		},
+		{
+			MethodName: "UpdateMpStoreProductAttrValue",
+			Handler:    _Lbsingle_UpdateMpStoreProductAttrValue_Handler,
+		},
+		{
+			MethodName: "GetMpStoreProductAttrValue",
+			Handler:    _Lbsingle_GetMpStoreProductAttrValue_Handler,
+		},
+		{
+			MethodName: "GetMpStoreProductAttrValueList",
+			Handler:    _Lbsingle_GetMpStoreProductAttrValueList_Handler,
+		},
+		{
+			MethodName: "AddMpStoreProductReply",
+			Handler:    _Lbsingle_AddMpStoreProductReply_Handler,
+		},
+		{
+			MethodName: "DelMpStoreProductReplyList",
+			Handler:    _Lbsingle_DelMpStoreProductReplyList_Handler,
+		},
+		{
+			MethodName: "UpdateMpStoreProductReply",
+			Handler:    _Lbsingle_UpdateMpStoreProductReply_Handler,
+		},
+		{
+			MethodName: "GetMpStoreProductReply",
+			Handler:    _Lbsingle_GetMpStoreProductReply_Handler,
+		},
+		{
+			MethodName: "GetMpStoreProductReplyList",
+			Handler:    _Lbsingle_GetMpStoreProductReplyList_Handler,
+		},
+		{
+			MethodName: "AddMpStoreProductRule",
+			Handler:    _Lbsingle_AddMpStoreProductRule_Handler,
+		},
+		{
+			MethodName: "DelMpStoreProductRuleList",
+			Handler:    _Lbsingle_DelMpStoreProductRuleList_Handler,
+		},
+		{
+			MethodName: "UpdateMpStoreProductRule",
+			Handler:    _Lbsingle_UpdateMpStoreProductRule_Handler,
+		},
+		{
+			MethodName: "GetMpStoreProductRule",
+			Handler:    _Lbsingle_GetMpStoreProductRule_Handler,
+		},
+		{
+			MethodName: "GetMpStoreProductRuleList",
+			Handler:    _Lbsingle_GetMpStoreProductRuleList_Handler,
+		},
+		{
+			MethodName: "AddMpStoreShop",
+			Handler:    _Lbsingle_AddMpStoreShop_Handler,
+		},
+		{
+			MethodName: "DelMpStoreShopList",
+			Handler:    _Lbsingle_DelMpStoreShopList_Handler,
+		},
+		{
+			MethodName: "UpdateMpStoreShop",
+			Handler:    _Lbsingle_UpdateMpStoreShop_Handler,
+		},
+		{
+			MethodName: "GetMpStoreShop",
+			Handler:    _Lbsingle_GetMpStoreShop_Handler,
+		},
+		{
+			MethodName: "GetMpStoreShopList",
+			Handler:    _Lbsingle_GetMpStoreShopList_Handler,
+		},
+		{
+			MethodName: "AddMpCoupon",
+			Handler:    _Lbsingle_AddMpCoupon_Handler,
+		},
+		{
+			MethodName: "DelMpCouponList",
+			Handler:    _Lbsingle_DelMpCouponList_Handler,
+		},
+		{
+			MethodName: "UpdateMpCoupon",
+			Handler:    _Lbsingle_UpdateMpCoupon_Handler,
+		},
+		{
+			MethodName: "GetMpCoupon",
+			Handler:    _Lbsingle_GetMpCoupon_Handler,
+		},
+		{
+			MethodName: "GetMpCouponList",
+			Handler:    _Lbsingle_GetMpCouponList_Handler,
+		},
+		{
+			MethodName: "AddMpCouponUser",
+			Handler:    _Lbsingle_AddMpCouponUser_Handler,
+		},
+		{
+			MethodName: "DelMpCouponUserList",
+			Handler:    _Lbsingle_DelMpCouponUserList_Handler,
+		},
+		{
+			MethodName: "UpdateMpCouponUser",
+			Handler:    _Lbsingle_UpdateMpCouponUser_Handler,
+		},
+		{
+			MethodName: "GetMpCouponUser",
+			Handler:    _Lbsingle_GetMpCouponUser_Handler,
+		},
+		{
+			MethodName: "GetMpCouponUserList",
+			Handler:    _Lbsingle_GetMpCouponUserList_Handler,
+		},
+		{
+			MethodName: "AddMpOrderNumber",
+			Handler:    _Lbsingle_AddMpOrderNumber_Handler,
+		},
+		{
+			MethodName: "DelMpOrderNumberList",
+			Handler:    _Lbsingle_DelMpOrderNumberList_Handler,
+		},
+		{
+			MethodName: "UpdateMpOrderNumber",
+			Handler:    _Lbsingle_UpdateMpOrderNumber_Handler,
+		},
+		{
+			MethodName: "GetMpOrderNumber",
+			Handler:    _Lbsingle_GetMpOrderNumber_Handler,
+		},
+		{
+			MethodName: "GetMpOrderNumberList",
+			Handler:    _Lbsingle_GetMpOrderNumberList_Handler,
+		},
+		{
+			MethodName: "AddMpStoreOrder",
+			Handler:    _Lbsingle_AddMpStoreOrder_Handler,
+		},
+		{
+			MethodName: "DelMpStoreOrderList",
+			Handler:    _Lbsingle_DelMpStoreOrderList_Handler,
+		},
+		{
+			MethodName: "UpdateMpStoreOrder",
+			Handler:    _Lbsingle_UpdateMpStoreOrder_Handler,
+		},
+		{
+			MethodName: "GetMpStoreOrder",
+			Handler:    _Lbsingle_GetMpStoreOrder_Handler,
+		},
+		{
+			MethodName: "GetMpStoreOrderList",
+			Handler:    _Lbsingle_GetMpStoreOrderList_Handler,
+		},
+		{
+			MethodName: "AddMpStoreOrderCartInfo",
+			Handler:    _Lbsingle_AddMpStoreOrderCartInfo_Handler,
+		},
+		{
+			MethodName: "DelMpStoreOrderCartInfoList",
+			Handler:    _Lbsingle_DelMpStoreOrderCartInfoList_Handler,
+		},
+		{
+			MethodName: "UpdateMpStoreOrderCartInfo",
+			Handler:    _Lbsingle_UpdateMpStoreOrderCartInfo_Handler,
+		},
+		{
+			MethodName: "GetMpStoreOrderCartInfo",
+			Handler:    _Lbsingle_GetMpStoreOrderCartInfo_Handler,
+		},
+		{
+			MethodName: "GetMpStoreOrderCartInfoList",
+			Handler:    _Lbsingle_GetMpStoreOrderCartInfoList_Handler,
+		},
+		{
+			MethodName: "AddMpStoreOrderStatus",
+			Handler:    _Lbsingle_AddMpStoreOrderStatus_Handler,
+		},
+		{
+			MethodName: "DelMpStoreOrderStatusList",
+			Handler:    _Lbsingle_DelMpStoreOrderStatusList_Handler,
+		},
+		{
+			MethodName: "UpdateMpStoreOrderStatus",
+			Handler:    _Lbsingle_UpdateMpStoreOrderStatus_Handler,
+		},
+		{
+			MethodName: "GetMpStoreOrderStatus",
+			Handler:    _Lbsingle_GetMpStoreOrderStatus_Handler,
+		},
+		{
+			MethodName: "GetMpStoreOrderStatusList",
+			Handler:    _Lbsingle_GetMpStoreOrderStatusList_Handler,
+		},
+		{
+			MethodName: "AddMpMaterial",
+			Handler:    _Lbsingle_AddMpMaterial_Handler,
+		},
+		{
+			MethodName: "DelMpMaterialList",
+			Handler:    _Lbsingle_DelMpMaterialList_Handler,
+		},
+		{
+			MethodName: "UpdateMpMaterial",
+			Handler:    _Lbsingle_UpdateMpMaterial_Handler,
+		},
+		{
+			MethodName: "GetMpMaterial",
+			Handler:    _Lbsingle_GetMpMaterial_Handler,
+		},
+		{
+			MethodName: "GetMpMaterialList",
+			Handler:    _Lbsingle_GetMpMaterialList_Handler,
+		},
+		{
+			MethodName: "AddMpMaterialGroup",
+			Handler:    _Lbsingle_AddMpMaterialGroup_Handler,
+		},
+		{
+			MethodName: "DelMpMaterialGroupList",
+			Handler:    _Lbsingle_DelMpMaterialGroupList_Handler,
+		},
+		{
+			MethodName: "UpdateMpMaterialGroup",
+			Handler:    _Lbsingle_UpdateMpMaterialGroup_Handler,
+		},
+		{
+			MethodName: "GetMpMaterialGroup",
+			Handler:    _Lbsingle_GetMpMaterialGroup_Handler,
+		},
+		{
+			MethodName: "GetMpMaterialGroupList",
+			Handler:    _Lbsingle_GetMpMaterialGroupList_Handler,
+		},
+		{
+			MethodName: "AddMpService",
+			Handler:    _Lbsingle_AddMpService_Handler,
+		},
+		{
+			MethodName: "DelMpServiceList",
+			Handler:    _Lbsingle_DelMpServiceList_Handler,
+		},
+		{
+			MethodName: "UpdateMpService",
+			Handler:    _Lbsingle_UpdateMpService_Handler,
+		},
+		{
+			MethodName: "GetMpService",
+			Handler:    _Lbsingle_GetMpService_Handler,
+		},
+		{
+			MethodName: "GetMpServiceList",
+			Handler:    _Lbsingle_GetMpServiceList_Handler,
+		},
+		{
+			MethodName: "AddMpShopAds",
+			Handler:    _Lbsingle_AddMpShopAds_Handler,
+		},
+		{
+			MethodName: "DelMpShopAdsList",
+			Handler:    _Lbsingle_DelMpShopAdsList_Handler,
+		},
+		{
+			MethodName: "UpdateMpShopAds",
+			Handler:    _Lbsingle_UpdateMpShopAds_Handler,
+		},
+		{
+			MethodName: "GetMpShopAds",
+			Handler:    _Lbsingle_GetMpShopAds_Handler,
+		},
+		{
+			MethodName: "GetMpShopAdsList",
+			Handler:    _Lbsingle_GetMpShopAdsList_Handler,
+		},
+		{
+			MethodName: "GetMpShopAdsListPublic",
+			Handler:    _Lbsingle_GetMpShopAdsListPublic_Handler,
+		},
+		{
+			MethodName: "WxMiniProgramAuthSession",
+			Handler:    _Lbsingle_WxMiniProgramAuthSession_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

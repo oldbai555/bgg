@@ -42,7 +42,7 @@ type program struct {
 }
 
 func (p *program) Init(_ svc.Environment) error {
-	syscfg.InitGlobal("", utils.GetCurDir(), syscfg.OptionWithServer())
+	syscfg.InitGlobal("", utils.GetCurDir(), syscfg.OptionWithServer(), syscfg.OptionWithWxMiniProgram())
 	conf, err := syscfg.GetServerConf()
 	if err != nil {
 		log.Errorf("err:%v", err)

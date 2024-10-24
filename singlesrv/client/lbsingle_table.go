@@ -14,9 +14,69 @@ func (*ModelChat) TableName() string {
 func (*ModelMessage) TableName() string {
 	return "lbsingle_message"
 }
-func (*ModelFoodMenu) TableName() string {
-	return "lbsingle_food_menu"
+func (*ModelMpMerchantDetails) TableName() string {
+	return "lbsingle_mp_merchant_details"
 }
-func (*ModelFoodMenuElem) TableName() string {
-	return "lbsingle_food_menu_elem"
+func (*ModelMpMemberUser) TableName() string {
+	return "lbsingle_mp_member_user"
+}
+func (*ModelMpUserAddress) TableName() string {
+	return "lbsingle_mp_user_address"
+}
+func (*ModelMpUserBill) TableName() string {
+	return "lbsingle_mp_user_bill"
+}
+func (*ModelMpProductCategory) TableName() string {
+	return "lbsingle_mp_product_category"
+}
+func (*ModelMpStoreProduct) TableName() string {
+	return "lbsingle_mp_store_product"
+}
+func (*ModelMpStoreProductAttr) TableName() string {
+	return "lbsingle_mp_store_product_attr"
+}
+func (*ModelMpStoreProductAttrResult) TableName() string {
+	return "lbsingle_mp_store_product_attr_result"
+}
+func (*ModelMpStoreProductAttrValue) TableName() string {
+	return "lbsingle_mp_store_product_attr_value"
+}
+func (*ModelMpStoreProductReply) TableName() string {
+	return "lbsingle_mp_store_product_reply"
+}
+func (*ModelMpStoreProductRule) TableName() string {
+	return "lbsingle_mp_store_product_rule"
+}
+func (*ModelMpStoreShop) TableName() string {
+	return "lbsingle_mp_store_shop"
+}
+func (*ModelMpCoupon) TableName() string {
+	return "lbsingle_mp_coupon"
+}
+func (*ModelMpCouponUser) TableName() string {
+	return "lbsingle_mp_coupon_user"
+}
+func (*ModelMpOrderNumber) TableName() string {
+	return "lbsingle_mp_order_number"
+}
+func (*ModelMpStoreOrder) TableName() string {
+	return "lbsingle_mp_store_order"
+}
+func (*ModelMpStoreOrderCartInfo) TableName() string {
+	return "lbsingle_mp_store_order_cart_info"
+}
+func (*ModelMpStoreOrderStatus) TableName() string {
+	return "lbsingle_mp_store_order_status"
+}
+func (*ModelMpMaterial) TableName() string {
+	return "lbsingle_mp_material"
+}
+func (*ModelMpMaterialGroup) TableName() string {
+	return "lbsingle_mp_material_group"
+}
+func (*ModelMpService) TableName() string {
+	return "lbsingle_mp_service"
+}
+func (*ModelMpShopAds) TableName() string {
+	return "lbsingle_mp_shop_ads"
 }

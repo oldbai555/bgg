@@ -347,6 +347,8 @@ func (m *BaseUser) validate(all bool) error {
 
 	// no validation rules for CreatedAt
 
+	// no validation rules for Type
+
 	if len(errors) > 0 {
 		return BaseUserMultiError(errors)
 	}
@@ -890,6 +892,226 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ChatRoomMemberValidationError{}
+
+// Validate checks the field values on JsCodeToSessionReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *JsCodeToSessionReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on JsCodeToSessionReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// JsCodeToSessionReqMultiError, or nil if none found.
+func (m *JsCodeToSessionReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *JsCodeToSessionReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for JsCode
+
+	// no validation rules for Appid
+
+	// no validation rules for Secret
+
+	if len(errors) > 0 {
+		return JsCodeToSessionReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// JsCodeToSessionReqMultiError is an error wrapping multiple validation errors
+// returned by JsCodeToSessionReq.ValidateAll() if the designated constraints
+// aren't met.
+type JsCodeToSessionReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m JsCodeToSessionReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m JsCodeToSessionReqMultiError) AllErrors() []error { return m }
+
+// JsCodeToSessionReqValidationError is the validation error returned by
+// JsCodeToSessionReq.Validate if the designated constraints aren't met.
+type JsCodeToSessionReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e JsCodeToSessionReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e JsCodeToSessionReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e JsCodeToSessionReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e JsCodeToSessionReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e JsCodeToSessionReqValidationError) ErrorName() string {
+	return "JsCodeToSessionReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e JsCodeToSessionReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sJsCodeToSessionReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = JsCodeToSessionReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = JsCodeToSessionReqValidationError{}
+
+// Validate checks the field values on JsCodeToSessionRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *JsCodeToSessionRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on JsCodeToSessionRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// JsCodeToSessionRspMultiError, or nil if none found.
+func (m *JsCodeToSessionRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *JsCodeToSessionRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for SessionKey
+
+	// no validation rules for Unionid
+
+	// no validation rules for Errmsg
+
+	// no validation rules for Openid
+
+	// no validation rules for Errcode
+
+	if len(errors) > 0 {
+		return JsCodeToSessionRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// JsCodeToSessionRspMultiError is an error wrapping multiple validation errors
+// returned by JsCodeToSessionRsp.ValidateAll() if the designated constraints
+// aren't met.
+type JsCodeToSessionRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m JsCodeToSessionRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m JsCodeToSessionRspMultiError) AllErrors() []error { return m }
+
+// JsCodeToSessionRspValidationError is the validation error returned by
+// JsCodeToSessionRsp.Validate if the designated constraints aren't met.
+type JsCodeToSessionRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e JsCodeToSessionRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e JsCodeToSessionRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e JsCodeToSessionRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e JsCodeToSessionRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e JsCodeToSessionRspValidationError) ErrorName() string {
+	return "JsCodeToSessionRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e JsCodeToSessionRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sJsCodeToSessionRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = JsCodeToSessionRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = JsCodeToSessionRspValidationError{}
 
 // Validate checks the field values on Content_Text with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
