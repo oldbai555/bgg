@@ -102,6 +102,8 @@ const (
 	GetUserListCMDPath                     = "/lbsingle/GetUserList"
 	LoginCMDPath                           = "/lbsingle/Login"
 	LogoutCMDPath                          = "/lbsingle/Logout"
+	MPShopNearByCMDPath                    = "/lbsingle/MPShopNearBy"
+	MPShopProductCMDPath                   = "/lbsingle/MPShopProduct"
 	ResetPasswordCMDPath                   = "/lbsingle/ResetPassword"
 	SyncFileCMDPath                        = "/lbsingle/SyncFile"
 	UpdateLoginUserInfoCMDPath             = "/lbsingle/UpdateLoginUserInfo"
@@ -128,5 +130,7 @@ const (
 	UpdateMpUserAddressCMDPath             = "/lbsingle/UpdateMpUserAddress"
 	UpdateMpUserBillCMDPath                = "/lbsingle/UpdateMpUserBill"
 	UpdateUserCMDPath                      = "/lbsingle/UpdateUser"
+	WxMPAuthSendSmsCodeCMDPath             = "/lbsingle/WxMPAuthSendSmsCode"
+	WxMPAuthSendSmsLoginCMDPath            = "/lbsingle/WxMPAuthSendSmsLogin"
 	WxMiniProgramAuthSessionCMDPath        = "/lbsingle/WxMiniProgramAuthSession"
 )

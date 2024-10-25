@@ -261,4 +261,12 @@ var cmdList = []*bcmd.Cmd{
 	{Server: client.ServerName, Path: client.GetMpShopAdsListPublicCMDPath, GRpcFunc: server.OnceSvrImpl.GetMpShopAdsListPublic, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "public"}},
 
 	{Server: client.ServerName, Path: client.WxMiniProgramAuthSessionCMDPath, GRpcFunc: server.OnceSvrImpl.WxMiniProgramAuthSession, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "public"}},
+
+	{Server: client.ServerName, Path: client.WxMPAuthSendSmsCodeCMDPath, GRpcFunc: server.OnceSvrImpl.WxMPAuthSendSmsCode, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "public"}},
+
+	{Server: client.ServerName, Path: client.WxMPAuthSendSmsLoginCMDPath, GRpcFunc: server.OnceSvrImpl.WxMPAuthSendSmsLogin, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "public"}},
+
+	{Server: client.ServerName, Path: client.MPShopNearByCMDPath, GRpcFunc: server.OnceSvrImpl.MPShopNearBy, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "public"}},
+
+	{Server: client.ServerName, Path: client.MPShopProductCMDPath, GRpcFunc: server.OnceSvrImpl.MPShopProduct, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "public"}},
 }

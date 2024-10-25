@@ -319,11 +319,6 @@ var ModelMpMemberUser = &engine.ModelObjectType{
 				IsArray:   false,
 			},
 			{
-				FieldName: "creator_id",
-				Type:      "uint64",
-				IsArray:   false,
-			},
-			{
 				FieldName: "nickname",
 				Type:      "string",
 				IsArray:   false,
@@ -691,11 +686,6 @@ var ModelMpStoreProduct = &engine.ModelObjectType{
 				IsArray:   false,
 			},
 			{
-				FieldName: "shop_name",
-				Type:      "string",
-				IsArray:   false,
-			},
-			{
 				FieldName: "image",
 				Type:      "string",
 				IsArray:   false,
@@ -706,12 +696,12 @@ var ModelMpStoreProduct = &engine.ModelObjectType{
 				IsArray:   true,
 			},
 			{
-				FieldName: "store_name",
+				FieldName: "name",
 				Type:      "string",
 				IsArray:   false,
 			},
 			{
-				FieldName: "store_info",
+				FieldName: "info",
 				Type:      "string",
 				IsArray:   false,
 			},
@@ -727,7 +717,7 @@ var ModelMpStoreProduct = &engine.ModelObjectType{
 			},
 			{
 				FieldName: "cate_id",
-				Type:      "string",
+				Type:      "uint64",
 				IsArray:   false,
 			},
 			{
@@ -776,43 +766,8 @@ var ModelMpStoreProduct = &engine.ModelObjectType{
 				IsArray:   false,
 			},
 			{
-				FieldName: "is_show",
-				Type:      "int32",
-				IsArray:   false,
-			},
-			{
-				FieldName: "is_hot",
-				Type:      "bool",
-				IsArray:   false,
-			},
-			{
-				FieldName: "is_benefit",
-				Type:      "bool",
-				IsArray:   false,
-			},
-			{
-				FieldName: "is_best",
-				Type:      "bool",
-				IsArray:   false,
-			},
-			{
-				FieldName: "is_new",
-				Type:      "int32",
-				IsArray:   false,
-			},
-			{
 				FieldName: "description",
 				Type:      "string",
-				IsArray:   false,
-			},
-			{
-				FieldName: "is_postage",
-				Type:      "int32",
-				IsArray:   false,
-			},
-			{
-				FieldName: "mer_use",
-				Type:      "int32",
 				IsArray:   false,
 			},
 			{
@@ -823,21 +778,6 @@ var ModelMpStoreProduct = &engine.ModelObjectType{
 			{
 				FieldName: "cost",
 				Type:      "int64",
-				IsArray:   false,
-			},
-			{
-				FieldName: "is_seckill",
-				Type:      "int32",
-				IsArray:   false,
-			},
-			{
-				FieldName: "is_bargain",
-				Type:      "int32",
-				IsArray:   false,
-			},
-			{
-				FieldName: "is_good",
-				Type:      "bool",
 				IsArray:   false,
 			},
 			{
@@ -856,11 +796,6 @@ var ModelMpStoreProduct = &engine.ModelObjectType{
 				IsArray:   false,
 			},
 			{
-				FieldName: "is_sub",
-				Type:      "bool",
-				IsArray:   false,
-			},
-			{
 				FieldName: "temp_id",
 				Type:      "int32",
 				IsArray:   false,
@@ -871,13 +806,13 @@ var ModelMpStoreProduct = &engine.ModelObjectType{
 				IsArray:   false,
 			},
 			{
-				FieldName: "is_integral",
+				FieldName: "integral",
 				Type:      "int32",
 				IsArray:   false,
 			},
 			{
-				FieldName: "integral",
-				Type:      "int32",
+				FieldName: "prop",
+				Type:      "uint32",
 				IsArray:   false,
 			},
 		},
@@ -915,7 +850,7 @@ var ModelMpStoreProductAttr = &engine.ModelObjectType{
 			},
 			{
 				FieldName: "product_id",
-				Type:      "int64",
+				Type:      "uint64",
 				IsArray:   false,
 			},
 			{
@@ -926,7 +861,7 @@ var ModelMpStoreProductAttr = &engine.ModelObjectType{
 			{
 				FieldName: "attr_values",
 				Type:      "string",
-				IsArray:   false,
+				IsArray:   true,
 			},
 		},
 	},
@@ -1006,7 +941,7 @@ var ModelMpStoreProductAttrValue = &engine.ModelObjectType{
 			},
 			{
 				FieldName: "product_id",
-				Type:      "int64",
+				Type:      "uint64",
 				IsArray:   false,
 			},
 			{
@@ -1031,11 +966,6 @@ var ModelMpStoreProductAttrValue = &engine.ModelObjectType{
 			},
 			{
 				FieldName: "image",
-				Type:      "string",
-				IsArray:   false,
-			},
-			{
-				FieldName: "unique",
 				Type:      "string",
 				IsArray:   false,
 			},
@@ -1223,7 +1153,7 @@ var ModelMpStoreProductRule = &engine.ModelObjectType{
 			{
 				FieldName: "rule_value",
 				Type:      "string",
-				IsArray:   false,
+				IsArray:   true,
 			},
 		},
 	},

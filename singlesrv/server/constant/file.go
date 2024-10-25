@@ -7,5 +7,6 @@
 package constant
 
 const (
-	FileCachePrefix = "FileSortUrlCache"
+	FileCachePrefix  = "FileSortUrlCache"
+	MpSmsCachePrefix = "MpSmsCache"
 )

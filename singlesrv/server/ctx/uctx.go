@@ -30,6 +30,7 @@ func NewCtx(ctx context.Context, options ...Option) *Ctx {
 
 type Ctx struct {
 	*uctx.BaseUCtx
+	ClientIp string
 }
 
 type Option func(ctx *Ctx)
@@ -90,5 +91,11 @@ func WithGinHeaderAuthType(ctx *gin.Context, cmd *bcmd.Cmd) Option {
 		} else {
 			c.SetAuthType(cmd.GetAuthType())
 		}
+	}
+}
+
+func WithClientIp(ctx *gin.Context) Option {
+	return func(c *Ctx) {
+		c.ClientIp = ctx.ClientIP()
 	}
 }

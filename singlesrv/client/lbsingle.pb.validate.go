@@ -1246,8 +1246,6 @@ func (m *ModelMpMemberUser) validate(all bool) error {
 
 	// no validation rules for DeletedAt
 
-	// no validation rules for CreatorId
-
 	// no validation rules for Nickname
 
 	// no validation rules for Avatar
@@ -1788,13 +1786,11 @@ func (m *ModelMpStoreProduct) validate(all bool) error {
 
 	// no validation rules for MpStoreShopId
 
-	// no validation rules for ShopName
-
 	// no validation rules for Image
 
-	// no validation rules for StoreName
+	// no validation rules for Name
 
-	// no validation rules for StoreInfo
+	// no validation rules for Info
 
 	// no validation rules for Keyword
 
@@ -1820,31 +1816,11 @@ func (m *ModelMpStoreProduct) validate(all bool) error {
 
 	// no validation rules for Stock
 
-	// no validation rules for IsShow
-
-	// no validation rules for IsHot
-
-	// no validation rules for IsBenefit
-
-	// no validation rules for IsBest
-
-	// no validation rules for IsNew
-
 	// no validation rules for Description
-
-	// no validation rules for IsPostage
-
-	// no validation rules for MerUse
 
 	// no validation rules for GiveIntegral
 
 	// no validation rules for Cost
-
-	// no validation rules for IsSeckill
-
-	// no validation rules for IsBargain
-
-	// no validation rules for IsGood
 
 	// no validation rules for Ficti
 
@@ -1852,15 +1828,13 @@ func (m *ModelMpStoreProduct) validate(all bool) error {
 
 	// no validation rules for CodePath
 
-	// no validation rules for IsSub
-
 	// no validation rules for TempId
 
 	// no validation rules for SpecType
 
-	// no validation rules for IsIntegral
-
 	// no validation rules for Integral
+
+	// no validation rules for Prop
 
 	if len(errors) > 0 {
 		return ModelMpStoreProductMultiError(errors)
@@ -1977,8 +1951,6 @@ func (m *ModelMpStoreProductAttr) validate(all bool) error {
 	// no validation rules for ProductId
 
 	// no validation rules for AttrName
-
-	// no validation rules for AttrValues
 
 	if len(errors) > 0 {
 		return ModelMpStoreProductAttrMultiError(errors)
@@ -2220,8 +2192,6 @@ func (m *ModelMpStoreProductAttrValue) validate(all bool) error {
 	// no validation rules for Price
 
 	// no validation rules for Image
-
-	// no validation rules for Unique
 
 	// no validation rules for Cost
 
@@ -2491,8 +2461,6 @@ func (m *ModelMpStoreProductRule) validate(all bool) error {
 	// no validation rules for CreatorId
 
 	// no validation rules for RuleName
-
-	// no validation rules for RuleValue
 
 	if len(errors) > 0 {
 		return ModelMpStoreProductRuleMultiError(errors)
@@ -36945,3 +36913,1502 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = WxMiniProgramAuthSessionRspValidationError{}
+
+// Validate checks the field values on WxMPAuthSendSmsCodeReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *WxMPAuthSendSmsCodeReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on WxMPAuthSendSmsCodeReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// WxMPAuthSendSmsCodeReqMultiError, or nil if none found.
+func (m *WxMPAuthSendSmsCodeReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *WxMPAuthSendSmsCodeReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Mobile
+
+	// no validation rules for Scene
+
+	if len(errors) > 0 {
+		return WxMPAuthSendSmsCodeReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// WxMPAuthSendSmsCodeReqMultiError is an error wrapping multiple validation
+// errors returned by WxMPAuthSendSmsCodeReq.ValidateAll() if the designated
+// constraints aren't met.
+type WxMPAuthSendSmsCodeReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m WxMPAuthSendSmsCodeReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m WxMPAuthSendSmsCodeReqMultiError) AllErrors() []error { return m }
+
+// WxMPAuthSendSmsCodeReqValidationError is the validation error returned by
+// WxMPAuthSendSmsCodeReq.Validate if the designated constraints aren't met.
+type WxMPAuthSendSmsCodeReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e WxMPAuthSendSmsCodeReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e WxMPAuthSendSmsCodeReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e WxMPAuthSendSmsCodeReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e WxMPAuthSendSmsCodeReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e WxMPAuthSendSmsCodeReqValidationError) ErrorName() string {
+	return "WxMPAuthSendSmsCodeReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e WxMPAuthSendSmsCodeReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sWxMPAuthSendSmsCodeReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = WxMPAuthSendSmsCodeReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = WxMPAuthSendSmsCodeReqValidationError{}
+
+// Validate checks the field values on WxMPAuthSendSmsCodeRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *WxMPAuthSendSmsCodeRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on WxMPAuthSendSmsCodeRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// WxMPAuthSendSmsCodeRspMultiError, or nil if none found.
+func (m *WxMPAuthSendSmsCodeRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *WxMPAuthSendSmsCodeRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Code
+
+	if len(errors) > 0 {
+		return WxMPAuthSendSmsCodeRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// WxMPAuthSendSmsCodeRspMultiError is an error wrapping multiple validation
+// errors returned by WxMPAuthSendSmsCodeRsp.ValidateAll() if the designated
+// constraints aren't met.
+type WxMPAuthSendSmsCodeRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m WxMPAuthSendSmsCodeRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m WxMPAuthSendSmsCodeRspMultiError) AllErrors() []error { return m }
+
+// WxMPAuthSendSmsCodeRspValidationError is the validation error returned by
+// WxMPAuthSendSmsCodeRsp.Validate if the designated constraints aren't met.
+type WxMPAuthSendSmsCodeRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e WxMPAuthSendSmsCodeRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e WxMPAuthSendSmsCodeRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e WxMPAuthSendSmsCodeRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e WxMPAuthSendSmsCodeRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e WxMPAuthSendSmsCodeRspValidationError) ErrorName() string {
+	return "WxMPAuthSendSmsCodeRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e WxMPAuthSendSmsCodeRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sWxMPAuthSendSmsCodeRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = WxMPAuthSendSmsCodeRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = WxMPAuthSendSmsCodeRspValidationError{}
+
+// Validate checks the field values on WxMPAuthSendSmsLoginReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *WxMPAuthSendSmsLoginReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on WxMPAuthSendSmsLoginReq with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// WxMPAuthSendSmsLoginReqMultiError, or nil if none found.
+func (m *WxMPAuthSendSmsLoginReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *WxMPAuthSendSmsLoginReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Openid
+
+	// no validation rules for Mobile
+
+	// no validation rules for From
+
+	// no validation rules for Code
+
+	if len(errors) > 0 {
+		return WxMPAuthSendSmsLoginReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// WxMPAuthSendSmsLoginReqMultiError is an error wrapping multiple validation
+// errors returned by WxMPAuthSendSmsLoginReq.ValidateAll() if the designated
+// constraints aren't met.
+type WxMPAuthSendSmsLoginReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m WxMPAuthSendSmsLoginReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m WxMPAuthSendSmsLoginReqMultiError) AllErrors() []error { return m }
+
+// WxMPAuthSendSmsLoginReqValidationError is the validation error returned by
+// WxMPAuthSendSmsLoginReq.Validate if the designated constraints aren't met.
+type WxMPAuthSendSmsLoginReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e WxMPAuthSendSmsLoginReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e WxMPAuthSendSmsLoginReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e WxMPAuthSendSmsLoginReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e WxMPAuthSendSmsLoginReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e WxMPAuthSendSmsLoginReqValidationError) ErrorName() string {
+	return "WxMPAuthSendSmsLoginReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e WxMPAuthSendSmsLoginReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sWxMPAuthSendSmsLoginReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = WxMPAuthSendSmsLoginReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = WxMPAuthSendSmsLoginReqValidationError{}
+
+// Validate checks the field values on WxMPAuthSendSmsLoginRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *WxMPAuthSendSmsLoginRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on WxMPAuthSendSmsLoginRsp with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// WxMPAuthSendSmsLoginRspMultiError, or nil if none found.
+func (m *WxMPAuthSendSmsLoginRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *WxMPAuthSendSmsLoginRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetUserInfo()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, WxMPAuthSendSmsLoginRspValidationError{
+					field:  "UserInfo",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, WxMPAuthSendSmsLoginRspValidationError{
+					field:  "UserInfo",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetUserInfo()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return WxMPAuthSendSmsLoginRspValidationError{
+				field:  "UserInfo",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for AccessToken
+
+	if len(errors) > 0 {
+		return WxMPAuthSendSmsLoginRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// WxMPAuthSendSmsLoginRspMultiError is an error wrapping multiple validation
+// errors returned by WxMPAuthSendSmsLoginRsp.ValidateAll() if the designated
+// constraints aren't met.
+type WxMPAuthSendSmsLoginRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m WxMPAuthSendSmsLoginRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m WxMPAuthSendSmsLoginRspMultiError) AllErrors() []error { return m }
+
+// WxMPAuthSendSmsLoginRspValidationError is the validation error returned by
+// WxMPAuthSendSmsLoginRsp.Validate if the designated constraints aren't met.
+type WxMPAuthSendSmsLoginRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e WxMPAuthSendSmsLoginRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e WxMPAuthSendSmsLoginRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e WxMPAuthSendSmsLoginRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e WxMPAuthSendSmsLoginRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e WxMPAuthSendSmsLoginRspValidationError) ErrorName() string {
+	return "WxMPAuthSendSmsLoginRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e WxMPAuthSendSmsLoginRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sWxMPAuthSendSmsLoginRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = WxMPAuthSendSmsLoginRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = WxMPAuthSendSmsLoginRspValidationError{}
+
+// Validate checks the field values on MPShopNearByReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *MPShopNearByReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPShopNearByReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPShopNearByReqMultiError, or nil if none found.
+func (m *MPShopNearByReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPShopNearByReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Lat
+
+	// no validation rules for Lng
+
+	// no validation rules for ShopId
+
+	// no validation rules for Kw
+
+	if len(errors) > 0 {
+		return MPShopNearByReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPShopNearByReqMultiError is an error wrapping multiple validation errors
+// returned by MPShopNearByReq.ValidateAll() if the designated constraints
+// aren't met.
+type MPShopNearByReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPShopNearByReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPShopNearByReqMultiError) AllErrors() []error { return m }
+
+// MPShopNearByReqValidationError is the validation error returned by
+// MPShopNearByReq.Validate if the designated constraints aren't met.
+type MPShopNearByReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPShopNearByReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPShopNearByReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPShopNearByReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPShopNearByReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPShopNearByReqValidationError) ErrorName() string { return "MPShopNearByReqValidationError" }
+
+// Error satisfies the builtin error interface
+func (e MPShopNearByReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPShopNearByReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPShopNearByReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPShopNearByReqValidationError{}
+
+// Validate checks the field values on MPShopNearByRsp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *MPShopNearByRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPShopNearByRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPShopNearByRspMultiError, or nil if none found.
+func (m *MPShopNearByRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPShopNearByRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetShop() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, MPShopNearByRspValidationError{
+						field:  fmt.Sprintf("Shop[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, MPShopNearByRspValidationError{
+						field:  fmt.Sprintf("Shop[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return MPShopNearByRspValidationError{
+					field:  fmt.Sprintf("Shop[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return MPShopNearByRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPShopNearByRspMultiError is an error wrapping multiple validation errors
+// returned by MPShopNearByRsp.ValidateAll() if the designated constraints
+// aren't met.
+type MPShopNearByRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPShopNearByRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPShopNearByRspMultiError) AllErrors() []error { return m }
+
+// MPShopNearByRspValidationError is the validation error returned by
+// MPShopNearByRsp.Validate if the designated constraints aren't met.
+type MPShopNearByRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPShopNearByRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPShopNearByRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPShopNearByRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPShopNearByRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPShopNearByRspValidationError) ErrorName() string { return "MPShopNearByRspValidationError" }
+
+// Error satisfies the builtin error interface
+func (e MPShopNearByRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPShopNearByRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPShopNearByRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPShopNearByRspValidationError{}
+
+// Validate checks the field values on MPShopProductReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *MPShopProductReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPShopProductReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPShopProductReqMultiError, or nil if none found.
+func (m *MPShopProductReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPShopProductReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for ShopId
+
+	if len(errors) > 0 {
+		return MPShopProductReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPShopProductReqMultiError is an error wrapping multiple validation errors
+// returned by MPShopProductReq.ValidateAll() if the designated constraints
+// aren't met.
+type MPShopProductReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPShopProductReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPShopProductReqMultiError) AllErrors() []error { return m }
+
+// MPShopProductReqValidationError is the validation error returned by
+// MPShopProductReq.Validate if the designated constraints aren't met.
+type MPShopProductReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPShopProductReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPShopProductReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPShopProductReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPShopProductReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPShopProductReqValidationError) ErrorName() string { return "MPShopProductReqValidationError" }
+
+// Error satisfies the builtin error interface
+func (e MPShopProductReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPShopProductReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPShopProductReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPShopProductReqValidationError{}
+
+// Validate checks the field values on MPShopProductRsp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *MPShopProductRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPShopProductRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPShopProductRspMultiError, or nil if none found.
+func (m *MPShopProductRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPShopProductRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetList() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, MPShopProductRspValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, MPShopProductRspValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return MPShopProductRspValidationError{
+					field:  fmt.Sprintf("List[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	{
+		sorted_keys := make([]uint64, len(m.GetProductMap()))
+		i := 0
+		for key := range m.GetProductMap() {
+			sorted_keys[i] = key
+			i++
+		}
+		sort.Slice(sorted_keys, func(i, j int) bool { return sorted_keys[i] < sorted_keys[j] })
+		for _, key := range sorted_keys {
+			val := m.GetProductMap()[key]
+			_ = val
+
+			// no validation rules for ProductMap[key]
+
+			if all {
+				switch v := interface{}(val).(type) {
+				case interface{ ValidateAll() error }:
+					if err := v.ValidateAll(); err != nil {
+						errors = append(errors, MPShopProductRspValidationError{
+							field:  fmt.Sprintf("ProductMap[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				case interface{ Validate() error }:
+					if err := v.Validate(); err != nil {
+						errors = append(errors, MPShopProductRspValidationError{
+							field:  fmt.Sprintf("ProductMap[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				}
+			} else if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+				if err := v.Validate(); err != nil {
+					return MPShopProductRspValidationError{
+						field:  fmt.Sprintf("ProductMap[%v]", key),
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		}
+	}
+
+	if len(errors) > 0 {
+		return MPShopProductRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPShopProductRspMultiError is an error wrapping multiple validation errors
+// returned by MPShopProductRsp.ValidateAll() if the designated constraints
+// aren't met.
+type MPShopProductRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPShopProductRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPShopProductRspMultiError) AllErrors() []error { return m }
+
+// MPShopProductRspValidationError is the validation error returned by
+// MPShopProductRsp.Validate if the designated constraints aren't met.
+type MPShopProductRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPShopProductRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPShopProductRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPShopProductRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPShopProductRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPShopProductRspValidationError) ErrorName() string { return "MPShopProductRspValidationError" }
+
+// Error satisfies the builtin error interface
+func (e MPShopProductRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPShopProductRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPShopProductRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPShopProductRspValidationError{}
+
+// Validate checks the field values on MPShopProductRsp_AppStoreProduct with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the first error encountered is returned, or nil if there are
+// no violations.
+func (m *MPShopProductRsp_AppStoreProduct) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPShopProductRsp_AppStoreProduct with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// MPShopProductRsp_AppStoreProductMultiError, or nil if none found.
+func (m *MPShopProductRsp_AppStoreProduct) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPShopProductRsp_AppStoreProduct) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetList() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, MPShopProductRsp_AppStoreProductValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, MPShopProductRsp_AppStoreProductValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return MPShopProductRsp_AppStoreProductValidationError{
+					field:  fmt.Sprintf("List[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	{
+		sorted_keys := make([]uint64, len(m.GetProductAttr()))
+		i := 0
+		for key := range m.GetProductAttr() {
+			sorted_keys[i] = key
+			i++
+		}
+		sort.Slice(sorted_keys, func(i, j int) bool { return sorted_keys[i] < sorted_keys[j] })
+		for _, key := range sorted_keys {
+			val := m.GetProductAttr()[key]
+			_ = val
+
+			// no validation rules for ProductAttr[key]
+
+			if all {
+				switch v := interface{}(val).(type) {
+				case interface{ ValidateAll() error }:
+					if err := v.ValidateAll(); err != nil {
+						errors = append(errors, MPShopProductRsp_AppStoreProductValidationError{
+							field:  fmt.Sprintf("ProductAttr[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				case interface{ Validate() error }:
+					if err := v.Validate(); err != nil {
+						errors = append(errors, MPShopProductRsp_AppStoreProductValidationError{
+							field:  fmt.Sprintf("ProductAttr[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				}
+			} else if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+				if err := v.Validate(); err != nil {
+					return MPShopProductRsp_AppStoreProductValidationError{
+						field:  fmt.Sprintf("ProductAttr[%v]", key),
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		}
+	}
+
+	{
+		sorted_keys := make([]uint64, len(m.GetProductAttrValue()))
+		i := 0
+		for key := range m.GetProductAttrValue() {
+			sorted_keys[i] = key
+			i++
+		}
+		sort.Slice(sorted_keys, func(i, j int) bool { return sorted_keys[i] < sorted_keys[j] })
+		for _, key := range sorted_keys {
+			val := m.GetProductAttrValue()[key]
+			_ = val
+
+			// no validation rules for ProductAttrValue[key]
+
+			if all {
+				switch v := interface{}(val).(type) {
+				case interface{ ValidateAll() error }:
+					if err := v.ValidateAll(); err != nil {
+						errors = append(errors, MPShopProductRsp_AppStoreProductValidationError{
+							field:  fmt.Sprintf("ProductAttrValue[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				case interface{ Validate() error }:
+					if err := v.Validate(); err != nil {
+						errors = append(errors, MPShopProductRsp_AppStoreProductValidationError{
+							field:  fmt.Sprintf("ProductAttrValue[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				}
+			} else if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+				if err := v.Validate(); err != nil {
+					return MPShopProductRsp_AppStoreProductValidationError{
+						field:  fmt.Sprintf("ProductAttrValue[%v]", key),
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		}
+	}
+
+	if len(errors) > 0 {
+		return MPShopProductRsp_AppStoreProductMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPShopProductRsp_AppStoreProductMultiError is an error wrapping multiple
+// validation errors returned by
+// MPShopProductRsp_AppStoreProduct.ValidateAll() if the designated
+// constraints aren't met.
+type MPShopProductRsp_AppStoreProductMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPShopProductRsp_AppStoreProductMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPShopProductRsp_AppStoreProductMultiError) AllErrors() []error { return m }
+
+// MPShopProductRsp_AppStoreProductValidationError is the validation error
+// returned by MPShopProductRsp_AppStoreProduct.Validate if the designated
+// constraints aren't met.
+type MPShopProductRsp_AppStoreProductValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPShopProductRsp_AppStoreProductValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPShopProductRsp_AppStoreProductValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPShopProductRsp_AppStoreProductValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPShopProductRsp_AppStoreProductValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPShopProductRsp_AppStoreProductValidationError) ErrorName() string {
+	return "MPShopProductRsp_AppStoreProductValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPShopProductRsp_AppStoreProductValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPShopProductRsp_AppStoreProduct.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPShopProductRsp_AppStoreProductValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPShopProductRsp_AppStoreProductValidationError{}
+
+// Validate checks the field values on MPShopProductRsp_AppStoreProductAttr
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the first error encountered is returned, or nil if
+// there are no violations.
+func (m *MPShopProductRsp_AppStoreProductAttr) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPShopProductRsp_AppStoreProductAttr
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// MPShopProductRsp_AppStoreProductAttrMultiError, or nil if none found.
+func (m *MPShopProductRsp_AppStoreProductAttr) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPShopProductRsp_AppStoreProductAttr) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetList() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, MPShopProductRsp_AppStoreProductAttrValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, MPShopProductRsp_AppStoreProductAttrValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return MPShopProductRsp_AppStoreProductAttrValidationError{
+					field:  fmt.Sprintf("List[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return MPShopProductRsp_AppStoreProductAttrMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPShopProductRsp_AppStoreProductAttrMultiError is an error wrapping multiple
+// validation errors returned by
+// MPShopProductRsp_AppStoreProductAttr.ValidateAll() if the designated
+// constraints aren't met.
+type MPShopProductRsp_AppStoreProductAttrMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPShopProductRsp_AppStoreProductAttrMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPShopProductRsp_AppStoreProductAttrMultiError) AllErrors() []error { return m }
+
+// MPShopProductRsp_AppStoreProductAttrValidationError is the validation error
+// returned by MPShopProductRsp_AppStoreProductAttr.Validate if the designated
+// constraints aren't met.
+type MPShopProductRsp_AppStoreProductAttrValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPShopProductRsp_AppStoreProductAttrValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPShopProductRsp_AppStoreProductAttrValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPShopProductRsp_AppStoreProductAttrValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPShopProductRsp_AppStoreProductAttrValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPShopProductRsp_AppStoreProductAttrValidationError) ErrorName() string {
+	return "MPShopProductRsp_AppStoreProductAttrValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPShopProductRsp_AppStoreProductAttrValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPShopProductRsp_AppStoreProductAttr.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPShopProductRsp_AppStoreProductAttrValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPShopProductRsp_AppStoreProductAttrValidationError{}
+
+// Validate checks the field values on MPShopProductRsp_StoreProductAttrValueDO
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the first error encountered is returned, or nil if
+// there are no violations.
+func (m *MPShopProductRsp_StoreProductAttrValueDO) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on
+// MPShopProductRsp_StoreProductAttrValueDO with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in
+// MPShopProductRsp_StoreProductAttrValueDOMultiError, or nil if none found.
+func (m *MPShopProductRsp_StoreProductAttrValueDO) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPShopProductRsp_StoreProductAttrValueDO) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	{
+		sorted_keys := make([]string, len(m.GetProductValue()))
+		i := 0
+		for key := range m.GetProductValue() {
+			sorted_keys[i] = key
+			i++
+		}
+		sort.Slice(sorted_keys, func(i, j int) bool { return sorted_keys[i] < sorted_keys[j] })
+		for _, key := range sorted_keys {
+			val := m.GetProductValue()[key]
+			_ = val
+
+			// no validation rules for ProductValue[key]
+
+			if all {
+				switch v := interface{}(val).(type) {
+				case interface{ ValidateAll() error }:
+					if err := v.ValidateAll(); err != nil {
+						errors = append(errors, MPShopProductRsp_StoreProductAttrValueDOValidationError{
+							field:  fmt.Sprintf("ProductValue[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				case interface{ Validate() error }:
+					if err := v.Validate(); err != nil {
+						errors = append(errors, MPShopProductRsp_StoreProductAttrValueDOValidationError{
+							field:  fmt.Sprintf("ProductValue[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				}
+			} else if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+				if err := v.Validate(); err != nil {
+					return MPShopProductRsp_StoreProductAttrValueDOValidationError{
+						field:  fmt.Sprintf("ProductValue[%v]", key),
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		}
+	}
+
+	if len(errors) > 0 {
+		return MPShopProductRsp_StoreProductAttrValueDOMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPShopProductRsp_StoreProductAttrValueDOMultiError is an error wrapping
+// multiple validation errors returned by
+// MPShopProductRsp_StoreProductAttrValueDO.ValidateAll() if the designated
+// constraints aren't met.
+type MPShopProductRsp_StoreProductAttrValueDOMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPShopProductRsp_StoreProductAttrValueDOMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPShopProductRsp_StoreProductAttrValueDOMultiError) AllErrors() []error { return m }
+
+// MPShopProductRsp_StoreProductAttrValueDOValidationError is the validation
+// error returned by MPShopProductRsp_StoreProductAttrValueDO.Validate if the
+// designated constraints aren't met.
+type MPShopProductRsp_StoreProductAttrValueDOValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPShopProductRsp_StoreProductAttrValueDOValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPShopProductRsp_StoreProductAttrValueDOValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPShopProductRsp_StoreProductAttrValueDOValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPShopProductRsp_StoreProductAttrValueDOValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPShopProductRsp_StoreProductAttrValueDOValidationError) ErrorName() string {
+	return "MPShopProductRsp_StoreProductAttrValueDOValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPShopProductRsp_StoreProductAttrValueDOValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPShopProductRsp_StoreProductAttrValueDO.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPShopProductRsp_StoreProductAttrValueDOValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPShopProductRsp_StoreProductAttrValueDOValidationError{}

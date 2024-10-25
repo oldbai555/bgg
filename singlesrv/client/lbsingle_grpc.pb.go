@@ -643,6 +643,26 @@ type LbsingleClient interface {
 	// @desc:
 	// @error:
 	WxMiniProgramAuthSession(ctx context.Context, in *WxMiniProgramAuthSessionReq, opts ...grpc.CallOption) (*WxMiniProgramAuthSessionRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	WxMPAuthSendSmsCode(ctx context.Context, in *WxMPAuthSendSmsCodeReq, opts ...grpc.CallOption) (*WxMPAuthSendSmsCodeRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	WxMPAuthSendSmsLogin(ctx context.Context, in *WxMPAuthSendSmsLoginReq, opts ...grpc.CallOption) (*WxMPAuthSendSmsLoginRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPShopNearBy(ctx context.Context, in *MPShopNearByReq, opts ...grpc.CallOption) (*MPShopNearByRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPShopProduct(ctx context.Context, in *MPShopProductReq, opts ...grpc.CallOption) (*MPShopProductRsp, error)
 }
 
 type lbsingleClient struct {
@@ -1787,6 +1807,42 @@ func (c *lbsingleClient) WxMiniProgramAuthSession(ctx context.Context, in *WxMin
 	return out, nil
 }
 
+func (c *lbsingleClient) WxMPAuthSendSmsCode(ctx context.Context, in *WxMPAuthSendSmsCodeReq, opts ...grpc.CallOption) (*WxMPAuthSendSmsCodeRsp, error) {
+	out := new(WxMPAuthSendSmsCodeRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/WxMPAuthSendSmsCode", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) WxMPAuthSendSmsLogin(ctx context.Context, in *WxMPAuthSendSmsLoginReq, opts ...grpc.CallOption) (*WxMPAuthSendSmsLoginRsp, error) {
+	out := new(WxMPAuthSendSmsLoginRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/WxMPAuthSendSmsLogin", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) MPShopNearBy(ctx context.Context, in *MPShopNearByReq, opts ...grpc.CallOption) (*MPShopNearByRsp, error) {
+	out := new(MPShopNearByRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/MPShopNearBy", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) MPShopProduct(ctx context.Context, in *MPShopProductReq, opts ...grpc.CallOption) (*MPShopProductRsp, error) {
+	out := new(MPShopProductRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/MPShopProduct", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // LbsingleServer is the server API for Lbsingle service.
 // All implementations must embed UnimplementedLbsingleServer
 // for forward compatibility
@@ -2412,6 +2468,26 @@ type LbsingleServer interface {
 	// @desc:
 	// @error:
 	WxMiniProgramAuthSession(context.Context, *WxMiniProgramAuthSessionReq) (*WxMiniProgramAuthSessionRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	WxMPAuthSendSmsCode(context.Context, *WxMPAuthSendSmsCodeReq) (*WxMPAuthSendSmsCodeRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	WxMPAuthSendSmsLogin(context.Context, *WxMPAuthSendSmsLoginReq) (*WxMPAuthSendSmsLoginRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPShopNearBy(context.Context, *MPShopNearByReq) (*MPShopNearByRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPShopProduct(context.Context, *MPShopProductReq) (*MPShopProductRsp, error)
 	mustEmbedUnimplementedLbsingleServer()
 }
 
@@ -2796,6 +2872,18 @@ func (UnimplementedLbsingleServer) GetMpShopAdsListPublic(context.Context, *GetM
 }
 func (UnimplementedLbsingleServer) WxMiniProgramAuthSession(context.Context, *WxMiniProgramAuthSessionReq) (*WxMiniProgramAuthSessionRsp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method WxMiniProgramAuthSession not implemented")
+}
+func (UnimplementedLbsingleServer) WxMPAuthSendSmsCode(context.Context, *WxMPAuthSendSmsCodeReq) (*WxMPAuthSendSmsCodeRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method WxMPAuthSendSmsCode not implemented")
+}
+func (UnimplementedLbsingleServer) WxMPAuthSendSmsLogin(context.Context, *WxMPAuthSendSmsLoginReq) (*WxMPAuthSendSmsLoginRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method WxMPAuthSendSmsLogin not implemented")
+}
+func (UnimplementedLbsingleServer) MPShopNearBy(context.Context, *MPShopNearByReq) (*MPShopNearByRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MPShopNearBy not implemented")
+}
+func (UnimplementedLbsingleServer) MPShopProduct(context.Context, *MPShopProductReq) (*MPShopProductRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MPShopProduct not implemented")
 }
 func (UnimplementedLbsingleServer) mustEmbedUnimplementedLbsingleServer() {}
 
@@ -5078,6 +5166,78 @@ func _Lbsingle_WxMiniProgramAuthSession_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Lbsingle_WxMPAuthSendSmsCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WxMPAuthSendSmsCodeReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).WxMPAuthSendSmsCode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/WxMPAuthSendSmsCode",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).WxMPAuthSendSmsCode(ctx, req.(*WxMPAuthSendSmsCodeReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_WxMPAuthSendSmsLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WxMPAuthSendSmsLoginReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).WxMPAuthSendSmsLogin(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/WxMPAuthSendSmsLogin",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).WxMPAuthSendSmsLogin(ctx, req.(*WxMPAuthSendSmsLoginReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_MPShopNearBy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MPShopNearByReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).MPShopNearBy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/MPShopNearBy",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).MPShopNearBy(ctx, req.(*MPShopNearByReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_MPShopProduct_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MPShopProductReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).MPShopProduct(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/MPShopProduct",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).MPShopProduct(ctx, req.(*MPShopProductReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Lbsingle_ServiceDesc is the grpc.ServiceDesc for Lbsingle service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -5588,6 +5748,22 @@ var Lbsingle_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "WxMiniProgramAuthSession",
 			Handler:    _Lbsingle_WxMiniProgramAuthSession_Handler,
+		},
+		{
+			MethodName: "WxMPAuthSendSmsCode",
+			Handler:    _Lbsingle_WxMPAuthSendSmsCode_Handler,
+		},
+		{
+			MethodName: "WxMPAuthSendSmsLogin",
+			Handler:    _Lbsingle_WxMPAuthSendSmsLogin_Handler,
+		},
+		{
+			MethodName: "MPShopNearBy",
+			Handler:    _Lbsingle_MPShopNearBy_Handler,
+		},
+		{
+			MethodName: "MPShopProduct",
+			Handler:    _Lbsingle_MPShopProduct_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

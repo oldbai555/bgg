@@ -173,6 +173,7 @@ func (p *program) registerCmd(r *gin.Engine, cmd *bcmd.Cmd) {
 			c,
 			ctx.WithGinHeaderAuthorization(c),
 			ctx.WithGinHeaderAuthType(c, cmd),
+			ctx.WithClientIp(c),
 		)
 
 		// 需要校验

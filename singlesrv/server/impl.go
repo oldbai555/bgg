@@ -3334,9 +3334,10 @@ func (a *LbsingleServer) WxMiniProgramAuthSession(c context.Context, req *client
 	}
 
 	rsp.Openid = session.Openid
-	rsp.UserInfo, err = OrmMpMemberUser.NewBaseScope().Where(client.FieldMpOpenid, session.Openid).First(ctx.NewCtx(c))
+	rsp.UserInfo, err = OrmMpMemberUser.NewBaseScope().Where(client.FieldMpOpenid_, session.Openid).First(ctx.NewCtx(c))
 	if err != nil {
 		log.Errorf("err:%v", err)
+		err = nil
 	}
 	if rsp.UserInfo != nil {
 		sid := utils.GenUUID()
@@ -3346,6 +3347,169 @@ func (a *LbsingleServer) WxMiniProgramAuthSession(c context.Context, req *client
 			return nil, err
 		}
 		rsp.AccessToken = sid
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) WxMPAuthSendSmsCode(ctx context.Context, req *client.WxMPAuthSendSmsCodeReq) (*client.WxMPAuthSendSmsCodeRsp, error) {
+	var rsp client.WxMPAuthSendSmsCodeRsp
+	var err error
+
+	code, err := cache.GetMpSmsCode(fmt.Sprintf("%s", req.Mobile))
+	if err == nil && code != "" {
+		return nil, client.ErrMpSmsCodeNoExpired
+	}
+
+	rsp.Code = utils.GetRandomString(6, utils.RandomStringModNumber)
+	err = cache.SetMpSmsCode(fmt.Sprintf("%s", req.Mobile), rsp.Code)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) WxMPAuthSendSmsLogin(c context.Context, req *client.WxMPAuthSendSmsLoginReq) (*client.WxMPAuthSendSmsLoginRsp, error) {
+	var rsp client.WxMPAuthSendSmsLoginRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(c)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	ctx2, ok := uCtx.(*ctx.Ctx)
+	if !ok {
+		return nil, client.ErrMpCtxConvertFailed
+	}
+
+	code, err := cache.GetMpSmsCode(fmt.Sprintf("%s", req.Mobile))
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	if code != req.Code {
+		return nil, client.ErrMpSmsCodeNotEqual
+	}
+	cache.DelMpSmsCode(fmt.Sprintf("%s", req.Mobile))
+
+	mpUser := &client.ModelMpMemberUser{
+		Nickname:    "微信用户_" + utils.GenUUID(),
+		Mobile:      req.Mobile,
+		RegisterIp:  ctx2.ClientIp,
+		LastLoginAt: utils.TimeNow(),
+		LastLoginIp: ctx2.ClientIp,
+		LoginType:   req.From,
+		MpOpenid:    req.Openid,
+	}
+
+	isEmpty, err := OrmMpMemberUser.NewBaseScope().Where(client.FieldMobile_, mpUser.Mobile).IsEmpty(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	if isEmpty {
+		err = OrmMpMemberUser.NewBaseScope().Create(uCtx, mpUser)
+	}
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	rsp.UserInfo = mpUser
+	sid := utils.GenUUID()
+	err = cache.SetLoginInfo(sid, rsp.UserInfo.ToBaseUser())
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.AccessToken = sid
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) MPShopNearBy(ctx context.Context, req *client.MPShopNearByReq) (*client.MPShopNearByRsp, error) {
+	var rsp client.MPShopNearByRsp
+	var err error
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	db := OrmMpStoreShop.NewBaseScope()
+	if req.ShopId != 0 {
+		db.Where(client.FieldId_, req.ShopId)
+	}
+	if req.Kw != "" {
+		db.WhereLike(client.FieldName_, fmt.Sprintf("%%%s%%", req.Kw))
+	}
+	rsp.Shop, err = db.Find(uCtx)
+	return &rsp, err
+}
+
+func (a *LbsingleServer) MPShopProduct(ctx context.Context, req *client.MPShopProductReq) (*client.MPShopProductRsp, error) {
+	var rsp client.MPShopProductRsp
+	var err error
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	db := OrmMpStoreShop.NewBaseScope()
+	if req.ShopId != 0 {
+		db.Where(client.FieldId_, req.ShopId)
+	}
+	storeShop, err := db.First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.List, err = OrmMpProductCategory.NewBaseScope().Where(client.FieldMpStoreShopId_, storeShop.Id).Find(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	if len(rsp.List) == 0 {
+		return &rsp, nil
+	}
+
+	rsp.ProductMap = make(map[uint64]*client.MPShopProductRsp_AppStoreProduct)
+	for _, category := range rsp.List {
+		var product client.MPShopProductRsp_AppStoreProduct
+		find, err := OrmMpStoreProduct.NewBaseScope().Where(client.FieldMpStoreShopId_, storeShop.Id).Where(client.FieldCateId_, category.Id).Find(uCtx)
+		if err != nil {
+			log.Errorf("err:%v", err)
+			continue
+		}
+
+		product.List = find
+		product.ProductAttr = make(map[uint64]*client.MPShopProductRsp_AppStoreProductAttr)
+		product.ProductAttrValue = make(map[uint64]*client.MPShopProductRsp_StoreProductAttrValueDO)
+		for _, storeProduct := range find {
+			find2, err := OrmMpStoreProductAttr.NewBaseScope().Where(client.FieldProductId_, storeProduct.Id).Find(uCtx)
+			if err != nil {
+				log.Errorf("err:%v", err)
+				continue
+			}
+			find3, err := OrmMpStoreProductAttrValue.NewBaseScope().Where(client.FieldProductId_, storeProduct.Id).Find(uCtx)
+			if err != nil {
+				log.Errorf("err:%v", err)
+				continue
+			}
+			product.ProductAttr[storeProduct.Id] = &client.MPShopProductRsp_AppStoreProductAttr{
+				List: find2,
+			}
+			product.ProductAttrValue[storeProduct.Id] = &client.MPShopProductRsp_StoreProductAttrValueDO{
+				ProductValue: utils.Slice2MapKeyByStructField(find3, client.FieldSku).(map[string]*client.ModelMpStoreProductAttrValue),
+			}
+		}
+		rsp.ProductMap[category.Id] = &product
 	}
 
 	return &rsp, err

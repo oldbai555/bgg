@@ -44,4 +44,7 @@ var (
 	ErrMpMaterialGroupNotFound          = status.Error(codes.Code(int32(ErrCode_ErrMpMaterialGroupNotFound)), "ErrMpMaterialGroupNotFound")
 	ErrMpServiceNotFound                = status.Error(codes.Code(int32(ErrCode_ErrMpServiceNotFound)), "ErrMpServiceNotFound")
 	ErrMpShopAdsNotFound                = status.Error(codes.Code(int32(ErrCode_ErrMpShopAdsNotFound)), "ErrMpShopAdsNotFound")
+	ErrMpSmsCodeNotEqual                = status.Error(codes.Code(int32(ErrCode_ErrMpSmsCodeNotEqual)), "ErrMpSmsCodeNotEqual")
+	ErrMpCtxConvertFailed               = status.Error(codes.Code(int32(ErrCode_ErrMpCtxConvertFailed)), "ErrMpCtxConvertFailed")
+	ErrMpSmsCodeNoExpired               = status.Error(codes.Code(int32(ErrCode_ErrMpSmsCodeNoExpired)), "ErrMpSmsCodeNoExpired")
 )
