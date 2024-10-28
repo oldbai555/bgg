@@ -269,4 +269,48 @@ var cmdList = []*bcmd.Cmd{
 	{Server: client.ServerName, Path: client.MPShopNearByCMDPath, GRpcFunc: server.OnceSvrImpl.MPShopNearBy, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "public"}},
 
 	{Server: client.ServerName, Path: client.MPShopProductCMDPath, GRpcFunc: server.OnceSvrImpl.MPShopProduct, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "public"}},
+
+	{Server: client.ServerName, Path: client.MPShopCouponCountCMDPath, GRpcFunc: server.OnceSvrImpl.MPShopCouponCount, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "public"}},
+
+	{Server: client.ServerName, Path: client.MPShopCouponListCMDPath, GRpcFunc: server.OnceSvrImpl.MPShopCouponList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "public"}},
+
+	{Server: client.ServerName, Path: client.MPShopCouponMineCMDPath, GRpcFunc: server.OnceSvrImpl.MPShopCouponMine, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: client.ServerName, Path: client.MPShopCouponReceiveCMDPath, GRpcFunc: server.OnceSvrImpl.MPShopCouponReceive, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "public"}},
+
+	{Server: client.ServerName, Path: client.MPShopOrderCreateCMDPath, GRpcFunc: server.OnceSvrImpl.MPShopOrderCreate, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: client.ServerName, Path: client.MPShopOrderListCMDPath, GRpcFunc: server.OnceSvrImpl.MPShopOrderList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: client.ServerName, Path: client.MPShopOrderDetailCMDPath, GRpcFunc: server.OnceSvrImpl.MPShopOrderDetail, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: client.ServerName, Path: client.MPShopOrderTakeCMDPath, GRpcFunc: server.OnceSvrImpl.MPShopOrderTake, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: client.ServerName, Path: client.MPShopOrderRefundCMDPath, GRpcFunc: server.OnceSvrImpl.MPShopOrderRefund, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: client.ServerName, Path: client.MPShopOrderPayCMDPath, GRpcFunc: server.OnceSvrImpl.MPShopOrderPay, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: client.ServerName, Path: client.MPWechatConfigCMDPath, GRpcFunc: server.OnceSvrImpl.MPWechatConfig, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: client.ServerName, Path: client.MPUserAddressListCMDPath, GRpcFunc: server.OnceSvrImpl.MPUserAddressList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: client.ServerName, Path: client.MPUserAddressDefaultCMDPath, GRpcFunc: server.OnceSvrImpl.MPUserAddressDefault, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: client.ServerName, Path: client.MPUserAddressAddAndEditCMDPath, GRpcFunc: server.OnceSvrImpl.MPUserAddressAddAndEdit, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: client.ServerName, Path: client.MPUserAddressDelCMDPath, GRpcFunc: server.OnceSvrImpl.MPUserAddressDel, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: client.ServerName, Path: client.MPUserInfoCMDPath, GRpcFunc: server.OnceSvrImpl.MPUserInfo, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: client.ServerName, Path: client.MPUserMineServiceCMDPath, GRpcFunc: server.OnceSvrImpl.MPUserMineService, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: client.ServerName, Path: client.MPUserServiceContentCMDPath, GRpcFunc: server.OnceSvrImpl.MPUserServiceContent, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: client.ServerName, Path: client.MPUserSaveInfoCMDPath, GRpcFunc: server.OnceSvrImpl.MPUserSaveInfo, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: client.ServerName, Path: client.MPUserBillListCMDPath, GRpcFunc: server.OnceSvrImpl.MPUserBillList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: client.ServerName, Path: client.MPUserMoneyListCMDPath, GRpcFunc: server.OnceSvrImpl.MPUserMoneyList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: client.ServerName, Path: client.MPUserRechargeCMDPath, GRpcFunc: server.OnceSvrImpl.MPUserRecharge, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
 }

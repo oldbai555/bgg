@@ -93,6 +93,19 @@ func TestAddUser(t *testing.T) {
 		return
 	}
 }
+func TestDecStock(t *testing.T) {
+	initMysqlTest()
+	_, err := OrmMpStoreProductAttrValue.NewBaseScope().Where(map[string]interface{}{
+		client.FieldProductId_: 1,
+		client.FieldSku_:       "小条",
+	}).Update(uctx.NewBaseUCtx(), map[string]interface{}{
+		client.FieldStock_: fmt.Sprintf("%s-1", client.FieldStock_),
+	})
+	if err != nil {
+		t.Errorf("err:%v", err)
+		return
+	}
+}
 
 func TestAddStore(t *testing.T) {
 	initMysqlTest()

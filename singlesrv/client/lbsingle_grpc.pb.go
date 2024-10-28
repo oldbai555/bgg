@@ -663,6 +663,116 @@ type LbsingleClient interface {
 	// @desc:
 	// @error:
 	MPShopProduct(ctx context.Context, in *MPShopProductReq, opts ...grpc.CallOption) (*MPShopProductRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPShopCouponCount(ctx context.Context, in *MPShopCouponCountReq, opts ...grpc.CallOption) (*MPShopCouponCountRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPShopCouponList(ctx context.Context, in *MPShopCouponListReq, opts ...grpc.CallOption) (*MPShopCouponListRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPShopCouponMine(ctx context.Context, in *MPShopCouponMineReq, opts ...grpc.CallOption) (*MPShopCouponMineRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPShopCouponReceive(ctx context.Context, in *MPShopCouponReceiveReq, opts ...grpc.CallOption) (*MPShopCouponReceiveRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPShopOrderCreate(ctx context.Context, in *MPShopOrderCreateReq, opts ...grpc.CallOption) (*MPShopOrderCreateRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPShopOrderList(ctx context.Context, in *MPShopOrderListReq, opts ...grpc.CallOption) (*MPShopOrderListRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPShopOrderDetail(ctx context.Context, in *MPShopOrderDetailReq, opts ...grpc.CallOption) (*MPShopOrderDetailRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPShopOrderTake(ctx context.Context, in *MPShopOrderTakeReq, opts ...grpc.CallOption) (*MPShopOrderTakeRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPShopOrderRefund(ctx context.Context, in *MPShopOrderRefundReq, opts ...grpc.CallOption) (*MPShopOrderRefundRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPShopOrderPay(ctx context.Context, in *MPShopOrderPayReq, opts ...grpc.CallOption) (*MPShopOrderPayRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPWechatConfig(ctx context.Context, in *MPWechatConfigReq, opts ...grpc.CallOption) (*MPWechatConfigRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPUserAddressList(ctx context.Context, in *MPUserAddressListReq, opts ...grpc.CallOption) (*MPUserAddressListRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPUserAddressDefault(ctx context.Context, in *MPUserAddressDefaultReq, opts ...grpc.CallOption) (*MPUserAddressDefaultRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPUserAddressAddAndEdit(ctx context.Context, in *MPUserAddressAddAndEditReq, opts ...grpc.CallOption) (*MPUserAddressAddAndEditRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPUserAddressDel(ctx context.Context, in *MPUserAddressDelReq, opts ...grpc.CallOption) (*MPUserAddressDelRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPUserInfo(ctx context.Context, in *MPUserInfoReq, opts ...grpc.CallOption) (*MPUserInfoRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPUserMineService(ctx context.Context, in *MPUserMineServiceReq, opts ...grpc.CallOption) (*MPUserMineServiceRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPUserServiceContent(ctx context.Context, in *MPUserServiceContentReq, opts ...grpc.CallOption) (*MPUserServiceContentRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPUserSaveInfo(ctx context.Context, in *MPUserSaveInfoReq, opts ...grpc.CallOption) (*MPUserSaveInfoRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPUserBillList(ctx context.Context, in *MPUserBillListReq, opts ...grpc.CallOption) (*MPUserBillListRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPUserMoneyList(ctx context.Context, in *MPUserMoneyListReq, opts ...grpc.CallOption) (*MPUserMoneyListRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPUserRecharge(ctx context.Context, in *MPUserRechargeReq, opts ...grpc.CallOption) (*MPUserRechargeRsp, error)
 }
 
 type lbsingleClient struct {
@@ -1843,6 +1953,204 @@ func (c *lbsingleClient) MPShopProduct(ctx context.Context, in *MPShopProductReq
 	return out, nil
 }
 
+func (c *lbsingleClient) MPShopCouponCount(ctx context.Context, in *MPShopCouponCountReq, opts ...grpc.CallOption) (*MPShopCouponCountRsp, error) {
+	out := new(MPShopCouponCountRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/MPShopCouponCount", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) MPShopCouponList(ctx context.Context, in *MPShopCouponListReq, opts ...grpc.CallOption) (*MPShopCouponListRsp, error) {
+	out := new(MPShopCouponListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/MPShopCouponList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) MPShopCouponMine(ctx context.Context, in *MPShopCouponMineReq, opts ...grpc.CallOption) (*MPShopCouponMineRsp, error) {
+	out := new(MPShopCouponMineRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/MPShopCouponMine", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) MPShopCouponReceive(ctx context.Context, in *MPShopCouponReceiveReq, opts ...grpc.CallOption) (*MPShopCouponReceiveRsp, error) {
+	out := new(MPShopCouponReceiveRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/MPShopCouponReceive", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) MPShopOrderCreate(ctx context.Context, in *MPShopOrderCreateReq, opts ...grpc.CallOption) (*MPShopOrderCreateRsp, error) {
+	out := new(MPShopOrderCreateRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/MPShopOrderCreate", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) MPShopOrderList(ctx context.Context, in *MPShopOrderListReq, opts ...grpc.CallOption) (*MPShopOrderListRsp, error) {
+	out := new(MPShopOrderListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/MPShopOrderList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) MPShopOrderDetail(ctx context.Context, in *MPShopOrderDetailReq, opts ...grpc.CallOption) (*MPShopOrderDetailRsp, error) {
+	out := new(MPShopOrderDetailRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/MPShopOrderDetail", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) MPShopOrderTake(ctx context.Context, in *MPShopOrderTakeReq, opts ...grpc.CallOption) (*MPShopOrderTakeRsp, error) {
+	out := new(MPShopOrderTakeRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/MPShopOrderTake", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) MPShopOrderRefund(ctx context.Context, in *MPShopOrderRefundReq, opts ...grpc.CallOption) (*MPShopOrderRefundRsp, error) {
+	out := new(MPShopOrderRefundRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/MPShopOrderRefund", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) MPShopOrderPay(ctx context.Context, in *MPShopOrderPayReq, opts ...grpc.CallOption) (*MPShopOrderPayRsp, error) {
+	out := new(MPShopOrderPayRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/MPShopOrderPay", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) MPWechatConfig(ctx context.Context, in *MPWechatConfigReq, opts ...grpc.CallOption) (*MPWechatConfigRsp, error) {
+	out := new(MPWechatConfigRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/MPWechatConfig", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) MPUserAddressList(ctx context.Context, in *MPUserAddressListReq, opts ...grpc.CallOption) (*MPUserAddressListRsp, error) {
+	out := new(MPUserAddressListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/MPUserAddressList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) MPUserAddressDefault(ctx context.Context, in *MPUserAddressDefaultReq, opts ...grpc.CallOption) (*MPUserAddressDefaultRsp, error) {
+	out := new(MPUserAddressDefaultRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/MPUserAddressDefault", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) MPUserAddressAddAndEdit(ctx context.Context, in *MPUserAddressAddAndEditReq, opts ...grpc.CallOption) (*MPUserAddressAddAndEditRsp, error) {
+	out := new(MPUserAddressAddAndEditRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/MPUserAddressAddAndEdit", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) MPUserAddressDel(ctx context.Context, in *MPUserAddressDelReq, opts ...grpc.CallOption) (*MPUserAddressDelRsp, error) {
+	out := new(MPUserAddressDelRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/MPUserAddressDel", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) MPUserInfo(ctx context.Context, in *MPUserInfoReq, opts ...grpc.CallOption) (*MPUserInfoRsp, error) {
+	out := new(MPUserInfoRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/MPUserInfo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) MPUserMineService(ctx context.Context, in *MPUserMineServiceReq, opts ...grpc.CallOption) (*MPUserMineServiceRsp, error) {
+	out := new(MPUserMineServiceRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/MPUserMineService", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) MPUserServiceContent(ctx context.Context, in *MPUserServiceContentReq, opts ...grpc.CallOption) (*MPUserServiceContentRsp, error) {
+	out := new(MPUserServiceContentRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/MPUserServiceContent", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) MPUserSaveInfo(ctx context.Context, in *MPUserSaveInfoReq, opts ...grpc.CallOption) (*MPUserSaveInfoRsp, error) {
+	out := new(MPUserSaveInfoRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/MPUserSaveInfo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) MPUserBillList(ctx context.Context, in *MPUserBillListReq, opts ...grpc.CallOption) (*MPUserBillListRsp, error) {
+	out := new(MPUserBillListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/MPUserBillList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) MPUserMoneyList(ctx context.Context, in *MPUserMoneyListReq, opts ...grpc.CallOption) (*MPUserMoneyListRsp, error) {
+	out := new(MPUserMoneyListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/MPUserMoneyList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) MPUserRecharge(ctx context.Context, in *MPUserRechargeReq, opts ...grpc.CallOption) (*MPUserRechargeRsp, error) {
+	out := new(MPUserRechargeRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/MPUserRecharge", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // LbsingleServer is the server API for Lbsingle service.
 // All implementations must embed UnimplementedLbsingleServer
 // for forward compatibility
@@ -2488,6 +2796,116 @@ type LbsingleServer interface {
 	// @desc:
 	// @error:
 	MPShopProduct(context.Context, *MPShopProductReq) (*MPShopProductRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPShopCouponCount(context.Context, *MPShopCouponCountReq) (*MPShopCouponCountRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPShopCouponList(context.Context, *MPShopCouponListReq) (*MPShopCouponListRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPShopCouponMine(context.Context, *MPShopCouponMineReq) (*MPShopCouponMineRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPShopCouponReceive(context.Context, *MPShopCouponReceiveReq) (*MPShopCouponReceiveRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPShopOrderCreate(context.Context, *MPShopOrderCreateReq) (*MPShopOrderCreateRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPShopOrderList(context.Context, *MPShopOrderListReq) (*MPShopOrderListRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPShopOrderDetail(context.Context, *MPShopOrderDetailReq) (*MPShopOrderDetailRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPShopOrderTake(context.Context, *MPShopOrderTakeReq) (*MPShopOrderTakeRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPShopOrderRefund(context.Context, *MPShopOrderRefundReq) (*MPShopOrderRefundRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPShopOrderPay(context.Context, *MPShopOrderPayReq) (*MPShopOrderPayRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPWechatConfig(context.Context, *MPWechatConfigReq) (*MPWechatConfigRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPUserAddressList(context.Context, *MPUserAddressListReq) (*MPUserAddressListRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPUserAddressDefault(context.Context, *MPUserAddressDefaultReq) (*MPUserAddressDefaultRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPUserAddressAddAndEdit(context.Context, *MPUserAddressAddAndEditReq) (*MPUserAddressAddAndEditRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPUserAddressDel(context.Context, *MPUserAddressDelReq) (*MPUserAddressDelRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPUserInfo(context.Context, *MPUserInfoReq) (*MPUserInfoRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPUserMineService(context.Context, *MPUserMineServiceReq) (*MPUserMineServiceRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPUserServiceContent(context.Context, *MPUserServiceContentReq) (*MPUserServiceContentRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPUserSaveInfo(context.Context, *MPUserSaveInfoReq) (*MPUserSaveInfoRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPUserBillList(context.Context, *MPUserBillListReq) (*MPUserBillListRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPUserMoneyList(context.Context, *MPUserMoneyListReq) (*MPUserMoneyListRsp, error)
+	// @cat:
+	// @name:
+	// @desc:
+	// @error:
+	MPUserRecharge(context.Context, *MPUserRechargeReq) (*MPUserRechargeRsp, error)
 	mustEmbedUnimplementedLbsingleServer()
 }
 
@@ -2884,6 +3302,72 @@ func (UnimplementedLbsingleServer) MPShopNearBy(context.Context, *MPShopNearByRe
 }
 func (UnimplementedLbsingleServer) MPShopProduct(context.Context, *MPShopProductReq) (*MPShopProductRsp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method MPShopProduct not implemented")
+}
+func (UnimplementedLbsingleServer) MPShopCouponCount(context.Context, *MPShopCouponCountReq) (*MPShopCouponCountRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MPShopCouponCount not implemented")
+}
+func (UnimplementedLbsingleServer) MPShopCouponList(context.Context, *MPShopCouponListReq) (*MPShopCouponListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MPShopCouponList not implemented")
+}
+func (UnimplementedLbsingleServer) MPShopCouponMine(context.Context, *MPShopCouponMineReq) (*MPShopCouponMineRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MPShopCouponMine not implemented")
+}
+func (UnimplementedLbsingleServer) MPShopCouponReceive(context.Context, *MPShopCouponReceiveReq) (*MPShopCouponReceiveRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MPShopCouponReceive not implemented")
+}
+func (UnimplementedLbsingleServer) MPShopOrderCreate(context.Context, *MPShopOrderCreateReq) (*MPShopOrderCreateRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MPShopOrderCreate not implemented")
+}
+func (UnimplementedLbsingleServer) MPShopOrderList(context.Context, *MPShopOrderListReq) (*MPShopOrderListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MPShopOrderList not implemented")
+}
+func (UnimplementedLbsingleServer) MPShopOrderDetail(context.Context, *MPShopOrderDetailReq) (*MPShopOrderDetailRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MPShopOrderDetail not implemented")
+}
+func (UnimplementedLbsingleServer) MPShopOrderTake(context.Context, *MPShopOrderTakeReq) (*MPShopOrderTakeRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MPShopOrderTake not implemented")
+}
+func (UnimplementedLbsingleServer) MPShopOrderRefund(context.Context, *MPShopOrderRefundReq) (*MPShopOrderRefundRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MPShopOrderRefund not implemented")
+}
+func (UnimplementedLbsingleServer) MPShopOrderPay(context.Context, *MPShopOrderPayReq) (*MPShopOrderPayRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MPShopOrderPay not implemented")
+}
+func (UnimplementedLbsingleServer) MPWechatConfig(context.Context, *MPWechatConfigReq) (*MPWechatConfigRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MPWechatConfig not implemented")
+}
+func (UnimplementedLbsingleServer) MPUserAddressList(context.Context, *MPUserAddressListReq) (*MPUserAddressListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MPUserAddressList not implemented")
+}
+func (UnimplementedLbsingleServer) MPUserAddressDefault(context.Context, *MPUserAddressDefaultReq) (*MPUserAddressDefaultRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MPUserAddressDefault not implemented")
+}
+func (UnimplementedLbsingleServer) MPUserAddressAddAndEdit(context.Context, *MPUserAddressAddAndEditReq) (*MPUserAddressAddAndEditRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MPUserAddressAddAndEdit not implemented")
+}
+func (UnimplementedLbsingleServer) MPUserAddressDel(context.Context, *MPUserAddressDelReq) (*MPUserAddressDelRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MPUserAddressDel not implemented")
+}
+func (UnimplementedLbsingleServer) MPUserInfo(context.Context, *MPUserInfoReq) (*MPUserInfoRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MPUserInfo not implemented")
+}
+func (UnimplementedLbsingleServer) MPUserMineService(context.Context, *MPUserMineServiceReq) (*MPUserMineServiceRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MPUserMineService not implemented")
+}
+func (UnimplementedLbsingleServer) MPUserServiceContent(context.Context, *MPUserServiceContentReq) (*MPUserServiceContentRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MPUserServiceContent not implemented")
+}
+func (UnimplementedLbsingleServer) MPUserSaveInfo(context.Context, *MPUserSaveInfoReq) (*MPUserSaveInfoRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MPUserSaveInfo not implemented")
+}
+func (UnimplementedLbsingleServer) MPUserBillList(context.Context, *MPUserBillListReq) (*MPUserBillListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MPUserBillList not implemented")
+}
+func (UnimplementedLbsingleServer) MPUserMoneyList(context.Context, *MPUserMoneyListReq) (*MPUserMoneyListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MPUserMoneyList not implemented")
+}
+func (UnimplementedLbsingleServer) MPUserRecharge(context.Context, *MPUserRechargeReq) (*MPUserRechargeRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MPUserRecharge not implemented")
 }
 func (UnimplementedLbsingleServer) mustEmbedUnimplementedLbsingleServer() {}
 
@@ -5238,6 +5722,402 @@ func _Lbsingle_MPShopProduct_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Lbsingle_MPShopCouponCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MPShopCouponCountReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).MPShopCouponCount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/MPShopCouponCount",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).MPShopCouponCount(ctx, req.(*MPShopCouponCountReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_MPShopCouponList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MPShopCouponListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).MPShopCouponList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/MPShopCouponList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).MPShopCouponList(ctx, req.(*MPShopCouponListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_MPShopCouponMine_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MPShopCouponMineReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).MPShopCouponMine(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/MPShopCouponMine",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).MPShopCouponMine(ctx, req.(*MPShopCouponMineReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_MPShopCouponReceive_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MPShopCouponReceiveReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).MPShopCouponReceive(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/MPShopCouponReceive",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).MPShopCouponReceive(ctx, req.(*MPShopCouponReceiveReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_MPShopOrderCreate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MPShopOrderCreateReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).MPShopOrderCreate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/MPShopOrderCreate",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).MPShopOrderCreate(ctx, req.(*MPShopOrderCreateReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_MPShopOrderList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MPShopOrderListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).MPShopOrderList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/MPShopOrderList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).MPShopOrderList(ctx, req.(*MPShopOrderListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_MPShopOrderDetail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MPShopOrderDetailReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).MPShopOrderDetail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/MPShopOrderDetail",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).MPShopOrderDetail(ctx, req.(*MPShopOrderDetailReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_MPShopOrderTake_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MPShopOrderTakeReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).MPShopOrderTake(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/MPShopOrderTake",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).MPShopOrderTake(ctx, req.(*MPShopOrderTakeReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_MPShopOrderRefund_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MPShopOrderRefundReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).MPShopOrderRefund(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/MPShopOrderRefund",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).MPShopOrderRefund(ctx, req.(*MPShopOrderRefundReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_MPShopOrderPay_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MPShopOrderPayReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).MPShopOrderPay(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/MPShopOrderPay",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).MPShopOrderPay(ctx, req.(*MPShopOrderPayReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_MPWechatConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MPWechatConfigReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).MPWechatConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/MPWechatConfig",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).MPWechatConfig(ctx, req.(*MPWechatConfigReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_MPUserAddressList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MPUserAddressListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).MPUserAddressList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/MPUserAddressList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).MPUserAddressList(ctx, req.(*MPUserAddressListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_MPUserAddressDefault_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MPUserAddressDefaultReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).MPUserAddressDefault(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/MPUserAddressDefault",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).MPUserAddressDefault(ctx, req.(*MPUserAddressDefaultReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_MPUserAddressAddAndEdit_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MPUserAddressAddAndEditReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).MPUserAddressAddAndEdit(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/MPUserAddressAddAndEdit",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).MPUserAddressAddAndEdit(ctx, req.(*MPUserAddressAddAndEditReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_MPUserAddressDel_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MPUserAddressDelReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).MPUserAddressDel(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/MPUserAddressDel",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).MPUserAddressDel(ctx, req.(*MPUserAddressDelReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_MPUserInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MPUserInfoReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).MPUserInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/MPUserInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).MPUserInfo(ctx, req.(*MPUserInfoReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_MPUserMineService_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MPUserMineServiceReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).MPUserMineService(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/MPUserMineService",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).MPUserMineService(ctx, req.(*MPUserMineServiceReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_MPUserServiceContent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MPUserServiceContentReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).MPUserServiceContent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/MPUserServiceContent",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).MPUserServiceContent(ctx, req.(*MPUserServiceContentReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_MPUserSaveInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MPUserSaveInfoReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).MPUserSaveInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/MPUserSaveInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).MPUserSaveInfo(ctx, req.(*MPUserSaveInfoReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_MPUserBillList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MPUserBillListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).MPUserBillList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/MPUserBillList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).MPUserBillList(ctx, req.(*MPUserBillListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_MPUserMoneyList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MPUserMoneyListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).MPUserMoneyList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/MPUserMoneyList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).MPUserMoneyList(ctx, req.(*MPUserMoneyListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_MPUserRecharge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MPUserRechargeReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).MPUserRecharge(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/MPUserRecharge",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).MPUserRecharge(ctx, req.(*MPUserRechargeReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Lbsingle_ServiceDesc is the grpc.ServiceDesc for Lbsingle service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -5764,6 +6644,94 @@ var Lbsingle_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "MPShopProduct",
 			Handler:    _Lbsingle_MPShopProduct_Handler,
+		},
+		{
+			MethodName: "MPShopCouponCount",
+			Handler:    _Lbsingle_MPShopCouponCount_Handler,
+		},
+		{
+			MethodName: "MPShopCouponList",
+			Handler:    _Lbsingle_MPShopCouponList_Handler,
+		},
+		{
+			MethodName: "MPShopCouponMine",
+			Handler:    _Lbsingle_MPShopCouponMine_Handler,
+		},
+		{
+			MethodName: "MPShopCouponReceive",
+			Handler:    _Lbsingle_MPShopCouponReceive_Handler,
+		},
+		{
+			MethodName: "MPShopOrderCreate",
+			Handler:    _Lbsingle_MPShopOrderCreate_Handler,
+		},
+		{
+			MethodName: "MPShopOrderList",
+			Handler:    _Lbsingle_MPShopOrderList_Handler,
+		},
+		{
+			MethodName: "MPShopOrderDetail",
+			Handler:    _Lbsingle_MPShopOrderDetail_Handler,
+		},
+		{
+			MethodName: "MPShopOrderTake",
+			Handler:    _Lbsingle_MPShopOrderTake_Handler,
+		},
+		{
+			MethodName: "MPShopOrderRefund",
+			Handler:    _Lbsingle_MPShopOrderRefund_Handler,
+		},
+		{
+			MethodName: "MPShopOrderPay",
+			Handler:    _Lbsingle_MPShopOrderPay_Handler,
+		},
+		{
+			MethodName: "MPWechatConfig",
+			Handler:    _Lbsingle_MPWechatConfig_Handler,
+		},
+		{
+			MethodName: "MPUserAddressList",
+			Handler:    _Lbsingle_MPUserAddressList_Handler,
+		},
+		{
+			MethodName: "MPUserAddressDefault",
+			Handler:    _Lbsingle_MPUserAddressDefault_Handler,
+		},
+		{
+			MethodName: "MPUserAddressAddAndEdit",
+			Handler:    _Lbsingle_MPUserAddressAddAndEdit_Handler,
+		},
+		{
+			MethodName: "MPUserAddressDel",
+			Handler:    _Lbsingle_MPUserAddressDel_Handler,
+		},
+		{
+			MethodName: "MPUserInfo",
+			Handler:    _Lbsingle_MPUserInfo_Handler,
+		},
+		{
+			MethodName: "MPUserMineService",
+			Handler:    _Lbsingle_MPUserMineService_Handler,
+		},
+		{
+			MethodName: "MPUserServiceContent",
+			Handler:    _Lbsingle_MPUserServiceContent_Handler,
+		},
+		{
+			MethodName: "MPUserSaveInfo",
+			Handler:    _Lbsingle_MPUserSaveInfo_Handler,
+		},
+		{
+			MethodName: "MPUserBillList",
+			Handler:    _Lbsingle_MPUserBillList_Handler,
+		},
+		{
+			MethodName: "MPUserMoneyList",
+			Handler:    _Lbsingle_MPUserMoneyList_Handler,
+		},
+		{
+			MethodName: "MPUserRecharge",
+			Handler:    _Lbsingle_MPUserRecharge_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

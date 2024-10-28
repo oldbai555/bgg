@@ -1552,7 +1552,7 @@ var ModelMpStoreOrder = &engine.ModelObjectType{
 			},
 			{
 				FieldName: "total_num",
-				Type:      "int32",
+				Type:      "uint32",
 				IsArray:   false,
 			},
 			{
@@ -1582,7 +1582,7 @@ var ModelMpStoreOrder = &engine.ModelObjectType{
 			},
 			{
 				FieldName: "coupon_id",
-				Type:      "int32",
+				Type:      "uint64",
 				IsArray:   false,
 			},
 			{
@@ -1810,7 +1810,7 @@ var ModelMpStoreOrderCartInfo = &engine.ModelObjectType{
 			},
 			{
 				FieldName: "mp_order_id",
-				Type:      "int64",
+				Type:      "uint64",
 				IsArray:   false,
 			},
 			{
@@ -1820,12 +1820,12 @@ var ModelMpStoreOrderCartInfo = &engine.ModelObjectType{
 			},
 			{
 				FieldName: "cart_id",
-				Type:      "int64",
+				Type:      "uint64",
 				IsArray:   false,
 			},
 			{
 				FieldName: "product_id",
-				Type:      "int64",
+				Type:      "uint64",
 				IsArray:   false,
 			},
 			{
@@ -1855,7 +1855,7 @@ var ModelMpStoreOrderCartInfo = &engine.ModelObjectType{
 			},
 			{
 				FieldName: "number",
-				Type:      "int32",
+				Type:      "uint32",
 				IsArray:   false,
 			},
 			{
@@ -1903,7 +1903,7 @@ var ModelMpStoreOrderStatus = &engine.ModelObjectType{
 			},
 			{
 				FieldName: "oid",
-				Type:      "int64",
+				Type:      "uint64",
 				IsArray:   false,
 			},
 			{

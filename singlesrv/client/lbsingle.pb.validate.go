@@ -37891,6 +37891,4666 @@ var _ interface {
 	ErrorName() string
 } = MPShopProductRspValidationError{}
 
+// Validate checks the field values on MPShopCouponCountReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MPShopCouponCountReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPShopCouponCountReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPShopCouponCountReqMultiError, or nil if none found.
+func (m *MPShopCouponCountReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPShopCouponCountReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for ShopId
+
+	// no validation rules for Type
+
+	if len(errors) > 0 {
+		return MPShopCouponCountReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPShopCouponCountReqMultiError is an error wrapping multiple validation
+// errors returned by MPShopCouponCountReq.ValidateAll() if the designated
+// constraints aren't met.
+type MPShopCouponCountReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPShopCouponCountReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPShopCouponCountReqMultiError) AllErrors() []error { return m }
+
+// MPShopCouponCountReqValidationError is the validation error returned by
+// MPShopCouponCountReq.Validate if the designated constraints aren't met.
+type MPShopCouponCountReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPShopCouponCountReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPShopCouponCountReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPShopCouponCountReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPShopCouponCountReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPShopCouponCountReqValidationError) ErrorName() string {
+	return "MPShopCouponCountReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPShopCouponCountReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPShopCouponCountReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPShopCouponCountReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPShopCouponCountReqValidationError{}
+
+// Validate checks the field values on MPShopCouponCountRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MPShopCouponCountRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPShopCouponCountRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPShopCouponCountRspMultiError, or nil if none found.
+func (m *MPShopCouponCountRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPShopCouponCountRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Count
+
+	if len(errors) > 0 {
+		return MPShopCouponCountRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPShopCouponCountRspMultiError is an error wrapping multiple validation
+// errors returned by MPShopCouponCountRsp.ValidateAll() if the designated
+// constraints aren't met.
+type MPShopCouponCountRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPShopCouponCountRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPShopCouponCountRspMultiError) AllErrors() []error { return m }
+
+// MPShopCouponCountRspValidationError is the validation error returned by
+// MPShopCouponCountRsp.Validate if the designated constraints aren't met.
+type MPShopCouponCountRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPShopCouponCountRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPShopCouponCountRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPShopCouponCountRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPShopCouponCountRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPShopCouponCountRspValidationError) ErrorName() string {
+	return "MPShopCouponCountRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPShopCouponCountRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPShopCouponCountRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPShopCouponCountRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPShopCouponCountRspValidationError{}
+
+// Validate checks the field values on MPShopCouponListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MPShopCouponListReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPShopCouponListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPShopCouponListReqMultiError, or nil if none found.
+func (m *MPShopCouponListReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPShopCouponListReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetListOption() == nil {
+		err := MPShopCouponListReqValidationError{
+			field:  "ListOption",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetListOption()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, MPShopCouponListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, MPShopCouponListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetListOption()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return MPShopCouponListReqValidationError{
+				field:  "ListOption",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return MPShopCouponListReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPShopCouponListReqMultiError is an error wrapping multiple validation
+// errors returned by MPShopCouponListReq.ValidateAll() if the designated
+// constraints aren't met.
+type MPShopCouponListReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPShopCouponListReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPShopCouponListReqMultiError) AllErrors() []error { return m }
+
+// MPShopCouponListReqValidationError is the validation error returned by
+// MPShopCouponListReq.Validate if the designated constraints aren't met.
+type MPShopCouponListReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPShopCouponListReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPShopCouponListReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPShopCouponListReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPShopCouponListReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPShopCouponListReqValidationError) ErrorName() string {
+	return "MPShopCouponListReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPShopCouponListReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPShopCouponListReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPShopCouponListReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPShopCouponListReqValidationError{}
+
+// Validate checks the field values on MPShopCouponListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MPShopCouponListRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPShopCouponListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPShopCouponListRspMultiError, or nil if none found.
+func (m *MPShopCouponListRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPShopCouponListRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetList() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, MPShopCouponListRspValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, MPShopCouponListRspValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return MPShopCouponListRspValidationError{
+					field:  fmt.Sprintf("List[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return MPShopCouponListRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPShopCouponListRspMultiError is an error wrapping multiple validation
+// errors returned by MPShopCouponListRsp.ValidateAll() if the designated
+// constraints aren't met.
+type MPShopCouponListRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPShopCouponListRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPShopCouponListRspMultiError) AllErrors() []error { return m }
+
+// MPShopCouponListRspValidationError is the validation error returned by
+// MPShopCouponListRsp.Validate if the designated constraints aren't met.
+type MPShopCouponListRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPShopCouponListRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPShopCouponListRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPShopCouponListRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPShopCouponListRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPShopCouponListRspValidationError) ErrorName() string {
+	return "MPShopCouponListRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPShopCouponListRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPShopCouponListRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPShopCouponListRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPShopCouponListRspValidationError{}
+
+// Validate checks the field values on MPShopCouponMineReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MPShopCouponMineReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPShopCouponMineReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPShopCouponMineReqMultiError, or nil if none found.
+func (m *MPShopCouponMineReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPShopCouponMineReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetListOption() == nil {
+		err := MPShopCouponMineReqValidationError{
+			field:  "ListOption",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetListOption()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, MPShopCouponMineReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, MPShopCouponMineReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetListOption()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return MPShopCouponMineReqValidationError{
+				field:  "ListOption",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return MPShopCouponMineReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPShopCouponMineReqMultiError is an error wrapping multiple validation
+// errors returned by MPShopCouponMineReq.ValidateAll() if the designated
+// constraints aren't met.
+type MPShopCouponMineReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPShopCouponMineReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPShopCouponMineReqMultiError) AllErrors() []error { return m }
+
+// MPShopCouponMineReqValidationError is the validation error returned by
+// MPShopCouponMineReq.Validate if the designated constraints aren't met.
+type MPShopCouponMineReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPShopCouponMineReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPShopCouponMineReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPShopCouponMineReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPShopCouponMineReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPShopCouponMineReqValidationError) ErrorName() string {
+	return "MPShopCouponMineReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPShopCouponMineReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPShopCouponMineReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPShopCouponMineReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPShopCouponMineReqValidationError{}
+
+// Validate checks the field values on MPShopCouponMineRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MPShopCouponMineRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPShopCouponMineRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPShopCouponMineRspMultiError, or nil if none found.
+func (m *MPShopCouponMineRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPShopCouponMineRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetList() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, MPShopCouponMineRspValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, MPShopCouponMineRspValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return MPShopCouponMineRspValidationError{
+					field:  fmt.Sprintf("List[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return MPShopCouponMineRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPShopCouponMineRspMultiError is an error wrapping multiple validation
+// errors returned by MPShopCouponMineRsp.ValidateAll() if the designated
+// constraints aren't met.
+type MPShopCouponMineRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPShopCouponMineRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPShopCouponMineRspMultiError) AllErrors() []error { return m }
+
+// MPShopCouponMineRspValidationError is the validation error returned by
+// MPShopCouponMineRsp.Validate if the designated constraints aren't met.
+type MPShopCouponMineRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPShopCouponMineRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPShopCouponMineRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPShopCouponMineRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPShopCouponMineRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPShopCouponMineRspValidationError) ErrorName() string {
+	return "MPShopCouponMineRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPShopCouponMineRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPShopCouponMineRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPShopCouponMineRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPShopCouponMineRspValidationError{}
+
+// Validate checks the field values on MPShopCouponReceiveReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MPShopCouponReceiveReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPShopCouponReceiveReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPShopCouponReceiveReqMultiError, or nil if none found.
+func (m *MPShopCouponReceiveReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPShopCouponReceiveReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Code
+
+	if len(errors) > 0 {
+		return MPShopCouponReceiveReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPShopCouponReceiveReqMultiError is an error wrapping multiple validation
+// errors returned by MPShopCouponReceiveReq.ValidateAll() if the designated
+// constraints aren't met.
+type MPShopCouponReceiveReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPShopCouponReceiveReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPShopCouponReceiveReqMultiError) AllErrors() []error { return m }
+
+// MPShopCouponReceiveReqValidationError is the validation error returned by
+// MPShopCouponReceiveReq.Validate if the designated constraints aren't met.
+type MPShopCouponReceiveReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPShopCouponReceiveReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPShopCouponReceiveReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPShopCouponReceiveReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPShopCouponReceiveReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPShopCouponReceiveReqValidationError) ErrorName() string {
+	return "MPShopCouponReceiveReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPShopCouponReceiveReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPShopCouponReceiveReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPShopCouponReceiveReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPShopCouponReceiveReqValidationError{}
+
+// Validate checks the field values on MPShopCouponReceiveRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MPShopCouponReceiveRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPShopCouponReceiveRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPShopCouponReceiveRspMultiError, or nil if none found.
+func (m *MPShopCouponReceiveRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPShopCouponReceiveRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Code
+
+	if len(errors) > 0 {
+		return MPShopCouponReceiveRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPShopCouponReceiveRspMultiError is an error wrapping multiple validation
+// errors returned by MPShopCouponReceiveRsp.ValidateAll() if the designated
+// constraints aren't met.
+type MPShopCouponReceiveRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPShopCouponReceiveRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPShopCouponReceiveRspMultiError) AllErrors() []error { return m }
+
+// MPShopCouponReceiveRspValidationError is the validation error returned by
+// MPShopCouponReceiveRsp.Validate if the designated constraints aren't met.
+type MPShopCouponReceiveRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPShopCouponReceiveRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPShopCouponReceiveRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPShopCouponReceiveRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPShopCouponReceiveRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPShopCouponReceiveRspValidationError) ErrorName() string {
+	return "MPShopCouponReceiveRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPShopCouponReceiveRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPShopCouponReceiveRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPShopCouponReceiveRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPShopCouponReceiveRspValidationError{}
+
+// Validate checks the field values on MPShopOrderCreateReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MPShopOrderCreateReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPShopOrderCreateReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPShopOrderCreateReqMultiError, or nil if none found.
+func (m *MPShopOrderCreateReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPShopOrderCreateReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for AddressId
+
+	// no validation rules for CouponId
+
+	// no validation rules for GetTime
+
+	// no validation rules for Mobile
+
+	// no validation rules for OrderType
+
+	// no validation rules for PayType
+
+	// no validation rules for ShopId
+
+	// no validation rules for Remark
+
+	if len(errors) > 0 {
+		return MPShopOrderCreateReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPShopOrderCreateReqMultiError is an error wrapping multiple validation
+// errors returned by MPShopOrderCreateReq.ValidateAll() if the designated
+// constraints aren't met.
+type MPShopOrderCreateReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPShopOrderCreateReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPShopOrderCreateReqMultiError) AllErrors() []error { return m }
+
+// MPShopOrderCreateReqValidationError is the validation error returned by
+// MPShopOrderCreateReq.Validate if the designated constraints aren't met.
+type MPShopOrderCreateReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPShopOrderCreateReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPShopOrderCreateReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPShopOrderCreateReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPShopOrderCreateReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPShopOrderCreateReqValidationError) ErrorName() string {
+	return "MPShopOrderCreateReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPShopOrderCreateReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPShopOrderCreateReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPShopOrderCreateReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPShopOrderCreateReqValidationError{}
+
+// Validate checks the field values on MPShopOrderCreateRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MPShopOrderCreateRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPShopOrderCreateRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPShopOrderCreateRspMultiError, or nil if none found.
+func (m *MPShopOrderCreateRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPShopOrderCreateRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for OrderSn
+
+	if len(errors) > 0 {
+		return MPShopOrderCreateRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPShopOrderCreateRspMultiError is an error wrapping multiple validation
+// errors returned by MPShopOrderCreateRsp.ValidateAll() if the designated
+// constraints aren't met.
+type MPShopOrderCreateRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPShopOrderCreateRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPShopOrderCreateRspMultiError) AllErrors() []error { return m }
+
+// MPShopOrderCreateRspValidationError is the validation error returned by
+// MPShopOrderCreateRsp.Validate if the designated constraints aren't met.
+type MPShopOrderCreateRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPShopOrderCreateRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPShopOrderCreateRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPShopOrderCreateRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPShopOrderCreateRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPShopOrderCreateRspValidationError) ErrorName() string {
+	return "MPShopOrderCreateRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPShopOrderCreateRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPShopOrderCreateRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPShopOrderCreateRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPShopOrderCreateRspValidationError{}
+
+// Validate checks the field values on MPShopOrderListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MPShopOrderListReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPShopOrderListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPShopOrderListReqMultiError, or nil if none found.
+func (m *MPShopOrderListReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPShopOrderListReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MPShopOrderListReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPShopOrderListReqMultiError is an error wrapping multiple validation errors
+// returned by MPShopOrderListReq.ValidateAll() if the designated constraints
+// aren't met.
+type MPShopOrderListReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPShopOrderListReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPShopOrderListReqMultiError) AllErrors() []error { return m }
+
+// MPShopOrderListReqValidationError is the validation error returned by
+// MPShopOrderListReq.Validate if the designated constraints aren't met.
+type MPShopOrderListReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPShopOrderListReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPShopOrderListReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPShopOrderListReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPShopOrderListReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPShopOrderListReqValidationError) ErrorName() string {
+	return "MPShopOrderListReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPShopOrderListReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPShopOrderListReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPShopOrderListReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPShopOrderListReqValidationError{}
+
+// Validate checks the field values on MPShopOrderListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MPShopOrderListRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPShopOrderListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPShopOrderListRspMultiError, or nil if none found.
+func (m *MPShopOrderListRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPShopOrderListRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MPShopOrderListRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPShopOrderListRspMultiError is an error wrapping multiple validation errors
+// returned by MPShopOrderListRsp.ValidateAll() if the designated constraints
+// aren't met.
+type MPShopOrderListRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPShopOrderListRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPShopOrderListRspMultiError) AllErrors() []error { return m }
+
+// MPShopOrderListRspValidationError is the validation error returned by
+// MPShopOrderListRsp.Validate if the designated constraints aren't met.
+type MPShopOrderListRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPShopOrderListRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPShopOrderListRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPShopOrderListRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPShopOrderListRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPShopOrderListRspValidationError) ErrorName() string {
+	return "MPShopOrderListRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPShopOrderListRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPShopOrderListRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPShopOrderListRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPShopOrderListRspValidationError{}
+
+// Validate checks the field values on MPShopOrderDetailReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MPShopOrderDetailReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPShopOrderDetailReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPShopOrderDetailReqMultiError, or nil if none found.
+func (m *MPShopOrderDetailReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPShopOrderDetailReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MPShopOrderDetailReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPShopOrderDetailReqMultiError is an error wrapping multiple validation
+// errors returned by MPShopOrderDetailReq.ValidateAll() if the designated
+// constraints aren't met.
+type MPShopOrderDetailReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPShopOrderDetailReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPShopOrderDetailReqMultiError) AllErrors() []error { return m }
+
+// MPShopOrderDetailReqValidationError is the validation error returned by
+// MPShopOrderDetailReq.Validate if the designated constraints aren't met.
+type MPShopOrderDetailReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPShopOrderDetailReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPShopOrderDetailReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPShopOrderDetailReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPShopOrderDetailReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPShopOrderDetailReqValidationError) ErrorName() string {
+	return "MPShopOrderDetailReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPShopOrderDetailReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPShopOrderDetailReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPShopOrderDetailReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPShopOrderDetailReqValidationError{}
+
+// Validate checks the field values on MPShopOrderDetailRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MPShopOrderDetailRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPShopOrderDetailRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPShopOrderDetailRspMultiError, or nil if none found.
+func (m *MPShopOrderDetailRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPShopOrderDetailRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MPShopOrderDetailRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPShopOrderDetailRspMultiError is an error wrapping multiple validation
+// errors returned by MPShopOrderDetailRsp.ValidateAll() if the designated
+// constraints aren't met.
+type MPShopOrderDetailRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPShopOrderDetailRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPShopOrderDetailRspMultiError) AllErrors() []error { return m }
+
+// MPShopOrderDetailRspValidationError is the validation error returned by
+// MPShopOrderDetailRsp.Validate if the designated constraints aren't met.
+type MPShopOrderDetailRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPShopOrderDetailRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPShopOrderDetailRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPShopOrderDetailRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPShopOrderDetailRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPShopOrderDetailRspValidationError) ErrorName() string {
+	return "MPShopOrderDetailRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPShopOrderDetailRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPShopOrderDetailRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPShopOrderDetailRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPShopOrderDetailRspValidationError{}
+
+// Validate checks the field values on MPShopOrderTakeReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MPShopOrderTakeReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPShopOrderTakeReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPShopOrderTakeReqMultiError, or nil if none found.
+func (m *MPShopOrderTakeReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPShopOrderTakeReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MPShopOrderTakeReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPShopOrderTakeReqMultiError is an error wrapping multiple validation errors
+// returned by MPShopOrderTakeReq.ValidateAll() if the designated constraints
+// aren't met.
+type MPShopOrderTakeReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPShopOrderTakeReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPShopOrderTakeReqMultiError) AllErrors() []error { return m }
+
+// MPShopOrderTakeReqValidationError is the validation error returned by
+// MPShopOrderTakeReq.Validate if the designated constraints aren't met.
+type MPShopOrderTakeReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPShopOrderTakeReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPShopOrderTakeReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPShopOrderTakeReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPShopOrderTakeReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPShopOrderTakeReqValidationError) ErrorName() string {
+	return "MPShopOrderTakeReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPShopOrderTakeReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPShopOrderTakeReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPShopOrderTakeReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPShopOrderTakeReqValidationError{}
+
+// Validate checks the field values on MPShopOrderTakeRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MPShopOrderTakeRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPShopOrderTakeRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPShopOrderTakeRspMultiError, or nil if none found.
+func (m *MPShopOrderTakeRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPShopOrderTakeRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MPShopOrderTakeRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPShopOrderTakeRspMultiError is an error wrapping multiple validation errors
+// returned by MPShopOrderTakeRsp.ValidateAll() if the designated constraints
+// aren't met.
+type MPShopOrderTakeRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPShopOrderTakeRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPShopOrderTakeRspMultiError) AllErrors() []error { return m }
+
+// MPShopOrderTakeRspValidationError is the validation error returned by
+// MPShopOrderTakeRsp.Validate if the designated constraints aren't met.
+type MPShopOrderTakeRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPShopOrderTakeRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPShopOrderTakeRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPShopOrderTakeRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPShopOrderTakeRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPShopOrderTakeRspValidationError) ErrorName() string {
+	return "MPShopOrderTakeRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPShopOrderTakeRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPShopOrderTakeRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPShopOrderTakeRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPShopOrderTakeRspValidationError{}
+
+// Validate checks the field values on MPShopOrderRefundReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MPShopOrderRefundReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPShopOrderRefundReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPShopOrderRefundReqMultiError, or nil if none found.
+func (m *MPShopOrderRefundReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPShopOrderRefundReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MPShopOrderRefundReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPShopOrderRefundReqMultiError is an error wrapping multiple validation
+// errors returned by MPShopOrderRefundReq.ValidateAll() if the designated
+// constraints aren't met.
+type MPShopOrderRefundReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPShopOrderRefundReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPShopOrderRefundReqMultiError) AllErrors() []error { return m }
+
+// MPShopOrderRefundReqValidationError is the validation error returned by
+// MPShopOrderRefundReq.Validate if the designated constraints aren't met.
+type MPShopOrderRefundReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPShopOrderRefundReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPShopOrderRefundReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPShopOrderRefundReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPShopOrderRefundReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPShopOrderRefundReqValidationError) ErrorName() string {
+	return "MPShopOrderRefundReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPShopOrderRefundReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPShopOrderRefundReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPShopOrderRefundReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPShopOrderRefundReqValidationError{}
+
+// Validate checks the field values on MPShopOrderRefundRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MPShopOrderRefundRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPShopOrderRefundRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPShopOrderRefundRspMultiError, or nil if none found.
+func (m *MPShopOrderRefundRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPShopOrderRefundRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MPShopOrderRefundRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPShopOrderRefundRspMultiError is an error wrapping multiple validation
+// errors returned by MPShopOrderRefundRsp.ValidateAll() if the designated
+// constraints aren't met.
+type MPShopOrderRefundRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPShopOrderRefundRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPShopOrderRefundRspMultiError) AllErrors() []error { return m }
+
+// MPShopOrderRefundRspValidationError is the validation error returned by
+// MPShopOrderRefundRsp.Validate if the designated constraints aren't met.
+type MPShopOrderRefundRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPShopOrderRefundRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPShopOrderRefundRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPShopOrderRefundRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPShopOrderRefundRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPShopOrderRefundRspValidationError) ErrorName() string {
+	return "MPShopOrderRefundRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPShopOrderRefundRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPShopOrderRefundRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPShopOrderRefundRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPShopOrderRefundRspValidationError{}
+
+// Validate checks the field values on MPShopOrderPayReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *MPShopOrderPayReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPShopOrderPayReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPShopOrderPayReqMultiError, or nil if none found.
+func (m *MPShopOrderPayReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPShopOrderPayReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MPShopOrderPayReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPShopOrderPayReqMultiError is an error wrapping multiple validation errors
+// returned by MPShopOrderPayReq.ValidateAll() if the designated constraints
+// aren't met.
+type MPShopOrderPayReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPShopOrderPayReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPShopOrderPayReqMultiError) AllErrors() []error { return m }
+
+// MPShopOrderPayReqValidationError is the validation error returned by
+// MPShopOrderPayReq.Validate if the designated constraints aren't met.
+type MPShopOrderPayReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPShopOrderPayReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPShopOrderPayReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPShopOrderPayReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPShopOrderPayReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPShopOrderPayReqValidationError) ErrorName() string {
+	return "MPShopOrderPayReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPShopOrderPayReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPShopOrderPayReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPShopOrderPayReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPShopOrderPayReqValidationError{}
+
+// Validate checks the field values on MPShopOrderPayRsp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *MPShopOrderPayRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPShopOrderPayRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPShopOrderPayRspMultiError, or nil if none found.
+func (m *MPShopOrderPayRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPShopOrderPayRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MPShopOrderPayRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPShopOrderPayRspMultiError is an error wrapping multiple validation errors
+// returned by MPShopOrderPayRsp.ValidateAll() if the designated constraints
+// aren't met.
+type MPShopOrderPayRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPShopOrderPayRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPShopOrderPayRspMultiError) AllErrors() []error { return m }
+
+// MPShopOrderPayRspValidationError is the validation error returned by
+// MPShopOrderPayRsp.Validate if the designated constraints aren't met.
+type MPShopOrderPayRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPShopOrderPayRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPShopOrderPayRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPShopOrderPayRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPShopOrderPayRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPShopOrderPayRspValidationError) ErrorName() string {
+	return "MPShopOrderPayRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPShopOrderPayRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPShopOrderPayRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPShopOrderPayRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPShopOrderPayRspValidationError{}
+
+// Validate checks the field values on MPWechatConfigReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *MPWechatConfigReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPWechatConfigReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPWechatConfigReqMultiError, or nil if none found.
+func (m *MPWechatConfigReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPWechatConfigReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MPWechatConfigReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPWechatConfigReqMultiError is an error wrapping multiple validation errors
+// returned by MPWechatConfigReq.ValidateAll() if the designated constraints
+// aren't met.
+type MPWechatConfigReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPWechatConfigReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPWechatConfigReqMultiError) AllErrors() []error { return m }
+
+// MPWechatConfigReqValidationError is the validation error returned by
+// MPWechatConfigReq.Validate if the designated constraints aren't met.
+type MPWechatConfigReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPWechatConfigReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPWechatConfigReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPWechatConfigReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPWechatConfigReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPWechatConfigReqValidationError) ErrorName() string {
+	return "MPWechatConfigReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPWechatConfigReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPWechatConfigReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPWechatConfigReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPWechatConfigReqValidationError{}
+
+// Validate checks the field values on MPWechatConfigRsp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *MPWechatConfigRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPWechatConfigRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPWechatConfigRspMultiError, or nil if none found.
+func (m *MPWechatConfigRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPWechatConfigRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MPWechatConfigRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPWechatConfigRspMultiError is an error wrapping multiple validation errors
+// returned by MPWechatConfigRsp.ValidateAll() if the designated constraints
+// aren't met.
+type MPWechatConfigRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPWechatConfigRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPWechatConfigRspMultiError) AllErrors() []error { return m }
+
+// MPWechatConfigRspValidationError is the validation error returned by
+// MPWechatConfigRsp.Validate if the designated constraints aren't met.
+type MPWechatConfigRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPWechatConfigRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPWechatConfigRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPWechatConfigRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPWechatConfigRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPWechatConfigRspValidationError) ErrorName() string {
+	return "MPWechatConfigRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPWechatConfigRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPWechatConfigRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPWechatConfigRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPWechatConfigRspValidationError{}
+
+// Validate checks the field values on MPUserAddressListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MPUserAddressListReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPUserAddressListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPUserAddressListReqMultiError, or nil if none found.
+func (m *MPUserAddressListReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPUserAddressListReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MPUserAddressListReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPUserAddressListReqMultiError is an error wrapping multiple validation
+// errors returned by MPUserAddressListReq.ValidateAll() if the designated
+// constraints aren't met.
+type MPUserAddressListReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPUserAddressListReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPUserAddressListReqMultiError) AllErrors() []error { return m }
+
+// MPUserAddressListReqValidationError is the validation error returned by
+// MPUserAddressListReq.Validate if the designated constraints aren't met.
+type MPUserAddressListReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPUserAddressListReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPUserAddressListReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPUserAddressListReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPUserAddressListReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPUserAddressListReqValidationError) ErrorName() string {
+	return "MPUserAddressListReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPUserAddressListReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPUserAddressListReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPUserAddressListReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPUserAddressListReqValidationError{}
+
+// Validate checks the field values on MPUserAddressListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MPUserAddressListRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPUserAddressListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPUserAddressListRspMultiError, or nil if none found.
+func (m *MPUserAddressListRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPUserAddressListRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MPUserAddressListRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPUserAddressListRspMultiError is an error wrapping multiple validation
+// errors returned by MPUserAddressListRsp.ValidateAll() if the designated
+// constraints aren't met.
+type MPUserAddressListRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPUserAddressListRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPUserAddressListRspMultiError) AllErrors() []error { return m }
+
+// MPUserAddressListRspValidationError is the validation error returned by
+// MPUserAddressListRsp.Validate if the designated constraints aren't met.
+type MPUserAddressListRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPUserAddressListRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPUserAddressListRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPUserAddressListRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPUserAddressListRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPUserAddressListRspValidationError) ErrorName() string {
+	return "MPUserAddressListRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPUserAddressListRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPUserAddressListRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPUserAddressListRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPUserAddressListRspValidationError{}
+
+// Validate checks the field values on MPUserAddressDefaultReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MPUserAddressDefaultReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPUserAddressDefaultReq with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPUserAddressDefaultReqMultiError, or nil if none found.
+func (m *MPUserAddressDefaultReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPUserAddressDefaultReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MPUserAddressDefaultReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPUserAddressDefaultReqMultiError is an error wrapping multiple validation
+// errors returned by MPUserAddressDefaultReq.ValidateAll() if the designated
+// constraints aren't met.
+type MPUserAddressDefaultReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPUserAddressDefaultReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPUserAddressDefaultReqMultiError) AllErrors() []error { return m }
+
+// MPUserAddressDefaultReqValidationError is the validation error returned by
+// MPUserAddressDefaultReq.Validate if the designated constraints aren't met.
+type MPUserAddressDefaultReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPUserAddressDefaultReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPUserAddressDefaultReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPUserAddressDefaultReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPUserAddressDefaultReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPUserAddressDefaultReqValidationError) ErrorName() string {
+	return "MPUserAddressDefaultReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPUserAddressDefaultReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPUserAddressDefaultReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPUserAddressDefaultReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPUserAddressDefaultReqValidationError{}
+
+// Validate checks the field values on MPUserAddressDefaultRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MPUserAddressDefaultRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPUserAddressDefaultRsp with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPUserAddressDefaultRspMultiError, or nil if none found.
+func (m *MPUserAddressDefaultRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPUserAddressDefaultRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MPUserAddressDefaultRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPUserAddressDefaultRspMultiError is an error wrapping multiple validation
+// errors returned by MPUserAddressDefaultRsp.ValidateAll() if the designated
+// constraints aren't met.
+type MPUserAddressDefaultRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPUserAddressDefaultRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPUserAddressDefaultRspMultiError) AllErrors() []error { return m }
+
+// MPUserAddressDefaultRspValidationError is the validation error returned by
+// MPUserAddressDefaultRsp.Validate if the designated constraints aren't met.
+type MPUserAddressDefaultRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPUserAddressDefaultRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPUserAddressDefaultRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPUserAddressDefaultRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPUserAddressDefaultRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPUserAddressDefaultRspValidationError) ErrorName() string {
+	return "MPUserAddressDefaultRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPUserAddressDefaultRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPUserAddressDefaultRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPUserAddressDefaultRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPUserAddressDefaultRspValidationError{}
+
+// Validate checks the field values on MPUserAddressAddAndEditReq with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MPUserAddressAddAndEditReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPUserAddressAddAndEditReq with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPUserAddressAddAndEditReqMultiError, or nil if none found.
+func (m *MPUserAddressAddAndEditReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPUserAddressAddAndEditReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MPUserAddressAddAndEditReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPUserAddressAddAndEditReqMultiError is an error wrapping multiple
+// validation errors returned by MPUserAddressAddAndEditReq.ValidateAll() if
+// the designated constraints aren't met.
+type MPUserAddressAddAndEditReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPUserAddressAddAndEditReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPUserAddressAddAndEditReqMultiError) AllErrors() []error { return m }
+
+// MPUserAddressAddAndEditReqValidationError is the validation error returned
+// by MPUserAddressAddAndEditReq.Validate if the designated constraints aren't met.
+type MPUserAddressAddAndEditReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPUserAddressAddAndEditReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPUserAddressAddAndEditReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPUserAddressAddAndEditReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPUserAddressAddAndEditReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPUserAddressAddAndEditReqValidationError) ErrorName() string {
+	return "MPUserAddressAddAndEditReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPUserAddressAddAndEditReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPUserAddressAddAndEditReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPUserAddressAddAndEditReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPUserAddressAddAndEditReqValidationError{}
+
+// Validate checks the field values on MPUserAddressAddAndEditRsp with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MPUserAddressAddAndEditRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPUserAddressAddAndEditRsp with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPUserAddressAddAndEditRspMultiError, or nil if none found.
+func (m *MPUserAddressAddAndEditRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPUserAddressAddAndEditRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MPUserAddressAddAndEditRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPUserAddressAddAndEditRspMultiError is an error wrapping multiple
+// validation errors returned by MPUserAddressAddAndEditRsp.ValidateAll() if
+// the designated constraints aren't met.
+type MPUserAddressAddAndEditRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPUserAddressAddAndEditRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPUserAddressAddAndEditRspMultiError) AllErrors() []error { return m }
+
+// MPUserAddressAddAndEditRspValidationError is the validation error returned
+// by MPUserAddressAddAndEditRsp.Validate if the designated constraints aren't met.
+type MPUserAddressAddAndEditRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPUserAddressAddAndEditRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPUserAddressAddAndEditRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPUserAddressAddAndEditRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPUserAddressAddAndEditRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPUserAddressAddAndEditRspValidationError) ErrorName() string {
+	return "MPUserAddressAddAndEditRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPUserAddressAddAndEditRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPUserAddressAddAndEditRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPUserAddressAddAndEditRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPUserAddressAddAndEditRspValidationError{}
+
+// Validate checks the field values on MPUserAddressDelReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MPUserAddressDelReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPUserAddressDelReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPUserAddressDelReqMultiError, or nil if none found.
+func (m *MPUserAddressDelReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPUserAddressDelReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MPUserAddressDelReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPUserAddressDelReqMultiError is an error wrapping multiple validation
+// errors returned by MPUserAddressDelReq.ValidateAll() if the designated
+// constraints aren't met.
+type MPUserAddressDelReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPUserAddressDelReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPUserAddressDelReqMultiError) AllErrors() []error { return m }
+
+// MPUserAddressDelReqValidationError is the validation error returned by
+// MPUserAddressDelReq.Validate if the designated constraints aren't met.
+type MPUserAddressDelReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPUserAddressDelReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPUserAddressDelReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPUserAddressDelReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPUserAddressDelReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPUserAddressDelReqValidationError) ErrorName() string {
+	return "MPUserAddressDelReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPUserAddressDelReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPUserAddressDelReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPUserAddressDelReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPUserAddressDelReqValidationError{}
+
+// Validate checks the field values on MPUserAddressDelRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MPUserAddressDelRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPUserAddressDelRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPUserAddressDelRspMultiError, or nil if none found.
+func (m *MPUserAddressDelRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPUserAddressDelRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MPUserAddressDelRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPUserAddressDelRspMultiError is an error wrapping multiple validation
+// errors returned by MPUserAddressDelRsp.ValidateAll() if the designated
+// constraints aren't met.
+type MPUserAddressDelRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPUserAddressDelRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPUserAddressDelRspMultiError) AllErrors() []error { return m }
+
+// MPUserAddressDelRspValidationError is the validation error returned by
+// MPUserAddressDelRsp.Validate if the designated constraints aren't met.
+type MPUserAddressDelRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPUserAddressDelRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPUserAddressDelRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPUserAddressDelRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPUserAddressDelRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPUserAddressDelRspValidationError) ErrorName() string {
+	return "MPUserAddressDelRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPUserAddressDelRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPUserAddressDelRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPUserAddressDelRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPUserAddressDelRspValidationError{}
+
+// Validate checks the field values on MPUserInfoReq with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *MPUserInfoReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPUserInfoReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in MPUserInfoReqMultiError, or
+// nil if none found.
+func (m *MPUserInfoReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPUserInfoReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MPUserInfoReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPUserInfoReqMultiError is an error wrapping multiple validation errors
+// returned by MPUserInfoReq.ValidateAll() if the designated constraints
+// aren't met.
+type MPUserInfoReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPUserInfoReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPUserInfoReqMultiError) AllErrors() []error { return m }
+
+// MPUserInfoReqValidationError is the validation error returned by
+// MPUserInfoReq.Validate if the designated constraints aren't met.
+type MPUserInfoReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPUserInfoReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPUserInfoReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPUserInfoReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPUserInfoReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPUserInfoReqValidationError) ErrorName() string { return "MPUserInfoReqValidationError" }
+
+// Error satisfies the builtin error interface
+func (e MPUserInfoReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPUserInfoReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPUserInfoReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPUserInfoReqValidationError{}
+
+// Validate checks the field values on MPUserInfoRsp with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *MPUserInfoRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPUserInfoRsp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in MPUserInfoRspMultiError, or
+// nil if none found.
+func (m *MPUserInfoRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPUserInfoRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MPUserInfoRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPUserInfoRspMultiError is an error wrapping multiple validation errors
+// returned by MPUserInfoRsp.ValidateAll() if the designated constraints
+// aren't met.
+type MPUserInfoRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPUserInfoRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPUserInfoRspMultiError) AllErrors() []error { return m }
+
+// MPUserInfoRspValidationError is the validation error returned by
+// MPUserInfoRsp.Validate if the designated constraints aren't met.
+type MPUserInfoRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPUserInfoRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPUserInfoRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPUserInfoRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPUserInfoRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPUserInfoRspValidationError) ErrorName() string { return "MPUserInfoRspValidationError" }
+
+// Error satisfies the builtin error interface
+func (e MPUserInfoRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPUserInfoRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPUserInfoRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPUserInfoRspValidationError{}
+
+// Validate checks the field values on MPUserMineServiceReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MPUserMineServiceReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPUserMineServiceReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPUserMineServiceReqMultiError, or nil if none found.
+func (m *MPUserMineServiceReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPUserMineServiceReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MPUserMineServiceReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPUserMineServiceReqMultiError is an error wrapping multiple validation
+// errors returned by MPUserMineServiceReq.ValidateAll() if the designated
+// constraints aren't met.
+type MPUserMineServiceReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPUserMineServiceReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPUserMineServiceReqMultiError) AllErrors() []error { return m }
+
+// MPUserMineServiceReqValidationError is the validation error returned by
+// MPUserMineServiceReq.Validate if the designated constraints aren't met.
+type MPUserMineServiceReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPUserMineServiceReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPUserMineServiceReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPUserMineServiceReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPUserMineServiceReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPUserMineServiceReqValidationError) ErrorName() string {
+	return "MPUserMineServiceReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPUserMineServiceReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPUserMineServiceReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPUserMineServiceReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPUserMineServiceReqValidationError{}
+
+// Validate checks the field values on MPUserMineServiceRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MPUserMineServiceRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPUserMineServiceRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPUserMineServiceRspMultiError, or nil if none found.
+func (m *MPUserMineServiceRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPUserMineServiceRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MPUserMineServiceRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPUserMineServiceRspMultiError is an error wrapping multiple validation
+// errors returned by MPUserMineServiceRsp.ValidateAll() if the designated
+// constraints aren't met.
+type MPUserMineServiceRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPUserMineServiceRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPUserMineServiceRspMultiError) AllErrors() []error { return m }
+
+// MPUserMineServiceRspValidationError is the validation error returned by
+// MPUserMineServiceRsp.Validate if the designated constraints aren't met.
+type MPUserMineServiceRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPUserMineServiceRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPUserMineServiceRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPUserMineServiceRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPUserMineServiceRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPUserMineServiceRspValidationError) ErrorName() string {
+	return "MPUserMineServiceRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPUserMineServiceRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPUserMineServiceRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPUserMineServiceRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPUserMineServiceRspValidationError{}
+
+// Validate checks the field values on MPUserServiceContentReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MPUserServiceContentReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPUserServiceContentReq with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPUserServiceContentReqMultiError, or nil if none found.
+func (m *MPUserServiceContentReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPUserServiceContentReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MPUserServiceContentReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPUserServiceContentReqMultiError is an error wrapping multiple validation
+// errors returned by MPUserServiceContentReq.ValidateAll() if the designated
+// constraints aren't met.
+type MPUserServiceContentReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPUserServiceContentReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPUserServiceContentReqMultiError) AllErrors() []error { return m }
+
+// MPUserServiceContentReqValidationError is the validation error returned by
+// MPUserServiceContentReq.Validate if the designated constraints aren't met.
+type MPUserServiceContentReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPUserServiceContentReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPUserServiceContentReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPUserServiceContentReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPUserServiceContentReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPUserServiceContentReqValidationError) ErrorName() string {
+	return "MPUserServiceContentReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPUserServiceContentReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPUserServiceContentReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPUserServiceContentReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPUserServiceContentReqValidationError{}
+
+// Validate checks the field values on MPUserServiceContentRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MPUserServiceContentRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPUserServiceContentRsp with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPUserServiceContentRspMultiError, or nil if none found.
+func (m *MPUserServiceContentRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPUserServiceContentRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MPUserServiceContentRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPUserServiceContentRspMultiError is an error wrapping multiple validation
+// errors returned by MPUserServiceContentRsp.ValidateAll() if the designated
+// constraints aren't met.
+type MPUserServiceContentRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPUserServiceContentRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPUserServiceContentRspMultiError) AllErrors() []error { return m }
+
+// MPUserServiceContentRspValidationError is the validation error returned by
+// MPUserServiceContentRsp.Validate if the designated constraints aren't met.
+type MPUserServiceContentRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPUserServiceContentRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPUserServiceContentRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPUserServiceContentRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPUserServiceContentRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPUserServiceContentRspValidationError) ErrorName() string {
+	return "MPUserServiceContentRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPUserServiceContentRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPUserServiceContentRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPUserServiceContentRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPUserServiceContentRspValidationError{}
+
+// Validate checks the field values on MPUserSaveInfoReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *MPUserSaveInfoReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPUserSaveInfoReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPUserSaveInfoReqMultiError, or nil if none found.
+func (m *MPUserSaveInfoReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPUserSaveInfoReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MPUserSaveInfoReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPUserSaveInfoReqMultiError is an error wrapping multiple validation errors
+// returned by MPUserSaveInfoReq.ValidateAll() if the designated constraints
+// aren't met.
+type MPUserSaveInfoReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPUserSaveInfoReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPUserSaveInfoReqMultiError) AllErrors() []error { return m }
+
+// MPUserSaveInfoReqValidationError is the validation error returned by
+// MPUserSaveInfoReq.Validate if the designated constraints aren't met.
+type MPUserSaveInfoReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPUserSaveInfoReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPUserSaveInfoReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPUserSaveInfoReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPUserSaveInfoReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPUserSaveInfoReqValidationError) ErrorName() string {
+	return "MPUserSaveInfoReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPUserSaveInfoReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPUserSaveInfoReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPUserSaveInfoReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPUserSaveInfoReqValidationError{}
+
+// Validate checks the field values on MPUserSaveInfoRsp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *MPUserSaveInfoRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPUserSaveInfoRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPUserSaveInfoRspMultiError, or nil if none found.
+func (m *MPUserSaveInfoRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPUserSaveInfoRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MPUserSaveInfoRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPUserSaveInfoRspMultiError is an error wrapping multiple validation errors
+// returned by MPUserSaveInfoRsp.ValidateAll() if the designated constraints
+// aren't met.
+type MPUserSaveInfoRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPUserSaveInfoRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPUserSaveInfoRspMultiError) AllErrors() []error { return m }
+
+// MPUserSaveInfoRspValidationError is the validation error returned by
+// MPUserSaveInfoRsp.Validate if the designated constraints aren't met.
+type MPUserSaveInfoRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPUserSaveInfoRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPUserSaveInfoRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPUserSaveInfoRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPUserSaveInfoRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPUserSaveInfoRspValidationError) ErrorName() string {
+	return "MPUserSaveInfoRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPUserSaveInfoRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPUserSaveInfoRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPUserSaveInfoRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPUserSaveInfoRspValidationError{}
+
+// Validate checks the field values on MPUserBillListReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *MPUserBillListReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPUserBillListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPUserBillListReqMultiError, or nil if none found.
+func (m *MPUserBillListReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPUserBillListReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MPUserBillListReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPUserBillListReqMultiError is an error wrapping multiple validation errors
+// returned by MPUserBillListReq.ValidateAll() if the designated constraints
+// aren't met.
+type MPUserBillListReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPUserBillListReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPUserBillListReqMultiError) AllErrors() []error { return m }
+
+// MPUserBillListReqValidationError is the validation error returned by
+// MPUserBillListReq.Validate if the designated constraints aren't met.
+type MPUserBillListReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPUserBillListReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPUserBillListReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPUserBillListReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPUserBillListReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPUserBillListReqValidationError) ErrorName() string {
+	return "MPUserBillListReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPUserBillListReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPUserBillListReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPUserBillListReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPUserBillListReqValidationError{}
+
+// Validate checks the field values on MPUserBillListRsp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *MPUserBillListRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPUserBillListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPUserBillListRspMultiError, or nil if none found.
+func (m *MPUserBillListRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPUserBillListRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MPUserBillListRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPUserBillListRspMultiError is an error wrapping multiple validation errors
+// returned by MPUserBillListRsp.ValidateAll() if the designated constraints
+// aren't met.
+type MPUserBillListRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPUserBillListRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPUserBillListRspMultiError) AllErrors() []error { return m }
+
+// MPUserBillListRspValidationError is the validation error returned by
+// MPUserBillListRsp.Validate if the designated constraints aren't met.
+type MPUserBillListRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPUserBillListRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPUserBillListRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPUserBillListRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPUserBillListRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPUserBillListRspValidationError) ErrorName() string {
+	return "MPUserBillListRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPUserBillListRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPUserBillListRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPUserBillListRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPUserBillListRspValidationError{}
+
+// Validate checks the field values on MPUserMoneyListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MPUserMoneyListReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPUserMoneyListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPUserMoneyListReqMultiError, or nil if none found.
+func (m *MPUserMoneyListReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPUserMoneyListReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MPUserMoneyListReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPUserMoneyListReqMultiError is an error wrapping multiple validation errors
+// returned by MPUserMoneyListReq.ValidateAll() if the designated constraints
+// aren't met.
+type MPUserMoneyListReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPUserMoneyListReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPUserMoneyListReqMultiError) AllErrors() []error { return m }
+
+// MPUserMoneyListReqValidationError is the validation error returned by
+// MPUserMoneyListReq.Validate if the designated constraints aren't met.
+type MPUserMoneyListReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPUserMoneyListReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPUserMoneyListReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPUserMoneyListReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPUserMoneyListReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPUserMoneyListReqValidationError) ErrorName() string {
+	return "MPUserMoneyListReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPUserMoneyListReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPUserMoneyListReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPUserMoneyListReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPUserMoneyListReqValidationError{}
+
+// Validate checks the field values on MPUserMoneyListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MPUserMoneyListRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPUserMoneyListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPUserMoneyListRspMultiError, or nil if none found.
+func (m *MPUserMoneyListRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPUserMoneyListRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MPUserMoneyListRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPUserMoneyListRspMultiError is an error wrapping multiple validation errors
+// returned by MPUserMoneyListRsp.ValidateAll() if the designated constraints
+// aren't met.
+type MPUserMoneyListRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPUserMoneyListRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPUserMoneyListRspMultiError) AllErrors() []error { return m }
+
+// MPUserMoneyListRspValidationError is the validation error returned by
+// MPUserMoneyListRsp.Validate if the designated constraints aren't met.
+type MPUserMoneyListRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPUserMoneyListRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPUserMoneyListRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPUserMoneyListRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPUserMoneyListRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPUserMoneyListRspValidationError) ErrorName() string {
+	return "MPUserMoneyListRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPUserMoneyListRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPUserMoneyListRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPUserMoneyListRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPUserMoneyListRspValidationError{}
+
+// Validate checks the field values on MPUserRechargeReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *MPUserRechargeReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPUserRechargeReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPUserRechargeReqMultiError, or nil if none found.
+func (m *MPUserRechargeReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPUserRechargeReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MPUserRechargeReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPUserRechargeReqMultiError is an error wrapping multiple validation errors
+// returned by MPUserRechargeReq.ValidateAll() if the designated constraints
+// aren't met.
+type MPUserRechargeReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPUserRechargeReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPUserRechargeReqMultiError) AllErrors() []error { return m }
+
+// MPUserRechargeReqValidationError is the validation error returned by
+// MPUserRechargeReq.Validate if the designated constraints aren't met.
+type MPUserRechargeReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPUserRechargeReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPUserRechargeReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPUserRechargeReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPUserRechargeReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPUserRechargeReqValidationError) ErrorName() string {
+	return "MPUserRechargeReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPUserRechargeReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPUserRechargeReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPUserRechargeReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPUserRechargeReqValidationError{}
+
+// Validate checks the field values on MPUserRechargeRsp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *MPUserRechargeRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPUserRechargeRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPUserRechargeRspMultiError, or nil if none found.
+func (m *MPUserRechargeRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPUserRechargeRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return MPUserRechargeRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPUserRechargeRspMultiError is an error wrapping multiple validation errors
+// returned by MPUserRechargeRsp.ValidateAll() if the designated constraints
+// aren't met.
+type MPUserRechargeRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPUserRechargeRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPUserRechargeRspMultiError) AllErrors() []error { return m }
+
+// MPUserRechargeRspValidationError is the validation error returned by
+// MPUserRechargeRsp.Validate if the designated constraints aren't met.
+type MPUserRechargeRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPUserRechargeRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPUserRechargeRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPUserRechargeRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPUserRechargeRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPUserRechargeRspValidationError) ErrorName() string {
+	return "MPUserRechargeRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPUserRechargeRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPUserRechargeRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPUserRechargeRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPUserRechargeRspValidationError{}
+
 // Validate checks the field values on MPShopProductRsp_AppStoreProduct with
 // the rules defined in the proto definition for this message. If any rules
 // are violated, the first error encountered is returned, or nil if there are

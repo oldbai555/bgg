@@ -10,6 +10,7 @@ import (
 	"github.com/oldbai555/bgg/singlesrv/server/wsmgr"
 	"github.com/oldbai555/bgg/singlesrv/server/wxminiprogram"
 	"github.com/oldbai555/lbtool/log"
+	"github.com/oldbai555/lbtool/pkg/lberr"
 	"github.com/oldbai555/lbtool/utils"
 	"github.com/oldbai555/micro/core"
 	"github.com/oldbai555/micro/gormx"
@@ -17,6 +18,7 @@ import (
 	"golang.org/x/sync/singleflight"
 	"os"
 	"strings"
+	"time"
 )
 
 var OnceSvrImpl = &LbsingleServer{}
@@ -3280,6 +3282,7 @@ func (a *LbsingleServer) GetMpShopAdsList(ctx context.Context, req *client.GetMp
 
 	return &rsp, err
 }
+
 func (a *LbsingleServer) GetMpShopAdsListPublic(ctx context.Context, req *client.GetMpShopAdsListPublicReq) (*client.GetMpShopAdsListPublicRsp, error) {
 	var rsp client.GetMpShopAdsListPublicRsp
 	var err error
@@ -3511,6 +3514,356 @@ func (a *LbsingleServer) MPShopProduct(ctx context.Context, req *client.MPShopPr
 		}
 		rsp.ProductMap[category.Id] = &product
 	}
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) MPShopCouponCount(ctx context.Context, req *client.MPShopCouponCountReq) (*client.MPShopCouponCountRsp, error) {
+	var rsp client.MPShopCouponCountRsp
+	var err error
+	return &rsp, err
+}
+
+func (a *LbsingleServer) MPShopCouponList(ctx context.Context, req *client.MPShopCouponListReq) (*client.MPShopCouponListRsp, error) {
+	var rsp client.MPShopCouponListRsp
+	var err error
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) MPShopCouponMine(ctx context.Context, req *client.MPShopCouponMineReq) (*client.MPShopCouponMineRsp, error) {
+	var rsp client.MPShopCouponMineRsp
+	var err error
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) MPShopCouponReceive(ctx context.Context, req *client.MPShopCouponReceiveReq) (*client.MPShopCouponReceiveRsp, error) {
+	var rsp client.MPShopCouponReceiveRsp
+	var err error
+
+	return &rsp, err
+}
+func (a *LbsingleServer) MPShopOrderCreate(ctx context.Context, req *client.MPShopOrderCreateReq) (*client.MPShopOrderCreateRsp, error) {
+	var rsp client.MPShopOrderCreateRsp
+	var err error
+
+	var (
+		sumPrice     int64
+		couponPrice  int64
+		postagePrice int64
+		totalNum     uint32
+	)
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	user, ok := uCtx.ExtInfo().(*client.BaseUser)
+	if !ok {
+		return nil, client.ErrUserNotFound
+	}
+
+	storeShop, err := OrmMpStoreShop.NewBaseScope().Where(client.FieldId_, req.ShopId).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	if storeShop.DeliveryPrice > 0 {
+		postagePrice = storeShop.DeliveryPrice
+	}
+
+	// todo 加锁
+
+	specs := req.Spec
+	productIds := req.ProductId
+	numbers := req.Number
+	couponId := req.CouponId
+
+	// 计算商品价格
+	for i, productId := range productIds {
+		newSku := strings.Replace(specs[i], "|", ",", -1)
+		storeProduct, err := OrmMpStoreProductAttrValue.NewBaseScope().Where(map[string]interface{}{
+			client.FieldProductId_: productId,
+			client.FieldSku_:       newSku,
+		}).First(uCtx)
+		if err != nil {
+			log.Errorf("err:%v", err)
+			return nil, err
+		}
+		num := numbers[i]
+		totalNum += num
+		sumPrice += int64(num) * storeProduct.Price
+	}
+
+	// todo 校验优惠卷
+	if couponId != 0 {
+		_, err := OrmMpCouponUser.NewBaseScope().Where(client.FieldCouponId_, couponId).First(uCtx)
+		if err != nil {
+			log.Errorf("err:%v", err)
+			return nil, err
+		}
+		coupon, err := OrmMpCoupon.NewBaseScope().Where(client.FieldId_, couponId).First(uCtx)
+		if err != nil {
+			log.Errorf("err:%v", err)
+			return nil, err
+		}
+		couponPrice = coupon.Value
+	}
+
+	// 计算最终价格
+	var payPrice = sumPrice - couponPrice
+	if req.OrderType == "takeout" {
+		payPrice += postagePrice
+	}
+
+	// 奖励积分
+	var gainIntegral int64
+	for _, productId := range productIds {
+		product, err := OrmMpStoreProduct.NewBaseScope().Where(client.FieldId_, productId).First(uCtx)
+		if err != nil {
+			log.Errorf("err:%v", err)
+			return nil, err
+		}
+		gainIntegral += product.GiveIntegral
+	}
+
+	// 生成一个订单号
+	orderSn := GenerateOrderID()
+
+	// 取餐表
+	orderNumber := &client.ModelMpOrderNumber{
+		OrderSn: orderSn,
+	}
+	err = OrmMpOrderNumber.NewBaseScope().Create(uCtx, orderNumber)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	order := &client.ModelMpStoreOrder{
+		OrderSn:       orderSn,
+		MpUid:         user.Id,
+		NumberId:      int64(orderNumber.Id),
+		MpStoreShopId: storeShop.Id,
+		GetAt:         uint32(time.Now().Add(time.Duration(req.GetGetTime()) * time.Minute).Unix()),
+		TotalNum:      totalNum,
+		CartId:        "",
+		TotalPrice:    sumPrice,
+		TotalPostage:  postagePrice,
+		CouponId:      req.CouponId,
+		CouponPrice:   couponPrice,
+		PayPrice:      payPrice,
+		PayPostage:    postagePrice,
+		PayType:       req.PayType,
+		GainIntegral:  gainIntegral,
+		Mark:          req.Remark,
+		ShippingType:  2, // 默认门店自提
+		OrderType:     req.OrderType,
+	}
+
+	if req.OrderType == "takeout" {
+		userAddress, err := OrmMpUserAddress.NewBaseScope().Where(client.FieldMpUid_, user.Id).Where(client.FieldId_, req.AddressId).First(uCtx)
+		if err != nil {
+			log.Errorf("err:%v", err)
+			return nil, err
+		}
+		order.UserPhone = userAddress.Phone
+		order.RealName = userAddress.RealName
+		order.UserAddress = userAddress.GetAddress() + " " + userAddress.GetDetail()
+	}
+
+	err = OrmMpStoreOrder.NewBaseScope().Create(uCtx, order)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	// 减库存
+	for i, productId := range productIds {
+		newSku := strings.Replace(specs[i], "|", ",", -1)
+		skuVal, err := OrmMpStoreProductAttrValue.NewBaseScope().Where(map[string]interface{}{
+			client.FieldProductId_: productId,
+			client.FieldSku_:       newSku,
+		}).First(uCtx)
+		if err != nil {
+			log.Errorf("err:%v", err)
+			return nil, err
+		}
+		res, err := OrmMpStoreProductAttrValue.NewBaseScope().Where(client.FieldId_, skuVal.Id).Where(fmt.Sprintf("%s > %d", client.FieldStock_, numbers[i])).Update(uCtx, map[string]interface{}{
+			client.FieldStock_: skuVal.Stock - int32(numbers[i]),
+		})
+		if err != nil {
+			log.Errorf("err:%v", err)
+			return nil, err
+		}
+		if res.RowsAffected == 0 {
+			return nil, lberr.NewInvalidArg("decrease stock failed %d %d", skuVal.Id, numbers[i])
+		}
+
+		product, err := OrmMpStoreProduct.NewBaseScope().Where(client.FieldId_, productId).First(uCtx)
+		if err != nil {
+			log.Errorf("err:%v", err)
+			return nil, err
+		}
+
+		// 添加进入购物车
+		var shopCar = &client.ModelMpStoreOrderCartInfo{
+			MpOrderId:    order.Id,
+			OrderSn:      orderSn,
+			CartId:       0,
+			ProductId:    productId,
+			CartInfo:     "",
+			Unique:       utils.GenUUID(),
+			IsAfterSales: 1,
+			Title:        storeShop.Name,
+			Image:        product.Image,
+			Number:       numbers[i],
+			Spec:         specs[i],
+			Price:        skuVal.Price,
+		}
+		err = OrmMpStoreOrderCartInfo.NewBaseScope().Create(uCtx, shopCar)
+		if err != nil {
+			log.Errorf("err:%v", err)
+			return nil, err
+		}
+	}
+
+	// 订单状态
+	var orderStatus = &client.ModelMpStoreOrderStatus{
+		Oid:           order.Id,
+		ChangeType:    "yshop_create_order",
+		ChangeMessage: "订单生成",
+	}
+	err = OrmMpStoreOrderStatus.NewBaseScope().Create(uCtx, orderStatus)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	// todo 如果超时需要取消订单
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) MPShopOrderList(ctx context.Context, req *client.MPShopOrderListReq) (*client.MPShopOrderListRsp, error) {
+	var rsp client.MPShopOrderListRsp
+	var err error
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) MPShopOrderDetail(ctx context.Context, req *client.MPShopOrderDetailReq) (*client.MPShopOrderDetailRsp, error) {
+	var rsp client.MPShopOrderDetailRsp
+	var err error
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) MPShopOrderTake(ctx context.Context, req *client.MPShopOrderTakeReq) (*client.MPShopOrderTakeRsp, error) {
+	var rsp client.MPShopOrderTakeRsp
+	var err error
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) MPShopOrderRefund(ctx context.Context, req *client.MPShopOrderRefundReq) (*client.MPShopOrderRefundRsp, error) {
+	var rsp client.MPShopOrderRefundRsp
+	var err error
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) MPShopOrderPay(ctx context.Context, req *client.MPShopOrderPayReq) (*client.MPShopOrderPayRsp, error) {
+	var rsp client.MPShopOrderPayRsp
+	var err error
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) MPWechatConfig(ctx context.Context, req *client.MPWechatConfigReq) (*client.MPWechatConfigRsp, error) {
+	var rsp client.MPWechatConfigRsp
+	var err error
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) MPUserAddressList(ctx context.Context, req *client.MPUserAddressListReq) (*client.MPUserAddressListRsp, error) {
+	var rsp client.MPUserAddressListRsp
+	var err error
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) MPUserAddressDefault(ctx context.Context, req *client.MPUserAddressDefaultReq) (*client.MPUserAddressDefaultRsp, error) {
+	var rsp client.MPUserAddressDefaultRsp
+	var err error
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) MPUserAddressAddAndEdit(ctx context.Context, req *client.MPUserAddressAddAndEditReq) (*client.MPUserAddressAddAndEditRsp, error) {
+	var rsp client.MPUserAddressAddAndEditRsp
+	var err error
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) MPUserAddressDel(ctx context.Context, req *client.MPUserAddressDelReq) (*client.MPUserAddressDelRsp, error) {
+	var rsp client.MPUserAddressDelRsp
+	var err error
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) MPUserInfo(ctx context.Context, req *client.MPUserInfoReq) (*client.MPUserInfoRsp, error) {
+	var rsp client.MPUserInfoRsp
+	var err error
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) MPUserMineService(ctx context.Context, req *client.MPUserMineServiceReq) (*client.MPUserMineServiceRsp, error) {
+	var rsp client.MPUserMineServiceRsp
+	var err error
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) MPUserServiceContent(ctx context.Context, req *client.MPUserServiceContentReq) (*client.MPUserServiceContentRsp, error) {
+	var rsp client.MPUserServiceContentRsp
+	var err error
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) MPUserSaveInfo(ctx context.Context, req *client.MPUserSaveInfoReq) (*client.MPUserSaveInfoRsp, error) {
+	var rsp client.MPUserSaveInfoRsp
+	var err error
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) MPUserBillList(ctx context.Context, req *client.MPUserBillListReq) (*client.MPUserBillListRsp, error) {
+	var rsp client.MPUserBillListRsp
+	var err error
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) MPUserMoneyList(ctx context.Context, req *client.MPUserMoneyListReq) (*client.MPUserMoneyListRsp, error) {
+	var rsp client.MPUserMoneyListRsp
+	var err error
+
+	return &rsp, err
+}
+
+func (a *LbsingleServer) MPUserRecharge(ctx context.Context, req *client.MPUserRechargeReq) (*client.MPUserRechargeRsp, error) {
+	var rsp client.MPUserRechargeRsp
+	var err error
 
 	return &rsp, err
 }
