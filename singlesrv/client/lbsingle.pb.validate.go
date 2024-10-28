@@ -39109,6 +39109,12 @@ func (m *MPShopOrderListReq) validate(all bool) error {
 
 	var errors []error
 
+	// no validation rules for Type
+
+	// no validation rules for Page
+
+	// no validation rules for Limit
+
 	if len(errors) > 0 {
 		return MPShopOrderListReqMultiError(errors)
 	}
@@ -39210,6 +39216,40 @@ func (m *MPShopOrderListRsp) validate(all bool) error {
 	}
 
 	var errors []error
+
+	for idx, item := range m.GetList() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, MPShopOrderListRspValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, MPShopOrderListRspValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return MPShopOrderListRspValidationError{
+					field:  fmt.Sprintf("List[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	if len(errors) > 0 {
 		return MPShopOrderListRspMultiError(errors)
@@ -39925,6 +39965,12 @@ func (m *MPShopOrderPayReq) validate(all bool) error {
 
 	var errors []error
 
+	// no validation rules for From
+
+	// no validation rules for PayType
+
+	// no validation rules for OrderSn
+
 	if len(errors) > 0 {
 		return MPShopOrderPayReqMultiError(errors)
 	}
@@ -40026,6 +40072,12 @@ func (m *MPShopOrderPayRsp) validate(all bool) error {
 	}
 
 	var errors []error
+
+	// no validation rules for Data
+
+	// no validation rules for TradeType
+
+	// no validation rules for Status
 
 	if len(errors) > 0 {
 		return MPShopOrderPayRspMultiError(errors)

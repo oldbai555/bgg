@@ -3780,7 +3780,7 @@ func (a *LbsingleServer) MPShopOrderRefund(ctx context.Context, req *client.MPSh
 func (a *LbsingleServer) MPShopOrderPay(ctx context.Context, req *client.MPShopOrderPayReq) (*client.MPShopOrderPayRsp, error) {
 	var rsp client.MPShopOrderPayRsp
 	var err error
-
+	rsp.Status = "ok"
 	return &rsp, err
 }
 
