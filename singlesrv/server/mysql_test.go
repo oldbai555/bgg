@@ -256,3 +256,7 @@ func TestAddStore(t *testing.T) {
 		return
 	}
 }
+
+func TestAddService(t *testing.T) {
+
+}

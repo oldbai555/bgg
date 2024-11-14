@@ -3544,6 +3544,7 @@ func (a *LbsingleServer) MPShopCouponReceive(ctx context.Context, req *client.MP
 
 	return &rsp, err
 }
+
 func (a *LbsingleServer) MPShopOrderCreate(ctx context.Context, req *client.MPShopOrderCreateReq) (*client.MPShopOrderCreateRsp, error) {
 	var rsp client.MPShopOrderCreateRsp
 	var err error
@@ -3823,13 +3824,32 @@ func (a *LbsingleServer) MPUserInfo(ctx context.Context, req *client.MPUserInfoR
 	var rsp client.MPUserInfoRsp
 	var err error
 
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	user, ok := uCtx.ExtInfo().(*client.BaseUser)
+	if !ok {
+		return nil, client.ErrUserNotFound
+	}
+	rsp.UserInfo = user
+
 	return &rsp, err
 }
 
 func (a *LbsingleServer) MPUserMineService(ctx context.Context, req *client.MPUserMineServiceReq) (*client.MPUserMineServiceRsp, error) {
 	var rsp client.MPUserMineServiceRsp
 	var err error
-
+	rsp.List = append(rsp.List, &client.ModelMpService{
+		Id:     1,
+		Status: 1,
+		Type:   "call",
+		Phone:  "14788777898",
+		Name:   "电话",
+		Image:  "https://oldbai.top/oss/download/BUOZ74",
+	})
 	return &rsp, err
 }
 
