@@ -39251,6 +39251,98 @@ func (m *MPShopOrderListRsp) validate(all bool) error {
 
 	}
 
+	{
+		sorted_keys := make([]uint64, len(m.GetShopMap()))
+		i := 0
+		for key := range m.GetShopMap() {
+			sorted_keys[i] = key
+			i++
+		}
+		sort.Slice(sorted_keys, func(i, j int) bool { return sorted_keys[i] < sorted_keys[j] })
+		for _, key := range sorted_keys {
+			val := m.GetShopMap()[key]
+			_ = val
+
+			// no validation rules for ShopMap[key]
+
+			if all {
+				switch v := interface{}(val).(type) {
+				case interface{ ValidateAll() error }:
+					if err := v.ValidateAll(); err != nil {
+						errors = append(errors, MPShopOrderListRspValidationError{
+							field:  fmt.Sprintf("ShopMap[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				case interface{ Validate() error }:
+					if err := v.Validate(); err != nil {
+						errors = append(errors, MPShopOrderListRspValidationError{
+							field:  fmt.Sprintf("ShopMap[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				}
+			} else if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+				if err := v.Validate(); err != nil {
+					return MPShopOrderListRspValidationError{
+						field:  fmt.Sprintf("ShopMap[%v]", key),
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		}
+	}
+
+	{
+		sorted_keys := make([]string, len(m.GetCartMap()))
+		i := 0
+		for key := range m.GetCartMap() {
+			sorted_keys[i] = key
+			i++
+		}
+		sort.Slice(sorted_keys, func(i, j int) bool { return sorted_keys[i] < sorted_keys[j] })
+		for _, key := range sorted_keys {
+			val := m.GetCartMap()[key]
+			_ = val
+
+			// no validation rules for CartMap[key]
+
+			if all {
+				switch v := interface{}(val).(type) {
+				case interface{ ValidateAll() error }:
+					if err := v.ValidateAll(); err != nil {
+						errors = append(errors, MPShopOrderListRspValidationError{
+							field:  fmt.Sprintf("CartMap[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				case interface{ Validate() error }:
+					if err := v.Validate(); err != nil {
+						errors = append(errors, MPShopOrderListRspValidationError{
+							field:  fmt.Sprintf("CartMap[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				}
+			} else if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+				if err := v.Validate(); err != nil {
+					return MPShopOrderListRspValidationError{
+						field:  fmt.Sprintf("CartMap[%v]", key),
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		}
+	}
+
 	if len(errors) > 0 {
 		return MPShopOrderListRspMultiError(errors)
 	}
@@ -39353,6 +39445,17 @@ func (m *MPShopOrderDetailReq) validate(all bool) error {
 
 	var errors []error
 
+	if utf8.RuneCountInString(m.GetOrderSn()) < 1 {
+		err := MPShopOrderDetailReqValidationError{
+			field:  "OrderSn",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
 	if len(errors) > 0 {
 		return MPShopOrderDetailReqMultiError(errors)
 	}
@@ -39454,6 +39557,98 @@ func (m *MPShopOrderDetailRsp) validate(all bool) error {
 	}
 
 	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetOrder()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, MPShopOrderDetailRspValidationError{
+					field:  "Order",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, MPShopOrderDetailRspValidationError{
+					field:  "Order",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetOrder()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return MPShopOrderDetailRspValidationError{
+				field:  "Order",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetShopInfo()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, MPShopOrderDetailRspValidationError{
+					field:  "ShopInfo",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, MPShopOrderDetailRspValidationError{
+					field:  "ShopInfo",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetShopInfo()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return MPShopOrderDetailRspValidationError{
+				field:  "ShopInfo",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	for idx, item := range m.GetCartList() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, MPShopOrderDetailRspValidationError{
+						field:  fmt.Sprintf("CartList[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, MPShopOrderDetailRspValidationError{
+						field:  fmt.Sprintf("CartList[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return MPShopOrderDetailRspValidationError{
+					field:  fmt.Sprintf("CartList[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	if len(errors) > 0 {
 		return MPShopOrderDetailRspMultiError(errors)
@@ -43187,3 +43382,140 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = MPShopProductRsp_StoreProductAttrValueDOValidationError{}
+
+// Validate checks the field values on MPShopOrderListRsp_CartInfo with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MPShopOrderListRsp_CartInfo) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MPShopOrderListRsp_CartInfo with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MPShopOrderListRsp_CartInfoMultiError, or nil if none found.
+func (m *MPShopOrderListRsp_CartInfo) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MPShopOrderListRsp_CartInfo) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetList() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, MPShopOrderListRsp_CartInfoValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, MPShopOrderListRsp_CartInfoValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return MPShopOrderListRsp_CartInfoValidationError{
+					field:  fmt.Sprintf("List[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return MPShopOrderListRsp_CartInfoMultiError(errors)
+	}
+
+	return nil
+}
+
+// MPShopOrderListRsp_CartInfoMultiError is an error wrapping multiple
+// validation errors returned by MPShopOrderListRsp_CartInfo.ValidateAll() if
+// the designated constraints aren't met.
+type MPShopOrderListRsp_CartInfoMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MPShopOrderListRsp_CartInfoMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MPShopOrderListRsp_CartInfoMultiError) AllErrors() []error { return m }
+
+// MPShopOrderListRsp_CartInfoValidationError is the validation error returned
+// by MPShopOrderListRsp_CartInfo.Validate if the designated constraints
+// aren't met.
+type MPShopOrderListRsp_CartInfoValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MPShopOrderListRsp_CartInfoValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MPShopOrderListRsp_CartInfoValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MPShopOrderListRsp_CartInfoValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MPShopOrderListRsp_CartInfoValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MPShopOrderListRsp_CartInfoValidationError) ErrorName() string {
+	return "MPShopOrderListRsp_CartInfoValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MPShopOrderListRsp_CartInfoValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMPShopOrderListRsp_CartInfo.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MPShopOrderListRsp_CartInfoValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MPShopOrderListRsp_CartInfoValidationError{}

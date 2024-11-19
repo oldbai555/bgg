@@ -3720,7 +3720,7 @@ func (a *LbsingleServer) MPShopOrderCreate(ctx context.Context, req *client.MPSh
 			CartInfo:     "",
 			Unique:       utils.GenUUID(),
 			IsAfterSales: 1,
-			Title:        storeShop.Name,
+			Title:        product.Name,
 			Image:        product.Image,
 			Number:       numbers[i],
 			Spec:         specs[i],
@@ -3754,6 +3754,52 @@ func (a *LbsingleServer) MPShopOrderList(ctx context.Context, req *client.MPShop
 	var rsp client.MPShopOrderListRsp
 	var err error
 
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	db := OrmMpStoreOrder.NewList(&core.ListOption{
+		Offset:    uint32((req.Page - 1) * req.Limit),
+		Limit:     uint32(req.Limit),
+		SkipTotal: true,
+	})
+	if req.Type >= 0 {
+		db.Where(client.FieldStatus_, req.Type)
+	}
+	list, err := db.Find(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.List = list
+
+	mpStoreShopIds := utils.PluckUint64List(rsp.List, client.FieldMpStoreShopId)
+	mpStoreShopList, err := OrmMpStoreShop.WhereIn(client.FieldId_, mpStoreShopIds).Find(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.ShopMap = utils.Slice2MapKeyByStructField(mpStoreShopList, client.FieldId).(map[uint64]*client.ModelMpStoreShop)
+
+	orderSnList := utils.PluckStringList(rsp.List, client.FieldOrderSn)
+	cartInfoList, err := OrmMpStoreOrderCartInfo.WhereIn(client.FieldOrderSn_, orderSnList).Find(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	rsp.CartMap = make(map[string]*client.MPShopOrderListRsp_CartInfo)
+	for _, info := range cartInfoList {
+		cartInfo, ok := rsp.CartMap[info.OrderSn]
+		if !ok {
+			rsp.CartMap[info.OrderSn] = &client.MPShopOrderListRsp_CartInfo{}
+			cartInfo = rsp.CartMap[info.OrderSn]
+		}
+		cartInfo.List = append(cartInfo.List, info)
+	}
+
 	return &rsp, err
 }
 
@@ -3761,6 +3807,33 @@ func (a *LbsingleServer) MPShopOrderDetail(ctx context.Context, req *client.MPSh
 	var rsp client.MPShopOrderDetailRsp
 	var err error
 
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	order, err := OrmMpStoreOrder.Where(client.FieldOrderSn_, req.OrderSn).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	mpStoreShop, err := OrmMpStoreShop.Where(client.FieldId_, order.MpStoreShopId).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	cartInfoList, err := OrmMpStoreOrderCartInfo.Where(client.FieldOrderSn_, order.OrderSn).Find(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	rsp.Order = order
+	rsp.ShopInfo = mpStoreShop
+	rsp.CartList = cartInfoList
 	return &rsp, err
 }
 

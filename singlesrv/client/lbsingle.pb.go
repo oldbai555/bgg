@@ -19040,7 +19040,9 @@ type MPShopOrderListRsp struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	List []*ModelMpStoreOrder `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
+	List    []*ModelMpStoreOrder                    `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
+	ShopMap map[uint64]*ModelMpStoreShop            `protobuf:"bytes,2,rep,name=shop_map,json=shopMap,proto3" json:"shop_map,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	CartMap map[string]*MPShopOrderListRsp_CartInfo `protobuf:"bytes,3,rep,name=cart_map,json=cartMap,proto3" json:"cart_map,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
 func (x *MPShopOrderListRsp) Reset() {
@@ -19082,10 +19084,26 @@ func (x *MPShopOrderListRsp) GetList() []*ModelMpStoreOrder {
 	return nil
 }
 
+func (x *MPShopOrderListRsp) GetShopMap() map[uint64]*ModelMpStoreShop {
+	if x != nil {
+		return x.ShopMap
+	}
+	return nil
+}
+
+func (x *MPShopOrderListRsp) GetCartMap() map[string]*MPShopOrderListRsp_CartInfo {
+	if x != nil {
+		return x.CartMap
+	}
+	return nil
+}
+
 type MPShopOrderDetailReq struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
+
+	OrderSn string `protobuf:"bytes,1,opt,name=order_sn,json=orderSn,proto3" json:"order_sn,omitempty"`
 }
 
 func (x *MPShopOrderDetailReq) Reset() {
@@ -19120,10 +19138,21 @@ func (*MPShopOrderDetailReq) Descriptor() ([]byte, []int) {
 	return file_lbsingle_proto_rawDescGZIP(), []int{303}
 }
 
+func (x *MPShopOrderDetailReq) GetOrderSn() string {
+	if x != nil {
+		return x.OrderSn
+	}
+	return ""
+}
+
 type MPShopOrderDetailRsp struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
+
+	Order    *ModelMpStoreOrder           `protobuf:"bytes,1,opt,name=order,proto3" json:"order,omitempty"`
+	ShopInfo *ModelMpStoreShop            `protobuf:"bytes,2,opt,name=shop_info,json=shopInfo,proto3" json:"shop_info,omitempty"`
+	CartList []*ModelMpStoreOrderCartInfo `protobuf:"bytes,3,rep,name=cart_list,json=cartList,proto3" json:"cart_list,omitempty"`
 }
 
 func (x *MPShopOrderDetailRsp) Reset() {
@@ -19156,6 +19185,27 @@ func (x *MPShopOrderDetailRsp) ProtoReflect() protoreflect.Message {
 // Deprecated: Use MPShopOrderDetailRsp.ProtoReflect.Descriptor instead.
 func (*MPShopOrderDetailRsp) Descriptor() ([]byte, []int) {
 	return file_lbsingle_proto_rawDescGZIP(), []int{304}
+}
+
+func (x *MPShopOrderDetailRsp) GetOrder() *ModelMpStoreOrder {
+	if x != nil {
+		return x.Order
+	}
+	return nil
+}
+
+func (x *MPShopOrderDetailRsp) GetShopInfo() *ModelMpStoreShop {
+	if x != nil {
+		return x.ShopInfo
+	}
+	return nil
+}
+
+func (x *MPShopOrderDetailRsp) GetCartList() []*ModelMpStoreOrderCartInfo {
+	if x != nil {
+		return x.CartList
+	}
+	return nil
 }
 
 type MPShopOrderTakeReq struct {
@@ -20519,6 +20569,53 @@ func (*MPShopProductRsp_StoreProductAttrValueDO) Descriptor() ([]byte, []int) {
 func (x *MPShopProductRsp_StoreProductAttrValueDO) GetProductValue() map[string]*ModelMpStoreProductAttrValue {
 	if x != nil {
 		return x.ProductValue
+	}
+	return nil
+}
+
+type MPShopOrderListRsp_CartInfo struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	List []*ModelMpStoreOrderCartInfo `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
+}
+
+func (x *MPShopOrderListRsp_CartInfo) Reset() {
+	*x = MPShopOrderListRsp_CartInfo{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lbsingle_proto_msgTypes[342]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MPShopOrderListRsp_CartInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MPShopOrderListRsp_CartInfo) ProtoMessage() {}
+
+func (x *MPShopOrderListRsp_CartInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_lbsingle_proto_msgTypes[342]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MPShopOrderListRsp_CartInfo.ProtoReflect.Descriptor instead.
+func (*MPShopOrderListRsp_CartInfo) Descriptor() ([]byte, []int) {
+	return file_lbsingle_proto_rawDescGZIP(), []int{302, 0}
+}
+
+func (x *MPShopOrderListRsp_CartInfo) GetList() []*ModelMpStoreOrderCartInfo {
+	if x != nil {
+		return x.List
 	}
 	return nil
 }
@@ -22662,15 +22759,53 @@ var file_lbsingle_proto_rawDesc = []byte{
 	0x12, 0x12, 0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x04,
 	0x74, 0x79, 0x70, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x70, 0x61, 0x67, 0x65, 0x18, 0x02, 0x20, 0x01,
 	0x28, 0x05, 0x52, 0x04, 0x70, 0x61, 0x67, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x6c, 0x69, 0x6d, 0x69,
-	0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x05, 0x52, 0x05, 0x6c, 0x69, 0x6d, 0x69, 0x74, 0x22, 0x45,
-	0x0a, 0x12, 0x4d, 0x50, 0x53, 0x68, 0x6f, 0x70, 0x4f, 0x72, 0x64, 0x65, 0x72, 0x4c, 0x69, 0x73,
-	0x74, 0x52, 0x73, 0x70, 0x12, 0x2f, 0x0a, 0x04, 0x6c, 0x69, 0x73, 0x74, 0x18, 0x01, 0x20, 0x03,
-	0x28, 0x0b, 0x32, 0x1b, 0x2e, 0x6c, 0x62, 0x73, 0x69, 0x6e, 0x67, 0x6c, 0x65, 0x2e, 0x4d, 0x6f,
-	0x64, 0x65, 0x6c, 0x4d, 0x70, 0x53, 0x74, 0x6f, 0x72, 0x65, 0x4f, 0x72, 0x64, 0x65, 0x72, 0x52,
-	0x04, 0x6c, 0x69, 0x73, 0x74, 0x22, 0x16, 0x0a, 0x14, 0x4d, 0x50, 0x53, 0x68, 0x6f, 0x70, 0x4f,
-	0x72, 0x64, 0x65, 0x72, 0x44, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x71, 0x22, 0x16, 0x0a,
-	0x14, 0x4d, 0x50, 0x53, 0x68, 0x6f, 0x70, 0x4f, 0x72, 0x64, 0x65, 0x72, 0x44, 0x65, 0x74, 0x61,
-	0x69, 0x6c, 0x52, 0x73, 0x70, 0x22, 0x14, 0x0a, 0x12, 0x4d, 0x50, 0x53, 0x68, 0x6f, 0x70, 0x4f,
+	0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x05, 0x52, 0x05, 0x6c, 0x69, 0x6d, 0x69, 0x74, 0x22, 0xd1,
+	0x03, 0x0a, 0x12, 0x4d, 0x50, 0x53, 0x68, 0x6f, 0x70, 0x4f, 0x72, 0x64, 0x65, 0x72, 0x4c, 0x69,
+	0x73, 0x74, 0x52, 0x73, 0x70, 0x12, 0x2f, 0x0a, 0x04, 0x6c, 0x69, 0x73, 0x74, 0x18, 0x01, 0x20,
+	0x03, 0x28, 0x0b, 0x32, 0x1b, 0x2e, 0x6c, 0x62, 0x73, 0x69, 0x6e, 0x67, 0x6c, 0x65, 0x2e, 0x4d,
+	0x6f, 0x64, 0x65, 0x6c, 0x4d, 0x70, 0x53, 0x74, 0x6f, 0x72, 0x65, 0x4f, 0x72, 0x64, 0x65, 0x72,
+	0x52, 0x04, 0x6c, 0x69, 0x73, 0x74, 0x12, 0x44, 0x0a, 0x08, 0x73, 0x68, 0x6f, 0x70, 0x5f, 0x6d,
+	0x61, 0x70, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x29, 0x2e, 0x6c, 0x62, 0x73, 0x69, 0x6e,
+	0x67, 0x6c, 0x65, 0x2e, 0x4d, 0x50, 0x53, 0x68, 0x6f, 0x70, 0x4f, 0x72, 0x64, 0x65, 0x72, 0x4c,
+	0x69, 0x73, 0x74, 0x52, 0x73, 0x70, 0x2e, 0x53, 0x68, 0x6f, 0x70, 0x4d, 0x61, 0x70, 0x45, 0x6e,
+	0x74, 0x72, 0x79, 0x52, 0x07, 0x73, 0x68, 0x6f, 0x70, 0x4d, 0x61, 0x70, 0x12, 0x44, 0x0a, 0x08,
+	0x63, 0x61, 0x72, 0x74, 0x5f, 0x6d, 0x61, 0x70, 0x18, 0x03, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x29,
+	0x2e, 0x6c, 0x62, 0x73, 0x69, 0x6e, 0x67, 0x6c, 0x65, 0x2e, 0x4d, 0x50, 0x53, 0x68, 0x6f, 0x70,
+	0x4f, 0x72, 0x64, 0x65, 0x72, 0x4c, 0x69, 0x73, 0x74, 0x52, 0x73, 0x70, 0x2e, 0x43, 0x61, 0x72,
+	0x74, 0x4d, 0x61, 0x70, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x52, 0x07, 0x63, 0x61, 0x72, 0x74, 0x4d,
+	0x61, 0x70, 0x1a, 0x43, 0x0a, 0x08, 0x43, 0x61, 0x72, 0x74, 0x49, 0x6e, 0x66, 0x6f, 0x12, 0x37,
+	0x0a, 0x04, 0x6c, 0x69, 0x73, 0x74, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x23, 0x2e, 0x6c,
+	0x62, 0x73, 0x69, 0x6e, 0x67, 0x6c, 0x65, 0x2e, 0x4d, 0x6f, 0x64, 0x65, 0x6c, 0x4d, 0x70, 0x53,
+	0x74, 0x6f, 0x72, 0x65, 0x4f, 0x72, 0x64, 0x65, 0x72, 0x43, 0x61, 0x72, 0x74, 0x49, 0x6e, 0x66,
+	0x6f, 0x52, 0x04, 0x6c, 0x69, 0x73, 0x74, 0x1a, 0x56, 0x0a, 0x0c, 0x53, 0x68, 0x6f, 0x70, 0x4d,
+	0x61, 0x70, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x04, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x30, 0x0a, 0x05, 0x76, 0x61, 0x6c,
+	0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x6c, 0x62, 0x73, 0x69, 0x6e,
+	0x67, 0x6c, 0x65, 0x2e, 0x4d, 0x6f, 0x64, 0x65, 0x6c, 0x4d, 0x70, 0x53, 0x74, 0x6f, 0x72, 0x65,
+	0x53, 0x68, 0x6f, 0x70, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x1a,
+	0x61, 0x0a, 0x0c, 0x43, 0x61, 0x72, 0x74, 0x4d, 0x61, 0x70, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x12,
+	0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65,
+	0x79, 0x12, 0x3b, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b,
+	0x32, 0x25, 0x2e, 0x6c, 0x62, 0x73, 0x69, 0x6e, 0x67, 0x6c, 0x65, 0x2e, 0x4d, 0x50, 0x53, 0x68,
+	0x6f, 0x70, 0x4f, 0x72, 0x64, 0x65, 0x72, 0x4c, 0x69, 0x73, 0x74, 0x52, 0x73, 0x70, 0x2e, 0x43,
+	0x61, 0x72, 0x74, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02,
+	0x38, 0x01, 0x22, 0x3a, 0x0a, 0x14, 0x4d, 0x50, 0x53, 0x68, 0x6f, 0x70, 0x4f, 0x72, 0x64, 0x65,
+	0x72, 0x44, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x71, 0x12, 0x22, 0x0a, 0x08, 0x6f, 0x72,
+	0x64, 0x65, 0x72, 0x5f, 0x73, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x07, 0xfa, 0x42,
+	0x04, 0x72, 0x02, 0x10, 0x01, 0x52, 0x07, 0x6f, 0x72, 0x64, 0x65, 0x72, 0x53, 0x6e, 0x22, 0xc4,
+	0x01, 0x0a, 0x14, 0x4d, 0x50, 0x53, 0x68, 0x6f, 0x70, 0x4f, 0x72, 0x64, 0x65, 0x72, 0x44, 0x65,
+	0x74, 0x61, 0x69, 0x6c, 0x52, 0x73, 0x70, 0x12, 0x31, 0x0a, 0x05, 0x6f, 0x72, 0x64, 0x65, 0x72,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1b, 0x2e, 0x6c, 0x62, 0x73, 0x69, 0x6e, 0x67, 0x6c,
+	0x65, 0x2e, 0x4d, 0x6f, 0x64, 0x65, 0x6c, 0x4d, 0x70, 0x53, 0x74, 0x6f, 0x72, 0x65, 0x4f, 0x72,
+	0x64, 0x65, 0x72, 0x52, 0x05, 0x6f, 0x72, 0x64, 0x65, 0x72, 0x12, 0x37, 0x0a, 0x09, 0x73, 0x68,
+	0x6f, 0x70, 0x5f, 0x69, 0x6e, 0x66, 0x6f, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e,
+	0x6c, 0x62, 0x73, 0x69, 0x6e, 0x67, 0x6c, 0x65, 0x2e, 0x4d, 0x6f, 0x64, 0x65, 0x6c, 0x4d, 0x70,
+	0x53, 0x74, 0x6f, 0x72, 0x65, 0x53, 0x68, 0x6f, 0x70, 0x52, 0x08, 0x73, 0x68, 0x6f, 0x70, 0x49,
+	0x6e, 0x66, 0x6f, 0x12, 0x40, 0x0a, 0x09, 0x63, 0x61, 0x72, 0x74, 0x5f, 0x6c, 0x69, 0x73, 0x74,
+	0x18, 0x03, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x23, 0x2e, 0x6c, 0x62, 0x73, 0x69, 0x6e, 0x67, 0x6c,
+	0x65, 0x2e, 0x4d, 0x6f, 0x64, 0x65, 0x6c, 0x4d, 0x70, 0x53, 0x74, 0x6f, 0x72, 0x65, 0x4f, 0x72,
+	0x64, 0x65, 0x72, 0x43, 0x61, 0x72, 0x74, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x08, 0x63, 0x61, 0x72,
+	0x74, 0x4c, 0x69, 0x73, 0x74, 0x22, 0x14, 0x0a, 0x12, 0x4d, 0x50, 0x53, 0x68, 0x6f, 0x70, 0x4f,
 	0x72, 0x64, 0x65, 0x72, 0x54, 0x61, 0x6b, 0x65, 0x52, 0x65, 0x71, 0x22, 0x14, 0x0a, 0x12, 0x4d,
 	0x50, 0x53, 0x68, 0x6f, 0x70, 0x4f, 0x72, 0x64, 0x65, 0x72, 0x54, 0x61, 0x6b, 0x65, 0x52, 0x73,
 	0x70, 0x22, 0x16, 0x0a, 0x14, 0x4d, 0x50, 0x53, 0x68, 0x6f, 0x70, 0x4f, 0x72, 0x64, 0x65, 0x72,
@@ -23896,7 +24031,7 @@ func file_lbsingle_proto_rawDescGZIP() []byte {
 }
 
 var file_lbsingle_proto_enumTypes = make([]protoimpl.EnumInfo, 36)
-var file_lbsingle_proto_msgTypes = make([]protoimpl.MessageInfo, 342)
+var file_lbsingle_proto_msgTypes = make([]protoimpl.MessageInfo, 345)
 var file_lbsingle_proto_goTypes = []interface{}{
 	(ErrCode)(0),                                       // 0: lbsingle.ErrCode
 	(ModelFile_State)(0),                               // 1: lbsingle.ModelFile.State
@@ -24272,548 +24407,559 @@ var file_lbsingle_proto_goTypes = []interface{}{
 	(*MPShopProductRsp_AppStoreProduct)(nil),           // 371: lbsingle.MPShopProductRsp.AppStoreProduct
 	(*MPShopProductRsp_AppStoreProductAttr)(nil),       // 372: lbsingle.MPShopProductRsp.AppStoreProductAttr
 	(*MPShopProductRsp_StoreProductAttrValueDO)(nil),   // 373: lbsingle.MPShopProductRsp.StoreProductAttrValueDO
-	nil,                     // 374: lbsingle.MPShopProductRsp.ProductMapEntry
-	nil,                     // 375: lbsingle.MPShopProductRsp.AppStoreProduct.ProductAttrEntry
-	nil,                     // 376: lbsingle.MPShopProductRsp.AppStoreProduct.ProductAttrValueEntry
-	nil,                     // 377: lbsingle.MPShopProductRsp.StoreProductAttrValueDO.ProductValueEntry
-	(*Login)(nil),           // 378: lbsinglest.Login
-	(*JoinChatRoom)(nil),    // 379: lbsinglest.JoinChatRoom
-	(*LeaveChatRoom)(nil),   // 380: lbsinglest.LeaveChatRoom
-	(*Content)(nil),         // 381: lbsinglest.Content
-	(*core.ListOption)(nil), // 382: lb.ListOption
-	(*core.Paginate)(nil),   // 383: lb.Paginate
-	(*BaseUser)(nil),        // 384: lbsinglest.BaseUser
+	nil,                                 // 374: lbsingle.MPShopProductRsp.ProductMapEntry
+	nil,                                 // 375: lbsingle.MPShopProductRsp.AppStoreProduct.ProductAttrEntry
+	nil,                                 // 376: lbsingle.MPShopProductRsp.AppStoreProduct.ProductAttrValueEntry
+	nil,                                 // 377: lbsingle.MPShopProductRsp.StoreProductAttrValueDO.ProductValueEntry
+	(*MPShopOrderListRsp_CartInfo)(nil), // 378: lbsingle.MPShopOrderListRsp.CartInfo
+	nil,                                 // 379: lbsingle.MPShopOrderListRsp.ShopMapEntry
+	nil,                                 // 380: lbsingle.MPShopOrderListRsp.CartMapEntry
+	(*Login)(nil),                       // 381: lbsinglest.Login
+	(*JoinChatRoom)(nil),                // 382: lbsinglest.JoinChatRoom
+	(*LeaveChatRoom)(nil),               // 383: lbsinglest.LeaveChatRoom
+	(*Content)(nil),                     // 384: lbsinglest.Content
+	(*core.ListOption)(nil),             // 385: lb.ListOption
+	(*core.Paginate)(nil),               // 386: lb.Paginate
+	(*BaseUser)(nil),                    // 387: lbsinglest.BaseUser
 }
 var file_lbsingle_proto_depIdxs = []int32{
 	43,  // 0: lbsingle.WebsocketMsg.chat_message:type_name -> lbsingle.ModelMessage
-	378, // 1: lbsingle.WebsocketMsg.login:type_name -> lbsinglest.Login
-	379, // 2: lbsingle.WebsocketMsg.join_chat_room:type_name -> lbsinglest.JoinChatRoom
-	380, // 3: lbsingle.WebsocketMsg.leave_chat_room:type_name -> lbsinglest.LeaveChatRoom
+	381, // 1: lbsingle.WebsocketMsg.login:type_name -> lbsinglest.Login
+	382, // 2: lbsingle.WebsocketMsg.join_chat_room:type_name -> lbsinglest.JoinChatRoom
+	383, // 3: lbsingle.WebsocketMsg.leave_chat_room:type_name -> lbsinglest.LeaveChatRoom
 	40,  // 4: lbsingle.MqSyncFile.fileList:type_name -> lbsingle.ModelFile
-	381, // 5: lbsingle.ModelMessage.content:type_name -> lbsinglest.Content
-	382, // 6: lbsingle.DelFileListReq.list_option:type_name -> lb.ListOption
+	384, // 5: lbsingle.ModelMessage.content:type_name -> lbsinglest.Content
+	385, // 6: lbsingle.DelFileListReq.list_option:type_name -> lb.ListOption
 	40,  // 7: lbsingle.GetFileRsp.data:type_name -> lbsingle.ModelFile
-	382, // 8: lbsingle.GetFileListReq.list_option:type_name -> lb.ListOption
-	383, // 9: lbsingle.GetFileListRsp.paginate:type_name -> lb.Paginate
+	385, // 8: lbsingle.GetFileListReq.list_option:type_name -> lb.ListOption
+	386, // 9: lbsingle.GetFileListRsp.paginate:type_name -> lb.Paginate
 	40,  // 10: lbsingle.GetFileListRsp.list:type_name -> lbsingle.ModelFile
-	384, // 11: lbsingle.LoginRsp.user:type_name -> lbsinglest.BaseUser
-	384, // 12: lbsingle.GetLoginUserRsp.user:type_name -> lbsinglest.BaseUser
-	384, // 13: lbsingle.UpdateLoginUserInfoReq.user:type_name -> lbsinglest.BaseUser
+	387, // 11: lbsingle.LoginRsp.user:type_name -> lbsinglest.BaseUser
+	387, // 12: lbsingle.GetLoginUserRsp.user:type_name -> lbsinglest.BaseUser
+	387, // 13: lbsingle.UpdateLoginUserInfoReq.user:type_name -> lbsinglest.BaseUser
 	41,  // 14: lbsingle.AddUserReq.data:type_name -> lbsingle.ModelUser
-	384, // 15: lbsingle.AddUserRsp.data:type_name -> lbsinglest.BaseUser
-	384, // 16: lbsingle.UpdateUserReq.data:type_name -> lbsinglest.BaseUser
-	382, // 17: lbsingle.DelUserListReq.list_option:type_name -> lb.ListOption
-	384, // 18: lbsingle.GetUserRsp.data:type_name -> lbsinglest.BaseUser
-	382, // 19: lbsingle.GetUserListReq.list_option:type_name -> lb.ListOption
-	383, // 20: lbsingle.GetUserListRsp.paginate:type_name -> lb.Paginate
-	384, // 21: lbsingle.GetUserListRsp.list:type_name -> lbsinglest.BaseUser
+	387, // 15: lbsingle.AddUserRsp.data:type_name -> lbsinglest.BaseUser
+	387, // 16: lbsingle.UpdateUserReq.data:type_name -> lbsinglest.BaseUser
+	385, // 17: lbsingle.DelUserListReq.list_option:type_name -> lb.ListOption
+	387, // 18: lbsingle.GetUserRsp.data:type_name -> lbsinglest.BaseUser
+	385, // 19: lbsingle.GetUserListReq.list_option:type_name -> lb.ListOption
+	386, // 20: lbsingle.GetUserListRsp.paginate:type_name -> lb.Paginate
+	387, // 21: lbsingle.GetUserListRsp.list:type_name -> lbsinglest.BaseUser
 	44,  // 22: lbsingle.AddMpMerchantDetailsReq.data:type_name -> lbsingle.ModelMpMerchantDetails
 	44,  // 23: lbsingle.AddMpMerchantDetailsRsp.data:type_name -> lbsingle.ModelMpMerchantDetails
 	44,  // 24: lbsingle.UpdateMpMerchantDetailsReq.data:type_name -> lbsingle.ModelMpMerchantDetails
-	382, // 25: lbsingle.DelMpMerchantDetailsListReq.list_option:type_name -> lb.ListOption
+	385, // 25: lbsingle.DelMpMerchantDetailsListReq.list_option:type_name -> lb.ListOption
 	44,  // 26: lbsingle.GetMpMerchantDetailsRsp.data:type_name -> lbsingle.ModelMpMerchantDetails
-	382, // 27: lbsingle.GetMpMerchantDetailsListReq.list_option:type_name -> lb.ListOption
-	383, // 28: lbsingle.GetMpMerchantDetailsListRsp.paginate:type_name -> lb.Paginate
+	385, // 27: lbsingle.GetMpMerchantDetailsListReq.list_option:type_name -> lb.ListOption
+	386, // 28: lbsingle.GetMpMerchantDetailsListRsp.paginate:type_name -> lb.Paginate
 	44,  // 29: lbsingle.GetMpMerchantDetailsListRsp.list:type_name -> lbsingle.ModelMpMerchantDetails
 	45,  // 30: lbsingle.AddMpMemberUserReq.data:type_name -> lbsingle.ModelMpMemberUser
 	45,  // 31: lbsingle.AddMpMemberUserRsp.data:type_name -> lbsingle.ModelMpMemberUser
 	45,  // 32: lbsingle.UpdateMpMemberUserReq.data:type_name -> lbsingle.ModelMpMemberUser
-	382, // 33: lbsingle.DelMpMemberUserListReq.list_option:type_name -> lb.ListOption
+	385, // 33: lbsingle.DelMpMemberUserListReq.list_option:type_name -> lb.ListOption
 	45,  // 34: lbsingle.GetMpMemberUserRsp.data:type_name -> lbsingle.ModelMpMemberUser
-	382, // 35: lbsingle.GetMpMemberUserListReq.list_option:type_name -> lb.ListOption
-	383, // 36: lbsingle.GetMpMemberUserListRsp.paginate:type_name -> lb.Paginate
+	385, // 35: lbsingle.GetMpMemberUserListReq.list_option:type_name -> lb.ListOption
+	386, // 36: lbsingle.GetMpMemberUserListRsp.paginate:type_name -> lb.Paginate
 	45,  // 37: lbsingle.GetMpMemberUserListRsp.list:type_name -> lbsingle.ModelMpMemberUser
 	46,  // 38: lbsingle.AddMpUserAddressReq.data:type_name -> lbsingle.ModelMpUserAddress
 	46,  // 39: lbsingle.AddMpUserAddressRsp.data:type_name -> lbsingle.ModelMpUserAddress
 	46,  // 40: lbsingle.UpdateMpUserAddressReq.data:type_name -> lbsingle.ModelMpUserAddress
-	382, // 41: lbsingle.DelMpUserAddressListReq.list_option:type_name -> lb.ListOption
+	385, // 41: lbsingle.DelMpUserAddressListReq.list_option:type_name -> lb.ListOption
 	46,  // 42: lbsingle.GetMpUserAddressRsp.data:type_name -> lbsingle.ModelMpUserAddress
-	382, // 43: lbsingle.GetMpUserAddressListReq.list_option:type_name -> lb.ListOption
-	383, // 44: lbsingle.GetMpUserAddressListRsp.paginate:type_name -> lb.Paginate
+	385, // 43: lbsingle.GetMpUserAddressListReq.list_option:type_name -> lb.ListOption
+	386, // 44: lbsingle.GetMpUserAddressListRsp.paginate:type_name -> lb.Paginate
 	46,  // 45: lbsingle.GetMpUserAddressListRsp.list:type_name -> lbsingle.ModelMpUserAddress
 	47,  // 46: lbsingle.AddMpUserBillReq.data:type_name -> lbsingle.ModelMpUserBill
 	47,  // 47: lbsingle.AddMpUserBillRsp.data:type_name -> lbsingle.ModelMpUserBill
 	47,  // 48: lbsingle.UpdateMpUserBillReq.data:type_name -> lbsingle.ModelMpUserBill
-	382, // 49: lbsingle.DelMpUserBillListReq.list_option:type_name -> lb.ListOption
+	385, // 49: lbsingle.DelMpUserBillListReq.list_option:type_name -> lb.ListOption
 	47,  // 50: lbsingle.GetMpUserBillRsp.data:type_name -> lbsingle.ModelMpUserBill
-	382, // 51: lbsingle.GetMpUserBillListReq.list_option:type_name -> lb.ListOption
-	383, // 52: lbsingle.GetMpUserBillListRsp.paginate:type_name -> lb.Paginate
+	385, // 51: lbsingle.GetMpUserBillListReq.list_option:type_name -> lb.ListOption
+	386, // 52: lbsingle.GetMpUserBillListRsp.paginate:type_name -> lb.Paginate
 	47,  // 53: lbsingle.GetMpUserBillListRsp.list:type_name -> lbsingle.ModelMpUserBill
 	48,  // 54: lbsingle.AddMpProductCategoryReq.data:type_name -> lbsingle.ModelMpProductCategory
 	48,  // 55: lbsingle.AddMpProductCategoryRsp.data:type_name -> lbsingle.ModelMpProductCategory
 	48,  // 56: lbsingle.UpdateMpProductCategoryReq.data:type_name -> lbsingle.ModelMpProductCategory
-	382, // 57: lbsingle.DelMpProductCategoryListReq.list_option:type_name -> lb.ListOption
+	385, // 57: lbsingle.DelMpProductCategoryListReq.list_option:type_name -> lb.ListOption
 	48,  // 58: lbsingle.GetMpProductCategoryRsp.data:type_name -> lbsingle.ModelMpProductCategory
-	382, // 59: lbsingle.GetMpProductCategoryListReq.list_option:type_name -> lb.ListOption
-	383, // 60: lbsingle.GetMpProductCategoryListRsp.paginate:type_name -> lb.Paginate
+	385, // 59: lbsingle.GetMpProductCategoryListReq.list_option:type_name -> lb.ListOption
+	386, // 60: lbsingle.GetMpProductCategoryListRsp.paginate:type_name -> lb.Paginate
 	48,  // 61: lbsingle.GetMpProductCategoryListRsp.list:type_name -> lbsingle.ModelMpProductCategory
 	49,  // 62: lbsingle.AddMpStoreProductReq.data:type_name -> lbsingle.ModelMpStoreProduct
 	49,  // 63: lbsingle.AddMpStoreProductRsp.data:type_name -> lbsingle.ModelMpStoreProduct
 	49,  // 64: lbsingle.UpdateMpStoreProductReq.data:type_name -> lbsingle.ModelMpStoreProduct
-	382, // 65: lbsingle.DelMpStoreProductListReq.list_option:type_name -> lb.ListOption
+	385, // 65: lbsingle.DelMpStoreProductListReq.list_option:type_name -> lb.ListOption
 	49,  // 66: lbsingle.GetMpStoreProductRsp.data:type_name -> lbsingle.ModelMpStoreProduct
-	382, // 67: lbsingle.GetMpStoreProductListReq.list_option:type_name -> lb.ListOption
-	383, // 68: lbsingle.GetMpStoreProductListRsp.paginate:type_name -> lb.Paginate
+	385, // 67: lbsingle.GetMpStoreProductListReq.list_option:type_name -> lb.ListOption
+	386, // 68: lbsingle.GetMpStoreProductListRsp.paginate:type_name -> lb.Paginate
 	49,  // 69: lbsingle.GetMpStoreProductListRsp.list:type_name -> lbsingle.ModelMpStoreProduct
 	50,  // 70: lbsingle.AddMpStoreProductAttrReq.data:type_name -> lbsingle.ModelMpStoreProductAttr
 	50,  // 71: lbsingle.AddMpStoreProductAttrRsp.data:type_name -> lbsingle.ModelMpStoreProductAttr
 	50,  // 72: lbsingle.UpdateMpStoreProductAttrReq.data:type_name -> lbsingle.ModelMpStoreProductAttr
-	382, // 73: lbsingle.DelMpStoreProductAttrListReq.list_option:type_name -> lb.ListOption
+	385, // 73: lbsingle.DelMpStoreProductAttrListReq.list_option:type_name -> lb.ListOption
 	50,  // 74: lbsingle.GetMpStoreProductAttrRsp.data:type_name -> lbsingle.ModelMpStoreProductAttr
-	382, // 75: lbsingle.GetMpStoreProductAttrListReq.list_option:type_name -> lb.ListOption
-	383, // 76: lbsingle.GetMpStoreProductAttrListRsp.paginate:type_name -> lb.Paginate
+	385, // 75: lbsingle.GetMpStoreProductAttrListReq.list_option:type_name -> lb.ListOption
+	386, // 76: lbsingle.GetMpStoreProductAttrListRsp.paginate:type_name -> lb.Paginate
 	50,  // 77: lbsingle.GetMpStoreProductAttrListRsp.list:type_name -> lbsingle.ModelMpStoreProductAttr
 	51,  // 78: lbsingle.AddMpStoreProductAttrResultReq.data:type_name -> lbsingle.ModelMpStoreProductAttrResult
 	51,  // 79: lbsingle.AddMpStoreProductAttrResultRsp.data:type_name -> lbsingle.ModelMpStoreProductAttrResult
 	51,  // 80: lbsingle.UpdateMpStoreProductAttrResultReq.data:type_name -> lbsingle.ModelMpStoreProductAttrResult
-	382, // 81: lbsingle.DelMpStoreProductAttrResultListReq.list_option:type_name -> lb.ListOption
+	385, // 81: lbsingle.DelMpStoreProductAttrResultListReq.list_option:type_name -> lb.ListOption
 	51,  // 82: lbsingle.GetMpStoreProductAttrResultRsp.data:type_name -> lbsingle.ModelMpStoreProductAttrResult
-	382, // 83: lbsingle.GetMpStoreProductAttrResultListReq.list_option:type_name -> lb.ListOption
-	383, // 84: lbsingle.GetMpStoreProductAttrResultListRsp.paginate:type_name -> lb.Paginate
+	385, // 83: lbsingle.GetMpStoreProductAttrResultListReq.list_option:type_name -> lb.ListOption
+	386, // 84: lbsingle.GetMpStoreProductAttrResultListRsp.paginate:type_name -> lb.Paginate
 	51,  // 85: lbsingle.GetMpStoreProductAttrResultListRsp.list:type_name -> lbsingle.ModelMpStoreProductAttrResult
 	52,  // 86: lbsingle.AddMpStoreProductAttrValueReq.data:type_name -> lbsingle.ModelMpStoreProductAttrValue
 	52,  // 87: lbsingle.AddMpStoreProductAttrValueRsp.data:type_name -> lbsingle.ModelMpStoreProductAttrValue
 	52,  // 88: lbsingle.UpdateMpStoreProductAttrValueReq.data:type_name -> lbsingle.ModelMpStoreProductAttrValue
-	382, // 89: lbsingle.DelMpStoreProductAttrValueListReq.list_option:type_name -> lb.ListOption
+	385, // 89: lbsingle.DelMpStoreProductAttrValueListReq.list_option:type_name -> lb.ListOption
 	52,  // 90: lbsingle.GetMpStoreProductAttrValueRsp.data:type_name -> lbsingle.ModelMpStoreProductAttrValue
-	382, // 91: lbsingle.GetMpStoreProductAttrValueListReq.list_option:type_name -> lb.ListOption
-	383, // 92: lbsingle.GetMpStoreProductAttrValueListRsp.paginate:type_name -> lb.Paginate
+	385, // 91: lbsingle.GetMpStoreProductAttrValueListReq.list_option:type_name -> lb.ListOption
+	386, // 92: lbsingle.GetMpStoreProductAttrValueListRsp.paginate:type_name -> lb.Paginate
 	52,  // 93: lbsingle.GetMpStoreProductAttrValueListRsp.list:type_name -> lbsingle.ModelMpStoreProductAttrValue
 	53,  // 94: lbsingle.AddMpStoreProductReplyReq.data:type_name -> lbsingle.ModelMpStoreProductReply
 	53,  // 95: lbsingle.AddMpStoreProductReplyRsp.data:type_name -> lbsingle.ModelMpStoreProductReply
 	53,  // 96: lbsingle.UpdateMpStoreProductReplyReq.data:type_name -> lbsingle.ModelMpStoreProductReply
-	382, // 97: lbsingle.DelMpStoreProductReplyListReq.list_option:type_name -> lb.ListOption
+	385, // 97: lbsingle.DelMpStoreProductReplyListReq.list_option:type_name -> lb.ListOption
 	53,  // 98: lbsingle.GetMpStoreProductReplyRsp.data:type_name -> lbsingle.ModelMpStoreProductReply
-	382, // 99: lbsingle.GetMpStoreProductReplyListReq.list_option:type_name -> lb.ListOption
-	383, // 100: lbsingle.GetMpStoreProductReplyListRsp.paginate:type_name -> lb.Paginate
+	385, // 99: lbsingle.GetMpStoreProductReplyListReq.list_option:type_name -> lb.ListOption
+	386, // 100: lbsingle.GetMpStoreProductReplyListRsp.paginate:type_name -> lb.Paginate
 	53,  // 101: lbsingle.GetMpStoreProductReplyListRsp.list:type_name -> lbsingle.ModelMpStoreProductReply
 	54,  // 102: lbsingle.AddMpStoreProductRuleReq.data:type_name -> lbsingle.ModelMpStoreProductRule
 	54,  // 103: lbsingle.AddMpStoreProductRuleRsp.data:type_name -> lbsingle.ModelMpStoreProductRule
 	54,  // 104: lbsingle.UpdateMpStoreProductRuleReq.data:type_name -> lbsingle.ModelMpStoreProductRule
-	382, // 105: lbsingle.DelMpStoreProductRuleListReq.list_option:type_name -> lb.ListOption
+	385, // 105: lbsingle.DelMpStoreProductRuleListReq.list_option:type_name -> lb.ListOption
 	54,  // 106: lbsingle.GetMpStoreProductRuleRsp.data:type_name -> lbsingle.ModelMpStoreProductRule
-	382, // 107: lbsingle.GetMpStoreProductRuleListReq.list_option:type_name -> lb.ListOption
-	383, // 108: lbsingle.GetMpStoreProductRuleListRsp.paginate:type_name -> lb.Paginate
+	385, // 107: lbsingle.GetMpStoreProductRuleListReq.list_option:type_name -> lb.ListOption
+	386, // 108: lbsingle.GetMpStoreProductRuleListRsp.paginate:type_name -> lb.Paginate
 	54,  // 109: lbsingle.GetMpStoreProductRuleListRsp.list:type_name -> lbsingle.ModelMpStoreProductRule
 	55,  // 110: lbsingle.AddMpStoreShopReq.data:type_name -> lbsingle.ModelMpStoreShop
 	55,  // 111: lbsingle.AddMpStoreShopRsp.data:type_name -> lbsingle.ModelMpStoreShop
 	55,  // 112: lbsingle.UpdateMpStoreShopReq.data:type_name -> lbsingle.ModelMpStoreShop
-	382, // 113: lbsingle.DelMpStoreShopListReq.list_option:type_name -> lb.ListOption
+	385, // 113: lbsingle.DelMpStoreShopListReq.list_option:type_name -> lb.ListOption
 	55,  // 114: lbsingle.GetMpStoreShopRsp.data:type_name -> lbsingle.ModelMpStoreShop
-	382, // 115: lbsingle.GetMpStoreShopListReq.list_option:type_name -> lb.ListOption
-	383, // 116: lbsingle.GetMpStoreShopListRsp.paginate:type_name -> lb.Paginate
+	385, // 115: lbsingle.GetMpStoreShopListReq.list_option:type_name -> lb.ListOption
+	386, // 116: lbsingle.GetMpStoreShopListRsp.paginate:type_name -> lb.Paginate
 	55,  // 117: lbsingle.GetMpStoreShopListRsp.list:type_name -> lbsingle.ModelMpStoreShop
 	56,  // 118: lbsingle.AddMpCouponReq.data:type_name -> lbsingle.ModelMpCoupon
 	56,  // 119: lbsingle.AddMpCouponRsp.data:type_name -> lbsingle.ModelMpCoupon
 	56,  // 120: lbsingle.UpdateMpCouponReq.data:type_name -> lbsingle.ModelMpCoupon
-	382, // 121: lbsingle.DelMpCouponListReq.list_option:type_name -> lb.ListOption
+	385, // 121: lbsingle.DelMpCouponListReq.list_option:type_name -> lb.ListOption
 	56,  // 122: lbsingle.GetMpCouponRsp.data:type_name -> lbsingle.ModelMpCoupon
-	382, // 123: lbsingle.GetMpCouponListReq.list_option:type_name -> lb.ListOption
-	383, // 124: lbsingle.GetMpCouponListRsp.paginate:type_name -> lb.Paginate
+	385, // 123: lbsingle.GetMpCouponListReq.list_option:type_name -> lb.ListOption
+	386, // 124: lbsingle.GetMpCouponListRsp.paginate:type_name -> lb.Paginate
 	56,  // 125: lbsingle.GetMpCouponListRsp.list:type_name -> lbsingle.ModelMpCoupon
 	57,  // 126: lbsingle.AddMpCouponUserReq.data:type_name -> lbsingle.ModelMpCouponUser
 	57,  // 127: lbsingle.AddMpCouponUserRsp.data:type_name -> lbsingle.ModelMpCouponUser
 	57,  // 128: lbsingle.UpdateMpCouponUserReq.data:type_name -> lbsingle.ModelMpCouponUser
-	382, // 129: lbsingle.DelMpCouponUserListReq.list_option:type_name -> lb.ListOption
+	385, // 129: lbsingle.DelMpCouponUserListReq.list_option:type_name -> lb.ListOption
 	57,  // 130: lbsingle.GetMpCouponUserRsp.data:type_name -> lbsingle.ModelMpCouponUser
-	382, // 131: lbsingle.GetMpCouponUserListReq.list_option:type_name -> lb.ListOption
-	383, // 132: lbsingle.GetMpCouponUserListRsp.paginate:type_name -> lb.Paginate
+	385, // 131: lbsingle.GetMpCouponUserListReq.list_option:type_name -> lb.ListOption
+	386, // 132: lbsingle.GetMpCouponUserListRsp.paginate:type_name -> lb.Paginate
 	57,  // 133: lbsingle.GetMpCouponUserListRsp.list:type_name -> lbsingle.ModelMpCouponUser
 	58,  // 134: lbsingle.AddMpOrderNumberReq.data:type_name -> lbsingle.ModelMpOrderNumber
 	58,  // 135: lbsingle.AddMpOrderNumberRsp.data:type_name -> lbsingle.ModelMpOrderNumber
 	58,  // 136: lbsingle.UpdateMpOrderNumberReq.data:type_name -> lbsingle.ModelMpOrderNumber
-	382, // 137: lbsingle.DelMpOrderNumberListReq.list_option:type_name -> lb.ListOption
+	385, // 137: lbsingle.DelMpOrderNumberListReq.list_option:type_name -> lb.ListOption
 	58,  // 138: lbsingle.GetMpOrderNumberRsp.data:type_name -> lbsingle.ModelMpOrderNumber
-	382, // 139: lbsingle.GetMpOrderNumberListReq.list_option:type_name -> lb.ListOption
-	383, // 140: lbsingle.GetMpOrderNumberListRsp.paginate:type_name -> lb.Paginate
+	385, // 139: lbsingle.GetMpOrderNumberListReq.list_option:type_name -> lb.ListOption
+	386, // 140: lbsingle.GetMpOrderNumberListRsp.paginate:type_name -> lb.Paginate
 	58,  // 141: lbsingle.GetMpOrderNumberListRsp.list:type_name -> lbsingle.ModelMpOrderNumber
 	59,  // 142: lbsingle.AddMpStoreOrderReq.data:type_name -> lbsingle.ModelMpStoreOrder
 	59,  // 143: lbsingle.AddMpStoreOrderRsp.data:type_name -> lbsingle.ModelMpStoreOrder
 	59,  // 144: lbsingle.UpdateMpStoreOrderReq.data:type_name -> lbsingle.ModelMpStoreOrder
-	382, // 145: lbsingle.DelMpStoreOrderListReq.list_option:type_name -> lb.ListOption
+	385, // 145: lbsingle.DelMpStoreOrderListReq.list_option:type_name -> lb.ListOption
 	59,  // 146: lbsingle.GetMpStoreOrderRsp.data:type_name -> lbsingle.ModelMpStoreOrder
-	382, // 147: lbsingle.GetMpStoreOrderListReq.list_option:type_name -> lb.ListOption
-	383, // 148: lbsingle.GetMpStoreOrderListRsp.paginate:type_name -> lb.Paginate
+	385, // 147: lbsingle.GetMpStoreOrderListReq.list_option:type_name -> lb.ListOption
+	386, // 148: lbsingle.GetMpStoreOrderListRsp.paginate:type_name -> lb.Paginate
 	59,  // 149: lbsingle.GetMpStoreOrderListRsp.list:type_name -> lbsingle.ModelMpStoreOrder
 	60,  // 150: lbsingle.AddMpStoreOrderCartInfoReq.data:type_name -> lbsingle.ModelMpStoreOrderCartInfo
 	60,  // 151: lbsingle.AddMpStoreOrderCartInfoRsp.data:type_name -> lbsingle.ModelMpStoreOrderCartInfo
 	60,  // 152: lbsingle.UpdateMpStoreOrderCartInfoReq.data:type_name -> lbsingle.ModelMpStoreOrderCartInfo
-	382, // 153: lbsingle.DelMpStoreOrderCartInfoListReq.list_option:type_name -> lb.ListOption
+	385, // 153: lbsingle.DelMpStoreOrderCartInfoListReq.list_option:type_name -> lb.ListOption
 	60,  // 154: lbsingle.GetMpStoreOrderCartInfoRsp.data:type_name -> lbsingle.ModelMpStoreOrderCartInfo
-	382, // 155: lbsingle.GetMpStoreOrderCartInfoListReq.list_option:type_name -> lb.ListOption
-	383, // 156: lbsingle.GetMpStoreOrderCartInfoListRsp.paginate:type_name -> lb.Paginate
+	385, // 155: lbsingle.GetMpStoreOrderCartInfoListReq.list_option:type_name -> lb.ListOption
+	386, // 156: lbsingle.GetMpStoreOrderCartInfoListRsp.paginate:type_name -> lb.Paginate
 	60,  // 157: lbsingle.GetMpStoreOrderCartInfoListRsp.list:type_name -> lbsingle.ModelMpStoreOrderCartInfo
 	61,  // 158: lbsingle.AddMpStoreOrderStatusReq.data:type_name -> lbsingle.ModelMpStoreOrderStatus
 	61,  // 159: lbsingle.AddMpStoreOrderStatusRsp.data:type_name -> lbsingle.ModelMpStoreOrderStatus
 	61,  // 160: lbsingle.UpdateMpStoreOrderStatusReq.data:type_name -> lbsingle.ModelMpStoreOrderStatus
-	382, // 161: lbsingle.DelMpStoreOrderStatusListReq.list_option:type_name -> lb.ListOption
+	385, // 161: lbsingle.DelMpStoreOrderStatusListReq.list_option:type_name -> lb.ListOption
 	61,  // 162: lbsingle.GetMpStoreOrderStatusRsp.data:type_name -> lbsingle.ModelMpStoreOrderStatus
-	382, // 163: lbsingle.GetMpStoreOrderStatusListReq.list_option:type_name -> lb.ListOption
-	383, // 164: lbsingle.GetMpStoreOrderStatusListRsp.paginate:type_name -> lb.Paginate
+	385, // 163: lbsingle.GetMpStoreOrderStatusListReq.list_option:type_name -> lb.ListOption
+	386, // 164: lbsingle.GetMpStoreOrderStatusListRsp.paginate:type_name -> lb.Paginate
 	61,  // 165: lbsingle.GetMpStoreOrderStatusListRsp.list:type_name -> lbsingle.ModelMpStoreOrderStatus
 	62,  // 166: lbsingle.AddMpMaterialReq.data:type_name -> lbsingle.ModelMpMaterial
 	62,  // 167: lbsingle.AddMpMaterialRsp.data:type_name -> lbsingle.ModelMpMaterial
 	62,  // 168: lbsingle.UpdateMpMaterialReq.data:type_name -> lbsingle.ModelMpMaterial
-	382, // 169: lbsingle.DelMpMaterialListReq.list_option:type_name -> lb.ListOption
+	385, // 169: lbsingle.DelMpMaterialListReq.list_option:type_name -> lb.ListOption
 	62,  // 170: lbsingle.GetMpMaterialRsp.data:type_name -> lbsingle.ModelMpMaterial
-	382, // 171: lbsingle.GetMpMaterialListReq.list_option:type_name -> lb.ListOption
-	383, // 172: lbsingle.GetMpMaterialListRsp.paginate:type_name -> lb.Paginate
+	385, // 171: lbsingle.GetMpMaterialListReq.list_option:type_name -> lb.ListOption
+	386, // 172: lbsingle.GetMpMaterialListRsp.paginate:type_name -> lb.Paginate
 	62,  // 173: lbsingle.GetMpMaterialListRsp.list:type_name -> lbsingle.ModelMpMaterial
 	63,  // 174: lbsingle.AddMpMaterialGroupReq.data:type_name -> lbsingle.ModelMpMaterialGroup
 	63,  // 175: lbsingle.AddMpMaterialGroupRsp.data:type_name -> lbsingle.ModelMpMaterialGroup
 	63,  // 176: lbsingle.UpdateMpMaterialGroupReq.data:type_name -> lbsingle.ModelMpMaterialGroup
-	382, // 177: lbsingle.DelMpMaterialGroupListReq.list_option:type_name -> lb.ListOption
+	385, // 177: lbsingle.DelMpMaterialGroupListReq.list_option:type_name -> lb.ListOption
 	63,  // 178: lbsingle.GetMpMaterialGroupRsp.data:type_name -> lbsingle.ModelMpMaterialGroup
-	382, // 179: lbsingle.GetMpMaterialGroupListReq.list_option:type_name -> lb.ListOption
-	383, // 180: lbsingle.GetMpMaterialGroupListRsp.paginate:type_name -> lb.Paginate
+	385, // 179: lbsingle.GetMpMaterialGroupListReq.list_option:type_name -> lb.ListOption
+	386, // 180: lbsingle.GetMpMaterialGroupListRsp.paginate:type_name -> lb.Paginate
 	63,  // 181: lbsingle.GetMpMaterialGroupListRsp.list:type_name -> lbsingle.ModelMpMaterialGroup
 	64,  // 182: lbsingle.AddMpServiceReq.data:type_name -> lbsingle.ModelMpService
 	64,  // 183: lbsingle.AddMpServiceRsp.data:type_name -> lbsingle.ModelMpService
 	64,  // 184: lbsingle.UpdateMpServiceReq.data:type_name -> lbsingle.ModelMpService
-	382, // 185: lbsingle.DelMpServiceListReq.list_option:type_name -> lb.ListOption
+	385, // 185: lbsingle.DelMpServiceListReq.list_option:type_name -> lb.ListOption
 	64,  // 186: lbsingle.GetMpServiceRsp.data:type_name -> lbsingle.ModelMpService
-	382, // 187: lbsingle.GetMpServiceListReq.list_option:type_name -> lb.ListOption
-	383, // 188: lbsingle.GetMpServiceListRsp.paginate:type_name -> lb.Paginate
+	385, // 187: lbsingle.GetMpServiceListReq.list_option:type_name -> lb.ListOption
+	386, // 188: lbsingle.GetMpServiceListRsp.paginate:type_name -> lb.Paginate
 	64,  // 189: lbsingle.GetMpServiceListRsp.list:type_name -> lbsingle.ModelMpService
 	65,  // 190: lbsingle.AddMpShopAdsReq.data:type_name -> lbsingle.ModelMpShopAds
 	65,  // 191: lbsingle.AddMpShopAdsRsp.data:type_name -> lbsingle.ModelMpShopAds
 	65,  // 192: lbsingle.UpdateMpShopAdsReq.data:type_name -> lbsingle.ModelMpShopAds
-	382, // 193: lbsingle.DelMpShopAdsListReq.list_option:type_name -> lb.ListOption
+	385, // 193: lbsingle.DelMpShopAdsListReq.list_option:type_name -> lb.ListOption
 	65,  // 194: lbsingle.GetMpShopAdsRsp.data:type_name -> lbsingle.ModelMpShopAds
-	382, // 195: lbsingle.GetMpShopAdsListReq.list_option:type_name -> lb.ListOption
-	383, // 196: lbsingle.GetMpShopAdsListRsp.paginate:type_name -> lb.Paginate
+	385, // 195: lbsingle.GetMpShopAdsListReq.list_option:type_name -> lb.ListOption
+	386, // 196: lbsingle.GetMpShopAdsListRsp.paginate:type_name -> lb.Paginate
 	65,  // 197: lbsingle.GetMpShopAdsListRsp.list:type_name -> lbsingle.ModelMpShopAds
-	382, // 198: lbsingle.GetMpShopAdsListPublicReq.list_option:type_name -> lb.ListOption
+	385, // 198: lbsingle.GetMpShopAdsListPublicReq.list_option:type_name -> lb.ListOption
 	45,  // 199: lbsingle.WxMiniProgramAuthSessionRsp.user_info:type_name -> lbsingle.ModelMpMemberUser
 	45,  // 200: lbsingle.WxMPAuthSendSmsLoginRsp.user_info:type_name -> lbsingle.ModelMpMemberUser
 	55,  // 201: lbsingle.MPShopNearByRsp.shop:type_name -> lbsingle.ModelMpStoreShop
 	48,  // 202: lbsingle.MPShopProductRsp.list:type_name -> lbsingle.ModelMpProductCategory
 	374, // 203: lbsingle.MPShopProductRsp.product_map:type_name -> lbsingle.MPShopProductRsp.ProductMapEntry
-	382, // 204: lbsingle.MPShopCouponListReq.list_option:type_name -> lb.ListOption
+	385, // 204: lbsingle.MPShopCouponListReq.list_option:type_name -> lb.ListOption
 	56,  // 205: lbsingle.MPShopCouponListRsp.list:type_name -> lbsingle.ModelMpCoupon
-	382, // 206: lbsingle.MPShopCouponMineReq.list_option:type_name -> lb.ListOption
+	385, // 206: lbsingle.MPShopCouponMineReq.list_option:type_name -> lb.ListOption
 	57,  // 207: lbsingle.MPShopCouponMineRsp.list:type_name -> lbsingle.ModelMpCouponUser
 	59,  // 208: lbsingle.MPShopOrderListRsp.list:type_name -> lbsingle.ModelMpStoreOrder
-	384, // 209: lbsingle.MPUserInfoRsp.user_info:type_name -> lbsinglest.BaseUser
-	64,  // 210: lbsingle.MPUserMineServiceRsp.list:type_name -> lbsingle.ModelMpService
-	49,  // 211: lbsingle.MPShopProductRsp.AppStoreProduct.list:type_name -> lbsingle.ModelMpStoreProduct
-	375, // 212: lbsingle.MPShopProductRsp.AppStoreProduct.product_attr:type_name -> lbsingle.MPShopProductRsp.AppStoreProduct.ProductAttrEntry
-	376, // 213: lbsingle.MPShopProductRsp.AppStoreProduct.product_attr_value:type_name -> lbsingle.MPShopProductRsp.AppStoreProduct.ProductAttrValueEntry
-	50,  // 214: lbsingle.MPShopProductRsp.AppStoreProductAttr.list:type_name -> lbsingle.ModelMpStoreProductAttr
-	377, // 215: lbsingle.MPShopProductRsp.StoreProductAttrValueDO.productValue:type_name -> lbsingle.MPShopProductRsp.StoreProductAttrValueDO.ProductValueEntry
-	371, // 216: lbsingle.MPShopProductRsp.ProductMapEntry.value:type_name -> lbsingle.MPShopProductRsp.AppStoreProduct
-	372, // 217: lbsingle.MPShopProductRsp.AppStoreProduct.ProductAttrEntry.value:type_name -> lbsingle.MPShopProductRsp.AppStoreProductAttr
-	373, // 218: lbsingle.MPShopProductRsp.AppStoreProduct.ProductAttrValueEntry.value:type_name -> lbsingle.MPShopProductRsp.StoreProductAttrValueDO
-	52,  // 219: lbsingle.MPShopProductRsp.StoreProductAttrValueDO.ProductValueEntry.value:type_name -> lbsingle.ModelMpStoreProductAttrValue
-	66,  // 220: lbsingle.lbsingle.DelFileList:input_type -> lbsingle.DelFileListReq
-	68,  // 221: lbsingle.lbsingle.GetFile:input_type -> lbsingle.GetFileReq
-	70,  // 222: lbsingle.lbsingle.GetFileList:input_type -> lbsingle.GetFileListReq
-	72,  // 223: lbsingle.lbsingle.Login:input_type -> lbsingle.LoginReq
-	74,  // 224: lbsingle.lbsingle.Logout:input_type -> lbsingle.LogoutReq
-	76,  // 225: lbsingle.lbsingle.GetLoginUser:input_type -> lbsingle.GetLoginUserReq
-	78,  // 226: lbsingle.lbsingle.UpdateLoginUserInfo:input_type -> lbsingle.UpdateLoginUserInfoReq
-	80,  // 227: lbsingle.lbsingle.ResetPassword:input_type -> lbsingle.ResetPasswordReq
-	83,  // 228: lbsingle.lbsingle.SyncFile:input_type -> lbsingle.SyncFileReq
-	85,  // 229: lbsingle.lbsingle.AddUser:input_type -> lbsingle.AddUserReq
-	89,  // 230: lbsingle.lbsingle.DelUserList:input_type -> lbsingle.DelUserListReq
-	87,  // 231: lbsingle.lbsingle.UpdateUser:input_type -> lbsingle.UpdateUserReq
-	91,  // 232: lbsingle.lbsingle.GetUser:input_type -> lbsingle.GetUserReq
-	93,  // 233: lbsingle.lbsingle.GetUserList:input_type -> lbsingle.GetUserListReq
-	95,  // 234: lbsingle.lbsingle.AddMpMerchantDetails:input_type -> lbsingle.AddMpMerchantDetailsReq
-	99,  // 235: lbsingle.lbsingle.DelMpMerchantDetailsList:input_type -> lbsingle.DelMpMerchantDetailsListReq
-	97,  // 236: lbsingle.lbsingle.UpdateMpMerchantDetails:input_type -> lbsingle.UpdateMpMerchantDetailsReq
-	101, // 237: lbsingle.lbsingle.GetMpMerchantDetails:input_type -> lbsingle.GetMpMerchantDetailsReq
-	103, // 238: lbsingle.lbsingle.GetMpMerchantDetailsList:input_type -> lbsingle.GetMpMerchantDetailsListReq
-	105, // 239: lbsingle.lbsingle.AddMpMemberUser:input_type -> lbsingle.AddMpMemberUserReq
-	109, // 240: lbsingle.lbsingle.DelMpMemberUserList:input_type -> lbsingle.DelMpMemberUserListReq
-	107, // 241: lbsingle.lbsingle.UpdateMpMemberUser:input_type -> lbsingle.UpdateMpMemberUserReq
-	111, // 242: lbsingle.lbsingle.GetMpMemberUser:input_type -> lbsingle.GetMpMemberUserReq
-	113, // 243: lbsingle.lbsingle.GetMpMemberUserList:input_type -> lbsingle.GetMpMemberUserListReq
-	115, // 244: lbsingle.lbsingle.AddMpUserAddress:input_type -> lbsingle.AddMpUserAddressReq
-	119, // 245: lbsingle.lbsingle.DelMpUserAddressList:input_type -> lbsingle.DelMpUserAddressListReq
-	117, // 246: lbsingle.lbsingle.UpdateMpUserAddress:input_type -> lbsingle.UpdateMpUserAddressReq
-	121, // 247: lbsingle.lbsingle.GetMpUserAddress:input_type -> lbsingle.GetMpUserAddressReq
-	123, // 248: lbsingle.lbsingle.GetMpUserAddressList:input_type -> lbsingle.GetMpUserAddressListReq
-	125, // 249: lbsingle.lbsingle.AddMpUserBill:input_type -> lbsingle.AddMpUserBillReq
-	129, // 250: lbsingle.lbsingle.DelMpUserBillList:input_type -> lbsingle.DelMpUserBillListReq
-	127, // 251: lbsingle.lbsingle.UpdateMpUserBill:input_type -> lbsingle.UpdateMpUserBillReq
-	131, // 252: lbsingle.lbsingle.GetMpUserBill:input_type -> lbsingle.GetMpUserBillReq
-	133, // 253: lbsingle.lbsingle.GetMpUserBillList:input_type -> lbsingle.GetMpUserBillListReq
-	135, // 254: lbsingle.lbsingle.AddMpProductCategory:input_type -> lbsingle.AddMpProductCategoryReq
-	139, // 255: lbsingle.lbsingle.DelMpProductCategoryList:input_type -> lbsingle.DelMpProductCategoryListReq
-	137, // 256: lbsingle.lbsingle.UpdateMpProductCategory:input_type -> lbsingle.UpdateMpProductCategoryReq
-	141, // 257: lbsingle.lbsingle.GetMpProductCategory:input_type -> lbsingle.GetMpProductCategoryReq
-	143, // 258: lbsingle.lbsingle.GetMpProductCategoryList:input_type -> lbsingle.GetMpProductCategoryListReq
-	145, // 259: lbsingle.lbsingle.AddMpStoreProduct:input_type -> lbsingle.AddMpStoreProductReq
-	149, // 260: lbsingle.lbsingle.DelMpStoreProductList:input_type -> lbsingle.DelMpStoreProductListReq
-	147, // 261: lbsingle.lbsingle.UpdateMpStoreProduct:input_type -> lbsingle.UpdateMpStoreProductReq
-	151, // 262: lbsingle.lbsingle.GetMpStoreProduct:input_type -> lbsingle.GetMpStoreProductReq
-	153, // 263: lbsingle.lbsingle.GetMpStoreProductList:input_type -> lbsingle.GetMpStoreProductListReq
-	155, // 264: lbsingle.lbsingle.AddMpStoreProductAttr:input_type -> lbsingle.AddMpStoreProductAttrReq
-	159, // 265: lbsingle.lbsingle.DelMpStoreProductAttrList:input_type -> lbsingle.DelMpStoreProductAttrListReq
-	157, // 266: lbsingle.lbsingle.UpdateMpStoreProductAttr:input_type -> lbsingle.UpdateMpStoreProductAttrReq
-	161, // 267: lbsingle.lbsingle.GetMpStoreProductAttr:input_type -> lbsingle.GetMpStoreProductAttrReq
-	163, // 268: lbsingle.lbsingle.GetMpStoreProductAttrList:input_type -> lbsingle.GetMpStoreProductAttrListReq
-	165, // 269: lbsingle.lbsingle.AddMpStoreProductAttrResult:input_type -> lbsingle.AddMpStoreProductAttrResultReq
-	169, // 270: lbsingle.lbsingle.DelMpStoreProductAttrResultList:input_type -> lbsingle.DelMpStoreProductAttrResultListReq
-	167, // 271: lbsingle.lbsingle.UpdateMpStoreProductAttrResult:input_type -> lbsingle.UpdateMpStoreProductAttrResultReq
-	171, // 272: lbsingle.lbsingle.GetMpStoreProductAttrResult:input_type -> lbsingle.GetMpStoreProductAttrResultReq
-	173, // 273: lbsingle.lbsingle.GetMpStoreProductAttrResultList:input_type -> lbsingle.GetMpStoreProductAttrResultListReq
-	175, // 274: lbsingle.lbsingle.AddMpStoreProductAttrValue:input_type -> lbsingle.AddMpStoreProductAttrValueReq
-	179, // 275: lbsingle.lbsingle.DelMpStoreProductAttrValueList:input_type -> lbsingle.DelMpStoreProductAttrValueListReq
-	177, // 276: lbsingle.lbsingle.UpdateMpStoreProductAttrValue:input_type -> lbsingle.UpdateMpStoreProductAttrValueReq
-	181, // 277: lbsingle.lbsingle.GetMpStoreProductAttrValue:input_type -> lbsingle.GetMpStoreProductAttrValueReq
-	183, // 278: lbsingle.lbsingle.GetMpStoreProductAttrValueList:input_type -> lbsingle.GetMpStoreProductAttrValueListReq
-	185, // 279: lbsingle.lbsingle.AddMpStoreProductReply:input_type -> lbsingle.AddMpStoreProductReplyReq
-	189, // 280: lbsingle.lbsingle.DelMpStoreProductReplyList:input_type -> lbsingle.DelMpStoreProductReplyListReq
-	187, // 281: lbsingle.lbsingle.UpdateMpStoreProductReply:input_type -> lbsingle.UpdateMpStoreProductReplyReq
-	191, // 282: lbsingle.lbsingle.GetMpStoreProductReply:input_type -> lbsingle.GetMpStoreProductReplyReq
-	193, // 283: lbsingle.lbsingle.GetMpStoreProductReplyList:input_type -> lbsingle.GetMpStoreProductReplyListReq
-	195, // 284: lbsingle.lbsingle.AddMpStoreProductRule:input_type -> lbsingle.AddMpStoreProductRuleReq
-	199, // 285: lbsingle.lbsingle.DelMpStoreProductRuleList:input_type -> lbsingle.DelMpStoreProductRuleListReq
-	197, // 286: lbsingle.lbsingle.UpdateMpStoreProductRule:input_type -> lbsingle.UpdateMpStoreProductRuleReq
-	201, // 287: lbsingle.lbsingle.GetMpStoreProductRule:input_type -> lbsingle.GetMpStoreProductRuleReq
-	203, // 288: lbsingle.lbsingle.GetMpStoreProductRuleList:input_type -> lbsingle.GetMpStoreProductRuleListReq
-	205, // 289: lbsingle.lbsingle.AddMpStoreShop:input_type -> lbsingle.AddMpStoreShopReq
-	209, // 290: lbsingle.lbsingle.DelMpStoreShopList:input_type -> lbsingle.DelMpStoreShopListReq
-	207, // 291: lbsingle.lbsingle.UpdateMpStoreShop:input_type -> lbsingle.UpdateMpStoreShopReq
-	211, // 292: lbsingle.lbsingle.GetMpStoreShop:input_type -> lbsingle.GetMpStoreShopReq
-	213, // 293: lbsingle.lbsingle.GetMpStoreShopList:input_type -> lbsingle.GetMpStoreShopListReq
-	215, // 294: lbsingle.lbsingle.AddMpCoupon:input_type -> lbsingle.AddMpCouponReq
-	219, // 295: lbsingle.lbsingle.DelMpCouponList:input_type -> lbsingle.DelMpCouponListReq
-	217, // 296: lbsingle.lbsingle.UpdateMpCoupon:input_type -> lbsingle.UpdateMpCouponReq
-	221, // 297: lbsingle.lbsingle.GetMpCoupon:input_type -> lbsingle.GetMpCouponReq
-	223, // 298: lbsingle.lbsingle.GetMpCouponList:input_type -> lbsingle.GetMpCouponListReq
-	225, // 299: lbsingle.lbsingle.AddMpCouponUser:input_type -> lbsingle.AddMpCouponUserReq
-	229, // 300: lbsingle.lbsingle.DelMpCouponUserList:input_type -> lbsingle.DelMpCouponUserListReq
-	227, // 301: lbsingle.lbsingle.UpdateMpCouponUser:input_type -> lbsingle.UpdateMpCouponUserReq
-	231, // 302: lbsingle.lbsingle.GetMpCouponUser:input_type -> lbsingle.GetMpCouponUserReq
-	233, // 303: lbsingle.lbsingle.GetMpCouponUserList:input_type -> lbsingle.GetMpCouponUserListReq
-	235, // 304: lbsingle.lbsingle.AddMpOrderNumber:input_type -> lbsingle.AddMpOrderNumberReq
-	239, // 305: lbsingle.lbsingle.DelMpOrderNumberList:input_type -> lbsingle.DelMpOrderNumberListReq
-	237, // 306: lbsingle.lbsingle.UpdateMpOrderNumber:input_type -> lbsingle.UpdateMpOrderNumberReq
-	241, // 307: lbsingle.lbsingle.GetMpOrderNumber:input_type -> lbsingle.GetMpOrderNumberReq
-	243, // 308: lbsingle.lbsingle.GetMpOrderNumberList:input_type -> lbsingle.GetMpOrderNumberListReq
-	245, // 309: lbsingle.lbsingle.AddMpStoreOrder:input_type -> lbsingle.AddMpStoreOrderReq
-	249, // 310: lbsingle.lbsingle.DelMpStoreOrderList:input_type -> lbsingle.DelMpStoreOrderListReq
-	247, // 311: lbsingle.lbsingle.UpdateMpStoreOrder:input_type -> lbsingle.UpdateMpStoreOrderReq
-	251, // 312: lbsingle.lbsingle.GetMpStoreOrder:input_type -> lbsingle.GetMpStoreOrderReq
-	253, // 313: lbsingle.lbsingle.GetMpStoreOrderList:input_type -> lbsingle.GetMpStoreOrderListReq
-	255, // 314: lbsingle.lbsingle.AddMpStoreOrderCartInfo:input_type -> lbsingle.AddMpStoreOrderCartInfoReq
-	259, // 315: lbsingle.lbsingle.DelMpStoreOrderCartInfoList:input_type -> lbsingle.DelMpStoreOrderCartInfoListReq
-	257, // 316: lbsingle.lbsingle.UpdateMpStoreOrderCartInfo:input_type -> lbsingle.UpdateMpStoreOrderCartInfoReq
-	261, // 317: lbsingle.lbsingle.GetMpStoreOrderCartInfo:input_type -> lbsingle.GetMpStoreOrderCartInfoReq
-	263, // 318: lbsingle.lbsingle.GetMpStoreOrderCartInfoList:input_type -> lbsingle.GetMpStoreOrderCartInfoListReq
-	265, // 319: lbsingle.lbsingle.AddMpStoreOrderStatus:input_type -> lbsingle.AddMpStoreOrderStatusReq
-	269, // 320: lbsingle.lbsingle.DelMpStoreOrderStatusList:input_type -> lbsingle.DelMpStoreOrderStatusListReq
-	267, // 321: lbsingle.lbsingle.UpdateMpStoreOrderStatus:input_type -> lbsingle.UpdateMpStoreOrderStatusReq
-	271, // 322: lbsingle.lbsingle.GetMpStoreOrderStatus:input_type -> lbsingle.GetMpStoreOrderStatusReq
-	273, // 323: lbsingle.lbsingle.GetMpStoreOrderStatusList:input_type -> lbsingle.GetMpStoreOrderStatusListReq
-	275, // 324: lbsingle.lbsingle.AddMpMaterial:input_type -> lbsingle.AddMpMaterialReq
-	279, // 325: lbsingle.lbsingle.DelMpMaterialList:input_type -> lbsingle.DelMpMaterialListReq
-	277, // 326: lbsingle.lbsingle.UpdateMpMaterial:input_type -> lbsingle.UpdateMpMaterialReq
-	281, // 327: lbsingle.lbsingle.GetMpMaterial:input_type -> lbsingle.GetMpMaterialReq
-	283, // 328: lbsingle.lbsingle.GetMpMaterialList:input_type -> lbsingle.GetMpMaterialListReq
-	285, // 329: lbsingle.lbsingle.AddMpMaterialGroup:input_type -> lbsingle.AddMpMaterialGroupReq
-	289, // 330: lbsingle.lbsingle.DelMpMaterialGroupList:input_type -> lbsingle.DelMpMaterialGroupListReq
-	287, // 331: lbsingle.lbsingle.UpdateMpMaterialGroup:input_type -> lbsingle.UpdateMpMaterialGroupReq
-	291, // 332: lbsingle.lbsingle.GetMpMaterialGroup:input_type -> lbsingle.GetMpMaterialGroupReq
-	293, // 333: lbsingle.lbsingle.GetMpMaterialGroupList:input_type -> lbsingle.GetMpMaterialGroupListReq
-	295, // 334: lbsingle.lbsingle.AddMpService:input_type -> lbsingle.AddMpServiceReq
-	299, // 335: lbsingle.lbsingle.DelMpServiceList:input_type -> lbsingle.DelMpServiceListReq
-	297, // 336: lbsingle.lbsingle.UpdateMpService:input_type -> lbsingle.UpdateMpServiceReq
-	301, // 337: lbsingle.lbsingle.GetMpService:input_type -> lbsingle.GetMpServiceReq
-	303, // 338: lbsingle.lbsingle.GetMpServiceList:input_type -> lbsingle.GetMpServiceListReq
-	305, // 339: lbsingle.lbsingle.AddMpShopAds:input_type -> lbsingle.AddMpShopAdsReq
-	309, // 340: lbsingle.lbsingle.DelMpShopAdsList:input_type -> lbsingle.DelMpShopAdsListReq
-	307, // 341: lbsingle.lbsingle.UpdateMpShopAds:input_type -> lbsingle.UpdateMpShopAdsReq
-	311, // 342: lbsingle.lbsingle.GetMpShopAds:input_type -> lbsingle.GetMpShopAdsReq
-	313, // 343: lbsingle.lbsingle.GetMpShopAdsList:input_type -> lbsingle.GetMpShopAdsListReq
-	315, // 344: lbsingle.lbsingle.GetMpShopAdsListPublic:input_type -> lbsingle.GetMpShopAdsListPublicReq
-	317, // 345: lbsingle.lbsingle.WxMiniProgramAuthSession:input_type -> lbsingle.WxMiniProgramAuthSessionReq
-	319, // 346: lbsingle.lbsingle.WxMPAuthSendSmsCode:input_type -> lbsingle.WxMPAuthSendSmsCodeReq
-	321, // 347: lbsingle.lbsingle.WxMPAuthSendSmsLogin:input_type -> lbsingle.WxMPAuthSendSmsLoginReq
-	323, // 348: lbsingle.lbsingle.MPShopNearBy:input_type -> lbsingle.MPShopNearByReq
-	325, // 349: lbsingle.lbsingle.MPShopProduct:input_type -> lbsingle.MPShopProductReq
-	327, // 350: lbsingle.lbsingle.MPShopCouponCount:input_type -> lbsingle.MPShopCouponCountReq
-	329, // 351: lbsingle.lbsingle.MPShopCouponList:input_type -> lbsingle.MPShopCouponListReq
-	331, // 352: lbsingle.lbsingle.MPShopCouponMine:input_type -> lbsingle.MPShopCouponMineReq
-	333, // 353: lbsingle.lbsingle.MPShopCouponReceive:input_type -> lbsingle.MPShopCouponReceiveReq
-	335, // 354: lbsingle.lbsingle.MPShopOrderCreate:input_type -> lbsingle.MPShopOrderCreateReq
-	337, // 355: lbsingle.lbsingle.MPShopOrderList:input_type -> lbsingle.MPShopOrderListReq
-	339, // 356: lbsingle.lbsingle.MPShopOrderDetail:input_type -> lbsingle.MPShopOrderDetailReq
-	341, // 357: lbsingle.lbsingle.MPShopOrderTake:input_type -> lbsingle.MPShopOrderTakeReq
-	343, // 358: lbsingle.lbsingle.MPShopOrderRefund:input_type -> lbsingle.MPShopOrderRefundReq
-	345, // 359: lbsingle.lbsingle.MPShopOrderPay:input_type -> lbsingle.MPShopOrderPayReq
-	347, // 360: lbsingle.lbsingle.MPWechatConfig:input_type -> lbsingle.MPWechatConfigReq
-	349, // 361: lbsingle.lbsingle.MPUserAddressList:input_type -> lbsingle.MPUserAddressListReq
-	351, // 362: lbsingle.lbsingle.MPUserAddressDefault:input_type -> lbsingle.MPUserAddressDefaultReq
-	353, // 363: lbsingle.lbsingle.MPUserAddressAddAndEdit:input_type -> lbsingle.MPUserAddressAddAndEditReq
-	355, // 364: lbsingle.lbsingle.MPUserAddressDel:input_type -> lbsingle.MPUserAddressDelReq
-	357, // 365: lbsingle.lbsingle.MPUserInfo:input_type -> lbsingle.MPUserInfoReq
-	359, // 366: lbsingle.lbsingle.MPUserMineService:input_type -> lbsingle.MPUserMineServiceReq
-	361, // 367: lbsingle.lbsingle.MPUserServiceContent:input_type -> lbsingle.MPUserServiceContentReq
-	363, // 368: lbsingle.lbsingle.MPUserSaveInfo:input_type -> lbsingle.MPUserSaveInfoReq
-	365, // 369: lbsingle.lbsingle.MPUserBillList:input_type -> lbsingle.MPUserBillListReq
-	367, // 370: lbsingle.lbsingle.MPUserMoneyList:input_type -> lbsingle.MPUserMoneyListReq
-	369, // 371: lbsingle.lbsingle.MPUserRecharge:input_type -> lbsingle.MPUserRechargeReq
-	67,  // 372: lbsingle.lbsingle.DelFileList:output_type -> lbsingle.DelFileListRsp
-	69,  // 373: lbsingle.lbsingle.GetFile:output_type -> lbsingle.GetFileRsp
-	71,  // 374: lbsingle.lbsingle.GetFileList:output_type -> lbsingle.GetFileListRsp
-	73,  // 375: lbsingle.lbsingle.Login:output_type -> lbsingle.LoginRsp
-	75,  // 376: lbsingle.lbsingle.Logout:output_type -> lbsingle.LogoutRsp
-	77,  // 377: lbsingle.lbsingle.GetLoginUser:output_type -> lbsingle.GetLoginUserRsp
-	79,  // 378: lbsingle.lbsingle.UpdateLoginUserInfo:output_type -> lbsingle.UpdateLoginUserInfoRsp
-	81,  // 379: lbsingle.lbsingle.ResetPassword:output_type -> lbsingle.ResetPasswordRsp
-	84,  // 380: lbsingle.lbsingle.SyncFile:output_type -> lbsingle.SyncFileRsp
-	86,  // 381: lbsingle.lbsingle.AddUser:output_type -> lbsingle.AddUserRsp
-	90,  // 382: lbsingle.lbsingle.DelUserList:output_type -> lbsingle.DelUserListRsp
-	88,  // 383: lbsingle.lbsingle.UpdateUser:output_type -> lbsingle.UpdateUserRsp
-	92,  // 384: lbsingle.lbsingle.GetUser:output_type -> lbsingle.GetUserRsp
-	94,  // 385: lbsingle.lbsingle.GetUserList:output_type -> lbsingle.GetUserListRsp
-	96,  // 386: lbsingle.lbsingle.AddMpMerchantDetails:output_type -> lbsingle.AddMpMerchantDetailsRsp
-	100, // 387: lbsingle.lbsingle.DelMpMerchantDetailsList:output_type -> lbsingle.DelMpMerchantDetailsListRsp
-	98,  // 388: lbsingle.lbsingle.UpdateMpMerchantDetails:output_type -> lbsingle.UpdateMpMerchantDetailsRsp
-	102, // 389: lbsingle.lbsingle.GetMpMerchantDetails:output_type -> lbsingle.GetMpMerchantDetailsRsp
-	104, // 390: lbsingle.lbsingle.GetMpMerchantDetailsList:output_type -> lbsingle.GetMpMerchantDetailsListRsp
-	106, // 391: lbsingle.lbsingle.AddMpMemberUser:output_type -> lbsingle.AddMpMemberUserRsp
-	110, // 392: lbsingle.lbsingle.DelMpMemberUserList:output_type -> lbsingle.DelMpMemberUserListRsp
-	108, // 393: lbsingle.lbsingle.UpdateMpMemberUser:output_type -> lbsingle.UpdateMpMemberUserRsp
-	112, // 394: lbsingle.lbsingle.GetMpMemberUser:output_type -> lbsingle.GetMpMemberUserRsp
-	114, // 395: lbsingle.lbsingle.GetMpMemberUserList:output_type -> lbsingle.GetMpMemberUserListRsp
-	116, // 396: lbsingle.lbsingle.AddMpUserAddress:output_type -> lbsingle.AddMpUserAddressRsp
-	120, // 397: lbsingle.lbsingle.DelMpUserAddressList:output_type -> lbsingle.DelMpUserAddressListRsp
-	118, // 398: lbsingle.lbsingle.UpdateMpUserAddress:output_type -> lbsingle.UpdateMpUserAddressRsp
-	122, // 399: lbsingle.lbsingle.GetMpUserAddress:output_type -> lbsingle.GetMpUserAddressRsp
-	124, // 400: lbsingle.lbsingle.GetMpUserAddressList:output_type -> lbsingle.GetMpUserAddressListRsp
-	126, // 401: lbsingle.lbsingle.AddMpUserBill:output_type -> lbsingle.AddMpUserBillRsp
-	130, // 402: lbsingle.lbsingle.DelMpUserBillList:output_type -> lbsingle.DelMpUserBillListRsp
-	128, // 403: lbsingle.lbsingle.UpdateMpUserBill:output_type -> lbsingle.UpdateMpUserBillRsp
-	132, // 404: lbsingle.lbsingle.GetMpUserBill:output_type -> lbsingle.GetMpUserBillRsp
-	134, // 405: lbsingle.lbsingle.GetMpUserBillList:output_type -> lbsingle.GetMpUserBillListRsp
-	136, // 406: lbsingle.lbsingle.AddMpProductCategory:output_type -> lbsingle.AddMpProductCategoryRsp
-	140, // 407: lbsingle.lbsingle.DelMpProductCategoryList:output_type -> lbsingle.DelMpProductCategoryListRsp
-	138, // 408: lbsingle.lbsingle.UpdateMpProductCategory:output_type -> lbsingle.UpdateMpProductCategoryRsp
-	142, // 409: lbsingle.lbsingle.GetMpProductCategory:output_type -> lbsingle.GetMpProductCategoryRsp
-	144, // 410: lbsingle.lbsingle.GetMpProductCategoryList:output_type -> lbsingle.GetMpProductCategoryListRsp
-	146, // 411: lbsingle.lbsingle.AddMpStoreProduct:output_type -> lbsingle.AddMpStoreProductRsp
-	150, // 412: lbsingle.lbsingle.DelMpStoreProductList:output_type -> lbsingle.DelMpStoreProductListRsp
-	148, // 413: lbsingle.lbsingle.UpdateMpStoreProduct:output_type -> lbsingle.UpdateMpStoreProductRsp
-	152, // 414: lbsingle.lbsingle.GetMpStoreProduct:output_type -> lbsingle.GetMpStoreProductRsp
-	154, // 415: lbsingle.lbsingle.GetMpStoreProductList:output_type -> lbsingle.GetMpStoreProductListRsp
-	156, // 416: lbsingle.lbsingle.AddMpStoreProductAttr:output_type -> lbsingle.AddMpStoreProductAttrRsp
-	160, // 417: lbsingle.lbsingle.DelMpStoreProductAttrList:output_type -> lbsingle.DelMpStoreProductAttrListRsp
-	158, // 418: lbsingle.lbsingle.UpdateMpStoreProductAttr:output_type -> lbsingle.UpdateMpStoreProductAttrRsp
-	162, // 419: lbsingle.lbsingle.GetMpStoreProductAttr:output_type -> lbsingle.GetMpStoreProductAttrRsp
-	164, // 420: lbsingle.lbsingle.GetMpStoreProductAttrList:output_type -> lbsingle.GetMpStoreProductAttrListRsp
-	166, // 421: lbsingle.lbsingle.AddMpStoreProductAttrResult:output_type -> lbsingle.AddMpStoreProductAttrResultRsp
-	170, // 422: lbsingle.lbsingle.DelMpStoreProductAttrResultList:output_type -> lbsingle.DelMpStoreProductAttrResultListRsp
-	168, // 423: lbsingle.lbsingle.UpdateMpStoreProductAttrResult:output_type -> lbsingle.UpdateMpStoreProductAttrResultRsp
-	172, // 424: lbsingle.lbsingle.GetMpStoreProductAttrResult:output_type -> lbsingle.GetMpStoreProductAttrResultRsp
-	174, // 425: lbsingle.lbsingle.GetMpStoreProductAttrResultList:output_type -> lbsingle.GetMpStoreProductAttrResultListRsp
-	176, // 426: lbsingle.lbsingle.AddMpStoreProductAttrValue:output_type -> lbsingle.AddMpStoreProductAttrValueRsp
-	180, // 427: lbsingle.lbsingle.DelMpStoreProductAttrValueList:output_type -> lbsingle.DelMpStoreProductAttrValueListRsp
-	178, // 428: lbsingle.lbsingle.UpdateMpStoreProductAttrValue:output_type -> lbsingle.UpdateMpStoreProductAttrValueRsp
-	182, // 429: lbsingle.lbsingle.GetMpStoreProductAttrValue:output_type -> lbsingle.GetMpStoreProductAttrValueRsp
-	184, // 430: lbsingle.lbsingle.GetMpStoreProductAttrValueList:output_type -> lbsingle.GetMpStoreProductAttrValueListRsp
-	186, // 431: lbsingle.lbsingle.AddMpStoreProductReply:output_type -> lbsingle.AddMpStoreProductReplyRsp
-	190, // 432: lbsingle.lbsingle.DelMpStoreProductReplyList:output_type -> lbsingle.DelMpStoreProductReplyListRsp
-	188, // 433: lbsingle.lbsingle.UpdateMpStoreProductReply:output_type -> lbsingle.UpdateMpStoreProductReplyRsp
-	192, // 434: lbsingle.lbsingle.GetMpStoreProductReply:output_type -> lbsingle.GetMpStoreProductReplyRsp
-	194, // 435: lbsingle.lbsingle.GetMpStoreProductReplyList:output_type -> lbsingle.GetMpStoreProductReplyListRsp
-	196, // 436: lbsingle.lbsingle.AddMpStoreProductRule:output_type -> lbsingle.AddMpStoreProductRuleRsp
-	200, // 437: lbsingle.lbsingle.DelMpStoreProductRuleList:output_type -> lbsingle.DelMpStoreProductRuleListRsp
-	198, // 438: lbsingle.lbsingle.UpdateMpStoreProductRule:output_type -> lbsingle.UpdateMpStoreProductRuleRsp
-	202, // 439: lbsingle.lbsingle.GetMpStoreProductRule:output_type -> lbsingle.GetMpStoreProductRuleRsp
-	204, // 440: lbsingle.lbsingle.GetMpStoreProductRuleList:output_type -> lbsingle.GetMpStoreProductRuleListRsp
-	206, // 441: lbsingle.lbsingle.AddMpStoreShop:output_type -> lbsingle.AddMpStoreShopRsp
-	210, // 442: lbsingle.lbsingle.DelMpStoreShopList:output_type -> lbsingle.DelMpStoreShopListRsp
-	208, // 443: lbsingle.lbsingle.UpdateMpStoreShop:output_type -> lbsingle.UpdateMpStoreShopRsp
-	212, // 444: lbsingle.lbsingle.GetMpStoreShop:output_type -> lbsingle.GetMpStoreShopRsp
-	214, // 445: lbsingle.lbsingle.GetMpStoreShopList:output_type -> lbsingle.GetMpStoreShopListRsp
-	216, // 446: lbsingle.lbsingle.AddMpCoupon:output_type -> lbsingle.AddMpCouponRsp
-	220, // 447: lbsingle.lbsingle.DelMpCouponList:output_type -> lbsingle.DelMpCouponListRsp
-	218, // 448: lbsingle.lbsingle.UpdateMpCoupon:output_type -> lbsingle.UpdateMpCouponRsp
-	222, // 449: lbsingle.lbsingle.GetMpCoupon:output_type -> lbsingle.GetMpCouponRsp
-	224, // 450: lbsingle.lbsingle.GetMpCouponList:output_type -> lbsingle.GetMpCouponListRsp
-	226, // 451: lbsingle.lbsingle.AddMpCouponUser:output_type -> lbsingle.AddMpCouponUserRsp
-	230, // 452: lbsingle.lbsingle.DelMpCouponUserList:output_type -> lbsingle.DelMpCouponUserListRsp
-	228, // 453: lbsingle.lbsingle.UpdateMpCouponUser:output_type -> lbsingle.UpdateMpCouponUserRsp
-	232, // 454: lbsingle.lbsingle.GetMpCouponUser:output_type -> lbsingle.GetMpCouponUserRsp
-	234, // 455: lbsingle.lbsingle.GetMpCouponUserList:output_type -> lbsingle.GetMpCouponUserListRsp
-	236, // 456: lbsingle.lbsingle.AddMpOrderNumber:output_type -> lbsingle.AddMpOrderNumberRsp
-	240, // 457: lbsingle.lbsingle.DelMpOrderNumberList:output_type -> lbsingle.DelMpOrderNumberListRsp
-	238, // 458: lbsingle.lbsingle.UpdateMpOrderNumber:output_type -> lbsingle.UpdateMpOrderNumberRsp
-	242, // 459: lbsingle.lbsingle.GetMpOrderNumber:output_type -> lbsingle.GetMpOrderNumberRsp
-	244, // 460: lbsingle.lbsingle.GetMpOrderNumberList:output_type -> lbsingle.GetMpOrderNumberListRsp
-	246, // 461: lbsingle.lbsingle.AddMpStoreOrder:output_type -> lbsingle.AddMpStoreOrderRsp
-	250, // 462: lbsingle.lbsingle.DelMpStoreOrderList:output_type -> lbsingle.DelMpStoreOrderListRsp
-	248, // 463: lbsingle.lbsingle.UpdateMpStoreOrder:output_type -> lbsingle.UpdateMpStoreOrderRsp
-	252, // 464: lbsingle.lbsingle.GetMpStoreOrder:output_type -> lbsingle.GetMpStoreOrderRsp
-	254, // 465: lbsingle.lbsingle.GetMpStoreOrderList:output_type -> lbsingle.GetMpStoreOrderListRsp
-	256, // 466: lbsingle.lbsingle.AddMpStoreOrderCartInfo:output_type -> lbsingle.AddMpStoreOrderCartInfoRsp
-	260, // 467: lbsingle.lbsingle.DelMpStoreOrderCartInfoList:output_type -> lbsingle.DelMpStoreOrderCartInfoListRsp
-	258, // 468: lbsingle.lbsingle.UpdateMpStoreOrderCartInfo:output_type -> lbsingle.UpdateMpStoreOrderCartInfoRsp
-	262, // 469: lbsingle.lbsingle.GetMpStoreOrderCartInfo:output_type -> lbsingle.GetMpStoreOrderCartInfoRsp
-	264, // 470: lbsingle.lbsingle.GetMpStoreOrderCartInfoList:output_type -> lbsingle.GetMpStoreOrderCartInfoListRsp
-	266, // 471: lbsingle.lbsingle.AddMpStoreOrderStatus:output_type -> lbsingle.AddMpStoreOrderStatusRsp
-	270, // 472: lbsingle.lbsingle.DelMpStoreOrderStatusList:output_type -> lbsingle.DelMpStoreOrderStatusListRsp
-	268, // 473: lbsingle.lbsingle.UpdateMpStoreOrderStatus:output_type -> lbsingle.UpdateMpStoreOrderStatusRsp
-	272, // 474: lbsingle.lbsingle.GetMpStoreOrderStatus:output_type -> lbsingle.GetMpStoreOrderStatusRsp
-	274, // 475: lbsingle.lbsingle.GetMpStoreOrderStatusList:output_type -> lbsingle.GetMpStoreOrderStatusListRsp
-	276, // 476: lbsingle.lbsingle.AddMpMaterial:output_type -> lbsingle.AddMpMaterialRsp
-	280, // 477: lbsingle.lbsingle.DelMpMaterialList:output_type -> lbsingle.DelMpMaterialListRsp
-	278, // 478: lbsingle.lbsingle.UpdateMpMaterial:output_type -> lbsingle.UpdateMpMaterialRsp
-	282, // 479: lbsingle.lbsingle.GetMpMaterial:output_type -> lbsingle.GetMpMaterialRsp
-	284, // 480: lbsingle.lbsingle.GetMpMaterialList:output_type -> lbsingle.GetMpMaterialListRsp
-	286, // 481: lbsingle.lbsingle.AddMpMaterialGroup:output_type -> lbsingle.AddMpMaterialGroupRsp
-	290, // 482: lbsingle.lbsingle.DelMpMaterialGroupList:output_type -> lbsingle.DelMpMaterialGroupListRsp
-	288, // 483: lbsingle.lbsingle.UpdateMpMaterialGroup:output_type -> lbsingle.UpdateMpMaterialGroupRsp
-	292, // 484: lbsingle.lbsingle.GetMpMaterialGroup:output_type -> lbsingle.GetMpMaterialGroupRsp
-	294, // 485: lbsingle.lbsingle.GetMpMaterialGroupList:output_type -> lbsingle.GetMpMaterialGroupListRsp
-	296, // 486: lbsingle.lbsingle.AddMpService:output_type -> lbsingle.AddMpServiceRsp
-	300, // 487: lbsingle.lbsingle.DelMpServiceList:output_type -> lbsingle.DelMpServiceListRsp
-	298, // 488: lbsingle.lbsingle.UpdateMpService:output_type -> lbsingle.UpdateMpServiceRsp
-	302, // 489: lbsingle.lbsingle.GetMpService:output_type -> lbsingle.GetMpServiceRsp
-	304, // 490: lbsingle.lbsingle.GetMpServiceList:output_type -> lbsingle.GetMpServiceListRsp
-	306, // 491: lbsingle.lbsingle.AddMpShopAds:output_type -> lbsingle.AddMpShopAdsRsp
-	310, // 492: lbsingle.lbsingle.DelMpShopAdsList:output_type -> lbsingle.DelMpShopAdsListRsp
-	308, // 493: lbsingle.lbsingle.UpdateMpShopAds:output_type -> lbsingle.UpdateMpShopAdsRsp
-	312, // 494: lbsingle.lbsingle.GetMpShopAds:output_type -> lbsingle.GetMpShopAdsRsp
-	314, // 495: lbsingle.lbsingle.GetMpShopAdsList:output_type -> lbsingle.GetMpShopAdsListRsp
-	316, // 496: lbsingle.lbsingle.GetMpShopAdsListPublic:output_type -> lbsingle.GetMpShopAdsListPublicRsp
-	318, // 497: lbsingle.lbsingle.WxMiniProgramAuthSession:output_type -> lbsingle.WxMiniProgramAuthSessionRsp
-	320, // 498: lbsingle.lbsingle.WxMPAuthSendSmsCode:output_type -> lbsingle.WxMPAuthSendSmsCodeRsp
-	322, // 499: lbsingle.lbsingle.WxMPAuthSendSmsLogin:output_type -> lbsingle.WxMPAuthSendSmsLoginRsp
-	324, // 500: lbsingle.lbsingle.MPShopNearBy:output_type -> lbsingle.MPShopNearByRsp
-	326, // 501: lbsingle.lbsingle.MPShopProduct:output_type -> lbsingle.MPShopProductRsp
-	328, // 502: lbsingle.lbsingle.MPShopCouponCount:output_type -> lbsingle.MPShopCouponCountRsp
-	330, // 503: lbsingle.lbsingle.MPShopCouponList:output_type -> lbsingle.MPShopCouponListRsp
-	332, // 504: lbsingle.lbsingle.MPShopCouponMine:output_type -> lbsingle.MPShopCouponMineRsp
-	334, // 505: lbsingle.lbsingle.MPShopCouponReceive:output_type -> lbsingle.MPShopCouponReceiveRsp
-	336, // 506: lbsingle.lbsingle.MPShopOrderCreate:output_type -> lbsingle.MPShopOrderCreateRsp
-	338, // 507: lbsingle.lbsingle.MPShopOrderList:output_type -> lbsingle.MPShopOrderListRsp
-	340, // 508: lbsingle.lbsingle.MPShopOrderDetail:output_type -> lbsingle.MPShopOrderDetailRsp
-	342, // 509: lbsingle.lbsingle.MPShopOrderTake:output_type -> lbsingle.MPShopOrderTakeRsp
-	344, // 510: lbsingle.lbsingle.MPShopOrderRefund:output_type -> lbsingle.MPShopOrderRefundRsp
-	346, // 511: lbsingle.lbsingle.MPShopOrderPay:output_type -> lbsingle.MPShopOrderPayRsp
-	348, // 512: lbsingle.lbsingle.MPWechatConfig:output_type -> lbsingle.MPWechatConfigRsp
-	350, // 513: lbsingle.lbsingle.MPUserAddressList:output_type -> lbsingle.MPUserAddressListRsp
-	352, // 514: lbsingle.lbsingle.MPUserAddressDefault:output_type -> lbsingle.MPUserAddressDefaultRsp
-	354, // 515: lbsingle.lbsingle.MPUserAddressAddAndEdit:output_type -> lbsingle.MPUserAddressAddAndEditRsp
-	356, // 516: lbsingle.lbsingle.MPUserAddressDel:output_type -> lbsingle.MPUserAddressDelRsp
-	358, // 517: lbsingle.lbsingle.MPUserInfo:output_type -> lbsingle.MPUserInfoRsp
-	360, // 518: lbsingle.lbsingle.MPUserMineService:output_type -> lbsingle.MPUserMineServiceRsp
-	362, // 519: lbsingle.lbsingle.MPUserServiceContent:output_type -> lbsingle.MPUserServiceContentRsp
-	364, // 520: lbsingle.lbsingle.MPUserSaveInfo:output_type -> lbsingle.MPUserSaveInfoRsp
-	366, // 521: lbsingle.lbsingle.MPUserBillList:output_type -> lbsingle.MPUserBillListRsp
-	368, // 522: lbsingle.lbsingle.MPUserMoneyList:output_type -> lbsingle.MPUserMoneyListRsp
-	370, // 523: lbsingle.lbsingle.MPUserRecharge:output_type -> lbsingle.MPUserRechargeRsp
-	372, // [372:524] is the sub-list for method output_type
-	220, // [220:372] is the sub-list for method input_type
-	220, // [220:220] is the sub-list for extension type_name
-	220, // [220:220] is the sub-list for extension extendee
-	0,   // [0:220] is the sub-list for field type_name
+	379, // 209: lbsingle.MPShopOrderListRsp.shop_map:type_name -> lbsingle.MPShopOrderListRsp.ShopMapEntry
+	380, // 210: lbsingle.MPShopOrderListRsp.cart_map:type_name -> lbsingle.MPShopOrderListRsp.CartMapEntry
+	59,  // 211: lbsingle.MPShopOrderDetailRsp.order:type_name -> lbsingle.ModelMpStoreOrder
+	55,  // 212: lbsingle.MPShopOrderDetailRsp.shop_info:type_name -> lbsingle.ModelMpStoreShop
+	60,  // 213: lbsingle.MPShopOrderDetailRsp.cart_list:type_name -> lbsingle.ModelMpStoreOrderCartInfo
+	387, // 214: lbsingle.MPUserInfoRsp.user_info:type_name -> lbsinglest.BaseUser
+	64,  // 215: lbsingle.MPUserMineServiceRsp.list:type_name -> lbsingle.ModelMpService
+	49,  // 216: lbsingle.MPShopProductRsp.AppStoreProduct.list:type_name -> lbsingle.ModelMpStoreProduct
+	375, // 217: lbsingle.MPShopProductRsp.AppStoreProduct.product_attr:type_name -> lbsingle.MPShopProductRsp.AppStoreProduct.ProductAttrEntry
+	376, // 218: lbsingle.MPShopProductRsp.AppStoreProduct.product_attr_value:type_name -> lbsingle.MPShopProductRsp.AppStoreProduct.ProductAttrValueEntry
+	50,  // 219: lbsingle.MPShopProductRsp.AppStoreProductAttr.list:type_name -> lbsingle.ModelMpStoreProductAttr
+	377, // 220: lbsingle.MPShopProductRsp.StoreProductAttrValueDO.productValue:type_name -> lbsingle.MPShopProductRsp.StoreProductAttrValueDO.ProductValueEntry
+	371, // 221: lbsingle.MPShopProductRsp.ProductMapEntry.value:type_name -> lbsingle.MPShopProductRsp.AppStoreProduct
+	372, // 222: lbsingle.MPShopProductRsp.AppStoreProduct.ProductAttrEntry.value:type_name -> lbsingle.MPShopProductRsp.AppStoreProductAttr
+	373, // 223: lbsingle.MPShopProductRsp.AppStoreProduct.ProductAttrValueEntry.value:type_name -> lbsingle.MPShopProductRsp.StoreProductAttrValueDO
+	52,  // 224: lbsingle.MPShopProductRsp.StoreProductAttrValueDO.ProductValueEntry.value:type_name -> lbsingle.ModelMpStoreProductAttrValue
+	60,  // 225: lbsingle.MPShopOrderListRsp.CartInfo.list:type_name -> lbsingle.ModelMpStoreOrderCartInfo
+	55,  // 226: lbsingle.MPShopOrderListRsp.ShopMapEntry.value:type_name -> lbsingle.ModelMpStoreShop
+	378, // 227: lbsingle.MPShopOrderListRsp.CartMapEntry.value:type_name -> lbsingle.MPShopOrderListRsp.CartInfo
+	66,  // 228: lbsingle.lbsingle.DelFileList:input_type -> lbsingle.DelFileListReq
+	68,  // 229: lbsingle.lbsingle.GetFile:input_type -> lbsingle.GetFileReq
+	70,  // 230: lbsingle.lbsingle.GetFileList:input_type -> lbsingle.GetFileListReq
+	72,  // 231: lbsingle.lbsingle.Login:input_type -> lbsingle.LoginReq
+	74,  // 232: lbsingle.lbsingle.Logout:input_type -> lbsingle.LogoutReq
+	76,  // 233: lbsingle.lbsingle.GetLoginUser:input_type -> lbsingle.GetLoginUserReq
+	78,  // 234: lbsingle.lbsingle.UpdateLoginUserInfo:input_type -> lbsingle.UpdateLoginUserInfoReq
+	80,  // 235: lbsingle.lbsingle.ResetPassword:input_type -> lbsingle.ResetPasswordReq
+	83,  // 236: lbsingle.lbsingle.SyncFile:input_type -> lbsingle.SyncFileReq
+	85,  // 237: lbsingle.lbsingle.AddUser:input_type -> lbsingle.AddUserReq
+	89,  // 238: lbsingle.lbsingle.DelUserList:input_type -> lbsingle.DelUserListReq
+	87,  // 239: lbsingle.lbsingle.UpdateUser:input_type -> lbsingle.UpdateUserReq
+	91,  // 240: lbsingle.lbsingle.GetUser:input_type -> lbsingle.GetUserReq
+	93,  // 241: lbsingle.lbsingle.GetUserList:input_type -> lbsingle.GetUserListReq
+	95,  // 242: lbsingle.lbsingle.AddMpMerchantDetails:input_type -> lbsingle.AddMpMerchantDetailsReq
+	99,  // 243: lbsingle.lbsingle.DelMpMerchantDetailsList:input_type -> lbsingle.DelMpMerchantDetailsListReq
+	97,  // 244: lbsingle.lbsingle.UpdateMpMerchantDetails:input_type -> lbsingle.UpdateMpMerchantDetailsReq
+	101, // 245: lbsingle.lbsingle.GetMpMerchantDetails:input_type -> lbsingle.GetMpMerchantDetailsReq
+	103, // 246: lbsingle.lbsingle.GetMpMerchantDetailsList:input_type -> lbsingle.GetMpMerchantDetailsListReq
+	105, // 247: lbsingle.lbsingle.AddMpMemberUser:input_type -> lbsingle.AddMpMemberUserReq
+	109, // 248: lbsingle.lbsingle.DelMpMemberUserList:input_type -> lbsingle.DelMpMemberUserListReq
+	107, // 249: lbsingle.lbsingle.UpdateMpMemberUser:input_type -> lbsingle.UpdateMpMemberUserReq
+	111, // 250: lbsingle.lbsingle.GetMpMemberUser:input_type -> lbsingle.GetMpMemberUserReq
+	113, // 251: lbsingle.lbsingle.GetMpMemberUserList:input_type -> lbsingle.GetMpMemberUserListReq
+	115, // 252: lbsingle.lbsingle.AddMpUserAddress:input_type -> lbsingle.AddMpUserAddressReq
+	119, // 253: lbsingle.lbsingle.DelMpUserAddressList:input_type -> lbsingle.DelMpUserAddressListReq
+	117, // 254: lbsingle.lbsingle.UpdateMpUserAddress:input_type -> lbsingle.UpdateMpUserAddressReq
+	121, // 255: lbsingle.lbsingle.GetMpUserAddress:input_type -> lbsingle.GetMpUserAddressReq
+	123, // 256: lbsingle.lbsingle.GetMpUserAddressList:input_type -> lbsingle.GetMpUserAddressListReq
+	125, // 257: lbsingle.lbsingle.AddMpUserBill:input_type -> lbsingle.AddMpUserBillReq
+	129, // 258: lbsingle.lbsingle.DelMpUserBillList:input_type -> lbsingle.DelMpUserBillListReq
+	127, // 259: lbsingle.lbsingle.UpdateMpUserBill:input_type -> lbsingle.UpdateMpUserBillReq
+	131, // 260: lbsingle.lbsingle.GetMpUserBill:input_type -> lbsingle.GetMpUserBillReq
+	133, // 261: lbsingle.lbsingle.GetMpUserBillList:input_type -> lbsingle.GetMpUserBillListReq
+	135, // 262: lbsingle.lbsingle.AddMpProductCategory:input_type -> lbsingle.AddMpProductCategoryReq
+	139, // 263: lbsingle.lbsingle.DelMpProductCategoryList:input_type -> lbsingle.DelMpProductCategoryListReq
+	137, // 264: lbsingle.lbsingle.UpdateMpProductCategory:input_type -> lbsingle.UpdateMpProductCategoryReq
+	141, // 265: lbsingle.lbsingle.GetMpProductCategory:input_type -> lbsingle.GetMpProductCategoryReq
+	143, // 266: lbsingle.lbsingle.GetMpProductCategoryList:input_type -> lbsingle.GetMpProductCategoryListReq
+	145, // 267: lbsingle.lbsingle.AddMpStoreProduct:input_type -> lbsingle.AddMpStoreProductReq
+	149, // 268: lbsingle.lbsingle.DelMpStoreProductList:input_type -> lbsingle.DelMpStoreProductListReq
+	147, // 269: lbsingle.lbsingle.UpdateMpStoreProduct:input_type -> lbsingle.UpdateMpStoreProductReq
+	151, // 270: lbsingle.lbsingle.GetMpStoreProduct:input_type -> lbsingle.GetMpStoreProductReq
+	153, // 271: lbsingle.lbsingle.GetMpStoreProductList:input_type -> lbsingle.GetMpStoreProductListReq
+	155, // 272: lbsingle.lbsingle.AddMpStoreProductAttr:input_type -> lbsingle.AddMpStoreProductAttrReq
+	159, // 273: lbsingle.lbsingle.DelMpStoreProductAttrList:input_type -> lbsingle.DelMpStoreProductAttrListReq
+	157, // 274: lbsingle.lbsingle.UpdateMpStoreProductAttr:input_type -> lbsingle.UpdateMpStoreProductAttrReq
+	161, // 275: lbsingle.lbsingle.GetMpStoreProductAttr:input_type -> lbsingle.GetMpStoreProductAttrReq
+	163, // 276: lbsingle.lbsingle.GetMpStoreProductAttrList:input_type -> lbsingle.GetMpStoreProductAttrListReq
+	165, // 277: lbsingle.lbsingle.AddMpStoreProductAttrResult:input_type -> lbsingle.AddMpStoreProductAttrResultReq
+	169, // 278: lbsingle.lbsingle.DelMpStoreProductAttrResultList:input_type -> lbsingle.DelMpStoreProductAttrResultListReq
+	167, // 279: lbsingle.lbsingle.UpdateMpStoreProductAttrResult:input_type -> lbsingle.UpdateMpStoreProductAttrResultReq
+	171, // 280: lbsingle.lbsingle.GetMpStoreProductAttrResult:input_type -> lbsingle.GetMpStoreProductAttrResultReq
+	173, // 281: lbsingle.lbsingle.GetMpStoreProductAttrResultList:input_type -> lbsingle.GetMpStoreProductAttrResultListReq
+	175, // 282: lbsingle.lbsingle.AddMpStoreProductAttrValue:input_type -> lbsingle.AddMpStoreProductAttrValueReq
+	179, // 283: lbsingle.lbsingle.DelMpStoreProductAttrValueList:input_type -> lbsingle.DelMpStoreProductAttrValueListReq
+	177, // 284: lbsingle.lbsingle.UpdateMpStoreProductAttrValue:input_type -> lbsingle.UpdateMpStoreProductAttrValueReq
+	181, // 285: lbsingle.lbsingle.GetMpStoreProductAttrValue:input_type -> lbsingle.GetMpStoreProductAttrValueReq
+	183, // 286: lbsingle.lbsingle.GetMpStoreProductAttrValueList:input_type -> lbsingle.GetMpStoreProductAttrValueListReq
+	185, // 287: lbsingle.lbsingle.AddMpStoreProductReply:input_type -> lbsingle.AddMpStoreProductReplyReq
+	189, // 288: lbsingle.lbsingle.DelMpStoreProductReplyList:input_type -> lbsingle.DelMpStoreProductReplyListReq
+	187, // 289: lbsingle.lbsingle.UpdateMpStoreProductReply:input_type -> lbsingle.UpdateMpStoreProductReplyReq
+	191, // 290: lbsingle.lbsingle.GetMpStoreProductReply:input_type -> lbsingle.GetMpStoreProductReplyReq
+	193, // 291: lbsingle.lbsingle.GetMpStoreProductReplyList:input_type -> lbsingle.GetMpStoreProductReplyListReq
+	195, // 292: lbsingle.lbsingle.AddMpStoreProductRule:input_type -> lbsingle.AddMpStoreProductRuleReq
+	199, // 293: lbsingle.lbsingle.DelMpStoreProductRuleList:input_type -> lbsingle.DelMpStoreProductRuleListReq
+	197, // 294: lbsingle.lbsingle.UpdateMpStoreProductRule:input_type -> lbsingle.UpdateMpStoreProductRuleReq
+	201, // 295: lbsingle.lbsingle.GetMpStoreProductRule:input_type -> lbsingle.GetMpStoreProductRuleReq
+	203, // 296: lbsingle.lbsingle.GetMpStoreProductRuleList:input_type -> lbsingle.GetMpStoreProductRuleListReq
+	205, // 297: lbsingle.lbsingle.AddMpStoreShop:input_type -> lbsingle.AddMpStoreShopReq
+	209, // 298: lbsingle.lbsingle.DelMpStoreShopList:input_type -> lbsingle.DelMpStoreShopListReq
+	207, // 299: lbsingle.lbsingle.UpdateMpStoreShop:input_type -> lbsingle.UpdateMpStoreShopReq
+	211, // 300: lbsingle.lbsingle.GetMpStoreShop:input_type -> lbsingle.GetMpStoreShopReq
+	213, // 301: lbsingle.lbsingle.GetMpStoreShopList:input_type -> lbsingle.GetMpStoreShopListReq
+	215, // 302: lbsingle.lbsingle.AddMpCoupon:input_type -> lbsingle.AddMpCouponReq
+	219, // 303: lbsingle.lbsingle.DelMpCouponList:input_type -> lbsingle.DelMpCouponListReq
+	217, // 304: lbsingle.lbsingle.UpdateMpCoupon:input_type -> lbsingle.UpdateMpCouponReq
+	221, // 305: lbsingle.lbsingle.GetMpCoupon:input_type -> lbsingle.GetMpCouponReq
+	223, // 306: lbsingle.lbsingle.GetMpCouponList:input_type -> lbsingle.GetMpCouponListReq
+	225, // 307: lbsingle.lbsingle.AddMpCouponUser:input_type -> lbsingle.AddMpCouponUserReq
+	229, // 308: lbsingle.lbsingle.DelMpCouponUserList:input_type -> lbsingle.DelMpCouponUserListReq
+	227, // 309: lbsingle.lbsingle.UpdateMpCouponUser:input_type -> lbsingle.UpdateMpCouponUserReq
+	231, // 310: lbsingle.lbsingle.GetMpCouponUser:input_type -> lbsingle.GetMpCouponUserReq
+	233, // 311: lbsingle.lbsingle.GetMpCouponUserList:input_type -> lbsingle.GetMpCouponUserListReq
+	235, // 312: lbsingle.lbsingle.AddMpOrderNumber:input_type -> lbsingle.AddMpOrderNumberReq
+	239, // 313: lbsingle.lbsingle.DelMpOrderNumberList:input_type -> lbsingle.DelMpOrderNumberListReq
+	237, // 314: lbsingle.lbsingle.UpdateMpOrderNumber:input_type -> lbsingle.UpdateMpOrderNumberReq
+	241, // 315: lbsingle.lbsingle.GetMpOrderNumber:input_type -> lbsingle.GetMpOrderNumberReq
+	243, // 316: lbsingle.lbsingle.GetMpOrderNumberList:input_type -> lbsingle.GetMpOrderNumberListReq
+	245, // 317: lbsingle.lbsingle.AddMpStoreOrder:input_type -> lbsingle.AddMpStoreOrderReq
+	249, // 318: lbsingle.lbsingle.DelMpStoreOrderList:input_type -> lbsingle.DelMpStoreOrderListReq
+	247, // 319: lbsingle.lbsingle.UpdateMpStoreOrder:input_type -> lbsingle.UpdateMpStoreOrderReq
+	251, // 320: lbsingle.lbsingle.GetMpStoreOrder:input_type -> lbsingle.GetMpStoreOrderReq
+	253, // 321: lbsingle.lbsingle.GetMpStoreOrderList:input_type -> lbsingle.GetMpStoreOrderListReq
+	255, // 322: lbsingle.lbsingle.AddMpStoreOrderCartInfo:input_type -> lbsingle.AddMpStoreOrderCartInfoReq
+	259, // 323: lbsingle.lbsingle.DelMpStoreOrderCartInfoList:input_type -> lbsingle.DelMpStoreOrderCartInfoListReq
+	257, // 324: lbsingle.lbsingle.UpdateMpStoreOrderCartInfo:input_type -> lbsingle.UpdateMpStoreOrderCartInfoReq
+	261, // 325: lbsingle.lbsingle.GetMpStoreOrderCartInfo:input_type -> lbsingle.GetMpStoreOrderCartInfoReq
+	263, // 326: lbsingle.lbsingle.GetMpStoreOrderCartInfoList:input_type -> lbsingle.GetMpStoreOrderCartInfoListReq
+	265, // 327: lbsingle.lbsingle.AddMpStoreOrderStatus:input_type -> lbsingle.AddMpStoreOrderStatusReq
+	269, // 328: lbsingle.lbsingle.DelMpStoreOrderStatusList:input_type -> lbsingle.DelMpStoreOrderStatusListReq
+	267, // 329: lbsingle.lbsingle.UpdateMpStoreOrderStatus:input_type -> lbsingle.UpdateMpStoreOrderStatusReq
+	271, // 330: lbsingle.lbsingle.GetMpStoreOrderStatus:input_type -> lbsingle.GetMpStoreOrderStatusReq
+	273, // 331: lbsingle.lbsingle.GetMpStoreOrderStatusList:input_type -> lbsingle.GetMpStoreOrderStatusListReq
+	275, // 332: lbsingle.lbsingle.AddMpMaterial:input_type -> lbsingle.AddMpMaterialReq
+	279, // 333: lbsingle.lbsingle.DelMpMaterialList:input_type -> lbsingle.DelMpMaterialListReq
+	277, // 334: lbsingle.lbsingle.UpdateMpMaterial:input_type -> lbsingle.UpdateMpMaterialReq
+	281, // 335: lbsingle.lbsingle.GetMpMaterial:input_type -> lbsingle.GetMpMaterialReq
+	283, // 336: lbsingle.lbsingle.GetMpMaterialList:input_type -> lbsingle.GetMpMaterialListReq
+	285, // 337: lbsingle.lbsingle.AddMpMaterialGroup:input_type -> lbsingle.AddMpMaterialGroupReq
+	289, // 338: lbsingle.lbsingle.DelMpMaterialGroupList:input_type -> lbsingle.DelMpMaterialGroupListReq
+	287, // 339: lbsingle.lbsingle.UpdateMpMaterialGroup:input_type -> lbsingle.UpdateMpMaterialGroupReq
+	291, // 340: lbsingle.lbsingle.GetMpMaterialGroup:input_type -> lbsingle.GetMpMaterialGroupReq
+	293, // 341: lbsingle.lbsingle.GetMpMaterialGroupList:input_type -> lbsingle.GetMpMaterialGroupListReq
+	295, // 342: lbsingle.lbsingle.AddMpService:input_type -> lbsingle.AddMpServiceReq
+	299, // 343: lbsingle.lbsingle.DelMpServiceList:input_type -> lbsingle.DelMpServiceListReq
+	297, // 344: lbsingle.lbsingle.UpdateMpService:input_type -> lbsingle.UpdateMpServiceReq
+	301, // 345: lbsingle.lbsingle.GetMpService:input_type -> lbsingle.GetMpServiceReq
+	303, // 346: lbsingle.lbsingle.GetMpServiceList:input_type -> lbsingle.GetMpServiceListReq
+	305, // 347: lbsingle.lbsingle.AddMpShopAds:input_type -> lbsingle.AddMpShopAdsReq
+	309, // 348: lbsingle.lbsingle.DelMpShopAdsList:input_type -> lbsingle.DelMpShopAdsListReq
+	307, // 349: lbsingle.lbsingle.UpdateMpShopAds:input_type -> lbsingle.UpdateMpShopAdsReq
+	311, // 350: lbsingle.lbsingle.GetMpShopAds:input_type -> lbsingle.GetMpShopAdsReq
+	313, // 351: lbsingle.lbsingle.GetMpShopAdsList:input_type -> lbsingle.GetMpShopAdsListReq
+	315, // 352: lbsingle.lbsingle.GetMpShopAdsListPublic:input_type -> lbsingle.GetMpShopAdsListPublicReq
+	317, // 353: lbsingle.lbsingle.WxMiniProgramAuthSession:input_type -> lbsingle.WxMiniProgramAuthSessionReq
+	319, // 354: lbsingle.lbsingle.WxMPAuthSendSmsCode:input_type -> lbsingle.WxMPAuthSendSmsCodeReq
+	321, // 355: lbsingle.lbsingle.WxMPAuthSendSmsLogin:input_type -> lbsingle.WxMPAuthSendSmsLoginReq
+	323, // 356: lbsingle.lbsingle.MPShopNearBy:input_type -> lbsingle.MPShopNearByReq
+	325, // 357: lbsingle.lbsingle.MPShopProduct:input_type -> lbsingle.MPShopProductReq
+	327, // 358: lbsingle.lbsingle.MPShopCouponCount:input_type -> lbsingle.MPShopCouponCountReq
+	329, // 359: lbsingle.lbsingle.MPShopCouponList:input_type -> lbsingle.MPShopCouponListReq
+	331, // 360: lbsingle.lbsingle.MPShopCouponMine:input_type -> lbsingle.MPShopCouponMineReq
+	333, // 361: lbsingle.lbsingle.MPShopCouponReceive:input_type -> lbsingle.MPShopCouponReceiveReq
+	335, // 362: lbsingle.lbsingle.MPShopOrderCreate:input_type -> lbsingle.MPShopOrderCreateReq
+	337, // 363: lbsingle.lbsingle.MPShopOrderList:input_type -> lbsingle.MPShopOrderListReq
+	339, // 364: lbsingle.lbsingle.MPShopOrderDetail:input_type -> lbsingle.MPShopOrderDetailReq
+	341, // 365: lbsingle.lbsingle.MPShopOrderTake:input_type -> lbsingle.MPShopOrderTakeReq
+	343, // 366: lbsingle.lbsingle.MPShopOrderRefund:input_type -> lbsingle.MPShopOrderRefundReq
+	345, // 367: lbsingle.lbsingle.MPShopOrderPay:input_type -> lbsingle.MPShopOrderPayReq
+	347, // 368: lbsingle.lbsingle.MPWechatConfig:input_type -> lbsingle.MPWechatConfigReq
+	349, // 369: lbsingle.lbsingle.MPUserAddressList:input_type -> lbsingle.MPUserAddressListReq
+	351, // 370: lbsingle.lbsingle.MPUserAddressDefault:input_type -> lbsingle.MPUserAddressDefaultReq
+	353, // 371: lbsingle.lbsingle.MPUserAddressAddAndEdit:input_type -> lbsingle.MPUserAddressAddAndEditReq
+	355, // 372: lbsingle.lbsingle.MPUserAddressDel:input_type -> lbsingle.MPUserAddressDelReq
+	357, // 373: lbsingle.lbsingle.MPUserInfo:input_type -> lbsingle.MPUserInfoReq
+	359, // 374: lbsingle.lbsingle.MPUserMineService:input_type -> lbsingle.MPUserMineServiceReq
+	361, // 375: lbsingle.lbsingle.MPUserServiceContent:input_type -> lbsingle.MPUserServiceContentReq
+	363, // 376: lbsingle.lbsingle.MPUserSaveInfo:input_type -> lbsingle.MPUserSaveInfoReq
+	365, // 377: lbsingle.lbsingle.MPUserBillList:input_type -> lbsingle.MPUserBillListReq
+	367, // 378: lbsingle.lbsingle.MPUserMoneyList:input_type -> lbsingle.MPUserMoneyListReq
+	369, // 379: lbsingle.lbsingle.MPUserRecharge:input_type -> lbsingle.MPUserRechargeReq
+	67,  // 380: lbsingle.lbsingle.DelFileList:output_type -> lbsingle.DelFileListRsp
+	69,  // 381: lbsingle.lbsingle.GetFile:output_type -> lbsingle.GetFileRsp
+	71,  // 382: lbsingle.lbsingle.GetFileList:output_type -> lbsingle.GetFileListRsp
+	73,  // 383: lbsingle.lbsingle.Login:output_type -> lbsingle.LoginRsp
+	75,  // 384: lbsingle.lbsingle.Logout:output_type -> lbsingle.LogoutRsp
+	77,  // 385: lbsingle.lbsingle.GetLoginUser:output_type -> lbsingle.GetLoginUserRsp
+	79,  // 386: lbsingle.lbsingle.UpdateLoginUserInfo:output_type -> lbsingle.UpdateLoginUserInfoRsp
+	81,  // 387: lbsingle.lbsingle.ResetPassword:output_type -> lbsingle.ResetPasswordRsp
+	84,  // 388: lbsingle.lbsingle.SyncFile:output_type -> lbsingle.SyncFileRsp
+	86,  // 389: lbsingle.lbsingle.AddUser:output_type -> lbsingle.AddUserRsp
+	90,  // 390: lbsingle.lbsingle.DelUserList:output_type -> lbsingle.DelUserListRsp
+	88,  // 391: lbsingle.lbsingle.UpdateUser:output_type -> lbsingle.UpdateUserRsp
+	92,  // 392: lbsingle.lbsingle.GetUser:output_type -> lbsingle.GetUserRsp
+	94,  // 393: lbsingle.lbsingle.GetUserList:output_type -> lbsingle.GetUserListRsp
+	96,  // 394: lbsingle.lbsingle.AddMpMerchantDetails:output_type -> lbsingle.AddMpMerchantDetailsRsp
+	100, // 395: lbsingle.lbsingle.DelMpMerchantDetailsList:output_type -> lbsingle.DelMpMerchantDetailsListRsp
+	98,  // 396: lbsingle.lbsingle.UpdateMpMerchantDetails:output_type -> lbsingle.UpdateMpMerchantDetailsRsp
+	102, // 397: lbsingle.lbsingle.GetMpMerchantDetails:output_type -> lbsingle.GetMpMerchantDetailsRsp
+	104, // 398: lbsingle.lbsingle.GetMpMerchantDetailsList:output_type -> lbsingle.GetMpMerchantDetailsListRsp
+	106, // 399: lbsingle.lbsingle.AddMpMemberUser:output_type -> lbsingle.AddMpMemberUserRsp
+	110, // 400: lbsingle.lbsingle.DelMpMemberUserList:output_type -> lbsingle.DelMpMemberUserListRsp
+	108, // 401: lbsingle.lbsingle.UpdateMpMemberUser:output_type -> lbsingle.UpdateMpMemberUserRsp
+	112, // 402: lbsingle.lbsingle.GetMpMemberUser:output_type -> lbsingle.GetMpMemberUserRsp
+	114, // 403: lbsingle.lbsingle.GetMpMemberUserList:output_type -> lbsingle.GetMpMemberUserListRsp
+	116, // 404: lbsingle.lbsingle.AddMpUserAddress:output_type -> lbsingle.AddMpUserAddressRsp
+	120, // 405: lbsingle.lbsingle.DelMpUserAddressList:output_type -> lbsingle.DelMpUserAddressListRsp
+	118, // 406: lbsingle.lbsingle.UpdateMpUserAddress:output_type -> lbsingle.UpdateMpUserAddressRsp
+	122, // 407: lbsingle.lbsingle.GetMpUserAddress:output_type -> lbsingle.GetMpUserAddressRsp
+	124, // 408: lbsingle.lbsingle.GetMpUserAddressList:output_type -> lbsingle.GetMpUserAddressListRsp
+	126, // 409: lbsingle.lbsingle.AddMpUserBill:output_type -> lbsingle.AddMpUserBillRsp
+	130, // 410: lbsingle.lbsingle.DelMpUserBillList:output_type -> lbsingle.DelMpUserBillListRsp
+	128, // 411: lbsingle.lbsingle.UpdateMpUserBill:output_type -> lbsingle.UpdateMpUserBillRsp
+	132, // 412: lbsingle.lbsingle.GetMpUserBill:output_type -> lbsingle.GetMpUserBillRsp
+	134, // 413: lbsingle.lbsingle.GetMpUserBillList:output_type -> lbsingle.GetMpUserBillListRsp
+	136, // 414: lbsingle.lbsingle.AddMpProductCategory:output_type -> lbsingle.AddMpProductCategoryRsp
+	140, // 415: lbsingle.lbsingle.DelMpProductCategoryList:output_type -> lbsingle.DelMpProductCategoryListRsp
+	138, // 416: lbsingle.lbsingle.UpdateMpProductCategory:output_type -> lbsingle.UpdateMpProductCategoryRsp
+	142, // 417: lbsingle.lbsingle.GetMpProductCategory:output_type -> lbsingle.GetMpProductCategoryRsp
+	144, // 418: lbsingle.lbsingle.GetMpProductCategoryList:output_type -> lbsingle.GetMpProductCategoryListRsp
+	146, // 419: lbsingle.lbsingle.AddMpStoreProduct:output_type -> lbsingle.AddMpStoreProductRsp
+	150, // 420: lbsingle.lbsingle.DelMpStoreProductList:output_type -> lbsingle.DelMpStoreProductListRsp
+	148, // 421: lbsingle.lbsingle.UpdateMpStoreProduct:output_type -> lbsingle.UpdateMpStoreProductRsp
+	152, // 422: lbsingle.lbsingle.GetMpStoreProduct:output_type -> lbsingle.GetMpStoreProductRsp
+	154, // 423: lbsingle.lbsingle.GetMpStoreProductList:output_type -> lbsingle.GetMpStoreProductListRsp
+	156, // 424: lbsingle.lbsingle.AddMpStoreProductAttr:output_type -> lbsingle.AddMpStoreProductAttrRsp
+	160, // 425: lbsingle.lbsingle.DelMpStoreProductAttrList:output_type -> lbsingle.DelMpStoreProductAttrListRsp
+	158, // 426: lbsingle.lbsingle.UpdateMpStoreProductAttr:output_type -> lbsingle.UpdateMpStoreProductAttrRsp
+	162, // 427: lbsingle.lbsingle.GetMpStoreProductAttr:output_type -> lbsingle.GetMpStoreProductAttrRsp
+	164, // 428: lbsingle.lbsingle.GetMpStoreProductAttrList:output_type -> lbsingle.GetMpStoreProductAttrListRsp
+	166, // 429: lbsingle.lbsingle.AddMpStoreProductAttrResult:output_type -> lbsingle.AddMpStoreProductAttrResultRsp
+	170, // 430: lbsingle.lbsingle.DelMpStoreProductAttrResultList:output_type -> lbsingle.DelMpStoreProductAttrResultListRsp
+	168, // 431: lbsingle.lbsingle.UpdateMpStoreProductAttrResult:output_type -> lbsingle.UpdateMpStoreProductAttrResultRsp
+	172, // 432: lbsingle.lbsingle.GetMpStoreProductAttrResult:output_type -> lbsingle.GetMpStoreProductAttrResultRsp
+	174, // 433: lbsingle.lbsingle.GetMpStoreProductAttrResultList:output_type -> lbsingle.GetMpStoreProductAttrResultListRsp
+	176, // 434: lbsingle.lbsingle.AddMpStoreProductAttrValue:output_type -> lbsingle.AddMpStoreProductAttrValueRsp
+	180, // 435: lbsingle.lbsingle.DelMpStoreProductAttrValueList:output_type -> lbsingle.DelMpStoreProductAttrValueListRsp
+	178, // 436: lbsingle.lbsingle.UpdateMpStoreProductAttrValue:output_type -> lbsingle.UpdateMpStoreProductAttrValueRsp
+	182, // 437: lbsingle.lbsingle.GetMpStoreProductAttrValue:output_type -> lbsingle.GetMpStoreProductAttrValueRsp
+	184, // 438: lbsingle.lbsingle.GetMpStoreProductAttrValueList:output_type -> lbsingle.GetMpStoreProductAttrValueListRsp
+	186, // 439: lbsingle.lbsingle.AddMpStoreProductReply:output_type -> lbsingle.AddMpStoreProductReplyRsp
+	190, // 440: lbsingle.lbsingle.DelMpStoreProductReplyList:output_type -> lbsingle.DelMpStoreProductReplyListRsp
+	188, // 441: lbsingle.lbsingle.UpdateMpStoreProductReply:output_type -> lbsingle.UpdateMpStoreProductReplyRsp
+	192, // 442: lbsingle.lbsingle.GetMpStoreProductReply:output_type -> lbsingle.GetMpStoreProductReplyRsp
+	194, // 443: lbsingle.lbsingle.GetMpStoreProductReplyList:output_type -> lbsingle.GetMpStoreProductReplyListRsp
+	196, // 444: lbsingle.lbsingle.AddMpStoreProductRule:output_type -> lbsingle.AddMpStoreProductRuleRsp
+	200, // 445: lbsingle.lbsingle.DelMpStoreProductRuleList:output_type -> lbsingle.DelMpStoreProductRuleListRsp
+	198, // 446: lbsingle.lbsingle.UpdateMpStoreProductRule:output_type -> lbsingle.UpdateMpStoreProductRuleRsp
+	202, // 447: lbsingle.lbsingle.GetMpStoreProductRule:output_type -> lbsingle.GetMpStoreProductRuleRsp
+	204, // 448: lbsingle.lbsingle.GetMpStoreProductRuleList:output_type -> lbsingle.GetMpStoreProductRuleListRsp
+	206, // 449: lbsingle.lbsingle.AddMpStoreShop:output_type -> lbsingle.AddMpStoreShopRsp
+	210, // 450: lbsingle.lbsingle.DelMpStoreShopList:output_type -> lbsingle.DelMpStoreShopListRsp
+	208, // 451: lbsingle.lbsingle.UpdateMpStoreShop:output_type -> lbsingle.UpdateMpStoreShopRsp
+	212, // 452: lbsingle.lbsingle.GetMpStoreShop:output_type -> lbsingle.GetMpStoreShopRsp
+	214, // 453: lbsingle.lbsingle.GetMpStoreShopList:output_type -> lbsingle.GetMpStoreShopListRsp
+	216, // 454: lbsingle.lbsingle.AddMpCoupon:output_type -> lbsingle.AddMpCouponRsp
+	220, // 455: lbsingle.lbsingle.DelMpCouponList:output_type -> lbsingle.DelMpCouponListRsp
+	218, // 456: lbsingle.lbsingle.UpdateMpCoupon:output_type -> lbsingle.UpdateMpCouponRsp
+	222, // 457: lbsingle.lbsingle.GetMpCoupon:output_type -> lbsingle.GetMpCouponRsp
+	224, // 458: lbsingle.lbsingle.GetMpCouponList:output_type -> lbsingle.GetMpCouponListRsp
+	226, // 459: lbsingle.lbsingle.AddMpCouponUser:output_type -> lbsingle.AddMpCouponUserRsp
+	230, // 460: lbsingle.lbsingle.DelMpCouponUserList:output_type -> lbsingle.DelMpCouponUserListRsp
+	228, // 461: lbsingle.lbsingle.UpdateMpCouponUser:output_type -> lbsingle.UpdateMpCouponUserRsp
+	232, // 462: lbsingle.lbsingle.GetMpCouponUser:output_type -> lbsingle.GetMpCouponUserRsp
+	234, // 463: lbsingle.lbsingle.GetMpCouponUserList:output_type -> lbsingle.GetMpCouponUserListRsp
+	236, // 464: lbsingle.lbsingle.AddMpOrderNumber:output_type -> lbsingle.AddMpOrderNumberRsp
+	240, // 465: lbsingle.lbsingle.DelMpOrderNumberList:output_type -> lbsingle.DelMpOrderNumberListRsp
+	238, // 466: lbsingle.lbsingle.UpdateMpOrderNumber:output_type -> lbsingle.UpdateMpOrderNumberRsp
+	242, // 467: lbsingle.lbsingle.GetMpOrderNumber:output_type -> lbsingle.GetMpOrderNumberRsp
+	244, // 468: lbsingle.lbsingle.GetMpOrderNumberList:output_type -> lbsingle.GetMpOrderNumberListRsp
+	246, // 469: lbsingle.lbsingle.AddMpStoreOrder:output_type -> lbsingle.AddMpStoreOrderRsp
+	250, // 470: lbsingle.lbsingle.DelMpStoreOrderList:output_type -> lbsingle.DelMpStoreOrderListRsp
+	248, // 471: lbsingle.lbsingle.UpdateMpStoreOrder:output_type -> lbsingle.UpdateMpStoreOrderRsp
+	252, // 472: lbsingle.lbsingle.GetMpStoreOrder:output_type -> lbsingle.GetMpStoreOrderRsp
+	254, // 473: lbsingle.lbsingle.GetMpStoreOrderList:output_type -> lbsingle.GetMpStoreOrderListRsp
+	256, // 474: lbsingle.lbsingle.AddMpStoreOrderCartInfo:output_type -> lbsingle.AddMpStoreOrderCartInfoRsp
+	260, // 475: lbsingle.lbsingle.DelMpStoreOrderCartInfoList:output_type -> lbsingle.DelMpStoreOrderCartInfoListRsp
+	258, // 476: lbsingle.lbsingle.UpdateMpStoreOrderCartInfo:output_type -> lbsingle.UpdateMpStoreOrderCartInfoRsp
+	262, // 477: lbsingle.lbsingle.GetMpStoreOrderCartInfo:output_type -> lbsingle.GetMpStoreOrderCartInfoRsp
+	264, // 478: lbsingle.lbsingle.GetMpStoreOrderCartInfoList:output_type -> lbsingle.GetMpStoreOrderCartInfoListRsp
+	266, // 479: lbsingle.lbsingle.AddMpStoreOrderStatus:output_type -> lbsingle.AddMpStoreOrderStatusRsp
+	270, // 480: lbsingle.lbsingle.DelMpStoreOrderStatusList:output_type -> lbsingle.DelMpStoreOrderStatusListRsp
+	268, // 481: lbsingle.lbsingle.UpdateMpStoreOrderStatus:output_type -> lbsingle.UpdateMpStoreOrderStatusRsp
+	272, // 482: lbsingle.lbsingle.GetMpStoreOrderStatus:output_type -> lbsingle.GetMpStoreOrderStatusRsp
+	274, // 483: lbsingle.lbsingle.GetMpStoreOrderStatusList:output_type -> lbsingle.GetMpStoreOrderStatusListRsp
+	276, // 484: lbsingle.lbsingle.AddMpMaterial:output_type -> lbsingle.AddMpMaterialRsp
+	280, // 485: lbsingle.lbsingle.DelMpMaterialList:output_type -> lbsingle.DelMpMaterialListRsp
+	278, // 486: lbsingle.lbsingle.UpdateMpMaterial:output_type -> lbsingle.UpdateMpMaterialRsp
+	282, // 487: lbsingle.lbsingle.GetMpMaterial:output_type -> lbsingle.GetMpMaterialRsp
+	284, // 488: lbsingle.lbsingle.GetMpMaterialList:output_type -> lbsingle.GetMpMaterialListRsp
+	286, // 489: lbsingle.lbsingle.AddMpMaterialGroup:output_type -> lbsingle.AddMpMaterialGroupRsp
+	290, // 490: lbsingle.lbsingle.DelMpMaterialGroupList:output_type -> lbsingle.DelMpMaterialGroupListRsp
+	288, // 491: lbsingle.lbsingle.UpdateMpMaterialGroup:output_type -> lbsingle.UpdateMpMaterialGroupRsp
+	292, // 492: lbsingle.lbsingle.GetMpMaterialGroup:output_type -> lbsingle.GetMpMaterialGroupRsp
+	294, // 493: lbsingle.lbsingle.GetMpMaterialGroupList:output_type -> lbsingle.GetMpMaterialGroupListRsp
+	296, // 494: lbsingle.lbsingle.AddMpService:output_type -> lbsingle.AddMpServiceRsp
+	300, // 495: lbsingle.lbsingle.DelMpServiceList:output_type -> lbsingle.DelMpServiceListRsp
+	298, // 496: lbsingle.lbsingle.UpdateMpService:output_type -> lbsingle.UpdateMpServiceRsp
+	302, // 497: lbsingle.lbsingle.GetMpService:output_type -> lbsingle.GetMpServiceRsp
+	304, // 498: lbsingle.lbsingle.GetMpServiceList:output_type -> lbsingle.GetMpServiceListRsp
+	306, // 499: lbsingle.lbsingle.AddMpShopAds:output_type -> lbsingle.AddMpShopAdsRsp
+	310, // 500: lbsingle.lbsingle.DelMpShopAdsList:output_type -> lbsingle.DelMpShopAdsListRsp
+	308, // 501: lbsingle.lbsingle.UpdateMpShopAds:output_type -> lbsingle.UpdateMpShopAdsRsp
+	312, // 502: lbsingle.lbsingle.GetMpShopAds:output_type -> lbsingle.GetMpShopAdsRsp
+	314, // 503: lbsingle.lbsingle.GetMpShopAdsList:output_type -> lbsingle.GetMpShopAdsListRsp
+	316, // 504: lbsingle.lbsingle.GetMpShopAdsListPublic:output_type -> lbsingle.GetMpShopAdsListPublicRsp
+	318, // 505: lbsingle.lbsingle.WxMiniProgramAuthSession:output_type -> lbsingle.WxMiniProgramAuthSessionRsp
+	320, // 506: lbsingle.lbsingle.WxMPAuthSendSmsCode:output_type -> lbsingle.WxMPAuthSendSmsCodeRsp
+	322, // 507: lbsingle.lbsingle.WxMPAuthSendSmsLogin:output_type -> lbsingle.WxMPAuthSendSmsLoginRsp
+	324, // 508: lbsingle.lbsingle.MPShopNearBy:output_type -> lbsingle.MPShopNearByRsp
+	326, // 509: lbsingle.lbsingle.MPShopProduct:output_type -> lbsingle.MPShopProductRsp
+	328, // 510: lbsingle.lbsingle.MPShopCouponCount:output_type -> lbsingle.MPShopCouponCountRsp
+	330, // 511: lbsingle.lbsingle.MPShopCouponList:output_type -> lbsingle.MPShopCouponListRsp
+	332, // 512: lbsingle.lbsingle.MPShopCouponMine:output_type -> lbsingle.MPShopCouponMineRsp
+	334, // 513: lbsingle.lbsingle.MPShopCouponReceive:output_type -> lbsingle.MPShopCouponReceiveRsp
+	336, // 514: lbsingle.lbsingle.MPShopOrderCreate:output_type -> lbsingle.MPShopOrderCreateRsp
+	338, // 515: lbsingle.lbsingle.MPShopOrderList:output_type -> lbsingle.MPShopOrderListRsp
+	340, // 516: lbsingle.lbsingle.MPShopOrderDetail:output_type -> lbsingle.MPShopOrderDetailRsp
+	342, // 517: lbsingle.lbsingle.MPShopOrderTake:output_type -> lbsingle.MPShopOrderTakeRsp
+	344, // 518: lbsingle.lbsingle.MPShopOrderRefund:output_type -> lbsingle.MPShopOrderRefundRsp
+	346, // 519: lbsingle.lbsingle.MPShopOrderPay:output_type -> lbsingle.MPShopOrderPayRsp
+	348, // 520: lbsingle.lbsingle.MPWechatConfig:output_type -> lbsingle.MPWechatConfigRsp
+	350, // 521: lbsingle.lbsingle.MPUserAddressList:output_type -> lbsingle.MPUserAddressListRsp
+	352, // 522: lbsingle.lbsingle.MPUserAddressDefault:output_type -> lbsingle.MPUserAddressDefaultRsp
+	354, // 523: lbsingle.lbsingle.MPUserAddressAddAndEdit:output_type -> lbsingle.MPUserAddressAddAndEditRsp
+	356, // 524: lbsingle.lbsingle.MPUserAddressDel:output_type -> lbsingle.MPUserAddressDelRsp
+	358, // 525: lbsingle.lbsingle.MPUserInfo:output_type -> lbsingle.MPUserInfoRsp
+	360, // 526: lbsingle.lbsingle.MPUserMineService:output_type -> lbsingle.MPUserMineServiceRsp
+	362, // 527: lbsingle.lbsingle.MPUserServiceContent:output_type -> lbsingle.MPUserServiceContentRsp
+	364, // 528: lbsingle.lbsingle.MPUserSaveInfo:output_type -> lbsingle.MPUserSaveInfoRsp
+	366, // 529: lbsingle.lbsingle.MPUserBillList:output_type -> lbsingle.MPUserBillListRsp
+	368, // 530: lbsingle.lbsingle.MPUserMoneyList:output_type -> lbsingle.MPUserMoneyListRsp
+	370, // 531: lbsingle.lbsingle.MPUserRecharge:output_type -> lbsingle.MPUserRechargeRsp
+	380, // [380:532] is the sub-list for method output_type
+	228, // [228:380] is the sub-list for method input_type
+	228, // [228:228] is the sub-list for extension type_name
+	228, // [228:228] is the sub-list for extension extendee
+	0,   // [0:228] is the sub-list for field type_name
 }
 
 func init() { file_lbsingle_proto_init() }
@@ -28879,6 +29025,18 @@ func file_lbsingle_proto_init() {
 				return nil
 			}
 		}
+		file_lbsingle_proto_msgTypes[342].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*MPShopOrderListRsp_CartInfo); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -28886,7 +29044,7 @@ func file_lbsingle_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_lbsingle_proto_rawDesc,
 			NumEnums:      36,
-			NumMessages:   342,
+			NumMessages:   345,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
