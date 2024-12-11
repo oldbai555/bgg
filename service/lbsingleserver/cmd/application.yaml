@@ -1,0 +1,6 @@
+server:
+  name: "lbsingle"
+  port: 20011
+wxMiniProgram:
+  appId: ""
+  secret: ""
