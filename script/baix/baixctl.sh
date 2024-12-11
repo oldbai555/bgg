@@ -43,68 +43,38 @@ function safe_exec_baixctl() {
 
 function usage() {
   echo "Usage: sh baixctl.sh [OPTION]"
-  echo "gc | genclient 根据 proto 生成客户端代码"
-  echo "gs | genserver 根据 proto 生成服务端代码"
-  echo "gsc | gensc 根据 proto 生成客户端 服务端代码"
-  echo "gg | gengingateway 根据 proto 生成网关代码"
-  echo "gt | gents 根据 proto 生成 ts 代码"
-  echo "ap | addproto 新增 proto 文件"
-  echo "ar | addrpc 新增 rpc 方法"
-  echo "ac | addCurdRpc 新增 curd rpc 方法以及 message. 示例 sh bin.sh addCurdRpc lbbill.proto Bill,BillCategory"
-  echo "asc | addCurdSysRpc 新增系统 curd rpc 方法以及 message. 示例 sh bin.sh addCurdRpc lbbill.proto Bill,BillCategory"
-  echo "gts 生成 ts 代码"
-  echo "gsg 生成 单体应用 代码"
+  echo "genAddCurdRpc 添加pb的Curd rpc方法
+        genAddProto   初始化pb文件
+        genAddRpc     添加pb的rpc方法
+        genClient     生成客户端代码
+        genServer     生成服务端代码
+        gensinglepb   执行单体应用proto代码生成器"
   exit 1
 }
 
 # 命令执行函数
-function gen_client() {
-  safe_exec_baixctl genclient -p "$1"
+function genAddCurdRpc() {
+  safe_exec_baixctl genAddCurdRpc -p "$1" -m "$2" -s "$3"
 }
 
-function gen_server() {
-  safe_exec_baixctl genserver -p "$1"
-}
-
-function gen_client_and_server() {
-  safe_exec_baixctl genclient -p "$1"
-  safe_exec_baixctl genserver -p "$1"
-}
-
-function gen_gateway() {
-  safe_exec_baixctl gengingateway -p "$1"
-}
-
-function gen_ts() {
-  safe_exec_baixctl gen_ts_vue -p "$1" -o "$2"
-}
-
-function add_rpc() {
-  safe_exec_baixctl genAddRpc -p "$1" -r "$2"
-}
-
-function add_curd_rpc() {
-  safe_exec_baixctl genAddCurdRpc -p "$1" -m "$2"
-}
-
-function add_curd_sys_rpc() {
-  safe_exec_baixctl genAddCurdRpc -p "$1" -m "$2" -s true
-}
-
-function add_proto() {
+function genAddProto() {
   safe_exec_baixctl genAddProto -p "$1"
 }
 
-function gen_ts_admin() {
-  safe_exec_baixctl gen_ts_vue  -p "$1" -o "/e/bgg/github.com/oldbai555/bgg/webv2/admin"
+function genAddRpc() {
+  safe_exec_baixctl genAddRpc -p "$1" -r "$2"
 }
 
-function gen_single() {
-  safe_exec_baixctl gensingle  -p "$1"
+function genClient() {
+  safe_exec_baixctl genClient -p "$1"
 }
 
-function gen_single_pb() {
-  safe_exec_baixctl gensinglepb  -p "$1"
+function genServer() {
+  safe_exec_baixctl genServer -p "$1"
+}
+
+function gensinglepb() {
+  safe_exec_baixctl gensinglepb -p "$1"
 }
 
 # 主逻辑部分
@@ -112,41 +82,27 @@ sed_i_backup
 safe_process_env
 
 case "$1" in
-  "gc" | "genclient")
-    gen_client "$2"
+  "gacr" | "genAddCurdRpc")
+    genAddCurdRpc "$2" "$3" "$4"
     ;;
-  "gs" | "genserver")
-    gen_server "$2"
+  "gap" | "genAddProto")
+    genAddProto "$2"
     ;;
-  "gsc" | "gensc")
-    gen_client_and_server "$2"
+  "gar" | "genAddRpc")
+    genAddRpc "$2" "$3"
     ;;
-  "gg" | "gengingateway")
-    gen_gateway "$2"
+  "gc" | "genClient")
+    genClient "$2"
     ;;
-  "gt" | "gents")
-    gen_ts "$2" "$3"
+  "gs" | "genServer")
+    genServer "$2"
     ;;
-  "ar" | "addrpc")
-    add_rpc "$2" "$3"
+  "gall")
+    genClient "$2"
+    genServer "$2"
     ;;
-  "ap" | "addproto")
-    add_proto "$2"
-    ;;
-  "ac" | "addCurdRpc")
-    add_curd_rpc "$2" "$3"
-    ;;
-  "asc" | "addCurdSysRpc")
-    add_curd_sys_rpc "$2" "$3"
-    ;;
-  "gts")
-    gen_ts_admin "$2"
-    ;;
-  "gsg")
-    gen_single "$2"
-    ;;
-  "gspb")
-    gen_single_pb "$2"
+  "gb" | "gensinglepb")
+    gensinglepb "$2"
     ;;
   *)
     usage
