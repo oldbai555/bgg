@@ -4,6 +4,7 @@ package lbsingle
 
 const (
 	AddUserCMDPath             = "/lbsingle/AddUser"
+	CheckAuthSysCMDPath        = "/lbsingle/CheckAuthSys"
 	DelFileListCMDPath         = "/lbsingle/DelFileList"
 	DelUserListCMDPath         = "/lbsingle/DelUserList"
 	GetFileCMDPath             = "/lbsingle/GetFile"

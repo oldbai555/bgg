@@ -138,7 +138,7 @@ lpg)
   ;;
 lpcmd)
   shift
-  localPackSrv "$1" ${proRootDir}"/service/"$1"/cmd"
+  localPackSrv "$1" ${proRootDir}"/service/"$1"server/cmd"
   deploySupervisorService "$1"
   ;;
 *)

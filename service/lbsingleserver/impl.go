@@ -3,7 +3,7 @@ package lbsingleserver
 import (
 	"context"
 	"fmt"
-	"github.com/oldbai555/bgg/pkg/ctx"
+	"github.com/oldbai555/bgg/pkg/bctx"
 	"github.com/oldbai555/bgg/service/lbbase"
 	"github.com/oldbai555/bgg/service/lbsingle"
 	"github.com/oldbai555/bgg/service/lbsingleserver/cache"
@@ -105,7 +105,7 @@ func (a *LbsingleServer) Logout(c context.Context, req *lbsingle.LogoutReq) (*lb
 
 	conn := wsmgr.GetConnByUid(baseUser.Id)
 	if conn != nil {
-		newCtx := ctx.NewCtx(context.Background())
+		newCtx := bctx.NewCtx(context.Background())
 		newCtx.SetExtInfo(conn)
 		_, err = handleWebsocketDataTypeLogout(newCtx, wsmgr.PacketWebsocketDataByLogout())
 		if err != nil {
@@ -373,5 +373,20 @@ func (a *LbsingleServer) GetUserList(ctx context.Context, req *lbsingle.GetUserL
 		return nil, err
 	}
 
+	return &rsp, err
+}
+
+func (a *LbsingleServer) CheckAuthSys(_ context.Context, req *lbsingle.CheckAuthSysReq) (*lbsingle.CheckAuthSysRsp, error) {
+	var rsp lbsingle.CheckAuthSysRsp
+	var err error
+
+	uCtx := uctx.NewBaseUCtx()
+	uCtx.SetSid(req.Sid)
+	auth, err := CheckAuth(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.User = auth
 	return &rsp, err
 }

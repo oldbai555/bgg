@@ -37,4 +37,6 @@ var cmdList = []*bcmd.Cmd{
 	{Server: lbsingle.ServerName, Path: lbsingle.GetUserCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.GetUser, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
 
 	{Server: lbsingle.ServerName, Path: lbsingle.GetUserListCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.GetUserList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.CheckAuthSysCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.CheckAuthSys, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "system"}},
 }

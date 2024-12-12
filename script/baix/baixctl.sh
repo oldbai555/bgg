@@ -43,7 +43,8 @@ function safe_exec_baixctl() {
 
 function usage() {
   echo "Usage: sh baixctl.sh [OPTION]"
-  echo "genAddCurdRpc 添加pb的Curd rpc方法
+  echo "
+        genAddCurdRpc 添加pb的Curd rpc方法
         genAddProto   初始化pb文件
         genAddRpc     添加pb的rpc方法
         genClient     生成客户端代码

@@ -21,4 +21,5 @@ git remote set-url origin https://token@github.com/oldbai555/bgg.git
 /service/gateway/go_build_github_com_oldbai555_bgg_service_gateway.exe
 /service/lbsingle/d2admin/
 /service/lbwxmp/d2admin/
-/service/lbsingleserver/cmd/go_build_github_com_oldbai555_bgg_service_lbsingleserver_cmd.exe
+/service/**/cmd/**.exe
+/service/**/d2admin/

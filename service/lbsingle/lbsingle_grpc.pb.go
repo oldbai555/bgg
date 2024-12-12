@@ -83,6 +83,11 @@ type LbsingleClient interface {
 	// @desc:
 	// @error:
 	GetUserList(ctx context.Context, in *GetUserListReq, opts ...grpc.CallOption) (*GetUserListRsp, error)
+	// @cat: User
+	// @name:
+	// @desc:
+	// @error:
+	CheckAuthSys(ctx context.Context, in *CheckAuthSysReq, opts ...grpc.CallOption) (*CheckAuthSysRsp, error)
 }
 
 type lbsingleClient struct {
@@ -219,6 +224,15 @@ func (c *lbsingleClient) GetUserList(ctx context.Context, in *GetUserListReq, op
 	return out, nil
 }
 
+func (c *lbsingleClient) CheckAuthSys(ctx context.Context, in *CheckAuthSysReq, opts ...grpc.CallOption) (*CheckAuthSysRsp, error) {
+	out := new(CheckAuthSysRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/CheckAuthSys", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // LbsingleServer is the server API for Lbsingle service.
 // All implementations must embed UnimplementedLbsingleServer
 // for forward compatibility
@@ -284,6 +298,11 @@ type LbsingleServer interface {
 	// @desc:
 	// @error:
 	GetUserList(context.Context, *GetUserListReq) (*GetUserListRsp, error)
+	// @cat: User
+	// @name:
+	// @desc:
+	// @error:
+	CheckAuthSys(context.Context, *CheckAuthSysReq) (*CheckAuthSysRsp, error)
 	mustEmbedUnimplementedLbsingleServer()
 }
 
@@ -332,6 +351,9 @@ func (UnimplementedLbsingleServer) GetUser(context.Context, *GetUserReq) (*GetUs
 }
 func (UnimplementedLbsingleServer) GetUserList(context.Context, *GetUserListReq) (*GetUserListRsp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserList not implemented")
+}
+func (UnimplementedLbsingleServer) CheckAuthSys(context.Context, *CheckAuthSysReq) (*CheckAuthSysRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckAuthSys not implemented")
 }
 func (UnimplementedLbsingleServer) mustEmbedUnimplementedLbsingleServer() {}
 
@@ -598,6 +620,24 @@ func _Lbsingle_GetUserList_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Lbsingle_CheckAuthSys_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckAuthSysReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).CheckAuthSys(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/CheckAuthSys",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).CheckAuthSys(ctx, req.(*CheckAuthSysReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Lbsingle_ServiceDesc is the grpc.ServiceDesc for Lbsingle service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -660,6 +700,10 @@ var Lbsingle_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUserList",
 			Handler:    _Lbsingle_GetUserList_Handler,
+		},
+		{
+			MethodName: "CheckAuthSys",
+			Handler:    _Lbsingle_CheckAuthSys_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

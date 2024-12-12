@@ -10,8 +10,8 @@ import (
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/nsqio/go-nsq"
+	"github.com/oldbai555/bgg/pkg/bctx"
 	"github.com/oldbai555/bgg/pkg/compress"
-	"github.com/oldbai555/bgg/pkg/ctx"
 	"github.com/oldbai555/bgg/pkg/marshal"
 	"github.com/oldbai555/bgg/pkg/tool"
 	"github.com/oldbai555/bgg/service/lbsingle"
@@ -241,9 +241,9 @@ func MqTopicByCacheAllFileHandler(msg *nsq.Message) error {
 
 func handleUploadFile(c *gin.Context) {
 	handler := bgin.NewHandler(c)
-	nCtx := ctx.NewCtx(
+	nCtx := bctx.NewCtx(
 		c,
-		ctx.WithGinHeaderAuthorization(c),
+		bctx.WithGinHeaderAuthorization(c),
 	)
 	_, err := CheckAuth(nCtx)
 	if err != nil {
