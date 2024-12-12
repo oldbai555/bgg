@@ -4,7 +4,7 @@
  * @Desc:
 **/
 
-package lbsingleserver
+package lbwxmpserver
 
 import (
 	"fmt"

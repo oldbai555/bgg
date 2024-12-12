@@ -10,10 +10,9 @@ import (
 	"github.com/oldbai555/bgg/pkg/bctx"
 	"github.com/oldbai555/bgg/pkg/syscfg"
 	"github.com/oldbai555/bgg/pkg/tool"
-	"github.com/oldbai555/bgg/service/lbsingleserver"
-	"github.com/oldbai555/bgg/service/lbsingleserver/cache"
-	"github.com/oldbai555/bgg/service/lbsingleserver/mq"
-	"github.com/oldbai555/bgg/service/lbsingleserver/wsmgr"
+	"github.com/oldbai555/bgg/service/lbsingle"
+	"github.com/oldbai555/bgg/service/lbwxmpserver"
+	"github.com/oldbai555/bgg/service/lbwxmpserver/cache"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/jsonpb"
 	"github.com/oldbai555/lbtool/pkg/lberr"
@@ -57,7 +56,7 @@ func (p *program) Init(_ svc.Environment) error {
 	gate.CheckCmdList(cmdList)
 
 	// 初始化mysql
-	err = lbsingleserver.Init()
+	err = lbwxmpserver.Init()
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return err
@@ -92,30 +91,10 @@ func (p *program) Start() error {
 		log.Errorf("err:%v", err)
 		return err
 	}
-
-	err = lbsingleserver.InitTopic()
-	if err != nil {
-		log.Errorf("err:%v", err)
-		return err
-	}
-
-	err = mq.Start()
-	if err != nil {
-		log.Errorf("err:%v", err)
-		return err
-	}
-
-	err = lbsingleserver.SyncFileIndex(context.Background(), true)
-	if err != nil {
-		log.Errorf("err:%v", err)
-		return err
-	}
-
 	return nil
 }
 
 func (p *program) Stop() error {
-	wsmgr.CloseAllWsConn()
 	if p.prometheus != nil {
 		log.Infof("stop prometheus")
 		err := p.prometheus.Shutdown(context.Background())
@@ -131,7 +110,6 @@ func (p *program) Stop() error {
 			return err
 		}
 	}
-	mq.Stop()
 	cache.Stop()
 	return nil
 }
@@ -178,7 +156,7 @@ func (p *program) registerCmd(r *gin.Engine, cmd *bcmd.Cmd) {
 
 		// 需要校验
 		if cmd.IsUserAuthType() {
-			info, err := lbsingleserver.CheckAuth(nCtx)
+			info, err := lbsingle.CheckAuth(nCtx)
 			if err != nil {
 				log.Errorf("err:%v", err)
 				handler.RespByJson(http.StatusUnauthorized, http.StatusUnauthorized, "", "unauthorized")
@@ -269,9 +247,6 @@ func (p *program) startGinHttpServer() error {
 	for _, cmd := range cmdList {
 		p.registerCmd(router, cmd)
 	}
-
-	// 注册自定义路由
-	lbsingleserver.RegisterCustomRouter(router)
 
 	p.ginSrv = &http.Server{
 		Addr:    fmt.Sprintf(":%d", p.port),

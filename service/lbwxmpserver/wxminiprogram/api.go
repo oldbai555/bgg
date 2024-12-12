@@ -7,8 +7,8 @@
 package wxminiprogram
 
 import (
-	"github.com/oldbai555/bgg/service/lbsingle/client"
-	"github.com/oldbai555/bgg/service/lbsingle/server/constant"
+	"github.com/oldbai555/bgg/service/lbbase"
+	"github.com/oldbai555/bgg/service/lbsingleserver/constant"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/json"
 	"github.com/oldbai555/lbtool/pkg/lberr"
@@ -16,7 +16,7 @@ import (
 	"net/url"
 )
 
-func Code2Session(req *client.JsCodeToSessionReq) (*client.JsCodeToSessionRsp, error) {
+func Code2Session(req *lbbase.JsCodeToSessionReq) (*lbbase.JsCodeToSessionRsp, error) {
 	path, _ := url.JoinPath(constant.WxMiniProgramPath, "sns", "jscode2session")
 	request := restysdk.NewRequest()
 	response, err := request.SetQueryParams(map[string]string{
@@ -29,7 +29,7 @@ func Code2Session(req *client.JsCodeToSessionReq) (*client.JsCodeToSessionRsp, e
 		log.Errorf("err:%v", err)
 		return nil, err
 	}
-	var resp client.JsCodeToSessionRsp
+	var resp lbbase.JsCodeToSessionRsp
 	err = json.Unmarshal(response.Body(), &resp)
 	if err != nil {
 		log.Errorf("err:%v", err)

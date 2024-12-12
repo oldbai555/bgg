@@ -7,10 +7,10 @@
 package wxminiprogram
 
 import (
-	"github.com/oldbai555/bgg/service/lbsingle/client"
+	"github.com/oldbai555/bgg/service/lbbase"
 	"testing"
 )
 
 func TestCode2Session(t *testing.T) {
-	Code2Session(&client.JsCodeToSessionReq{})
+	Code2Session(&lbbase.JsCodeToSessionReq{})
 }

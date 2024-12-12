@@ -9,7 +9,7 @@ package wsmgr
 import (
 	"context"
 	"fmt"
-	"github.com/oldbai555/bgg/pkg/ctx"
+	"github.com/oldbai555/bgg/pkg/bctx"
 	"github.com/oldbai555/bgg/service/lbbase"
 	"github.com/oldbai555/bgg/service/lbsingle"
 	"github.com/oldbai555/bgg/service/lbsingleserver/iface"
@@ -40,7 +40,7 @@ func handleMessage(c *wsConn, data *lbsingle.WebsocketMsg) {
 		return
 	}
 
-	nCtx := ctx.NewCtx(context.Background())
+	nCtx := bctx.NewCtx(context.Background())
 
 	// 转换成接口传下去
 	var extInfo iface.IWsConn = c
