@@ -3,6 +3,7 @@ module github.com/oldbai555/bgg
 go 1.20
 
 //replace github.com/oldbai555/micro => E:\bgg\github.com\oldbai555\micro
+
 //replace github.com/oldbai555/lbtool => E:\bgg\github.com\oldbai555\lbtool
 
 require (
@@ -14,7 +15,7 @@ require (
 	github.com/judwhite/go-svc v1.2.1
 	github.com/nsqio/go-nsq v1.1.0
 	github.com/oldbai555/lbtool v0.0.4-0.20241225081330-187682ac7b55
-	github.com/oldbai555/micro v0.0.2-0.20241225081901-57ef00a1b808
+	github.com/oldbai555/micro v0.0.2-0.20241230032455-843096f580a7
 	github.com/prometheus/client_golang v1.11.1
 	github.com/spf13/viper v1.9.0
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c

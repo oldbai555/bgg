@@ -7,7 +7,7 @@
 package cache
 
 import (
-	"github.com/oldbai555/bgg/service/lbsingleserver/constant"
+	"github.com/oldbai555/bgg/pkg/constant"
 	"github.com/oldbai555/lbtool/log"
 )
 

@@ -182,36 +182,6 @@ var ModelMpStoreShop = &engine.ModelObjectType{
 				IsArray:   false,
 			},
 			{
-				FieldName: "address_map",
-				Type:      "string",
-				IsArray:   false,
-			},
-			{
-				FieldName: "lng",
-				Type:      "string",
-				IsArray:   false,
-			},
-			{
-				FieldName: "lat",
-				Type:      "string",
-				IsArray:   false,
-			},
-			{
-				FieldName: "distance",
-				Type:      "int32",
-				IsArray:   false,
-			},
-			{
-				FieldName: "min_price",
-				Type:      "int64",
-				IsArray:   false,
-			},
-			{
-				FieldName: "delivery_price",
-				Type:      "int64",
-				IsArray:   false,
-			},
-			{
 				FieldName: "notice",
 				Type:      "string",
 				IsArray:   false,
@@ -222,23 +192,13 @@ var ModelMpStoreShop = &engine.ModelObjectType{
 				IsArray:   false,
 			},
 			{
-				FieldName: "admin_id",
-				Type:      "string",
-				IsArray:   true,
-			},
-			{
-				FieldName: "uniprint_id",
+				FieldName: "lng",
 				Type:      "string",
 				IsArray:   false,
 			},
 			{
-				FieldName: "start_at",
-				Type:      "uint32",
-				IsArray:   false,
-			},
-			{
-				FieldName: "end_at",
-				Type:      "uint32",
+				FieldName: "lat",
+				Type:      "string",
 				IsArray:   false,
 			},
 		},
@@ -275,11 +235,6 @@ var ModelMpProductCategory = &engine.ModelObjectType{
 				IsArray:   false,
 			},
 			{
-				FieldName: "parent_id",
-				Type:      "uint64",
-				IsArray:   false,
-			},
-			{
 				FieldName: "mp_store_shop_id",
 				Type:      "uint64",
 				IsArray:   false,
@@ -297,11 +252,6 @@ var ModelMpProductCategory = &engine.ModelObjectType{
 			{
 				FieldName: "description",
 				Type:      "string",
-				IsArray:   false,
-			},
-			{
-				FieldName: "status",
-				Type:      "uint32",
 				IsArray:   false,
 			},
 		},
@@ -343,6 +293,11 @@ var ModelMpStoreProduct = &engine.ModelObjectType{
 				IsArray:   false,
 			},
 			{
+				FieldName: "cate_id",
+				Type:      "uint64",
+				IsArray:   false,
+			},
+			{
 				FieldName: "image",
 				Type:      "string",
 				IsArray:   false,
@@ -360,116 +315,6 @@ var ModelMpStoreProduct = &engine.ModelObjectType{
 			{
 				FieldName: "info",
 				Type:      "string",
-				IsArray:   false,
-			},
-			{
-				FieldName: "keyword",
-				Type:      "string",
-				IsArray:   false,
-			},
-			{
-				FieldName: "bar_code",
-				Type:      "string",
-				IsArray:   false,
-			},
-			{
-				FieldName: "cate_id",
-				Type:      "uint64",
-				IsArray:   false,
-			},
-			{
-				FieldName: "brand_id",
-				Type:      "int64",
-				IsArray:   false,
-			},
-			{
-				FieldName: "price",
-				Type:      "int64",
-				IsArray:   false,
-			},
-			{
-				FieldName: "vip_price",
-				Type:      "int64",
-				IsArray:   false,
-			},
-			{
-				FieldName: "ot_price",
-				Type:      "int64",
-				IsArray:   false,
-			},
-			{
-				FieldName: "postage",
-				Type:      "int64",
-				IsArray:   false,
-			},
-			{
-				FieldName: "unit_name",
-				Type:      "string",
-				IsArray:   false,
-			},
-			{
-				FieldName: "sort",
-				Type:      "int32",
-				IsArray:   false,
-			},
-			{
-				FieldName: "sales",
-				Type:      "int32",
-				IsArray:   false,
-			},
-			{
-				FieldName: "stock",
-				Type:      "int32",
-				IsArray:   false,
-			},
-			{
-				FieldName: "description",
-				Type:      "string",
-				IsArray:   false,
-			},
-			{
-				FieldName: "give_integral",
-				Type:      "int64",
-				IsArray:   false,
-			},
-			{
-				FieldName: "cost",
-				Type:      "int64",
-				IsArray:   false,
-			},
-			{
-				FieldName: "ficti",
-				Type:      "int32",
-				IsArray:   false,
-			},
-			{
-				FieldName: "browse",
-				Type:      "int32",
-				IsArray:   false,
-			},
-			{
-				FieldName: "code_path",
-				Type:      "string",
-				IsArray:   false,
-			},
-			{
-				FieldName: "temp_id",
-				Type:      "int32",
-				IsArray:   false,
-			},
-			{
-				FieldName: "spec_type",
-				Type:      "int32",
-				IsArray:   false,
-			},
-			{
-				FieldName: "integral",
-				Type:      "int32",
-				IsArray:   false,
-			},
-			{
-				FieldName: "prop",
-				Type:      "uint32",
 				IsArray:   false,
 			},
 		},
@@ -516,28 +361,8 @@ var ModelMpStoreOrderCartInfo = &engine.ModelObjectType{
 				IsArray:   false,
 			},
 			{
-				FieldName: "cart_id",
-				Type:      "uint64",
-				IsArray:   false,
-			},
-			{
 				FieldName: "product_id",
 				Type:      "uint64",
-				IsArray:   false,
-			},
-			{
-				FieldName: "cart_info",
-				Type:      "string",
-				IsArray:   false,
-			},
-			{
-				FieldName: "unique",
-				Type:      "string",
-				IsArray:   false,
-			},
-			{
-				FieldName: "is_after_sales",
-				Type:      "int32",
 				IsArray:   false,
 			},
 			{
@@ -553,16 +378,6 @@ var ModelMpStoreOrderCartInfo = &engine.ModelObjectType{
 			{
 				FieldName: "number",
 				Type:      "uint32",
-				IsArray:   false,
-			},
-			{
-				FieldName: "spec",
-				Type:      "string",
-				IsArray:   false,
-			},
-			{
-				FieldName: "price",
-				Type:      "int64",
 				IsArray:   false,
 			},
 		},
@@ -604,263 +419,28 @@ var ModelMpStoreOrder = &engine.ModelObjectType{
 				IsArray:   false,
 			},
 			{
-				FieldName: "extend_order_sn",
-				Type:      "string",
-				IsArray:   false,
-			},
-			{
-				FieldName: "mp_uid",
-				Type:      "uint64",
-				IsArray:   false,
-			},
-			{
-				FieldName: "real_name",
-				Type:      "string",
-				IsArray:   false,
-			},
-			{
-				FieldName: "user_phone",
-				Type:      "string",
-				IsArray:   false,
-			},
-			{
-				FieldName: "user_address",
-				Type:      "string",
-				IsArray:   false,
-			},
-			{
-				FieldName: "cart_id",
-				Type:      "string",
-				IsArray:   false,
-			},
-			{
-				FieldName: "freight_price",
-				Type:      "int64",
-				IsArray:   false,
-			},
-			{
-				FieldName: "total_num",
-				Type:      "uint32",
-				IsArray:   false,
-			},
-			{
-				FieldName: "total_price",
-				Type:      "int64",
-				IsArray:   false,
-			},
-			{
-				FieldName: "total_postage",
-				Type:      "int64",
-				IsArray:   false,
-			},
-			{
-				FieldName: "pay_price",
-				Type:      "int64",
-				IsArray:   false,
-			},
-			{
-				FieldName: "pay_postage",
-				Type:      "int64",
-				IsArray:   false,
-			},
-			{
-				FieldName: "deduction_price",
-				Type:      "int64",
-				IsArray:   false,
-			},
-			{
-				FieldName: "coupon_id",
-				Type:      "uint64",
-				IsArray:   false,
-			},
-			{
-				FieldName: "coupon_price",
-				Type:      "int64",
-				IsArray:   false,
-			},
-			{
-				FieldName: "paid",
-				Type:      "int32",
-				IsArray:   false,
-			},
-			{
-				FieldName: "pay_at",
-				Type:      "uint32",
-				IsArray:   false,
-			},
-			{
-				FieldName: "pay_type",
-				Type:      "string",
-				IsArray:   false,
-			},
-			{
-				FieldName: "order_type",
-				Type:      "string",
-				IsArray:   false,
-			},
-			{
-				FieldName: "status",
-				Type:      "int32",
-				IsArray:   false,
-			},
-			{
-				FieldName: "refund_status",
-				Type:      "int32",
-				IsArray:   false,
-			},
-			{
-				FieldName: "refund_reason_wap_img",
-				Type:      "string",
-				IsArray:   false,
-			},
-			{
-				FieldName: "refund_reason_wap_explain",
-				Type:      "string",
-				IsArray:   false,
-			},
-			{
-				FieldName: "refund_reason_at",
-				Type:      "uint32",
-				IsArray:   false,
-			},
-			{
-				FieldName: "refund_reason_wap",
-				Type:      "string",
-				IsArray:   false,
-			},
-			{
-				FieldName: "refund_reason",
-				Type:      "string",
-				IsArray:   false,
-			},
-			{
-				FieldName: "refund_price",
-				Type:      "int64",
-				IsArray:   false,
-			},
-			{
-				FieldName: "delivery_sn",
-				Type:      "string",
-				IsArray:   false,
-			},
-			{
-				FieldName: "delivery_name",
-				Type:      "string",
-				IsArray:   false,
-			},
-			{
-				FieldName: "delivery_type",
-				Type:      "string",
-				IsArray:   false,
-			},
-			{
-				FieldName: "delivery_id",
-				Type:      "string",
-				IsArray:   false,
-			},
-			{
-				FieldName: "delivery_at",
-				Type:      "uint32",
-				IsArray:   false,
-			},
-			{
-				FieldName: "gain_integral",
-				Type:      "int64",
-				IsArray:   false,
-			},
-			{
-				FieldName: "use_integral",
-				Type:      "int64",
-				IsArray:   false,
-			},
-			{
-				FieldName: "pay_integral",
-				Type:      "int64",
-				IsArray:   false,
-			},
-			{
-				FieldName: "back_integral",
-				Type:      "int64",
-				IsArray:   false,
-			},
-			{
-				FieldName: "mark",
-				Type:      "string",
-				IsArray:   false,
-			},
-			{
-				FieldName: "unique",
-				Type:      "string",
-				IsArray:   false,
-			},
-			{
-				FieldName: "remark",
-				Type:      "string",
-				IsArray:   false,
-			},
-			{
-				FieldName: "mer_id",
-				Type:      "int32",
-				IsArray:   false,
-			},
-			{
-				FieldName: "combination_id",
-				Type:      "int64",
-				IsArray:   false,
-			},
-			{
-				FieldName: "pink_id",
-				Type:      "int64",
-				IsArray:   false,
-			},
-			{
-				FieldName: "cost",
-				Type:      "int64",
-				IsArray:   false,
-			},
-			{
-				FieldName: "seckill_id",
-				Type:      "int64",
-				IsArray:   false,
-			},
-			{
-				FieldName: "bargain_id",
-				Type:      "int32",
-				IsArray:   false,
-			},
-			{
-				FieldName: "verify_code",
-				Type:      "string",
-				IsArray:   false,
-			},
-			{
 				FieldName: "mp_store_shop_id",
 				Type:      "uint64",
 				IsArray:   false,
 			},
 			{
-				FieldName: "shipping_type",
-				Type:      "int32",
-				IsArray:   false,
-			},
-			{
-				FieldName: "is_channel",
-				Type:      "int32",
-				IsArray:   false,
-			},
-			{
-				FieldName: "is_system_del",
-				Type:      "int32",
-				IsArray:   false,
-			},
-			{
-				FieldName: "get_at",
-				Type:      "uint32",
-				IsArray:   false,
-			},
-			{
 				FieldName: "number_id",
-				Type:      "int64",
+				Type:      "uint64",
+				IsArray:   false,
+			},
+			{
+				FieldName: "total_num",
+				Type:      "int32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "pay_type",
+				Type:      "int32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "remark",
+				Type:      "string",
 				IsArray:   false,
 			},
 		},

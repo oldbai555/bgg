@@ -637,6 +637,8 @@ func (m *ModelFile) validate(all bool) error {
 
 	// no validation rules for State
 
+	// no validation rules for Type
+
 	if len(errors) > 0 {
 		return ModelFileMultiError(errors)
 	}

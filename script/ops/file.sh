@@ -19,3 +19,9 @@ CreateDirIfNotExists() {
     mkdir -p "$dir_path"
   fi
 }
+
+# 删除7天前的文件
+FindFileDate(){
+  # find ./ -type f ! -newermt "$(date +%Y-%m-01)" -delete
+  find ./ -type f -mtime +7 -delete
+}

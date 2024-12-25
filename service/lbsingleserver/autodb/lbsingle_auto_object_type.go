@@ -68,6 +68,11 @@ var ModelFile = &engine.ModelObjectType{
 				Type:      "uint32",
 				IsArray:   false,
 			},
+			{
+				FieldName: "type",
+				Type:      "uint32",
+				IsArray:   false,
+			},
 		},
 	},
 }
