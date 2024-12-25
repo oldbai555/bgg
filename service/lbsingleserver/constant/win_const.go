@@ -11,4 +11,5 @@ package constant
 
 const (
 	BaseStoragePath = "C:\\work\\storage\\"
+	BaseDeployPath  = "C:\\work\\package\\"
 )

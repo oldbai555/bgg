@@ -374,3 +374,104 @@ func handleDownloadFile(ctx *gin.Context) {
 	ctx.Header("Content-Disposition", "attachment; filename="+fileName)
 	ctx.File(fileInfo.Path)
 }
+
+func handleUploadDeployFile(c *gin.Context) {
+	handler := bgin.NewHandler(c)
+	nCtx := bctx.NewCtx(
+		c,
+		bctx.WithGinHeaderAuthorization(c),
+	)
+
+	// 1.获取文件信息
+	file, err := c.FormFile("file")
+	if err != nil {
+		log.Errorf("err:%v", err)
+		handler.Error(err)
+		return
+	}
+
+	// 2.构造文件存储路径, 可以很方便的按照天进行数据同步
+	fileName := path.Base(file.Filename)
+	filePath := path.Join(constant.BaseDeployPath)
+	savePath := path.Join(filePath, fileName)
+
+	// 判断如果是windows环境 则需要将 savePath ToSlash
+	savePath = tool.ToSlash(savePath)
+
+	// 3.判断文件是否存在
+	if _, err = os.Stat(savePath); err == nil {
+		handler.Error(lbsingle.ErrFileAlreadyExist)
+		return
+	}
+
+	// 4.创建存储路径文件夹
+	if !utils.FileExists(filePath) {
+		err = os.MkdirAll(filePath, 0775)
+		if err != nil {
+			log.Errorf("err:%v", err)
+			handler.Error(err)
+			return
+		}
+	}
+
+	// 5.保存文件到本地目录
+	err = c.SaveUploadedFile(file, savePath)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		handler.Error(err)
+		return
+	}
+
+	saveFile, err := os.Open(savePath)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		handler.Error(err)
+		return
+	}
+
+	// 6.构造保存结构
+	var fileInfo = &lbsingle.ModelFile{
+		Size:    file.Size,
+		Name:    file.Filename,
+		Rename:  fileName,
+		Path:    savePath,
+		Md5:     tool.GetFileMd5(saveFile),
+		SortUrl: "",
+	}
+
+	sUrl := compress.GenShortUrl(compress.CharsetRandomAlphanumeric, savePath, func(url, keyword string) bool {
+		_, err := cache.GetFileBySortUrl(keyword)
+		if err != nil && !cache.IsNotFound(err) {
+			log.Errorf("err:%v", err)
+			return true
+		}
+		if cache.IsNotFound(err) {
+			return true
+		}
+		return false
+	})
+	if sUrl == "" {
+		handler.Error(lbsingle.ErrFileUploadFailure)
+		return
+	}
+	fileInfo.SortUrl = sUrl
+
+	// 7.保存
+	var aSync = c.GetHeader(constant.HEADER_LBSINGLE_ASYNC)
+	var fileList = []*lbsingle.ModelFile{fileInfo}
+	if aSync != "" {
+		err = MqTopicSyncFile.Pub(nCtx, &lbsingle.MqSyncFile{
+			FileList: fileList,
+		})
+	} else {
+		err = doSingleFileLogic(nCtx, fileInfo)
+	}
+	if err != nil {
+		log.Errorf("err:%v", err)
+		handler.Error(err)
+		return
+	}
+
+	// 8.返回文件唯一索引
+	handler.HttpJson(sUrl)
+}
