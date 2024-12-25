@@ -11,4 +11,5 @@ package constant
 
 const (
 	BaseStoragePath = "/home/work/storage/"
+	BaseDeployPath  = "/home/ubuntu/package"
 )

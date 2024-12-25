@@ -49,7 +49,11 @@ EOF
 
 # 函数：部署 Supervisor 服务
 deploySupervisorService() {
-  local appName=$1
+  local packName
+  local appName
+  packName=$1
+  appName=$(echo "$packName" | cut -d'_' -f1)
+  echo "====== 包体 $packName ======"
   echo "====== 开始部署 $appName ======"
 
   cd "$supervisorDir" || exit
@@ -58,7 +62,7 @@ deploySupervisorService() {
 
   mkdir -p "$appName"
 
-  tar -xvf "$packOutputDir/$appName.tar" -C "$supervisorDir/$appName"
+  tar -xvf "$sh_dir/$packName" -C "$supervisorDir/$appName"
 
   chmod +x -R "$supervisorDir/$appName"
 
@@ -97,6 +101,9 @@ localPackSrv() {
   local appName=$1
   echo "====== 开始打包 $appName ======"
 
+  hash=$(git rev-parse --short HEAD)
+  echo "版本号："${hash}
+
   # 打包路径
   local proSrvPath=$2
 
@@ -111,8 +118,27 @@ localPackSrv() {
 
   cp "${proSrvPath}/application.yaml" ${outputDir}
 
-  tar -cvf ${packOutputDir}"/"${appName}".tar" -C ${outputDir} . --remove-files
+  local srvOutPut=${packOutputDir}"/${appName}_${hash}.tar"
+  tar -cvf ${srvOutPut} -C ${outputDir} . --remove-files
+  echo "====== 输出文件 ${srvOutPut}"
   echo "====== 完成打包 $appName ======"
+
+  start_upload ${srvOutPut}
+}
+
+function start_upload()
+{
+        file=$1
+        fileMd5=`md5sum ${file}`
+        url="https://oldbai.top/oss/deploy/upload"
+        echo "uri:$url"
+        echo "文件md5:$fileMd5"
+        echo "文件大小:"$(stat -c %s ${file} | numfmt --to=iec)
+        echo "开始上传文件:$1"
+
+        curl -k --location --request POST ${url} \
+                --header 'Content-Type: multipart/form-data' \
+                --form 'file=@'${file}''
 }
 
 # 使用说明
@@ -134,12 +160,20 @@ case "$1" in
 lpg)
   shift
   localPackSrv "$1" ${proRootDir}"/service/gateway"
-  deploySupervisorService "$1"
+#  deploySupervisorService "$1"
   ;;
 lpcmd)
   shift
   localPackSrv "$1" ${proRootDir}"/service/"$1"server/cmd"
+#  deploySupervisorService "$1"
+  ;;
+deploy)
+  shift
   deploySupervisorService "$1"
+  ;;
+upload)
+  shift
+  start_upload "$1"
   ;;
 *)
   usage
