@@ -105,12 +105,6 @@ func (p *program) Start() error {
 		return err
 	}
 
-	err = lbsingleserver.SyncFileIndex(context.Background(), true)
-	if err != nil {
-		log.Errorf("err:%v", err)
-		return err
-	}
-
 	return nil
 }
 
