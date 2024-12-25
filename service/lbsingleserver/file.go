@@ -356,23 +356,51 @@ func handleDownloadFile(ctx *gin.Context) {
 		return
 	}
 
+	nCtx := bctx.NewCtx(ctx)
 	fileInfoStr, err := cache.GetFileBySortUrl(sUrl)
-	if err != nil {
+	if err != nil && !cache.IsNotFound(err) {
 		log.Errorf("err:%v", err)
 		handler.Error(err)
 		return
 	}
 
-	var fileInfo lbsingle.ModelFile
-	if err = marshal.PbUnmarshal([]byte(fileInfoStr), &fileInfo); err != nil {
+	var filePath string
+	var fileName string
+	switch {
+	case err != nil && !cache.IsNotFound(err):
 		log.Errorf("err:%v", err)
 		handler.Error(err)
 		return
+	case cache.IsNotFound(err):
+		modelFile, err := OrmFile.NewBaseScope().Where(lbsingle.FieldSortUrl_, sUrl).First(nCtx)
+		if err != nil {
+			log.Errorf("err:%v", err)
+			handler.Error(err)
+			return
+		}
+		p := modelFile.Path
+		_, err = os.Stat(p)
+		if err != nil {
+			log.Errorf("err:%v", err)
+			handler.Error(lbsingle.ErrFileNotFound)
+			return
+		}
+		fileName = url.QueryEscape(modelFile.Name)
+		filePath = modelFile.Path
+	default:
+		var fileInfo lbsingle.ModelFile
+		if err = marshal.PbUnmarshal([]byte(fileInfoStr), &fileInfo); err != nil {
+			log.Errorf("err:%v", err)
+			handler.Error(err)
+			return
+		}
+		fileName = url.QueryEscape(fileInfo.Name)
+		filePath = fileInfo.Path
 	}
-	fileName := url.QueryEscape(fileInfo.Name)
+
 	ctx.Header("Content-Type", "application/octet-stream")
 	ctx.Header("Content-Disposition", "attachment; filename="+fileName)
-	ctx.File(fileInfo.Path)
+	ctx.File(filePath)
 }
 
 func handleUploadDeployFile(c *gin.Context) {
