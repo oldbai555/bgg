@@ -8,8 +8,8 @@ package mq
 
 import (
 	"github.com/nsqio/go-nsq"
+	"github.com/oldbai555/bgg/pkg/constant"
 	"github.com/oldbai555/bgg/service/lbsingle"
-	"github.com/oldbai555/bgg/service/lbsingleserver/constant"
 	"github.com/oldbai555/lbtool/log"
 )
 

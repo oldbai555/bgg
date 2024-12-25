@@ -15,20 +15,16 @@ import (
 	"github.com/oldbai555/bgg/service/lbsingleserver/mq"
 	"github.com/oldbai555/bgg/service/lbsingleserver/wsmgr"
 	"github.com/oldbai555/lbtool/log"
-	"github.com/oldbai555/lbtool/pkg/jsonpb"
-	"github.com/oldbai555/lbtool/pkg/lberr"
 	"github.com/oldbai555/lbtool/pkg/routine"
 	"github.com/oldbai555/lbtool/utils"
 	"github.com/oldbai555/micro/bcmd"
 	"github.com/oldbai555/micro/bgin"
 	"github.com/oldbai555/micro/bgin/gate"
 	"github.com/oldbai555/micro/blimiter"
-	"github.com/oldbai555/micro/brpc/middleware"
+	"github.com/oldbai555/micro/uctx"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/protobuf/proto"
-	"io"
 	"net/http"
-	"reflect"
 	"sync"
 	"syscall"
 )
@@ -105,6 +101,11 @@ func (p *program) Start() error {
 		return err
 	}
 
+	err = lbsingleserver.SyncFileIndex(context.Background(), true)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return err
+	}
 	return nil
 }
 
@@ -131,88 +132,18 @@ func (p *program) Stop() error {
 }
 
 func (p *program) registerCmd(r *gin.Engine, cmd *bcmd.Cmd) {
-	r.POST(cmd.Path, func(c *gin.Context) {
-		handler := bgin.NewHandler(c)
-		// call
-		h := cmd.GRpcFunc
-		v := reflect.ValueOf(h)
-		t := v.Type()
-
-		// 拼装 request
-		reqT := t.In(1).Elem()
-		reqV := reflect.New(reqT)
-		msg := reqV.Interface().(proto.Message)
-		buff, err := io.ReadAll(c.Request.Body)
-		if err != nil {
-			log.Errorf("read err:%v", err)
-			return
-		}
-		err = jsonpb.Unmarshal(buff, msg)
-		if err != nil {
-			log.Errorf("err:%v", err)
-			handler.Error(err)
-			return
-		}
-
-		if validator, ok := reqV.Interface().(middleware.Validator); ok {
-			err := validator.Validate()
-			if err != nil {
-				log.Errorf("err:%v", err)
-				handler.Error(err)
-				return
-			}
-		}
-
-		nCtx := bctx.NewCtx(
-			c,
-			bctx.WithGinHeaderAuthorization(c),
-			bctx.WithGinHeaderAuthType(c, cmd),
-			bctx.WithClientIp(c),
-		)
-
-		// 需要校验
-		if cmd.IsUserAuthType() {
-			info, err := lbsingleserver.CheckAuth(nCtx)
-			if err != nil {
-				log.Errorf("err:%v", err)
-				handler.RespByJson(http.StatusUnauthorized, http.StatusUnauthorized, "", "unauthorized")
-				return
-			}
-			nCtx.SetExtInfo(info)
-		}
-
-		log.Infof("req:[%s]", string(buff))
-
-		handlerRet := v.Call([]reflect.Value{reflect.ValueOf(nCtx), reqV})
-
-		// 检查是否有误
-		var callRes error
-		if !handlerRet[1].IsNil() {
-			callRes = handlerRet[1].Interface().(error)
-		}
-
-		if callRes != nil {
-			log.Errorf("err:%v", callRes)
-			handler.Error(callRes)
-			return
-		}
-
-		// 检查返回值
-		if handlerRet[0].IsValid() && !handlerRet[0].IsNil() {
-			rspBody, ok := handlerRet[0].Interface().(proto.Message)
-			if !ok {
-				log.Errorf("proto convert failed")
-				handler.Error(lberr.NewErr(http.StatusInternalServerError, "proto convert failed"))
-				return
-			}
-
-			handler.Success(rspBody)
-			return
-		}
-
-		// 走到这里说明走不动了
-		handler.Error(lberr.NewErr(http.StatusInternalServerError, "Internal error"))
+	cmd.WithGenIUCtx(func(ctx *gin.Context) uctx.IUCtx {
+		return bctx.NewCtx(ctx, bctx.WithGinHeaderAuthorization(ctx), bctx.WithGinHeaderAuthType(ctx, cmd), bctx.WithClientIp(ctx))
+	}).WithCheckAuthF(func(nCtx uctx.IUCtx) (extInfo interface{}, err error) {
+		return lbsingleserver.CheckAuth(nCtx)
+	}).WithHandleError(func(ctx *gin.Context, err error) {
+		handler := bgin.NewHandler(ctx)
+		handler.Error(err)
+	}).WithHandleResult(func(ctx *gin.Context, result proto.Message) {
+		handler := bgin.NewHandler(ctx)
+		handler.Success(result)
 	})
+	r.POST(cmd.Path, cmd.GinPost)
 }
 
 func (p *program) startPrometheusMonitor() error {

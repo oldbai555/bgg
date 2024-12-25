@@ -223,27 +223,13 @@ func (m *ModelMpStoreShop) validate(all bool) error {
 
 	// no validation rules for Address
 
-	// no validation rules for AddressMap
-
-	// no validation rules for Lng
-
-	// no validation rules for Lat
-
-	// no validation rules for Distance
-
-	// no validation rules for MinPrice
-
-	// no validation rules for DeliveryPrice
-
 	// no validation rules for Notice
 
 	// no validation rules for Status
 
-	// no validation rules for UniprintId
+	// no validation rules for Lng
 
-	// no validation rules for StartAt
-
-	// no validation rules for EndAt
+	// no validation rules for Lat
 
 	if len(errors) > 0 {
 		return ModelMpStoreShopMultiError(errors)
@@ -355,8 +341,6 @@ func (m *ModelMpProductCategory) validate(all bool) error {
 
 	// no validation rules for CreatorId
 
-	// no validation rules for ParentId
-
 	// no validation rules for MpStoreShopId
 
 	// no validation rules for Name
@@ -364,8 +348,6 @@ func (m *ModelMpProductCategory) validate(all bool) error {
 	// no validation rules for PicUrl
 
 	// no validation rules for Description
-
-	// no validation rules for Status
 
 	if len(errors) > 0 {
 		return ModelMpProductCategoryMultiError(errors)
@@ -481,55 +463,13 @@ func (m *ModelMpStoreProduct) validate(all bool) error {
 
 	// no validation rules for MpStoreShopId
 
+	// no validation rules for CateId
+
 	// no validation rules for Image
 
 	// no validation rules for Name
 
 	// no validation rules for Info
-
-	// no validation rules for Keyword
-
-	// no validation rules for BarCode
-
-	// no validation rules for CateId
-
-	// no validation rules for BrandId
-
-	// no validation rules for Price
-
-	// no validation rules for VipPrice
-
-	// no validation rules for OtPrice
-
-	// no validation rules for Postage
-
-	// no validation rules for UnitName
-
-	// no validation rules for Sort
-
-	// no validation rules for Sales
-
-	// no validation rules for Stock
-
-	// no validation rules for Description
-
-	// no validation rules for GiveIntegral
-
-	// no validation rules for Cost
-
-	// no validation rules for Ficti
-
-	// no validation rules for Browse
-
-	// no validation rules for CodePath
-
-	// no validation rules for TempId
-
-	// no validation rules for SpecType
-
-	// no validation rules for Integral
-
-	// no validation rules for Prop
 
 	if len(errors) > 0 {
 		return ModelMpStoreProductMultiError(errors)
@@ -647,25 +587,13 @@ func (m *ModelMpStoreOrderCartInfo) validate(all bool) error {
 
 	// no validation rules for OrderSn
 
-	// no validation rules for CartId
-
 	// no validation rules for ProductId
-
-	// no validation rules for CartInfo
-
-	// no validation rules for Unique
-
-	// no validation rules for IsAfterSales
 
 	// no validation rules for Title
 
 	// no validation rules for Image
 
 	// no validation rules for Number
-
-	// no validation rules for Spec
-
-	// no validation rules for Price
 
 	if len(errors) > 0 {
 		return ModelMpStoreOrderCartInfoMultiError(errors)
@@ -781,109 +709,15 @@ func (m *ModelMpStoreOrder) validate(all bool) error {
 
 	// no validation rules for OrderSn
 
-	// no validation rules for ExtendOrderSn
+	// no validation rules for MpStoreShopId
 
-	// no validation rules for MpUid
-
-	// no validation rules for RealName
-
-	// no validation rules for UserPhone
-
-	// no validation rules for UserAddress
-
-	// no validation rules for CartId
-
-	// no validation rules for FreightPrice
+	// no validation rules for NumberId
 
 	// no validation rules for TotalNum
 
-	// no validation rules for TotalPrice
-
-	// no validation rules for TotalPostage
-
-	// no validation rules for PayPrice
-
-	// no validation rules for PayPostage
-
-	// no validation rules for DeductionPrice
-
-	// no validation rules for CouponId
-
-	// no validation rules for CouponPrice
-
-	// no validation rules for Paid
-
-	// no validation rules for PayAt
-
 	// no validation rules for PayType
 
-	// no validation rules for OrderType
-
-	// no validation rules for Status
-
-	// no validation rules for RefundStatus
-
-	// no validation rules for RefundReasonWapImg
-
-	// no validation rules for RefundReasonWapExplain
-
-	// no validation rules for RefundReasonAt
-
-	// no validation rules for RefundReasonWap
-
-	// no validation rules for RefundReason
-
-	// no validation rules for RefundPrice
-
-	// no validation rules for DeliverySn
-
-	// no validation rules for DeliveryName
-
-	// no validation rules for DeliveryType
-
-	// no validation rules for DeliveryId
-
-	// no validation rules for DeliveryAt
-
-	// no validation rules for GainIntegral
-
-	// no validation rules for UseIntegral
-
-	// no validation rules for PayIntegral
-
-	// no validation rules for BackIntegral
-
-	// no validation rules for Mark
-
-	// no validation rules for Unique
-
 	// no validation rules for Remark
-
-	// no validation rules for MerId
-
-	// no validation rules for CombinationId
-
-	// no validation rules for PinkId
-
-	// no validation rules for Cost
-
-	// no validation rules for SeckillId
-
-	// no validation rules for BargainId
-
-	// no validation rules for VerifyCode
-
-	// no validation rules for MpStoreShopId
-
-	// no validation rules for ShippingType
-
-	// no validation rules for IsChannel
-
-	// no validation rules for IsSystemDel
-
-	// no validation rules for GetAt
-
-	// no validation rules for NumberId
 
 	if len(errors) > 0 {
 		return ModelMpStoreOrderMultiError(errors)

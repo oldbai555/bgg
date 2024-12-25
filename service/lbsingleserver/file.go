@@ -7,16 +7,17 @@
 package lbsingleserver
 
 import (
+	"bytes"
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/nsqio/go-nsq"
 	"github.com/oldbai555/bgg/pkg/bctx"
 	"github.com/oldbai555/bgg/pkg/compress"
+	constant2 "github.com/oldbai555/bgg/pkg/constant"
 	"github.com/oldbai555/bgg/pkg/marshal"
 	"github.com/oldbai555/bgg/pkg/tool"
 	"github.com/oldbai555/bgg/service/lbsingle"
 	"github.com/oldbai555/bgg/service/lbsingleserver/cache"
-	"github.com/oldbai555/bgg/service/lbsingleserver/constant"
 	"github.com/oldbai555/bgg/service/lbsingleserver/mq"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/lberr"
@@ -56,7 +57,7 @@ func SyncFileIndex(ctx context.Context, cacheAllFile bool) error {
 	var newFileList []*lbsingle.ModelFile
 
 	// 同步本地文件
-	err = tool.ListFile(constant.BaseStoragePath, func(path string, info os.FileInfo) {
+	err = tool.ListFile(constant2.BaseStoragePath, func(path string, info os.FileInfo) {
 		file, err := os.Open(path)
 		if err != nil {
 			log.Errorf("err:%v", err)
@@ -263,7 +264,119 @@ func handleUploadFile(c *gin.Context) {
 	// 2.构造文件存储路径, 可以很方便的按照天进行数据同步
 	fileName := utils.Md5(utils.GenUUID()) + path.Ext(file.Filename)
 	timeFmt := time.Unix(time.Now().Unix(), 0).Format("20060102")
-	filePath := path.Join(constant.BaseStoragePath, timeFmt)
+	filePath := path.Join(constant2.BaseStoragePath, timeFmt)
+	savePath := path.Join(filePath, fileName)
+
+	// 判断如果是windows环境 则需要将 savePath ToSlash
+	savePath = tool.ToSlash(savePath)
+
+	// 3.判断文件是否存在
+	if _, err = os.Stat(savePath); err == nil {
+		handler.Error(lbsingle.ErrFileAlreadyExist)
+		return
+	}
+
+	// 4.创建存储路径文件夹
+	if !utils.FileExists(filePath) {
+		err = os.MkdirAll(filePath, 0775)
+		if err != nil {
+			log.Errorf("err:%v", err)
+			handler.Error(err)
+			return
+		}
+	}
+
+	// 5.保存文件到本地目录
+	err = c.SaveUploadedFile(file, savePath)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		handler.Error(err)
+		return
+	}
+
+	saveFile, err := os.Open(savePath)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		handler.Error(err)
+		return
+	}
+
+	var typ = uint32(0)
+	var fileBytes []byte
+	_, err = saveFile.Read(fileBytes)
+	if err != nil {
+		return
+	}
+	if isImageByExtension(fileName) || isImageByMagicNumber(fileBytes) {
+		typ = uint32(lbsingle.ModelFile_TypeImage)
+	}
+
+	// 6.构造保存结构
+	var fileInfo = &lbsingle.ModelFile{
+		Size:    file.Size,
+		Name:    file.Filename,
+		Rename:  fileName,
+		Path:    savePath,
+		Md5:     tool.GetFileMd5(saveFile),
+		SortUrl: "",
+		Type:    typ,
+	}
+
+	sUrl := compress.GenShortUrl(compress.CharsetRandomAlphanumeric, savePath, func(url, keyword string) bool {
+		_, err := cache.GetFileBySortUrl(keyword)
+		if err != nil && !cache.IsNotFound(err) {
+			log.Errorf("err:%v", err)
+			return true
+		}
+		if cache.IsNotFound(err) {
+			return true
+		}
+		return false
+	})
+	if sUrl == "" {
+		handler.Error(lbsingle.ErrFileUploadFailure)
+		return
+	}
+	fileInfo.SortUrl = sUrl
+
+	// 7.保存
+	var aSync = c.GetHeader(constant2.HEADER_LBSINGLE_ASYNC)
+	var fileList = []*lbsingle.ModelFile{fileInfo}
+	if aSync != "" {
+		err = MqTopicSyncFile.Pub(nCtx, &lbsingle.MqSyncFile{
+			FileList: fileList,
+		})
+	} else {
+		err = doSingleFileLogic(nCtx, fileInfo)
+	}
+	if err != nil {
+		log.Errorf("err:%v", err)
+		handler.Error(err)
+		return
+	}
+
+	// 8.返回文件唯一索引
+	handler.HttpJson(sUrl)
+}
+
+func handleUploadDeployFile(c *gin.Context) {
+	handler := bgin.NewHandler(c)
+	nCtx := bctx.NewCtx(
+		c,
+		bctx.WithGinHeaderAuthorization(c),
+	)
+
+	// 1.获取文件信息
+	file, err := c.FormFile("file")
+	if err != nil {
+		log.Errorf("err:%v", err)
+		handler.Error(err)
+		return
+	}
+
+	// 2.构造文件存储路径
+	fileName := path.Base(file.Filename)
+	filePath := path.Join(constant2.BaseDeployPath)
 	savePath := path.Join(filePath, fileName)
 
 	// 判断如果是windows环境 则需要将 savePath ToSlash
@@ -308,6 +421,7 @@ func handleUploadFile(c *gin.Context) {
 		Path:    savePath,
 		Md5:     tool.GetFileMd5(saveFile),
 		SortUrl: "",
+		Type:    uint32(lbsingle.ModelFile_TypeSrvPack),
 	}
 
 	sUrl := compress.GenShortUrl(compress.CharsetRandomAlphanumeric, savePath, func(url, keyword string) bool {
@@ -328,7 +442,7 @@ func handleUploadFile(c *gin.Context) {
 	fileInfo.SortUrl = sUrl
 
 	// 7.保存
-	var aSync = c.GetHeader(constant.HEADER_LBSINGLE_ASYNC)
+	var aSync = c.GetHeader(constant2.HEADER_LBSINGLE_ASYNC)
 	var fileList = []*lbsingle.ModelFile{fileInfo}
 	if aSync != "" {
 		err = MqTopicSyncFile.Pub(nCtx, &lbsingle.MqSyncFile{
@@ -385,6 +499,20 @@ func handleDownloadFile(ctx *gin.Context) {
 			handler.Error(lbsingle.ErrFileNotFound)
 			return
 		}
+
+		// 重新存一下缓存
+		if err == nil {
+			buf, err := marshal.PbMarshal(modelFile)
+			if err != nil {
+				log.Errorf("err:%v", err)
+				return
+			}
+			err = cache.SetFileBySortUrl(modelFile.SortUrl, string(buf))
+			if err != nil {
+				log.Errorf("err:%v", err)
+			}
+		}
+
 		fileName = url.QueryEscape(modelFile.Name)
 		filePath = modelFile.Path
 	default:
@@ -403,103 +531,42 @@ func handleDownloadFile(ctx *gin.Context) {
 	ctx.File(filePath)
 }
 
-func handleUploadDeployFile(c *gin.Context) {
-	handler := bgin.NewHandler(c)
-	nCtx := bctx.NewCtx(
-		c,
-		bctx.WithGinHeaderAuthorization(c),
-	)
-
-	// 1.获取文件信息
-	file, err := c.FormFile("file")
-	if err != nil {
-		log.Errorf("err:%v", err)
-		handler.Error(err)
-		return
-	}
-
-	// 2.构造文件存储路径, 可以很方便的按照天进行数据同步
-	fileName := path.Base(file.Filename)
-	filePath := path.Join(constant.BaseDeployPath)
-	savePath := path.Join(filePath, fileName)
-
-	// 判断如果是windows环境 则需要将 savePath ToSlash
-	savePath = tool.ToSlash(savePath)
-
-	// 3.判断文件是否存在
-	if _, err = os.Stat(savePath); err == nil {
-		handler.Error(lbsingle.ErrFileAlreadyExist)
-		return
-	}
-
-	// 4.创建存储路径文件夹
-	if !utils.FileExists(filePath) {
-		err = os.MkdirAll(filePath, 0775)
-		if err != nil {
-			log.Errorf("err:%v", err)
-			handler.Error(err)
-			return
-		}
-	}
-
-	// 5.保存文件到本地目录
-	err = c.SaveUploadedFile(file, savePath)
-	if err != nil {
-		log.Errorf("err:%v", err)
-		handler.Error(err)
-		return
-	}
-
-	saveFile, err := os.Open(savePath)
-	if err != nil {
-		log.Errorf("err:%v", err)
-		handler.Error(err)
-		return
-	}
-
-	// 6.构造保存结构
-	var fileInfo = &lbsingle.ModelFile{
-		Size:    file.Size,
-		Name:    file.Filename,
-		Rename:  fileName,
-		Path:    savePath,
-		Md5:     tool.GetFileMd5(saveFile),
-		SortUrl: "",
-	}
-
-	sUrl := compress.GenShortUrl(compress.CharsetRandomAlphanumeric, savePath, func(url, keyword string) bool {
-		_, err := cache.GetFileBySortUrl(keyword)
-		if err != nil && !cache.IsNotFound(err) {
-			log.Errorf("err:%v", err)
-			return true
-		}
-		if cache.IsNotFound(err) {
-			return true
-		}
+// 通过文件头信息（魔术字节）判断
+func isImageByMagicNumber(data []byte) bool {
+	if len(data) < 4 {
 		return false
-	})
-	if sUrl == "" {
-		handler.Error(lbsingle.ErrFileUploadFailure)
-		return
-	}
-	fileInfo.SortUrl = sUrl
-
-	// 7.保存
-	var aSync = c.GetHeader(constant.HEADER_LBSINGLE_ASYNC)
-	var fileList = []*lbsingle.ModelFile{fileInfo}
-	if aSync != "" {
-		err = MqTopicSyncFile.Pub(nCtx, &lbsingle.MqSyncFile{
-			FileList: fileList,
-		})
-	} else {
-		err = doSingleFileLogic(nCtx, fileInfo)
-	}
-	if err != nil {
-		log.Errorf("err:%v", err)
-		handler.Error(err)
-		return
 	}
 
-	// 8.返回文件唯一索引
-	handler.HttpJson(sUrl)
+	// 常见图片格式的魔术字节
+	magicNumbers := map[string][]byte{
+		"JPEG": {0xFF, 0xD8, 0xFF},
+		"PNG":  {0x89, 0x50, 0x4E, 0x47},
+		"GIF":  {0x47, 0x49, 0x46, 0x38},
+		"BMP":  {0x42, 0x4D},
+		"TIFF": {0x49, 0x49, 0x2A, 0x00},
+		"WEBP": {0x52, 0x49, 0x46, 0x46},
+	}
+
+	for _, magic := range magicNumbers {
+		if bytes.HasPrefix(data, magic) {
+			return true
+		}
+	}
+	return false
+}
+
+// 通过文件扩展名判断
+func isImageByExtension(filename string) bool {
+	ext := strings.ToLower(path.Ext(filename))
+	imageExtensions := map[string]bool{
+		".jpg":  true,
+		".jpeg": true,
+		".png":  true,
+		".gif":  true,
+		".bmp":  true,
+		".tiff": true,
+		".webp": true,
+		// 添加其他图片格式
+	}
+	return imageExtensions[ext]
 }

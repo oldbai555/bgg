@@ -10,7 +10,6 @@ import (
 	"github.com/oldbai555/micro/core"
 	"github.com/oldbai555/micro/gormx"
 	"github.com/oldbai555/micro/uctx"
-	"time"
 )
 
 func (a *LbwxmpServer) AddMpStoreOrder(ctx context.Context, req *lbwxmp.AddMpStoreOrderReq) (*lbwxmp.AddMpStoreOrderRsp, error) {
@@ -171,15 +170,12 @@ func (a *LbwxmpServer) MPShopOrderCreate(ctx context.Context, req *lbwxmp.MPShop
 	// 生成一个订单号
 	order := &lbwxmp.ModelMpStoreOrder{
 		OrderSn:       orderSn,
-		MpUid:         user.Id,
-		NumberId:      int64(orderNumber.GetId()), // 取餐号
+		CreatorId:     user.Id,
+		NumberId:      orderNumber.Id, // 取餐号
 		MpStoreShopId: storeShop.Id,
-		GetAt:         uint32(time.Now().Add(time.Duration(req.GetGetTime()) * time.Minute).Unix()),
 		TotalNum:      1,
-		PayType:       req.PayType,
-		Mark:          req.Remark,
-		ShippingType:  2, // 默认门店自提
-		OrderType:     req.OrderType,
+		PayType:       int32(lbwxmp.ModelMpStoreOrder_PayTypeBalance),
+		Remark:        req.Remark,
 	}
 
 	err = OrmMpStoreOrder.NewBaseScope().Create(uCtx, order)
@@ -196,15 +192,17 @@ func (a *LbwxmpServer) MPShopOrderCreate(ctx context.Context, req *lbwxmp.MPShop
 			return nil, err
 		}
 		var shopCar = &lbwxmp.ModelMpStoreOrderCartInfo{
-			MpOrderId:    order.Id,
-			OrderSn:      orderSn,
-			ProductId:    productId,
-			Unique:       utils.GenUUID(),
-			IsAfterSales: 0,
-			Title:        product.Name,
-			Image:        product.Image,
-			Number:       1,
-			Spec:         req.Spec[i],
+			Id:        0,
+			CreatedAt: 0,
+			UpdatedAt: 0,
+			DeletedAt: 0,
+			CreatorId: user.Id,
+			MpOrderId: order.Id,
+			OrderSn:   orderSn,
+			ProductId: productId,
+			Title:     product.Name,
+			Image:     product.Image,
+			Number:    req.Number[i],
 		}
 		err = OrmMpStoreOrderCartInfo.NewBaseScope().Create(uCtx, shopCar)
 		if err != nil {
