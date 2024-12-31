@@ -639,6 +639,8 @@ func (m *ModelFile) validate(all bool) error {
 
 	// no validation rules for Type
 
+	// no validation rules for BucketPath
+
 	if len(errors) > 0 {
 		return ModelFileMultiError(errors)
 	}
@@ -1145,6 +1147,8 @@ func (m *ModelDailyShortSentences) validate(all bool) error {
 	// no validation rules for Img
 
 	// no validation rules for LiteratureAuthor
+
+	// no validation rules for ConvertImg
 
 	if len(errors) > 0 {
 		return ModelDailyShortSentencesMultiError(errors)

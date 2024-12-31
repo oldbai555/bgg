@@ -73,6 +73,11 @@ var ModelFile = &engine.ModelObjectType{
 				Type:      "uint32",
 				IsArray:   false,
 			},
+			{
+				FieldName: "bucket_path",
+				Type:      "string",
+				IsArray:   false,
+			},
 		},
 	},
 }
@@ -312,6 +317,11 @@ var ModelDailyShortSentences = &engine.ModelObjectType{
 			},
 			{
 				FieldName: "literature_author",
+				Type:      "string",
+				IsArray:   false,
+			},
+			{
+				FieldName: "convert_img",
 				Type:      "string",
 				IsArray:   false,
 			},
