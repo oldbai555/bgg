@@ -9,11 +9,13 @@ package lbsingleserver
 import (
 	"bytes"
 	"context"
+	"crypto/md5"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/nsqio/go-nsq"
 	"github.com/oldbai555/bgg/pkg/bctx"
 	"github.com/oldbai555/bgg/pkg/compress"
-	constant2 "github.com/oldbai555/bgg/pkg/constant"
+	"github.com/oldbai555/bgg/pkg/constant"
 	"github.com/oldbai555/bgg/pkg/marshal"
 	"github.com/oldbai555/bgg/pkg/tool"
 	"github.com/oldbai555/bgg/service/lbsingle"
@@ -59,7 +61,7 @@ func SyncFileIndex(ctx context.Context, cacheAllFile bool) error {
 	var newFileList []*lbsingle.ModelFile
 
 	// 同步本地文件
-	err = tool.ListFile(constant2.BaseStoragePath, func(path string, info os.FileInfo) {
+	err = tool.ListFile(constant.BaseStoragePath, func(path string, info os.FileInfo) {
 		file, err := os.Open(path)
 		if err != nil {
 			log.Errorf("err:%v", err)
@@ -244,10 +246,8 @@ func MqTopicByCacheAllFileHandler(msg *nsq.Message) error {
 
 func handleUploadFile(c *gin.Context) {
 	handler := bgin.NewHandler(c)
-	nCtx := bctx.NewCtx(
-		c,
-		bctx.WithGinHeaderAuthorization(c),
-	)
+	nCtx := bctx.NewCtx(c, bctx.WithGinHeaderAuthorization(c))
+
 	_, err := CheckAuth(nCtx)
 	if err != nil {
 		log.Errorf("err:%v", err)
@@ -255,7 +255,7 @@ func handleUploadFile(c *gin.Context) {
 		return
 	}
 
-	// 1.获取文件信息
+	// 获取文件信息
 	file, err := c.FormFile("file")
 	if err != nil {
 		log.Errorf("err:%v", err)
@@ -263,112 +263,29 @@ func handleUploadFile(c *gin.Context) {
 		return
 	}
 
-	// 2.构造文件存储路径, 可以很方便的按照天进行数据同步
-	fileName := utils.Md5(utils.GenUUID()) + path.Ext(file.Filename)
-	timeFmt := time.Unix(time.Now().Unix(), 0).Format("20060102")
-	filePath := path.Join(constant2.BaseStoragePath, timeFmt)
-	savePath := path.Join(filePath, fileName)
-
-	// 判断如果是windows环境 则需要将 savePath ToSlash
-	savePath = tool.ToSlash(savePath)
-
-	// 3.判断文件是否存在
-	if _, err = os.Stat(savePath); err == nil {
-		handler.Error(lbsingle.ErrFileAlreadyExist)
-		return
-	}
-
-	// 4.创建存储路径文件夹
-	if !utils.FileExists(filePath) {
-		err = os.MkdirAll(filePath, 0775)
-		if err != nil {
-			log.Errorf("err:%v", err)
-			handler.Error(err)
-			return
-		}
-	}
-
-	// 5.保存文件到本地目录
-	err = c.SaveUploadedFile(file, savePath)
+	open, err := file.Open()
 	if err != nil {
 		log.Errorf("err:%v", err)
 		handler.Error(err)
 		return
 	}
 
-	saveFile, err := os.Open(savePath)
+	surl, err := saveFile(nCtx, 0, constant.BaseStoragePath, file.Filename, open)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		handler.Error(err)
 		return
 	}
 
-	var typ = uint32(0)
-	var fileBytes []byte
-	_, err = saveFile.Read(fileBytes)
-	if err != nil {
-		return
-	}
-	if isImageByExtension(fileName) || isImageByMagicNumber(fileBytes) {
-		typ = uint32(lbsingle.ModelFile_TypeImage)
-	}
-
-	// 6.构造保存结构
-	var fileInfo = &lbsingle.ModelFile{
-		Size:    file.Size,
-		Name:    file.Filename,
-		Rename:  fileName,
-		Path:    savePath,
-		Md5:     tool.GetFileMd5(saveFile),
-		SortUrl: "",
-		Type:    typ,
-	}
-
-	sUrl := compress.GenShortUrl(compress.CharsetRandomAlphanumeric, savePath, func(url, keyword string) bool {
-		_, err := cache.GetFileBySortUrl(keyword)
-		if err != nil && !cache.IsNotFound(err) {
-			log.Errorf("err:%v", err)
-			return true
-		}
-		if cache.IsNotFound(err) {
-			return true
-		}
-		return false
-	})
-	if sUrl == "" {
-		handler.Error(lbsingle.ErrFileUploadFailure)
-		return
-	}
-	fileInfo.SortUrl = sUrl
-
-	// 7.保存
-	var aSync = c.GetHeader(constant2.HEADER_LBSINGLE_ASYNC)
-	var fileList = []*lbsingle.ModelFile{fileInfo}
-	if aSync != "" {
-		err = MqTopicSyncFile.Pub(nCtx, &lbsingle.MqSyncFile{
-			FileList: fileList,
-		})
-	} else {
-		err = doSingleFileLogic(nCtx, fileInfo)
-	}
-	if err != nil {
-		log.Errorf("err:%v", err)
-		handler.Error(err)
-		return
-	}
-
-	// 8.返回文件唯一索引
-	handler.HttpJson(sUrl)
+	// 返回文件 URl
+	handler.HttpJson(surl)
 }
 
 func handleUploadDeployFile(c *gin.Context) {
 	handler := bgin.NewHandler(c)
-	nCtx := bctx.NewCtx(
-		c,
-		bctx.WithGinHeaderAuthorization(c),
-	)
+	nCtx := bctx.NewCtx(c)
 
-	// 1.获取文件信息
+	// 获取文件信息
 	file, err := c.FormFile("file")
 	if err != nil {
 		log.Errorf("err:%v", err)
@@ -376,91 +293,22 @@ func handleUploadDeployFile(c *gin.Context) {
 		return
 	}
 
-	// 2.构造文件存储路径
-	fileName := path.Base(file.Filename)
-	filePath := path.Join(constant2.BaseDeployPath)
-	savePath := path.Join(filePath, fileName)
-
-	// 判断如果是windows环境 则需要将 savePath ToSlash
-	savePath = tool.ToSlash(savePath)
-
-	// 3.判断文件是否存在
-	if _, err = os.Stat(savePath); err == nil {
-		handler.Error(lbsingle.ErrFileAlreadyExist)
-		return
-	}
-
-	// 4.创建存储路径文件夹
-	if !utils.FileExists(filePath) {
-		err = os.MkdirAll(filePath, 0775)
-		if err != nil {
-			log.Errorf("err:%v", err)
-			handler.Error(err)
-			return
-		}
-	}
-
-	// 5.保存文件到本地目录
-	err = c.SaveUploadedFile(file, savePath)
+	open, err := file.Open()
 	if err != nil {
 		log.Errorf("err:%v", err)
 		handler.Error(err)
 		return
 	}
 
-	saveFile, err := os.Open(savePath)
+	surl, err := saveFile(nCtx, uint32(lbsingle.ModelFile_TypeSrvPack), constant.BaseDeployPath, file.Filename, open)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		handler.Error(err)
 		return
 	}
 
-	// 6.构造保存结构
-	var fileInfo = &lbsingle.ModelFile{
-		Size:    file.Size,
-		Name:    file.Filename,
-		Rename:  fileName,
-		Path:    savePath,
-		Md5:     tool.GetFileMd5(saveFile),
-		SortUrl: "",
-		Type:    uint32(lbsingle.ModelFile_TypeSrvPack),
-	}
-
-	sUrl := compress.GenShortUrl(compress.CharsetRandomAlphanumeric, savePath, func(url, keyword string) bool {
-		_, err := cache.GetFileBySortUrl(keyword)
-		if err != nil && !cache.IsNotFound(err) {
-			log.Errorf("err:%v", err)
-			return true
-		}
-		if cache.IsNotFound(err) {
-			return true
-		}
-		return false
-	})
-	if sUrl == "" {
-		handler.Error(lbsingle.ErrFileUploadFailure)
-		return
-	}
-	fileInfo.SortUrl = sUrl
-
-	// 7.保存
-	var aSync = c.GetHeader(constant2.HEADER_LBSINGLE_ASYNC)
-	var fileList = []*lbsingle.ModelFile{fileInfo}
-	if aSync != "" {
-		err = MqTopicSyncFile.Pub(nCtx, &lbsingle.MqSyncFile{
-			FileList: fileList,
-		})
-	} else {
-		err = doSingleFileLogic(nCtx, fileInfo)
-	}
-	if err != nil {
-		log.Errorf("err:%v", err)
-		handler.Error(err)
-		return
-	}
-
-	// 8.返回文件唯一索引
-	handler.HttpJson(sUrl)
+	// 返回文件 URl
+	handler.HttpJson(surl)
 }
 
 func handleDownloadFile(ctx *gin.Context) {
@@ -574,56 +422,153 @@ func isImageByExtension(filename string) bool {
 }
 
 // downloadFile 下载文件并保存到本地
-func downloadFile(url string, rootPath, fileName string) (string, error) {
+func downloadFile(url string, basePath, fileName string) (string, error) {
 	// 发送HTTP GET请求
 	resp, err := http.Get(url)
 	if err != nil {
+		log.Errorf("err:%v", err)
 		return "", err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		closeErr := resp.Body.Close()
+		if closeErr != nil {
+			log.Errorf("closeErr:%v", closeErr)
+		}
+	}()
+	return saveFile(bctx.NewCtx(context.Background()), 0, basePath, fileName, resp.Body)
+}
 
-	// 创建文件
-	filePath := path.Join(rootPath, fileName)
-	out, err := os.Create(filePath)
+// 保存文件
+func saveFile(ctx uctx.IUCtx, fileType uint32, basePath, fileName string, fileReader io.Reader) (string, error) {
+	var fileBytes []byte
+	size, err := fileReader.Read(fileBytes)
 	if err != nil {
-		return "", err
-	}
-	defer out.Close()
-
-	// 将响应体复制到文件中
-	written, err := io.Copy(out, resp.Body)
-	if err != nil {
+		log.Errorf("err:%v", err)
 		return "", err
 	}
 
-	var fileInfo = &lbsingle.ModelFile{
-		Size:    written,
-		Name:    fileName,
-		Rename:  "",
-		Path:    filePath,
-		Md5:     tool.GetFileMd5(out),
-		SortUrl: "",
-		Type:    0,
+	if size == 0 {
+		log.Errorf("file size is zero")
+		return "", lbsingle.ErrFileNotFound
 	}
 
-	sUrl := compress.GenShortUrl(compress.CharsetRandomAlphanumeric, rootPath, func(url, keyword string) bool {
-		_, err := cache.GetFileBySortUrl(keyword)
-		if err != nil && !cache.IsNotFound(err) {
+	if fileType == 0 {
+		if isImageByExtension(fileName) || isImageByMagicNumber(fileBytes) {
+			fileType = uint32(lbsingle.ModelFile_TypeImage)
+		}
+	}
+
+	if basePath == "" {
+		basePath = constant.BaseStoragePath
+	}
+
+	if fileName == "" {
+		fileName = utils.GenUUID() + ".bin"
+	}
+
+	md5h := md5.New()
+	md5h.Write(fileBytes)
+	md5Str := fmt.Sprintf("%x", md5h.Sum(nil))
+	reFileName := md5Str + path.Ext(fileName)
+
+	timeFmt := time.Unix(time.Now().Unix(), 0).Format("20060102")
+	filePath := path.Join(basePath, timeFmt)
+	savePath := path.Join(filePath, reFileName)
+
+	// 判断如果是windows环境 则需要将 savePath ToSlash
+	savePath = tool.ToSlash(savePath)
+
+	file, err := OrmFile.NewBaseScope().Where(lbsingle.FieldMd5_, md5Str).First(ctx)
+	if err != nil && !OrmFile.IsNotFoundErr(err) {
+		log.Errorf("err:%v", err)
+		return "", err
+	}
+
+	// 本地文件
+	_, statErr := os.Stat(savePath)
+
+	// 本地存在且也入库
+	if statErr == nil && file != nil {
+		return url.JoinPath(file.BucketPath, file.SortUrl)
+	}
+
+	// 本地不存在 但是入库
+	if statErr != nil && file == nil {
+		_, err = OrmFile.NewBaseScope().Where(lbsingle.FieldMd5_, md5Str).Delete(ctx)
+		if err != nil && !OrmFile.IsNotFoundErr(err) {
 			log.Errorf("err:%v", err)
-			return true
+			return "", err
 		}
-		if cache.IsNotFound(err) {
-			return true
+	}
+
+	// 创建存储路径文件夹
+	if !utils.FileExists(filePath) {
+		err = os.MkdirAll(filePath, 0775)
+		if err != nil {
+			log.Errorf("err:%v", err)
+			return "", err
 		}
-		return false
+	}
+
+	// 生成短链
+	sUrl := compress.GenShortUrl(compress.CharsetRandomAlphanumeric, basePath, func(url, keyword string) bool {
+		_, err := cache.GetFileBySortUrl(keyword)
+		switch {
+		case err != nil && !cache.IsNotFound(err):
+			log.Errorf("err:%v", err)
+			_, err := OrmFile.NewBaseScope().Where(lbsingle.FieldSortUrl_, keyword).First(ctx)
+			if OrmFile.IsNotFoundErr(err) {
+				return true
+			}
+			return false
+		case cache.IsNotFound(err):
+			return true
+		default:
+			return false
+		}
 	})
 	if sUrl == "" {
-		return "", err
+		log.Errorf("gen sort url failed , err:%v", lbsingle.ErrFileAlreadyExist)
+		return "", lbsingle.ErrFileAlreadyExist
 	}
-	fileInfo.SortUrl = sUrl
-	err = doSingleFileLogic(bctx.NewCtx(context.Background()), fileInfo)
+
+	// 保存到本地
+	out, err := os.Create(savePath)
 	if err != nil {
+		log.Errorf("err:%v", err)
 		return "", err
 	}
-	return sUrl, err
+	defer func() {
+		closeErr := out.Close()
+		if closeErr != nil {
+			log.Errorf("closeErr:%v", closeErr)
+		}
+	}()
+
+	// 将响应体复制到文件中
+	_, err = io.Copy(out, fileReader)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return "", err
+	}
+
+	// 6.构造保存结构
+	var fileInfo = &lbsingle.ModelFile{
+		Size:       int64(size),
+		Name:       fileName,
+		Rename:     reFileName,
+		Path:       savePath,
+		Md5:        md5Str,
+		SortUrl:    sUrl,
+		Type:       fileType,
+		BucketPath: "https://oldbai.top/oss/download/",
+	}
+
+	// 保存到数据库和缓存
+	err = doSingleFileLogic(ctx, fileInfo)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return "", err
+	}
+	return url.JoinPath(file.BucketPath, file.SortUrl)
 }
