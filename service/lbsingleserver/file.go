@@ -185,6 +185,12 @@ func doSingleFileLogic(ctx uctx.IUCtx, file *lbsingle.ModelFile) error {
 			log.Errorf("err:%v", err)
 			return err
 		}
+		_, err = OrmFile.NewBaseScope().Update(ctx, map[string]interface{}{
+			lbsingle.FieldSortUrl_: file.SortUrl,
+		})
+		if err != nil {
+			log.Errorf("err:%v", err)
+		}
 		return cache.SetFileBySortUrl(file.SortUrl, string(buf))
 	}
 
@@ -440,12 +446,13 @@ func downloadFile(url string, basePath, fileName string) (string, error) {
 
 // 保存文件
 func saveFile(ctx uctx.IUCtx, fileType uint32, basePath, fileName string, fileReader io.Reader) (string, error) {
-	var fileBytes []byte
-	size, err := fileReader.Read(fileBytes)
+	var buf bytes.Buffer
+	_, err := io.Copy(&buf, fileReader)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return "", err
 	}
+	size := buf.Len()
 
 	if size == 0 {
 		log.Errorf("file size is zero")
@@ -453,7 +460,7 @@ func saveFile(ctx uctx.IUCtx, fileType uint32, basePath, fileName string, fileRe
 	}
 
 	if fileType == 0 {
-		if isImageByExtension(fileName) || isImageByMagicNumber(fileBytes) {
+		if isImageByExtension(fileName) || isImageByMagicNumber(buf.Bytes()) {
 			fileType = uint32(lbsingle.ModelFile_TypeImage)
 		}
 	}
@@ -467,7 +474,7 @@ func saveFile(ctx uctx.IUCtx, fileType uint32, basePath, fileName string, fileRe
 	}
 
 	md5h := md5.New()
-	md5h.Write(fileBytes)
+	md5h.Write(buf.Bytes())
 	md5Str := fmt.Sprintf("%x", md5h.Sum(nil))
 	reFileName := md5Str + path.Ext(fileName)
 
@@ -546,7 +553,7 @@ func saveFile(ctx uctx.IUCtx, fileType uint32, basePath, fileName string, fileRe
 	}()
 
 	// 将响应体复制到文件中
-	_, err = io.Copy(out, fileReader)
+	_, err = io.Copy(out, &buf)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return "", err
@@ -570,5 +577,5 @@ func saveFile(ctx uctx.IUCtx, fileType uint32, basePath, fileName string, fileRe
 		log.Errorf("err:%v", err)
 		return "", err
 	}
-	return url.JoinPath(file.BucketPath, file.SortUrl)
+	return url.JoinPath(fileInfo.BucketPath, fileInfo.SortUrl)
 }
