@@ -11,10 +11,11 @@ import (
 )
 
 var (
-	OrmFile    *gormx.BaseModel[*lbsingle.ModelFile]
-	OrmUser    *gormx.BaseModel[*lbsingle.ModelUser]
-	OrmChat    *gormx.BaseModel[*lbsingle.ModelChat]
-	OrmMessage *gormx.BaseModel[*lbsingle.ModelMessage]
+	OrmFile                *gormx.BaseModel[*lbsingle.ModelFile]
+	OrmUser                *gormx.BaseModel[*lbsingle.ModelUser]
+	OrmChat                *gormx.BaseModel[*lbsingle.ModelChat]
+	OrmMessage             *gormx.BaseModel[*lbsingle.ModelMessage]
+	OrmDailyShortSentences *gormx.BaseModel[*lbsingle.ModelDailyShortSentences]
 )
 
 func Init() (err error) {
@@ -32,6 +33,7 @@ func Init() (err error) {
 		&lbsingle.ModelUser{},
 		&lbsingle.ModelChat{},
 		&lbsingle.ModelMessage{},
+		&lbsingle.ModelDailyShortSentences{},
 	},
 	)
 	// 注入结构
@@ -41,6 +43,7 @@ func Init() (err error) {
 		autodb.ModelUser,
 		autodb.ModelChat,
 		autodb.ModelMessage,
+		autodb.ModelDailyShortSentences,
 	)
 
 	OrmFile = gormx.NewBaseModel[*lbsingle.ModelFile](gormx.ModelConfig{
@@ -57,6 +60,10 @@ func Init() (err error) {
 	})
 	OrmMessage = gormx.NewBaseModel[*lbsingle.ModelMessage](gormx.ModelConfig{
 		NotFoundErrCode: int32(lbsingle.ErrCode_ErrMessageNotFound),
+		Db:              "biz",
+	})
+	OrmDailyShortSentences = gormx.NewBaseModel[*lbsingle.ModelDailyShortSentences](gormx.ModelConfig{
+		NotFoundErrCode: int32(lbsingle.ErrCode_ErrDailyShortSentencesNotFound),
 		Db:              "biz",
 	})
 

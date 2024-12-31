@@ -39,4 +39,14 @@ var cmdList = []*bcmd.Cmd{
 	{Server: lbsingle.ServerName, Path: lbsingle.GetUserListCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.GetUserList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
 
 	{Server: lbsingle.ServerName, Path: lbsingle.CheckAuthSysCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.CheckAuthSys, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "system"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.AddDailyShortSentencesCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.AddDailyShortSentences, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.DelDailyShortSentencesListCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.DelDailyShortSentencesList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.UpdateDailyShortSentencesCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.UpdateDailyShortSentences, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.GetDailyShortSentencesCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.GetDailyShortSentences, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.GetDailyShortSentencesListCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.GetDailyShortSentencesList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
 }

@@ -1106,6 +1106,126 @@ var _ interface {
 	ErrorName() string
 } = ModelMessageValidationError{}
 
+// Validate checks the field values on ModelDailyShortSentences with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ModelDailyShortSentences) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ModelDailyShortSentences with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ModelDailyShortSentencesMultiError, or nil if none found.
+func (m *ModelDailyShortSentences) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ModelDailyShortSentences) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Id
+
+	// no validation rules for CreatedAt
+
+	// no validation rules for UpdatedAt
+
+	// no validation rules for DeletedAt
+
+	// no validation rules for CreatorId
+
+	// no validation rules for Type
+
+	// no validation rules for Content
+
+	// no validation rules for Img
+
+	// no validation rules for LiteratureAuthor
+
+	if len(errors) > 0 {
+		return ModelDailyShortSentencesMultiError(errors)
+	}
+
+	return nil
+}
+
+// ModelDailyShortSentencesMultiError is an error wrapping multiple validation
+// errors returned by ModelDailyShortSentences.ValidateAll() if the designated
+// constraints aren't met.
+type ModelDailyShortSentencesMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ModelDailyShortSentencesMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ModelDailyShortSentencesMultiError) AllErrors() []error { return m }
+
+// ModelDailyShortSentencesValidationError is the validation error returned by
+// ModelDailyShortSentences.Validate if the designated constraints aren't met.
+type ModelDailyShortSentencesValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ModelDailyShortSentencesValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ModelDailyShortSentencesValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ModelDailyShortSentencesValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ModelDailyShortSentencesValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ModelDailyShortSentencesValidationError) ErrorName() string {
+	return "ModelDailyShortSentencesValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ModelDailyShortSentencesValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sModelDailyShortSentences.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ModelDailyShortSentencesValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ModelDailyShortSentencesValidationError{}
+
 // Validate checks the field values on DelFileListReq with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -4849,3 +4969,1321 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = CheckAuthSysRspValidationError{}
+
+// Validate checks the field values on AddDailyShortSentencesReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *AddDailyShortSentencesReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddDailyShortSentencesReq with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AddDailyShortSentencesReqMultiError, or nil if none found.
+func (m *AddDailyShortSentencesReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddDailyShortSentencesReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetData() == nil {
+		err := AddDailyShortSentencesReqValidationError{
+			field:  "Data",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AddDailyShortSentencesReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AddDailyShortSentencesReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AddDailyShortSentencesReqValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return AddDailyShortSentencesReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// AddDailyShortSentencesReqMultiError is an error wrapping multiple validation
+// errors returned by AddDailyShortSentencesReq.ValidateAll() if the
+// designated constraints aren't met.
+type AddDailyShortSentencesReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddDailyShortSentencesReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddDailyShortSentencesReqMultiError) AllErrors() []error { return m }
+
+// AddDailyShortSentencesReqValidationError is the validation error returned by
+// AddDailyShortSentencesReq.Validate if the designated constraints aren't met.
+type AddDailyShortSentencesReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddDailyShortSentencesReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddDailyShortSentencesReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddDailyShortSentencesReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddDailyShortSentencesReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddDailyShortSentencesReqValidationError) ErrorName() string {
+	return "AddDailyShortSentencesReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AddDailyShortSentencesReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddDailyShortSentencesReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddDailyShortSentencesReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddDailyShortSentencesReqValidationError{}
+
+// Validate checks the field values on AddDailyShortSentencesRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *AddDailyShortSentencesRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddDailyShortSentencesRsp with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AddDailyShortSentencesRspMultiError, or nil if none found.
+func (m *AddDailyShortSentencesRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddDailyShortSentencesRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AddDailyShortSentencesRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AddDailyShortSentencesRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AddDailyShortSentencesRspValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return AddDailyShortSentencesRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// AddDailyShortSentencesRspMultiError is an error wrapping multiple validation
+// errors returned by AddDailyShortSentencesRsp.ValidateAll() if the
+// designated constraints aren't met.
+type AddDailyShortSentencesRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddDailyShortSentencesRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddDailyShortSentencesRspMultiError) AllErrors() []error { return m }
+
+// AddDailyShortSentencesRspValidationError is the validation error returned by
+// AddDailyShortSentencesRsp.Validate if the designated constraints aren't met.
+type AddDailyShortSentencesRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddDailyShortSentencesRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddDailyShortSentencesRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddDailyShortSentencesRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddDailyShortSentencesRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddDailyShortSentencesRspValidationError) ErrorName() string {
+	return "AddDailyShortSentencesRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AddDailyShortSentencesRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddDailyShortSentencesRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddDailyShortSentencesRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddDailyShortSentencesRspValidationError{}
+
+// Validate checks the field values on UpdateDailyShortSentencesReq with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *UpdateDailyShortSentencesReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdateDailyShortSentencesReq with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpdateDailyShortSentencesReqMultiError, or nil if none found.
+func (m *UpdateDailyShortSentencesReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdateDailyShortSentencesReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetData() == nil {
+		err := UpdateDailyShortSentencesReqValidationError{
+			field:  "Data",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UpdateDailyShortSentencesReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UpdateDailyShortSentencesReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpdateDailyShortSentencesReqValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return UpdateDailyShortSentencesReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpdateDailyShortSentencesReqMultiError is an error wrapping multiple
+// validation errors returned by UpdateDailyShortSentencesReq.ValidateAll() if
+// the designated constraints aren't met.
+type UpdateDailyShortSentencesReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdateDailyShortSentencesReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdateDailyShortSentencesReqMultiError) AllErrors() []error { return m }
+
+// UpdateDailyShortSentencesReqValidationError is the validation error returned
+// by UpdateDailyShortSentencesReq.Validate if the designated constraints
+// aren't met.
+type UpdateDailyShortSentencesReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateDailyShortSentencesReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateDailyShortSentencesReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateDailyShortSentencesReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateDailyShortSentencesReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateDailyShortSentencesReqValidationError) ErrorName() string {
+	return "UpdateDailyShortSentencesReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateDailyShortSentencesReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateDailyShortSentencesReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateDailyShortSentencesReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateDailyShortSentencesReqValidationError{}
+
+// Validate checks the field values on UpdateDailyShortSentencesRsp with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *UpdateDailyShortSentencesRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdateDailyShortSentencesRsp with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpdateDailyShortSentencesRspMultiError, or nil if none found.
+func (m *UpdateDailyShortSentencesRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdateDailyShortSentencesRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return UpdateDailyShortSentencesRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpdateDailyShortSentencesRspMultiError is an error wrapping multiple
+// validation errors returned by UpdateDailyShortSentencesRsp.ValidateAll() if
+// the designated constraints aren't met.
+type UpdateDailyShortSentencesRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdateDailyShortSentencesRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdateDailyShortSentencesRspMultiError) AllErrors() []error { return m }
+
+// UpdateDailyShortSentencesRspValidationError is the validation error returned
+// by UpdateDailyShortSentencesRsp.Validate if the designated constraints
+// aren't met.
+type UpdateDailyShortSentencesRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateDailyShortSentencesRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateDailyShortSentencesRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateDailyShortSentencesRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateDailyShortSentencesRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateDailyShortSentencesRspValidationError) ErrorName() string {
+	return "UpdateDailyShortSentencesRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateDailyShortSentencesRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateDailyShortSentencesRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateDailyShortSentencesRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateDailyShortSentencesRspValidationError{}
+
+// Validate checks the field values on DelDailyShortSentencesListReq with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DelDailyShortSentencesListReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DelDailyShortSentencesListReq with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// DelDailyShortSentencesListReqMultiError, or nil if none found.
+func (m *DelDailyShortSentencesListReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DelDailyShortSentencesListReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetListOption() == nil {
+		err := DelDailyShortSentencesListReqValidationError{
+			field:  "ListOption",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetListOption()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DelDailyShortSentencesListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DelDailyShortSentencesListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetListOption()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DelDailyShortSentencesListReqValidationError{
+				field:  "ListOption",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return DelDailyShortSentencesListReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// DelDailyShortSentencesListReqMultiError is an error wrapping multiple
+// validation errors returned by DelDailyShortSentencesListReq.ValidateAll()
+// if the designated constraints aren't met.
+type DelDailyShortSentencesListReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DelDailyShortSentencesListReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DelDailyShortSentencesListReqMultiError) AllErrors() []error { return m }
+
+// DelDailyShortSentencesListReqValidationError is the validation error
+// returned by DelDailyShortSentencesListReq.Validate if the designated
+// constraints aren't met.
+type DelDailyShortSentencesListReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DelDailyShortSentencesListReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DelDailyShortSentencesListReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DelDailyShortSentencesListReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DelDailyShortSentencesListReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DelDailyShortSentencesListReqValidationError) ErrorName() string {
+	return "DelDailyShortSentencesListReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DelDailyShortSentencesListReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDelDailyShortSentencesListReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DelDailyShortSentencesListReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DelDailyShortSentencesListReqValidationError{}
+
+// Validate checks the field values on DelDailyShortSentencesListRsp with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DelDailyShortSentencesListRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DelDailyShortSentencesListRsp with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// DelDailyShortSentencesListRspMultiError, or nil if none found.
+func (m *DelDailyShortSentencesListRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DelDailyShortSentencesListRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return DelDailyShortSentencesListRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// DelDailyShortSentencesListRspMultiError is an error wrapping multiple
+// validation errors returned by DelDailyShortSentencesListRsp.ValidateAll()
+// if the designated constraints aren't met.
+type DelDailyShortSentencesListRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DelDailyShortSentencesListRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DelDailyShortSentencesListRspMultiError) AllErrors() []error { return m }
+
+// DelDailyShortSentencesListRspValidationError is the validation error
+// returned by DelDailyShortSentencesListRsp.Validate if the designated
+// constraints aren't met.
+type DelDailyShortSentencesListRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DelDailyShortSentencesListRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DelDailyShortSentencesListRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DelDailyShortSentencesListRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DelDailyShortSentencesListRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DelDailyShortSentencesListRspValidationError) ErrorName() string {
+	return "DelDailyShortSentencesListRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DelDailyShortSentencesListRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDelDailyShortSentencesListRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DelDailyShortSentencesListRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DelDailyShortSentencesListRspValidationError{}
+
+// Validate checks the field values on GetDailyShortSentencesReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetDailyShortSentencesReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetDailyShortSentencesReq with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetDailyShortSentencesReqMultiError, or nil if none found.
+func (m *GetDailyShortSentencesReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetDailyShortSentencesReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetId() <= 0 {
+		err := GetDailyShortSentencesReqValidationError{
+			field:  "Id",
+			reason: "value must be greater than 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return GetDailyShortSentencesReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetDailyShortSentencesReqMultiError is an error wrapping multiple validation
+// errors returned by GetDailyShortSentencesReq.ValidateAll() if the
+// designated constraints aren't met.
+type GetDailyShortSentencesReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetDailyShortSentencesReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetDailyShortSentencesReqMultiError) AllErrors() []error { return m }
+
+// GetDailyShortSentencesReqValidationError is the validation error returned by
+// GetDailyShortSentencesReq.Validate if the designated constraints aren't met.
+type GetDailyShortSentencesReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetDailyShortSentencesReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetDailyShortSentencesReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetDailyShortSentencesReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetDailyShortSentencesReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetDailyShortSentencesReqValidationError) ErrorName() string {
+	return "GetDailyShortSentencesReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetDailyShortSentencesReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetDailyShortSentencesReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetDailyShortSentencesReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetDailyShortSentencesReqValidationError{}
+
+// Validate checks the field values on GetDailyShortSentencesRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetDailyShortSentencesRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetDailyShortSentencesRsp with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetDailyShortSentencesRspMultiError, or nil if none found.
+func (m *GetDailyShortSentencesRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetDailyShortSentencesRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetDailyShortSentencesRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetDailyShortSentencesRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetDailyShortSentencesRspValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetDailyShortSentencesRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetDailyShortSentencesRspMultiError is an error wrapping multiple validation
+// errors returned by GetDailyShortSentencesRsp.ValidateAll() if the
+// designated constraints aren't met.
+type GetDailyShortSentencesRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetDailyShortSentencesRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetDailyShortSentencesRspMultiError) AllErrors() []error { return m }
+
+// GetDailyShortSentencesRspValidationError is the validation error returned by
+// GetDailyShortSentencesRsp.Validate if the designated constraints aren't met.
+type GetDailyShortSentencesRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetDailyShortSentencesRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetDailyShortSentencesRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetDailyShortSentencesRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetDailyShortSentencesRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetDailyShortSentencesRspValidationError) ErrorName() string {
+	return "GetDailyShortSentencesRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetDailyShortSentencesRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetDailyShortSentencesRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetDailyShortSentencesRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetDailyShortSentencesRspValidationError{}
+
+// Validate checks the field values on GetDailyShortSentencesListReq with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetDailyShortSentencesListReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetDailyShortSentencesListReq with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// GetDailyShortSentencesListReqMultiError, or nil if none found.
+func (m *GetDailyShortSentencesListReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetDailyShortSentencesListReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetListOption() == nil {
+		err := GetDailyShortSentencesListReqValidationError{
+			field:  "ListOption",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetListOption()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetDailyShortSentencesListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetDailyShortSentencesListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetListOption()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetDailyShortSentencesListReqValidationError{
+				field:  "ListOption",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetDailyShortSentencesListReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetDailyShortSentencesListReqMultiError is an error wrapping multiple
+// validation errors returned by GetDailyShortSentencesListReq.ValidateAll()
+// if the designated constraints aren't met.
+type GetDailyShortSentencesListReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetDailyShortSentencesListReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetDailyShortSentencesListReqMultiError) AllErrors() []error { return m }
+
+// GetDailyShortSentencesListReqValidationError is the validation error
+// returned by GetDailyShortSentencesListReq.Validate if the designated
+// constraints aren't met.
+type GetDailyShortSentencesListReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetDailyShortSentencesListReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetDailyShortSentencesListReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetDailyShortSentencesListReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetDailyShortSentencesListReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetDailyShortSentencesListReqValidationError) ErrorName() string {
+	return "GetDailyShortSentencesListReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetDailyShortSentencesListReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetDailyShortSentencesListReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetDailyShortSentencesListReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetDailyShortSentencesListReqValidationError{}
+
+// Validate checks the field values on GetDailyShortSentencesListRsp with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetDailyShortSentencesListRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetDailyShortSentencesListRsp with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// GetDailyShortSentencesListRspMultiError, or nil if none found.
+func (m *GetDailyShortSentencesListRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetDailyShortSentencesListRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetPaginate()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetDailyShortSentencesListRspValidationError{
+					field:  "Paginate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetDailyShortSentencesListRspValidationError{
+					field:  "Paginate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPaginate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetDailyShortSentencesListRspValidationError{
+				field:  "Paginate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	for idx, item := range m.GetList() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, GetDailyShortSentencesListRspValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, GetDailyShortSentencesListRspValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return GetDailyShortSentencesListRspValidationError{
+					field:  fmt.Sprintf("List[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return GetDailyShortSentencesListRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetDailyShortSentencesListRspMultiError is an error wrapping multiple
+// validation errors returned by GetDailyShortSentencesListRsp.ValidateAll()
+// if the designated constraints aren't met.
+type GetDailyShortSentencesListRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetDailyShortSentencesListRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetDailyShortSentencesListRspMultiError) AllErrors() []error { return m }
+
+// GetDailyShortSentencesListRspValidationError is the validation error
+// returned by GetDailyShortSentencesListRsp.Validate if the designated
+// constraints aren't met.
+type GetDailyShortSentencesListRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetDailyShortSentencesListRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetDailyShortSentencesListRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetDailyShortSentencesListRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetDailyShortSentencesListRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetDailyShortSentencesListRspValidationError) ErrorName() string {
+	return "GetDailyShortSentencesListRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetDailyShortSentencesListRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetDailyShortSentencesListRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetDailyShortSentencesListRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetDailyShortSentencesListRspValidationError{}

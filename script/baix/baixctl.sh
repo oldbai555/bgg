@@ -84,7 +84,7 @@ safe_process_env
 
 case "$1" in
   "gacr" | "genAddCurdRpc")
-    genAddCurdRpc "$2" "$3" "$4"
+    genAddCurdRpc "$2" "$3"
     ;;
   "gap" | "genAddProto")
     genAddProto "$2"

@@ -390,3 +390,127 @@ func (a *LbsingleServer) CheckAuthSys(_ context.Context, req *lbsingle.CheckAuth
 	rsp.User = auth
 	return &rsp, err
 }
+func (a *LbsingleServer) AddDailyShortSentences(ctx context.Context, req *lbsingle.AddDailyShortSentencesReq) (*lbsingle.AddDailyShortSentencesRsp, error) {
+	var rsp lbsingle.AddDailyShortSentencesRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = OrmDailyShortSentences.NewBaseScope().Create(uCtx, req.Data)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = req.Data
+
+	return &rsp, err
+}
+func (a *LbsingleServer) DelDailyShortSentencesList(ctx context.Context, req *lbsingle.DelDailyShortSentencesListReq) (*lbsingle.DelDailyShortSentencesListRsp, error) {
+	var rsp lbsingle.DelDailyShortSentencesListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	listRsp, err := a.GetDailyShortSentencesList(ctx, &lbsingle.GetDailyShortSentencesListReq{
+		ListOption: req.ListOption.
+			SetSkipTotal().
+			AddOpt(core.DefaultListOption_DefaultListOptionSelect, lbsingle.FieldId_),
+	})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	if len(listRsp.List) == 0 {
+		log.Infof("list is empty")
+		return &rsp, nil
+	}
+
+	idList := utils.PluckUint64List(listRsp.List, lbsingle.FieldId)
+	_, err = OrmDailyShortSentences.NewBaseScope().WhereIn(lbsingle.FieldId_, idList).Delete(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+func (a *LbsingleServer) UpdateDailyShortSentences(ctx context.Context, req *lbsingle.UpdateDailyShortSentencesReq) (*lbsingle.UpdateDailyShortSentencesRsp, error) {
+	var rsp lbsingle.UpdateDailyShortSentencesRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmDailyShortSentences.NewBaseScope().Where(lbsingle.FieldId_, req.Data.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	_, err = OrmDailyShortSentences.NewBaseScope().Where(lbsingle.FieldId_, data.Id).Update(uCtx, utils.OrmStruct2Map(req.Data))
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}
+func (a *LbsingleServer) GetDailyShortSentences(ctx context.Context, req *lbsingle.GetDailyShortSentencesReq) (*lbsingle.GetDailyShortSentencesRsp, error) {
+	var rsp lbsingle.GetDailyShortSentencesRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	data, err := OrmDailyShortSentences.NewBaseScope().Where(lbsingle.FieldId_, req.Id).First(uCtx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+	rsp.Data = data
+
+	return &rsp, err
+}
+func (a *LbsingleServer) GetDailyShortSentencesList(ctx context.Context, req *lbsingle.GetDailyShortSentencesListReq) (*lbsingle.GetDailyShortSentencesListRsp, error) {
+	var rsp lbsingle.GetDailyShortSentencesListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	db := OrmDailyShortSentences.NewList(req.ListOption)
+	err = gormx.ProcessDefaultOptions[*lbsingle.ModelDailyShortSentences](req.ListOption, db)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	err = core.NewOptionsProcessor(req.ListOption).
+		Process()
+
+	rsp.Paginate, err = db.FindPaginate(uCtx, &rsp.List)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return nil, err
+	}
+
+	return &rsp, err
+}

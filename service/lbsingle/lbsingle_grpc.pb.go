@@ -88,6 +88,31 @@ type LbsingleClient interface {
 	// @desc:
 	// @error:
 	CheckAuthSys(ctx context.Context, in *CheckAuthSysReq, opts ...grpc.CallOption) (*CheckAuthSysRsp, error)
+	// @cat: DailyShortSentences
+	// @name:
+	// @desc:
+	// @error:
+	AddDailyShortSentences(ctx context.Context, in *AddDailyShortSentencesReq, opts ...grpc.CallOption) (*AddDailyShortSentencesRsp, error)
+	// @cat: DailyShortSentences
+	// @name:
+	// @desc:
+	// @error:
+	DelDailyShortSentencesList(ctx context.Context, in *DelDailyShortSentencesListReq, opts ...grpc.CallOption) (*DelDailyShortSentencesListRsp, error)
+	// @cat: DailyShortSentences
+	// @name:
+	// @desc:
+	// @error:
+	UpdateDailyShortSentences(ctx context.Context, in *UpdateDailyShortSentencesReq, opts ...grpc.CallOption) (*UpdateDailyShortSentencesRsp, error)
+	// @cat: DailyShortSentences
+	// @name:
+	// @desc:
+	// @error:
+	GetDailyShortSentences(ctx context.Context, in *GetDailyShortSentencesReq, opts ...grpc.CallOption) (*GetDailyShortSentencesRsp, error)
+	// @cat: DailyShortSentences
+	// @name:
+	// @desc:
+	// @error:
+	GetDailyShortSentencesList(ctx context.Context, in *GetDailyShortSentencesListReq, opts ...grpc.CallOption) (*GetDailyShortSentencesListRsp, error)
 }
 
 type lbsingleClient struct {
@@ -233,6 +258,51 @@ func (c *lbsingleClient) CheckAuthSys(ctx context.Context, in *CheckAuthSysReq, 
 	return out, nil
 }
 
+func (c *lbsingleClient) AddDailyShortSentences(ctx context.Context, in *AddDailyShortSentencesReq, opts ...grpc.CallOption) (*AddDailyShortSentencesRsp, error) {
+	out := new(AddDailyShortSentencesRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddDailyShortSentences", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) DelDailyShortSentencesList(ctx context.Context, in *DelDailyShortSentencesListReq, opts ...grpc.CallOption) (*DelDailyShortSentencesListRsp, error) {
+	out := new(DelDailyShortSentencesListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelDailyShortSentencesList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) UpdateDailyShortSentences(ctx context.Context, in *UpdateDailyShortSentencesReq, opts ...grpc.CallOption) (*UpdateDailyShortSentencesRsp, error) {
+	out := new(UpdateDailyShortSentencesRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateDailyShortSentences", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetDailyShortSentences(ctx context.Context, in *GetDailyShortSentencesReq, opts ...grpc.CallOption) (*GetDailyShortSentencesRsp, error) {
+	out := new(GetDailyShortSentencesRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetDailyShortSentences", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetDailyShortSentencesList(ctx context.Context, in *GetDailyShortSentencesListReq, opts ...grpc.CallOption) (*GetDailyShortSentencesListRsp, error) {
+	out := new(GetDailyShortSentencesListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetDailyShortSentencesList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // LbsingleServer is the server API for Lbsingle service.
 // All implementations must embed UnimplementedLbsingleServer
 // for forward compatibility
@@ -303,6 +373,31 @@ type LbsingleServer interface {
 	// @desc:
 	// @error:
 	CheckAuthSys(context.Context, *CheckAuthSysReq) (*CheckAuthSysRsp, error)
+	// @cat: DailyShortSentences
+	// @name:
+	// @desc:
+	// @error:
+	AddDailyShortSentences(context.Context, *AddDailyShortSentencesReq) (*AddDailyShortSentencesRsp, error)
+	// @cat: DailyShortSentences
+	// @name:
+	// @desc:
+	// @error:
+	DelDailyShortSentencesList(context.Context, *DelDailyShortSentencesListReq) (*DelDailyShortSentencesListRsp, error)
+	// @cat: DailyShortSentences
+	// @name:
+	// @desc:
+	// @error:
+	UpdateDailyShortSentences(context.Context, *UpdateDailyShortSentencesReq) (*UpdateDailyShortSentencesRsp, error)
+	// @cat: DailyShortSentences
+	// @name:
+	// @desc:
+	// @error:
+	GetDailyShortSentences(context.Context, *GetDailyShortSentencesReq) (*GetDailyShortSentencesRsp, error)
+	// @cat: DailyShortSentences
+	// @name:
+	// @desc:
+	// @error:
+	GetDailyShortSentencesList(context.Context, *GetDailyShortSentencesListReq) (*GetDailyShortSentencesListRsp, error)
 	mustEmbedUnimplementedLbsingleServer()
 }
 
@@ -354,6 +449,21 @@ func (UnimplementedLbsingleServer) GetUserList(context.Context, *GetUserListReq)
 }
 func (UnimplementedLbsingleServer) CheckAuthSys(context.Context, *CheckAuthSysReq) (*CheckAuthSysRsp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckAuthSys not implemented")
+}
+func (UnimplementedLbsingleServer) AddDailyShortSentences(context.Context, *AddDailyShortSentencesReq) (*AddDailyShortSentencesRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddDailyShortSentences not implemented")
+}
+func (UnimplementedLbsingleServer) DelDailyShortSentencesList(context.Context, *DelDailyShortSentencesListReq) (*DelDailyShortSentencesListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelDailyShortSentencesList not implemented")
+}
+func (UnimplementedLbsingleServer) UpdateDailyShortSentences(context.Context, *UpdateDailyShortSentencesReq) (*UpdateDailyShortSentencesRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateDailyShortSentences not implemented")
+}
+func (UnimplementedLbsingleServer) GetDailyShortSentences(context.Context, *GetDailyShortSentencesReq) (*GetDailyShortSentencesRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDailyShortSentences not implemented")
+}
+func (UnimplementedLbsingleServer) GetDailyShortSentencesList(context.Context, *GetDailyShortSentencesListReq) (*GetDailyShortSentencesListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDailyShortSentencesList not implemented")
 }
 func (UnimplementedLbsingleServer) mustEmbedUnimplementedLbsingleServer() {}
 
@@ -638,6 +748,96 @@ func _Lbsingle_CheckAuthSys_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Lbsingle_AddDailyShortSentences_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddDailyShortSentencesReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).AddDailyShortSentences(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/AddDailyShortSentences",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).AddDailyShortSentences(ctx, req.(*AddDailyShortSentencesReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_DelDailyShortSentencesList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelDailyShortSentencesListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).DelDailyShortSentencesList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/DelDailyShortSentencesList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).DelDailyShortSentencesList(ctx, req.(*DelDailyShortSentencesListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_UpdateDailyShortSentences_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateDailyShortSentencesReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).UpdateDailyShortSentences(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/UpdateDailyShortSentences",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).UpdateDailyShortSentences(ctx, req.(*UpdateDailyShortSentencesReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetDailyShortSentences_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDailyShortSentencesReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetDailyShortSentences(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetDailyShortSentences",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetDailyShortSentences(ctx, req.(*GetDailyShortSentencesReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetDailyShortSentencesList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDailyShortSentencesListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetDailyShortSentencesList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetDailyShortSentencesList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetDailyShortSentencesList(ctx, req.(*GetDailyShortSentencesListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Lbsingle_ServiceDesc is the grpc.ServiceDesc for Lbsingle service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -704,6 +904,26 @@ var Lbsingle_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CheckAuthSys",
 			Handler:    _Lbsingle_CheckAuthSys_Handler,
+		},
+		{
+			MethodName: "AddDailyShortSentences",
+			Handler:    _Lbsingle_AddDailyShortSentences_Handler,
+		},
+		{
+			MethodName: "DelDailyShortSentencesList",
+			Handler:    _Lbsingle_DelDailyShortSentencesList_Handler,
+		},
+		{
+			MethodName: "UpdateDailyShortSentences",
+			Handler:    _Lbsingle_UpdateDailyShortSentences_Handler,
+		},
+		{
+			MethodName: "GetDailyShortSentences",
+			Handler:    _Lbsingle_GetDailyShortSentences_Handler,
+		},
+		{
+			MethodName: "GetDailyShortSentencesList",
+			Handler:    _Lbsingle_GetDailyShortSentencesList_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

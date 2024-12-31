@@ -24,6 +24,8 @@ import (
 	"github.com/oldbai555/lbtool/utils"
 	"github.com/oldbai555/micro/bgin"
 	"github.com/oldbai555/micro/uctx"
+	"io"
+	"net/http"
 	"net/url"
 	"os"
 	"path"
@@ -569,4 +571,59 @@ func isImageByExtension(filename string) bool {
 		// 添加其他图片格式
 	}
 	return imageExtensions[ext]
+}
+
+// downloadFile 下载文件并保存到本地
+func downloadFile(url string, rootPath, fileName string) (string, error) {
+	// 发送HTTP GET请求
+	resp, err := http.Get(url)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	// 创建文件
+	filePath := path.Join(rootPath, fileName)
+	out, err := os.Create(filePath)
+	if err != nil {
+		return "", err
+	}
+	defer out.Close()
+
+	// 将响应体复制到文件中
+	written, err := io.Copy(out, resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	var fileInfo = &lbsingle.ModelFile{
+		Size:    written,
+		Name:    fileName,
+		Rename:  "",
+		Path:    filePath,
+		Md5:     tool.GetFileMd5(out),
+		SortUrl: "",
+		Type:    0,
+	}
+
+	sUrl := compress.GenShortUrl(compress.CharsetRandomAlphanumeric, rootPath, func(url, keyword string) bool {
+		_, err := cache.GetFileBySortUrl(keyword)
+		if err != nil && !cache.IsNotFound(err) {
+			log.Errorf("err:%v", err)
+			return true
+		}
+		if cache.IsNotFound(err) {
+			return true
+		}
+		return false
+	})
+	if sUrl == "" {
+		return "", err
+	}
+	fileInfo.SortUrl = sUrl
+	err = doSingleFileLogic(bctx.NewCtx(context.Background()), fileInfo)
+	if err != nil {
+		return "", err
+	}
+	return sUrl, err
 }
