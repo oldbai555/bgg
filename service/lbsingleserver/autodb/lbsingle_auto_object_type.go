@@ -265,3 +265,56 @@ var ModelMessage = &engine.ModelObjectType{
 		},
 	},
 }
+
+var ModelDailyShortSentences = &engine.ModelObjectType{
+	Name: "lbsingle.ModelDailyShortSentences",
+	FieldList: &engine.ObjectFieldList{
+		List: []*engine.ObjectField{
+			{
+				FieldName: "id",
+				Type:      "uint64",
+				IsArray:   false,
+			},
+			{
+				FieldName: "created_at",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "updated_at",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "deleted_at",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "creator_id",
+				Type:      "uint64",
+				IsArray:   false,
+			},
+			{
+				FieldName: "type",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "content",
+				Type:      "string",
+				IsArray:   false,
+			},
+			{
+				FieldName: "img",
+				Type:      "string",
+				IsArray:   false,
+			},
+			{
+				FieldName: "literature_author",
+				Type:      "string",
+				IsArray:   false,
+			},
+		},
+	},
+}

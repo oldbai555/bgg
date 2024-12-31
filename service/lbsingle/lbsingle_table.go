@@ -14,3 +14,6 @@ func (*ModelChat) TableName() string {
 func (*ModelMessage) TableName() string {
 	return "lbsingle_message"
 }
+func (*ModelDailyShortSentences) TableName() string {
+	return "lbsingle_daily_short_sentences"
+}
