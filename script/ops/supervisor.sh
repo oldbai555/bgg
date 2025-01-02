@@ -126,8 +126,7 @@ localPackSrv() {
   start_upload ${srvOutPut}
 }
 
-function start_upload()
-{
+start_upload(){
         file=$1
         fileMd5=`md5sum ${file}`
         url="https://oldbai.top/oss/deploy/upload"
@@ -139,6 +138,11 @@ function start_upload()
         curl -k --location --request POST ${url} \
                 --header 'Content-Type: multipart/form-data' \
                 --form 'file=@'${file}''
+}
+
+deployWeb(){
+  file=$1
+  mv ${file} /home/ubuntu/web && cd /home/ubuntu/web && rm -rf dist && tar -zxvf ${file}
 }
 
 # 使用说明
@@ -170,6 +174,10 @@ lpcmd)
 deploy)
   shift
   deploySupervisorService "$1"
+  ;;
+web)
+  shift
+  deployWeb "$1"
   ;;
 upload)
   shift

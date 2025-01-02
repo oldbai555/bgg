@@ -25,3 +25,8 @@ func OptionWithProxyConf() Option {
 		tool.Proxys = NewProxys(tool.V)
 	}
 }
+func OptionWithDeepSeek() Option {
+	return func(tool *SysCfg) {
+		tool.DeepSeek = NewDeepSeek("")
+	}
+}

@@ -7,14 +7,17 @@
 package lbsingleserver
 
 import (
+	"github.com/oldbai555/bgg/pkg/syscfg"
 	"github.com/oldbai555/bgg/service/lbbase"
 	"github.com/oldbai555/bgg/service/lbsingle"
+	"github.com/oldbai555/bgg/service/lbsingleserver/deepseek"
 	"github.com/oldbai555/bgg/service/lbsingleserver/iface"
 	"github.com/oldbai555/bgg/service/lbsingleserver/roommgr"
 	"github.com/oldbai555/bgg/service/lbsingleserver/wsmgr"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/micro/uctx"
 	"google.golang.org/protobuf/proto"
+	"time"
 )
 
 func handleWebsocketDataTypeLogin(ctx uctx.IUCtx, msg *lbsingle.WebsocketMsg) (ret proto.Message, err error) {
@@ -76,18 +79,55 @@ func handleWebsocketDataTypeLogout(ctx uctx.IUCtx, msg *lbsingle.WebsocketMsg) (
 	return
 }
 
-func handleWebsocketDataTypeChat(ctx uctx.IUCtx, msg *lbsingle.WebsocketMsg) (ret proto.Message, err error) {
+func handleWebsocketDataTypeChat(ctx uctx.IUCtx, msg *lbsingle.WebsocketMsg) (proto.Message, error) {
 	conn := ctx.ExtInfo().(iface.IWsConn)
 	if !conn.IsLogin() {
-		return
+		return nil, lbsingle.ErrUserNotFound
 	}
 
-	err = roommgr.GetSingleChatRoom().Broadcast(msg)
+	// 先广播给房间的所有人
+	err := roommgr.GetSingleChatRoom().Broadcast(msg)
 	if err != nil {
-		return
+		log.Errorf("err:%v", err)
+		return nil, err
 	}
 
-	return
+	// 再通知deepseek去生成回答
+	if msg.ChatMessage.To == "deepseek" {
+		deepSeekCfg, err := syscfg.GetDeepSeek()
+		if err != nil {
+			log.Errorf("err:%v", err)
+			return nil, err
+		}
+		completions, err := deepseek.ChatCompletions(&deepseek.ChatChatCompletionsReq{
+			BaseUrl: deepSeekCfg.BaseUrl,
+			Token:   deepSeekCfg.Token,
+			MsgList: []*deepseek.ChatCompletionsMessage{
+				{
+					Content: msg.ChatMessage.Content.Text.Content,
+					Role:    "user",
+				},
+			},
+		})
+		for _, message := range completions.MsgList {
+			err = roommgr.GetSingleChatRoom().Broadcast(wsmgr.PacketWebsocketDataByChatMessage(&lbsingle.ModelMessage{
+				SendAt: uint64(time.Now().UnixMilli()),
+				From:   "deepseek",
+				To:     msg.ChatMessage.From,
+				Content: &lbbase.Content{
+					Text: &lbbase.Content_Text{
+						Content: message.Content,
+					},
+				},
+			}))
+			if err != nil {
+				log.Errorf("err:%v", err)
+				return nil, err
+			}
+		}
+	}
+
+	return nil, nil
 }
 
 func handleWebsocketDataTypeHeartBeat(_ uctx.IUCtx, msg *lbsingle.WebsocketMsg) (ret proto.Message, err error) {

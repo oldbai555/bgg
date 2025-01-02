@@ -13,6 +13,7 @@ type SysCfg struct {
 	ServerConf        *ServerConf
 	WxMiniProgramConf *WxMiniProgramConf
 	Proxys            *Proxys
+	DeepSeek          *DeepSeek
 }
 
 var sc *SysCfg

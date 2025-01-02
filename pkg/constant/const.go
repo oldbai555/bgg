@@ -13,3 +13,7 @@ const (
 const (
 	HEADER_LBSINGLE_ASYNC = "HEADER_LBSINGLE_ASYNC"
 )
+
+const (
+	BucketPath = "https://oldbai.top/oss/download/"
+)
