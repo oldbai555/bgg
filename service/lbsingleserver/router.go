@@ -17,6 +17,7 @@ func RegisterCustomRouter(r *gin.Engine) {
 	group := r.Group(lbsingle.ServerName)
 	group.POST("/upload", handleUploadFile)
 	group.POST("/deploy/upload", handleUploadDeployFile)
+	group.GET("/syncfileindex", handleSyncFileIndex)
 	group.GET("/download/*sUrl", handleDownloadFile)
 	group.Any("/ws", wsmgr.HandleWs)
 }

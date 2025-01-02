@@ -58,8 +58,6 @@ func SyncFileIndex(ctx context.Context, cacheAllFile bool) error {
 		return err
 	}
 
-	var newFileList []*lbsingle.ModelFile
-
 	// 同步本地文件
 	err = tool.ListFile(constant.BaseStoragePath, func(path string, info os.FileInfo) {
 		file, err := os.Open(path)
@@ -86,41 +84,17 @@ func SyncFileIndex(ctx context.Context, cacheAllFile bool) error {
 			return
 		}
 
-		var canUse bool
-		sUrl := compress.GenShortUrl(compress.CharsetRandomAlphanumeric, path, func(url, keyword string) bool {
-			_, ok := sortUrlMap[keyword]
-			if ok {
-				canUse = false
-				return canUse
-			}
-			canUse = true
-			return canUse
-		})
-		if !canUse {
+		// 新文件
+		nCtx := bctx.NewCtx(context.Background())
+		_, err = saveFile(nCtx, 0, constant.BaseStoragePath, info.Name(), file)
+		if err != nil {
+			log.Errorf("err:%v", err)
 			return
 		}
-		if sUrl == "" {
-			return
-		}
-		newFileList = append(newFileList, &lbsingle.ModelFile{
-			Size:    info.Size(),
-			Name:    info.Name(),
-			Rename:  info.Name(),
-			Path:    path,
-			Md5:     tool.GetFileMd5(file),
-			SortUrl: sUrl,
-		})
 	})
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return err
-	}
-
-	for _, file := range newFileList {
-		err := doSingleFileLogic(uCtx, file)
-		if err != nil {
-			log.Errorf("save file failed %s", file.Name)
-		}
 	}
 
 	// 打上标记
@@ -387,6 +361,17 @@ func handleDownloadFile(ctx *gin.Context) {
 	ctx.File(filePath)
 }
 
+func handleSyncFileIndex(c *gin.Context) {
+	handler := bgin.NewHandler(c)
+	err := SyncFileIndex(c, true)
+	if err != nil {
+		log.Errorf("err:%v", err)
+		handler.Error(err)
+		return
+	}
+	handler.HttpJson("ok")
+}
+
 // 通过文件头信息（魔术字节）判断
 func isImageByMagicNumber(data []byte) bool {
 	if len(data) < 4 {
@@ -476,13 +461,20 @@ func saveFile(ctx uctx.IUCtx, fileType uint32, basePath, fileName string, fileRe
 	md5h := md5.New()
 	md5h.Write(buf.Bytes())
 	md5Str := fmt.Sprintf("%x", md5h.Sum(nil))
-	reFileName := md5Str + path.Ext(fileName)
 
-	timeFmt := time.Unix(time.Now().Unix(), 0).Format("20060102")
-	filePath := path.Join(basePath, timeFmt)
-	savePath := path.Join(filePath, reFileName)
+	var filePath, reFileName string
+	switch fileType {
+	case uint32(lbsingle.ModelFile_TypeSrvPack):
+		filePath = basePath
+		reFileName = fileName
+	default:
+		timeFmt := time.Unix(time.Now().Unix(), 0).Format("20060102")
+		filePath = path.Join(basePath, timeFmt)
+		reFileName = md5Str + path.Ext(fileName)
+	}
 
 	// 判断如果是windows环境 则需要将 savePath ToSlash
+	savePath := path.Join(filePath, reFileName)
 	savePath = tool.ToSlash(savePath)
 
 	file, err := OrmFile.NewBaseScope().Where(lbsingle.FieldMd5_, md5Str).First(ctx)
@@ -518,7 +510,8 @@ func saveFile(ctx uctx.IUCtx, fileType uint32, basePath, fileName string, fileRe
 	}
 
 	// 生成短链
-	sUrl := compress.GenShortUrl(compress.CharsetRandomAlphanumeric, basePath, func(url, keyword string) bool {
+	result, _ := url.JoinPath(constant.BaseStoragePath, reFileName)
+	sUrl := compress.GenShortUrl(compress.CharsetRandomAlphanumeric, result, func(url, keyword string) bool {
 		_, err := cache.GetFileBySortUrl(keyword)
 		switch {
 		case err != nil && !cache.IsNotFound(err):
@@ -568,7 +561,7 @@ func saveFile(ctx uctx.IUCtx, fileType uint32, basePath, fileName string, fileRe
 		Md5:        md5Str,
 		SortUrl:    sUrl,
 		Type:       fileType,
-		BucketPath: "https://oldbai.top/oss/download/",
+		BucketPath: constant.BucketPath,
 	}
 
 	// 保存到数据库和缓存
