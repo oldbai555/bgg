@@ -8,8 +8,8 @@ package roommgr
 
 import (
 	"github.com/oldbai555/bgg/service/lbsingleserver/wsmgr"
-	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/jsonpb"
+	"github.com/oldbai555/lbtool/pkg/lberr"
 	"google.golang.org/protobuf/proto"
 	"sync"
 )
@@ -56,8 +56,7 @@ func (s *ChatRoomSt) DelUser(uid uint64) {
 func (s *ChatRoomSt) Broadcast(msg proto.Message) error {
 	bytes, err := jsonpb.Marshal(msg)
 	if err != nil {
-		log.Errorf("unmarshal err:%v", err)
-		return err
+		return lberr.Wrap(err)
 	}
 	for uid := range s.userMgr {
 		wsmgr.WriteBytes(uid, bytes)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/oldbai555/bgg/service/lbwxmp"
 	"github.com/oldbai555/lbtool/log"
+	"github.com/oldbai555/lbtool/pkg/lberr"
 	"github.com/oldbai555/lbtool/utils"
 	"github.com/oldbai555/micro/core"
 	"github.com/oldbai555/micro/gormx"
@@ -16,14 +17,12 @@ func (a *LbwxmpServer) AddMpService(ctx context.Context, req *lbwxmp.AddMpServic
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	err = OrmMpService.NewBaseScope().Create(uCtx, req.Data)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 	rsp.Data = req.Data
 
@@ -35,8 +34,7 @@ func (a *LbwxmpServer) DelMpServiceList(ctx context.Context, req *lbwxmp.DelMpSe
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	listRsp, err := a.GetMpServiceList(ctx, &lbwxmp.GetMpServiceListReq{
@@ -45,8 +43,7 @@ func (a *LbwxmpServer) DelMpServiceList(ctx context.Context, req *lbwxmp.DelMpSe
 			AddOpt(core.DefaultListOption_DefaultListOptionSelect, lbwxmp.FieldId_),
 	})
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	if len(listRsp.List) == 0 {
@@ -57,8 +54,7 @@ func (a *LbwxmpServer) DelMpServiceList(ctx context.Context, req *lbwxmp.DelMpSe
 	idList := utils.PluckUint64List(listRsp.List, lbwxmp.FieldId)
 	_, err = OrmMpService.NewBaseScope().WhereIn(lbwxmp.FieldId_, idList).Delete(uCtx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	return &rsp, err
@@ -69,20 +65,17 @@ func (a *LbwxmpServer) UpdateMpService(ctx context.Context, req *lbwxmp.UpdateMp
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	data, err := OrmMpService.NewBaseScope().Where(lbwxmp.FieldId_, req.Data.Id).First(uCtx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	_, err = OrmMpService.NewBaseScope().Where(lbwxmp.FieldId_, data.Id).Update(uCtx, utils.OrmStruct2Map(req.Data))
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	return &rsp, err
@@ -93,14 +86,12 @@ func (a *LbwxmpServer) GetMpService(ctx context.Context, req *lbwxmp.GetMpServic
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	data, err := OrmMpService.NewBaseScope().Where(lbwxmp.FieldId_, req.Id).First(uCtx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 	rsp.Data = data
 
@@ -112,15 +103,13 @@ func (a *LbwxmpServer) GetMpServiceList(ctx context.Context, req *lbwxmp.GetMpSe
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	db := OrmMpService.NewList(req.ListOption)
 	err = gormx.ProcessDefaultOptions[*lbwxmp.ModelMpService](req.ListOption, db)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	err = core.NewOptionsProcessor(req.ListOption).
@@ -128,8 +117,7 @@ func (a *LbwxmpServer) GetMpServiceList(ctx context.Context, req *lbwxmp.GetMpSe
 
 	rsp.Paginate, err = db.FindPaginate(uCtx, &rsp.List)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	return &rsp, err

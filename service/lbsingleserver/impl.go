@@ -9,6 +9,7 @@ import (
 	"github.com/oldbai555/bgg/service/lbsingleserver/cache"
 	"github.com/oldbai555/bgg/service/lbsingleserver/wsmgr"
 	"github.com/oldbai555/lbtool/log"
+	"github.com/oldbai555/lbtool/pkg/lberr"
 	"github.com/oldbai555/lbtool/utils"
 	"github.com/oldbai555/micro/core"
 	"github.com/oldbai555/micro/gormx"
@@ -29,15 +30,13 @@ func (a *LbsingleServer) GetFileList(ctx context.Context, req *lbsingle.GetFileL
 	var err error
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	db := OrmFile.NewList(req.ListOption)
 	err = gormx.ProcessDefaultOptions[*lbsingle.ModelFile](req.ListOption, db)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	err = core.NewOptionsProcessor(req.ListOption).
@@ -49,8 +48,7 @@ func (a *LbsingleServer) GetFileList(ctx context.Context, req *lbsingle.GetFileL
 
 	rsp.Paginate, err = db.FindPaginate(uCtx, &rsp.List)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	return &rsp, err
@@ -61,8 +59,7 @@ func (a *LbsingleServer) Login(ctx context.Context, req *lbsingle.LoginReq) (*lb
 	var err error
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	var user *lbsingle.ModelUser
@@ -71,15 +68,13 @@ func (a *LbsingleServer) Login(ctx context.Context, req *lbsingle.LoginReq) (*lb
 		lbsingle.FieldPassword_: utils.StrMd5(req.Password),
 	}).First(uCtx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	sid := utils.GenUUID()
 	err = cache.SetLoginInfo(sid, user.ToBaseUser())
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 	rsp.Token = sid
 	rsp.User = user.ToBaseUser()
@@ -92,15 +87,13 @@ func (a *LbsingleServer) Logout(c context.Context, req *lbsingle.LogoutReq) (*lb
 	var err error
 	uCtx, err := uctx.ToUCtx(c)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 	baseUser := uCtx.ExtInfo().(*lbbase.BaseUser)
 
 	err = cache.DelLoginInfo(uCtx.Sid())
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	conn := wsmgr.GetConnByUid(baseUser.Id)
@@ -123,8 +116,7 @@ func (a *LbsingleServer) GetLoginUser(ctx context.Context, req *lbsingle.GetLogi
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	rsp.User = uCtx.ExtInfo().(*lbbase.BaseUser)
@@ -138,27 +130,23 @@ func (a *LbsingleServer) UpdateLoginUserInfo(ctx context.Context, req *lbsingle.
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 	baseUser := uCtx.ExtInfo().(*lbbase.BaseUser)
 
 	_, err = OrmUser.NewBaseScope().Where(lbsingle.FieldId_, baseUser.Id).First(uCtx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	_, err = OrmUser.NewBaseScope().Where(lbsingle.FieldId_, baseUser.Id).Update(uCtx, utils.OrmStruct2Map(req.User, lbsingle.FieldRole))
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	err = cache.SetLoginInfo(uCtx.Sid(), req.User)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	return &rsp, err
@@ -170,8 +158,7 @@ func (a *LbsingleServer) ResetPassword(ctx context.Context, req *lbsingle.ResetP
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 	baseUser := uCtx.ExtInfo().(*lbbase.BaseUser)
 
@@ -197,14 +184,12 @@ func (a *LbsingleServer) ResetPassword(ctx context.Context, req *lbsingle.ResetP
 		lbsingle.FieldPassword_: newPsw,
 	})
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	err = cache.DelLoginInfo(uCtx.Sid())
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	return &rsp, err
@@ -218,14 +203,12 @@ func (a *LbsingleServer) SyncFile(ctx context.Context, _ *lbsingle.SyncFileReq) 
 	_, err, _ = a.singleGroup.Do("syncfile", func() (interface{}, error) {
 		err := SyncFileIndex(ctx, true)
 		if err != nil {
-			log.Errorf("err:%v", err)
-			return nil, err
+			return nil, lberr.Wrap(err)
 		}
 		return nil, nil
 	})
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	return &rsp, err
@@ -237,8 +220,7 @@ func (a *LbsingleServer) AddUser(ctx context.Context, req *lbsingle.AddUserReq) 
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	// check user
@@ -251,8 +233,7 @@ func (a *LbsingleServer) AddUser(ctx context.Context, req *lbsingle.AddUserReq) 
 
 	err = OrmUser.NewBaseScope().Create(uCtx, req.Data)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 	rsp.Data = req.Data.ToBaseUser()
 
@@ -265,8 +246,7 @@ func (a *LbsingleServer) DelUserList(ctx context.Context, req *lbsingle.DelUserL
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	listRsp, err := a.GetUserList(ctx, &lbsingle.GetUserListReq{
@@ -275,8 +255,7 @@ func (a *LbsingleServer) DelUserList(ctx context.Context, req *lbsingle.DelUserL
 			AddOpt(core.DefaultListOption_DefaultListOptionSelect, lbsingle.FieldId_),
 	})
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	if len(listRsp.List) == 0 {
@@ -287,8 +266,7 @@ func (a *LbsingleServer) DelUserList(ctx context.Context, req *lbsingle.DelUserL
 	idList := utils.PluckUint64List(listRsp.List, lbsingle.FieldId)
 	_, err = OrmUser.NewBaseScope().WhereIn(lbsingle.FieldId_, idList).Delete(uCtx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	return &rsp, err
@@ -300,20 +278,17 @@ func (a *LbsingleServer) UpdateUser(ctx context.Context, req *lbsingle.UpdateUse
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	data, err := OrmUser.NewBaseScope().Where(lbsingle.FieldId_, req.Data.Id).First(uCtx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	_, err = OrmUser.NewBaseScope().Where(lbsingle.FieldId_, data.Id).Update(uCtx, utils.OrmStruct2Map4Update(req.Data))
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	return &rsp, err
@@ -325,14 +300,12 @@ func (a *LbsingleServer) GetUser(ctx context.Context, req *lbsingle.GetUserReq) 
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	data, err := OrmUser.NewBaseScope().Where(lbsingle.FieldId_, req.Id).First(uCtx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 	rsp.Data = data.ToBaseUser()
 
@@ -345,15 +318,13 @@ func (a *LbsingleServer) GetUserList(ctx context.Context, req *lbsingle.GetUserL
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	db := OrmUser.NewList(req.ListOption)
 	err = gormx.ProcessDefaultOptions[*lbsingle.ModelUser](req.ListOption, db)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	err = core.NewOptionsProcessor(req.ListOption).
@@ -369,8 +340,7 @@ func (a *LbsingleServer) GetUserList(ctx context.Context, req *lbsingle.GetUserL
 
 	rsp.Paginate, err = db.FindPaginate(uCtx, &rsp.List)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	return &rsp, err
@@ -384,8 +354,7 @@ func (a *LbsingleServer) CheckAuthSys(_ context.Context, req *lbsingle.CheckAuth
 	uCtx.SetSid(req.Sid)
 	auth, err := CheckAuth(uCtx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 	rsp.User = auth
 	return &rsp, err
@@ -396,14 +365,12 @@ func (a *LbsingleServer) AddDailyShortSentences(ctx context.Context, req *lbsing
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	err = OrmDailyShortSentences.NewBaseScope().Create(uCtx, req.Data)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 	rsp.Data = req.Data
 
@@ -415,8 +382,7 @@ func (a *LbsingleServer) DelDailyShortSentencesList(ctx context.Context, req *lb
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	listRsp, err := a.GetDailyShortSentencesList(ctx, &lbsingle.GetDailyShortSentencesListReq{
@@ -425,8 +391,7 @@ func (a *LbsingleServer) DelDailyShortSentencesList(ctx context.Context, req *lb
 			AddOpt(core.DefaultListOption_DefaultListOptionSelect, lbsingle.FieldId_),
 	})
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	if len(listRsp.List) == 0 {
@@ -437,8 +402,7 @@ func (a *LbsingleServer) DelDailyShortSentencesList(ctx context.Context, req *lb
 	idList := utils.PluckUint64List(listRsp.List, lbsingle.FieldId)
 	_, err = OrmDailyShortSentences.NewBaseScope().WhereIn(lbsingle.FieldId_, idList).Delete(uCtx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	return &rsp, err
@@ -449,20 +413,17 @@ func (a *LbsingleServer) UpdateDailyShortSentences(ctx context.Context, req *lbs
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	data, err := OrmDailyShortSentences.NewBaseScope().Where(lbsingle.FieldId_, req.Data.Id).First(uCtx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	_, err = OrmDailyShortSentences.NewBaseScope().Where(lbsingle.FieldId_, data.Id).Update(uCtx, utils.OrmStruct2Map(req.Data))
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	return &rsp, err
@@ -473,14 +434,12 @@ func (a *LbsingleServer) GetDailyShortSentences(ctx context.Context, req *lbsing
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	data, err := OrmDailyShortSentences.NewBaseScope().Where(lbsingle.FieldId_, req.Id).First(uCtx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 	rsp.Data = data
 
@@ -492,15 +451,13 @@ func (a *LbsingleServer) GetDailyShortSentencesList(ctx context.Context, req *lb
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	db := OrmDailyShortSentences.NewList(req.ListOption)
 	err = gormx.ProcessDefaultOptions[*lbsingle.ModelDailyShortSentences](req.ListOption, db)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	err = core.NewOptionsProcessor(req.ListOption).
@@ -508,8 +465,7 @@ func (a *LbsingleServer) GetDailyShortSentencesList(ctx context.Context, req *lb
 
 	rsp.Paginate, err = db.FindPaginate(uCtx, &rsp.List)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	return &rsp, err

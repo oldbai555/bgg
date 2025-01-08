@@ -13,7 +13,10 @@ import (
 	"github.com/oldbai555/bgg/service/lbsingleserver/cache"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/json"
+	"github.com/oldbai555/lbtool/pkg/lberr"
 	"github.com/oldbai555/lbtool/pkg/restysdk"
+	"github.com/oldbai555/micro/gormx"
+	"github.com/oldbai555/micro/uctx"
 	"testing"
 )
 
@@ -72,5 +75,29 @@ func TestInit(t *testing.T) {
 			lbsingle.FieldImg_:              val.Img,
 			lbsingle.FieldLiteratureAuthor_: val.LiteratureAuthor,
 		})
+	}
+}
+
+func TestTransaction(t *testing.T) {
+	ctx := bctx.NewCtx(context.Background())
+	err := gormx.OnTransaction(ctx, func(ctx uctx.IUCtx, trId string) error {
+		err := OrmDailyShortSentences.WithTransactionId(trId).Create(ctx, &lbsingle.ModelDailyShortSentences{
+			Content: "测试事务的短语2",
+		})
+		if err != nil {
+			t.Errorf("err:%v", err)
+			return err
+		}
+		return lberr.NewInvalidArg("%s failed", trId)
+	})
+	if err != nil {
+		t.Errorf("err:%v", err)
+	}
+	err = OrmDailyShortSentences.Create(ctx, &lbsingle.ModelDailyShortSentences{
+		Content: "测试事务的短语3",
+	})
+	if err != nil {
+		t.Errorf("err:%v", err)
+		return
 	}
 }

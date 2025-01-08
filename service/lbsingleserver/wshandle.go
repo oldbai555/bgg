@@ -14,7 +14,7 @@ import (
 	"github.com/oldbai555/bgg/service/lbsingleserver/iface"
 	"github.com/oldbai555/bgg/service/lbsingleserver/roommgr"
 	"github.com/oldbai555/bgg/service/lbsingleserver/wsmgr"
-	"github.com/oldbai555/lbtool/log"
+	"github.com/oldbai555/lbtool/pkg/lberr"
 	"github.com/oldbai555/micro/uctx"
 	"google.golang.org/protobuf/proto"
 	"time"
@@ -32,7 +32,7 @@ func handleWebsocketDataTypeLogin(ctx uctx.IUCtx, msg *lbsingle.WebsocketMsg) (r
 	// 鉴权
 	info, err := CheckAuth(ctx)
 	if err != nil {
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	uid := info.Id
@@ -53,7 +53,7 @@ func handleWebsocketDataTypeLogin(ctx uctx.IUCtx, msg *lbsingle.WebsocketMsg) (r
 	newMsg := wsmgr.PacketWebsocketDataByJoinChatRoom(&lbbase.JoinChatRoom{RoomId: 1, Member: &lbbase.ChatRoomMember{Uid: uid, Username: info.Username}})
 	err = chatRoomSt.Broadcast(newMsg)
 	if err != nil {
-		log.Errorf("err:%v", err)
+		err = lberr.Wrap(err)
 		return
 	}
 	return
@@ -69,6 +69,7 @@ func handleWebsocketDataTypeLogout(ctx uctx.IUCtx, msg *lbsingle.WebsocketMsg) (
 	newMsg := wsmgr.PacketWebsocketDataByLeaveChatRoom(&lbbase.LeaveChatRoom{RoomId: 1, Member: &lbbase.ChatRoomMember{Uid: uid}})
 	err = roommgr.GetSingleChatRoom().Broadcast(newMsg)
 	if err != nil {
+		err = lberr.Wrap(err)
 		return
 	}
 
@@ -77,6 +78,28 @@ func handleWebsocketDataTypeLogout(ctx uctx.IUCtx, msg *lbsingle.WebsocketMsg) (
 	wsmgr.WriteProtoMsg(uid, msg)
 	roommgr.GetSingleChatRoom().DelUser(uid)
 	return
+}
+
+var cacheMsgList []*deepseek.ChatCompletionsMessage
+var defaultFirstMsg = &deepseek.ChatCompletionsMessage{
+	Content: "请你扮演一个无所不知的学者,说话通俗易懂,面对我们提出的问题你都能一一回答解决",
+	Role:    "system",
+}
+
+func appendCacheMsgList(msg *deepseek.ChatCompletionsMessage) {
+	cacheMsgList = append(cacheMsgList, msg)
+	if len(cacheMsgList) >= 30 {
+		cacheMsgList = cacheMsgList[1:]
+	}
+}
+
+func buildMsgList(msg *deepseek.ChatCompletionsMessage) []*deepseek.ChatCompletionsMessage {
+	var msgList []*deepseek.ChatCompletionsMessage
+	msgList = append(msgList, defaultFirstMsg)
+	msgList = append(msgList, cacheMsgList...)
+	msgList = append(msgList, msg)
+	appendCacheMsgList(msg)
+	return msgList
 }
 
 func handleWebsocketDataTypeChat(ctx uctx.IUCtx, msg *lbsingle.WebsocketMsg) (proto.Message, error) {
@@ -88,28 +111,25 @@ func handleWebsocketDataTypeChat(ctx uctx.IUCtx, msg *lbsingle.WebsocketMsg) (pr
 	// 先广播给房间的所有人
 	err := roommgr.GetSingleChatRoom().Broadcast(msg)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	// 再通知deepseek去生成回答
 	if msg.ChatMessage.To == "deepseek" {
 		deepSeekCfg, err := syscfg.GetDeepSeek()
 		if err != nil {
-			log.Errorf("err:%v", err)
-			return nil, err
+			return nil, lberr.Wrap(err)
 		}
 		completions, err := deepseek.ChatCompletions(&deepseek.ChatChatCompletionsReq{
 			BaseUrl: deepSeekCfg.BaseUrl,
 			Token:   deepSeekCfg.Token,
-			MsgList: []*deepseek.ChatCompletionsMessage{
-				{
-					Content: msg.ChatMessage.Content.Text.Content,
-					Role:    "user",
-				},
-			},
+			MsgList: buildMsgList(&deepseek.ChatCompletionsMessage{
+				Content: msg.ChatMessage.Content.Text.Content,
+				Role:    "user",
+			}),
 		})
 		for _, message := range completions.MsgList {
+			appendCacheMsgList(message)
 			err = roommgr.GetSingleChatRoom().Broadcast(wsmgr.PacketWebsocketDataByChatMessage(&lbsingle.ModelMessage{
 				SendAt: uint64(time.Now().UnixMilli()),
 				From:   "deepseek",
@@ -121,8 +141,7 @@ func handleWebsocketDataTypeChat(ctx uctx.IUCtx, msg *lbsingle.WebsocketMsg) (pr
 				},
 			}))
 			if err != nil {
-				log.Errorf("err:%v", err)
-				return nil, err
+				return nil, lberr.Wrap(err)
 			}
 		}
 	}

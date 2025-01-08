@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/oldbai555/bgg/service/lbwxmp"
 	"github.com/oldbai555/lbtool/log"
+	"github.com/oldbai555/lbtool/pkg/lberr"
 	"github.com/oldbai555/lbtool/utils"
 	"github.com/oldbai555/micro/core"
 	"github.com/oldbai555/micro/gormx"
@@ -34,14 +35,12 @@ func (a *LbwxmpServer) AddMpMemberUser(ctx context.Context, req *lbwxmp.AddMpMem
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	err = OrmMpMemberUser.NewBaseScope().Create(uCtx, req.Data)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 	rsp.Data = req.Data
 
@@ -53,8 +52,7 @@ func (a *LbwxmpServer) DelMpMemberUserList(ctx context.Context, req *lbwxmp.DelM
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	listRsp, err := a.GetMpMemberUserList(ctx, &lbwxmp.GetMpMemberUserListReq{
@@ -63,8 +61,7 @@ func (a *LbwxmpServer) DelMpMemberUserList(ctx context.Context, req *lbwxmp.DelM
 			AddOpt(core.DefaultListOption_DefaultListOptionSelect, lbwxmp.FieldId_),
 	})
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	if len(listRsp.List) == 0 {
@@ -75,8 +72,7 @@ func (a *LbwxmpServer) DelMpMemberUserList(ctx context.Context, req *lbwxmp.DelM
 	idList := utils.PluckUint64List(listRsp.List, lbwxmp.FieldId)
 	_, err = OrmMpMemberUser.NewBaseScope().WhereIn(lbwxmp.FieldId_, idList).Delete(uCtx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	return &rsp, err
@@ -87,20 +83,17 @@ func (a *LbwxmpServer) UpdateMpMemberUser(ctx context.Context, req *lbwxmp.Updat
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	data, err := OrmMpMemberUser.NewBaseScope().Where(lbwxmp.FieldId_, req.Data.Id).First(uCtx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	_, err = OrmMpMemberUser.NewBaseScope().Where(lbwxmp.FieldId_, data.Id).Update(uCtx, utils.OrmStruct2Map(req.Data))
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	return &rsp, err
@@ -111,14 +104,12 @@ func (a *LbwxmpServer) GetMpMemberUser(ctx context.Context, req *lbwxmp.GetMpMem
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	data, err := OrmMpMemberUser.NewBaseScope().Where(lbwxmp.FieldId_, req.Id).First(uCtx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 	rsp.Data = data
 
@@ -130,15 +121,13 @@ func (a *LbwxmpServer) GetMpMemberUserList(ctx context.Context, req *lbwxmp.GetM
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	db := OrmMpMemberUser.NewList(req.ListOption)
 	err = gormx.ProcessDefaultOptions[*lbwxmp.ModelMpMemberUser](req.ListOption, db)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	err = core.NewOptionsProcessor(req.ListOption).
@@ -146,8 +135,7 @@ func (a *LbwxmpServer) GetMpMemberUserList(ctx context.Context, req *lbwxmp.GetM
 
 	rsp.Paginate, err = db.FindPaginate(uCtx, &rsp.List)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	return &rsp, err

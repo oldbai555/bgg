@@ -13,6 +13,7 @@ import (
 	"github.com/oldbai555/bgg/pkg/syscfg"
 	"github.com/oldbai555/bgg/pkg/tool"
 	"github.com/oldbai555/lbtool/log"
+	"github.com/oldbai555/lbtool/pkg/lberr"
 	"github.com/oldbai555/lbtool/utils"
 	"github.com/oldbai555/micro/bconst"
 	"github.com/oldbai555/micro/bgin"
@@ -77,8 +78,7 @@ func handleRevProxy(ctx *gin.Context) {
 	var target = ipAddr
 	proxyUrl, err := url.Parse(target)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		handler.Error(err)
+		handler.Error(lberr.Wrap(err))
 		return
 	}
 

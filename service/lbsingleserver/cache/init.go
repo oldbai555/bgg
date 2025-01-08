@@ -20,7 +20,7 @@ func InitCache() (err error) {
 	r := syscfg.NewRedisConf("")
 	rdb, err = bredis.New(r.Host, r.Port, r.Password)
 	if err != nil {
-		return err
+		return lberr.Wrap(err)
 	}
 	return nil
 }

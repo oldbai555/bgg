@@ -16,14 +16,12 @@ func (a *LbwxmpServer) AddMpStoreProduct(ctx context.Context, req *lbwxmp.AddMpS
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	err = OrmMpStoreProduct.NewBaseScope().Create(uCtx, req.Data)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 	rsp.Data = req.Data
 
@@ -35,8 +33,7 @@ func (a *LbwxmpServer) DelMpStoreProductList(ctx context.Context, req *lbwxmp.De
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	listRsp, err := a.GetMpStoreProductList(ctx, &lbwxmp.GetMpStoreProductListReq{
@@ -45,8 +42,7 @@ func (a *LbwxmpServer) DelMpStoreProductList(ctx context.Context, req *lbwxmp.De
 			AddOpt(core.DefaultListOption_DefaultListOptionSelect, lbwxmp.FieldId_),
 	})
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	if len(listRsp.List) == 0 {
@@ -57,8 +53,7 @@ func (a *LbwxmpServer) DelMpStoreProductList(ctx context.Context, req *lbwxmp.De
 	idList := utils.PluckUint64List(listRsp.List, lbwxmp.FieldId)
 	_, err = OrmMpStoreProduct.NewBaseScope().WhereIn(lbwxmp.FieldId_, idList).Delete(uCtx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	return &rsp, err
@@ -69,20 +64,17 @@ func (a *LbwxmpServer) UpdateMpStoreProduct(ctx context.Context, req *lbwxmp.Upd
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	data, err := OrmMpStoreProduct.NewBaseScope().Where(lbwxmp.FieldId_, req.Data.Id).First(uCtx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	_, err = OrmMpStoreProduct.NewBaseScope().Where(lbwxmp.FieldId_, data.Id).Update(uCtx, utils.OrmStruct2Map(req.Data))
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	return &rsp, err
@@ -93,14 +85,12 @@ func (a *LbwxmpServer) GetMpStoreProduct(ctx context.Context, req *lbwxmp.GetMpS
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	data, err := OrmMpStoreProduct.NewBaseScope().Where(lbwxmp.FieldId_, req.Id).First(uCtx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 	rsp.Data = data
 
@@ -112,15 +102,13 @@ func (a *LbwxmpServer) GetMpStoreProductList(ctx context.Context, req *lbwxmp.Ge
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	db := OrmMpStoreProduct.NewList(req.ListOption)
 	err = gormx.ProcessDefaultOptions[*lbwxmp.ModelMpStoreProduct](req.ListOption, db)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	err = core.NewOptionsProcessor(req.ListOption).
@@ -128,8 +116,7 @@ func (a *LbwxmpServer) GetMpStoreProductList(ctx context.Context, req *lbwxmp.Ge
 
 	rsp.Paginate, err = db.FindPaginate(uCtx, &rsp.List)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	return &rsp, err

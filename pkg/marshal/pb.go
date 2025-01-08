@@ -19,7 +19,7 @@ func PbMarshal(obj proto.Message) ([]byte, error) {
 func PbUnmarshal(buf []byte, obj proto.Message) error {
 	err := proto.Unmarshal(buf, obj)
 	if err != nil {
-		return err
+		return lberr.Wrap(err)
 	}
 	return nil
 }

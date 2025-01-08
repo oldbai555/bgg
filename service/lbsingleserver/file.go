@@ -54,8 +54,7 @@ func SyncFileIndex(ctx context.Context, cacheAllFile bool) error {
 		return nil
 	})
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return err
+		return lberr.Wrap(err)
 	}
 
 	// 同步本地文件
@@ -110,8 +109,7 @@ func SyncFileIndex(ctx context.Context, cacheAllFile bool) error {
 				lbsingle.FieldState_: uint32(lbsingle.ModelFile_StateNotFoundInLocalDir),
 			})
 		if err != nil {
-			log.Errorf("err:%v", err)
-			return err
+			return lberr.Wrap(err)
 		}
 		_, err = OrmFile.NewBaseScope().
 			Where(lbsingle.FieldState_, uint32(lbsingle.ModelFile_StateNotFoundInLocalDir)).
@@ -120,8 +118,7 @@ func SyncFileIndex(ctx context.Context, cacheAllFile bool) error {
 				lbsingle.FieldState_: uint32(lbsingle.ModelFile_StateNil),
 			})
 		if err != nil {
-			log.Errorf("err:%v", err)
-			return err
+			return lberr.Wrap(err)
 		}
 	}
 
@@ -156,8 +153,7 @@ func doSingleFileLogic(ctx uctx.IUCtx, file *lbsingle.ModelFile) error {
 	if err == nil {
 		buf, err := marshal.PbMarshal(file)
 		if err != nil {
-			log.Errorf("err:%v", err)
-			return err
+			return lberr.Wrap(err)
 		}
 		_, err = OrmFile.NewBaseScope().Update(ctx, map[string]interface{}{
 			lbsingle.FieldSortUrl_: file.SortUrl,
@@ -216,8 +212,7 @@ func MqTopicByCacheAllFileHandler(msg *nsq.Message) error {
 			return nil
 		})
 		if err != nil {
-			log.Errorf("err:%v", err)
-			return err
+			return lberr.Wrap(err)
 		}
 
 		return nil

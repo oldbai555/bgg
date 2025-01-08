@@ -14,6 +14,7 @@ import (
 	"github.com/oldbai555/bgg/service/lbwxmpserver"
 	"github.com/oldbai555/bgg/service/lbwxmpserver/cache"
 	"github.com/oldbai555/lbtool/log"
+	"github.com/oldbai555/lbtool/pkg/lberr"
 	"github.com/oldbai555/lbtool/pkg/routine"
 	"github.com/oldbai555/lbtool/utils"
 	"github.com/oldbai555/micro/bcmd"
@@ -102,8 +103,7 @@ func (p *program) Stop() error {
 		log.Infof("stop gin server")
 		err := p.ginSrv.Shutdown(context.Background())
 		if err != nil {
-			log.Errorf("err:%v", err)
-			return err
+			return lberr.Wrap(err)
 		}
 	}
 	cache.Stop()

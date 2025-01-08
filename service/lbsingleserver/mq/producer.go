@@ -10,6 +10,7 @@ import (
 	"github.com/nsqio/go-nsq"
 	"github.com/oldbai555/bgg/pkg/constant"
 	"github.com/oldbai555/lbtool/log"
+	"github.com/oldbai555/lbtool/pkg/lberr"
 )
 
 func NewProducer(addr string) (*nsq.Producer, error) {
@@ -18,15 +19,13 @@ func NewProducer(addr string) (*nsq.Producer, error) {
 
 	p, err := nsq.NewProducer(addr, cfg)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	//p.SetLogger(nil, 0)
 	err = p.Ping()
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 	log.Infof("init Producer SUCCESS addr:%s", addr)
 	return p, nil

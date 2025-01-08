@@ -15,6 +15,7 @@ import (
 	"github.com/oldbai555/bgg/service/lbsingleserver/mq"
 	"github.com/oldbai555/bgg/service/lbsingleserver/wsmgr"
 	"github.com/oldbai555/lbtool/log"
+	"github.com/oldbai555/lbtool/pkg/lberr"
 	"github.com/oldbai555/lbtool/pkg/routine"
 	"github.com/oldbai555/lbtool/utils"
 	"github.com/oldbai555/micro/bcmd"
@@ -41,8 +42,7 @@ func (p *program) Init(_ svc.Environment) error {
 	syscfg.InitGlobal("", utils.GetCurDir(), syscfg.OptionWithServer(), syscfg.OptionWithWxMiniProgram(), syscfg.OptionWithDeepSeek())
 	conf, err := syscfg.GetServerConf()
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return err
+		return lberr.Wrap(err)
 	}
 	srvName := conf.Name
 	p.srvName = srvName
@@ -55,15 +55,13 @@ func (p *program) Init(_ svc.Environment) error {
 	// 初始化mysql
 	err = lbsingleserver.Init()
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return err
+		return lberr.Wrap(err)
 	}
 
 	// 初始化redis
 	err = cache.InitCache()
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return err
+		return lberr.Wrap(err)
 	}
 
 	return nil
@@ -76,8 +74,7 @@ func (p *program) Start() error {
 		return nil
 	})
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return err
+		return lberr.Wrap(err)
 	}
 
 	routine.GoV2(func() error {
@@ -85,26 +82,22 @@ func (p *program) Start() error {
 		return nil
 	})
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return err
+		return lberr.Wrap(err)
 	}
 
 	err = lbsingleserver.InitTopic()
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return err
+		return lberr.Wrap(err)
 	}
 
 	err = mq.Start()
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return err
+		return lberr.Wrap(err)
 	}
 
 	err = lbsingleserver.SyncFileIndex(context.Background(), true)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return err
+		return lberr.Wrap(err)
 	}
 	return nil
 }
@@ -122,8 +115,7 @@ func (p *program) Stop() error {
 		log.Infof("stop gin server")
 		err := p.ginSrv.Shutdown(context.Background())
 		if err != nil {
-			log.Errorf("err:%v", err)
-			return err
+			return lberr.Wrap(err)
 		}
 	}
 	mq.Stop()
@@ -161,8 +153,7 @@ func (p *program) startPrometheusMonitor() error {
 	log.Infof("====== start prometheus monitor, port is %d ======", onePort)
 	err := p.prometheus.ListenAndServe()
 	if err != nil {
-		log.Warnf("err:%v", err)
-		return err
+		return lberr.Wrap(err)
 	}
 
 	return nil
@@ -207,8 +198,7 @@ func (p *program) startGinHttpServer() error {
 	log.Infof("====== start gin %s server, port is %d ======", p.srvName, p.port)
 	err := p.ginSrv.ListenAndServe()
 	if err != nil {
-		log.Warnf("err is %v", err)
-		return err
+		return lberr.Wrap(err)
 	}
 	return nil
 }

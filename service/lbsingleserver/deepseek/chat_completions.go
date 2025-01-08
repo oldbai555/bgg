@@ -7,8 +7,8 @@
 package deepseek
 
 import (
-	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/json"
+	"github.com/oldbai555/lbtool/pkg/lberr"
 	"github.com/oldbai555/lbtool/pkg/restysdk"
 	url2 "net/url"
 )
@@ -51,15 +51,13 @@ func ChatCompletions(req *ChatChatCompletionsReq) (*ChatCompletionsResp, error) 
 		"Authorization": "Bearer " + req.Token,
 	}).SetBody(apiReq).Post(url)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	var apiResp ChatCompletionsApiResp
 	err = json.Unmarshal(response.Body(), &apiResp)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	var resp = &ChatCompletionsResp{
