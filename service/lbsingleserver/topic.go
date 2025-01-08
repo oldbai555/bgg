@@ -10,6 +10,7 @@ import (
 	"github.com/oldbai555/bgg/service/lbbase"
 	"github.com/oldbai555/bgg/service/lbsingleserver/iface"
 	"github.com/oldbai555/bgg/service/lbsingleserver/mq"
+	"github.com/oldbai555/lbtool/pkg/lberr"
 )
 
 var (
@@ -22,7 +23,7 @@ func InitTopic() error {
 	MqTopicSyncFile, err = mq.NewTopicSt(lbbase.MqTopic_MqTopicSyncFile.String(), MqTopicBySyncFileHandler)
 	MqTopicCacheAllFile, err = mq.NewTopicSt(lbbase.MqTopic_MqTopicCacheAllFile.String(), MqTopicByCacheAllFileHandler)
 	if err != nil {
-		return err
+		return lberr.Wrap(err)
 	}
 	return nil
 }

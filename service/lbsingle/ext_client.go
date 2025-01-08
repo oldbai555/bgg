@@ -9,6 +9,7 @@ package lbsingle
 import (
 	"github.com/oldbai555/bgg/pkg/brpc"
 	"github.com/oldbai555/bgg/service/lbbase"
+	"github.com/oldbai555/lbtool/pkg/lberr"
 	"github.com/oldbai555/micro/uctx"
 	"net/http"
 )
@@ -19,7 +20,7 @@ func CheckAuth(ctx uctx.IUCtx) (*lbbase.BaseUser, error) {
 		Sid: ctx.Sid(),
 	}, &resp)
 	if err != nil {
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 	return resp.User, nil
 }

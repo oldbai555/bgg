@@ -14,12 +14,12 @@ import (
 func SetLoginInfo(sid string, user *lbbase.BaseUser) error {
 	rdb, err := Rdb()
 	if err != nil {
-		return err
+		return lberr.Wrap(err)
 	}
 
 	err = rdb.SetPb(sid, user, time.Hour*24)
 	if err != nil {
-		return err
+		return lberr.Wrap(err)
 	}
 
 	return nil
@@ -43,12 +43,12 @@ func GetLoginInfo(sid string) (*lbbase.BaseUser, error) {
 func DelLoginInfo(sid string) error {
 	rdb, err := Rdb()
 	if err != nil {
-		return err
+		return lberr.Wrap(err)
 	}
 
 	err = rdb.Del(sid)
 	if err != nil {
-		return err
+		return lberr.Wrap(err)
 	}
 
 	return nil

@@ -10,6 +10,7 @@ import (
 	"github.com/nsqio/go-nsq"
 	"github.com/oldbai555/bgg/pkg/constant"
 	"github.com/oldbai555/lbtool/log"
+	"github.com/oldbai555/lbtool/pkg/lberr"
 )
 
 type Consumer struct {
@@ -40,7 +41,7 @@ func (n *Consumer) Start() (err error) {
 		var cli *nsq.Consumer
 		cli, err = nsq.NewConsumer(e.topic, n.channel, n.cfg)
 		if err != nil {
-			log.Errorf("err:%v", err)
+			err = lberr.Wrap(err)
 			return
 		}
 		cli.AddHandler(e.handler)
@@ -48,6 +49,7 @@ func (n *Consumer) Start() (err error) {
 		// 直接连接 nsqd 不走服务发现
 		err = cli.ConnectToNSQDs(n.addressList)
 		if err != nil {
+			err = lberr.Wrap(err)
 			return
 		}
 		n.clis = append(n.clis, cli)

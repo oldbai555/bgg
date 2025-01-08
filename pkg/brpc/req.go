@@ -31,8 +31,7 @@ func DoRequest(_ uctx.IUCtx, _, path, method string, req, out proto.Message) err
 	val, err := jsonpb.MarshalToString(req)
 	body = []byte(val)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return err
+		return lberr.Wrap(err)
 	}
 
 	var headers = make(map[string]string)
@@ -42,22 +41,19 @@ func DoRequest(_ uctx.IUCtx, _, path, method string, req, out proto.Message) err
 	var target = fmt.Sprintf("%s://%s:%s/gateway", "http", "127.0.0.1", "20000")
 	result, err := url.JoinPath(target, path)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return err
+		return lberr.Wrap(err)
 	}
 
 	resp, err := restysdk.NewRequest().SetHeaders(headers).SetBody(body).Execute(method, result)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return err
+		return lberr.Wrap(err)
 	}
 
 	log.Infof("do http resp is %s", string(resp.Body()))
 	var respBody Resp
 	err = json.Unmarshal(resp.Body(), &respBody)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return err
+		return lberr.Wrap(err)
 	}
 
 	if respBody.ErrCode > 0 {
@@ -66,8 +62,7 @@ func DoRequest(_ uctx.IUCtx, _, path, method string, req, out proto.Message) err
 
 	err = jsonpb.Unmarshal([]byte(respBody.Data), out)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return err
+		return lberr.Wrap(err)
 	}
 
 	return nil

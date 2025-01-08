@@ -178,7 +178,7 @@ func (d *diskQueue) Put(data []byte) error {
 func (d *diskQueue) Close() error {
 	err := d.exit(false)
 	if err != nil {
-		return err
+		return lberr.Wrap(err)
 	}
 	return d.sync()
 }
@@ -416,12 +416,12 @@ func (d *diskQueue) writeOne(data []byte) error {
 	d.writeBuf.Reset()
 	err = binary.Write(&d.writeBuf, binary.BigEndian, dataLen)
 	if err != nil {
-		return err
+		return lberr.Wrap(err)
 	}
 
 	_, err = d.writeBuf.Write(data)
 	if err != nil {
-		return err
+		return lberr.Wrap(err)
 	}
 
 	// only write to the file once
@@ -451,7 +451,7 @@ func (d *diskQueue) sync() error {
 
 	err := d.persistMetaData()
 	if err != nil {
-		return err
+		return lberr.Wrap(err)
 	}
 
 	d.needSync = false
@@ -466,7 +466,7 @@ func (d *diskQueue) retrieveMetaData() error {
 	fileName := d.metaDataFileName()
 	f, err = os.OpenFile(fileName, os.O_RDONLY, 0600)
 	if err != nil {
-		return err
+		return lberr.Wrap(err)
 	}
 	defer f.Close()
 
@@ -476,7 +476,7 @@ func (d *diskQueue) retrieveMetaData() error {
 		&d.readFileNum, &d.readPos,
 		&d.writeFileNum, &d.writePos)
 	if err != nil {
-		return err
+		return lberr.Wrap(err)
 	}
 	d.depth = depth
 	d.nextReadFileNum = d.readFileNum
@@ -490,7 +490,7 @@ func (d *diskQueue) retrieveMetaData() error {
 	fileName = d.fileName(d.writeFileNum)
 	fileInfo, err := os.Stat(fileName)
 	if err != nil {
-		return err
+		return lberr.Wrap(err)
 	}
 	fileSize := fileInfo.Size()
 	if d.writePos < fileSize {
@@ -519,7 +519,7 @@ func (d *diskQueue) persistMetaData() error {
 	// write to tmp file
 	f, err = os.OpenFile(tmpFileName, os.O_RDWR|os.O_CREATE, 0600)
 	if err != nil {
-		return err
+		return lberr.Wrap(err)
 	}
 
 	_, err = fmt.Fprintf(f, "%d\n%d,%d\n%d,%d\n",

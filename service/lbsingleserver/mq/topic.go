@@ -10,6 +10,7 @@ import (
 	"github.com/nsqio/go-nsq"
 	"github.com/oldbai555/bgg/pkg/marshal"
 	"github.com/oldbai555/bgg/service/lbsingle"
+	"github.com/oldbai555/lbtool/pkg/lberr"
 	"github.com/oldbai555/micro/uctx"
 	"google.golang.org/protobuf/proto"
 	"time"
@@ -38,17 +39,17 @@ func (t TopicSt) Pub(ctx uctx.IUCtx, obj proto.Message) error {
 
 	err := producer.Ping()
 	if err != nil {
-		return err
+		return lberr.Wrap(err)
 	}
 
 	val, err := marshal.PbMarshal(obj)
 	if err != nil {
-		return err
+		return lberr.Wrap(err)
 	}
 
 	b, err := encodeMsg(ctx.TraceId(), val)
 	if err != nil {
-		return err
+		return lberr.Wrap(err)
 	}
 
 	return producer.Publish(t.topic, b)
@@ -61,17 +62,17 @@ func (t TopicSt) DeferredPublish(ctx uctx.IUCtx, delay time.Duration, obj proto.
 
 	err := producer.Ping()
 	if err != nil {
-		return err
+		return lberr.Wrap(err)
 	}
 
 	val, err := marshal.PbMarshal(obj)
 	if err != nil {
-		return err
+		return lberr.Wrap(err)
 	}
 
 	b, err := encodeMsg(ctx.TraceId(), val)
 	if err != nil {
-		return err
+		return lberr.Wrap(err)
 	}
 
 	return producer.DeferredPublish(t.topic, delay, b)

@@ -3,23 +3,22 @@
 package lbwxmp
 
 import (
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	"github.com/oldbai555/lbtool/pkg/lberr"
 )
 
 var (
-	Success                         = status.Error(codes.Code(int32(ErrCode_Success)), "Success")
-	ErrMpMemberUserNotFound         = status.Error(codes.Code(int32(ErrCode_ErrMpMemberUserNotFound)), "ErrMpMemberUserNotFound")
-	ErrMpStoreShopNotFound          = status.Error(codes.Code(int32(ErrCode_ErrMpStoreShopNotFound)), "ErrMpStoreShopNotFound")
-	ErrMpProductCategoryNotFound    = status.Error(codes.Code(int32(ErrCode_ErrMpProductCategoryNotFound)), "ErrMpProductCategoryNotFound")
-	ErrMpStoreProductNotFound       = status.Error(codes.Code(int32(ErrCode_ErrMpStoreProductNotFound)), "ErrMpStoreProductNotFound")
-	ErrMpStoreOrderNotFound         = status.Error(codes.Code(int32(ErrCode_ErrMpStoreOrderNotFound)), "ErrMpStoreOrderNotFound")
-	ErrMpStoreOrderCartInfoNotFound = status.Error(codes.Code(int32(ErrCode_ErrMpStoreOrderCartInfoNotFound)), "ErrMpStoreOrderCartInfoNotFound")
-	ErrMpServiceNotFound            = status.Error(codes.Code(int32(ErrCode_ErrMpServiceNotFound)), "ErrMpServiceNotFound")
-	ErrMpCtxConvertFailed           = status.Error(codes.Code(int32(ErrCode_ErrMpCtxConvertFailed)), "ErrMpCtxConvertFailed")
-	ErrMpSmsCodeNotEqual            = status.Error(codes.Code(int32(ErrCode_ErrMpSmsCodeNotEqual)), "ErrMpSmsCodeNotEqual")
-	ErrMpSmsCodeNoExpired           = status.Error(codes.Code(int32(ErrCode_ErrMpSmsCodeNoExpired)), "ErrMpSmsCodeNoExpired")
-	ErrMpShopAdsNotFound            = status.Error(codes.Code(int32(ErrCode_ErrMpShopAdsNotFound)), "ErrMpShopAdsNotFound")
-	ErrMpStoreOrderStatusNotFound   = status.Error(codes.Code(int32(ErrCode_ErrMpStoreOrderStatusNotFound)), "ErrMpStoreOrderStatusNotFound")
-	ErrMpOrderNumberNotFound        = status.Error(codes.Code(int32(ErrCode_ErrMpOrderNumberNotFound)), "ErrMpOrderNumberNotFound")
+	Success                         = lberr.NewErr(int32(ErrCode_Success), "Success")
+	ErrMpMemberUserNotFound         = lberr.NewErr(int32(ErrCode_ErrMpMemberUserNotFound), "ErrMpMemberUserNotFound")
+	ErrMpStoreShopNotFound          = lberr.NewErr(int32(ErrCode_ErrMpStoreShopNotFound), "ErrMpStoreShopNotFound")
+	ErrMpProductCategoryNotFound    = lberr.NewErr(int32(ErrCode_ErrMpProductCategoryNotFound), "ErrMpProductCategoryNotFound")
+	ErrMpStoreProductNotFound       = lberr.NewErr(int32(ErrCode_ErrMpStoreProductNotFound), "ErrMpStoreProductNotFound")
+	ErrMpStoreOrderNotFound         = lberr.NewErr(int32(ErrCode_ErrMpStoreOrderNotFound), "ErrMpStoreOrderNotFound")
+	ErrMpStoreOrderCartInfoNotFound = lberr.NewErr(int32(ErrCode_ErrMpStoreOrderCartInfoNotFound), "ErrMpStoreOrderCartInfoNotFound")
+	ErrMpServiceNotFound            = lberr.NewErr(int32(ErrCode_ErrMpServiceNotFound), "ErrMpServiceNotFound")
+	ErrMpCtxConvertFailed           = lberr.NewErr(int32(ErrCode_ErrMpCtxConvertFailed), "ErrMpCtxConvertFailed")
+	ErrMpSmsCodeNotEqual            = lberr.NewErr(int32(ErrCode_ErrMpSmsCodeNotEqual), "ErrMpSmsCodeNotEqual")
+	ErrMpSmsCodeNoExpired           = lberr.NewErr(int32(ErrCode_ErrMpSmsCodeNoExpired), "ErrMpSmsCodeNoExpired")
+	ErrMpShopAdsNotFound            = lberr.NewErr(int32(ErrCode_ErrMpShopAdsNotFound), "ErrMpShopAdsNotFound")
+	ErrMpStoreOrderStatusNotFound   = lberr.NewErr(int32(ErrCode_ErrMpStoreOrderStatusNotFound), "ErrMpStoreOrderStatusNotFound")
+	ErrMpOrderNumberNotFound        = lberr.NewErr(int32(ErrCode_ErrMpOrderNumberNotFound), "ErrMpOrderNumberNotFound")
 )

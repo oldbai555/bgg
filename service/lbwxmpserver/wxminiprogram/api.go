@@ -9,7 +9,6 @@ package wxminiprogram
 import (
 	"github.com/oldbai555/bgg/pkg/constant"
 	"github.com/oldbai555/bgg/service/lbbase"
-	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/json"
 	"github.com/oldbai555/lbtool/pkg/lberr"
 	"github.com/oldbai555/lbtool/pkg/restysdk"
@@ -26,14 +25,12 @@ func Code2Session(req *lbbase.JsCodeToSessionReq) (*lbbase.JsCodeToSessionRsp, e
 		"grant_type": "authorization_code",
 	}).Get(path)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 	var resp lbbase.JsCodeToSessionRsp
 	err = json.Unmarshal(response.Body(), &resp)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 	if resp.Errcode > 0 {
 		return nil, lberr.NewErr(resp.Errcode, resp.Errmsg)

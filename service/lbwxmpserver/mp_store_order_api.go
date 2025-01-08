@@ -6,6 +6,7 @@ import (
 	"github.com/oldbai555/bgg/service/lbsingle"
 	"github.com/oldbai555/bgg/service/lbwxmp"
 	"github.com/oldbai555/lbtool/log"
+	"github.com/oldbai555/lbtool/pkg/lberr"
 	"github.com/oldbai555/lbtool/utils"
 	"github.com/oldbai555/micro/core"
 	"github.com/oldbai555/micro/gormx"
@@ -18,14 +19,12 @@ func (a *LbwxmpServer) AddMpStoreOrder(ctx context.Context, req *lbwxmp.AddMpSto
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	err = OrmMpStoreOrder.NewBaseScope().Create(uCtx, req.Data)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 	rsp.Data = req.Data
 
@@ -37,8 +36,7 @@ func (a *LbwxmpServer) DelMpStoreOrderList(ctx context.Context, req *lbwxmp.DelM
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	listRsp, err := a.GetMpStoreOrderList(ctx, &lbwxmp.GetMpStoreOrderListReq{
@@ -47,8 +45,7 @@ func (a *LbwxmpServer) DelMpStoreOrderList(ctx context.Context, req *lbwxmp.DelM
 			AddOpt(core.DefaultListOption_DefaultListOptionSelect, lbwxmp.FieldId_),
 	})
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	if len(listRsp.List) == 0 {
@@ -59,8 +56,7 @@ func (a *LbwxmpServer) DelMpStoreOrderList(ctx context.Context, req *lbwxmp.DelM
 	idList := utils.PluckUint64List(listRsp.List, lbwxmp.FieldId)
 	_, err = OrmMpStoreOrder.NewBaseScope().WhereIn(lbwxmp.FieldId_, idList).Delete(uCtx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	return &rsp, err
@@ -71,20 +67,17 @@ func (a *LbwxmpServer) UpdateMpStoreOrder(ctx context.Context, req *lbwxmp.Updat
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	data, err := OrmMpStoreOrder.NewBaseScope().Where(lbwxmp.FieldId_, req.Data.Id).First(uCtx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	_, err = OrmMpStoreOrder.NewBaseScope().Where(lbwxmp.FieldId_, data.Id).Update(uCtx, utils.OrmStruct2Map(req.Data))
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	return &rsp, err
@@ -95,14 +88,12 @@ func (a *LbwxmpServer) GetMpStoreOrder(ctx context.Context, req *lbwxmp.GetMpSto
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	data, err := OrmMpStoreOrder.NewBaseScope().Where(lbwxmp.FieldId_, req.Id).First(uCtx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 	rsp.Data = data
 
@@ -114,15 +105,13 @@ func (a *LbwxmpServer) GetMpStoreOrderList(ctx context.Context, req *lbwxmp.GetM
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	db := OrmMpStoreOrder.NewList(req.ListOption)
 	err = gormx.ProcessDefaultOptions[*lbwxmp.ModelMpStoreOrder](req.ListOption, db)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	err = core.NewOptionsProcessor(req.ListOption).
@@ -130,8 +119,7 @@ func (a *LbwxmpServer) GetMpStoreOrderList(ctx context.Context, req *lbwxmp.GetM
 
 	rsp.Paginate, err = db.FindPaginate(uCtx, &rsp.List)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	return &rsp, err
@@ -142,8 +130,7 @@ func (a *LbwxmpServer) MPShopOrderCreate(ctx context.Context, req *lbwxmp.MPShop
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	user, ok := uCtx.ExtInfo().(*lbbase.BaseUser)
@@ -153,8 +140,7 @@ func (a *LbwxmpServer) MPShopOrderCreate(ctx context.Context, req *lbwxmp.MPShop
 
 	storeShop, err := OrmMpStoreShop.NewBaseScope().Where(lbwxmp.FieldId_, req.ShopId).First(uCtx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	orderSn := GenerateOrderID()
@@ -163,8 +149,7 @@ func (a *LbwxmpServer) MPShopOrderCreate(ctx context.Context, req *lbwxmp.MPShop
 	}
 	err = OrmMpOrderNumber.Create(uCtx, orderNumber)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	// 生成一个订单号
@@ -180,8 +165,7 @@ func (a *LbwxmpServer) MPShopOrderCreate(ctx context.Context, req *lbwxmp.MPShop
 
 	err = OrmMpStoreOrder.NewBaseScope().Create(uCtx, order)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	// 添加进入购物车
@@ -219,8 +203,7 @@ func (a *LbwxmpServer) MPShopOrderCreate(ctx context.Context, req *lbwxmp.MPShop
 	}
 	err = OrmMpStoreOrderStatus.NewBaseScope().Create(uCtx, orderStatus)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	rsp.OrderSn = orderSn
@@ -232,8 +215,7 @@ func (a *LbwxmpServer) MPShopOrderList(ctx context.Context, req *lbwxmp.MPShopOr
 	var err error
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	db := OrmMpStoreOrder.NewList(&core.ListOption{
@@ -246,24 +228,21 @@ func (a *LbwxmpServer) MPShopOrderList(ctx context.Context, req *lbwxmp.MPShopOr
 	}
 	list, err := db.Find(uCtx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 	rsp.List = list
 
 	mpStoreShopIds := utils.PluckUint64List(rsp.List, lbwxmp.FieldMpStoreShopId)
 	mpStoreShopList, err := OrmMpStoreShop.WhereIn(lbwxmp.FieldId_, mpStoreShopIds).Find(uCtx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 	rsp.ShopMap = utils.Slice2MapKeyByStructField(mpStoreShopList, lbwxmp.FieldId).(map[uint64]*lbwxmp.ModelMpStoreShop)
 
 	orderSnList := utils.PluckStringList(rsp.List, lbwxmp.FieldOrderSn)
 	cartInfoList, err := OrmMpStoreOrderCartInfo.WhereIn(lbwxmp.FieldOrderSn_, orderSnList).Find(uCtx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	rsp.CartMap = make(map[string]*lbwxmp.MPShopOrderListRsp_CartInfo)
@@ -282,26 +261,22 @@ func (a *LbwxmpServer) MPShopOrderDetail(ctx context.Context, req *lbwxmp.MPShop
 	var err error
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	order, err := OrmMpStoreOrder.Where(lbwxmp.FieldOrderSn_, req.OrderSn).First(uCtx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	mpStoreShop, err := OrmMpStoreShop.Where(lbwxmp.FieldId_, order.MpStoreShopId).First(uCtx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	cartInfoList, err := OrmMpStoreOrderCartInfo.Where(lbwxmp.FieldOrderSn_, order.OrderSn).Find(uCtx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	rsp.Order = order

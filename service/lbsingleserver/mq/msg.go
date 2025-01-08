@@ -11,6 +11,7 @@ import (
 	"github.com/oldbai555/bgg/pkg/marshal"
 	"github.com/oldbai555/bgg/service/lbsingle"
 	"github.com/oldbai555/lbtool/log"
+	"github.com/oldbai555/lbtool/pkg/lberr"
 	"github.com/oldbai555/micro/uctx"
 	"google.golang.org/protobuf/proto"
 	"reflect"
@@ -23,7 +24,7 @@ func encodeMsg(reqId string, msg []byte) ([]byte, error) {
 	}
 	buf, err := marshal.PbMarshal(info)
 	if err != nil {
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 	return buf, nil
 }
@@ -32,7 +33,7 @@ func decodeMsg(msg []byte) (*lbsingle.NsqMsg, error) {
 	m := new(lbsingle.NsqMsg)
 	err := marshal.PbUnmarshal(msg, m)
 	if err != nil {
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 	return m, nil
 }
@@ -40,8 +41,7 @@ func decodeMsg(msg []byte) (*lbsingle.NsqMsg, error) {
 func Process[M proto.Message](msg *nsq.Message, doLogic func(uCtx uctx.IUCtx, msg M) error) error {
 	info, err := decodeMsg(msg.Body)
 	if err != nil {
-		log.Errorf("process err:%v", err)
-		return err
+		return lberr.Wrap(err)
 	}
 
 	log.SetLogHint(info.ReqId)
@@ -62,13 +62,11 @@ func Process[M proto.Message](msg *nsq.Message, doLogic func(uCtx uctx.IUCtx, ms
 
 	err = marshal.PbUnmarshal(info.Data, obj)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return err
+		return lberr.Wrap(err)
 	}
 	err = doLogic(ctx, obj)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return err
+		return lberr.Wrap(err)
 	}
 	return nil
 }

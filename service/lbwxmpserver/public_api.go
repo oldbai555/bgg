@@ -10,6 +10,7 @@ import (
 	"github.com/oldbai555/bgg/service/lbwxmpserver/cache"
 	"github.com/oldbai555/bgg/service/lbwxmpserver/wxminiprogram"
 	"github.com/oldbai555/lbtool/log"
+	"github.com/oldbai555/lbtool/pkg/lberr"
 	"github.com/oldbai555/lbtool/utils"
 	"github.com/oldbai555/micro/core"
 	"github.com/oldbai555/micro/gormx"
@@ -22,8 +23,7 @@ func (a *LbwxmpServer) WxMPAuthSendSmsLogin(ctx context.Context, req *lbwxmp.WxM
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	ctx2, ok := uCtx.(*bctx.Ctx)
@@ -33,8 +33,7 @@ func (a *LbwxmpServer) WxMPAuthSendSmsLogin(ctx context.Context, req *lbwxmp.WxM
 
 	code, err := cache.GetMpSmsCode(fmt.Sprintf("%s", req.Mobile))
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	if code != req.Code {
@@ -54,24 +53,21 @@ func (a *LbwxmpServer) WxMPAuthSendSmsLogin(ctx context.Context, req *lbwxmp.WxM
 
 	isEmpty, err := OrmMpMemberUser.NewBaseScope().Where(lbwxmp.FieldMobile_, mpUser.Mobile).IsEmpty(uCtx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	if isEmpty {
 		err = OrmMpMemberUser.NewBaseScope().Create(uCtx, mpUser)
 	}
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	rsp.UserInfo = mpUser
 	sid := utils.GenUUID()
 	err = cache.SetLoginInfo(sid, rsp.UserInfo.ToBaseUser())
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 	rsp.AccessToken = sid
 
@@ -89,8 +85,7 @@ func (a *LbwxmpServer) WxMPAuthSendSmsCode(ctx context.Context, req *lbwxmp.WxMP
 	rsp.Code = utils.GetRandomString(6, utils.RandomStringModNumber)
 	err = cache.SetMpSmsCode(fmt.Sprintf("%s", req.Mobile), rsp.Code)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	return &rsp, err
@@ -101,8 +96,7 @@ func (a *LbwxmpServer) WxMiniProgramAuthSession(ctx context.Context, req *lbwxmp
 
 	conf, err := syscfg.GetWxMiniProgramConf()
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	session, err := wxminiprogram.Code2Session(&lbbase.JsCodeToSessionReq{
@@ -111,8 +105,7 @@ func (a *LbwxmpServer) WxMiniProgramAuthSession(ctx context.Context, req *lbwxmp
 		Secret: conf.Secret,
 	})
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	rsp.Openid = session.Openid
@@ -138,8 +131,7 @@ func (a *LbwxmpServer) MPShopNearBy(ctx context.Context, req *lbwxmp.MPShopNearB
 	var err error
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 	db := OrmMpStoreShop.NewBaseScope()
 	if req.ShopId != 0 {
@@ -157,8 +149,7 @@ func (a *LbwxmpServer) MPShopProduct(ctx context.Context, req *lbwxmp.MPShopProd
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	db := OrmMpStoreShop.NewBaseScope()
@@ -167,13 +158,11 @@ func (a *LbwxmpServer) MPShopProduct(ctx context.Context, req *lbwxmp.MPShopProd
 	}
 	storeShop, err := db.First(uCtx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 	rsp.List, err = OrmMpProductCategory.NewBaseScope().Where(lbwxmp.FieldMpStoreShopId_, storeShop.Id).Find(uCtx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 	if len(rsp.List) == 0 {
 		return &rsp, nil
@@ -199,15 +188,13 @@ func (a *LbwxmpServer) GetMpShopAdsListPublic(ctx context.Context, req *lbwxmp.G
 
 	uCtx, err := uctx.ToUCtx(ctx)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	db := OrmMpShopAds.NewList(req.ListOption)
 	err = gormx.ProcessDefaultOptions[*lbwxmp.ModelMpShopAds](req.ListOption, db)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 
 	err = core.NewOptionsProcessor(req.ListOption).
@@ -216,8 +203,7 @@ func (a *LbwxmpServer) GetMpShopAdsListPublic(ctx context.Context, req *lbwxmp.G
 	var list []*lbwxmp.ModelMpShopAds
 	_, err = db.FindPaginate(uCtx, &list)
 	if err != nil {
-		log.Errorf("err:%v", err)
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 	if len(rsp.List) == 0 {
 		rsp.List = append(rsp.List, "https://oldbai.top/oss/download/BUOZ74", "https://oldbai.top/oss/download/BUOZ74")

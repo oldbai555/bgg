@@ -16,11 +16,11 @@ import (
 func SetMpSmsCode(k string, v string) error {
 	rdb, err := Rdb()
 	if err != nil {
-		return err
+		return lberr.Wrap(err)
 	}
 	err = rdb.Set(fmt.Sprintf("%s_%s", constant.MpSmsCachePrefix, k), []byte(v), 60*time.Second)
 	if err != nil {
-		return err
+		return lberr.Wrap(err)
 	}
 	return nil
 }
