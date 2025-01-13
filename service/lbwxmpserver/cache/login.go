@@ -8,6 +8,7 @@ package cache
 
 import (
 	"github.com/oldbai555/bgg/service/lbbase"
+	"github.com/oldbai555/lbtool/pkg/lberr"
 	"time"
 )
 

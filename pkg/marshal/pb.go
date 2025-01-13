@@ -6,12 +6,15 @@
 
 package marshal
 
-import "google.golang.org/protobuf/proto"
+import (
+	"github.com/oldbai555/lbtool/pkg/lberr"
+	"google.golang.org/protobuf/proto"
+)
 
 func PbMarshal(obj proto.Message) ([]byte, error) {
 	buf, err := proto.Marshal(obj)
 	if err != nil {
-		return nil, err
+		return nil, lberr.Wrap(err)
 	}
 	return buf, nil
 }
