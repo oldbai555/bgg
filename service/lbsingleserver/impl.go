@@ -470,3 +470,120 @@ func (a *LbsingleServer) GetDailyShortSentencesList(ctx context.Context, req *lb
 
 	return &rsp, err
 }
+
+func (a *LbsingleServer) AddOutsideWebSite(ctx context.Context, req *lbsingle.AddOutsideWebSiteReq) (*lbsingle.AddOutsideWebSiteRsp, error) {
+	var rsp lbsingle.AddOutsideWebSiteRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		return nil, lberr.Wrap(err)
+	}
+
+	// 不要有空格
+	req.Data.Url = strings.TrimSpace(req.Data.Url)
+	req.Data.Title = strings.TrimSpace(req.Data.Title)
+	req.Data.Desc = strings.TrimSpace(req.Data.Desc)
+
+	err = OrmOutsideWebSite.NewBaseScope().Create(uCtx, req.Data)
+	if err != nil {
+		return nil, lberr.Wrap(err)
+	}
+	rsp.Data = req.Data
+
+	return &rsp, err
+}
+func (a *LbsingleServer) DelOutsideWebSiteList(ctx context.Context, req *lbsingle.DelOutsideWebSiteListReq) (*lbsingle.DelOutsideWebSiteListRsp, error) {
+	var rsp lbsingle.DelOutsideWebSiteListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		return nil, lberr.Wrap(err)
+	}
+
+	listRsp, err := a.GetOutsideWebSiteList(ctx, &lbsingle.GetOutsideWebSiteListReq{
+		ListOption: req.ListOption.
+			SetSkipTotal().
+			AddOpt(core.DefaultListOption_DefaultListOptionSelect, lbsingle.FieldId_),
+	})
+	if err != nil {
+		return nil, lberr.Wrap(err)
+	}
+
+	if len(listRsp.List) == 0 {
+		log.Infof("list is empty")
+		return &rsp, nil
+	}
+
+	idList := utils.PluckUint64List(listRsp.List, lbsingle.FieldId)
+	_, err = OrmOutsideWebSite.NewBaseScope().WhereIn(lbsingle.FieldId_, idList).Delete(uCtx)
+	if err != nil {
+		return nil, lberr.Wrap(err)
+	}
+
+	return &rsp, err
+}
+func (a *LbsingleServer) UpdateOutsideWebSite(ctx context.Context, req *lbsingle.UpdateOutsideWebSiteReq) (*lbsingle.UpdateOutsideWebSiteRsp, error) {
+	var rsp lbsingle.UpdateOutsideWebSiteRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		return nil, lberr.Wrap(err)
+	}
+
+	data, err := OrmOutsideWebSite.NewBaseScope().Where(lbsingle.FieldId_, req.Data.Id).First(uCtx)
+	if err != nil {
+		return nil, lberr.Wrap(err)
+	}
+
+	_, err = OrmOutsideWebSite.NewBaseScope().Where(lbsingle.FieldId_, data.Id).Update(uCtx, utils.OrmStruct2Map(req.Data))
+	if err != nil {
+		return nil, lberr.Wrap(err)
+	}
+
+	return &rsp, err
+}
+func (a *LbsingleServer) GetOutsideWebSite(ctx context.Context, req *lbsingle.GetOutsideWebSiteReq) (*lbsingle.GetOutsideWebSiteRsp, error) {
+	var rsp lbsingle.GetOutsideWebSiteRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		return nil, lberr.Wrap(err)
+	}
+
+	data, err := OrmOutsideWebSite.NewBaseScope().Where(lbsingle.FieldId_, req.Id).First(uCtx)
+	if err != nil {
+		return nil, lberr.Wrap(err)
+	}
+	rsp.Data = data
+
+	return &rsp, err
+}
+func (a *LbsingleServer) GetOutsideWebSiteList(ctx context.Context, req *lbsingle.GetOutsideWebSiteListReq) (*lbsingle.GetOutsideWebSiteListRsp, error) {
+	var rsp lbsingle.GetOutsideWebSiteListRsp
+	var err error
+
+	uCtx, err := uctx.ToUCtx(ctx)
+	if err != nil {
+		return nil, lberr.Wrap(err)
+	}
+
+	db := OrmOutsideWebSite.NewList(req.ListOption)
+	err = gormx.ProcessDefaultOptions[*lbsingle.ModelOutsideWebSite](req.ListOption, db)
+	if err != nil {
+		return nil, lberr.Wrap(err)
+	}
+
+	err = core.NewOptionsProcessor(req.ListOption).
+		Process()
+
+	rsp.Paginate, err = db.FindPaginate(uCtx, &rsp.List)
+	if err != nil {
+		return nil, lberr.Wrap(err)
+	}
+
+	return &rsp, err
+}

@@ -17,3 +17,6 @@ func (*ModelMessage) TableName() string {
 func (*ModelDailyShortSentences) TableName() string {
 	return "lbsingle_daily_short_sentences"
 }
+func (*ModelOutsideWebSite) TableName() string {
+	return "lbsingle_outside_web_site"
+}

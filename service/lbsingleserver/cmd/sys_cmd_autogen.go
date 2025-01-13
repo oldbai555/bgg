@@ -49,4 +49,14 @@ var cmdList = []*bcmd.Cmd{
 	{Server: lbsingle.ServerName, Path: lbsingle.GetDailyShortSentencesCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.GetDailyShortSentences, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
 
 	{Server: lbsingle.ServerName, Path: lbsingle.GetDailyShortSentencesListCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.GetDailyShortSentencesList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.AddOutsideWebSiteCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.AddOutsideWebSite, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.DelOutsideWebSiteListCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.DelOutsideWebSiteList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.UpdateOutsideWebSiteCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.UpdateOutsideWebSite, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.GetOutsideWebSiteCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.GetOutsideWebSite, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.GetOutsideWebSiteListCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.GetOutsideWebSiteList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
 }

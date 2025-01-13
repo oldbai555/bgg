@@ -113,6 +113,31 @@ type LbsingleClient interface {
 	// @desc:
 	// @error:
 	GetDailyShortSentencesList(ctx context.Context, in *GetDailyShortSentencesListReq, opts ...grpc.CallOption) (*GetDailyShortSentencesListRsp, error)
+	// @cat: OutsideWebSite
+	// @name:
+	// @desc:
+	// @error:
+	AddOutsideWebSite(ctx context.Context, in *AddOutsideWebSiteReq, opts ...grpc.CallOption) (*AddOutsideWebSiteRsp, error)
+	// @cat: OutsideWebSite
+	// @name:
+	// @desc:
+	// @error:
+	DelOutsideWebSiteList(ctx context.Context, in *DelOutsideWebSiteListReq, opts ...grpc.CallOption) (*DelOutsideWebSiteListRsp, error)
+	// @cat: OutsideWebSite
+	// @name:
+	// @desc:
+	// @error:
+	UpdateOutsideWebSite(ctx context.Context, in *UpdateOutsideWebSiteReq, opts ...grpc.CallOption) (*UpdateOutsideWebSiteRsp, error)
+	// @cat: OutsideWebSite
+	// @name:
+	// @desc:
+	// @error:
+	GetOutsideWebSite(ctx context.Context, in *GetOutsideWebSiteReq, opts ...grpc.CallOption) (*GetOutsideWebSiteRsp, error)
+	// @cat: OutsideWebSite
+	// @name:
+	// @desc:
+	// @error:
+	GetOutsideWebSiteList(ctx context.Context, in *GetOutsideWebSiteListReq, opts ...grpc.CallOption) (*GetOutsideWebSiteListRsp, error)
 }
 
 type lbsingleClient struct {
@@ -303,6 +328,51 @@ func (c *lbsingleClient) GetDailyShortSentencesList(ctx context.Context, in *Get
 	return out, nil
 }
 
+func (c *lbsingleClient) AddOutsideWebSite(ctx context.Context, in *AddOutsideWebSiteReq, opts ...grpc.CallOption) (*AddOutsideWebSiteRsp, error) {
+	out := new(AddOutsideWebSiteRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddOutsideWebSite", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) DelOutsideWebSiteList(ctx context.Context, in *DelOutsideWebSiteListReq, opts ...grpc.CallOption) (*DelOutsideWebSiteListRsp, error) {
+	out := new(DelOutsideWebSiteListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelOutsideWebSiteList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) UpdateOutsideWebSite(ctx context.Context, in *UpdateOutsideWebSiteReq, opts ...grpc.CallOption) (*UpdateOutsideWebSiteRsp, error) {
+	out := new(UpdateOutsideWebSiteRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateOutsideWebSite", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetOutsideWebSite(ctx context.Context, in *GetOutsideWebSiteReq, opts ...grpc.CallOption) (*GetOutsideWebSiteRsp, error) {
+	out := new(GetOutsideWebSiteRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetOutsideWebSite", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetOutsideWebSiteList(ctx context.Context, in *GetOutsideWebSiteListReq, opts ...grpc.CallOption) (*GetOutsideWebSiteListRsp, error) {
+	out := new(GetOutsideWebSiteListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetOutsideWebSiteList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // LbsingleServer is the server API for Lbsingle service.
 // All implementations must embed UnimplementedLbsingleServer
 // for forward compatibility
@@ -398,6 +468,31 @@ type LbsingleServer interface {
 	// @desc:
 	// @error:
 	GetDailyShortSentencesList(context.Context, *GetDailyShortSentencesListReq) (*GetDailyShortSentencesListRsp, error)
+	// @cat: OutsideWebSite
+	// @name:
+	// @desc:
+	// @error:
+	AddOutsideWebSite(context.Context, *AddOutsideWebSiteReq) (*AddOutsideWebSiteRsp, error)
+	// @cat: OutsideWebSite
+	// @name:
+	// @desc:
+	// @error:
+	DelOutsideWebSiteList(context.Context, *DelOutsideWebSiteListReq) (*DelOutsideWebSiteListRsp, error)
+	// @cat: OutsideWebSite
+	// @name:
+	// @desc:
+	// @error:
+	UpdateOutsideWebSite(context.Context, *UpdateOutsideWebSiteReq) (*UpdateOutsideWebSiteRsp, error)
+	// @cat: OutsideWebSite
+	// @name:
+	// @desc:
+	// @error:
+	GetOutsideWebSite(context.Context, *GetOutsideWebSiteReq) (*GetOutsideWebSiteRsp, error)
+	// @cat: OutsideWebSite
+	// @name:
+	// @desc:
+	// @error:
+	GetOutsideWebSiteList(context.Context, *GetOutsideWebSiteListReq) (*GetOutsideWebSiteListRsp, error)
 	mustEmbedUnimplementedLbsingleServer()
 }
 
@@ -464,6 +559,21 @@ func (UnimplementedLbsingleServer) GetDailyShortSentences(context.Context, *GetD
 }
 func (UnimplementedLbsingleServer) GetDailyShortSentencesList(context.Context, *GetDailyShortSentencesListReq) (*GetDailyShortSentencesListRsp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetDailyShortSentencesList not implemented")
+}
+func (UnimplementedLbsingleServer) AddOutsideWebSite(context.Context, *AddOutsideWebSiteReq) (*AddOutsideWebSiteRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddOutsideWebSite not implemented")
+}
+func (UnimplementedLbsingleServer) DelOutsideWebSiteList(context.Context, *DelOutsideWebSiteListReq) (*DelOutsideWebSiteListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelOutsideWebSiteList not implemented")
+}
+func (UnimplementedLbsingleServer) UpdateOutsideWebSite(context.Context, *UpdateOutsideWebSiteReq) (*UpdateOutsideWebSiteRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateOutsideWebSite not implemented")
+}
+func (UnimplementedLbsingleServer) GetOutsideWebSite(context.Context, *GetOutsideWebSiteReq) (*GetOutsideWebSiteRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetOutsideWebSite not implemented")
+}
+func (UnimplementedLbsingleServer) GetOutsideWebSiteList(context.Context, *GetOutsideWebSiteListReq) (*GetOutsideWebSiteListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetOutsideWebSiteList not implemented")
 }
 func (UnimplementedLbsingleServer) mustEmbedUnimplementedLbsingleServer() {}
 
@@ -838,6 +948,96 @@ func _Lbsingle_GetDailyShortSentencesList_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Lbsingle_AddOutsideWebSite_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddOutsideWebSiteReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).AddOutsideWebSite(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/AddOutsideWebSite",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).AddOutsideWebSite(ctx, req.(*AddOutsideWebSiteReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_DelOutsideWebSiteList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelOutsideWebSiteListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).DelOutsideWebSiteList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/DelOutsideWebSiteList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).DelOutsideWebSiteList(ctx, req.(*DelOutsideWebSiteListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_UpdateOutsideWebSite_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateOutsideWebSiteReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).UpdateOutsideWebSite(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/UpdateOutsideWebSite",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).UpdateOutsideWebSite(ctx, req.(*UpdateOutsideWebSiteReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetOutsideWebSite_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetOutsideWebSiteReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetOutsideWebSite(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetOutsideWebSite",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetOutsideWebSite(ctx, req.(*GetOutsideWebSiteReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetOutsideWebSiteList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetOutsideWebSiteListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetOutsideWebSiteList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetOutsideWebSiteList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetOutsideWebSiteList(ctx, req.(*GetOutsideWebSiteListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Lbsingle_ServiceDesc is the grpc.ServiceDesc for Lbsingle service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -924,6 +1124,26 @@ var Lbsingle_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetDailyShortSentencesList",
 			Handler:    _Lbsingle_GetDailyShortSentencesList_Handler,
+		},
+		{
+			MethodName: "AddOutsideWebSite",
+			Handler:    _Lbsingle_AddOutsideWebSite_Handler,
+		},
+		{
+			MethodName: "DelOutsideWebSiteList",
+			Handler:    _Lbsingle_DelOutsideWebSiteList_Handler,
+		},
+		{
+			MethodName: "UpdateOutsideWebSite",
+			Handler:    _Lbsingle_UpdateOutsideWebSite_Handler,
+		},
+		{
+			MethodName: "GetOutsideWebSite",
+			Handler:    _Lbsingle_GetOutsideWebSite_Handler,
+		},
+		{
+			MethodName: "GetOutsideWebSiteList",
+			Handler:    _Lbsingle_GetOutsideWebSiteList_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

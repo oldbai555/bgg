@@ -4,16 +4,20 @@ package lbsingle
 
 const (
 	AddDailyShortSentencesCMDPath     = "/lbsingle/AddDailyShortSentences"
+	AddOutsideWebSiteCMDPath          = "/lbsingle/AddOutsideWebSite"
 	AddUserCMDPath                    = "/lbsingle/AddUser"
 	CheckAuthSysCMDPath               = "/lbsingle/CheckAuthSys"
 	DelDailyShortSentencesListCMDPath = "/lbsingle/DelDailyShortSentencesList"
 	DelFileListCMDPath                = "/lbsingle/DelFileList"
+	DelOutsideWebSiteListCMDPath      = "/lbsingle/DelOutsideWebSiteList"
 	DelUserListCMDPath                = "/lbsingle/DelUserList"
 	GetDailyShortSentencesCMDPath     = "/lbsingle/GetDailyShortSentences"
 	GetDailyShortSentencesListCMDPath = "/lbsingle/GetDailyShortSentencesList"
 	GetFileCMDPath                    = "/lbsingle/GetFile"
 	GetFileListCMDPath                = "/lbsingle/GetFileList"
 	GetLoginUserCMDPath               = "/lbsingle/GetLoginUser"
+	GetOutsideWebSiteCMDPath          = "/lbsingle/GetOutsideWebSite"
+	GetOutsideWebSiteListCMDPath      = "/lbsingle/GetOutsideWebSiteList"
 	GetUserCMDPath                    = "/lbsingle/GetUser"
 	GetUserListCMDPath                = "/lbsingle/GetUserList"
 	LoginCMDPath                      = "/lbsingle/Login"
@@ -22,5 +26,6 @@ const (
 	SyncFileCMDPath                   = "/lbsingle/SyncFile"
 	UpdateDailyShortSentencesCMDPath  = "/lbsingle/UpdateDailyShortSentences"
 	UpdateLoginUserInfoCMDPath        = "/lbsingle/UpdateLoginUserInfo"
+	UpdateOutsideWebSiteCMDPath       = "/lbsingle/UpdateOutsideWebSite"
 	UpdateUserCMDPath                 = "/lbsingle/UpdateUser"
 )
