@@ -328,3 +328,46 @@ var ModelDailyShortSentences = &engine.ModelObjectType{
 		},
 	},
 }
+
+var ModelOutsideWebSite = &engine.ModelObjectType{
+	Name: "lbsingle.ModelOutsideWebSite",
+	FieldList: &engine.ObjectFieldList{
+		List: []*engine.ObjectField{
+			{
+				FieldName: "id",
+				Type:      "uint64",
+				IsArray:   false,
+			},
+			{
+				FieldName: "created_at",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "updated_at",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "deleted_at",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "url",
+				Type:      "string",
+				IsArray:   false,
+			},
+			{
+				FieldName: "title",
+				Type:      "string",
+				IsArray:   false,
+			},
+			{
+				FieldName: "desc",
+				Type:      "string",
+				IsArray:   false,
+			},
+		},
+	},
+}

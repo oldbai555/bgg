@@ -55,7 +55,14 @@ function usage() {
 
 # 命令执行函数
 function genAddCurdRpc() {
-  safe_exec_baixctl genAddCurdRpc -p "$1" -m "$2" -s "$3"
+  if [ "$#" -eq 2 ]; then
+    safe_exec_baixctl genAddCurdRpc -p "$1" -m "$2"
+  elif [ "$#" -eq 3 ]; then
+    safe_exec_baixctl genAddCurdRpc -p "$1" -m "$2" -s "$3"
+  else
+    echo "Error: Invalid number of arguments for genAddCurdRpc. Expected 2 or 3 arguments." >&2
+    exit 1
+  fi
 }
 
 function genAddProto() {

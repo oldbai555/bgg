@@ -16,6 +16,7 @@ var (
 	OrmChat                *gormx.BaseModel[*lbsingle.ModelChat]
 	OrmMessage             *gormx.BaseModel[*lbsingle.ModelMessage]
 	OrmDailyShortSentences *gormx.BaseModel[*lbsingle.ModelDailyShortSentences]
+	OrmOutsideWebSite      *gormx.BaseModel[*lbsingle.ModelOutsideWebSite]
 )
 
 func Init() (err error) {
@@ -34,6 +35,7 @@ func Init() (err error) {
 		&lbsingle.ModelChat{},
 		&lbsingle.ModelMessage{},
 		&lbsingle.ModelDailyShortSentences{},
+		&lbsingle.ModelOutsideWebSite{},
 	},
 	)
 	// 注入结构
@@ -44,6 +46,7 @@ func Init() (err error) {
 		autodb.ModelChat,
 		autodb.ModelMessage,
 		autodb.ModelDailyShortSentences,
+		autodb.ModelOutsideWebSite,
 	)
 
 	OrmFile = gormx.NewBaseModel[*lbsingle.ModelFile](gormx.ModelConfig{
@@ -64,6 +67,10 @@ func Init() (err error) {
 	})
 	OrmDailyShortSentences = gormx.NewBaseModel[*lbsingle.ModelDailyShortSentences](gormx.ModelConfig{
 		NotFoundErrCode: int32(lbsingle.ErrCode_ErrDailyShortSentencesNotFound),
+		Db:              "biz",
+	})
+	OrmOutsideWebSite = gormx.NewBaseModel[*lbsingle.ModelOutsideWebSite](gormx.ModelConfig{
+		NotFoundErrCode: int32(lbsingle.ErrCode_ErrOutsideWebSiteNotFound),
 		Db:              "biz",
 	})
 

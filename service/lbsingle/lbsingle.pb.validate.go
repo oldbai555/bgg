@@ -1230,6 +1230,122 @@ var _ interface {
 	ErrorName() string
 } = ModelDailyShortSentencesValidationError{}
 
+// Validate checks the field values on ModelOutsideWebSite with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ModelOutsideWebSite) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ModelOutsideWebSite with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ModelOutsideWebSiteMultiError, or nil if none found.
+func (m *ModelOutsideWebSite) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ModelOutsideWebSite) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Id
+
+	// no validation rules for CreatedAt
+
+	// no validation rules for UpdatedAt
+
+	// no validation rules for DeletedAt
+
+	// no validation rules for Url
+
+	// no validation rules for Title
+
+	// no validation rules for Desc
+
+	if len(errors) > 0 {
+		return ModelOutsideWebSiteMultiError(errors)
+	}
+
+	return nil
+}
+
+// ModelOutsideWebSiteMultiError is an error wrapping multiple validation
+// errors returned by ModelOutsideWebSite.ValidateAll() if the designated
+// constraints aren't met.
+type ModelOutsideWebSiteMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ModelOutsideWebSiteMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ModelOutsideWebSiteMultiError) AllErrors() []error { return m }
+
+// ModelOutsideWebSiteValidationError is the validation error returned by
+// ModelOutsideWebSite.Validate if the designated constraints aren't met.
+type ModelOutsideWebSiteValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ModelOutsideWebSiteValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ModelOutsideWebSiteValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ModelOutsideWebSiteValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ModelOutsideWebSiteValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ModelOutsideWebSiteValidationError) ErrorName() string {
+	return "ModelOutsideWebSiteValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ModelOutsideWebSiteValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sModelOutsideWebSite.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ModelOutsideWebSiteValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ModelOutsideWebSiteValidationError{}
+
 // Validate checks the field values on DelFileListReq with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -6291,3 +6407,1315 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = GetDailyShortSentencesListRspValidationError{}
+
+// Validate checks the field values on AddOutsideWebSiteReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *AddOutsideWebSiteReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddOutsideWebSiteReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AddOutsideWebSiteReqMultiError, or nil if none found.
+func (m *AddOutsideWebSiteReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddOutsideWebSiteReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetData() == nil {
+		err := AddOutsideWebSiteReqValidationError{
+			field:  "Data",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AddOutsideWebSiteReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AddOutsideWebSiteReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AddOutsideWebSiteReqValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return AddOutsideWebSiteReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// AddOutsideWebSiteReqMultiError is an error wrapping multiple validation
+// errors returned by AddOutsideWebSiteReq.ValidateAll() if the designated
+// constraints aren't met.
+type AddOutsideWebSiteReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddOutsideWebSiteReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddOutsideWebSiteReqMultiError) AllErrors() []error { return m }
+
+// AddOutsideWebSiteReqValidationError is the validation error returned by
+// AddOutsideWebSiteReq.Validate if the designated constraints aren't met.
+type AddOutsideWebSiteReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddOutsideWebSiteReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddOutsideWebSiteReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddOutsideWebSiteReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddOutsideWebSiteReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddOutsideWebSiteReqValidationError) ErrorName() string {
+	return "AddOutsideWebSiteReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AddOutsideWebSiteReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddOutsideWebSiteReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddOutsideWebSiteReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddOutsideWebSiteReqValidationError{}
+
+// Validate checks the field values on AddOutsideWebSiteRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *AddOutsideWebSiteRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddOutsideWebSiteRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AddOutsideWebSiteRspMultiError, or nil if none found.
+func (m *AddOutsideWebSiteRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddOutsideWebSiteRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AddOutsideWebSiteRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AddOutsideWebSiteRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AddOutsideWebSiteRspValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return AddOutsideWebSiteRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// AddOutsideWebSiteRspMultiError is an error wrapping multiple validation
+// errors returned by AddOutsideWebSiteRsp.ValidateAll() if the designated
+// constraints aren't met.
+type AddOutsideWebSiteRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddOutsideWebSiteRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddOutsideWebSiteRspMultiError) AllErrors() []error { return m }
+
+// AddOutsideWebSiteRspValidationError is the validation error returned by
+// AddOutsideWebSiteRsp.Validate if the designated constraints aren't met.
+type AddOutsideWebSiteRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddOutsideWebSiteRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddOutsideWebSiteRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddOutsideWebSiteRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddOutsideWebSiteRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddOutsideWebSiteRspValidationError) ErrorName() string {
+	return "AddOutsideWebSiteRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AddOutsideWebSiteRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddOutsideWebSiteRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddOutsideWebSiteRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddOutsideWebSiteRspValidationError{}
+
+// Validate checks the field values on UpdateOutsideWebSiteReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *UpdateOutsideWebSiteReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdateOutsideWebSiteReq with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpdateOutsideWebSiteReqMultiError, or nil if none found.
+func (m *UpdateOutsideWebSiteReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdateOutsideWebSiteReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetData() == nil {
+		err := UpdateOutsideWebSiteReqValidationError{
+			field:  "Data",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UpdateOutsideWebSiteReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UpdateOutsideWebSiteReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpdateOutsideWebSiteReqValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return UpdateOutsideWebSiteReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpdateOutsideWebSiteReqMultiError is an error wrapping multiple validation
+// errors returned by UpdateOutsideWebSiteReq.ValidateAll() if the designated
+// constraints aren't met.
+type UpdateOutsideWebSiteReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdateOutsideWebSiteReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdateOutsideWebSiteReqMultiError) AllErrors() []error { return m }
+
+// UpdateOutsideWebSiteReqValidationError is the validation error returned by
+// UpdateOutsideWebSiteReq.Validate if the designated constraints aren't met.
+type UpdateOutsideWebSiteReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateOutsideWebSiteReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateOutsideWebSiteReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateOutsideWebSiteReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateOutsideWebSiteReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateOutsideWebSiteReqValidationError) ErrorName() string {
+	return "UpdateOutsideWebSiteReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateOutsideWebSiteReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateOutsideWebSiteReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateOutsideWebSiteReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateOutsideWebSiteReqValidationError{}
+
+// Validate checks the field values on UpdateOutsideWebSiteRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *UpdateOutsideWebSiteRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdateOutsideWebSiteRsp with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpdateOutsideWebSiteRspMultiError, or nil if none found.
+func (m *UpdateOutsideWebSiteRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdateOutsideWebSiteRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return UpdateOutsideWebSiteRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpdateOutsideWebSiteRspMultiError is an error wrapping multiple validation
+// errors returned by UpdateOutsideWebSiteRsp.ValidateAll() if the designated
+// constraints aren't met.
+type UpdateOutsideWebSiteRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdateOutsideWebSiteRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdateOutsideWebSiteRspMultiError) AllErrors() []error { return m }
+
+// UpdateOutsideWebSiteRspValidationError is the validation error returned by
+// UpdateOutsideWebSiteRsp.Validate if the designated constraints aren't met.
+type UpdateOutsideWebSiteRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateOutsideWebSiteRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateOutsideWebSiteRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateOutsideWebSiteRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateOutsideWebSiteRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateOutsideWebSiteRspValidationError) ErrorName() string {
+	return "UpdateOutsideWebSiteRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateOutsideWebSiteRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateOutsideWebSiteRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateOutsideWebSiteRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateOutsideWebSiteRspValidationError{}
+
+// Validate checks the field values on DelOutsideWebSiteListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DelOutsideWebSiteListReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DelOutsideWebSiteListReq with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DelOutsideWebSiteListReqMultiError, or nil if none found.
+func (m *DelOutsideWebSiteListReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DelOutsideWebSiteListReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetListOption() == nil {
+		err := DelOutsideWebSiteListReqValidationError{
+			field:  "ListOption",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetListOption()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DelOutsideWebSiteListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DelOutsideWebSiteListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetListOption()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DelOutsideWebSiteListReqValidationError{
+				field:  "ListOption",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return DelOutsideWebSiteListReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// DelOutsideWebSiteListReqMultiError is an error wrapping multiple validation
+// errors returned by DelOutsideWebSiteListReq.ValidateAll() if the designated
+// constraints aren't met.
+type DelOutsideWebSiteListReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DelOutsideWebSiteListReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DelOutsideWebSiteListReqMultiError) AllErrors() []error { return m }
+
+// DelOutsideWebSiteListReqValidationError is the validation error returned by
+// DelOutsideWebSiteListReq.Validate if the designated constraints aren't met.
+type DelOutsideWebSiteListReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DelOutsideWebSiteListReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DelOutsideWebSiteListReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DelOutsideWebSiteListReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DelOutsideWebSiteListReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DelOutsideWebSiteListReqValidationError) ErrorName() string {
+	return "DelOutsideWebSiteListReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DelOutsideWebSiteListReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDelOutsideWebSiteListReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DelOutsideWebSiteListReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DelOutsideWebSiteListReqValidationError{}
+
+// Validate checks the field values on DelOutsideWebSiteListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DelOutsideWebSiteListRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DelOutsideWebSiteListRsp with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DelOutsideWebSiteListRspMultiError, or nil if none found.
+func (m *DelOutsideWebSiteListRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DelOutsideWebSiteListRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return DelOutsideWebSiteListRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// DelOutsideWebSiteListRspMultiError is an error wrapping multiple validation
+// errors returned by DelOutsideWebSiteListRsp.ValidateAll() if the designated
+// constraints aren't met.
+type DelOutsideWebSiteListRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DelOutsideWebSiteListRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DelOutsideWebSiteListRspMultiError) AllErrors() []error { return m }
+
+// DelOutsideWebSiteListRspValidationError is the validation error returned by
+// DelOutsideWebSiteListRsp.Validate if the designated constraints aren't met.
+type DelOutsideWebSiteListRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DelOutsideWebSiteListRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DelOutsideWebSiteListRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DelOutsideWebSiteListRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DelOutsideWebSiteListRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DelOutsideWebSiteListRspValidationError) ErrorName() string {
+	return "DelOutsideWebSiteListRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DelOutsideWebSiteListRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDelOutsideWebSiteListRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DelOutsideWebSiteListRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DelOutsideWebSiteListRspValidationError{}
+
+// Validate checks the field values on GetOutsideWebSiteReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetOutsideWebSiteReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetOutsideWebSiteReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetOutsideWebSiteReqMultiError, or nil if none found.
+func (m *GetOutsideWebSiteReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetOutsideWebSiteReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetId() <= 0 {
+		err := GetOutsideWebSiteReqValidationError{
+			field:  "Id",
+			reason: "value must be greater than 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return GetOutsideWebSiteReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetOutsideWebSiteReqMultiError is an error wrapping multiple validation
+// errors returned by GetOutsideWebSiteReq.ValidateAll() if the designated
+// constraints aren't met.
+type GetOutsideWebSiteReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetOutsideWebSiteReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetOutsideWebSiteReqMultiError) AllErrors() []error { return m }
+
+// GetOutsideWebSiteReqValidationError is the validation error returned by
+// GetOutsideWebSiteReq.Validate if the designated constraints aren't met.
+type GetOutsideWebSiteReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetOutsideWebSiteReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetOutsideWebSiteReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetOutsideWebSiteReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetOutsideWebSiteReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetOutsideWebSiteReqValidationError) ErrorName() string {
+	return "GetOutsideWebSiteReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetOutsideWebSiteReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetOutsideWebSiteReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetOutsideWebSiteReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetOutsideWebSiteReqValidationError{}
+
+// Validate checks the field values on GetOutsideWebSiteRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetOutsideWebSiteRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetOutsideWebSiteRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetOutsideWebSiteRspMultiError, or nil if none found.
+func (m *GetOutsideWebSiteRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetOutsideWebSiteRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetOutsideWebSiteRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetOutsideWebSiteRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetOutsideWebSiteRspValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetOutsideWebSiteRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetOutsideWebSiteRspMultiError is an error wrapping multiple validation
+// errors returned by GetOutsideWebSiteRsp.ValidateAll() if the designated
+// constraints aren't met.
+type GetOutsideWebSiteRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetOutsideWebSiteRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetOutsideWebSiteRspMultiError) AllErrors() []error { return m }
+
+// GetOutsideWebSiteRspValidationError is the validation error returned by
+// GetOutsideWebSiteRsp.Validate if the designated constraints aren't met.
+type GetOutsideWebSiteRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetOutsideWebSiteRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetOutsideWebSiteRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetOutsideWebSiteRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetOutsideWebSiteRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetOutsideWebSiteRspValidationError) ErrorName() string {
+	return "GetOutsideWebSiteRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetOutsideWebSiteRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetOutsideWebSiteRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetOutsideWebSiteRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetOutsideWebSiteRspValidationError{}
+
+// Validate checks the field values on GetOutsideWebSiteListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetOutsideWebSiteListReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetOutsideWebSiteListReq with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetOutsideWebSiteListReqMultiError, or nil if none found.
+func (m *GetOutsideWebSiteListReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetOutsideWebSiteListReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetListOption() == nil {
+		err := GetOutsideWebSiteListReqValidationError{
+			field:  "ListOption",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetListOption()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetOutsideWebSiteListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetOutsideWebSiteListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetListOption()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetOutsideWebSiteListReqValidationError{
+				field:  "ListOption",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetOutsideWebSiteListReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetOutsideWebSiteListReqMultiError is an error wrapping multiple validation
+// errors returned by GetOutsideWebSiteListReq.ValidateAll() if the designated
+// constraints aren't met.
+type GetOutsideWebSiteListReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetOutsideWebSiteListReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetOutsideWebSiteListReqMultiError) AllErrors() []error { return m }
+
+// GetOutsideWebSiteListReqValidationError is the validation error returned by
+// GetOutsideWebSiteListReq.Validate if the designated constraints aren't met.
+type GetOutsideWebSiteListReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetOutsideWebSiteListReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetOutsideWebSiteListReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetOutsideWebSiteListReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetOutsideWebSiteListReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetOutsideWebSiteListReqValidationError) ErrorName() string {
+	return "GetOutsideWebSiteListReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetOutsideWebSiteListReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetOutsideWebSiteListReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetOutsideWebSiteListReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetOutsideWebSiteListReqValidationError{}
+
+// Validate checks the field values on GetOutsideWebSiteListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetOutsideWebSiteListRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetOutsideWebSiteListRsp with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetOutsideWebSiteListRspMultiError, or nil if none found.
+func (m *GetOutsideWebSiteListRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetOutsideWebSiteListRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetPaginate()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetOutsideWebSiteListRspValidationError{
+					field:  "Paginate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetOutsideWebSiteListRspValidationError{
+					field:  "Paginate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPaginate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetOutsideWebSiteListRspValidationError{
+				field:  "Paginate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	for idx, item := range m.GetList() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, GetOutsideWebSiteListRspValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, GetOutsideWebSiteListRspValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return GetOutsideWebSiteListRspValidationError{
+					field:  fmt.Sprintf("List[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return GetOutsideWebSiteListRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetOutsideWebSiteListRspMultiError is an error wrapping multiple validation
+// errors returned by GetOutsideWebSiteListRsp.ValidateAll() if the designated
+// constraints aren't met.
+type GetOutsideWebSiteListRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetOutsideWebSiteListRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetOutsideWebSiteListRspMultiError) AllErrors() []error { return m }
+
+// GetOutsideWebSiteListRspValidationError is the validation error returned by
+// GetOutsideWebSiteListRsp.Validate if the designated constraints aren't met.
+type GetOutsideWebSiteListRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetOutsideWebSiteListRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetOutsideWebSiteListRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetOutsideWebSiteListRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetOutsideWebSiteListRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetOutsideWebSiteListRspValidationError) ErrorName() string {
+	return "GetOutsideWebSiteListRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetOutsideWebSiteListRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetOutsideWebSiteListRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetOutsideWebSiteListRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetOutsideWebSiteListRspValidationError{}

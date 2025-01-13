@@ -14,7 +14,7 @@ require (
 	github.com/gorilla/websocket v1.5.3
 	github.com/judwhite/go-svc v1.2.1
 	github.com/nsqio/go-nsq v1.1.0
-	github.com/oldbai555/lbtool v0.0.4-0.20250113115027-5c5c4ac3676e
+	github.com/oldbai555/lbtool v0.0.4-0.20250113115743-1c70028d6673
 	github.com/oldbai555/micro v0.0.2-0.20250113113823-46a4a82ae442
 	github.com/prometheus/client_golang v1.11.1
 	github.com/spf13/viper v1.9.0

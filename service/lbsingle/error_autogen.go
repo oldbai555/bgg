@@ -22,4 +22,5 @@ var (
 	ErrMessageNotFound             = lberr.NewErr(int32(ErrCode_ErrMessageNotFound), "消息不存在")
 	ErrPasswordLength              = lberr.NewErr(int32(ErrCode_ErrPasswordLength), "密码长度在6-16位")
 	ErrDailyShortSentencesNotFound = lberr.NewErr(int32(ErrCode_ErrDailyShortSentencesNotFound), "ErrDailyShortSentencesNotFound")
+	ErrOutsideWebSiteNotFound      = lberr.NewErr(int32(ErrCode_ErrOutsideWebSiteNotFound), "ErrOutsideWebSiteNotFound")
 )

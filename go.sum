@@ -349,6 +349,8 @@ github.com/oldbai555/lbtool v0.0.4-0.20250113113643-718f938588fc h1:cO2r6mgS3CXL
 github.com/oldbai555/lbtool v0.0.4-0.20250113113643-718f938588fc/go.mod h1:Wi/HyNbFwp+84T6j0x0HIXtDmGcvT1c95KxuZ9+pP6w=
 github.com/oldbai555/lbtool v0.0.4-0.20250113115027-5c5c4ac3676e h1:q157n82sW4H/1jD1gzpS8BiZWW9Cszic4Yb8QGRZq54=
 github.com/oldbai555/lbtool v0.0.4-0.20250113115027-5c5c4ac3676e/go.mod h1:Wi/HyNbFwp+84T6j0x0HIXtDmGcvT1c95KxuZ9+pP6w=
+github.com/oldbai555/lbtool v0.0.4-0.20250113115743-1c70028d6673 h1:2anPXVxvwVjN27WGNghjvDEzUmYd9T7s0rA7HRxSrLA=
+github.com/oldbai555/lbtool v0.0.4-0.20250113115743-1c70028d6673/go.mod h1:Wi/HyNbFwp+84T6j0x0HIXtDmGcvT1c95KxuZ9+pP6w=
 github.com/oldbai555/micro v0.0.2-0.20250113113823-46a4a82ae442 h1:CpF5WhR670xxBssMseu93i9YG7Df2NCAdbQk0i4wUAw=
 github.com/oldbai555/micro v0.0.2-0.20250113113823-46a4a82ae442/go.mod h1:vIRZgs3AiV/ruOSLS16mGSWfxB+6wlM9t0ksjDiYAe4=
 github.com/onsi/ginkgo v1.16.5 h1:8xi0RTUf59SOSfEtZMvwTvXYMzG4gV23XVHOZiXNtnE=
