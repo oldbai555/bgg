@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/oldbai555/bgg/service/lbwxmp"
 	"github.com/oldbai555/lbtool/log"
+	"github.com/oldbai555/lbtool/pkg/lberr"
 	"github.com/oldbai555/lbtool/utils"
 	"github.com/oldbai555/micro/core"
 	"github.com/oldbai555/micro/gormx"
