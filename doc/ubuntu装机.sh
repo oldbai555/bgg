@@ -15,7 +15,7 @@ apt install curl
 # vim
 apt install vim
 # docker & docker-compose
-curl -fsSL https://test.docker.com -o test-docker.sh && sh test-docker.sh
+apt install docker
 apt install docker-compose
 #==================================================================
 
@@ -38,11 +38,12 @@ apt install docker-compose
 
 # =================================================================
 # supervisor 安装
-# apt-get install supervisor
+# apt install supervisor
 
 # =================================================================
 # nginx 安装
 # https://www.runoob.com/linux/nginx-install-setup.html
+# apt install nginx
 
 # =================================================================
 # etcd 安装
