@@ -6,3 +6,20 @@
 - go install gitee.com/extrame/dget/cmd/dget@latest
 - ./dget mayanghua/instock:202410
 - sudo docker load -i instock_202410-img.tar.gz
+- 换源
+```shell
+vim /etc/docker/daemon.json
+# 写入内容
+{
+    "registry-mirrors": [
+        "https://docker.m.daocloud.io",
+        "https://docker.imgdb.de",
+        "https://docker-0.unsee.tech",
+        "https://docker.hlmirror.com",
+        "https://cjie.eu.org"
+    ]
+  }
+# wq 保存
+# 更新重启
+sudo systemctl daemon-reload && sudo systemctl restart docker  
+```
