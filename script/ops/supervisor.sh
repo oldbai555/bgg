@@ -116,7 +116,7 @@ localPackSrv() {
 
   goBuild ${outputDir} ${proSrvPath} ${appName}
 
-  cp "${proSrvPath}/application.yaml" ${outputDir}
+#  cp "${proSrvPath}/application.yaml" ${outputDir}
 
   local srvOutPut=${packOutputDir}"/${appName}_${hash}.tar"
   tar -cvf ${srvOutPut} -C ${outputDir} . --remove-files

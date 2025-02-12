@@ -2,12 +2,14 @@ package main
 
 import (
 	"context"
+	"embed"
 	"fmt"
 	"github.com/didip/tollbooth"
 	"github.com/didip/tollbooth_gin"
 	"github.com/gin-gonic/gin"
 	"github.com/judwhite/go-svc"
 	"github.com/oldbai555/bgg/pkg/bctx"
+	scan "github.com/oldbai555/bgg/pkg/osargs"
 	"github.com/oldbai555/bgg/pkg/syscfg"
 	"github.com/oldbai555/bgg/pkg/tool"
 	"github.com/oldbai555/bgg/service/lbsingleserver"
@@ -26,9 +28,14 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/protobuf/proto"
 	"net/http"
+	"os"
+	"path"
 	"sync"
 	"syscall"
 )
+
+//go:embed application.yaml
+var configFile embed.FS
 
 type program struct {
 	once       sync.Once
@@ -203,7 +210,27 @@ func (p *program) startGinHttpServer() error {
 	return nil
 }
 
+func initConfig() {
+	configPath := scan.OptStrDefault("configPath", path.Join(utils.GetCurDir(), "application.yaml"))
+	if _, err := os.Stat(configPath); os.IsNotExist(err) {
+		configData, err := configFile.ReadFile("application.yaml")
+		if err != nil {
+			log.Errorf("err:%v", err)
+			return
+		}
+
+		err = os.WriteFile(configPath, configData, 0644)
+		if err != nil {
+			log.Errorf("err:%v", err)
+			return
+		}
+		log.Errorf("config file not found, created a new one, please restart")
+		return
+	}
+}
+
 func main() {
+	initConfig()
 	prg := &program{}
 	err := svc.Run(prg,
 		syscall.SIGHUP,
