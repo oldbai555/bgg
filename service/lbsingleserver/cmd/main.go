@@ -71,6 +71,12 @@ func (p *program) Init(_ svc.Environment) error {
 		return lberr.Wrap(err)
 	}
 
+	// 初始化minio
+	err = lbsingleserver.InitMinio()
+	if err != nil {
+		return lberr.Wrap(err)
+	}
+
 	return nil
 }
 
@@ -102,10 +108,6 @@ func (p *program) Start() error {
 		return lberr.Wrap(err)
 	}
 
-	err = lbsingleserver.SyncFileIndex(context.Background(), true)
-	if err != nil {
-		return lberr.Wrap(err)
-	}
 	return nil
 }
 

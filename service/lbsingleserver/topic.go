@@ -14,14 +14,12 @@ import (
 )
 
 var (
-	MqTopicSyncFile     iface.ITopic
-	MqTopicCacheAllFile iface.ITopic
+	MqTopicSyncFile iface.ITopic
 )
 
 func InitTopic() error {
 	var err error
 	MqTopicSyncFile, err = mq.NewTopicSt(lbbase.MqTopic_MqTopicSyncFile.String(), MqTopicBySyncFileHandler)
-	MqTopicCacheAllFile, err = mq.NewTopicSt(lbbase.MqTopic_MqTopicCacheAllFile.String(), MqTopicByCacheAllFileHandler)
 	if err != nil {
 		return lberr.Wrap(err)
 	}
