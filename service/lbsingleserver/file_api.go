@@ -3,13 +3,11 @@ package lbsingleserver
 import (
 	"context"
 	"github.com/oldbai555/bgg/service/lbsingle"
-	"github.com/oldbai555/bgg/service/lbsingleserver/cache"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/lberr"
 	"github.com/oldbai555/lbtool/utils"
 	"github.com/oldbai555/micro/core"
 	"github.com/oldbai555/micro/uctx"
-	"os"
 )
 
 func (a *LbsingleServer) DelFileList(ctx context.Context, req *lbsingle.DelFileListReq) (*lbsingle.DelFileListRsp, error) {
@@ -34,17 +32,7 @@ func (a *LbsingleServer) DelFileList(ctx context.Context, req *lbsingle.DelFileL
 		return &rsp, nil
 	}
 
-	// 清缓存 和 文件
-	for _, val := range listRsp.List {
-		err = cache.DelFileBySortUrl(val.SortUrl)
-		if err != nil {
-			log.Errorf("del %s cache failed err:%v", val.SortUrl, err)
-		}
-		err := os.Remove(val.Path)
-		if err != nil {
-			log.Errorf("remove file %s failed err:%v", val.Path, err)
-		}
-	}
+	// todo 清缓存 和 文件
 
 	idList := utils.PluckUint64List(listRsp.List, lbsingle.FieldId)
 	_, err = OrmFile.NewBaseScope().WhereIn(lbsingle.FieldId_, idList).Delete(uCtx)

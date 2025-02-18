@@ -6,3 +6,4 @@ package syscfg
 const defaultMysqlConfPath = "C:\\work"
 const defaultRedisConfPath = "C:\\work"
 const defaultConfPath = "C:\\work"
+const defaultConfMinIO = "C:\\work"

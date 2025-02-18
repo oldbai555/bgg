@@ -2,7 +2,6 @@ package cache
 
 import (
 	"github.com/oldbai555/bgg/pkg/syscfg"
-	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/lberr"
 	"github.com/oldbai555/micro/bredis"
 )
@@ -34,8 +33,4 @@ func IsNotFound(err error) bool {
 }
 
 func Stop() {
-	err := DelAllFileCache()
-	if err != nil {
-		log.Errorf("err:%v", err)
-	}
 }

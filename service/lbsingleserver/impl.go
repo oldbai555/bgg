@@ -198,19 +198,6 @@ func (a *LbsingleServer) ResetPassword(ctx context.Context, req *lbsingle.ResetP
 func (a *LbsingleServer) SyncFile(ctx context.Context, _ *lbsingle.SyncFileReq) (*lbsingle.SyncFileRsp, error) {
 	var rsp lbsingle.SyncFileRsp
 	var err error
-
-	// 单体环境 直接用单机的 singleflight 防并发
-	_, err, _ = a.singleGroup.Do("syncfile", func() (interface{}, error) {
-		err := SyncFileIndex(ctx, true)
-		if err != nil {
-			return nil, lberr.Wrap(err)
-		}
-		return nil, nil
-	})
-	if err != nil {
-		return nil, lberr.Wrap(err)
-	}
-
 	return &rsp, err
 }
 
