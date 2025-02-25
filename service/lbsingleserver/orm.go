@@ -11,7 +11,6 @@ import (
 )
 
 var (
-	OrmFile                *gormx.BaseModel[*lbsingle.ModelFile]
 	OrmUser                *gormx.BaseModel[*lbsingle.ModelUser]
 	OrmChat                *gormx.BaseModel[*lbsingle.ModelChat]
 	OrmMessage             *gormx.BaseModel[*lbsingle.ModelMessage]
@@ -30,7 +29,6 @@ func Init() (err error) {
 	// 注册表
 	gormEngine.AutoMigrate([]interface{}{
 
-		&lbsingle.ModelFile{},
 		&lbsingle.ModelUser{},
 		&lbsingle.ModelChat{},
 		&lbsingle.ModelMessage{},
@@ -41,7 +39,6 @@ func Init() (err error) {
 	// 注入结构
 	gormEngine.RegObjectType(
 
-		autodb.ModelFile,
 		autodb.ModelUser,
 		autodb.ModelChat,
 		autodb.ModelMessage,
@@ -49,10 +46,6 @@ func Init() (err error) {
 		autodb.ModelOutsideWebSite,
 	)
 
-	OrmFile = gormx.NewBaseModel[*lbsingle.ModelFile](gormx.ModelConfig{
-		NotFoundErrCode: int32(lbsingle.ErrCode_ErrFileNotFound),
-		Db:              "biz",
-	})
 	OrmUser = gormx.NewBaseModel[*lbsingle.ModelUser](gormx.ModelConfig{
 		NotFoundErrCode: int32(lbsingle.ErrCode_ErrUserNotFound),
 		Db:              "biz",

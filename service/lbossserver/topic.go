@@ -4,12 +4,12 @@
  * @Desc:
 **/
 
-package lbsingleserver
+package lbossserver
 
 import (
+	"github.com/oldbai555/bgg/iface"
+	"github.com/oldbai555/bgg/pkg/mq"
 	"github.com/oldbai555/bgg/service/lbbase"
-	"github.com/oldbai555/bgg/service/lbsingleserver/iface"
-	"github.com/oldbai555/bgg/service/lbsingleserver/mq"
 	"github.com/oldbai555/lbtool/pkg/lberr"
 )
 

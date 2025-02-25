@@ -8,16 +8,11 @@ import (
 
 var (
 	Success                        = lberr.NewErr(int32(ErrCode_Success), "Success")
-	ErrFileNotFound                = lberr.NewErr(int32(ErrCode_ErrFileNotFound), "文件不存在")
 	ErrUserNotFound                = lberr.NewErr(int32(ErrCode_ErrUserNotFound), "用户不存在")
 	ErrOldPasswordNotEqual         = lberr.NewErr(int32(ErrCode_ErrOldPasswordNotEqual), "旧密码有误")
 	ErrOldPwdEqualNewPwd           = lberr.NewErr(int32(ErrCode_ErrOldPwdEqualNewPwd), "新旧密码不能相同")
 	ErrNsqProducerConnectFailure   = lberr.NewErr(int32(ErrCode_ErrNsqProducerConnectFailure), "连接nsq生产者失败")
 	ErrNsqTopicAlready             = lberr.NewErr(int32(ErrCode_ErrNsqTopicAlready), "nsq topic 已经存在")
-	ErrFileMd5IsEmpty              = lberr.NewErr(int32(ErrCode_ErrFileMd5IsEmpty), "文件 md5 不能为空")
-	ErrFileMd5Already              = lberr.NewErr(int32(ErrCode_ErrFileMd5Already), "文件 md5 已经存在")
-	ErrFileUploadFailure           = lberr.NewErr(int32(ErrCode_ErrFileUploadFailure), "文件上传失败")
-	ErrFileAlreadyExist            = lberr.NewErr(int32(ErrCode_ErrFileAlreadyExist), "保存文件失败，文件重复")
 	ErrChatNotFound                = lberr.NewErr(int32(ErrCode_ErrChatNotFound), "会话不存在")
 	ErrMessageNotFound             = lberr.NewErr(int32(ErrCode_ErrMessageNotFound), "消息不存在")
 	ErrPasswordLength              = lberr.NewErr(int32(ErrCode_ErrPasswordLength), "密码长度在6-16位")

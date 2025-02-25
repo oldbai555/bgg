@@ -1,0 +1,40 @@
+// Code field_autogen.go, DO NOT EDIT.
+
+package lboss
+
+const (
+	ServerName      = "lboss"
+	FieldBucket     = "Bucket"
+	FieldCreatedAt  = "CreatedAt"
+	FieldCreatorId  = "CreatorId"
+	FieldData       = "Data"
+	FieldDeletedAt  = "DeletedAt"
+	FieldDomain     = "Domain"
+	FieldFileList   = "FileList"
+	FieldId         = "Id"
+	FieldList       = "List"
+	FieldListOption = "ListOption"
+	FieldName       = "Name"
+	FieldPaginate   = "Paginate"
+	FieldPath       = "Path"
+	FieldRename     = "Rename"
+	FieldSize       = "Size"
+	FieldUpdatedAt  = "UpdatedAt"
+
+	FieldBucket_     = "bucket"
+	FieldCreatedAt_  = "created_at"
+	FieldCreatorId_  = "creator_id"
+	FieldData_       = "data"
+	FieldDeletedAt_  = "deleted_at"
+	FieldDomain_     = "domain"
+	FieldFileList_   = "file_list"
+	FieldId_         = "id"
+	FieldList_       = "list"
+	FieldListOption_ = "list_option"
+	FieldName_       = "name"
+	FieldPaginate_   = "paginate"
+	FieldPath_       = "path"
+	FieldRename_     = "rename"
+	FieldSize_       = "size"
+	FieldUpdatedAt_  = "updated_at"
+)

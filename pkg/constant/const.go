@@ -15,5 +15,5 @@ const (
 )
 
 const (
-	BucketPath = "https://oldbai.top/oss/download/"
+	DOMAIN = "https://oldbai.top/oss/download/"
 )

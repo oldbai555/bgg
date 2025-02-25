@@ -22,21 +22,6 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type LbsingleClient interface {
-	// @cat:
-	// @name:
-	// @desc: 删除文件
-	// @error:
-	DelFileList(ctx context.Context, in *DelFileListReq, opts ...grpc.CallOption) (*DelFileListRsp, error)
-	// @cat:
-	// @name:
-	// @desc: 获取单个文件
-	// @error:
-	GetFile(ctx context.Context, in *GetFileReq, opts ...grpc.CallOption) (*GetFileRsp, error)
-	// @cat:
-	// @name:
-	// @desc: 获取文件列表
-	// @error:
-	GetFileList(ctx context.Context, in *GetFileListReq, opts ...grpc.CallOption) (*GetFileListRsp, error)
 	// @desc: 登录
 	Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginRsp, error)
 	// @desc: 登出
@@ -146,33 +131,6 @@ type lbsingleClient struct {
 
 func NewLbsingleClient(cc grpc.ClientConnInterface) LbsingleClient {
 	return &lbsingleClient{cc}
-}
-
-func (c *lbsingleClient) DelFileList(ctx context.Context, in *DelFileListReq, opts ...grpc.CallOption) (*DelFileListRsp, error) {
-	out := new(DelFileListRsp)
-	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelFileList", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *lbsingleClient) GetFile(ctx context.Context, in *GetFileReq, opts ...grpc.CallOption) (*GetFileRsp, error) {
-	out := new(GetFileRsp)
-	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetFile", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *lbsingleClient) GetFileList(ctx context.Context, in *GetFileListReq, opts ...grpc.CallOption) (*GetFileListRsp, error) {
-	out := new(GetFileListRsp)
-	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetFileList", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *lbsingleClient) Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginRsp, error) {
@@ -377,21 +335,6 @@ func (c *lbsingleClient) GetOutsideWebSiteList(ctx context.Context, in *GetOutsi
 // All implementations must embed UnimplementedLbsingleServer
 // for forward compatibility
 type LbsingleServer interface {
-	// @cat:
-	// @name:
-	// @desc: 删除文件
-	// @error:
-	DelFileList(context.Context, *DelFileListReq) (*DelFileListRsp, error)
-	// @cat:
-	// @name:
-	// @desc: 获取单个文件
-	// @error:
-	GetFile(context.Context, *GetFileReq) (*GetFileRsp, error)
-	// @cat:
-	// @name:
-	// @desc: 获取文件列表
-	// @error:
-	GetFileList(context.Context, *GetFileListReq) (*GetFileListRsp, error)
 	// @desc: 登录
 	Login(context.Context, *LoginReq) (*LoginRsp, error)
 	// @desc: 登出
@@ -500,15 +443,6 @@ type LbsingleServer interface {
 type UnimplementedLbsingleServer struct {
 }
 
-func (UnimplementedLbsingleServer) DelFileList(context.Context, *DelFileListReq) (*DelFileListRsp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DelFileList not implemented")
-}
-func (UnimplementedLbsingleServer) GetFile(context.Context, *GetFileReq) (*GetFileRsp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetFile not implemented")
-}
-func (UnimplementedLbsingleServer) GetFileList(context.Context, *GetFileListReq) (*GetFileListRsp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetFileList not implemented")
-}
 func (UnimplementedLbsingleServer) Login(context.Context, *LoginReq) (*LoginRsp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
 }
@@ -586,60 +520,6 @@ type UnsafeLbsingleServer interface {
 
 func RegisterLbsingleServer(s grpc.ServiceRegistrar, srv LbsingleServer) {
 	s.RegisterService(&Lbsingle_ServiceDesc, srv)
-}
-
-func _Lbsingle_DelFileList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DelFileListReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(LbsingleServer).DelFileList(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/lbsingle.lbsingle/DelFileList",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LbsingleServer).DelFileList(ctx, req.(*DelFileListReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Lbsingle_GetFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetFileReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(LbsingleServer).GetFile(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/lbsingle.lbsingle/GetFile",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LbsingleServer).GetFile(ctx, req.(*GetFileReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Lbsingle_GetFileList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetFileListReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(LbsingleServer).GetFileList(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/lbsingle.lbsingle/GetFileList",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LbsingleServer).GetFileList(ctx, req.(*GetFileListReq))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _Lbsingle_Login_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -1045,18 +925,6 @@ var Lbsingle_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "lbsingle.lbsingle",
 	HandlerType: (*LbsingleServer)(nil),
 	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "DelFileList",
-			Handler:    _Lbsingle_DelFileList_Handler,
-		},
-		{
-			MethodName: "GetFile",
-			Handler:    _Lbsingle_GetFile_Handler,
-		},
-		{
-			MethodName: "GetFileList",
-			Handler:    _Lbsingle_GetFileList_Handler,
-		},
 		{
 			MethodName: "Login",
 			Handler:    _Lbsingle_Login_Handler,

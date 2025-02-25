@@ -18,7 +18,7 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/home/bgg/minio server ~/minio-data
+ExecStart=/home/work/minio server /home/work/minio/data
 Restart=on-failure
 RestartSec=5s
 

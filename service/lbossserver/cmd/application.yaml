@@ -1,0 +1,3 @@
+server:
+  name: "lboss"
+  port: 20013

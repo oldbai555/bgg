@@ -11,7 +11,3 @@ import "time"
 const (
 	MqTimeOut = 5 * time.Second
 )
-
-const (
-	MqAddress = "oldbai.top:4150"
-)

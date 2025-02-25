@@ -2,9 +2,6 @@
 
 package lbsingle
 
-func (*ModelFile) TableName() string {
-	return "lbsingle_file"
-}
 func (*ModelUser) TableName() string {
 	return "lbsingle_user"
 }

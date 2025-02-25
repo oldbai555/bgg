@@ -7,11 +7,11 @@
 package lbsingleserver
 
 import (
+	"github.com/oldbai555/bgg/iface"
 	"github.com/oldbai555/bgg/pkg/syscfg"
 	"github.com/oldbai555/bgg/service/lbbase"
 	"github.com/oldbai555/bgg/service/lbsingle"
 	"github.com/oldbai555/bgg/service/lbsingleserver/deepseek"
-	"github.com/oldbai555/bgg/service/lbsingleserver/iface"
 	"github.com/oldbai555/bgg/service/lbsingleserver/roommgr"
 	"github.com/oldbai555/bgg/service/lbsingleserver/wsmgr"
 	"github.com/oldbai555/lbtool/pkg/lberr"

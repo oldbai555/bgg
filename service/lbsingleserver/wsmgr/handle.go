@@ -9,10 +9,10 @@ package wsmgr
 import (
 	"context"
 	"fmt"
+	"github.com/oldbai555/bgg/iface"
 	"github.com/oldbai555/bgg/pkg/bctx"
 	"github.com/oldbai555/bgg/service/lbbase"
 	"github.com/oldbai555/bgg/service/lbsingle"
-	"github.com/oldbai555/bgg/service/lbsingleserver/iface"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/jsonpb"
 	"github.com/oldbai555/micro/uctx"
