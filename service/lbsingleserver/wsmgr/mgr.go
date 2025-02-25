@@ -2,9 +2,9 @@ package wsmgr
 
 import (
 	"github.com/gorilla/websocket"
+	"github.com/oldbai555/bgg/iface"
 	"github.com/oldbai555/bgg/service/lbbase"
 	"github.com/oldbai555/bgg/service/lbsingle"
-	"github.com/oldbai555/bgg/service/lbsingleserver/iface"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/jsonpb"
 	"google.golang.org/protobuf/proto"

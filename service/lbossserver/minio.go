@@ -4,7 +4,7 @@
  * @Desc:
 **/
 
-package lbsingleserver
+package lbossserver
 
 import (
 	"github.com/oldbai555/bgg/pkg/miniosdk"

@@ -9,12 +9,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/judwhite/go-svc"
 	"github.com/oldbai555/bgg/pkg/bctx"
+	"github.com/oldbai555/bgg/pkg/mq"
 	scan "github.com/oldbai555/bgg/pkg/osargs"
 	"github.com/oldbai555/bgg/pkg/syscfg"
 	"github.com/oldbai555/bgg/pkg/tool"
-	"github.com/oldbai555/bgg/service/lbsingleserver"
-	"github.com/oldbai555/bgg/service/lbsingleserver/cache"
-	"github.com/oldbai555/bgg/service/lbsingleserver/wsmgr"
+	"github.com/oldbai555/bgg/service/lbossserver"
+	"github.com/oldbai555/bgg/service/lbossserver/cache"
+	"github.com/oldbai555/bgg/service/lbsingle"
 	"github.com/oldbai555/lbtool/log"
 	"github.com/oldbai555/lbtool/pkg/lberr"
 	"github.com/oldbai555/lbtool/pkg/routine"
@@ -45,7 +46,7 @@ type program struct {
 }
 
 func (p *program) Init(_ svc.Environment) error {
-	syscfg.InitGlobal("", utils.GetCurDir(), syscfg.OptionWithServer(), syscfg.OptionWithWxMiniProgram(), syscfg.OptionWithDeepSeek())
+	syscfg.InitGlobal("", utils.GetCurDir(), syscfg.OptionWithServer(), syscfg.OptionWithWxMiniProgram())
 	conf, err := syscfg.GetServerConf()
 	if err != nil {
 		return lberr.Wrap(err)
@@ -59,7 +60,7 @@ func (p *program) Init(_ svc.Environment) error {
 	gate.CheckCmdList(cmdList)
 
 	// 初始化mysql
-	err = lbsingleserver.Init()
+	err = lbossserver.Init()
 	if err != nil {
 		return lberr.Wrap(err)
 	}
@@ -70,6 +71,21 @@ func (p *program) Init(_ svc.Environment) error {
 		return lberr.Wrap(err)
 	}
 
+	err = lbossserver.InitTopic()
+	if err != nil {
+		return lberr.Wrap(err)
+	}
+
+	err = mq.Start()
+	if err != nil {
+		return lberr.Wrap(err)
+	}
+
+	// 初始化minio
+	err = lbossserver.InitMinio()
+	if err != nil {
+		return lberr.Wrap(err)
+	}
 	return nil
 }
 
@@ -90,12 +106,10 @@ func (p *program) Start() error {
 	if err != nil {
 		return lberr.Wrap(err)
 	}
-
 	return nil
 }
 
 func (p *program) Stop() error {
-	wsmgr.CloseAllWsConn()
 	if p.prometheus != nil {
 		log.Infof("stop prometheus")
 		err := p.prometheus.Shutdown(context.Background())
@@ -110,7 +124,9 @@ func (p *program) Stop() error {
 			return lberr.Wrap(err)
 		}
 	}
+	mq.Stop()
 	cache.Stop()
+
 	return nil
 }
 
@@ -118,7 +134,7 @@ func (p *program) registerCmd(r *gin.Engine, cmd *bcmd.Cmd) {
 	cmd.WithGenIUCtx(func(ctx *gin.Context) uctx.IUCtx {
 		return bctx.NewCtx(ctx, bctx.WithGinHeaderAuthorization(ctx), bctx.WithGinHeaderAuthType(ctx, cmd), bctx.WithClientIp(ctx))
 	}).WithCheckAuthF(func(nCtx uctx.IUCtx) (extInfo interface{}, err error) {
-		return lbsingleserver.CheckAuth(nCtx)
+		return lbsingle.CheckAuth(nCtx)
 	}).WithHandleError(func(ctx *gin.Context, err error) {
 		handler := bgin.NewHandler(ctx)
 		handler.Error(err)
@@ -144,7 +160,8 @@ func (p *program) startPrometheusMonitor() error {
 	log.Infof("====== start prometheus monitor, port is %d ======", onePort)
 	err := p.prometheus.ListenAndServe()
 	if err != nil {
-		return lberr.Wrap(err)
+		log.Warnf("err:%v", err)
+		return err
 	}
 
 	return nil
@@ -178,7 +195,7 @@ func (p *program) startGinHttpServer() error {
 	}
 
 	// 注册自定义路由
-	lbsingleserver.RegisterCustomRouter(router)
+	lbossserver.RegisterCustomRouter(router)
 
 	p.ginSrv = &http.Server{
 		Addr:    fmt.Sprintf(":%d", p.port),
@@ -189,7 +206,8 @@ func (p *program) startGinHttpServer() error {
 	log.Infof("====== start gin %s server, port is %d ======", p.srvName, p.port)
 	err := p.ginSrv.ListenAndServe()
 	if err != nil {
-		return lberr.Wrap(err)
+		log.Warnf("err is %v", err)
+		return err
 	}
 	return nil
 }

@@ -15,9 +15,5 @@ import (
 // RegisterCustomRouter 注册自定义路由
 func RegisterCustomRouter(r *gin.Engine) {
 	group := r.Group(lbsingle.ServerName)
-	group.POST("/upload", handleUploadFile)
-	group.POST("/deploy/upload", handleUploadDeployFile)
-	group.GET("/download/*sUrl", handleDownloadFile)
-	group.GET("/presigned/*fileName", handlePreSigned)
 	group.Any("/ws", wsmgr.HandleWs)
 }

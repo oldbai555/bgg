@@ -25,35 +25,6 @@ type LbsingleServer struct {
 	singleGroup singleflight.Group
 }
 
-func (a *LbsingleServer) GetFileList(ctx context.Context, req *lbsingle.GetFileListReq) (*lbsingle.GetFileListRsp, error) {
-	var rsp lbsingle.GetFileListRsp
-	var err error
-	uCtx, err := uctx.ToUCtx(ctx)
-	if err != nil {
-		return nil, lberr.Wrap(err)
-	}
-
-	db := OrmFile.NewList(req.ListOption)
-	err = gormx.ProcessDefaultOptions[*lbsingle.ModelFile](req.ListOption, db)
-	if err != nil {
-		return nil, lberr.Wrap(err)
-	}
-
-	err = core.NewOptionsProcessor(req.ListOption).
-		AddString(lbsingle.GetFileListReq_ListOptionLikeName, func(val string) error {
-			db.WhereLike(lbsingle.FieldName_, fmt.Sprintf("%%%s%%", val))
-			return nil
-		}).
-		Process()
-
-	rsp.Paginate, err = db.FindPaginate(uCtx, &rsp.List)
-	if err != nil {
-		return nil, lberr.Wrap(err)
-	}
-
-	return &rsp, err
-}
-
 func (a *LbsingleServer) Login(ctx context.Context, req *lbsingle.LoginReq) (*lbsingle.LoginRsp, error) {
 	var rsp lbsingle.LoginRsp
 	var err error
