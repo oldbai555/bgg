@@ -7,6 +7,7 @@ go 1.23.6
 //replace github.com/oldbai555/lbtool => E:\bgg\github.com\oldbai555\lbtool
 
 require (
+	github.com/DeanThompson/ginpprof v0.0.0-20201112072838-007b1e56b2e1
 	github.com/didip/tollbooth v4.0.2+incompatible
 	github.com/didip/tollbooth_gin v0.0.0-20170928041415-5752492be505
 	github.com/envoyproxy/protoc-gen-validate v0.9.1

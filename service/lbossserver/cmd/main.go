@@ -4,6 +4,7 @@ import (
 	"context"
 	"embed"
 	"fmt"
+	"github.com/DeanThompson/ginpprof"
 	"github.com/didip/tollbooth"
 	"github.com/didip/tollbooth_gin"
 	"github.com/gin-gonic/gin"
@@ -196,6 +197,7 @@ func (p *program) startGinHttpServer() error {
 
 	// 注册自定义路由
 	lbossserver.RegisterCustomRouter(router)
+	ginpprof.Wrap(router)
 
 	p.ginSrv = &http.Server{
 		Addr:    fmt.Sprintf(":%d", p.port),

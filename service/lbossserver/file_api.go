@@ -13,6 +13,7 @@ import (
 	"github.com/oldbai555/micro/bgin"
 	"github.com/oldbai555/micro/core"
 	"github.com/oldbai555/micro/uctx"
+	"net/http"
 	"path"
 	"strings"
 	"time"
@@ -139,6 +140,7 @@ func handleUploadDeployFile(c *gin.Context) {
 		handler.Error(err)
 		return
 	}
+	defer open.Close()
 	oss, err := uploadToOss(nCtx, file.Size, "deploy", file.Filename, file.Filename, open)
 	if err != nil {
 		log.Errorf("err:%v", err)
@@ -153,17 +155,26 @@ func handleDownloadFile(ctx *gin.Context) {
 	handler := bgin.NewHandler(ctx)
 	p := ctx.Param("path")
 	nCtx := bctx.NewCtx(ctx)
-	modelFile, err := OrmFile.NewBaseScope().Select(lboss.FieldPath_).Where(lboss.FieldPath_, strings.TrimLeft(p, "/")).First(nCtx)
+	modelFile, err := OrmFile.NewBaseScope().Select(lboss.FieldPath_, lboss.FieldName_, lboss.FieldId_).Where(lboss.FieldPath_, strings.TrimLeft(p, "/")).First(nCtx)
 	if err != nil {
 		log.Errorf("err:%v", err)
 		handler.Error(err)
 		return
 	}
-	u, err := minIoSDK.PreSignedGetObject(constant.BucketByPublic, modelFile.Path)
+	by, err := minIoSDK.Download(constant.BucketByPublic, modelFile.Path)
 	if err != nil {
-		log.Errorf("err:%v", err)
+		handler.Error(err)
+		return
+	}
+	if len(by) == 0 {
 		handler.Error(lboss.ErrFileNotFound)
 		return
 	}
-	ctx.Redirect(301, u)
+	defer func() {
+		by = nil
+	}()
+	ctx.Header("Content-Type", "application/octet-stream")
+	ctx.Header("Content-Disposition", "attachment; filename="+modelFile.Name)
+	ctx.Data(http.StatusOK, "application/octet-stream", by)
+
 }
