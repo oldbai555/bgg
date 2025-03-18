@@ -16,6 +16,7 @@ type MysqlConf struct {
 	Port     int    `json:"port"`
 	Username string `json:"username"`
 	Password string `json:"password"`
+	Database string `json:"database"`
 }
 
 func NewGormMysqlConf(path string) *MysqlConf {
@@ -36,5 +37,5 @@ func NewGormMysqlConf(path string) *MysqlConf {
 }
 
 func (m *MysqlConf) Dsn() string {
-	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local", m.Username, m.Password, m.Addr, m.Port, defaultDatabase)
+	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local", m.Username, m.Password, m.Addr, m.Port, m.Database)
 }

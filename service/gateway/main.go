@@ -7,6 +7,7 @@ package main
 */
 import (
 	"fmt"
+	"github.com/DeanThompson/ginpprof"
 	"github.com/didip/tollbooth"
 	"github.com/didip/tollbooth_gin"
 	"github.com/gin-gonic/gin"
@@ -48,6 +49,7 @@ func main() {
 	)
 	engine.GET("/gateway/*path", handleRevProxy)
 	engine.POST("/gateway/*path", handleRevProxy)
+	ginpprof.Wrap(engine)
 	err := engine.Run(fmt.Sprintf(":%d", syscfg.Global.ServerConf.Port))
 	if err != nil {
 		log.Errorf("err:%v", err)

@@ -19,10 +19,17 @@ supervisorDir="/home/work/service"
 supervisorLogDir="/home/work/supervisor/logs"
 packOutputDir="${proRootDir}/package"
 
+MkdirIfFileUnExist() {
+  stat $1 >/dev/null 2>&1
+  if [ $? != 0 ]; then
+    mkdir -p "$1"
+  fi
+}
+
 # 检查并创建日志目录 打包输出目录
-mkdir -p "$supervisorDir"
-mkdir -p "$supervisorLogDir"
-mkdir -p "$packOutputDir"
+MkdirIfFileUnExist "$supervisorDir"
+MkdirIfFileUnExist "$supervisorLogDir"
+MkdirIfFileUnExist "$packOutputDir"
 chmod +x -R "$supervisorLogDir"
 
 # 函数：生成 Supervisor 配置文件
@@ -47,6 +54,16 @@ stdout_logfile_backups=20
 EOF
 }
 
+# 函数：根据文件名前缀获取最新的文件
+getLatestFileByPrefix() {
+  local dir=$1
+  local prefix=$2
+
+  # 使用 find 命令查找所有以 prefix 开头的文件，并按修改时间排序，取最新的一个
+  local latestFile=$(find "$dir" -type f -name "${prefix}*" -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d' ' -f2-)
+  echo "$latestFile"
+}
+
 # 函数：部署 Supervisor 服务
 deploySupervisorService() {
   local packName
@@ -58,11 +75,36 @@ deploySupervisorService() {
 
   cd "$supervisorDir" || exit
 
-  rm -rf "$appName"
-
-  mkdir -p "$appName"
+  MkdirIfFileUnExist "$appName"
 
   tar -xvf "$sh_dir/$packName" -C "$supervisorDir/$appName"
+
+  chmod +x -R "$supervisorDir/$appName"
+
+  cp "$supervisorDir/$appName/$appName.conf" /etc/supervisor/conf.d
+
+  # 更新并重启 Supervisor 服务
+  supervisorctl update
+
+  supervisorctl restart "$appName"
+
+  # 检查服务状态
+  supervisorctl status "$appName"
+  echo "====== 完成部署 $appName ======"
+}
+
+# 获取改动时间部署最新的包体
+deployV2() {
+  appName=$1
+  packName=$(getLatestFileByPrefix $sh_dir $appName)
+  echo "====== 包体 $packName ======"
+  echo "====== 开始部署 $appName ======"
+
+  cd "$supervisorDir" || exit
+
+  MkdirIfFileUnExist "$appName"
+
+  tar -xvf "$packName" -C "$supervisorDir/$appName"
 
   chmod +x -R "$supervisorDir/$appName"
 
@@ -86,12 +128,13 @@ goBuild() {
   echo "====== 开始编译 $appName ======"
   echo "====== appPath: $appPath ======"
   echo "====== outputDir: $outputDir ======"
-
+  go env -w CGO_ENABLED=0
   export GOOS=linux
   export GOARCH=amd64
   go build -o "$outputDir/$appName" "$appPath"
   unset GOOS
   unset GOARCH
+  go env -w CGO_ENABLED=1
   echo "====== 完成编译 $appName ======"
 }
 
@@ -110,7 +153,7 @@ localPackSrv() {
   # 输出目录
   local outputDir=${packOutputDir}"/"${appName}
 
-  mkdir -p ${outputDir}
+  MkdirIfFileUnExist ${outputDir}
 
   outputSupervisorConf ${appName} ${outputDir}
 
@@ -142,7 +185,7 @@ start_upload(){
 
 deployWeb(){
   file=$1
-  mv ${file} /home/ubuntu/web && cd /home/ubuntu/web && rm -rf dist && tar -zxvf ${file}
+  mv ${file} /home/work/web && cd /home/work/web && rm -rf dist && tar -zxvf ${file}
 }
 
 # 使用说明
@@ -174,6 +217,13 @@ lpcmd)
 deploy)
   shift
   deploySupervisorService "$1"
+  ;;
+dall)
+  shift
+  deployV2 gateway
+  deployV2 lbsingle
+  deployV2 lboss
+  deployV2 lbwxmp
   ;;
 web)
   shift
