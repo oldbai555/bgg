@@ -19,6 +19,7 @@ require (
 	github.com/nsqio/go-nsq v1.1.0
 	github.com/oldbai555/lbtool v0.0.4-0.20250218030406-d9e56b8dbebc
 	github.com/oldbai555/micro v0.0.2-0.20250113113823-46a4a82ae442
+	github.com/panjf2000/ants/v2 v2.5.0
 	github.com/pkg/sftp v1.13.1
 	github.com/prometheus/client_golang v1.11.1
 	github.com/spf13/viper v1.9.0
