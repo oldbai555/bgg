@@ -222,7 +222,6 @@ func initConfig() {
 			log.Errorf("err:%v", err)
 			return
 		}
-
 		err = os.WriteFile(configPath, configData, 0644)
 		if err != nil {
 			log.Errorf("err:%v", err)
