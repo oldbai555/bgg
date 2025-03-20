@@ -1,0 +1,6 @@
+{
+  "server_ip":"127.0.0.1",
+  "server_user":"workuser",
+  "server_pass":"workuser",
+  "remote_dir":"/home/work/package"
+}

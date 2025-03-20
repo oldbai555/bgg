@@ -159,7 +159,7 @@ localPackSrv() {
 
   goBuild ${outputDir} ${proSrvPath} ${appName}
 
-#  cp "${proSrvPath}/application.yaml" ${outputDir}
+  #  cp "${proSrvPath}/application.yaml" ${outputDir}
 
   local srvOutPut=${packOutputDir}"/${appName}_${hash}.tar"
   tar -cvf ${srvOutPut} -C ${outputDir} . --remove-files
@@ -169,21 +169,11 @@ localPackSrv() {
   start_upload ${srvOutPut}
 }
 
-start_upload(){
-        file=$1
-        fileMd5=`md5sum ${file}`
-        url="https://oldbai.top/oss/deploy/upload"
-        echo "uri:$url"
-        echo "文件md5:$fileMd5"
-        echo "文件大小:"$(stat -c %s ${file} | numfmt --to=iec)
-        echo "开始上传文件:$1"
-
-        curl -k --location --request POST ${url} \
-                --header 'Content-Type: multipart/form-data' \
-                --form 'file=@'${file}''
+start_upload() {
+  ./uploader.exe $1
 }
 
-deployWeb(){
+deployWeb() {
   file=$1
   mv ${file} /home/work/web && cd /home/work/web && rm -rf dist && tar -zxvf ${file}
 }
@@ -207,12 +197,12 @@ case "$1" in
 lpg)
   shift
   localPackSrv "$1" ${proRootDir}"/service/gateway"
-#  deploySupervisorService "$1"
+  #  deploySupervisorService "$1"
   ;;
 lpcmd)
   shift
   localPackSrv "$1" ${proRootDir}"/service/"$1"server/cmd"
-#  deploySupervisorService "$1"
+  #  deploySupervisorService "$1"
   ;;
 deploy)
   shift
