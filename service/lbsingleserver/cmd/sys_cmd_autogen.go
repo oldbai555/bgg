@@ -53,4 +53,54 @@ var cmdList = []*bcmd.Cmd{
 	{Server: lbsingle.ServerName, Path: lbsingle.GetOutsideWebSiteCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.GetOutsideWebSite, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
 
 	{Server: lbsingle.ServerName, Path: lbsingle.GetOutsideWebSiteListCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.GetOutsideWebSiteList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.AddArticleCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.AddArticle, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.DelArticleListCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.DelArticleList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.UpdateArticleCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.UpdateArticle, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.GetArticleCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.GetArticle, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.GetArticleListCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.GetArticleList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.AddArticleTagCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.AddArticleTag, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.DelArticleTagListCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.DelArticleTagList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.UpdateArticleTagCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.UpdateArticleTag, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.GetArticleTagCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.GetArticleTag, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.GetArticleTagListCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.GetArticleTagList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.AddArticleCategoryCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.AddArticleCategory, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.DelArticleCategoryListCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.DelArticleCategoryList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.UpdateArticleCategoryCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.UpdateArticleCategory, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.GetArticleCategoryCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.GetArticleCategory, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.GetArticleCategoryListCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.GetArticleCategoryList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.AddDictTypeCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.AddDictType, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.DelDictTypeListCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.DelDictTypeList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.UpdateDictTypeCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.UpdateDictType, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.GetDictTypeCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.GetDictType, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.GetDictTypeListCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.GetDictTypeList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.AddDictDataCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.AddDictData, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.DelDictDataListCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.DelDictDataList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.UpdateDictDataCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.UpdateDictData, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.GetDictDataCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.GetDictData, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
+
+	{Server: lbsingle.ServerName, Path: lbsingle.GetDictDataListCMDPath, GRpcFunc: lbsingleserver.OnceSvrImpl.GetDictDataList, OptionMap: map[string]string{"ApiMethod": "POST", "AuthType": "user"}},
 }

@@ -15,10 +15,11 @@ require (
 	github.com/globalsign/mgo v0.0.0-20181015135952-eeefdecb41b8
 	github.com/gorilla/websocket v1.5.3
 	github.com/judwhite/go-svc v1.2.1
+	github.com/mattn/go-sqlite3 v1.14.27
 	github.com/minio/minio-go/v7 v7.0.87
 	github.com/nsqio/go-nsq v1.1.0
 	github.com/oldbai555/lbtool v0.0.4-0.20250218030406-d9e56b8dbebc
-	github.com/oldbai555/micro v0.0.2-0.20250113113823-46a4a82ae442
+	github.com/oldbai555/micro v0.0.2-0.20250401040957-2d9bef871e6a
 	github.com/panjf2000/ants/v2 v2.5.0
 	github.com/pkg/sftp v1.13.1
 	github.com/prometheus/client_golang v1.11.1

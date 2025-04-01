@@ -123,6 +123,131 @@ type LbsingleClient interface {
 	// @desc:
 	// @error:
 	GetOutsideWebSiteList(ctx context.Context, in *GetOutsideWebSiteListReq, opts ...grpc.CallOption) (*GetOutsideWebSiteListRsp, error)
+	// @cat: Article
+	// @name:
+	// @desc:
+	// @error:
+	AddArticle(ctx context.Context, in *AddArticleReq, opts ...grpc.CallOption) (*AddArticleRsp, error)
+	// @cat: Article
+	// @name:
+	// @desc:
+	// @error:
+	DelArticleList(ctx context.Context, in *DelArticleListReq, opts ...grpc.CallOption) (*DelArticleListRsp, error)
+	// @cat: Article
+	// @name:
+	// @desc:
+	// @error:
+	UpdateArticle(ctx context.Context, in *UpdateArticleReq, opts ...grpc.CallOption) (*UpdateArticleRsp, error)
+	// @cat: Article
+	// @name:
+	// @desc:
+	// @error:
+	GetArticle(ctx context.Context, in *GetArticleReq, opts ...grpc.CallOption) (*GetArticleRsp, error)
+	// @cat: Article
+	// @name:
+	// @desc:
+	// @error:
+	GetArticleList(ctx context.Context, in *GetArticleListReq, opts ...grpc.CallOption) (*GetArticleListRsp, error)
+	// @cat: ArticleTag
+	// @name:
+	// @desc:
+	// @error:
+	AddArticleTag(ctx context.Context, in *AddArticleTagReq, opts ...grpc.CallOption) (*AddArticleTagRsp, error)
+	// @cat: ArticleTag
+	// @name:
+	// @desc:
+	// @error:
+	DelArticleTagList(ctx context.Context, in *DelArticleTagListReq, opts ...grpc.CallOption) (*DelArticleTagListRsp, error)
+	// @cat: ArticleTag
+	// @name:
+	// @desc:
+	// @error:
+	UpdateArticleTag(ctx context.Context, in *UpdateArticleTagReq, opts ...grpc.CallOption) (*UpdateArticleTagRsp, error)
+	// @cat: ArticleTag
+	// @name:
+	// @desc:
+	// @error:
+	GetArticleTag(ctx context.Context, in *GetArticleTagReq, opts ...grpc.CallOption) (*GetArticleTagRsp, error)
+	// @cat: ArticleTag
+	// @name:
+	// @desc:
+	// @error:
+	GetArticleTagList(ctx context.Context, in *GetArticleTagListReq, opts ...grpc.CallOption) (*GetArticleTagListRsp, error)
+	// @cat: ArticleCategory
+	// @name:
+	// @desc:
+	// @error:
+	AddArticleCategory(ctx context.Context, in *AddArticleCategoryReq, opts ...grpc.CallOption) (*AddArticleCategoryRsp, error)
+	// @cat: ArticleCategory
+	// @name:
+	// @desc:
+	// @error:
+	DelArticleCategoryList(ctx context.Context, in *DelArticleCategoryListReq, opts ...grpc.CallOption) (*DelArticleCategoryListRsp, error)
+	// @cat: ArticleCategory
+	// @name:
+	// @desc:
+	// @error:
+	UpdateArticleCategory(ctx context.Context, in *UpdateArticleCategoryReq, opts ...grpc.CallOption) (*UpdateArticleCategoryRsp, error)
+	// @cat: ArticleCategory
+	// @name:
+	// @desc:
+	// @error:
+	GetArticleCategory(ctx context.Context, in *GetArticleCategoryReq, opts ...grpc.CallOption) (*GetArticleCategoryRsp, error)
+	// @cat: ArticleCategory
+	// @name:
+	// @desc:
+	// @error:
+	GetArticleCategoryList(ctx context.Context, in *GetArticleCategoryListReq, opts ...grpc.CallOption) (*GetArticleCategoryListRsp, error)
+	// @cat: DictType
+	// @name:
+	// @desc:
+	// @error:
+	AddDictType(ctx context.Context, in *AddDictTypeReq, opts ...grpc.CallOption) (*AddDictTypeRsp, error)
+	// @cat: DictType
+	// @name:
+	// @desc:
+	// @error:
+	DelDictTypeList(ctx context.Context, in *DelDictTypeListReq, opts ...grpc.CallOption) (*DelDictTypeListRsp, error)
+	// @cat: DictType
+	// @name:
+	// @desc:
+	// @error:
+	UpdateDictType(ctx context.Context, in *UpdateDictTypeReq, opts ...grpc.CallOption) (*UpdateDictTypeRsp, error)
+	// @cat: DictType
+	// @name:
+	// @desc:
+	// @error:
+	GetDictType(ctx context.Context, in *GetDictTypeReq, opts ...grpc.CallOption) (*GetDictTypeRsp, error)
+	// @cat: DictType
+	// @name:
+	// @desc:
+	// @error:
+	GetDictTypeList(ctx context.Context, in *GetDictTypeListReq, opts ...grpc.CallOption) (*GetDictTypeListRsp, error)
+	// @cat: DictData
+	// @name:
+	// @desc:
+	// @error:
+	AddDictData(ctx context.Context, in *AddDictDataReq, opts ...grpc.CallOption) (*AddDictDataRsp, error)
+	// @cat: DictData
+	// @name:
+	// @desc:
+	// @error:
+	DelDictDataList(ctx context.Context, in *DelDictDataListReq, opts ...grpc.CallOption) (*DelDictDataListRsp, error)
+	// @cat: DictData
+	// @name:
+	// @desc:
+	// @error:
+	UpdateDictData(ctx context.Context, in *UpdateDictDataReq, opts ...grpc.CallOption) (*UpdateDictDataRsp, error)
+	// @cat: DictData
+	// @name:
+	// @desc:
+	// @error:
+	GetDictData(ctx context.Context, in *GetDictDataReq, opts ...grpc.CallOption) (*GetDictDataRsp, error)
+	// @cat: DictData
+	// @name:
+	// @desc:
+	// @error:
+	GetDictDataList(ctx context.Context, in *GetDictDataListReq, opts ...grpc.CallOption) (*GetDictDataListRsp, error)
 }
 
 type lbsingleClient struct {
@@ -331,6 +456,231 @@ func (c *lbsingleClient) GetOutsideWebSiteList(ctx context.Context, in *GetOutsi
 	return out, nil
 }
 
+func (c *lbsingleClient) AddArticle(ctx context.Context, in *AddArticleReq, opts ...grpc.CallOption) (*AddArticleRsp, error) {
+	out := new(AddArticleRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddArticle", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) DelArticleList(ctx context.Context, in *DelArticleListReq, opts ...grpc.CallOption) (*DelArticleListRsp, error) {
+	out := new(DelArticleListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelArticleList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) UpdateArticle(ctx context.Context, in *UpdateArticleReq, opts ...grpc.CallOption) (*UpdateArticleRsp, error) {
+	out := new(UpdateArticleRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateArticle", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetArticle(ctx context.Context, in *GetArticleReq, opts ...grpc.CallOption) (*GetArticleRsp, error) {
+	out := new(GetArticleRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetArticle", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetArticleList(ctx context.Context, in *GetArticleListReq, opts ...grpc.CallOption) (*GetArticleListRsp, error) {
+	out := new(GetArticleListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetArticleList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) AddArticleTag(ctx context.Context, in *AddArticleTagReq, opts ...grpc.CallOption) (*AddArticleTagRsp, error) {
+	out := new(AddArticleTagRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddArticleTag", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) DelArticleTagList(ctx context.Context, in *DelArticleTagListReq, opts ...grpc.CallOption) (*DelArticleTagListRsp, error) {
+	out := new(DelArticleTagListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelArticleTagList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) UpdateArticleTag(ctx context.Context, in *UpdateArticleTagReq, opts ...grpc.CallOption) (*UpdateArticleTagRsp, error) {
+	out := new(UpdateArticleTagRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateArticleTag", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetArticleTag(ctx context.Context, in *GetArticleTagReq, opts ...grpc.CallOption) (*GetArticleTagRsp, error) {
+	out := new(GetArticleTagRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetArticleTag", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetArticleTagList(ctx context.Context, in *GetArticleTagListReq, opts ...grpc.CallOption) (*GetArticleTagListRsp, error) {
+	out := new(GetArticleTagListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetArticleTagList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) AddArticleCategory(ctx context.Context, in *AddArticleCategoryReq, opts ...grpc.CallOption) (*AddArticleCategoryRsp, error) {
+	out := new(AddArticleCategoryRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddArticleCategory", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) DelArticleCategoryList(ctx context.Context, in *DelArticleCategoryListReq, opts ...grpc.CallOption) (*DelArticleCategoryListRsp, error) {
+	out := new(DelArticleCategoryListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelArticleCategoryList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) UpdateArticleCategory(ctx context.Context, in *UpdateArticleCategoryReq, opts ...grpc.CallOption) (*UpdateArticleCategoryRsp, error) {
+	out := new(UpdateArticleCategoryRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateArticleCategory", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetArticleCategory(ctx context.Context, in *GetArticleCategoryReq, opts ...grpc.CallOption) (*GetArticleCategoryRsp, error) {
+	out := new(GetArticleCategoryRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetArticleCategory", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetArticleCategoryList(ctx context.Context, in *GetArticleCategoryListReq, opts ...grpc.CallOption) (*GetArticleCategoryListRsp, error) {
+	out := new(GetArticleCategoryListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetArticleCategoryList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) AddDictType(ctx context.Context, in *AddDictTypeReq, opts ...grpc.CallOption) (*AddDictTypeRsp, error) {
+	out := new(AddDictTypeRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddDictType", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) DelDictTypeList(ctx context.Context, in *DelDictTypeListReq, opts ...grpc.CallOption) (*DelDictTypeListRsp, error) {
+	out := new(DelDictTypeListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelDictTypeList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) UpdateDictType(ctx context.Context, in *UpdateDictTypeReq, opts ...grpc.CallOption) (*UpdateDictTypeRsp, error) {
+	out := new(UpdateDictTypeRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateDictType", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetDictType(ctx context.Context, in *GetDictTypeReq, opts ...grpc.CallOption) (*GetDictTypeRsp, error) {
+	out := new(GetDictTypeRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetDictType", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetDictTypeList(ctx context.Context, in *GetDictTypeListReq, opts ...grpc.CallOption) (*GetDictTypeListRsp, error) {
+	out := new(GetDictTypeListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetDictTypeList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) AddDictData(ctx context.Context, in *AddDictDataReq, opts ...grpc.CallOption) (*AddDictDataRsp, error) {
+	out := new(AddDictDataRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/AddDictData", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) DelDictDataList(ctx context.Context, in *DelDictDataListReq, opts ...grpc.CallOption) (*DelDictDataListRsp, error) {
+	out := new(DelDictDataListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/DelDictDataList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) UpdateDictData(ctx context.Context, in *UpdateDictDataReq, opts ...grpc.CallOption) (*UpdateDictDataRsp, error) {
+	out := new(UpdateDictDataRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/UpdateDictData", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetDictData(ctx context.Context, in *GetDictDataReq, opts ...grpc.CallOption) (*GetDictDataRsp, error) {
+	out := new(GetDictDataRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetDictData", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *lbsingleClient) GetDictDataList(ctx context.Context, in *GetDictDataListReq, opts ...grpc.CallOption) (*GetDictDataListRsp, error) {
+	out := new(GetDictDataListRsp)
+	err := c.cc.Invoke(ctx, "/lbsingle.lbsingle/GetDictDataList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // LbsingleServer is the server API for Lbsingle service.
 // All implementations must embed UnimplementedLbsingleServer
 // for forward compatibility
@@ -436,6 +786,131 @@ type LbsingleServer interface {
 	// @desc:
 	// @error:
 	GetOutsideWebSiteList(context.Context, *GetOutsideWebSiteListReq) (*GetOutsideWebSiteListRsp, error)
+	// @cat: Article
+	// @name:
+	// @desc:
+	// @error:
+	AddArticle(context.Context, *AddArticleReq) (*AddArticleRsp, error)
+	// @cat: Article
+	// @name:
+	// @desc:
+	// @error:
+	DelArticleList(context.Context, *DelArticleListReq) (*DelArticleListRsp, error)
+	// @cat: Article
+	// @name:
+	// @desc:
+	// @error:
+	UpdateArticle(context.Context, *UpdateArticleReq) (*UpdateArticleRsp, error)
+	// @cat: Article
+	// @name:
+	// @desc:
+	// @error:
+	GetArticle(context.Context, *GetArticleReq) (*GetArticleRsp, error)
+	// @cat: Article
+	// @name:
+	// @desc:
+	// @error:
+	GetArticleList(context.Context, *GetArticleListReq) (*GetArticleListRsp, error)
+	// @cat: ArticleTag
+	// @name:
+	// @desc:
+	// @error:
+	AddArticleTag(context.Context, *AddArticleTagReq) (*AddArticleTagRsp, error)
+	// @cat: ArticleTag
+	// @name:
+	// @desc:
+	// @error:
+	DelArticleTagList(context.Context, *DelArticleTagListReq) (*DelArticleTagListRsp, error)
+	// @cat: ArticleTag
+	// @name:
+	// @desc:
+	// @error:
+	UpdateArticleTag(context.Context, *UpdateArticleTagReq) (*UpdateArticleTagRsp, error)
+	// @cat: ArticleTag
+	// @name:
+	// @desc:
+	// @error:
+	GetArticleTag(context.Context, *GetArticleTagReq) (*GetArticleTagRsp, error)
+	// @cat: ArticleTag
+	// @name:
+	// @desc:
+	// @error:
+	GetArticleTagList(context.Context, *GetArticleTagListReq) (*GetArticleTagListRsp, error)
+	// @cat: ArticleCategory
+	// @name:
+	// @desc:
+	// @error:
+	AddArticleCategory(context.Context, *AddArticleCategoryReq) (*AddArticleCategoryRsp, error)
+	// @cat: ArticleCategory
+	// @name:
+	// @desc:
+	// @error:
+	DelArticleCategoryList(context.Context, *DelArticleCategoryListReq) (*DelArticleCategoryListRsp, error)
+	// @cat: ArticleCategory
+	// @name:
+	// @desc:
+	// @error:
+	UpdateArticleCategory(context.Context, *UpdateArticleCategoryReq) (*UpdateArticleCategoryRsp, error)
+	// @cat: ArticleCategory
+	// @name:
+	// @desc:
+	// @error:
+	GetArticleCategory(context.Context, *GetArticleCategoryReq) (*GetArticleCategoryRsp, error)
+	// @cat: ArticleCategory
+	// @name:
+	// @desc:
+	// @error:
+	GetArticleCategoryList(context.Context, *GetArticleCategoryListReq) (*GetArticleCategoryListRsp, error)
+	// @cat: DictType
+	// @name:
+	// @desc:
+	// @error:
+	AddDictType(context.Context, *AddDictTypeReq) (*AddDictTypeRsp, error)
+	// @cat: DictType
+	// @name:
+	// @desc:
+	// @error:
+	DelDictTypeList(context.Context, *DelDictTypeListReq) (*DelDictTypeListRsp, error)
+	// @cat: DictType
+	// @name:
+	// @desc:
+	// @error:
+	UpdateDictType(context.Context, *UpdateDictTypeReq) (*UpdateDictTypeRsp, error)
+	// @cat: DictType
+	// @name:
+	// @desc:
+	// @error:
+	GetDictType(context.Context, *GetDictTypeReq) (*GetDictTypeRsp, error)
+	// @cat: DictType
+	// @name:
+	// @desc:
+	// @error:
+	GetDictTypeList(context.Context, *GetDictTypeListReq) (*GetDictTypeListRsp, error)
+	// @cat: DictData
+	// @name:
+	// @desc:
+	// @error:
+	AddDictData(context.Context, *AddDictDataReq) (*AddDictDataRsp, error)
+	// @cat: DictData
+	// @name:
+	// @desc:
+	// @error:
+	DelDictDataList(context.Context, *DelDictDataListReq) (*DelDictDataListRsp, error)
+	// @cat: DictData
+	// @name:
+	// @desc:
+	// @error:
+	UpdateDictData(context.Context, *UpdateDictDataReq) (*UpdateDictDataRsp, error)
+	// @cat: DictData
+	// @name:
+	// @desc:
+	// @error:
+	GetDictData(context.Context, *GetDictDataReq) (*GetDictDataRsp, error)
+	// @cat: DictData
+	// @name:
+	// @desc:
+	// @error:
+	GetDictDataList(context.Context, *GetDictDataListReq) (*GetDictDataListRsp, error)
 	mustEmbedUnimplementedLbsingleServer()
 }
 
@@ -508,6 +983,81 @@ func (UnimplementedLbsingleServer) GetOutsideWebSite(context.Context, *GetOutsid
 }
 func (UnimplementedLbsingleServer) GetOutsideWebSiteList(context.Context, *GetOutsideWebSiteListReq) (*GetOutsideWebSiteListRsp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetOutsideWebSiteList not implemented")
+}
+func (UnimplementedLbsingleServer) AddArticle(context.Context, *AddArticleReq) (*AddArticleRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddArticle not implemented")
+}
+func (UnimplementedLbsingleServer) DelArticleList(context.Context, *DelArticleListReq) (*DelArticleListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelArticleList not implemented")
+}
+func (UnimplementedLbsingleServer) UpdateArticle(context.Context, *UpdateArticleReq) (*UpdateArticleRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateArticle not implemented")
+}
+func (UnimplementedLbsingleServer) GetArticle(context.Context, *GetArticleReq) (*GetArticleRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetArticle not implemented")
+}
+func (UnimplementedLbsingleServer) GetArticleList(context.Context, *GetArticleListReq) (*GetArticleListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetArticleList not implemented")
+}
+func (UnimplementedLbsingleServer) AddArticleTag(context.Context, *AddArticleTagReq) (*AddArticleTagRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddArticleTag not implemented")
+}
+func (UnimplementedLbsingleServer) DelArticleTagList(context.Context, *DelArticleTagListReq) (*DelArticleTagListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelArticleTagList not implemented")
+}
+func (UnimplementedLbsingleServer) UpdateArticleTag(context.Context, *UpdateArticleTagReq) (*UpdateArticleTagRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateArticleTag not implemented")
+}
+func (UnimplementedLbsingleServer) GetArticleTag(context.Context, *GetArticleTagReq) (*GetArticleTagRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetArticleTag not implemented")
+}
+func (UnimplementedLbsingleServer) GetArticleTagList(context.Context, *GetArticleTagListReq) (*GetArticleTagListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetArticleTagList not implemented")
+}
+func (UnimplementedLbsingleServer) AddArticleCategory(context.Context, *AddArticleCategoryReq) (*AddArticleCategoryRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddArticleCategory not implemented")
+}
+func (UnimplementedLbsingleServer) DelArticleCategoryList(context.Context, *DelArticleCategoryListReq) (*DelArticleCategoryListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelArticleCategoryList not implemented")
+}
+func (UnimplementedLbsingleServer) UpdateArticleCategory(context.Context, *UpdateArticleCategoryReq) (*UpdateArticleCategoryRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateArticleCategory not implemented")
+}
+func (UnimplementedLbsingleServer) GetArticleCategory(context.Context, *GetArticleCategoryReq) (*GetArticleCategoryRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetArticleCategory not implemented")
+}
+func (UnimplementedLbsingleServer) GetArticleCategoryList(context.Context, *GetArticleCategoryListReq) (*GetArticleCategoryListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetArticleCategoryList not implemented")
+}
+func (UnimplementedLbsingleServer) AddDictType(context.Context, *AddDictTypeReq) (*AddDictTypeRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddDictType not implemented")
+}
+func (UnimplementedLbsingleServer) DelDictTypeList(context.Context, *DelDictTypeListReq) (*DelDictTypeListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelDictTypeList not implemented")
+}
+func (UnimplementedLbsingleServer) UpdateDictType(context.Context, *UpdateDictTypeReq) (*UpdateDictTypeRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateDictType not implemented")
+}
+func (UnimplementedLbsingleServer) GetDictType(context.Context, *GetDictTypeReq) (*GetDictTypeRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDictType not implemented")
+}
+func (UnimplementedLbsingleServer) GetDictTypeList(context.Context, *GetDictTypeListReq) (*GetDictTypeListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDictTypeList not implemented")
+}
+func (UnimplementedLbsingleServer) AddDictData(context.Context, *AddDictDataReq) (*AddDictDataRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddDictData not implemented")
+}
+func (UnimplementedLbsingleServer) DelDictDataList(context.Context, *DelDictDataListReq) (*DelDictDataListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelDictDataList not implemented")
+}
+func (UnimplementedLbsingleServer) UpdateDictData(context.Context, *UpdateDictDataReq) (*UpdateDictDataRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateDictData not implemented")
+}
+func (UnimplementedLbsingleServer) GetDictData(context.Context, *GetDictDataReq) (*GetDictDataRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDictData not implemented")
+}
+func (UnimplementedLbsingleServer) GetDictDataList(context.Context, *GetDictDataListReq) (*GetDictDataListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDictDataList not implemented")
 }
 func (UnimplementedLbsingleServer) mustEmbedUnimplementedLbsingleServer() {}
 
@@ -918,6 +1468,456 @@ func _Lbsingle_GetOutsideWebSiteList_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Lbsingle_AddArticle_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddArticleReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).AddArticle(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/AddArticle",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).AddArticle(ctx, req.(*AddArticleReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_DelArticleList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelArticleListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).DelArticleList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/DelArticleList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).DelArticleList(ctx, req.(*DelArticleListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_UpdateArticle_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateArticleReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).UpdateArticle(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/UpdateArticle",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).UpdateArticle(ctx, req.(*UpdateArticleReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetArticle_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetArticleReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetArticle(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetArticle",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetArticle(ctx, req.(*GetArticleReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetArticleList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetArticleListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetArticleList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetArticleList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetArticleList(ctx, req.(*GetArticleListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_AddArticleTag_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddArticleTagReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).AddArticleTag(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/AddArticleTag",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).AddArticleTag(ctx, req.(*AddArticleTagReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_DelArticleTagList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelArticleTagListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).DelArticleTagList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/DelArticleTagList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).DelArticleTagList(ctx, req.(*DelArticleTagListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_UpdateArticleTag_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateArticleTagReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).UpdateArticleTag(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/UpdateArticleTag",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).UpdateArticleTag(ctx, req.(*UpdateArticleTagReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetArticleTag_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetArticleTagReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetArticleTag(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetArticleTag",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetArticleTag(ctx, req.(*GetArticleTagReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetArticleTagList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetArticleTagListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetArticleTagList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetArticleTagList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetArticleTagList(ctx, req.(*GetArticleTagListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_AddArticleCategory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddArticleCategoryReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).AddArticleCategory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/AddArticleCategory",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).AddArticleCategory(ctx, req.(*AddArticleCategoryReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_DelArticleCategoryList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelArticleCategoryListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).DelArticleCategoryList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/DelArticleCategoryList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).DelArticleCategoryList(ctx, req.(*DelArticleCategoryListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_UpdateArticleCategory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateArticleCategoryReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).UpdateArticleCategory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/UpdateArticleCategory",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).UpdateArticleCategory(ctx, req.(*UpdateArticleCategoryReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetArticleCategory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetArticleCategoryReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetArticleCategory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetArticleCategory",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetArticleCategory(ctx, req.(*GetArticleCategoryReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetArticleCategoryList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetArticleCategoryListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetArticleCategoryList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetArticleCategoryList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetArticleCategoryList(ctx, req.(*GetArticleCategoryListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_AddDictType_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddDictTypeReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).AddDictType(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/AddDictType",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).AddDictType(ctx, req.(*AddDictTypeReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_DelDictTypeList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelDictTypeListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).DelDictTypeList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/DelDictTypeList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).DelDictTypeList(ctx, req.(*DelDictTypeListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_UpdateDictType_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateDictTypeReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).UpdateDictType(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/UpdateDictType",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).UpdateDictType(ctx, req.(*UpdateDictTypeReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetDictType_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDictTypeReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetDictType(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetDictType",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetDictType(ctx, req.(*GetDictTypeReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetDictTypeList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDictTypeListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetDictTypeList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetDictTypeList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetDictTypeList(ctx, req.(*GetDictTypeListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_AddDictData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddDictDataReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).AddDictData(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/AddDictData",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).AddDictData(ctx, req.(*AddDictDataReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_DelDictDataList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DelDictDataListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).DelDictDataList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/DelDictDataList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).DelDictDataList(ctx, req.(*DelDictDataListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_UpdateDictData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateDictDataReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).UpdateDictData(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/UpdateDictData",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).UpdateDictData(ctx, req.(*UpdateDictDataReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetDictData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDictDataReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetDictData(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetDictData",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetDictData(ctx, req.(*GetDictDataReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Lbsingle_GetDictDataList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDictDataListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LbsingleServer).GetDictDataList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/lbsingle.lbsingle/GetDictDataList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LbsingleServer).GetDictDataList(ctx, req.(*GetDictDataListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Lbsingle_ServiceDesc is the grpc.ServiceDesc for Lbsingle service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1012,6 +2012,106 @@ var Lbsingle_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetOutsideWebSiteList",
 			Handler:    _Lbsingle_GetOutsideWebSiteList_Handler,
+		},
+		{
+			MethodName: "AddArticle",
+			Handler:    _Lbsingle_AddArticle_Handler,
+		},
+		{
+			MethodName: "DelArticleList",
+			Handler:    _Lbsingle_DelArticleList_Handler,
+		},
+		{
+			MethodName: "UpdateArticle",
+			Handler:    _Lbsingle_UpdateArticle_Handler,
+		},
+		{
+			MethodName: "GetArticle",
+			Handler:    _Lbsingle_GetArticle_Handler,
+		},
+		{
+			MethodName: "GetArticleList",
+			Handler:    _Lbsingle_GetArticleList_Handler,
+		},
+		{
+			MethodName: "AddArticleTag",
+			Handler:    _Lbsingle_AddArticleTag_Handler,
+		},
+		{
+			MethodName: "DelArticleTagList",
+			Handler:    _Lbsingle_DelArticleTagList_Handler,
+		},
+		{
+			MethodName: "UpdateArticleTag",
+			Handler:    _Lbsingle_UpdateArticleTag_Handler,
+		},
+		{
+			MethodName: "GetArticleTag",
+			Handler:    _Lbsingle_GetArticleTag_Handler,
+		},
+		{
+			MethodName: "GetArticleTagList",
+			Handler:    _Lbsingle_GetArticleTagList_Handler,
+		},
+		{
+			MethodName: "AddArticleCategory",
+			Handler:    _Lbsingle_AddArticleCategory_Handler,
+		},
+		{
+			MethodName: "DelArticleCategoryList",
+			Handler:    _Lbsingle_DelArticleCategoryList_Handler,
+		},
+		{
+			MethodName: "UpdateArticleCategory",
+			Handler:    _Lbsingle_UpdateArticleCategory_Handler,
+		},
+		{
+			MethodName: "GetArticleCategory",
+			Handler:    _Lbsingle_GetArticleCategory_Handler,
+		},
+		{
+			MethodName: "GetArticleCategoryList",
+			Handler:    _Lbsingle_GetArticleCategoryList_Handler,
+		},
+		{
+			MethodName: "AddDictType",
+			Handler:    _Lbsingle_AddDictType_Handler,
+		},
+		{
+			MethodName: "DelDictTypeList",
+			Handler:    _Lbsingle_DelDictTypeList_Handler,
+		},
+		{
+			MethodName: "UpdateDictType",
+			Handler:    _Lbsingle_UpdateDictType_Handler,
+		},
+		{
+			MethodName: "GetDictType",
+			Handler:    _Lbsingle_GetDictType_Handler,
+		},
+		{
+			MethodName: "GetDictTypeList",
+			Handler:    _Lbsingle_GetDictTypeList_Handler,
+		},
+		{
+			MethodName: "AddDictData",
+			Handler:    _Lbsingle_AddDictData_Handler,
+		},
+		{
+			MethodName: "DelDictDataList",
+			Handler:    _Lbsingle_DelDictDataList_Handler,
+		},
+		{
+			MethodName: "UpdateDictData",
+			Handler:    _Lbsingle_UpdateDictData_Handler,
+		},
+		{
+			MethodName: "GetDictData",
+			Handler:    _Lbsingle_GetDictData_Handler,
+		},
+		{
+			MethodName: "GetDictDataList",
+			Handler:    _Lbsingle_GetDictDataList_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

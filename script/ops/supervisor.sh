@@ -131,7 +131,7 @@ goBuild() {
   go env -w CGO_ENABLED=0
   export GOOS=linux
   export GOARCH=amd64
-  go build -o "$outputDir/$appName" "$appPath"
+  go build -ldflags "-s -w" -o "$outputDir/$appName" "$appPath"
   unset GOOS
   unset GOARCH
   go env -w CGO_ENABLED=1
