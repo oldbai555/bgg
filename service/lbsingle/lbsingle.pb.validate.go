@@ -986,6 +986,581 @@ var _ interface {
 	ErrorName() string
 } = ModelOutsideWebSiteValidationError{}
 
+// Validate checks the field values on ModelArticle with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *ModelArticle) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ModelArticle with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ModelArticleMultiError, or
+// nil if none found.
+func (m *ModelArticle) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ModelArticle) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Id
+
+	// no validation rules for CreatedAt
+
+	// no validation rules for UpdatedAt
+
+	// no validation rules for DeletedAt
+
+	// no validation rules for CreatorId
+
+	// no validation rules for Title
+
+	if len(errors) > 0 {
+		return ModelArticleMultiError(errors)
+	}
+
+	return nil
+}
+
+// ModelArticleMultiError is an error wrapping multiple validation errors
+// returned by ModelArticle.ValidateAll() if the designated constraints aren't met.
+type ModelArticleMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ModelArticleMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ModelArticleMultiError) AllErrors() []error { return m }
+
+// ModelArticleValidationError is the validation error returned by
+// ModelArticle.Validate if the designated constraints aren't met.
+type ModelArticleValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ModelArticleValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ModelArticleValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ModelArticleValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ModelArticleValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ModelArticleValidationError) ErrorName() string { return "ModelArticleValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ModelArticleValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sModelArticle.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ModelArticleValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ModelArticleValidationError{}
+
+// Validate checks the field values on ModelArticleTag with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *ModelArticleTag) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ModelArticleTag with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ModelArticleTagMultiError, or nil if none found.
+func (m *ModelArticleTag) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ModelArticleTag) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Id
+
+	// no validation rules for CreatedAt
+
+	// no validation rules for UpdatedAt
+
+	// no validation rules for DeletedAt
+
+	// no validation rules for CreatorId
+
+	// no validation rules for Name
+
+	if len(errors) > 0 {
+		return ModelArticleTagMultiError(errors)
+	}
+
+	return nil
+}
+
+// ModelArticleTagMultiError is an error wrapping multiple validation errors
+// returned by ModelArticleTag.ValidateAll() if the designated constraints
+// aren't met.
+type ModelArticleTagMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ModelArticleTagMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ModelArticleTagMultiError) AllErrors() []error { return m }
+
+// ModelArticleTagValidationError is the validation error returned by
+// ModelArticleTag.Validate if the designated constraints aren't met.
+type ModelArticleTagValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ModelArticleTagValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ModelArticleTagValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ModelArticleTagValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ModelArticleTagValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ModelArticleTagValidationError) ErrorName() string { return "ModelArticleTagValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ModelArticleTagValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sModelArticleTag.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ModelArticleTagValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ModelArticleTagValidationError{}
+
+// Validate checks the field values on ModelArticleCategory with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ModelArticleCategory) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ModelArticleCategory with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ModelArticleCategoryMultiError, or nil if none found.
+func (m *ModelArticleCategory) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ModelArticleCategory) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Id
+
+	// no validation rules for CreatedAt
+
+	// no validation rules for UpdatedAt
+
+	// no validation rules for DeletedAt
+
+	// no validation rules for CreatorId
+
+	// no validation rules for Name
+
+	if len(errors) > 0 {
+		return ModelArticleCategoryMultiError(errors)
+	}
+
+	return nil
+}
+
+// ModelArticleCategoryMultiError is an error wrapping multiple validation
+// errors returned by ModelArticleCategory.ValidateAll() if the designated
+// constraints aren't met.
+type ModelArticleCategoryMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ModelArticleCategoryMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ModelArticleCategoryMultiError) AllErrors() []error { return m }
+
+// ModelArticleCategoryValidationError is the validation error returned by
+// ModelArticleCategory.Validate if the designated constraints aren't met.
+type ModelArticleCategoryValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ModelArticleCategoryValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ModelArticleCategoryValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ModelArticleCategoryValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ModelArticleCategoryValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ModelArticleCategoryValidationError) ErrorName() string {
+	return "ModelArticleCategoryValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ModelArticleCategoryValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sModelArticleCategory.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ModelArticleCategoryValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ModelArticleCategoryValidationError{}
+
+// Validate checks the field values on ModelDictType with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *ModelDictType) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ModelDictType with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ModelDictTypeMultiError, or
+// nil if none found.
+func (m *ModelDictType) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ModelDictType) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Id
+
+	// no validation rules for CreatedAt
+
+	// no validation rules for UpdatedAt
+
+	// no validation rules for DeletedAt
+
+	// no validation rules for CreatorId
+
+	// no validation rules for Name
+
+	// no validation rules for Status
+
+	// no validation rules for Remark
+
+	if len(errors) > 0 {
+		return ModelDictTypeMultiError(errors)
+	}
+
+	return nil
+}
+
+// ModelDictTypeMultiError is an error wrapping multiple validation errors
+// returned by ModelDictType.ValidateAll() if the designated constraints
+// aren't met.
+type ModelDictTypeMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ModelDictTypeMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ModelDictTypeMultiError) AllErrors() []error { return m }
+
+// ModelDictTypeValidationError is the validation error returned by
+// ModelDictType.Validate if the designated constraints aren't met.
+type ModelDictTypeValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ModelDictTypeValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ModelDictTypeValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ModelDictTypeValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ModelDictTypeValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ModelDictTypeValidationError) ErrorName() string { return "ModelDictTypeValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ModelDictTypeValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sModelDictType.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ModelDictTypeValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ModelDictTypeValidationError{}
+
+// Validate checks the field values on ModelDictData with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *ModelDictData) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ModelDictData with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ModelDictDataMultiError, or
+// nil if none found.
+func (m *ModelDictData) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ModelDictData) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Id
+
+	// no validation rules for CreatedAt
+
+	// no validation rules for UpdatedAt
+
+	// no validation rules for DeletedAt
+
+	// no validation rules for CreatorId
+
+	// no validation rules for DictTypeId
+
+	// no validation rules for DictLabel
+
+	// no validation rules for DictValue
+
+	// no validation rules for Sort
+
+	// no validation rules for Status
+
+	// no validation rules for SysDefault
+
+	if len(errors) > 0 {
+		return ModelDictDataMultiError(errors)
+	}
+
+	return nil
+}
+
+// ModelDictDataMultiError is an error wrapping multiple validation errors
+// returned by ModelDictData.ValidateAll() if the designated constraints
+// aren't met.
+type ModelDictDataMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ModelDictDataMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ModelDictDataMultiError) AllErrors() []error { return m }
+
+// ModelDictDataValidationError is the validation error returned by
+// ModelDictData.Validate if the designated constraints aren't met.
+type ModelDictDataValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ModelDictDataValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ModelDictDataValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ModelDictDataValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ModelDictDataValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ModelDictDataValidationError) ErrorName() string { return "ModelDictDataValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ModelDictDataValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sModelDictData.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ModelDictDataValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ModelDictDataValidationError{}
+
 // Validate checks the field values on LoginReq with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -6578,3 +7153,6527 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = GetOutsideWebSiteListRspValidationError{}
+
+// Validate checks the field values on AddArticleReq with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *AddArticleReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddArticleReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in AddArticleReqMultiError, or
+// nil if none found.
+func (m *AddArticleReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddArticleReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetData() == nil {
+		err := AddArticleReqValidationError{
+			field:  "Data",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AddArticleReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AddArticleReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AddArticleReqValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return AddArticleReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// AddArticleReqMultiError is an error wrapping multiple validation errors
+// returned by AddArticleReq.ValidateAll() if the designated constraints
+// aren't met.
+type AddArticleReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddArticleReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddArticleReqMultiError) AllErrors() []error { return m }
+
+// AddArticleReqValidationError is the validation error returned by
+// AddArticleReq.Validate if the designated constraints aren't met.
+type AddArticleReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddArticleReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddArticleReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddArticleReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddArticleReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddArticleReqValidationError) ErrorName() string { return "AddArticleReqValidationError" }
+
+// Error satisfies the builtin error interface
+func (e AddArticleReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddArticleReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddArticleReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddArticleReqValidationError{}
+
+// Validate checks the field values on AddArticleRsp with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *AddArticleRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddArticleRsp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in AddArticleRspMultiError, or
+// nil if none found.
+func (m *AddArticleRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddArticleRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AddArticleRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AddArticleRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AddArticleRspValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return AddArticleRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// AddArticleRspMultiError is an error wrapping multiple validation errors
+// returned by AddArticleRsp.ValidateAll() if the designated constraints
+// aren't met.
+type AddArticleRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddArticleRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddArticleRspMultiError) AllErrors() []error { return m }
+
+// AddArticleRspValidationError is the validation error returned by
+// AddArticleRsp.Validate if the designated constraints aren't met.
+type AddArticleRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddArticleRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddArticleRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddArticleRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddArticleRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddArticleRspValidationError) ErrorName() string { return "AddArticleRspValidationError" }
+
+// Error satisfies the builtin error interface
+func (e AddArticleRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddArticleRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddArticleRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddArticleRspValidationError{}
+
+// Validate checks the field values on UpdateArticleReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *UpdateArticleReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdateArticleReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpdateArticleReqMultiError, or nil if none found.
+func (m *UpdateArticleReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdateArticleReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetData() == nil {
+		err := UpdateArticleReqValidationError{
+			field:  "Data",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UpdateArticleReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UpdateArticleReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpdateArticleReqValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return UpdateArticleReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpdateArticleReqMultiError is an error wrapping multiple validation errors
+// returned by UpdateArticleReq.ValidateAll() if the designated constraints
+// aren't met.
+type UpdateArticleReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdateArticleReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdateArticleReqMultiError) AllErrors() []error { return m }
+
+// UpdateArticleReqValidationError is the validation error returned by
+// UpdateArticleReq.Validate if the designated constraints aren't met.
+type UpdateArticleReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateArticleReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateArticleReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateArticleReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateArticleReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateArticleReqValidationError) ErrorName() string { return "UpdateArticleReqValidationError" }
+
+// Error satisfies the builtin error interface
+func (e UpdateArticleReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateArticleReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateArticleReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateArticleReqValidationError{}
+
+// Validate checks the field values on UpdateArticleRsp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *UpdateArticleRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdateArticleRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpdateArticleRspMultiError, or nil if none found.
+func (m *UpdateArticleRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdateArticleRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return UpdateArticleRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpdateArticleRspMultiError is an error wrapping multiple validation errors
+// returned by UpdateArticleRsp.ValidateAll() if the designated constraints
+// aren't met.
+type UpdateArticleRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdateArticleRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdateArticleRspMultiError) AllErrors() []error { return m }
+
+// UpdateArticleRspValidationError is the validation error returned by
+// UpdateArticleRsp.Validate if the designated constraints aren't met.
+type UpdateArticleRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateArticleRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateArticleRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateArticleRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateArticleRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateArticleRspValidationError) ErrorName() string { return "UpdateArticleRspValidationError" }
+
+// Error satisfies the builtin error interface
+func (e UpdateArticleRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateArticleRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateArticleRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateArticleRspValidationError{}
+
+// Validate checks the field values on DelArticleListReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *DelArticleListReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DelArticleListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DelArticleListReqMultiError, or nil if none found.
+func (m *DelArticleListReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DelArticleListReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetListOption() == nil {
+		err := DelArticleListReqValidationError{
+			field:  "ListOption",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetListOption()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DelArticleListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DelArticleListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetListOption()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DelArticleListReqValidationError{
+				field:  "ListOption",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return DelArticleListReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// DelArticleListReqMultiError is an error wrapping multiple validation errors
+// returned by DelArticleListReq.ValidateAll() if the designated constraints
+// aren't met.
+type DelArticleListReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DelArticleListReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DelArticleListReqMultiError) AllErrors() []error { return m }
+
+// DelArticleListReqValidationError is the validation error returned by
+// DelArticleListReq.Validate if the designated constraints aren't met.
+type DelArticleListReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DelArticleListReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DelArticleListReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DelArticleListReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DelArticleListReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DelArticleListReqValidationError) ErrorName() string {
+	return "DelArticleListReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DelArticleListReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDelArticleListReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DelArticleListReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DelArticleListReqValidationError{}
+
+// Validate checks the field values on DelArticleListRsp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *DelArticleListRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DelArticleListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DelArticleListRspMultiError, or nil if none found.
+func (m *DelArticleListRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DelArticleListRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return DelArticleListRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// DelArticleListRspMultiError is an error wrapping multiple validation errors
+// returned by DelArticleListRsp.ValidateAll() if the designated constraints
+// aren't met.
+type DelArticleListRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DelArticleListRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DelArticleListRspMultiError) AllErrors() []error { return m }
+
+// DelArticleListRspValidationError is the validation error returned by
+// DelArticleListRsp.Validate if the designated constraints aren't met.
+type DelArticleListRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DelArticleListRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DelArticleListRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DelArticleListRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DelArticleListRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DelArticleListRspValidationError) ErrorName() string {
+	return "DelArticleListRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DelArticleListRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDelArticleListRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DelArticleListRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DelArticleListRspValidationError{}
+
+// Validate checks the field values on GetArticleReq with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *GetArticleReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetArticleReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in GetArticleReqMultiError, or
+// nil if none found.
+func (m *GetArticleReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetArticleReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetId() <= 0 {
+		err := GetArticleReqValidationError{
+			field:  "Id",
+			reason: "value must be greater than 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return GetArticleReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetArticleReqMultiError is an error wrapping multiple validation errors
+// returned by GetArticleReq.ValidateAll() if the designated constraints
+// aren't met.
+type GetArticleReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetArticleReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetArticleReqMultiError) AllErrors() []error { return m }
+
+// GetArticleReqValidationError is the validation error returned by
+// GetArticleReq.Validate if the designated constraints aren't met.
+type GetArticleReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetArticleReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetArticleReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetArticleReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetArticleReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetArticleReqValidationError) ErrorName() string { return "GetArticleReqValidationError" }
+
+// Error satisfies the builtin error interface
+func (e GetArticleReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetArticleReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetArticleReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetArticleReqValidationError{}
+
+// Validate checks the field values on GetArticleRsp with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *GetArticleRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetArticleRsp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in GetArticleRspMultiError, or
+// nil if none found.
+func (m *GetArticleRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetArticleRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetArticleRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetArticleRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetArticleRspValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetArticleRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetArticleRspMultiError is an error wrapping multiple validation errors
+// returned by GetArticleRsp.ValidateAll() if the designated constraints
+// aren't met.
+type GetArticleRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetArticleRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetArticleRspMultiError) AllErrors() []error { return m }
+
+// GetArticleRspValidationError is the validation error returned by
+// GetArticleRsp.Validate if the designated constraints aren't met.
+type GetArticleRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetArticleRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetArticleRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetArticleRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetArticleRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetArticleRspValidationError) ErrorName() string { return "GetArticleRspValidationError" }
+
+// Error satisfies the builtin error interface
+func (e GetArticleRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetArticleRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetArticleRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetArticleRspValidationError{}
+
+// Validate checks the field values on GetArticleListReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *GetArticleListReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetArticleListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetArticleListReqMultiError, or nil if none found.
+func (m *GetArticleListReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetArticleListReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetListOption() == nil {
+		err := GetArticleListReqValidationError{
+			field:  "ListOption",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetListOption()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetArticleListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetArticleListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetListOption()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetArticleListReqValidationError{
+				field:  "ListOption",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetArticleListReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetArticleListReqMultiError is an error wrapping multiple validation errors
+// returned by GetArticleListReq.ValidateAll() if the designated constraints
+// aren't met.
+type GetArticleListReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetArticleListReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetArticleListReqMultiError) AllErrors() []error { return m }
+
+// GetArticleListReqValidationError is the validation error returned by
+// GetArticleListReq.Validate if the designated constraints aren't met.
+type GetArticleListReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetArticleListReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetArticleListReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetArticleListReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetArticleListReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetArticleListReqValidationError) ErrorName() string {
+	return "GetArticleListReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetArticleListReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetArticleListReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetArticleListReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetArticleListReqValidationError{}
+
+// Validate checks the field values on GetArticleListRsp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *GetArticleListRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetArticleListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetArticleListRspMultiError, or nil if none found.
+func (m *GetArticleListRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetArticleListRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetPaginate()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetArticleListRspValidationError{
+					field:  "Paginate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetArticleListRspValidationError{
+					field:  "Paginate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPaginate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetArticleListRspValidationError{
+				field:  "Paginate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	for idx, item := range m.GetList() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, GetArticleListRspValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, GetArticleListRspValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return GetArticleListRspValidationError{
+					field:  fmt.Sprintf("List[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return GetArticleListRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetArticleListRspMultiError is an error wrapping multiple validation errors
+// returned by GetArticleListRsp.ValidateAll() if the designated constraints
+// aren't met.
+type GetArticleListRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetArticleListRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetArticleListRspMultiError) AllErrors() []error { return m }
+
+// GetArticleListRspValidationError is the validation error returned by
+// GetArticleListRsp.Validate if the designated constraints aren't met.
+type GetArticleListRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetArticleListRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetArticleListRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetArticleListRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetArticleListRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetArticleListRspValidationError) ErrorName() string {
+	return "GetArticleListRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetArticleListRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetArticleListRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetArticleListRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetArticleListRspValidationError{}
+
+// Validate checks the field values on AddArticleTagReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *AddArticleTagReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddArticleTagReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AddArticleTagReqMultiError, or nil if none found.
+func (m *AddArticleTagReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddArticleTagReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetData() == nil {
+		err := AddArticleTagReqValidationError{
+			field:  "Data",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AddArticleTagReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AddArticleTagReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AddArticleTagReqValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return AddArticleTagReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// AddArticleTagReqMultiError is an error wrapping multiple validation errors
+// returned by AddArticleTagReq.ValidateAll() if the designated constraints
+// aren't met.
+type AddArticleTagReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddArticleTagReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddArticleTagReqMultiError) AllErrors() []error { return m }
+
+// AddArticleTagReqValidationError is the validation error returned by
+// AddArticleTagReq.Validate if the designated constraints aren't met.
+type AddArticleTagReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddArticleTagReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddArticleTagReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddArticleTagReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddArticleTagReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddArticleTagReqValidationError) ErrorName() string { return "AddArticleTagReqValidationError" }
+
+// Error satisfies the builtin error interface
+func (e AddArticleTagReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddArticleTagReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddArticleTagReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddArticleTagReqValidationError{}
+
+// Validate checks the field values on AddArticleTagRsp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *AddArticleTagRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddArticleTagRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AddArticleTagRspMultiError, or nil if none found.
+func (m *AddArticleTagRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddArticleTagRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AddArticleTagRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AddArticleTagRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AddArticleTagRspValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return AddArticleTagRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// AddArticleTagRspMultiError is an error wrapping multiple validation errors
+// returned by AddArticleTagRsp.ValidateAll() if the designated constraints
+// aren't met.
+type AddArticleTagRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddArticleTagRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddArticleTagRspMultiError) AllErrors() []error { return m }
+
+// AddArticleTagRspValidationError is the validation error returned by
+// AddArticleTagRsp.Validate if the designated constraints aren't met.
+type AddArticleTagRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddArticleTagRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddArticleTagRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddArticleTagRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddArticleTagRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddArticleTagRspValidationError) ErrorName() string { return "AddArticleTagRspValidationError" }
+
+// Error satisfies the builtin error interface
+func (e AddArticleTagRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddArticleTagRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddArticleTagRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddArticleTagRspValidationError{}
+
+// Validate checks the field values on UpdateArticleTagReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *UpdateArticleTagReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdateArticleTagReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpdateArticleTagReqMultiError, or nil if none found.
+func (m *UpdateArticleTagReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdateArticleTagReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetData() == nil {
+		err := UpdateArticleTagReqValidationError{
+			field:  "Data",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UpdateArticleTagReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UpdateArticleTagReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpdateArticleTagReqValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return UpdateArticleTagReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpdateArticleTagReqMultiError is an error wrapping multiple validation
+// errors returned by UpdateArticleTagReq.ValidateAll() if the designated
+// constraints aren't met.
+type UpdateArticleTagReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdateArticleTagReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdateArticleTagReqMultiError) AllErrors() []error { return m }
+
+// UpdateArticleTagReqValidationError is the validation error returned by
+// UpdateArticleTagReq.Validate if the designated constraints aren't met.
+type UpdateArticleTagReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateArticleTagReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateArticleTagReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateArticleTagReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateArticleTagReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateArticleTagReqValidationError) ErrorName() string {
+	return "UpdateArticleTagReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateArticleTagReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateArticleTagReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateArticleTagReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateArticleTagReqValidationError{}
+
+// Validate checks the field values on UpdateArticleTagRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *UpdateArticleTagRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdateArticleTagRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpdateArticleTagRspMultiError, or nil if none found.
+func (m *UpdateArticleTagRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdateArticleTagRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return UpdateArticleTagRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpdateArticleTagRspMultiError is an error wrapping multiple validation
+// errors returned by UpdateArticleTagRsp.ValidateAll() if the designated
+// constraints aren't met.
+type UpdateArticleTagRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdateArticleTagRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdateArticleTagRspMultiError) AllErrors() []error { return m }
+
+// UpdateArticleTagRspValidationError is the validation error returned by
+// UpdateArticleTagRsp.Validate if the designated constraints aren't met.
+type UpdateArticleTagRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateArticleTagRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateArticleTagRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateArticleTagRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateArticleTagRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateArticleTagRspValidationError) ErrorName() string {
+	return "UpdateArticleTagRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateArticleTagRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateArticleTagRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateArticleTagRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateArticleTagRspValidationError{}
+
+// Validate checks the field values on DelArticleTagListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DelArticleTagListReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DelArticleTagListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DelArticleTagListReqMultiError, or nil if none found.
+func (m *DelArticleTagListReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DelArticleTagListReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetListOption() == nil {
+		err := DelArticleTagListReqValidationError{
+			field:  "ListOption",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetListOption()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DelArticleTagListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DelArticleTagListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetListOption()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DelArticleTagListReqValidationError{
+				field:  "ListOption",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return DelArticleTagListReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// DelArticleTagListReqMultiError is an error wrapping multiple validation
+// errors returned by DelArticleTagListReq.ValidateAll() if the designated
+// constraints aren't met.
+type DelArticleTagListReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DelArticleTagListReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DelArticleTagListReqMultiError) AllErrors() []error { return m }
+
+// DelArticleTagListReqValidationError is the validation error returned by
+// DelArticleTagListReq.Validate if the designated constraints aren't met.
+type DelArticleTagListReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DelArticleTagListReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DelArticleTagListReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DelArticleTagListReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DelArticleTagListReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DelArticleTagListReqValidationError) ErrorName() string {
+	return "DelArticleTagListReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DelArticleTagListReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDelArticleTagListReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DelArticleTagListReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DelArticleTagListReqValidationError{}
+
+// Validate checks the field values on DelArticleTagListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DelArticleTagListRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DelArticleTagListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DelArticleTagListRspMultiError, or nil if none found.
+func (m *DelArticleTagListRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DelArticleTagListRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return DelArticleTagListRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// DelArticleTagListRspMultiError is an error wrapping multiple validation
+// errors returned by DelArticleTagListRsp.ValidateAll() if the designated
+// constraints aren't met.
+type DelArticleTagListRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DelArticleTagListRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DelArticleTagListRspMultiError) AllErrors() []error { return m }
+
+// DelArticleTagListRspValidationError is the validation error returned by
+// DelArticleTagListRsp.Validate if the designated constraints aren't met.
+type DelArticleTagListRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DelArticleTagListRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DelArticleTagListRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DelArticleTagListRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DelArticleTagListRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DelArticleTagListRspValidationError) ErrorName() string {
+	return "DelArticleTagListRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DelArticleTagListRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDelArticleTagListRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DelArticleTagListRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DelArticleTagListRspValidationError{}
+
+// Validate checks the field values on GetArticleTagReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *GetArticleTagReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetArticleTagReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetArticleTagReqMultiError, or nil if none found.
+func (m *GetArticleTagReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetArticleTagReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetId() <= 0 {
+		err := GetArticleTagReqValidationError{
+			field:  "Id",
+			reason: "value must be greater than 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return GetArticleTagReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetArticleTagReqMultiError is an error wrapping multiple validation errors
+// returned by GetArticleTagReq.ValidateAll() if the designated constraints
+// aren't met.
+type GetArticleTagReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetArticleTagReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetArticleTagReqMultiError) AllErrors() []error { return m }
+
+// GetArticleTagReqValidationError is the validation error returned by
+// GetArticleTagReq.Validate if the designated constraints aren't met.
+type GetArticleTagReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetArticleTagReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetArticleTagReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetArticleTagReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetArticleTagReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetArticleTagReqValidationError) ErrorName() string { return "GetArticleTagReqValidationError" }
+
+// Error satisfies the builtin error interface
+func (e GetArticleTagReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetArticleTagReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetArticleTagReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetArticleTagReqValidationError{}
+
+// Validate checks the field values on GetArticleTagRsp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *GetArticleTagRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetArticleTagRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetArticleTagRspMultiError, or nil if none found.
+func (m *GetArticleTagRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetArticleTagRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetArticleTagRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetArticleTagRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetArticleTagRspValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetArticleTagRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetArticleTagRspMultiError is an error wrapping multiple validation errors
+// returned by GetArticleTagRsp.ValidateAll() if the designated constraints
+// aren't met.
+type GetArticleTagRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetArticleTagRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetArticleTagRspMultiError) AllErrors() []error { return m }
+
+// GetArticleTagRspValidationError is the validation error returned by
+// GetArticleTagRsp.Validate if the designated constraints aren't met.
+type GetArticleTagRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetArticleTagRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetArticleTagRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetArticleTagRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetArticleTagRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetArticleTagRspValidationError) ErrorName() string { return "GetArticleTagRspValidationError" }
+
+// Error satisfies the builtin error interface
+func (e GetArticleTagRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetArticleTagRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetArticleTagRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetArticleTagRspValidationError{}
+
+// Validate checks the field values on GetArticleTagListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetArticleTagListReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetArticleTagListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetArticleTagListReqMultiError, or nil if none found.
+func (m *GetArticleTagListReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetArticleTagListReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetListOption() == nil {
+		err := GetArticleTagListReqValidationError{
+			field:  "ListOption",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetListOption()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetArticleTagListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetArticleTagListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetListOption()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetArticleTagListReqValidationError{
+				field:  "ListOption",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetArticleTagListReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetArticleTagListReqMultiError is an error wrapping multiple validation
+// errors returned by GetArticleTagListReq.ValidateAll() if the designated
+// constraints aren't met.
+type GetArticleTagListReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetArticleTagListReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetArticleTagListReqMultiError) AllErrors() []error { return m }
+
+// GetArticleTagListReqValidationError is the validation error returned by
+// GetArticleTagListReq.Validate if the designated constraints aren't met.
+type GetArticleTagListReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetArticleTagListReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetArticleTagListReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetArticleTagListReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetArticleTagListReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetArticleTagListReqValidationError) ErrorName() string {
+	return "GetArticleTagListReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetArticleTagListReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetArticleTagListReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetArticleTagListReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetArticleTagListReqValidationError{}
+
+// Validate checks the field values on GetArticleTagListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetArticleTagListRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetArticleTagListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetArticleTagListRspMultiError, or nil if none found.
+func (m *GetArticleTagListRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetArticleTagListRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetPaginate()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetArticleTagListRspValidationError{
+					field:  "Paginate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetArticleTagListRspValidationError{
+					field:  "Paginate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPaginate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetArticleTagListRspValidationError{
+				field:  "Paginate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	for idx, item := range m.GetList() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, GetArticleTagListRspValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, GetArticleTagListRspValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return GetArticleTagListRspValidationError{
+					field:  fmt.Sprintf("List[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return GetArticleTagListRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetArticleTagListRspMultiError is an error wrapping multiple validation
+// errors returned by GetArticleTagListRsp.ValidateAll() if the designated
+// constraints aren't met.
+type GetArticleTagListRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetArticleTagListRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetArticleTagListRspMultiError) AllErrors() []error { return m }
+
+// GetArticleTagListRspValidationError is the validation error returned by
+// GetArticleTagListRsp.Validate if the designated constraints aren't met.
+type GetArticleTagListRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetArticleTagListRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetArticleTagListRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetArticleTagListRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetArticleTagListRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetArticleTagListRspValidationError) ErrorName() string {
+	return "GetArticleTagListRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetArticleTagListRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetArticleTagListRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetArticleTagListRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetArticleTagListRspValidationError{}
+
+// Validate checks the field values on AddArticleCategoryReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *AddArticleCategoryReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddArticleCategoryReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AddArticleCategoryReqMultiError, or nil if none found.
+func (m *AddArticleCategoryReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddArticleCategoryReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetData() == nil {
+		err := AddArticleCategoryReqValidationError{
+			field:  "Data",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AddArticleCategoryReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AddArticleCategoryReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AddArticleCategoryReqValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return AddArticleCategoryReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// AddArticleCategoryReqMultiError is an error wrapping multiple validation
+// errors returned by AddArticleCategoryReq.ValidateAll() if the designated
+// constraints aren't met.
+type AddArticleCategoryReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddArticleCategoryReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddArticleCategoryReqMultiError) AllErrors() []error { return m }
+
+// AddArticleCategoryReqValidationError is the validation error returned by
+// AddArticleCategoryReq.Validate if the designated constraints aren't met.
+type AddArticleCategoryReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddArticleCategoryReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddArticleCategoryReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddArticleCategoryReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddArticleCategoryReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddArticleCategoryReqValidationError) ErrorName() string {
+	return "AddArticleCategoryReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AddArticleCategoryReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddArticleCategoryReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddArticleCategoryReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddArticleCategoryReqValidationError{}
+
+// Validate checks the field values on AddArticleCategoryRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *AddArticleCategoryRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddArticleCategoryRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AddArticleCategoryRspMultiError, or nil if none found.
+func (m *AddArticleCategoryRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddArticleCategoryRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AddArticleCategoryRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AddArticleCategoryRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AddArticleCategoryRspValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return AddArticleCategoryRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// AddArticleCategoryRspMultiError is an error wrapping multiple validation
+// errors returned by AddArticleCategoryRsp.ValidateAll() if the designated
+// constraints aren't met.
+type AddArticleCategoryRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddArticleCategoryRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddArticleCategoryRspMultiError) AllErrors() []error { return m }
+
+// AddArticleCategoryRspValidationError is the validation error returned by
+// AddArticleCategoryRsp.Validate if the designated constraints aren't met.
+type AddArticleCategoryRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddArticleCategoryRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddArticleCategoryRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddArticleCategoryRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddArticleCategoryRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddArticleCategoryRspValidationError) ErrorName() string {
+	return "AddArticleCategoryRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AddArticleCategoryRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddArticleCategoryRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddArticleCategoryRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddArticleCategoryRspValidationError{}
+
+// Validate checks the field values on UpdateArticleCategoryReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *UpdateArticleCategoryReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdateArticleCategoryReq with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpdateArticleCategoryReqMultiError, or nil if none found.
+func (m *UpdateArticleCategoryReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdateArticleCategoryReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetData() == nil {
+		err := UpdateArticleCategoryReqValidationError{
+			field:  "Data",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UpdateArticleCategoryReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UpdateArticleCategoryReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpdateArticleCategoryReqValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return UpdateArticleCategoryReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpdateArticleCategoryReqMultiError is an error wrapping multiple validation
+// errors returned by UpdateArticleCategoryReq.ValidateAll() if the designated
+// constraints aren't met.
+type UpdateArticleCategoryReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdateArticleCategoryReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdateArticleCategoryReqMultiError) AllErrors() []error { return m }
+
+// UpdateArticleCategoryReqValidationError is the validation error returned by
+// UpdateArticleCategoryReq.Validate if the designated constraints aren't met.
+type UpdateArticleCategoryReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateArticleCategoryReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateArticleCategoryReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateArticleCategoryReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateArticleCategoryReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateArticleCategoryReqValidationError) ErrorName() string {
+	return "UpdateArticleCategoryReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateArticleCategoryReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateArticleCategoryReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateArticleCategoryReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateArticleCategoryReqValidationError{}
+
+// Validate checks the field values on UpdateArticleCategoryRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *UpdateArticleCategoryRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdateArticleCategoryRsp with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpdateArticleCategoryRspMultiError, or nil if none found.
+func (m *UpdateArticleCategoryRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdateArticleCategoryRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return UpdateArticleCategoryRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpdateArticleCategoryRspMultiError is an error wrapping multiple validation
+// errors returned by UpdateArticleCategoryRsp.ValidateAll() if the designated
+// constraints aren't met.
+type UpdateArticleCategoryRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdateArticleCategoryRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdateArticleCategoryRspMultiError) AllErrors() []error { return m }
+
+// UpdateArticleCategoryRspValidationError is the validation error returned by
+// UpdateArticleCategoryRsp.Validate if the designated constraints aren't met.
+type UpdateArticleCategoryRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateArticleCategoryRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateArticleCategoryRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateArticleCategoryRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateArticleCategoryRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateArticleCategoryRspValidationError) ErrorName() string {
+	return "UpdateArticleCategoryRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateArticleCategoryRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateArticleCategoryRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateArticleCategoryRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateArticleCategoryRspValidationError{}
+
+// Validate checks the field values on DelArticleCategoryListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DelArticleCategoryListReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DelArticleCategoryListReq with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DelArticleCategoryListReqMultiError, or nil if none found.
+func (m *DelArticleCategoryListReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DelArticleCategoryListReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetListOption() == nil {
+		err := DelArticleCategoryListReqValidationError{
+			field:  "ListOption",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetListOption()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DelArticleCategoryListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DelArticleCategoryListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetListOption()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DelArticleCategoryListReqValidationError{
+				field:  "ListOption",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return DelArticleCategoryListReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// DelArticleCategoryListReqMultiError is an error wrapping multiple validation
+// errors returned by DelArticleCategoryListReq.ValidateAll() if the
+// designated constraints aren't met.
+type DelArticleCategoryListReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DelArticleCategoryListReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DelArticleCategoryListReqMultiError) AllErrors() []error { return m }
+
+// DelArticleCategoryListReqValidationError is the validation error returned by
+// DelArticleCategoryListReq.Validate if the designated constraints aren't met.
+type DelArticleCategoryListReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DelArticleCategoryListReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DelArticleCategoryListReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DelArticleCategoryListReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DelArticleCategoryListReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DelArticleCategoryListReqValidationError) ErrorName() string {
+	return "DelArticleCategoryListReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DelArticleCategoryListReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDelArticleCategoryListReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DelArticleCategoryListReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DelArticleCategoryListReqValidationError{}
+
+// Validate checks the field values on DelArticleCategoryListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DelArticleCategoryListRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DelArticleCategoryListRsp with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DelArticleCategoryListRspMultiError, or nil if none found.
+func (m *DelArticleCategoryListRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DelArticleCategoryListRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return DelArticleCategoryListRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// DelArticleCategoryListRspMultiError is an error wrapping multiple validation
+// errors returned by DelArticleCategoryListRsp.ValidateAll() if the
+// designated constraints aren't met.
+type DelArticleCategoryListRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DelArticleCategoryListRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DelArticleCategoryListRspMultiError) AllErrors() []error { return m }
+
+// DelArticleCategoryListRspValidationError is the validation error returned by
+// DelArticleCategoryListRsp.Validate if the designated constraints aren't met.
+type DelArticleCategoryListRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DelArticleCategoryListRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DelArticleCategoryListRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DelArticleCategoryListRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DelArticleCategoryListRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DelArticleCategoryListRspValidationError) ErrorName() string {
+	return "DelArticleCategoryListRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DelArticleCategoryListRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDelArticleCategoryListRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DelArticleCategoryListRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DelArticleCategoryListRspValidationError{}
+
+// Validate checks the field values on GetArticleCategoryReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetArticleCategoryReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetArticleCategoryReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetArticleCategoryReqMultiError, or nil if none found.
+func (m *GetArticleCategoryReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetArticleCategoryReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetId() <= 0 {
+		err := GetArticleCategoryReqValidationError{
+			field:  "Id",
+			reason: "value must be greater than 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return GetArticleCategoryReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetArticleCategoryReqMultiError is an error wrapping multiple validation
+// errors returned by GetArticleCategoryReq.ValidateAll() if the designated
+// constraints aren't met.
+type GetArticleCategoryReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetArticleCategoryReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetArticleCategoryReqMultiError) AllErrors() []error { return m }
+
+// GetArticleCategoryReqValidationError is the validation error returned by
+// GetArticleCategoryReq.Validate if the designated constraints aren't met.
+type GetArticleCategoryReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetArticleCategoryReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetArticleCategoryReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetArticleCategoryReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetArticleCategoryReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetArticleCategoryReqValidationError) ErrorName() string {
+	return "GetArticleCategoryReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetArticleCategoryReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetArticleCategoryReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetArticleCategoryReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetArticleCategoryReqValidationError{}
+
+// Validate checks the field values on GetArticleCategoryRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetArticleCategoryRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetArticleCategoryRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetArticleCategoryRspMultiError, or nil if none found.
+func (m *GetArticleCategoryRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetArticleCategoryRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetArticleCategoryRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetArticleCategoryRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetArticleCategoryRspValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetArticleCategoryRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetArticleCategoryRspMultiError is an error wrapping multiple validation
+// errors returned by GetArticleCategoryRsp.ValidateAll() if the designated
+// constraints aren't met.
+type GetArticleCategoryRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetArticleCategoryRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetArticleCategoryRspMultiError) AllErrors() []error { return m }
+
+// GetArticleCategoryRspValidationError is the validation error returned by
+// GetArticleCategoryRsp.Validate if the designated constraints aren't met.
+type GetArticleCategoryRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetArticleCategoryRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetArticleCategoryRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetArticleCategoryRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetArticleCategoryRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetArticleCategoryRspValidationError) ErrorName() string {
+	return "GetArticleCategoryRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetArticleCategoryRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetArticleCategoryRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetArticleCategoryRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetArticleCategoryRspValidationError{}
+
+// Validate checks the field values on GetArticleCategoryListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetArticleCategoryListReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetArticleCategoryListReq with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetArticleCategoryListReqMultiError, or nil if none found.
+func (m *GetArticleCategoryListReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetArticleCategoryListReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetListOption() == nil {
+		err := GetArticleCategoryListReqValidationError{
+			field:  "ListOption",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetListOption()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetArticleCategoryListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetArticleCategoryListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetListOption()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetArticleCategoryListReqValidationError{
+				field:  "ListOption",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetArticleCategoryListReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetArticleCategoryListReqMultiError is an error wrapping multiple validation
+// errors returned by GetArticleCategoryListReq.ValidateAll() if the
+// designated constraints aren't met.
+type GetArticleCategoryListReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetArticleCategoryListReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetArticleCategoryListReqMultiError) AllErrors() []error { return m }
+
+// GetArticleCategoryListReqValidationError is the validation error returned by
+// GetArticleCategoryListReq.Validate if the designated constraints aren't met.
+type GetArticleCategoryListReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetArticleCategoryListReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetArticleCategoryListReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetArticleCategoryListReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetArticleCategoryListReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetArticleCategoryListReqValidationError) ErrorName() string {
+	return "GetArticleCategoryListReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetArticleCategoryListReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetArticleCategoryListReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetArticleCategoryListReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetArticleCategoryListReqValidationError{}
+
+// Validate checks the field values on GetArticleCategoryListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetArticleCategoryListRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetArticleCategoryListRsp with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetArticleCategoryListRspMultiError, or nil if none found.
+func (m *GetArticleCategoryListRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetArticleCategoryListRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetPaginate()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetArticleCategoryListRspValidationError{
+					field:  "Paginate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetArticleCategoryListRspValidationError{
+					field:  "Paginate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPaginate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetArticleCategoryListRspValidationError{
+				field:  "Paginate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	for idx, item := range m.GetList() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, GetArticleCategoryListRspValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, GetArticleCategoryListRspValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return GetArticleCategoryListRspValidationError{
+					field:  fmt.Sprintf("List[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return GetArticleCategoryListRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetArticleCategoryListRspMultiError is an error wrapping multiple validation
+// errors returned by GetArticleCategoryListRsp.ValidateAll() if the
+// designated constraints aren't met.
+type GetArticleCategoryListRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetArticleCategoryListRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetArticleCategoryListRspMultiError) AllErrors() []error { return m }
+
+// GetArticleCategoryListRspValidationError is the validation error returned by
+// GetArticleCategoryListRsp.Validate if the designated constraints aren't met.
+type GetArticleCategoryListRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetArticleCategoryListRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetArticleCategoryListRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetArticleCategoryListRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetArticleCategoryListRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetArticleCategoryListRspValidationError) ErrorName() string {
+	return "GetArticleCategoryListRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetArticleCategoryListRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetArticleCategoryListRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetArticleCategoryListRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetArticleCategoryListRspValidationError{}
+
+// Validate checks the field values on AddDictTypeReq with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *AddDictTypeReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddDictTypeReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in AddDictTypeReqMultiError,
+// or nil if none found.
+func (m *AddDictTypeReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddDictTypeReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetData() == nil {
+		err := AddDictTypeReqValidationError{
+			field:  "Data",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AddDictTypeReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AddDictTypeReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AddDictTypeReqValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return AddDictTypeReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// AddDictTypeReqMultiError is an error wrapping multiple validation errors
+// returned by AddDictTypeReq.ValidateAll() if the designated constraints
+// aren't met.
+type AddDictTypeReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddDictTypeReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddDictTypeReqMultiError) AllErrors() []error { return m }
+
+// AddDictTypeReqValidationError is the validation error returned by
+// AddDictTypeReq.Validate if the designated constraints aren't met.
+type AddDictTypeReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddDictTypeReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddDictTypeReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddDictTypeReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddDictTypeReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddDictTypeReqValidationError) ErrorName() string { return "AddDictTypeReqValidationError" }
+
+// Error satisfies the builtin error interface
+func (e AddDictTypeReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddDictTypeReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddDictTypeReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddDictTypeReqValidationError{}
+
+// Validate checks the field values on AddDictTypeRsp with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *AddDictTypeRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddDictTypeRsp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in AddDictTypeRspMultiError,
+// or nil if none found.
+func (m *AddDictTypeRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddDictTypeRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AddDictTypeRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AddDictTypeRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AddDictTypeRspValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return AddDictTypeRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// AddDictTypeRspMultiError is an error wrapping multiple validation errors
+// returned by AddDictTypeRsp.ValidateAll() if the designated constraints
+// aren't met.
+type AddDictTypeRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddDictTypeRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddDictTypeRspMultiError) AllErrors() []error { return m }
+
+// AddDictTypeRspValidationError is the validation error returned by
+// AddDictTypeRsp.Validate if the designated constraints aren't met.
+type AddDictTypeRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddDictTypeRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddDictTypeRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddDictTypeRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddDictTypeRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddDictTypeRspValidationError) ErrorName() string { return "AddDictTypeRspValidationError" }
+
+// Error satisfies the builtin error interface
+func (e AddDictTypeRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddDictTypeRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddDictTypeRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddDictTypeRspValidationError{}
+
+// Validate checks the field values on UpdateDictTypeReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *UpdateDictTypeReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdateDictTypeReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpdateDictTypeReqMultiError, or nil if none found.
+func (m *UpdateDictTypeReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdateDictTypeReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetData() == nil {
+		err := UpdateDictTypeReqValidationError{
+			field:  "Data",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UpdateDictTypeReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UpdateDictTypeReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpdateDictTypeReqValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return UpdateDictTypeReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpdateDictTypeReqMultiError is an error wrapping multiple validation errors
+// returned by UpdateDictTypeReq.ValidateAll() if the designated constraints
+// aren't met.
+type UpdateDictTypeReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdateDictTypeReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdateDictTypeReqMultiError) AllErrors() []error { return m }
+
+// UpdateDictTypeReqValidationError is the validation error returned by
+// UpdateDictTypeReq.Validate if the designated constraints aren't met.
+type UpdateDictTypeReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateDictTypeReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateDictTypeReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateDictTypeReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateDictTypeReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateDictTypeReqValidationError) ErrorName() string {
+	return "UpdateDictTypeReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateDictTypeReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateDictTypeReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateDictTypeReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateDictTypeReqValidationError{}
+
+// Validate checks the field values on UpdateDictTypeRsp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *UpdateDictTypeRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdateDictTypeRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpdateDictTypeRspMultiError, or nil if none found.
+func (m *UpdateDictTypeRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdateDictTypeRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return UpdateDictTypeRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpdateDictTypeRspMultiError is an error wrapping multiple validation errors
+// returned by UpdateDictTypeRsp.ValidateAll() if the designated constraints
+// aren't met.
+type UpdateDictTypeRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdateDictTypeRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdateDictTypeRspMultiError) AllErrors() []error { return m }
+
+// UpdateDictTypeRspValidationError is the validation error returned by
+// UpdateDictTypeRsp.Validate if the designated constraints aren't met.
+type UpdateDictTypeRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateDictTypeRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateDictTypeRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateDictTypeRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateDictTypeRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateDictTypeRspValidationError) ErrorName() string {
+	return "UpdateDictTypeRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateDictTypeRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateDictTypeRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateDictTypeRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateDictTypeRspValidationError{}
+
+// Validate checks the field values on DelDictTypeListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DelDictTypeListReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DelDictTypeListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DelDictTypeListReqMultiError, or nil if none found.
+func (m *DelDictTypeListReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DelDictTypeListReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetListOption() == nil {
+		err := DelDictTypeListReqValidationError{
+			field:  "ListOption",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetListOption()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DelDictTypeListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DelDictTypeListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetListOption()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DelDictTypeListReqValidationError{
+				field:  "ListOption",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return DelDictTypeListReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// DelDictTypeListReqMultiError is an error wrapping multiple validation errors
+// returned by DelDictTypeListReq.ValidateAll() if the designated constraints
+// aren't met.
+type DelDictTypeListReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DelDictTypeListReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DelDictTypeListReqMultiError) AllErrors() []error { return m }
+
+// DelDictTypeListReqValidationError is the validation error returned by
+// DelDictTypeListReq.Validate if the designated constraints aren't met.
+type DelDictTypeListReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DelDictTypeListReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DelDictTypeListReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DelDictTypeListReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DelDictTypeListReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DelDictTypeListReqValidationError) ErrorName() string {
+	return "DelDictTypeListReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DelDictTypeListReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDelDictTypeListReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DelDictTypeListReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DelDictTypeListReqValidationError{}
+
+// Validate checks the field values on DelDictTypeListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DelDictTypeListRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DelDictTypeListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DelDictTypeListRspMultiError, or nil if none found.
+func (m *DelDictTypeListRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DelDictTypeListRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return DelDictTypeListRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// DelDictTypeListRspMultiError is an error wrapping multiple validation errors
+// returned by DelDictTypeListRsp.ValidateAll() if the designated constraints
+// aren't met.
+type DelDictTypeListRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DelDictTypeListRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DelDictTypeListRspMultiError) AllErrors() []error { return m }
+
+// DelDictTypeListRspValidationError is the validation error returned by
+// DelDictTypeListRsp.Validate if the designated constraints aren't met.
+type DelDictTypeListRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DelDictTypeListRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DelDictTypeListRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DelDictTypeListRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DelDictTypeListRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DelDictTypeListRspValidationError) ErrorName() string {
+	return "DelDictTypeListRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DelDictTypeListRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDelDictTypeListRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DelDictTypeListRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DelDictTypeListRspValidationError{}
+
+// Validate checks the field values on GetDictTypeReq with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *GetDictTypeReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetDictTypeReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in GetDictTypeReqMultiError,
+// or nil if none found.
+func (m *GetDictTypeReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetDictTypeReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetId() <= 0 {
+		err := GetDictTypeReqValidationError{
+			field:  "Id",
+			reason: "value must be greater than 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return GetDictTypeReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetDictTypeReqMultiError is an error wrapping multiple validation errors
+// returned by GetDictTypeReq.ValidateAll() if the designated constraints
+// aren't met.
+type GetDictTypeReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetDictTypeReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetDictTypeReqMultiError) AllErrors() []error { return m }
+
+// GetDictTypeReqValidationError is the validation error returned by
+// GetDictTypeReq.Validate if the designated constraints aren't met.
+type GetDictTypeReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetDictTypeReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetDictTypeReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetDictTypeReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetDictTypeReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetDictTypeReqValidationError) ErrorName() string { return "GetDictTypeReqValidationError" }
+
+// Error satisfies the builtin error interface
+func (e GetDictTypeReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetDictTypeReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetDictTypeReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetDictTypeReqValidationError{}
+
+// Validate checks the field values on GetDictTypeRsp with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *GetDictTypeRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetDictTypeRsp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in GetDictTypeRspMultiError,
+// or nil if none found.
+func (m *GetDictTypeRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetDictTypeRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetDictTypeRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetDictTypeRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetDictTypeRspValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetDictTypeRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetDictTypeRspMultiError is an error wrapping multiple validation errors
+// returned by GetDictTypeRsp.ValidateAll() if the designated constraints
+// aren't met.
+type GetDictTypeRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetDictTypeRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetDictTypeRspMultiError) AllErrors() []error { return m }
+
+// GetDictTypeRspValidationError is the validation error returned by
+// GetDictTypeRsp.Validate if the designated constraints aren't met.
+type GetDictTypeRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetDictTypeRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetDictTypeRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetDictTypeRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetDictTypeRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetDictTypeRspValidationError) ErrorName() string { return "GetDictTypeRspValidationError" }
+
+// Error satisfies the builtin error interface
+func (e GetDictTypeRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetDictTypeRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetDictTypeRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetDictTypeRspValidationError{}
+
+// Validate checks the field values on GetDictTypeListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetDictTypeListReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetDictTypeListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetDictTypeListReqMultiError, or nil if none found.
+func (m *GetDictTypeListReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetDictTypeListReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetListOption() == nil {
+		err := GetDictTypeListReqValidationError{
+			field:  "ListOption",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetListOption()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetDictTypeListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetDictTypeListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetListOption()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetDictTypeListReqValidationError{
+				field:  "ListOption",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetDictTypeListReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetDictTypeListReqMultiError is an error wrapping multiple validation errors
+// returned by GetDictTypeListReq.ValidateAll() if the designated constraints
+// aren't met.
+type GetDictTypeListReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetDictTypeListReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetDictTypeListReqMultiError) AllErrors() []error { return m }
+
+// GetDictTypeListReqValidationError is the validation error returned by
+// GetDictTypeListReq.Validate if the designated constraints aren't met.
+type GetDictTypeListReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetDictTypeListReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetDictTypeListReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetDictTypeListReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetDictTypeListReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetDictTypeListReqValidationError) ErrorName() string {
+	return "GetDictTypeListReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetDictTypeListReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetDictTypeListReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetDictTypeListReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetDictTypeListReqValidationError{}
+
+// Validate checks the field values on GetDictTypeListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetDictTypeListRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetDictTypeListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetDictTypeListRspMultiError, or nil if none found.
+func (m *GetDictTypeListRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetDictTypeListRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetPaginate()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetDictTypeListRspValidationError{
+					field:  "Paginate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetDictTypeListRspValidationError{
+					field:  "Paginate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPaginate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetDictTypeListRspValidationError{
+				field:  "Paginate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	for idx, item := range m.GetList() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, GetDictTypeListRspValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, GetDictTypeListRspValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return GetDictTypeListRspValidationError{
+					field:  fmt.Sprintf("List[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return GetDictTypeListRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetDictTypeListRspMultiError is an error wrapping multiple validation errors
+// returned by GetDictTypeListRsp.ValidateAll() if the designated constraints
+// aren't met.
+type GetDictTypeListRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetDictTypeListRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetDictTypeListRspMultiError) AllErrors() []error { return m }
+
+// GetDictTypeListRspValidationError is the validation error returned by
+// GetDictTypeListRsp.Validate if the designated constraints aren't met.
+type GetDictTypeListRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetDictTypeListRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetDictTypeListRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetDictTypeListRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetDictTypeListRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetDictTypeListRspValidationError) ErrorName() string {
+	return "GetDictTypeListRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetDictTypeListRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetDictTypeListRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetDictTypeListRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetDictTypeListRspValidationError{}
+
+// Validate checks the field values on AddDictDataReq with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *AddDictDataReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddDictDataReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in AddDictDataReqMultiError,
+// or nil if none found.
+func (m *AddDictDataReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddDictDataReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetData() == nil {
+		err := AddDictDataReqValidationError{
+			field:  "Data",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AddDictDataReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AddDictDataReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AddDictDataReqValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return AddDictDataReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// AddDictDataReqMultiError is an error wrapping multiple validation errors
+// returned by AddDictDataReq.ValidateAll() if the designated constraints
+// aren't met.
+type AddDictDataReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddDictDataReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddDictDataReqMultiError) AllErrors() []error { return m }
+
+// AddDictDataReqValidationError is the validation error returned by
+// AddDictDataReq.Validate if the designated constraints aren't met.
+type AddDictDataReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddDictDataReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddDictDataReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddDictDataReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddDictDataReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddDictDataReqValidationError) ErrorName() string { return "AddDictDataReqValidationError" }
+
+// Error satisfies the builtin error interface
+func (e AddDictDataReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddDictDataReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddDictDataReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddDictDataReqValidationError{}
+
+// Validate checks the field values on AddDictDataRsp with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *AddDictDataRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddDictDataRsp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in AddDictDataRspMultiError,
+// or nil if none found.
+func (m *AddDictDataRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddDictDataRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AddDictDataRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AddDictDataRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AddDictDataRspValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return AddDictDataRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// AddDictDataRspMultiError is an error wrapping multiple validation errors
+// returned by AddDictDataRsp.ValidateAll() if the designated constraints
+// aren't met.
+type AddDictDataRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddDictDataRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddDictDataRspMultiError) AllErrors() []error { return m }
+
+// AddDictDataRspValidationError is the validation error returned by
+// AddDictDataRsp.Validate if the designated constraints aren't met.
+type AddDictDataRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddDictDataRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddDictDataRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddDictDataRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddDictDataRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddDictDataRspValidationError) ErrorName() string { return "AddDictDataRspValidationError" }
+
+// Error satisfies the builtin error interface
+func (e AddDictDataRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddDictDataRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddDictDataRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddDictDataRspValidationError{}
+
+// Validate checks the field values on UpdateDictDataReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *UpdateDictDataReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdateDictDataReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpdateDictDataReqMultiError, or nil if none found.
+func (m *UpdateDictDataReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdateDictDataReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetData() == nil {
+		err := UpdateDictDataReqValidationError{
+			field:  "Data",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UpdateDictDataReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UpdateDictDataReqValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpdateDictDataReqValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return UpdateDictDataReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpdateDictDataReqMultiError is an error wrapping multiple validation errors
+// returned by UpdateDictDataReq.ValidateAll() if the designated constraints
+// aren't met.
+type UpdateDictDataReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdateDictDataReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdateDictDataReqMultiError) AllErrors() []error { return m }
+
+// UpdateDictDataReqValidationError is the validation error returned by
+// UpdateDictDataReq.Validate if the designated constraints aren't met.
+type UpdateDictDataReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateDictDataReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateDictDataReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateDictDataReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateDictDataReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateDictDataReqValidationError) ErrorName() string {
+	return "UpdateDictDataReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateDictDataReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateDictDataReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateDictDataReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateDictDataReqValidationError{}
+
+// Validate checks the field values on UpdateDictDataRsp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *UpdateDictDataRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdateDictDataRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpdateDictDataRspMultiError, or nil if none found.
+func (m *UpdateDictDataRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdateDictDataRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return UpdateDictDataRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpdateDictDataRspMultiError is an error wrapping multiple validation errors
+// returned by UpdateDictDataRsp.ValidateAll() if the designated constraints
+// aren't met.
+type UpdateDictDataRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdateDictDataRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdateDictDataRspMultiError) AllErrors() []error { return m }
+
+// UpdateDictDataRspValidationError is the validation error returned by
+// UpdateDictDataRsp.Validate if the designated constraints aren't met.
+type UpdateDictDataRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateDictDataRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateDictDataRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateDictDataRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateDictDataRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateDictDataRspValidationError) ErrorName() string {
+	return "UpdateDictDataRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateDictDataRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateDictDataRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateDictDataRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateDictDataRspValidationError{}
+
+// Validate checks the field values on DelDictDataListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DelDictDataListReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DelDictDataListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DelDictDataListReqMultiError, or nil if none found.
+func (m *DelDictDataListReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DelDictDataListReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetListOption() == nil {
+		err := DelDictDataListReqValidationError{
+			field:  "ListOption",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetListOption()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DelDictDataListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DelDictDataListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetListOption()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DelDictDataListReqValidationError{
+				field:  "ListOption",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return DelDictDataListReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// DelDictDataListReqMultiError is an error wrapping multiple validation errors
+// returned by DelDictDataListReq.ValidateAll() if the designated constraints
+// aren't met.
+type DelDictDataListReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DelDictDataListReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DelDictDataListReqMultiError) AllErrors() []error { return m }
+
+// DelDictDataListReqValidationError is the validation error returned by
+// DelDictDataListReq.Validate if the designated constraints aren't met.
+type DelDictDataListReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DelDictDataListReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DelDictDataListReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DelDictDataListReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DelDictDataListReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DelDictDataListReqValidationError) ErrorName() string {
+	return "DelDictDataListReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DelDictDataListReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDelDictDataListReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DelDictDataListReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DelDictDataListReqValidationError{}
+
+// Validate checks the field values on DelDictDataListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DelDictDataListRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DelDictDataListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DelDictDataListRspMultiError, or nil if none found.
+func (m *DelDictDataListRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DelDictDataListRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return DelDictDataListRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// DelDictDataListRspMultiError is an error wrapping multiple validation errors
+// returned by DelDictDataListRsp.ValidateAll() if the designated constraints
+// aren't met.
+type DelDictDataListRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DelDictDataListRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DelDictDataListRspMultiError) AllErrors() []error { return m }
+
+// DelDictDataListRspValidationError is the validation error returned by
+// DelDictDataListRsp.Validate if the designated constraints aren't met.
+type DelDictDataListRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DelDictDataListRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DelDictDataListRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DelDictDataListRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DelDictDataListRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DelDictDataListRspValidationError) ErrorName() string {
+	return "DelDictDataListRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DelDictDataListRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDelDictDataListRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DelDictDataListRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DelDictDataListRspValidationError{}
+
+// Validate checks the field values on GetDictDataReq with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *GetDictDataReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetDictDataReq with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in GetDictDataReqMultiError,
+// or nil if none found.
+func (m *GetDictDataReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetDictDataReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetId() <= 0 {
+		err := GetDictDataReqValidationError{
+			field:  "Id",
+			reason: "value must be greater than 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return GetDictDataReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetDictDataReqMultiError is an error wrapping multiple validation errors
+// returned by GetDictDataReq.ValidateAll() if the designated constraints
+// aren't met.
+type GetDictDataReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetDictDataReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetDictDataReqMultiError) AllErrors() []error { return m }
+
+// GetDictDataReqValidationError is the validation error returned by
+// GetDictDataReq.Validate if the designated constraints aren't met.
+type GetDictDataReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetDictDataReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetDictDataReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetDictDataReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetDictDataReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetDictDataReqValidationError) ErrorName() string { return "GetDictDataReqValidationError" }
+
+// Error satisfies the builtin error interface
+func (e GetDictDataReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetDictDataReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetDictDataReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetDictDataReqValidationError{}
+
+// Validate checks the field values on GetDictDataRsp with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *GetDictDataRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetDictDataRsp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in GetDictDataRspMultiError,
+// or nil if none found.
+func (m *GetDictDataRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetDictDataRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetDictDataRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetDictDataRspValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetDictDataRspValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetDictDataRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetDictDataRspMultiError is an error wrapping multiple validation errors
+// returned by GetDictDataRsp.ValidateAll() if the designated constraints
+// aren't met.
+type GetDictDataRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetDictDataRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetDictDataRspMultiError) AllErrors() []error { return m }
+
+// GetDictDataRspValidationError is the validation error returned by
+// GetDictDataRsp.Validate if the designated constraints aren't met.
+type GetDictDataRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetDictDataRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetDictDataRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetDictDataRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetDictDataRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetDictDataRspValidationError) ErrorName() string { return "GetDictDataRspValidationError" }
+
+// Error satisfies the builtin error interface
+func (e GetDictDataRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetDictDataRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetDictDataRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetDictDataRspValidationError{}
+
+// Validate checks the field values on GetDictDataListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetDictDataListReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetDictDataListReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetDictDataListReqMultiError, or nil if none found.
+func (m *GetDictDataListReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetDictDataListReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetListOption() == nil {
+		err := GetDictDataListReqValidationError{
+			field:  "ListOption",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetListOption()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetDictDataListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetDictDataListReqValidationError{
+					field:  "ListOption",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetListOption()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetDictDataListReqValidationError{
+				field:  "ListOption",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetDictDataListReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetDictDataListReqMultiError is an error wrapping multiple validation errors
+// returned by GetDictDataListReq.ValidateAll() if the designated constraints
+// aren't met.
+type GetDictDataListReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetDictDataListReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetDictDataListReqMultiError) AllErrors() []error { return m }
+
+// GetDictDataListReqValidationError is the validation error returned by
+// GetDictDataListReq.Validate if the designated constraints aren't met.
+type GetDictDataListReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetDictDataListReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetDictDataListReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetDictDataListReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetDictDataListReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetDictDataListReqValidationError) ErrorName() string {
+	return "GetDictDataListReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetDictDataListReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetDictDataListReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetDictDataListReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetDictDataListReqValidationError{}
+
+// Validate checks the field values on GetDictDataListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetDictDataListRsp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetDictDataListRsp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetDictDataListRspMultiError, or nil if none found.
+func (m *GetDictDataListRsp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetDictDataListRsp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetPaginate()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetDictDataListRspValidationError{
+					field:  "Paginate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetDictDataListRspValidationError{
+					field:  "Paginate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPaginate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetDictDataListRspValidationError{
+				field:  "Paginate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	for idx, item := range m.GetList() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, GetDictDataListRspValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, GetDictDataListRspValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return GetDictDataListRspValidationError{
+					field:  fmt.Sprintf("List[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return GetDictDataListRspMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetDictDataListRspMultiError is an error wrapping multiple validation errors
+// returned by GetDictDataListRsp.ValidateAll() if the designated constraints
+// aren't met.
+type GetDictDataListRspMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetDictDataListRspMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetDictDataListRspMultiError) AllErrors() []error { return m }
+
+// GetDictDataListRspValidationError is the validation error returned by
+// GetDictDataListRsp.Validate if the designated constraints aren't met.
+type GetDictDataListRspValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetDictDataListRspValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetDictDataListRspValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetDictDataListRspValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetDictDataListRspValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetDictDataListRspValidationError) ErrorName() string {
+	return "GetDictDataListRspValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetDictDataListRspValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetDictDataListRsp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetDictDataListRspValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetDictDataListRspValidationError{}

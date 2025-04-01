@@ -17,3 +17,18 @@ func (*ModelDailyShortSentences) TableName() string {
 func (*ModelOutsideWebSite) TableName() string {
 	return "lbsingle_outside_web_site"
 }
+func (*ModelArticle) TableName() string {
+	return "lbsingle_article"
+}
+func (*ModelArticleTag) TableName() string {
+	return "lbsingle_article_tag"
+}
+func (*ModelArticleCategory) TableName() string {
+	return "lbsingle_article_category"
+}
+func (*ModelDictType) TableName() string {
+	return "lbsingle_dict_type"
+}
+func (*ModelDictData) TableName() string {
+	return "lbsingle_dict_data"
+}

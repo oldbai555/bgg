@@ -293,3 +293,228 @@ var ModelOutsideWebSite = &engine.ModelObjectType{
 		},
 	},
 }
+
+var ModelArticle = &engine.ModelObjectType{
+	Name: "lbsingle.ModelArticle",
+	FieldList: &engine.ObjectFieldList{
+		List: []*engine.ObjectField{
+			{
+				FieldName: "id",
+				Type:      "uint64",
+				IsArray:   false,
+			},
+			{
+				FieldName: "created_at",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "updated_at",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "deleted_at",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "creator_id",
+				Type:      "uint64",
+				IsArray:   false,
+			},
+			{
+				FieldName: "title",
+				Type:      "string",
+				IsArray:   false,
+			},
+		},
+	},
+}
+
+var ModelArticleTag = &engine.ModelObjectType{
+	Name: "lbsingle.ModelArticleTag",
+	FieldList: &engine.ObjectFieldList{
+		List: []*engine.ObjectField{
+			{
+				FieldName: "id",
+				Type:      "uint64",
+				IsArray:   false,
+			},
+			{
+				FieldName: "created_at",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "updated_at",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "deleted_at",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "creator_id",
+				Type:      "uint64",
+				IsArray:   false,
+			},
+			{
+				FieldName: "name",
+				Type:      "string",
+				IsArray:   false,
+			},
+		},
+	},
+}
+
+var ModelArticleCategory = &engine.ModelObjectType{
+	Name: "lbsingle.ModelArticleCategory",
+	FieldList: &engine.ObjectFieldList{
+		List: []*engine.ObjectField{
+			{
+				FieldName: "id",
+				Type:      "uint64",
+				IsArray:   false,
+			},
+			{
+				FieldName: "created_at",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "updated_at",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "deleted_at",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "creator_id",
+				Type:      "uint64",
+				IsArray:   false,
+			},
+			{
+				FieldName: "name",
+				Type:      "string",
+				IsArray:   false,
+			},
+		},
+	},
+}
+
+var ModelDictType = &engine.ModelObjectType{
+	Name: "lbsingle.ModelDictType",
+	FieldList: &engine.ObjectFieldList{
+		List: []*engine.ObjectField{
+			{
+				FieldName: "id",
+				Type:      "uint64",
+				IsArray:   false,
+			},
+			{
+				FieldName: "created_at",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "updated_at",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "deleted_at",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "creator_id",
+				Type:      "uint64",
+				IsArray:   false,
+			},
+			{
+				FieldName: "name",
+				Type:      "string",
+				IsArray:   false,
+			},
+			{
+				FieldName: "status",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "remark",
+				Type:      "string",
+				IsArray:   false,
+			},
+		},
+	},
+}
+
+var ModelDictData = &engine.ModelObjectType{
+	Name: "lbsingle.ModelDictData",
+	FieldList: &engine.ObjectFieldList{
+		List: []*engine.ObjectField{
+			{
+				FieldName: "id",
+				Type:      "uint64",
+				IsArray:   false,
+			},
+			{
+				FieldName: "created_at",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "updated_at",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "deleted_at",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "creator_id",
+				Type:      "uint64",
+				IsArray:   false,
+			},
+			{
+				FieldName: "dict_type_id",
+				Type:      "string",
+				IsArray:   false,
+			},
+			{
+				FieldName: "dict_label",
+				Type:      "string",
+				IsArray:   false,
+			},
+			{
+				FieldName: "dict_value",
+				Type:      "string",
+				IsArray:   false,
+			},
+			{
+				FieldName: "sort",
+				Type:      "int32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "status",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+			{
+				FieldName: "sys_default",
+				Type:      "uint32",
+				IsArray:   false,
+			},
+		},
+	},
+}

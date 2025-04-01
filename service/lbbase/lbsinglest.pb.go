@@ -594,6 +594,109 @@ func (x *JsCodeToSessionRsp) GetErrcode() int32 {
 	return 0
 }
 
+type GenArticleVo struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Title      string   `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
+	Tags       []string `protobuf:"bytes,2,rep,name=tags,proto3" json:"tags,omitempty"`
+	Category   string   `protobuf:"bytes,3,opt,name=category,proto3" json:"category,omitempty"`
+	Keywords   []string `protobuf:"bytes,4,rep,name=keywords,proto3" json:"keywords,omitempty"`
+	CoverUrl   string   `protobuf:"bytes,5,opt,name=coverUrl,proto3" json:"coverUrl,omitempty"`
+	BannerUrl  string   `protobuf:"bytes,6,opt,name=bannerUrl,proto3" json:"bannerUrl,omitempty"`
+	BannerText string   `protobuf:"bytes,7,opt,name=bannerText,proto3" json:"bannerText,omitempty"`
+	Date       string   `protobuf:"bytes,8,opt,name=date,proto3" json:"date,omitempty"` //  示例：2023-11-21 14:16:54
+}
+
+func (x *GenArticleVo) Reset() {
+	*x = GenArticleVo{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lbsinglest_proto_msgTypes[8]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GenArticleVo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GenArticleVo) ProtoMessage() {}
+
+func (x *GenArticleVo) ProtoReflect() protoreflect.Message {
+	mi := &file_lbsinglest_proto_msgTypes[8]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GenArticleVo.ProtoReflect.Descriptor instead.
+func (*GenArticleVo) Descriptor() ([]byte, []int) {
+	return file_lbsinglest_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *GenArticleVo) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *GenArticleVo) GetTags() []string {
+	if x != nil {
+		return x.Tags
+	}
+	return nil
+}
+
+func (x *GenArticleVo) GetCategory() string {
+	if x != nil {
+		return x.Category
+	}
+	return ""
+}
+
+func (x *GenArticleVo) GetKeywords() []string {
+	if x != nil {
+		return x.Keywords
+	}
+	return nil
+}
+
+func (x *GenArticleVo) GetCoverUrl() string {
+	if x != nil {
+		return x.CoverUrl
+	}
+	return ""
+}
+
+func (x *GenArticleVo) GetBannerUrl() string {
+	if x != nil {
+		return x.BannerUrl
+	}
+	return ""
+}
+
+func (x *GenArticleVo) GetBannerText() string {
+	if x != nil {
+		return x.BannerText
+	}
+	return ""
+}
+
+func (x *GenArticleVo) GetDate() string {
+	if x != nil {
+		return x.Date
+	}
+	return ""
+}
+
 type Content_Text struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -607,7 +710,7 @@ type Content_Text struct {
 func (x *Content_Text) Reset() {
 	*x = Content_Text{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lbsinglest_proto_msgTypes[8]
+		mi := &file_lbsinglest_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -620,7 +723,7 @@ func (x *Content_Text) String() string {
 func (*Content_Text) ProtoMessage() {}
 
 func (x *Content_Text) ProtoReflect() protoreflect.Message {
-	mi := &file_lbsinglest_proto_msgTypes[8]
+	mi := &file_lbsinglest_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -667,7 +770,7 @@ type Content_Image struct {
 func (x *Content_Image) Reset() {
 	*x = Content_Image{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lbsinglest_proto_msgTypes[9]
+		mi := &file_lbsinglest_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -680,7 +783,7 @@ func (x *Content_Image) String() string {
 func (*Content_Image) ProtoMessage() {}
 
 func (x *Content_Image) ProtoReflect() protoreflect.Message {
-	mi := &file_lbsinglest_proto_msgTypes[9]
+	mi := &file_lbsinglest_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -743,7 +846,7 @@ type Content_Video struct {
 func (x *Content_Video) Reset() {
 	*x = Content_Video{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lbsinglest_proto_msgTypes[10]
+		mi := &file_lbsinglest_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -756,7 +859,7 @@ func (x *Content_Video) String() string {
 func (*Content_Video) ProtoMessage() {}
 
 func (x *Content_Video) ProtoReflect() protoreflect.Message {
-	mi := &file_lbsinglest_proto_msgTypes[10]
+	mi := &file_lbsinglest_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -826,7 +929,7 @@ type Content_Voice struct {
 func (x *Content_Voice) Reset() {
 	*x = Content_Voice{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lbsinglest_proto_msgTypes[11]
+		mi := &file_lbsinglest_proto_msgTypes[12]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -839,7 +942,7 @@ func (x *Content_Voice) String() string {
 func (*Content_Voice) ProtoMessage() {}
 
 func (x *Content_Voice) ProtoReflect() protoreflect.Message {
-	mi := &file_lbsinglest_proto_msgTypes[11]
+	mi := &file_lbsinglest_proto_msgTypes[12]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -907,7 +1010,7 @@ type Content_Document struct {
 func (x *Content_Document) Reset() {
 	*x = Content_Document{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lbsinglest_proto_msgTypes[12]
+		mi := &file_lbsinglest_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -920,7 +1023,7 @@ func (x *Content_Document) String() string {
 func (*Content_Document) ProtoMessage() {}
 
 func (x *Content_Document) ProtoReflect() protoreflect.Message {
-	mi := &file_lbsinglest_proto_msgTypes[12]
+	mi := &file_lbsinglest_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -982,7 +1085,7 @@ type Content_Location struct {
 func (x *Content_Location) Reset() {
 	*x = Content_Location{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lbsinglest_proto_msgTypes[13]
+		mi := &file_lbsinglest_proto_msgTypes[14]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -995,7 +1098,7 @@ func (x *Content_Location) String() string {
 func (*Content_Location) ProtoMessage() {}
 
 func (x *Content_Location) ProtoReflect() protoreflect.Message {
-	mi := &file_lbsinglest_proto_msgTypes[13]
+	mi := &file_lbsinglest_proto_msgTypes[14]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1153,11 +1256,25 @@ var file_lbsinglest_proto_rawDesc = []byte{
 	0x72, 0x6d, 0x73, 0x67, 0x12, 0x16, 0x0a, 0x06, 0x6f, 0x70, 0x65, 0x6e, 0x69, 0x64, 0x18, 0x04,
 	0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x6f, 0x70, 0x65, 0x6e, 0x69, 0x64, 0x12, 0x18, 0x0a, 0x07,
 	0x65, 0x72, 0x72, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x05, 0x20, 0x01, 0x28, 0x05, 0x52, 0x07, 0x65,
-	0x72, 0x72, 0x63, 0x6f, 0x64, 0x65, 0x32, 0x0c, 0x0a, 0x0a, 0x6c, 0x62, 0x73, 0x69, 0x6e, 0x67,
-	0x6c, 0x65, 0x73, 0x74, 0x42, 0x29, 0x5a, 0x27, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63,
-	0x6f, 0x6d, 0x2f, 0x6f, 0x6c, 0x64, 0x62, 0x61, 0x69, 0x35, 0x35, 0x35, 0x2f, 0x62, 0x67, 0x67,
-	0x2f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2f, 0x6c, 0x62, 0x62, 0x61, 0x73, 0x65, 0x62,
-	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x72, 0x72, 0x63, 0x6f, 0x64, 0x65, 0x22, 0xde, 0x01, 0x0a, 0x0c, 0x47, 0x65, 0x6e, 0x41, 0x72,
+	0x74, 0x69, 0x63, 0x6c, 0x65, 0x56, 0x6f, 0x12, 0x14, 0x0a, 0x05, 0x74, 0x69, 0x74, 0x6c, 0x65,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x12, 0x12, 0x0a,
+	0x04, 0x74, 0x61, 0x67, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x09, 0x52, 0x04, 0x74, 0x61, 0x67,
+	0x73, 0x12, 0x1a, 0x0a, 0x08, 0x63, 0x61, 0x74, 0x65, 0x67, 0x6f, 0x72, 0x79, 0x18, 0x03, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x08, 0x63, 0x61, 0x74, 0x65, 0x67, 0x6f, 0x72, 0x79, 0x12, 0x1a, 0x0a,
+	0x08, 0x6b, 0x65, 0x79, 0x77, 0x6f, 0x72, 0x64, 0x73, 0x18, 0x04, 0x20, 0x03, 0x28, 0x09, 0x52,
+	0x08, 0x6b, 0x65, 0x79, 0x77, 0x6f, 0x72, 0x64, 0x73, 0x12, 0x1a, 0x0a, 0x08, 0x63, 0x6f, 0x76,
+	0x65, 0x72, 0x55, 0x72, 0x6c, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x63, 0x6f, 0x76,
+	0x65, 0x72, 0x55, 0x72, 0x6c, 0x12, 0x1c, 0x0a, 0x09, 0x62, 0x61, 0x6e, 0x6e, 0x65, 0x72, 0x55,
+	0x72, 0x6c, 0x18, 0x06, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x62, 0x61, 0x6e, 0x6e, 0x65, 0x72,
+	0x55, 0x72, 0x6c, 0x12, 0x1e, 0x0a, 0x0a, 0x62, 0x61, 0x6e, 0x6e, 0x65, 0x72, 0x54, 0x65, 0x78,
+	0x74, 0x18, 0x07, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x62, 0x61, 0x6e, 0x6e, 0x65, 0x72, 0x54,
+	0x65, 0x78, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x65, 0x18, 0x08, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x04, 0x64, 0x61, 0x74, 0x65, 0x32, 0x0c, 0x0a, 0x0a, 0x6c, 0x62, 0x73, 0x69, 0x6e,
+	0x67, 0x6c, 0x65, 0x73, 0x74, 0x42, 0x29, 0x5a, 0x27, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e,
+	0x63, 0x6f, 0x6d, 0x2f, 0x6f, 0x6c, 0x64, 0x62, 0x61, 0x69, 0x35, 0x35, 0x35, 0x2f, 0x62, 0x67,
+	0x67, 0x2f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2f, 0x6c, 0x62, 0x62, 0x61, 0x73, 0x65,
+	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1172,7 +1289,7 @@ func file_lbsinglest_proto_rawDescGZIP() []byte {
 	return file_lbsinglest_proto_rawDescData
 }
 
-var file_lbsinglest_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_lbsinglest_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_lbsinglest_proto_goTypes = []interface{}{
 	(*Content)(nil),            // 0: lbsinglest.Content
 	(*BaseUser)(nil),           // 1: lbsinglest.BaseUser
@@ -1182,20 +1299,21 @@ var file_lbsinglest_proto_goTypes = []interface{}{
 	(*ChatRoomMember)(nil),     // 5: lbsinglest.ChatRoomMember
 	(*JsCodeToSessionReq)(nil), // 6: lbsinglest.JsCodeToSessionReq
 	(*JsCodeToSessionRsp)(nil), // 7: lbsinglest.JsCodeToSessionRsp
-	(*Content_Text)(nil),       // 8: lbsinglest.Content.Text
-	(*Content_Image)(nil),      // 9: lbsinglest.Content.Image
-	(*Content_Video)(nil),      // 10: lbsinglest.Content.Video
-	(*Content_Voice)(nil),      // 11: lbsinglest.Content.Voice
-	(*Content_Document)(nil),   // 12: lbsinglest.Content.Document
-	(*Content_Location)(nil),   // 13: lbsinglest.Content.Location
+	(*GenArticleVo)(nil),       // 8: lbsinglest.GenArticleVo
+	(*Content_Text)(nil),       // 9: lbsinglest.Content.Text
+	(*Content_Image)(nil),      // 10: lbsinglest.Content.Image
+	(*Content_Video)(nil),      // 11: lbsinglest.Content.Video
+	(*Content_Voice)(nil),      // 12: lbsinglest.Content.Voice
+	(*Content_Document)(nil),   // 13: lbsinglest.Content.Document
+	(*Content_Location)(nil),   // 14: lbsinglest.Content.Location
 }
 var file_lbsinglest_proto_depIdxs = []int32{
-	8,  // 0: lbsinglest.Content.text:type_name -> lbsinglest.Content.Text
-	9,  // 1: lbsinglest.Content.image:type_name -> lbsinglest.Content.Image
-	10, // 2: lbsinglest.Content.video:type_name -> lbsinglest.Content.Video
-	11, // 3: lbsinglest.Content.voice:type_name -> lbsinglest.Content.Voice
-	12, // 4: lbsinglest.Content.document:type_name -> lbsinglest.Content.Document
-	13, // 5: lbsinglest.Content.location:type_name -> lbsinglest.Content.Location
+	9,  // 0: lbsinglest.Content.text:type_name -> lbsinglest.Content.Text
+	10, // 1: lbsinglest.Content.image:type_name -> lbsinglest.Content.Image
+	11, // 2: lbsinglest.Content.video:type_name -> lbsinglest.Content.Video
+	12, // 3: lbsinglest.Content.voice:type_name -> lbsinglest.Content.Voice
+	13, // 4: lbsinglest.Content.document:type_name -> lbsinglest.Content.Document
+	14, // 5: lbsinglest.Content.location:type_name -> lbsinglest.Content.Location
 	5,  // 6: lbsinglest.JoinChatRoom.member:type_name -> lbsinglest.ChatRoomMember
 	5,  // 7: lbsinglest.LeaveChatRoom.member:type_name -> lbsinglest.ChatRoomMember
 	8,  // [8:8] is the sub-list for method output_type
@@ -1308,7 +1426,7 @@ func file_lbsinglest_proto_init() {
 			}
 		}
 		file_lbsinglest_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Content_Text); i {
+			switch v := v.(*GenArticleVo); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1320,7 +1438,7 @@ func file_lbsinglest_proto_init() {
 			}
 		}
 		file_lbsinglest_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Content_Image); i {
+			switch v := v.(*Content_Text); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1332,7 +1450,7 @@ func file_lbsinglest_proto_init() {
 			}
 		}
 		file_lbsinglest_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Content_Video); i {
+			switch v := v.(*Content_Image); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1344,7 +1462,7 @@ func file_lbsinglest_proto_init() {
 			}
 		}
 		file_lbsinglest_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Content_Voice); i {
+			switch v := v.(*Content_Video); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1356,7 +1474,7 @@ func file_lbsinglest_proto_init() {
 			}
 		}
 		file_lbsinglest_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Content_Document); i {
+			switch v := v.(*Content_Voice); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1368,6 +1486,18 @@ func file_lbsinglest_proto_init() {
 			}
 		}
 		file_lbsinglest_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Content_Document); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lbsinglest_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Content_Location); i {
 			case 0:
 				return &v.state
@@ -1386,7 +1516,7 @@ func file_lbsinglest_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_lbsinglest_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   14,
+			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

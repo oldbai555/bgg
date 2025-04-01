@@ -16,6 +16,11 @@ var (
 	OrmMessage             *gormx.BaseModel[*lbsingle.ModelMessage]
 	OrmDailyShortSentences *gormx.BaseModel[*lbsingle.ModelDailyShortSentences]
 	OrmOutsideWebSite      *gormx.BaseModel[*lbsingle.ModelOutsideWebSite]
+	OrmArticle             *gormx.BaseModel[*lbsingle.ModelArticle]
+	OrmArticleTag          *gormx.BaseModel[*lbsingle.ModelArticleTag]
+	OrmArticleCategory     *gormx.BaseModel[*lbsingle.ModelArticleCategory]
+	OrmDictType            *gormx.BaseModel[*lbsingle.ModelDictType]
+	OrmDictData            *gormx.BaseModel[*lbsingle.ModelDictData]
 )
 
 func Init() (err error) {
@@ -34,6 +39,11 @@ func Init() (err error) {
 		&lbsingle.ModelMessage{},
 		&lbsingle.ModelDailyShortSentences{},
 		&lbsingle.ModelOutsideWebSite{},
+		&lbsingle.ModelArticle{},
+		&lbsingle.ModelArticleTag{},
+		&lbsingle.ModelArticleCategory{},
+		&lbsingle.ModelDictType{},
+		&lbsingle.ModelDictData{},
 	},
 	)
 	// 注入结构
@@ -44,6 +54,11 @@ func Init() (err error) {
 		autodb.ModelMessage,
 		autodb.ModelDailyShortSentences,
 		autodb.ModelOutsideWebSite,
+		autodb.ModelArticle,
+		autodb.ModelArticleTag,
+		autodb.ModelArticleCategory,
+		autodb.ModelDictType,
+		autodb.ModelDictData,
 	)
 
 	OrmUser = gormx.NewBaseModel[*lbsingle.ModelUser](gormx.ModelConfig{
@@ -64,6 +79,26 @@ func Init() (err error) {
 	})
 	OrmOutsideWebSite = gormx.NewBaseModel[*lbsingle.ModelOutsideWebSite](gormx.ModelConfig{
 		NotFoundErrCode: int32(lbsingle.ErrCode_ErrOutsideWebSiteNotFound),
+		Db:              "biz",
+	})
+	OrmArticle = gormx.NewBaseModel[*lbsingle.ModelArticle](gormx.ModelConfig{
+		NotFoundErrCode: int32(lbsingle.ErrCode_ErrArticleNotFound),
+		Db:              "biz",
+	})
+	OrmArticleTag = gormx.NewBaseModel[*lbsingle.ModelArticleTag](gormx.ModelConfig{
+		NotFoundErrCode: int32(lbsingle.ErrCode_ErrArticleTagNotFound),
+		Db:              "biz",
+	})
+	OrmArticleCategory = gormx.NewBaseModel[*lbsingle.ModelArticleCategory](gormx.ModelConfig{
+		NotFoundErrCode: int32(lbsingle.ErrCode_ErrArticleCategoryNotFound),
+		Db:              "biz",
+	})
+	OrmDictType = gormx.NewBaseModel[*lbsingle.ModelDictType](gormx.ModelConfig{
+		NotFoundErrCode: int32(lbsingle.ErrCode_ErrDictTypeNotFound),
+		Db:              "biz",
+	})
+	OrmDictData = gormx.NewBaseModel[*lbsingle.ModelDictData](gormx.ModelConfig{
+		NotFoundErrCode: int32(lbsingle.ErrCode_ErrDictDataNotFound),
 		Db:              "biz",
 	})
 
