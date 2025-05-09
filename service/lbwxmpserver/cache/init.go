@@ -17,7 +17,7 @@ func Rdb() (*bredis.Group, error) {
 
 func InitCache() (err error) {
 	r := syscfg.NewRedisConf("")
-	rdb, err = bredis.New(r.Host, r.Port, r.Password)
+	rdb, err = bredis.New(r.Host, r.Port, r.Username, r.Password)
 	if err != nil {
 		return lberr.Wrap(err)
 	}
