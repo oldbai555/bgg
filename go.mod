@@ -19,7 +19,7 @@ require (
 	github.com/minio/minio-go/v7 v7.0.87
 	github.com/nsqio/go-nsq v1.1.0
 	github.com/oldbai555/lbtool v0.0.4-0.20250218030406-d9e56b8dbebc
-	github.com/oldbai555/micro v0.0.2-0.20250401040957-2d9bef871e6a
+	github.com/oldbai555/micro v0.0.2-0.20250509042418-e3c7829a8d57
 	github.com/panjf2000/ants/v2 v2.5.0
 	github.com/pkg/sftp v1.13.1
 	github.com/prometheus/client_golang v1.11.1
