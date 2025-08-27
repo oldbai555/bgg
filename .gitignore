@@ -26,3 +26,4 @@ git remote set-url origin https://token@github.com/oldbai555/bgg.git
 /package/*
 /demo/uploader/uploader
 /script/ops/uploader.exe
+/demo/m3u8/m3u8
