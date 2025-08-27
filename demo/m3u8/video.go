@@ -125,9 +125,7 @@ func getVideoList(c *gin.Context) {
 	}
 
 	// 返回成功响应
-	c.JSON(http.StatusOK, Response{
-		Code:    200,
-		Message: "查询成功",
-		Data:    videos,
+	c.HTML(http.StatusOK, "list.html", gin.H{
+		"videoList": videos,
 	})
 }
