@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M3U8视频列表</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            color: #333;
+            font-size: 3em;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .header p {
+            color: #666;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+
+        /* 搜索框样式 */
+        .search-section {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .search-box {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            max-width: 500px;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            border: 3px solid #e1e5e9;
+            border-radius: 25px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 4px 25px rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
+        }
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+            font-size: 1.2em;
+            pointer-events: none;
+        }
+
+        /* 视频列表样式 */
+        .video-list {
+            display: grid;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .url-item {
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .url-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .url-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+        }
+
+        .url-item:hover::before {
+            left: 100%;
+        }
+
+        .url-item:active {
+            transform: translateY(-3px) scale(0.98);
+        }
+
+        .url-item.hidden {
+            display: none;
+        }
+
+        .url-title {
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .url-title::before {
+            content: "🎬";
+            font-size: 1.2em;
+        }
+
+        .url-link {
+            font-size: 0.95em;
+            color: #666;
+            word-break: break-all;
+            line-height: 1.4;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            position: relative;
+        }
+
+        /* 空状态样式 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+            display: none;
+        }
+
+        .empty-state.show {
+            display: block;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #999;
+        }
+
+        /* 加载动画 */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            display: none;
+        }
+
+        .loading.show {
+            display: flex;
+        }
+
+        .loading-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            max-width: 300px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        .loading-text {
+            color: #333;
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 统计信息 */
+        .stats {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: linear-gradient(45deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border-radius: 10px;
+        }
+
+        .stats-text {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            .header h1 {
+                font-size: 2.2em;
+            }
+            .header p {
+                font-size: 1em;
+            }
+            .url-item {
+                padding: 15px;
+            }
+            .url-title {
+                font-size: 1.1em;
+            }
+            .url-link {
+                font-size: 0.9em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            .search-box input {
+                padding: 12px 40px 12px 15px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🎬 M3U8视频列表</h1>
+        <p>点击任意视频即可开始观看，享受高清流媒体体验</p>
+    </div>
+
+    <!-- 搜索区域 -->
+    <div class="search-section">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="🔍 搜索您想观看的视频..." oninput="searchVideos()">
+            <span class="search-icon">🔍</span>
+        </div>
+    </div>
+
+    <!-- 统计信息 -->
+    <div class="stats" id="stats">
+        <div class="stats-text">共有 <span id="totalCount">0</span> 个视频可观看</div>
+    </div>
+
+    <!-- 加载动画 -->
+    <div class="loading" id="loading">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <div class="loading-text">正在跳转到播放器...</div>
+        </div>
+    </div>
+
+    <!-- 视频列表 -->
+    <div class="video-list" id="videoList">
+        {{range .videoList}}
+        <div class="url-item" onclick="playVideo('{{.PlayerUrl}}', '{{.Name}}')">
+            <div class="url-title">{{.Name}}</div>
+            <div class="url-link">{{.GodNum}}</div>
+        </div>
+        {{end}}
+    </div>
+
+    <!-- 空状态 -->
+    <div class="empty-state" id="emptyState">
+        <h3>🔍 没有找到匹配的视频</h3>
+        <p>请尝试使用不同的关键词搜索</p>
+    </div>
+</div>
+
+<script>
+    // 初始化页面
+    document.addEventListener('DOMContentLoaded', function() {
+        updateStats();
+
+        // 为搜索框添加快捷键支持
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const visibleItems = document.querySelectorAll('.url-item:not(.hidden)');
+                if (visibleItems.length > 0) {
+                    visibleItems[0].click();
+                }
+            }
+        });
+    });
+
+    // 播放视频函数
+    function playVideo(playListUrl, title) {
+        // 显示加载动画
+        document.getElementById('loading').classList.add('show');
+
+        // 构造跳转URL
+        const targetUrl = `https://oldbai.top/onlinem3u8?m3u8Url=${encodeURIComponent(playListUrl)}&proxyUrl=https://oldbai.top/m3u8`;
+
+        // 延迟跳转，让用户看到加载动画
+        setTimeout(() => {
+            window.open(targetUrl, '_blank');
+            document.getElementById('loading').classList.remove('show');
+        }, 800);
+    }
+
+    // 搜索功能
+    function searchVideos() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+        const urlItems = document.querySelectorAll('.url-item');
+        let visibleCount = 0;
+
+        urlItems.forEach(item => {
+            const title = item.querySelector('.url-title').textContent.toLowerCase();
+            const link = item.querySelector('.url-link').textContent.toLowerCase();
+
+            if (searchTerm === '' || title.includes(searchTerm) || link.includes(searchTerm)) {
+                item.classList.remove('hidden');
+                visibleCount++;
+
+                // 添加搜索高亮效果
+                if (searchTerm !== '') {
+                    highlightSearchTerm(item, searchTerm);
+                } else {
+                    clearHighlight(item);
+                }
+            } else {
+                item.classList.add('hidden');
+            }
+        });
+
+        // 更新统计信息
+        updateStats(visibleCount, searchTerm);
+
+        // 显示/隐藏空状态
+        const emptyState = document.getElementById('emptyState');
+        if (visibleCount === 0 && searchTerm !== '') {
+            emptyState.classList.add('show');
+        } else {
+            emptyState.classList.remove('show');
+        }
+    }
+
+    // 高亮搜索词
+    function highlightSearchTerm(item, searchTerm) {
+        const title = item.querySelector('.url-title');
+        const link = item.querySelector('.url-link');
+
+        // 简单的高亮实现，实际项目中可能需要更复杂的处理
+        const regex = new RegExp(`(${searchTerm})`, 'gi');
+
+        const originalTitle = title.textContent;
+        const originalLink = link.textContent;
+
+        title.innerHTML = originalTitle.replace(regex, '<mark style="background: #ffeb3b; padding: 0 2px; border-radius: 2px;">$1</mark>');
+        link.innerHTML = originalLink.replace(regex, '<mark style="background: #ffeb3b; padding: 0 2px; border-radius: 2px;">$1</mark>');
+    }
+
+    // 清除高亮
+    function clearHighlight(item) {
+        const title = item.querySelector('.url-title');
+        const link = item.querySelector('.url-link');
+
+        title.innerHTML = title.textContent;
+        link.innerHTML = link.textContent;
+    }
+
+    // 更新统计信息
+    function updateStats(visibleCount, searchTerm) {
+        const totalItems = document.querySelectorAll('.url-item').length;
+        const count = visibleCount !== undefined ? visibleCount : totalItems;
+        const statsText = document.querySelector('.stats-text');
+
+        if (searchTerm) {
+            statsText.innerHTML = `找到 <span id="totalCount">${count}</span> 个匹配的视频`;
+        } else {
+            statsText.innerHTML = `共有 <span id="totalCount">${count}</span> 个视频可观看`;
+        }
+    }
+
+    // 添加键盘快捷键支持
+    document.addEventListener('keydown', function(e) {
+        // 按 / 键聚焦搜索框
+        if (e.key === '/' && e.target !== document.getElementById('searchInput')) {
+            e.preventDefault();
+            document.getElementById('searchInput').focus();
+        }
+
+        // 按 Escape 键清空搜索
+        if (e.key === 'Escape') {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.value = '';
+            searchVideos();
+            searchInput.blur();
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,7 +1,9 @@
 package main
 
 import (
+	"embed"
 	"github.com/gin-gonic/gin"
+	"html/template"
 	"io"
 	"log"
 	"net/http"
@@ -101,6 +103,9 @@ func healthHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "ok"})
 }
 
+//go:embed templates
+var tplFs embed.FS
+
 func main() {
 	// 创建一个 gin 路由
 	r := gin.Default()
@@ -111,6 +116,9 @@ func main() {
 	// 注册路由
 	r.GET("/proxy", proxyHandler)
 	r.GET("/health", healthHandler)
+
+	templ := template.Must(template.New("templates").ParseFS(tplFs, "templates/*.html"))
+	r.SetHTMLTemplate(templ)
 
 	// 注册视频相关路由
 	videoGroup := r.Group("/video")
