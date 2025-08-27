@@ -112,6 +112,13 @@ func main() {
 	r.GET("/proxy", proxyHandler)
 	r.GET("/health", healthHandler)
 
+	// 注册视频相关路由
+	videoGroup := r.Group("/video")
+	{
+		videoGroup.POST("/add", addVideo)
+		videoGroup.GET("/list", getVideoList)
+	}
+	initDB()
 	// 启动服务
 	log.Println("🚀 代理服务器启动: http://localhost:8888")
 	if err := r.Run(":8888"); err != nil {
