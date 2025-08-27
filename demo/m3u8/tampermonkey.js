@@ -4,7 +4,7 @@
 // @version      2.0
 // @description  B站悬浮球：支持拖拽、展开面板、动态解析m3u8并生成 采集/播放 按钮成对排列，带toast提示~
 // @author       You
-// @match        *://*.bilibili.com/*
+// @match        https://bilibili.com/*
 // @grant        none
 // ==/UserScript==
 
@@ -178,6 +178,11 @@
         const videoDoc = document.querySelector('.order-first');
         if (!videoDoc) return;
 
+        // 从当前页面URL提取godNum
+        const currentUrl = window.location.href;
+        const godNum = currentUrl.split('/').pop() || '';
+        console.log("提取的 godNum:", godNum);
+
         const prefix = 'https://surrit.com/';
         const suffix = '/playlist.m3u8';
 
@@ -200,48 +205,49 @@
                 .then(resp => resp.text())
                 .then(text => {
                     const lines = text.split('\n');
-                    lines.forEach(line => {
-                        if (line.trim() && !line.startsWith('#')) {
-                            const fileInfo = {
-                                filename: filename,
-                                url: prefix + first32Chars + '/' + line.trim(),
+                    const validLines = lines.filter(line => line.trim() && !line.startsWith('#'));
+
+                    // 只处理最后一个有效的line
+                    if (validLines.length > 0) {
+                        const lastLine = validLines[validLines.length - 1];
+                        const fileInfo = {
+                            filename: filename,
+                            url: prefix + first32Chars + '/' + lastLine.trim(),
+                            uuid: first32Chars,
+                        };
+
+                        // 按钮1：采集
+                        const collectBtn = createBtn(`采集 ${fileInfo.filename}`, () => {
+                            const payload = {
+                                player_url: fileInfo.url,
+                                name: fileInfo.filename,
                                 uuid: first32Chars,
-                                god_num:  "",
+                                god_num: godNum,
                             };
+                            fetch("https://oldbai.top/m3u8/video/add", {
+                                method: "POST",
+                                headers: {"Content-Type": "application/json"},
+                                body: JSON.stringify(payload)
+                            }).then(res => res.text())
+                                .then(() => {
+                                    showToast(`📡 已采集: ${fileInfo.filename}`, true);
+                                })
+                                .catch(err => {
+                                    console.error("采集失败:", err);
+                                    showToast("❌ 采集失败", false);
+                                });
+                        }, "#228be6", "#1864ab");
 
-                            // 按钮1：采集
-                            const collectBtn = createBtn(`采集 ${fileInfo.filename}`, () => {
-                                const payload = {
-                                    player_url: fileInfo.url,
-                                    name: fileInfo.filename,
-                                    god_num: "",
-                                    uuid: first32Chars,
-                                };
-                                fetch("https://oldbai.top/m3u8/video/add", {
-                                    method: "POST",
-                                    headers: {"Content-Type": "application/json"},
-                                    body: JSON.stringify(payload)
-                                }).then(res => res.text())
-                                    .then(() => {
-                                        showToast(`📡 已采集: ${fileInfo.filename}`, true);
-                                    })
-                                    .catch(err => {
-                                        console.error("采集失败:", err);
-                                        showToast("❌ 采集失败", false);
-                                    });
-                            }, "#228be6", "#1864ab");
+                        // 按钮2：播放
+                        const playBtn = createBtn(`播放 ${fileInfo.filename}`, () => {
+                            const targetUrl = `https://oldbai.top/onlinem3u8?m3u8Url=${encodeURIComponent(fileInfo.url)}&proxyUrl=https://oldbai.top/m3u8`;
+                            window.open(targetUrl, "_blank");
+                        }, "#ff6699", "#ff3366");
 
-                            // 按钮2：播放
-                            const playBtn = createBtn(`播放 ${fileInfo.filename}`, () => {
-                                const targetUrl = `https://oldbai.top/onlinem3u8?m3u8Url=${encodeURIComponent(fileInfo.url)}&proxyUrl=https://oldbai.top/m3u8`;
-                                window.open(targetUrl, "_blank");
-                            }, "#ff6699", "#ff3366");
-
-                            // 交替添加
-                            btnContainer.appendChild(collectBtn);
-                            btnContainer.appendChild(playBtn);
-                        }
-                    });
+                        // 只添加最后两个按钮
+                        btnContainer.appendChild(collectBtn);
+                        btnContainer.appendChild(playBtn);
+                    }
                 });
         }
     })();
