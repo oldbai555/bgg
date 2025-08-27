@@ -143,14 +143,14 @@
     <h3>🔧 代理服务器配置</h3>
     <div class="proxy-group">
       <input type="url" id="proxyUrl" class="proxy-input"
-             placeholder="请输入代理服务器地址，如: http://localhost:8080"
-             value="http://localhost:8080">
+             placeholder="请输入代理服务器地址，如: http://localhost:8888"
+             value="http://localhost:8888">
       <button class="btn btn-secondary btn-small" onclick="testProxy()">🔍 测试连接</button>
       <button class="btn btn-secondary btn-small" onclick="saveProxy()">💾 保存配置</button>
     </div>
     <div class="proxy-tips">
       💡 提示：代理服务器用于解决跨域问题。如果直接播放失败，将自动尝试通过代理播放。<br>
-      📋 格式示例：http://localhost:8080 或 https://your-proxy.com:8080
+      📋 格式示例：http://localhost:8888 或 https://your-proxy.com:8080
     </div>
   </div>
 
@@ -177,7 +177,7 @@
   <div id="status"></div>
 
   <div class="video-container">
-    <video id="videoPlayer" controls playsinline>
+    <video id="videoPlayer" controls playsinline webkit-playsinline x-webkit-airplay="allow" muted>
       <p>您的浏览器不支持HTML5视频播放。</p>
     </video>
   </div>
@@ -191,9 +191,25 @@
 
   <div class="preset-urls">
     <h3>📺 示例视频链接</h3>
-    <div class="url-item" onclick="loadPresetUrl('https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8')">
-      <div class="url-title">示例视频 - Sintel</div>
-      <div class="url-link">https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8</div>
+    <div class="url-item" onclick="loadPresetUrl('https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8')">
+      <div class="url-title">Tears of Steel (fMP4)</div>
+      <div class="url-link">https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8</div>
+    </div>
+    <div class="url-item" onclick="loadPresetUrl('https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_fmp4/master.m3u8')">
+      <div class="url-title">Apple 官方测试流 (fMP4)</div>
+      <div class="url-link">https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_fmp4/master.m3u8</div>
+    </div>
+    <div class="url-item" onclick="loadPresetUrl('https://cph-p2p-msl.akamaized.net/hls/live/2000341/test/master.m3u8')">
+      <div class="url-title">Akamai 直播流测试</div>
+      <div class="url-link">https://cph-p2p-msl.akamaized.net/hls/live/2000341/test/master.m3u8</div>
+    </div>
+    <div class="url-item" onclick="loadPresetUrl('https://moctobpltc-i.akamaihd.net/hls/live/571329/eight/playlist.m3u8')">
+      <div class="url-title">Akamai 直播流 - Eight</div>
+      <div class="url-link">https://moctobpltc-i.akamaihd.net/hls/live/571329/eight/playlist.m3u8</div>
+    </div>
+    <div class="url-item" onclick="loadPresetUrl('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8')">
+      <div class="url-title">Mux 测试流</div>
+      <div class="url-link">https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8</div>
     </div>
   </div>
 </div>
@@ -203,6 +219,15 @@
 <script>
   let hls = null;
   let video = document.getElementById('videoPlayer');
+
+  // 设备检测函数
+  function isIOS() {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent);
+  }
+
+  function isSafari() {
+    return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+  }
 
   // 从输入框获取代理服务地址
   function getProxyUrl(originalUrl) {
@@ -215,7 +240,7 @@
     const normalizedProxy = proxyBase.startsWith('http') ? proxyBase : `http://${proxyBase}`;
 
     // 构建代理URL - 这里假设代理服务接受 url 参数
-    return `${normalizedProxy}/proxy?domain=${encodeURIComponent(normalizedProxy)}&url=${encodeURIComponent(originalUrl)}`;
+    return `${normalizedProxy}/proxy?url=${encodeURIComponent(originalUrl)}`;
   }
 
   // 测试代理连接
@@ -403,6 +428,71 @@
     document.getElementById('m3u8Url').value = url;
     loadVideo();
   }
+
+  // 解析URL参数并自动填充输入框
+  function parseUrlParams() {
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // 获取m3u8Url参数
+    const m3u8Url = urlParams.get('m3u8Url');
+    if (m3u8Url) {
+      document.getElementById('m3u8Url').value = decodeURIComponent(m3u8Url);
+      showStatus('✅ 已自动填充视频地址', 'success');
+    }
+
+    // 获取proxyUrl参数
+    const proxyUrl = urlParams.get('proxyUrl');
+    if (proxyUrl) {
+      document.getElementById('proxyUrl').value = decodeURIComponent(proxyUrl);
+      showStatus('✅ 已自动填充代理地址', 'success');
+    }
+
+    // 如果两个参数都存在，自动播放视频
+    if (m3u8Url && proxyUrl) {
+      showStatus('🚀 检测到完整参数，即将自动播放...', 'info');
+      setTimeout(() => {
+        loadVideo();
+      }, 1500);
+    } else if (m3u8Url) {
+      // 只有视频地址，询问是否自动播放
+      showStatus('🎬 检测到视频地址，点击播放按钮开始播放', 'info');
+    }
+  }
+
+  // 页面加载完成后执行参数解析
+  document.addEventListener('DOMContentLoaded', function() {
+    // 确保视频默认静音
+    video.muted = true;
+    video.volume = 0.5; // 设置默认音量为50%，用户取消静音时使用
+
+    parseUrlParams();
+
+    // iOS Safari特殊处理
+    if (isIOS()) {
+      // 为iOS添加特殊提示
+      const iosNotice = document.createElement('div');
+      iosNotice.className = 'status info';
+      iosNotice.innerHTML = '📱 检测到iOS设备，播放器已优化适配Safari浏览器';
+      iosNotice.style.display = 'block';
+      document.getElementById('status').parentNode.insertBefore(iosNotice, document.getElementById('status'));
+
+      // iOS需要用户交互才能播放
+      video.addEventListener('play', function() {
+        console.log('iOS video play event triggered');
+      });
+
+      // 监听触摸事件以启用播放（保持静音状态）
+      document.addEventListener('touchstart', function enablePlay() {
+        // 不自动取消静音，让用户手动控制
+        document.removeEventListener('touchstart', enablePlay, true);
+      }, true);
+    }
+
+    // 添加静音状态监听器
+    video.addEventListener('volumechange', function() {
+      console.log('Volume changed - Muted:', video.muted, 'Volume:', video.volume);
+    });
+  });
 </script>
 </body>
 </html>
