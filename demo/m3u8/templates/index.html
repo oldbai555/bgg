@@ -136,22 +136,6 @@
 <div class="container">
   <div class="header">
     <h1>🎬 M3U8视频播放器</h1>
-    <p>支持自定义代理服务器，解决跨域问题</p>
-  </div>
-
-  <div class="proxy-section">
-    <h3>🔧 代理服务器配置</h3>
-    <div class="proxy-group">
-      <input type="url" id="proxyUrl" class="proxy-input"
-             placeholder="请输入代理服务器地址，如: http://localhost:8888"
-             value="http://localhost:8888">
-      <button class="btn btn-secondary btn-small" onclick="testProxy()">🔍 测试连接</button>
-      <button class="btn btn-secondary btn-small" onclick="saveProxy()">💾 保存配置</button>
-    </div>
-    <div class="proxy-tips">
-      💡 提示：代理服务器用于解决跨域问题。如果直接播放失败，将自动尝试通过代理播放。<br>
-      📋 格式示例：http://localhost:8888 或 https://your-proxy.com:8080
-    </div>
   </div>
 
   <div class="input-section">
@@ -219,6 +203,7 @@
 <script>
   let hls = null;
   let video = document.getElementById('videoPlayer');
+  let globalProxyUrl = ""
 
   // 设备检测函数
   function isIOS() {
@@ -231,7 +216,7 @@
 
   // 从输入框获取代理服务地址
   function getProxyUrl(originalUrl) {
-    const proxyBase = document.getElementById('proxyUrl').value.trim();
+    const proxyBase = globalProxyUrl;
     if (!proxyBase) {
       throw new Error('代理服务器地址不能为空');
     }
@@ -241,45 +226,6 @@
 
     // 构建代理URL - 这里假设代理服务接受 url 参数
     return `${normalizedProxy}/proxy?url=${encodeURIComponent(originalUrl)}`;
-  }
-
-  // 测试代理连接
-  function testProxy() {
-    const proxyUrl = document.getElementById('proxyUrl').value.trim();
-    if (!proxyUrl) {
-      showStatus('请先输入代理服务器地址', 'error');
-      return;
-    }
-
-    showStatus('正在测试代理连接...', 'info');
-
-    // 测试代理是否可访问
-    const testUrl = proxyUrl.startsWith('http') ? proxyUrl : `http://${proxyUrl}`;
-
-    fetch(testUrl)
-            .then(response => {
-              if (response.ok || response.status === 404) {
-                showStatus('✅ 代理服务器连接正常', 'success');
-              } else {
-                showStatus(`⚠️ 代理服务器响应异常 (状态码: ${response.status})`, 'error');
-              }
-            })
-            .catch(error => {
-              showStatus('❌ 无法连接到代理服务器，请检查地址是否正确', 'error');
-            });
-  }
-
-  // 保存代理配置到本地存储（仅在内存中）
-  function saveProxy() {
-    const proxyUrl = document.getElementById('proxyUrl').value.trim();
-    if (!proxyUrl) {
-      showStatus('请先输入代理服务器地址', 'error');
-      return;
-    }
-
-    // 在实际应用中，这里可以保存到localStorage
-    // 但在artifacts中，我们只是显示保存成功的消息
-    showStatus('✅ 代理配置已保存', 'success');
   }
 
   function showStatus(message, type='info') {
@@ -443,7 +389,7 @@
     // 获取proxyUrl参数
     const proxyUrl = urlParams.get('proxyUrl');
     if (proxyUrl) {
-      document.getElementById('proxyUrl').value = decodeURIComponent(proxyUrl);
+      globalProxyUrl = decodeURIComponent(proxyUrl);
       showStatus('✅ 已自动填充代理地址', 'success');
     }
 

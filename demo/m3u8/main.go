@@ -119,7 +119,9 @@ func main() {
 
 	templ := template.Must(template.New("templates").ParseFS(tplFs, "templates/*.html"))
 	r.SetHTMLTemplate(templ)
-
+	r.GET("/", func(ctx *gin.Context) {
+		ctx.HTML(http.StatusOK, "index.html", gin.H{})
+	})
 	// 注册视频相关路由
 	videoGroup := r.Group("/video")
 	{

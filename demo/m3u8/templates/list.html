@@ -281,7 +281,9 @@
     }
 
     function playVideo(url, title) {
-        const targetUrl = `https://oldbai.top/onlinem3u8?m3u8Url=${encodeURIComponent(url)}&proxyUrl=https://oldbai.top/m3u8`;
+        const domain = 'http://192.168.1.4:8888';
+        const domainUrl = `${domain}`;
+        const targetUrl = `${domainUrl}?m3u8Url=${encodeURIComponent(url)}&proxyUrl=${encodeURIComponent(domain)}`;
         window.open(targetUrl, '_blank');
     }
 
