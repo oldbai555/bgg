@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"html/template"
 	"io"
@@ -28,6 +29,29 @@ func CORS() gin.HandlerFunc {
 	}
 }
 
+func getDomain(c *gin.Context) string {
+	// 协议
+	scheme := c.GetHeader("X-Forwarded-Proto")
+	if scheme == "" {
+		if c.Request.TLS != nil {
+			scheme = "https"
+		} else {
+			scheme = "http"
+		}
+	}
+
+	// Host
+	host := c.GetHeader("X-Forwarded-Host")
+	if host == "" {
+		host = c.Request.Host
+	}
+
+	// Nginx 传来的前缀
+	prefix := c.GetHeader("X-Forwarded-Prefix")
+
+	return fmt.Sprintf("%s://%s%s", scheme, host, prefix)
+}
+
 // 代理处理函数
 func proxyHandler(c *gin.Context) {
 	// 获取代理的目标 URL
@@ -36,8 +60,8 @@ func proxyHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "缺少url参数"})
 		return
 	}
-
-	domain := c.DefaultQuery("domain", "http://localhost:8888")
+	// 获取请求的域名
+	domain := getDomain(c)
 
 	// 向目标地址发送请求
 	resp, err := http.Get(targetURL)
