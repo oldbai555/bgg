@@ -158,7 +158,7 @@
     {{end}}
     ];
 
-    const itemsPerPage = 12;
+    const itemsPerPage = 10;
     let currentPage = 1;
     let filteredList = [...videoList]; // 搜索后的数组
 
@@ -177,7 +177,7 @@
             card.innerHTML = `
         <img class="video-thumbnail" src="https://fourhoi.com/${video.GodNum}/cover-t.jpg" alt="${video.GodNum}-${video.Name}">
         <div class="video-overlay">
-          <div class="video-title">${video.GodNum}-${video.Name}</div>
+          <div class="video-title">${video.Name}-${video.GodNum}</div>
         </div>
       `;
             videoContainer.appendChild(card);
