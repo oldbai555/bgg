@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>微信群接龙数据解析器</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        .input-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .input-header h2 {
+            color: #34495e;
+            font-size: 1.3em;
+        }
+
+        .clear-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .clear-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        #inputArea {
+            width: 100%;
+            height: 300px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            line-height: 1.5;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        #inputArea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.2);
+        }
+
+        .output-section {
+            margin-top: 30px;
+        }
+
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .output-header h2 {
+            color: #34495e;
+            font-size: 1.3em;
+        }
+
+        .export-btn {
+            background: linear-gradient(45deg, #00b894, #00a085);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 184, 148, 0.3);
+        }
+
+        .export-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .date-group {
+            margin-bottom: 40px;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .date-title {
+            font-size: 1.4em;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: bold;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            background: white;
+            margin-bottom: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 500px;
+        }
+
+        th, td {
+            padding: 12px 8px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+            font-size: 14px;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        tr:hover {
+            background-color: #e3f2fd;
+            transition: background-color 0.2s ease;
+        }
+
+        td:first-child {
+            background-color: #f1f3f4;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        td:last-child {
+            background-color: #fff3cd;
+            font-weight: bold;
+            color: #856404;
+        }
+
+        .stats {
+            margin-top: 15px;
+            padding: 15px;
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5em;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .input-header, .output-header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: stretch;
+            }
+
+            .stats {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>📱 微信群接龙数据解析器</h1>
+
+    <div class="input-section">
+        <div class="input-header">
+            <h2>📝 输入接龙数据</h2>
+            <button class="clear-btn" onclick="clearInput()">🗑️ 清空</button>
+        </div>
+        <textarea id="inputArea" placeholder="请粘贴微信群接龙数据，支持多日期数据..."></textarea>
+    </div>
+
+    <div class="output-section">
+        <div class="output-header">
+            <h2>📊 解析结果</h2>
+            <button class="export-btn" id="exportBtn" onclick="exportToXLSX()" disabled>
+                📥 导出XLSX
+            </button>
+        </div>
+        <div id="tablesContainer">
+            <div class="empty-state">
+                暂无数据，请在上方输入框中输入接龙数据
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 固定的标准表头
+    const standardHeaders = [
+        '姓名', '身高体重', '血压', '腰臀围', '健康问卷', '视力', '嗅觉',
+        '听力', '纯音听阈', '动脉硬化', '心电图', '肺功能', '骨密度',
+        '心理测评', '人体成分分析', '眼底照相', '脑血流', '电话回访', '问卷筛查', '抽血'
+    ];
+
+    // 智能匹配规则
+    const matchingRules = {
+        '回访': '电话回访',
+        '电话': '电话回访',
+        '人体成分': '人体成分分析',
+        '人体': '人体成分分析',
+        '成分': '人体成分分析',
+        '纯音': '纯音听阈',
+        '听阈': '纯音听阈',
+        '听力': '纯音听阈', // 优先匹配纯音听阈
+        '肺功能': '肺功能',
+        '肺': '肺功能',
+        '心理': '心理测评',
+        '测评': '心理测评',
+        '心电图': '心电图',
+        '心': '心电图', // 心优先匹配心电图
+        '眼底': '眼底照相',
+        '照相': '眼底照相',
+        '动脉': '动脉硬化',
+        '硬化': '动脉硬化',
+        '骨密度': '骨密度',
+        '骨': '骨密度',
+        '身高': '身高体重',
+        '体重': '身高体重',
+        '血压': '血压',
+        '腰臀': '腰臀围',
+        '腰围': '腰臀围',
+        '臀围': '腰臀围',
+        '问卷': '问卷筛查',
+        '健康': '健康问卷',
+        '视力': '视力',
+        '嗅觉': '嗅觉',
+        '抽血': '抽血',
+        '血': '抽血'
+    };
+
+    let allDateData = {};
+
+    // 输入框事件监听
+    document.getElementById('inputArea').addEventListener('input', function() {
+        parseData(this.value);
+    });
+
+    // 智能匹配项目名称
+    function smartMatch(itemName) {
+        // 直接匹配
+        if (standardHeaders.includes(itemName)) {
+            return itemName;
+        }
+
+        // 规则匹配
+        for (let [keyword, standardName] of Object.entries(matchingRules)) {
+            if (itemName.includes(keyword)) {
+                return standardName;
+            }
+        }
+
+        // 模糊匹配
+        for (let header of standardHeaders) {
+            if (header.includes(itemName) || itemName.includes(header)) {
+                return header;
+            }
+        }
+
+        return null;
+    }
+
+    // 解析数据函数
+    function parseData(inputText) {
+        if (!inputText.trim()) {
+            displayEmptyState();
+            return;
+        }
+
+        allDateData = {};
+        const sections = inputText.split('#接龙').filter(section => section.trim());
+
+        for (let section of sections) {
+            const lines = section.split('\n').filter(line => line.trim());
+            if (lines.length === 0) continue;
+
+            // 提取日期和标题
+            let dateTitle = '';
+            let defaultCategory = '';
+
+            for (let line of lines) {
+                line = line.trim();
+                // 匹配日期格式（如：8.18 回访工作量）
+                const dateMatch = line.match(/^(\d+\.\d+)\s*(.*)$/);
+                if (dateMatch) {
+                    dateTitle = dateMatch[1];
+                    const title = dateMatch[2].trim();
+                    // 从标题中提取默认分类
+                    if (title.includes('回访')) {
+                        defaultCategory = '电话回访';
+                    } else {
+                        // 先尝试智能匹配
+                        const matched = smartMatch(title);
+                        defaultCategory = matched || title;
+                    }
+                    break;
+                }
+            }
+
+            if (!dateTitle) continue;
+
+            // 初始化日期数据
+            if (!allDateData[dateTitle]) {
+                allDateData[dateTitle] = {
+                    defaultCategory: defaultCategory,
+                    people: []
+                };
+            }
+
+            // 解析人员数据
+            for (let line of lines) {
+                line = line.trim();
+
+                // 跳过日期行、示例行和空行
+                if (line.match(/^\d+\.\d+/) || line.startsWith('例') || !line) continue;
+
+                // 匹配格式：数字. 姓名 项目数据
+                const match = line.match(/^\d+\.\s*(.+)$/);
+                if (!match) continue;
+
+                const content = match[1].trim();
+                if (content === '-' || content === '') continue;
+
+                // 分割姓名和项目
+                const parts = content.split(/[\s,，]+/);
+                if (parts.length < 1) continue;
+
+                const name = parts[0];
+                const items = parts.slice(1);
+
+                const personData = { '姓名': name };
+
+                // 如果只有一个数字，使用默认分类
+                if (items.length === 1 && /^\d+$/.test(items[0])) {
+                    if (defaultCategory && standardHeaders.includes(defaultCategory)) {
+                        personData[defaultCategory] = items[0];
+                    } else if (defaultCategory) {
+                        // 如果默认分类不在标准表头中，尝试智能匹配
+                        const matched = smartMatch(defaultCategory);
+                        if (matched) {
+                            personData[matched] = items[0];
+                        }
+                    }
+                } else {
+                    // 解析复杂项目数据
+                    let i = 0;
+                    while (i < items.length) {
+                        const item = items[i];
+
+                        // 匹配中文+数字格式
+                        const match = item.match(/^([^\d]*[^\d\s])(\d+)$/);
+                        if (match) {
+                            const itemName = match[1].trim();
+                            const value = match[2];
+                            const category = smartMatch(itemName);
+                            if (category) {
+                                personData[category] = value;
+                            }
+                        } else if (/^[^\d]+$/.test(item) && i + 1 < items.length && /^\d+$/.test(items[i + 1])) {
+                            // 分离的中文和数字
+                            const itemName = item.trim();
+                            const value = items[i + 1];
+                            const category = smartMatch(itemName);
+                            if (category) {
+                                personData[category] = value;
+                            }
+                            i++; // 跳过下一个数字
+                        }
+                        i++;
+                    }
+                }
+
+                allDateData[dateTitle].people.push(personData);
+            }
+        }
+
+        displayTables();
+    }
+
+    // 显示所有表格
+    function displayTables() {
+        const container = document.getElementById('tablesContainer');
+
+        if (Object.keys(allDateData).length === 0) {
+            displayEmptyState();
+            return;
+        }
+
+        let html = '';
+
+        for (let [date, data] of Object.entries(allDateData)) {
+            if (data.people.length === 0) continue;
+
+            // 使用所有标准表头，加上汇总
+            const dateHeaders = [...standardHeaders, '汇总'];
+
+            html += `
+                    <div class="date-group">
+                        <div class="date-title">📅 日期：${date}</div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        ${dateHeaders.map(header => `<th>${header}</th>`).join('')}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                `;
+
+            // 添加数据行
+            for (let person of data.people) {
+                let total = 0;
+                html += '<tr>';
+
+                for (let header of dateHeaders) {
+                    if (header === '汇总') {
+                        html += `<td>${total}</td>`;
+                    } else {
+                        const value = person[header] || '';
+                        if (header !== '姓名' && value) {
+                            total += parseInt(value) || 0;
+                        }
+                        html += `<td>${value}</td>`;
+                    }
+                }
+
+                html += '</tr>';
+            }
+
+            html += `
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="stats">
+                            <div class="stat-item">
+                                <span class="stat-number">${data.people.length}</span>
+                                <span class="stat-label">参与人数</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">${countActiveColumns(data.people)}</span>
+                                <span class="stat-label">有数据项目</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">${calculateTotalItems(data.people, dateHeaders)}</span>
+                                <span class="stat-label">总工作量</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+        }
+
+        // 添加总汇总表格
+        html += generateSummaryTable();
+
+        container.innerHTML = html;
+        document.getElementById('exportBtn').disabled = false;
+    }
+
+    // 计算有数据的列数
+    function countActiveColumns(people) {
+        const activeColumns = new Set();
+        people.forEach(person => {
+            Object.keys(person).forEach(key => {
+                if (key !== '姓名' && person[key] && person[key] !== '') {
+                    activeColumns.add(key);
+                }
+            });
+        });
+        return activeColumns.size;
+    }
+
+    // 生成总汇总表格
+    function generateSummaryTable() {
+        if (Object.keys(allDateData).length === 0) return '';
+
+        // 收集所有人员和他们的总数据
+        const allPeople = {};
+        const allUsedHeaders = new Set(['姓名']);
+
+        // 遍历所有日期的数据
+        for (let [date, data] of Object.entries(allDateData)) {
+            for (let person of data.people) {
+                const name = person['姓名'];
+                if (!allPeople[name]) {
+                    allPeople[name] = { '姓名': name };
+                    // 初始化所有可能的列
+                    standardHeaders.slice(1).forEach(header => {
+                        allPeople[name][header] = 0;
+                    });
+                }
+
+                // 累加数据
+                Object.keys(person).forEach(key => {
+                    if (key !== '姓名' && person[key]) {
+                        allUsedHeaders.add(key);
+                        const value = parseInt(person[key]) || 0;
+                        allPeople[name][key] = (allPeople[name][key] || 0) + value;
+                    }
+                });
+            }
+        }
+
+        // 按标准顺序排列表头
+        const summaryHeaders = ['姓名'];
+        standardHeaders.slice(1).forEach(header => {
+            if (allUsedHeaders.has(header)) {
+                summaryHeaders.push(header);
+            }
+        });
+        summaryHeaders.push('汇总');
+
+        let html = `
+                <div class="date-group">
+                    <div class="date-title">📊 总汇总表</div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    ${summaryHeaders.map(header => `<th>${header}</th>`).join('')}
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+
+        // 添加汇总数据行
+        for (let [name, person] of Object.entries(allPeople)) {
+            let total = 0;
+            html += '<tr>';
+
+            for (let header of summaryHeaders) {
+                if (header === '汇总') {
+                    html += `<td>${total}</td>`;
+                } else {
+                    const value = person[header] || '';
+                    if (header !== '姓名' && value) {
+                        total += parseInt(value) || 0;
+                    }
+                    html += `<td>${value || ''}</td>`;
+                }
+            }
+
+            html += '</tr>';
+        }
+
+        // 计算总计行
+        let grandTotals = {};
+        let grandTotal = 0;
+
+        for (let header of summaryHeaders) {
+            if (header === '姓名') {
+                grandTotals[header] = '总计';
+            } else if (header === '汇总') {
+                grandTotals[header] = grandTotal;
+            } else {
+                let columnTotal = 0;
+                Object.values(allPeople).forEach(person => {
+                    columnTotal += parseInt(person[header]) || 0;
+                });
+                grandTotals[header] = columnTotal;
+                grandTotal += columnTotal;
+            }
+        }
+
+        // 添加总计行
+        html += '<tr style="background-color: #e8f4fd; font-weight: bold;">';
+        for (let header of summaryHeaders) {
+            html += `<td>${grandTotals[header]}</td>`;
+        }
+        html += '</tr>';
+
+        html += `
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <span class="stat-number">${Object.keys(allPeople).length}</span>
+                            <span class="stat-label">总人数</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">${summaryHeaders.length - 2}</span>
+                            <span class="stat-label">涉及项目</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">${grandTotal}</span>
+                            <span class="stat-label">总工作量</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">${Object.keys(allDateData).length}</span>
+                            <span class="stat-label">统计天数</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+        return html;
+    }
+
+    // 显示空状态
+    function displayEmptyState() {
+        const container = document.getElementById('tablesContainer');
+        container.innerHTML = `
+                <div class="empty-state">
+                    暂无数据，请在上方输入框中输入接龙数据
+                </div>
+            `;
+        document.getElementById('exportBtn').disabled = true;
+    }
+
+    // 清空输入
+    function clearInput() {
+        document.getElementById('inputArea').value = '';
+        displayEmptyState();
+    }
+
+    // 导出XLSX
+    function exportToXLSX() {
+        if (Object.keys(allDateData).length === 0) {
+            alert('没有数据可导出');
+            return;
+        }
+
+        const wb = XLSX.utils.book_new();
+
+        for (let [date, data] of Object.entries(allDateData)) {
+            if (data.people.length === 0) continue;
+
+            // 获取这个日期用到的所有列
+            const usedHeaders = new Set(['姓名']);
+            data.people.forEach(person => {
+                Object.keys(person).forEach(key => {
+                    if (key !== '姓名' && person[key]) {
+                        usedHeaders.add(key);
+                    }
+                });
+            });
+
+            // 按标准顺序排列表头
+            const dateHeaders = ['姓名'];
+            standardHeaders.slice(1).forEach(header => {
+                if (usedHeaders.has(header)) {
+                    dateHeaders.push(header);
+                }
+            });
+            dateHeaders.push('汇总');
+
+            // 准备工作表数据
+            const wsData = [];
+            wsData.push(dateHeaders);
+
+            // 添加数据行
+            for (let person of data.people) {
+                const row = [];
+                let total = 0;
+
+                for (let header of dateHeaders) {
+                    if (header === '汇总') {
+                        row.push(total);
+                    } else {
+                        const value = person[header] || '';
+                        if (header !== '姓名' && value) {
+                            total += parseInt(value) || 0;
+                        }
+                        row.push(value);
+                    }
+                }
+                wsData.push(row);
+            }
+
+            // 创建工作表
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+            // 设置列宽
+            const colWidths = dateHeaders.map(() => ({ wch: 12 }));
+            colWidths[0].wch = 15; // 姓名列稍宽
+            ws['!cols'] = colWidths;
+
+            // 添加到工作簿
+            const sheetName = `${date}`;
+            XLSX.utils.book_append_sheet(wb, ws, sheetName);
+        }
+
+        // 添加总汇总表到工作簿
+        const summaryData = generateSummaryData();
+        if (summaryData.length > 0) {
+            const summaryWs = XLSX.utils.aoa_to_sheet(summaryData);
+            const colWidths = summaryData[0].map(() => ({ wch: 12 }));
+            colWidths[0].wch = 15; // 姓名列稍宽
+            summaryWs['!cols'] = colWidths;
+            XLSX.utils.book_append_sheet(wb, summaryWs, '总汇总');
+        }
+
+        // 导出文件
+        const fileName = `接龙数据_${new Date().toLocaleDateString().replace(/\//g, '-')}.xlsx`;
+        XLSX.writeFile(wb, fileName);
+    }
+
+    // 生成汇总数据用于导出
+    function generateSummaryData() {
+        if (Object.keys(allDateData).length === 0) return [];
+
+        // 收集所有人员和他们的总数据
+        const allPeople = {};
+        const allUsedHeaders = new Set(['姓名']);
+
+        // 遍历所有日期的数据
+        for (let [date, data] of Object.entries(allDateData)) {
+            for (let person of data.people) {
+                const name = person['姓名'];
+                if (!allPeople[name]) {
+                    allPeople[name] = { '姓名': name };
+                    standardHeaders.slice(1).forEach(header => {
+                        allPeople[name][header] = 0;
+                    });
+                }
+
+                // 累加数据
+                Object.keys(person).forEach(key => {
+                    if (key !== '姓名' && person[key]) {
+                        allUsedHeaders.add(key);
+                        const value = parseInt(person[key]) || 0;
+                        allPeople[name][key] = (allPeople[name][key] || 0) + value;
+                    }
+                });
+            }
+        }
+
+        // 按标准顺序排列表头
+        const summaryHeaders = ['姓名'];
+        standardHeaders.slice(1).forEach(header => {
+            if (allUsedHeaders.has(header)) {
+                summaryHeaders.push(header);
+            }
+        });
+        summaryHeaders.push('汇总');
+
+        const wsData = [];
+        wsData.push(summaryHeaders);
+
+        // 添加数据行
+        for (let [name, person] of Object.entries(allPeople)) {
+            const row = [];
+            let total = 0;
+
+            for (let header of summaryHeaders) {
+                if (header === '汇总') {
+                    row.push(total);
+                } else {
+                    const value = person[header] || '';
+                    if (header !== '姓名' && value) {
+                        total += parseInt(value) || 0;
+                    }
+                    row.push(value || '');
+                }
+            }
+            wsData.push(row);
+        }
+
+        // 添加总计行
+        const totalRow = [];
+        let grandTotal = 0;
+
+        for (let header of summaryHeaders) {
+            if (header === '姓名') {
+                totalRow.push('总计');
+            } else if (header === '汇总') {
+                totalRow.push(grandTotal);
+            } else {
+                let columnTotal = 0;
+                Object.values(allPeople).forEach(person => {
+                    columnTotal += parseInt(person[header]) || 0;
+                });
+                totalRow.push(columnTotal);
+                grandTotal += columnTotal;
+            }
+        }
+        wsData.push(totalRow);
+
+        return wsData;
+    }
+
+    // 计算总工作量
+    function calculateTotalItems(people, headers) {
+        let total = 0;
+        people.forEach(person => {
+            headers.slice(1, -1).forEach(header => {
+                const value = parseInt(person[header]) || 0;
+                total += value;
+            });
+        });
+        return total;
+    }
+
+    // 页面加载完成后的初始化
+    window.addEventListener('load', function() {
+        // 添加测试数据
+        const testData = ``;
+
+        document.getElementById('inputArea').value = testData;
+        parseData(testData);
+    });
+</script>
+</body>
+</html>
