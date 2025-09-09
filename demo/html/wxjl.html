@@ -365,6 +365,7 @@
     }
 
     // 解析数据函数
+    // 解析数据函数（最终增强版，自动处理空格 / 逗号 / 黏连）
     function parseData(inputText) {
         if (!inputText.trim()) {
             displayEmptyState();
@@ -425,53 +426,49 @@
                 const content = match[1].trim();
                 if (content === '-' || content === '') continue;
 
-                // 分割姓名和项目
+                // 提取姓名
                 const parts = content.split(/[\s,，]+/);
-                if (parts.length < 1) continue;
-
                 const name = parts[0];
-                const items = parts.slice(1);
+                if (!name) continue;
 
                 const personData = { '姓名': name };
 
-                // 如果只有一个数字，使用默认分类
-                if (items.length === 1 && /^\d+$/.test(items[0])) {
+                // 去掉姓名部分，剩余的作为项目数据
+                let rawItems = content.slice(name.length).trim();
+
+                // ✨ 统一处理：在黏连的项目之间自动加逗号
+                // 匹配：一个完整项目（汉字+数字）紧接着下一个项目（汉字）
+                rawItems = rawItems.replace(/([\u4e00-\u9fa5]+[0-9]+)(?=[\u4e00-\u9fa5])/g, '$1,');
+
+                // 再把中文逗号替换成英文逗号，便于统一处理
+                rawItems = rawItems.replace(/，/g, ',');
+
+                // 提取所有 “中文+数字” 对（支持黏连 / 空格 / 逗号）
+                const itemMatches = rawItems.match(/([\u4e00-\u9fa5]+)\s*(\d+)/g) || [];
+
+                if (itemMatches.length === 0 && /^\d+$/.test(rawItems)) {
+                    // 如果只有一个数字，使用默认分类
                     if (defaultCategory && standardHeaders.includes(defaultCategory)) {
-                        personData[defaultCategory] = items[0];
+                        personData[defaultCategory] = rawItems;
                     } else if (defaultCategory) {
-                        // 如果默认分类不在标准表头中，尝试智能匹配
                         const matched = smartMatch(defaultCategory);
                         if (matched) {
-                            personData[matched] = items[0];
+                            personData[matched] = rawItems;
                         }
                     }
                 } else {
-                    // 解析复杂项目数据
-                    let i = 0;
-                    while (i < items.length) {
-                        const item = items[i];
-
-                        // 匹配中文+数字格式
-                        const match = item.match(/^([^\d]*[^\d\s])(\d+)$/);
-                        if (match) {
-                            const itemName = match[1].trim();
-                            const value = match[2];
+                    // 遍历提取的项目
+                    itemMatches.forEach(match => {
+                        const m = match.match(/([\u4e00-\u9fa5]+)\s*(\d+)/);
+                        if (m) {
+                            const itemName = m[1].trim();
+                            const value = m[2];
                             const category = smartMatch(itemName);
                             if (category) {
                                 personData[category] = value;
                             }
-                        } else if (/^[^\d]+$/.test(item) && i + 1 < items.length && /^\d+$/.test(items[i + 1])) {
-                            // 分离的中文和数字
-                            const itemName = item.trim();
-                            const value = items[i + 1];
-                            const category = smartMatch(itemName);
-                            if (category) {
-                                personData[category] = value;
-                            }
-                            i++; // 跳过下一个数字
                         }
-                        i++;
-                    }
+                    });
                 }
 
                 allDateData[dateTitle].people.push(personData);
@@ -895,10 +892,59 @@
         return total;
     }
 
+    // 初始化智能匹配规则（自动中文分词）
+    function initializeMatchingRules() {
+        standardHeaders.forEach(header => {
+            // 按汉字拆分
+            const chars = header.split('');
+            chars.forEach(ch => {
+                // 只处理中文字符
+                if (/[\u4e00-\u9fa5]/.test(ch)) {
+                    // 如果规则中还没有该关键词，则添加
+                    if (!matchingRules[ch]) {
+                        matchingRules[ch] = header;
+                    }
+                }
+            });
+
+            // 生成长度为2的连续词
+            for (let i = 0; i < chars.length - 1; i++) {
+                const bigram = chars[i] + chars[i + 1];
+                if (/[\u4e00-\u9fa5]{2}/.test(bigram)) {
+                    if (!matchingRules[bigram]) {
+                        matchingRules[bigram] = header;
+                    }
+                }
+            }
+        });
+
+        console.log("✅ 自动扩展后的 matchingRules:", matchingRules);
+    }
+
     // 页面加载完成后的初始化
     window.addEventListener('load', function() {
+        // 先执行自动扩展规则
+        initializeMatchingRules();
+
         // 添加测试数据
-        const testData = ``;
+        const testData = `#接龙
+8.18  回访工作量
+例 李xx  50
+1. 罗雪慧  6
+2. 黄雨晴 51
+3. 韦莹玉 50
+4. 杨帆 6
+5. 潘秋花 50
+6. 廖观容 50
+#接龙
+8.19  回访工作量
+1. -
+2. 韦莹玉 回访40，人体成分16，纯音听力3，肺功能1
+3. 黄雨晴 回访48 心理测评28 眼底照相5 动脉硬化3骨密度3
+4. 潘秋花 回访50，动脉硬化5，心理测评17，骨密度5，肺功能5
+5. 廖观容 人体11骨密度7动脉10肺1听力3心理1回访45
+6. 罗雪慧 身高体重 33 血压 35 腰臀围 19 视力 16 听力 5 嗅觉 5 电话回访13
+7. 杨帆 抽血20 电话回访13`;
 
         document.getElementById('inputArea').value = testData;
         parseData(testData);
