@@ -1,17 +1,15 @@
 package syscfg
 
 import (
-	"encoding/json"
-	"github.com/oldbai555/lbtool/log"
 	"github.com/spf13/viper"
+	"gmicro/pkg/json"
+	"gmicro/pkg/log"
 )
 
 type SysCfg struct {
 	V *viper.Viper
 
-	StorageConf *StorageConf
-	ServerConf  *ServerConf
-	Proxys      *Proxys
+	ServerConf *ServerConf
 }
 
 var sc *SysCfg
@@ -31,13 +29,13 @@ func New(viper *viper.Viper, option ...Option) (*SysCfg, error) {
 func JsonConvertStruct(re interface{}, out interface{}) error {
 	marshal, err := json.Marshal(re)
 	if err != nil {
-		log.Errorf("err is : %v", err)
+		log.Errorf("err: %v", err)
 		return err
 	}
 
 	err = json.Unmarshal(marshal, out)
 	if err != nil {
-		log.Errorf("err is : %v", err)
+		log.Errorf("err: %v", err)
 		return err
 	}
 	return nil

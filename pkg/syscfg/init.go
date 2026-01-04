@@ -2,6 +2,6 @@ package syscfg
 
 var Global *SysCfg
 
-func InitGlobal(srv, path string, opt ...Option) {
-	Global = LoadSysCfgByYaml(srv, path, opt...)
+func InitGlobal(path string, opt ...Option) {
+	Global = LoadSysCfgByYaml(path, opt...)
 }

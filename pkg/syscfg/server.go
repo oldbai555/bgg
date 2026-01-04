@@ -1,18 +1,18 @@
 package syscfg
 
 import (
-	"github.com/oldbai555/lbtool/log"
-	"github.com/oldbai555/lbtool/pkg/lberr"
+	"fmt"
 	"github.com/spf13/viper"
+	"gmicro/pkg/gerr"
+	"gmicro/pkg/log"
 )
 
 const defaultApolloServerPrefix = "server"
 
 type ServerConf struct {
-	Name     string `json:"name"`
-	Port     uint32 `json:"port"`
-	Ip       string `json:"ip"`
-	GatePort uint32 `json:"gatePort"`
+	Name string `json:"name"`
+	Port uint32 `json:"port"`
+	Ip   string `json:"ip"`
 }
 
 func NewServerConf(viper *viper.Viper) *ServerConf {
@@ -28,10 +28,18 @@ func NewServerConf(viper *viper.Viper) *ServerConf {
 
 func GetServerConf() (*ServerConf, error) {
 	if Global == nil {
-		return nil, lberr.NewInvalidArg("not found Global")
+		return nil, gerr.NewInvalidArg("not found Global")
 	}
 	if Global.ServerConf == nil {
-		return nil, lberr.NewInvalidArg("not found server conf")
+		return nil, gerr.NewInvalidArg("not found server conf")
 	}
 	return Global.ServerConf, nil
+}
+
+func GetSrvAddr() (string, error) {
+	conf, err := GetServerConf()
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%s:%d", conf.Ip, conf.Port), nil
 }

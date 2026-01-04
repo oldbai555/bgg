@@ -2,7 +2,6 @@ package syscfg
 
 import (
 	"fmt"
-	"github.com/oldbai555/lbtool/log"
 	"github.com/spf13/viper"
 )
 
@@ -12,16 +11,12 @@ const (
 	defaultSuffix = "yaml"
 )
 
-func LoadSysCfgByYaml(srv, path string, option ...Option) *SysCfg {
+func LoadSysCfgByYaml(path string, option ...Option) *SysCfg {
 	if path == "" {
 		path = defaultPath
 	}
 
-	if srv == "" {
-		srv = defaultPrefix
-	}
-
-	viper.SetConfigName(srv)           // name of config file (without extension)
+	viper.SetConfigName(defaultPrefix) // name of config file (without extension)
 	viper.SetConfigType(defaultSuffix) // REQUIRED if the config file does not have the extension in the name
 	viper.AddConfigPath(path)          // path to look for the config file in
 	err := viper.ReadInConfig()        // Find and read the config file
@@ -31,7 +26,6 @@ func LoadSysCfgByYaml(srv, path string, option ...Option) *SysCfg {
 
 	global, err := New(viper.GetViper(), option...)
 	if err != nil {
-		log.Errorf("err:%v", err)
 		panic(err)
 	}
 
