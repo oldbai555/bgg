@@ -19,13 +19,6 @@ func NewSQLConn(conf config.DatabaseConf) (sqlx.SqlConn, error) {
 	}
 	conn := sqlx.NewMysql(conf.DSN)
 
-	// 配置连接池参数
-	// go-zero sqlx 内部使用 database/sql，通过反射获取底层 *sql.DB
-	if err := configureConnectionPool(conn, conf); err != nil {
-		logx.Errorf("配置数据库连接池失败: %v", err)
-		// 不返回错误，继续使用默认连接池配置
-	}
-
 	return conn, nil
 }
 

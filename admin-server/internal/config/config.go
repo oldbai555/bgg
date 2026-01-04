@@ -8,12 +8,12 @@ import "github.com/zeromicro/go-zero/rest"
 // Config 聚合服务配置，RestConf 内嵌以支持 go-zero HTTP 配置。
 type Config struct {
 	rest.RestConf `json:",inline" yaml:",inline" mapstructure:",squash"`
-	Database      DatabaseConf  `json:"database" yaml:"database" mapstructure:"database"`
-	Redis         RedisConf     `json:"redis" yaml:"redis" mapstructure:"redis"`
-	JWT           JWTConf       `json:"jwt" yaml:"jwt" mapstructure:"jwt"`
-	Bcrypt        BcryptConf    `json:"bcrypt" yaml:"bcrypt" mapstructure:"bcrypt"`
-	RateLimit     RateLimitConf `json:"rateLimit" yaml:"rateLimit" mapstructure:"rateLimit"`
-	BaseURL       string        `json:"baseUrl" yaml:"baseUrl" mapstructure:"baseUrl"` // API 基础 URL，用于生成文件完整访问路径
+	Database      DatabaseConf  `json:"database,optional" yaml:"database" mapstructure:"database"`
+	Redis         RedisConf     `json:"redis,optional" yaml:"redis" mapstructure:"redis"`
+	JWT           JWTConf       `json:"jwt,optional" yaml:"jwt" mapstructure:"jwt"`
+	Bcrypt        BcryptConf    `json:"bcrypt,optional" yaml:"bcrypt" mapstructure:"bcrypt"`
+	RateLimit     RateLimitConf `json:"rateLimit,optional" yaml:"rateLimit" mapstructure:"rateLimit"`
+	BaseURL       string        `json:"baseUrl,optional" yaml:"baseUrl" mapstructure:"baseUrl"` // API 基础 URL，用于生成文件完整访问路径
 }
 
 type DatabaseConf struct {

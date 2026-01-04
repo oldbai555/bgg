@@ -1,0 +1,23 @@
+# 中间件配置文件
+# 此文件用于统一管理中间件配置，多个服务可以共享此配置
+
+# 限流配置
+RateLimit:
+  enabled: true
+  ipLimit:
+    enabled: true
+    quota: 100    # 每个IP每秒最多100个请求
+    period: 1     # 时间窗口（秒）
+  userLimit:
+    enabled: true
+    quota: 200   # 每个用户每秒最多200个请求
+    period: 1    # 时间窗口（秒）
+  apiLimit:
+    enabled: true
+    quota: 50    # 每个接口每秒最多50个请求
+    period: 1    # 时间窗口（秒）
+  globalLimit:
+    enabled: true
+    quota: 1000  # 全局每秒最多1000个请求
+    period: 1    # 时间窗口（秒）
+

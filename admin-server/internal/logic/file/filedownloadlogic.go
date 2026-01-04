@@ -54,18 +54,25 @@ func (l *FileDownloadLogic) FileDownload(req *types.FileDownloadReq) (resp *type
 		return nil, errs.New(errs.CodeNotFound, "文件不存在")
 	}
 
-	// 构建文件访问URL（使用 /api/v1/uploads/xxx 格式，前端可以通过代理访问）
-	// file.Path 格式：/uploads/xxx 或 /api/v1/uploads/xxx
-	accessPath := file.Path
+	// 返回nginx代理路径（用于前端访问）
+	// nginx配置中，/files/uploads/ 路径会代理到后端的 /api/v1/uploads/
+	// 文件直接访问路径格式：/files/uploads/xxx（如果文件路径是 /uploads/xxx）
+	// 文件下载接口路径格式：/files/download?id=xxx（通过下载接口获取文件）
+
+	var proxyPath string
 	if strings.HasPrefix(file.Path, "/uploads/") {
-		// 如果是 /uploads/xxx，转换为 /api/v1/uploads/xxx
-		accessPath = fmt.Sprintf("/api/v1%s", file.Path)
-	} else if !strings.HasPrefix(file.Path, "/api/v1/") {
-		// 如果既不是 /uploads/ 也不是 /api/v1/，添加 /api/v1/uploads/ 前缀
-		accessPath = fmt.Sprintf("/api/v1/uploads/%s", strings.TrimPrefix(file.Path, "/"))
+		// 如果是 /uploads/xxx，转换为 /files/uploads/xxx（nginx代理路径）
+		fileName := strings.TrimPrefix(file.Path, "/uploads/")
+		proxyPath = fmt.Sprintf("/files/uploads/%s", fileName)
+	} else if strings.HasPrefix(file.Path, "/files/") {
+		// 如果已经是 /files/ 开头，直接使用
+		proxyPath = file.Path
+	} else {
+		// 其他情况，使用下载接口路径（通过nginx代理）
+		proxyPath = fmt.Sprintf("/files/download?id=%d", file.Id)
 	}
 
 	return &types.FileDownloadResp{
-		Url: accessPath,
+		Url: proxyPath,
 	}, nil
 }

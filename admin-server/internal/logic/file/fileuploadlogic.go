@@ -110,19 +110,29 @@ func (l *FileUploadLogic) FileUpload(r *http.Request) (resp *types.FileUploadRes
 		return nil, errs.Wrap(errs.CodeInternalError, "保存文件记录失败", err)
 	}
 
-	// 拼接完整 URL（用于返回给前端）
-	fullURL := accessPath
+	// 返回nginx代理路径（用于前端访问）
+	// nginx配置中，/files/uploads/ 路径会代理到后端的 /api/v1/uploads/
+	// 文件访问路径格式：/files/uploads/xxx
+	proxyPath := fmt.Sprintf("/files/uploads/%s", fileName)
+
+	// 兼容字段：如果配置了BaseURL，也返回完整URL
+	fullURL := proxyPath
 	if baseURL != "" {
-		fullURL = fmt.Sprintf("%s%s", baseURL, accessPath)
+		// 如果BaseURL包含域名，使用完整URL；否则只返回路径
+		if strings.HasPrefix(baseURL, "http://") || strings.HasPrefix(baseURL, "https://") {
+			fullURL = fmt.Sprintf("%s%s", baseURL, proxyPath)
+		} else {
+			fullURL = proxyPath
+		}
 	}
 
 	return &types.FileUploadResp{
 		Id:           fileModel.Id,
 		Name:         fileModel.Name,
 		OriginalName: fileModel.OriginalName,
-		Path:         fileModel.Path,
-		BaseUrl:      fileModel.BaseUrl,
-		Url:          fullURL, // 兼容字段，返回完整 URL
+		Path:         proxyPath, // 使用nginx代理路径
+		BaseUrl:      "",        // nginx代理不需要BaseURL
+		Url:          fullURL,   // 兼容字段，返回完整 URL
 		Size:         fileModel.Size,
 		MimeType:     mimeType,
 		Ext:          strings.TrimPrefix(ext, "."),

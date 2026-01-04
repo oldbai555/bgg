@@ -19,6 +19,7 @@ admin-server/*.exe
 /.cursor/
 **/node_modules
 **/*.exe
-/admin-frontend/dist/
+/admin-*/dist/
+/package/*
 /admin-server/api/*.api.temp
 /admin-server/uploads/**

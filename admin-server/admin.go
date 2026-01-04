@@ -21,13 +21,35 @@ import (
 	"github.com/zeromicro/go-zero/rest"
 )
 
-var configFile = flag.String("f", "etc/admin-api.yaml", "the config file")
+var (
+	// GIT_COMMIT_VERSION 编译时通过 -ldflags 传入的 git 提交版本号
+	GIT_COMMIT_VERSION string
+)
+
+var (
+	configFile           = flag.String("f", "", "the config file")
+	mysqlConfigFile      = flag.String("mysql-config", "", "MySQL config file path (default: /etc/work/mysql.json)")
+	redisConfigFile      = flag.String("redis-config", "", "Redis config file path (default: /etc/work/redis.json)")
+	middlewareConfigFile = flag.String("middleware-config", "", "Middleware config file path (default: etc/middleware.yaml)")
+)
 
 func main() {
 	flag.Parse()
 
+	// 打印版本信息
+	if GIT_COMMIT_VERSION != "" {
+		log.Printf("GIT_COMMIT_VERSION: %s", GIT_COMMIT_VERSION)
+	} else {
+		log.Printf("GIT_COMMIT_VERSION: dev (not set)")
+	}
+
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
+
+	// 从外部文件加载 MySQL、Redis 和中间件配置（如果存在）
+	if err := config.MergeExternalConfig(&c, *mysqlConfigFile, *redisConfigFile, *middlewareConfigFile); err != nil {
+		log.Fatalf("加载外部配置失败: %v", err)
+	}
 
 	err := logx.SetUp(logx.LogConf{
 		Encoding: "plain",

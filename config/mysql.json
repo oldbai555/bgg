@@ -1,0 +1,12 @@
+{
+  "addr": "192.168.61.231",
+  "port": 3306,
+  "username": "root",
+  "password": "game@2023",
+  "database": "postapoc_admin",
+  "maxOpen": 20,
+  "maxIdle": 10,
+  "connMaxLifetime": 300,
+  "connMaxIdleTime": 600,
+  "slowQueryThreshold": 1000
+}
