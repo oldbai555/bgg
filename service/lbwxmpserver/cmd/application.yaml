@@ -1,6 +1,0 @@
-server:
-  name: "lbwxmp"
-  port: 20012
-wxMiniProgram:
-  appId: ""
-  secret: ""

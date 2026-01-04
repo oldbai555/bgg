@@ -1,2 +1,0 @@
-- [官网文档](https://docs.jumpserver.org/zh/v4/quick_start/)
-- [通过SSH工具连接](https://kb.fit2cloud.com/?p=098989ab-b70d-49c2-bf03-04574312ae78)

@@ -1,8 +1,0 @@
-server:
-  name: "gateway"
-  port: 20000
-proxys:
-  map:
-    "lbsingle": "http://127.0.0.1:20011"
-    "lbwxmp": "http://127.0.0.1:20012"
-    "lboss": "http://127.0.0.1:20013"
