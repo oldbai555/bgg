@@ -1,0 +1,24 @@
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/jsLibraryMappings.xml
+/.idea/*
+/.idea/**
+/.idea
+**/.idea
+
+
+/files.zip
+/files*.zip
+/admin-server/*.exe
+/Claude*framework_*.json
+/.claude/
+/.vscode/
+/output/
+*.cs.uid
+# Admin server executables
+admin-server/*.exe
+/.cursor/
+**/node_modules
+**/*.exe
+/admin-frontend/dist/
+/admin-server/api/*.api.temp
+/admin-server/uploads/**

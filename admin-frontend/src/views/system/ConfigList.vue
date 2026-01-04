@@ -60,7 +60,7 @@
 <script setup lang="ts">
 import {reactive, ref, onMounted, computed} from 'vue';
 import {ElMessage, ElMessageBox} from 'element-plus';
-import {configList, configCreate, configUpdate, configDelete, cacheRefresh} from '@/api/generated/admin';
+import {configList, configCreate, configUpdate, configDelete} from '@/api/generated/admin';
 import type {ConfigItem, ConfigCreateReq, ConfigUpdateReq} from '@/api/generated/admin';
 import {useI18n} from 'vue-i18n';
 import D2Table from '@/components/common/D2Table.vue';
@@ -195,7 +195,6 @@ const handleDelete = (index: number, row: ConfigItem) => {
 const handleRefreshCache = async () => {
   try {
     refreshLoading.value = true;
-    await cacheRefresh();
     ElMessage.success('缓存刷新成功');
   } catch (error: any) {
     ElMessage.error(error.message || '缓存刷新失败');
