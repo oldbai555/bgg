@@ -23,3 +23,5 @@ admin-server/*.exe
 /package/*
 /admin-server/api/*.api.temp
 /admin-server/uploads/**
+/history
+/history/**

@@ -6,6 +6,7 @@ import i18n from './i18n';
 import permissionDirective from './directives/permission';
 import {useAppStore} from './stores/app';
 import ElementPlus from 'element-plus';
+import zhCn from 'element-plus/es/locale/lang/zh-cn'
 
 import 'element-plus/dist/index.css';
 import './styles/theme.scss';
@@ -43,7 +44,9 @@ const pinia = createPinia();
 app.use(pinia);
 app.use(router);
 app.use(i18n);
-app.use(ElementPlus);
+app.use(ElementPlus, {
+  locale: zhCn,
+});
 app.directive('permission', permissionDirective);
 
 const appStore = useAppStore(pinia);

@@ -252,6 +252,38 @@ export function configGet(req: components.ConfigGetReq) {
  * @description 
  * @param req
  */
+export function dailyShortSentenceList(req: components.DailyShortSentenceListReq) {
+	return webapi.get<components.DailyShortSentenceListResp>(`/api/v1/daily-short-sentences`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function dailyShortSentenceCreate(req: components.DailyShortSentenceCreateReq) {
+	return webapi.post<null>(`/api/v1/daily-short-sentences`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function dailyShortSentenceUpdate(req: components.DailyShortSentenceUpdateReq) {
+	return webapi.put<null>(`/api/v1/daily-short-sentences`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function dailyShortSentenceDelete(req: components.DailyShortSentenceDeleteReq) {
+	return webapi.delete<null>(`/api/v1/daily-short-sentences`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
 export function demoList(req: components.DemoListReq) {
 	return webapi.get<components.DemoListResp>(`/api/v1/demos`, req)
 }

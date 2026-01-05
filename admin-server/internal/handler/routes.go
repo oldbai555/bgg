@@ -13,6 +13,7 @@ import (
 	chat_group "postapocgame/admin-server/internal/handler/chat_group"
 	chat_message "postapocgame/admin-server/internal/handler/chat_message"
 	config "postapocgame/admin-server/internal/handler/config"
+	daily_short_sentence "postapocgame/admin-server/internal/handler/daily_short_sentence"
 	demo "postapocgame/admin-server/internal/handler/demo"
 	department "postapocgame/admin-server/internal/handler/department"
 	dict "postapocgame/admin-server/internal/handler/dict"
@@ -258,6 +259,35 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodGet,
 					Path:    "/configs/get",
 					Handler: config.ConfigGetHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.PerformanceMiddleware, serverCtx.RateLimitMiddleware, serverCtx.AuthMiddleware, serverCtx.PermissionMiddleware, serverCtx.OperationLogMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/daily-short-sentences",
+					Handler: daily_short_sentence.DailyShortSentenceListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/daily-short-sentences",
+					Handler: daily_short_sentence.DailyShortSentenceCreateHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/daily-short-sentences",
+					Handler: daily_short_sentence.DailyShortSentenceUpdateHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodDelete,
+					Path:    "/daily-short-sentences",
+					Handler: daily_short_sentence.DailyShortSentenceDeleteHandler(serverCtx),
 				},
 			}...,
 		),

@@ -294,6 +294,50 @@ type ConfigUpdateReq struct {
 	Description string `json:"description,optional"`
 }
 
+type DailyShortSentenceCreateReq struct {
+	SentenceType     int64  `json:"type,optional"`             // 类型：1普通，2文学
+	Content          string `json:"content"`                   // 短句内容
+	Img              string `json:"img,optional"`              // 图片URL
+	LiteratureAuthor string `json:"literatureAuthor,optional"` // 作者
+	ConvertImg       string `json:"convertImg,optional"`       // 转换后的图片URL
+}
+
+type DailyShortSentenceDeleteReq struct {
+	Id uint64 `json:"id"`
+}
+
+type DailyShortSentenceItem struct {
+	Id               uint64 `json:"id"`
+	SentenceType     int64  `json:"type"`                      // 类型：1普通，2文学
+	Content          string `json:"content"`                   // 短句内容
+	Img              string `json:"img,optional"`              // 图片URL
+	LiteratureAuthor string `json:"literatureAuthor,optional"` // 作者
+	ConvertImg       string `json:"convertImg,optional"`       // 转换后的图片URL
+	CreatedAt        int64  `json:"createdAt"`                 // 创建时间(秒级时间戳)
+	UpdatedAt        int64  `json:"updatedAt"`                 // 更新时间(秒级时间戳)
+}
+
+type DailyShortSentenceListReq struct {
+	Page         int64  `json:"page,optional" form:"page,optional"`
+	PageSize     int64  `json:"pageSize,optional" form:"pageSize,optional"`
+	Keyword      string `json:"keyword,optional" form:"keyword,optional"` // 搜索关键词（内容、作者）
+	SentenceType int64  `json:"type,optional" form:"type,optional"`       // 类型筛选
+}
+
+type DailyShortSentenceListResp struct {
+	Total int64                    `json:"total"`
+	List  []DailyShortSentenceItem `json:"list"`
+}
+
+type DailyShortSentenceUpdateReq struct {
+	Id               uint64 `json:"id"`
+	SentenceType     int64  `json:"type,optional"`             // 类型：1普通，2文学
+	Content          string `json:"content,optional"`          // 短句内容
+	Img              string `json:"img,optional"`              // 图片URL
+	LiteratureAuthor string `json:"literatureAuthor,optional"` // 作者
+	ConvertImg       string `json:"convertImg,optional"`       // 转换后的图片URL
+}
+
 type DemoCreateReq struct {
 	Name   string `json:"name"`
 	Status int64  `json:"status,optional"`

@@ -939,6 +939,45 @@ type (
 	DemoDeleteReq {
 		id uint64 `json:"id"`
 	}
+	// 每日短句
+	DailyShortSentenceItem {
+		id               uint64 `json:"id"`
+		sentenceType     int64  `json:"type"` // 类型：1普通，2文学
+		content          string `json:"content"` // 短句内容
+		img              string `json:"img,optional"` // 图片URL
+		literatureAuthor string `json:"literatureAuthor,optional"` // 作者
+		convertImg       string `json:"convertImg,optional"` // 转换后的图片URL
+		createdAt        int64  `json:"createdAt"` // 创建时间(秒级时间戳)
+		updatedAt        int64  `json:"updatedAt"` // 更新时间(秒级时间戳)
+	}
+	DailyShortSentenceListReq {
+		page         int64  `json:"page,optional" form:"page,optional"`
+		pageSize     int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		keyword      string `json:"keyword,optional" form:"keyword,optional"` // 搜索关键词（内容、作者）
+		sentenceType int64  `json:"type,optional" form:"type,optional"` // 类型筛选
+	}
+	DailyShortSentenceListResp {
+		total int64                    `json:"total"`
+		list  []DailyShortSentenceItem `json:"list"`
+	}
+	DailyShortSentenceCreateReq {
+		sentenceType     int64  `json:"type,optional"` // 类型：1普通，2文学
+		content          string `json:"content"` // 短句内容
+		img              string `json:"img,optional"` // 图片URL
+		literatureAuthor string `json:"literatureAuthor,optional"` // 作者
+		convertImg       string `json:"convertImg,optional"` // 转换后的图片URL
+	}
+	DailyShortSentenceUpdateReq {
+		id               uint64 `json:"id"`
+		sentenceType     int64  `json:"type,optional"` // 类型：1普通，2文学
+		content          string `json:"content,optional"` // 短句内容
+		img              string `json:"img,optional"` // 图片URL
+		literatureAuthor string `json:"literatureAuthor,optional"` // 作者
+		convertImg       string `json:"convertImg,optional"` // 转换后的图片URL
+	}
+	DailyShortSentenceDeleteReq {
+		id uint64 `json:"id"`
+	}
 )
 
 @server (
@@ -958,6 +997,25 @@ service admin-api {
 
 	@handler DemoDelete
 	delete /demos (DemoDeleteReq)
+}
+
+@server (
+	group:      daily_short_sentence
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler DailyShortSentenceList
+	get /daily-short-sentences (DailyShortSentenceListReq) returns (DailyShortSentenceListResp)
+
+	@handler DailyShortSentenceCreate
+	post /daily-short-sentences (DailyShortSentenceCreateReq)
+
+	@handler DailyShortSentenceUpdate
+	put /daily-short-sentences (DailyShortSentenceUpdateReq)
+
+	@handler DailyShortSentenceDelete
+	delete /daily-short-sentences (DailyShortSentenceDeleteReq)
 }
 
 type (

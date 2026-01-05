@@ -304,6 +304,50 @@ export interface ConfigUpdateReq {
 	description?: string
 }
 
+export interface DailyShortSentenceCreateReq {
+	type?: number // 类型：1普通，2文学
+	content: string // 短句内容
+	img?: string // 图片URL
+	literatureAuthor?: string // 作者
+	convertImg?: string // 转换后的图片URL
+}
+
+export interface DailyShortSentenceDeleteReq {
+	id: number
+}
+
+export interface DailyShortSentenceItem {
+	id: number
+	type: number // 类型：1普通，2文学
+	content: string // 短句内容
+	img?: string // 图片URL
+	literatureAuthor?: string // 作者
+	convertImg?: string // 转换后的图片URL
+	createdAt: number // 创建时间(秒级时间戳)
+	updatedAt: number // 更新时间(秒级时间戳)
+}
+
+export interface DailyShortSentenceListReq {
+	page?: number
+	pageSize?: number
+	keyword?: string // 搜索关键词（内容、作者）
+	type?: number // 类型筛选
+}
+
+export interface DailyShortSentenceListResp {
+	total: number
+	list: Array<DailyShortSentenceItem>
+}
+
+export interface DailyShortSentenceUpdateReq {
+	id: number
+	type?: number // 类型：1普通，2文学
+	content?: string // 短句内容
+	img?: string // 图片URL
+	literatureAuthor?: string // 作者
+	convertImg?: string // 转换后的图片URL
+}
+
 export interface DemoCreateReq {
 	name: string
 	status?: number
@@ -321,7 +365,7 @@ export interface DemoItem {
 }
 
 export interface DemoListReq {
-	// 注意：GET 请求的查询参数需要同时包含 json 和 form 标签// json 标签用于请求体（POST/PUT/DELETE），form 标签用于查询参数（GET）// 重要：form 标签中必须包含 optional，否则 httpx.Parse 无法正确解析查询参数
+	// 注意：GET 请求的查询参数需要同时包含 json 和 form 标签// json 标签用于请求体（POST/PUT/DELETE），form 标签用于查询参数（GET）// 重要：form 标签中必须包含 optional，否则 httpx.Parse 无法正确解析查询参数
 	page?: number
 	pageSize?: number
 	name?: string
