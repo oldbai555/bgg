@@ -39,14 +39,38 @@
 
     <el-dialog v-model="dialogVisible" :title="isEdit ? t('common.edit') : t('common.create')" width="600px">
       <el-form :model="form" :rules="rules" ref="formRef" label-width="100px">
-        <el-form-item :label="t('common.parent')">
-          <el-input v-model="parentName" disabled />
+        <el-form-item :label="t('common.parent')" prop="parentId">
+          <el-tree-select
+            v-model="form.parentId"
+            :data="parentOptions"
+            :props="{label: 'name', children: 'children', value: 'id'}"
+            :render-after-expand="false"
+            check-strictly
+            :filter-node-method="filterParentNode"
+            placeholder="请选择父级（根节点选择0）"
+            style="width: 100%"
+            :disabled="form.type === 1"
+          >
+            <template #default="{data}">
+              <span class="tree-select-label">
+                <el-icon v-if="getMenuIcon(data.icon)" class="menu-icon">
+                  <component :is="getMenuIcon(data.icon)" />
+                </el-icon>
+                <span>{{ data.name }}</span>
+                <el-tag v-if="data.type === 1" size="small" type="info" style="margin-left: 8px">目录</el-tag>
+                <el-tag v-else-if="data.type === 2" size="small" type="success" style="margin-left: 8px">菜单</el-tag>
+              </span>
+            </template>
+          </el-tree-select>
+          <div class="form-tip" v-if="form.type === 1">目录只能存在于根节点下</div>
+          <div class="form-tip" v-else-if="form.type === 2">菜单可以存在于根节点或目录下</div>
+          <div class="form-tip" v-else-if="form.type === 3">按钮只能存在于菜单下</div>
         </el-form-item>
         <el-form-item :label="t('common.name')" prop="name">
           <el-input v-model="form.name" />
         </el-form-item>
         <el-form-item :label="t('common.type')" prop="type">
-          <el-select v-model="form.type" style="width: 100%">
+          <el-select v-model="form.type" style="width: 100%" @change="handleTypeChange">
             <el-option :label="t('menu.type.directory')" :value="1" />
             <el-option :label="t('menu.type.menu')" :value="2" />
             <el-option :label="t('menu.type.button')" :value="3" />
@@ -111,24 +135,83 @@ const form = reactive({
   status: 1
 });
 
-const parentName = computed(() => {
-  if (form.parentId === 0) return t('menu.root');
-  const find = (list: MenuItem[], id: number): MenuItem | undefined => {
-    for (const item of list) {
-      if (item.id === id) return item;
-      if (item.children) {
-        const got = find(item.children, id);
-        if (got) return got;
-      }
+// 父级选项（根据菜单类型过滤）
+const parentOptions = computed(() => {
+  // 添加根节点选项
+  const options: MenuItem[] = [
+    {
+      id: 0,
+      parentId: 0,
+      name: '根节点',
+      path: '',
+      component: '',
+      icon: '',
+      type: 0,
+      orderNum: 0,
+      visible: 1,
+      status: 1,
+      children: []
     }
-    return undefined;
+  ];
+
+  // 根据菜单类型过滤可选的父级
+  const filterTree = (items: MenuItem[], excludeId?: number): MenuItem[] => {
+    return items
+      .filter(item => item.id !== excludeId) // 排除自己
+      .map(item => {
+        let include = false;
+        
+        if (form.type === 1) {
+          // 目录：只能选择根节点（已经在options中添加了）
+          include = false;
+        } else if (form.type === 2) {
+          // 菜单：可以选择根节点或目录（type=1）
+          include = item.type === 1;
+        } else if (form.type === 3) {
+          // 按钮：只能选择菜单（type=2）
+          include = item.type === 2;
+        }
+
+        if (!include) {
+          return null;
+        }
+
+        const children = item.children ? filterTree(item.children, excludeId) : [];
+        return {
+          ...item,
+          children: children.length > 0 ? children : undefined
+        };
+      })
+      .filter((item): item is MenuItem => item !== null);
   };
-  return find(treeData.value, form.parentId)?.name || t('menu.root');
+
+  const filtered = filterTree(treeData.value, isEdit.value ? form.id : undefined);
+  return [...options, ...filtered];
 });
+
+// 过滤父级节点（用于搜索）
+const filterParentNode = (value: string, data: MenuItem) => {
+  if (!value) return true;
+  return data.name.toLowerCase().includes(value.toLowerCase());
+};
 
 const rules = {
   name: [{required: true, message: t('common.nameRequired'), trigger: 'blur'}],
-  type: [{required: true, message: t('common.typeRequired'), trigger: 'change'}]
+  type: [{required: true, message: t('common.typeRequired'), trigger: 'change'}],
+  parentId: [
+    {
+      validator: (rule: any, value: number, callback: any) => {
+        if (form.type === 1 && value !== 0) {
+          callback(new Error('目录只能存在于根节点下'));
+        } else if (form.type === 3 && value === 0) {
+          callback(new Error('按钮只能存在于菜单下'));
+        } else {
+          callback();
+        }
+      },
+      trigger: 'change'
+    }
+  ]
 };
 
 const getMenuIcon = (iconName?: string) => {
@@ -209,6 +292,19 @@ const handleSubmit = () => {
   });
 };
 
+const handleTypeChange = () => {
+  // 当菜单类型改变时，自动调整parentId
+  if (form.type === 1) {
+    // 目录只能存在于根节点
+    form.parentId = 0;
+  } else if (form.type === 3 && form.parentId === 0) {
+    // 按钮不能存在于根节点，如果没有有效的父级，清空parentId让用户选择
+    // 这里不清空，让用户手动选择
+  }
+  // 重新验证
+  formRef.value?.validateField('parentId');
+};
+
 const handleDelete = (data: MenuItem) => {
   ElMessageBox.confirm(t('common.confirmDelete'), t('common.confirm'), {type: 'warning'})
     .then(async () => {
@@ -246,6 +342,16 @@ onMounted(loadData);
   margin-left: 12px;
   display: inline-flex;
   gap: 6px;
+}
+.tree-select-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.form-tip {
+  font-size: 12px;
+  color: #909399;
+  margin-top: 4px;
 }
 </style>
 

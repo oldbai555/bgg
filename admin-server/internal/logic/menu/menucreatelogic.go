@@ -35,6 +35,12 @@ func (l *MenuCreateLogic) MenuCreate(req *types.MenuCreateReq) error {
 	}
 
 	menuRepo := repository.NewMenuRepository(l.svcCtx.Repository)
+
+	// 验证菜单层级规则（创建时menuId为0，不需要检查循环引用）
+	if err := l.validateMenuHierarchy(0, req.ParentId, req.MenuType, menuRepo); err != nil {
+		return err
+	}
+
 	m := model.AdminMenu{
 		ParentId:  req.ParentId,
 		Name:      req.Name,
@@ -61,6 +67,43 @@ func (l *MenuCreateLogic) MenuCreate(req *types.MenuCreateReq) error {
 		// 注意：go-zero Redis 不支持 SCAN，这里只能清除已知的缓存
 		// 实际场景中，可以通过定时任务或延迟清除策略来处理
 	}()
+
+	return nil
+}
+
+// validateMenuHierarchy 验证菜单层级规则
+func (l *MenuCreateLogic) validateMenuHierarchy(menuId, parentId uint64, menuType int64, menuRepo repository.MenuRepository) error {
+	// 规则1：目录（type=1）只能存在根节点下（parent_id = 0）
+	if menuType == 1 && parentId != 0 {
+		return errs.New(errs.CodeBadRequest, "目录只能存在根节点下")
+	}
+
+	// 规则2：菜单（type=2）可以在目录下，也可以在根节点下
+	// 规则3：按钮（type=3）只能在菜单下（parent_id必须是菜单的id，且该菜单的type=2）
+	if menuType == 3 {
+		if parentId == 0 {
+			return errs.New(errs.CodeBadRequest, "按钮只能存在于菜单下")
+		}
+		// 验证父节点必须是菜单（type=2）
+		parentMenu, err := menuRepo.FindByID(l.ctx, parentId)
+		if err != nil {
+			return errs.Wrap(errs.CodeBadRequest, "父菜单不存在", err)
+		}
+		if parentMenu.Type != 2 {
+			return errs.New(errs.CodeBadRequest, "按钮的父节点必须是菜单（type=2）")
+		}
+	}
+
+	// 规则4：菜单（type=2）如果parent_id不为0，则父节点必须是目录（type=1）
+	if menuType == 2 && parentId != 0 {
+		parentMenu, err := menuRepo.FindByID(l.ctx, parentId)
+		if err != nil {
+			return errs.Wrap(errs.CodeBadRequest, "父菜单不存在", err)
+		}
+		if parentMenu.Type != 1 {
+			return errs.New(errs.CodeBadRequest, "菜单的父节点必须是目录（type=1）或根节点")
+		}
+	}
 
 	return nil
 }
