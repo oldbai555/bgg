@@ -2,7 +2,14 @@
   <div class="page">
     <!-- 系统统计卡片 -->
     <el-row :gutter="20" class="mb-12">
-      <el-col :xs="24" :sm="12" :md="8" :lg="6" v-for="stat in statsCards" :key="stat.key">
+      <el-col
+        v-for="stat in statsCards"
+        :key="stat.key"
+        :xs="24"
+        :sm="12"
+        :md="8"
+        :lg="6"
+      >
         <el-card class="stat-card">
           <div class="stat-card__content">
             <div class="stat-card__icon" :style="{ backgroundColor: stat.color }">
@@ -70,7 +77,12 @@
       </el-col>
 
       <!-- 磁盘使用率 -->
-      <el-col :xs="24" :sm="12" :md="12" class="mt-20">
+      <el-col
+        :xs="24"
+        :sm="12"
+        :md="12"
+        class="mt-20"
+      >
         <el-card>
           <template #header>
             <div class="card-header">
@@ -95,7 +107,12 @@
       </el-col>
 
       <!-- 网络流量 -->
-      <el-col :xs="24" :sm="12" :md="12" class="mt-20">
+      <el-col
+        :xs="24"
+        :sm="12"
+        :md="12"
+        class="mt-20"
+      >
         <el-card>
           <template #header>
             <div class="card-header">
@@ -124,19 +141,19 @@
 </template>
 
 <script setup lang="ts">
-import {ref, onMounted, onUnmounted, computed} from 'vue';
-import {ElMessage} from 'element-plus';
-import {User, Key, Menu, Document, Connection} from '@element-plus/icons-vue';
-import {monitorStatus as monitorStatusApi, monitorStats as monitorStatsApi} from '@/api/generated/admin';
-import type {MonitorStatusResp, MonitorStatsResp} from '@/api/generated/admin';
+import {ref, onMounted, onUnmounted, computed} from 'vue'
+import {ElMessage} from 'element-plus'
+import {User, Key, Menu, Document, Connection} from '@element-plus/icons-vue'
+import {monitorStatus as monitorStatusApi, monitorStats as monitorStatsApi} from '@/api/generated/admin'
+import type {MonitorStatusResp, MonitorStatsResp} from '@/api/generated/admin'
 
-const loading = ref(false);
+const loading = ref(false)
 const monitorStatusData = ref<MonitorStatusResp>({
   cpu: {usage: 0, cores: 0},
   memory: {total: 0, used: 0, available: 0, usage: 0},
   disk: {total: 0, used: 0, available: 0, usage: 0},
   network: {bytesSent: 0, bytesRecv: 0, packetsSent: 0, packetsRecv: 0}
-});
+})
 const monitorStatsData = ref<MonitorStatsResp>({
   userCount: 0,
   roleCount: 0,
@@ -145,7 +162,7 @@ const monitorStatsData = ref<MonitorStatsResp>({
   onlineUserCount: 0,
   operationLogCount: 0,
   loginLogCount: 0
-});
+})
 
 // 统计卡片数据
 const statsCards = computed(() => [
@@ -156,75 +173,83 @@ const statsCards = computed(() => [
   {key: 'online', label: '在线用户', value: monitorStatsData.value.onlineUserCount, icon: Connection, color: '#909399'},
   {key: 'operationLog', label: '操作日志', value: monitorStatsData.value.operationLogCount, icon: Document, color: '#606266'},
   {key: 'loginLog', label: '登录日志', value: monitorStatsData.value.loginLogCount, icon: Document, color: '#909399'}
-]);
+])
 
 // 监控状态数据（用于显示）
-const monitorStatus = computed(() => monitorStatusData.value);
+const monitorStatus = computed(() => monitorStatusData.value)
 
 // 加载监控状态
 const loadMonitorStatus = async () => {
-  loading.value = true;
+  loading.value = true
   try {
-    const resp = await monitorStatusApi();
-    monitorStatusData.value = resp;
-  } catch (err: any) {
-    ElMessage.error(err.message || '获取监控状态失败');
+    const resp = await monitorStatusApi()
+    monitorStatusData.value = resp
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '获取监控状态失败'
+    ElMessage.error(message)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 
 // 加载统计数据
 const loadMonitorStats = async () => {
   try {
-    const resp = await monitorStatsApi();
-    monitorStatsData.value = resp;
-  } catch (err: any) {
-    ElMessage.error(err.message || '获取统计数据失败');
+    const resp = await monitorStatsApi()
+    monitorStatsData.value = resp
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '获取统计数据失败'
+    ElMessage.error(message)
   }
-};
+}
 
 // 格式化数字
 const formatNumber = (num: number) => {
-  return num.toLocaleString();
-};
+  return num.toLocaleString()
+}
 
 // 格式化字节数
 const formatBytes = (bytes: number) => {
-  if (bytes === 0) return '0 B';
-  const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
-};
+  if (bytes === 0) {
+return '0 B'
+}
+  const k = 1024
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i]
+}
 
 // 获取进度条颜色
 const getProgressColor = (percentage: number) => {
-  if (percentage < 50) return '#67c23a';
-  if (percentage < 80) return '#e6a23c';
-  return '#f56c6c';
-};
+  if (percentage < 50) {
+return '#67c23a'
+}
+  if (percentage < 80) {
+return '#e6a23c'
+}
+  return '#f56c6c'
+}
 
 // 定时刷新
-let refreshTimer: number | null = null;
+let refreshTimer: number | null = null
 
 // 初始化加载
 onMounted(() => {
-  loadMonitorStatus();
-  loadMonitorStats();
+  loadMonitorStatus()
+  loadMonitorStats()
   // 每30秒自动刷新
   refreshTimer = window.setInterval(() => {
-    loadMonitorStatus();
-    loadMonitorStats();
-  }, 30000);
-});
+    loadMonitorStatus()
+    loadMonitorStats()
+  }, 30000)
+})
 
 // 清理定时器
 onUnmounted(() => {
   if (refreshTimer !== null) {
-    clearInterval(refreshTimer);
+    clearInterval(refreshTimer)
   }
-});
+})
 </script>
 
 <style scoped lang="scss">
@@ -242,13 +267,13 @@ onUnmounted(() => {
 
 .stat-card {
   margin-bottom: 20px;
-  
+
   &__content {
     display: flex;
     align-items: center;
     gap: 16px;
   }
-  
+
   &__icon {
     width: 48px;
     height: 48px;
@@ -258,17 +283,17 @@ onUnmounted(() => {
     justify-content: center;
     color: white;
   }
-  
+
   &__info {
     flex: 1;
   }
-  
+
   &__label {
     font-size: 14px;
     color: #909399;
     margin-bottom: 4px;
   }
-  
+
   &__value {
     font-size: 24px;
     font-weight: bold;
@@ -288,7 +313,7 @@ onUnmounted(() => {
     color: #606266;
     margin-bottom: 8px;
   }
-  
+
   &__info {
     display: flex;
     gap: 16px;
@@ -296,7 +321,7 @@ onUnmounted(() => {
     font-size: 12px;
     color: #909399;
   }
-  
+
   &__network {
     display: flex;
     gap: 24px;
@@ -305,13 +330,13 @@ onUnmounted(() => {
 
 .network-item {
   flex: 1;
-  
+
   &__label {
     font-size: 12px;
     color: #909399;
     margin-bottom: 4px;
   }
-  
+
   &__value {
     font-size: 18px;
     font-weight: bold;

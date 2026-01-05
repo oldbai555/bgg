@@ -44,6 +44,15 @@ const (
 
 	// WebSocket 路径
 	PathChatWS = "/api/v1/chats/ws"
+
+	// 文件上传相关路径
+	PathFileUploads = "/api/v1/files/uploads"
+)
+
+// 文件系统路径常量
+const (
+	// UploadDir 上传文件存储目录
+	UploadDir = "./uploads"
 )
 
 // 公告状态常量

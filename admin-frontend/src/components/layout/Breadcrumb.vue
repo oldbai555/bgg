@@ -20,7 +20,7 @@ interface Props {
   items: BreadcrumbItem[];
 }
 
-defineProps<Props>();
+defineProps<Props>()
 </script>
 
 <style scoped lang="scss">

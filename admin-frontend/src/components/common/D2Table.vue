@@ -26,7 +26,12 @@
         :fixed="column.fixed"
       >
         <template #default="scope">
-          <slot name="cell" :row="scope.row" :column="column" :index="index">
+          <slot
+            name="cell"
+            :row="scope.row"
+            :column="column"
+            :index="index"
+          >
             <!-- 时间戳转换 -->
             <el-tag v-if="column.type === D2TableElemType.ConvertTime">
               {{ formatUnixTime(scope.row[column.prop]) }}
@@ -227,6 +232,24 @@
             :disabled="!isEdit"
             style="width: 360px"
           />
+          <!-- 可编辑文本域 -->
+          <el-input
+            v-else-if="column.type === D2TableElemType.EditTextarea"
+            v-model="drawerRow[column.prop]"
+            type="textarea"
+            :rows="4"
+            :disabled="!isEdit"
+            style="width: 360px"
+          />
+          <!-- 只读文本域（用于详情显示） -->
+          <el-input
+            v-else-if="column.type === D2TableElemType.Textarea"
+            v-model="drawerRow[column.prop]"
+            type="textarea"
+            :rows="4"
+            disabled
+            style="width: 360px"
+          />
           <!-- 字节转MB -->
           <el-tag v-else-if="column.type === D2TableElemType.Byte2MB">
             {{ formatBytes(drawerRow[column.prop]) }}
@@ -306,6 +329,14 @@
           <div v-else-if="column.type === D2TableElemType.Image" class="d2-table__image">
             <ImageUpload v-model="drawerAddRow[column.prop]" />
           </div>
+          <!-- 可编辑文本域 -->
+          <el-input
+            v-else-if="column.type === D2TableElemType.EditTextarea"
+            v-model="drawerAddRow[column.prop]"
+            type="textarea"
+            :rows="4"
+            style="width: 360px"
+          />
           <!-- 默认输入框 -->
           <el-input
             v-else
@@ -328,27 +359,25 @@
 </template>
 
 <script setup lang="ts">
-import {computed, ref, watch} from 'vue';
-import {ElMessage} from 'element-plus';
-import {Picture} from '@element-plus/icons-vue';
-import {useI18n} from 'vue-i18n';
-import {useUserStore} from '@/stores/user';
-import {usePermission} from '@/hooks/usePermission';
-import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table';
-import {formatUnixTime} from '@/utils/date';
-import {copyToClipboard} from '@/utils/clipboard';
-import ImageUpload from './ImageUpload.vue';
+import {computed, ref} from 'vue'
+import {ElMessage} from 'element-plus'
+import {Picture} from '@element-plus/icons-vue'
+import {useI18n} from 'vue-i18n'
+import {usePermission} from '@/hooks/usePermission'
+import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table'
+import {formatUnixTime} from '@/utils/date'
+import {copyToClipboard} from '@/utils/clipboard'
+import ImageUpload from './ImageUpload.vue'
 
-const {t} = useI18n();
-const userStore = useUserStore();
-const {hasPermission} = usePermission();
+const {t} = useI18n()
+const {hasPermission} = usePermission()
 
 // Props
 interface Props {
   /** 表格列配置 */
   columns: TableColumn[];
   /** 表格数据 */
-  data: any[];
+  data: Record<string, unknown>[]
   /** 总条数 */
   total: number;
   /** 每页显示条数 */
@@ -409,153 +438,128 @@ const props = withDefaults(defineProps<Props>(), {
   deletePermission: '',
   detailPermission: '',
   customPermission: ''
-});
+})
 
 // Emits
 const emit = defineEmits<{
-  'size-change': [size: number];
-  'current-change': [page: number];
-  'onclick-delete': [index: number, row: any];
-  'onclick-updateRow': [row: any];
-  'onclick-addRow': [row: any];
-  'onclick-btnCustom': [index: number, row: any];
-}>();
+  'size-change': [size: number]
+  'current-change': [page: number]
+  'onclick-delete': [index: number, row: Record<string, unknown>]
+  'onclick-updateRow': [row: Record<string, unknown>]
+  'onclick-addRow': [row: Record<string, unknown>]
+  'onclick-btnCustom': [index: number, row: Record<string, unknown>]
+}>()
 
 // 内部状态
-const drawerVisible = ref(false);
-const drawerVisibleAdd = ref(false);
-const drawerRow = ref<Record<string, any>>({});
-const drawerAddRow = ref<Record<string, any>>({});
-const isEdit = ref(false);
+const drawerVisible = ref(false)
+const drawerVisibleAdd = ref(false)
+const drawerRow = ref<Record<string, unknown>>({})
+const drawerAddRow = ref<Record<string, unknown>>({})
+const isEdit = ref(false)
 
 // 分页模型（支持 v-model）
 const currentPageModel = computed({
   get: () => props.currentPage,
   set: (val) => {
     // 通过 emit 通知父组件更新，而不是直接修改内部状态
-    emit('current-change', val);
+    emit('current-change', val)
   }
-});
+})
 
 const pageSizeModel = computed({
   get: () => props.pageSize,
   set: (val) => {
     // 通过 emit 通知父组件更新，而不是直接修改内部状态
-    emit('size-change', val);
+    emit('size-change', val)
   }
-});
+})
 
 // 计算属性
-const displayedData = computed(() => props.data);
+const displayedData = computed(() => props.data)
 
 // 权限相关计算属性（未传权限编码时默认允许）
 const canCreate = computed(
   () => !props.createPermission || hasPermission(props.createPermission)
-);
+)
 const canUpdate = computed(
   () => !props.updatePermission || hasPermission(props.updatePermission)
-);
+)
 const canDelete = computed(
   () => !props.deletePermission || hasPermission(props.deletePermission)
-);
+)
 const canDetail = computed(
   () => !props.detailPermission || hasPermission(props.detailPermission)
-);
+)
 const canCustom = computed(
   () => !props.customPermission || hasPermission(props.customPermission)
-);
-
-// 上传请求头
-const uploadHeaders = computed(() => {
-  if (props.baseUrl && userStore.token) {
-    return {
-      Authorization: `Bearer ${userStore.token}`
-    };
-  }
-  return {};
-});
+)
 
 // 方法
 const formatBytes = (bytes: number): string => {
-  if (!bytes) return '0MB';
-  return `${(bytes / (1024 * 1024)).toFixed(2)}MB`;
-};
+  if (!bytes) {
+    return '0MB'
+  }
+  return `${(bytes / (1024 * 1024)).toFixed(2)}MB`
+}
 
 const handleSizeChange = (size: number) => {
-  emit('size-change', size);
-};
+  emit('size-change', size)
+}
 
 const handleCurrentChange = (page: number) => {
-  emit('current-change', page);
-};
+  emit('current-change', page)
+}
 
-const handleEdit = (index: number, row: any, edit: boolean) => {
-  cancelAdd();
-  isEdit.value = edit;
-  drawerRow.value = {...row};
-  drawerVisible.value = true;
-};
+const handleEdit = (index: number, row: Record<string, unknown>, edit: boolean) => {
+  cancelAdd()
+  isEdit.value = edit
+  drawerRow.value = {...row}
+  drawerVisible.value = true
+}
 
-const handleDelete = (index: number, row: any) => {
-  emit('onclick-delete', index, row);
-};
+const handleDelete = (index: number, row: Record<string, unknown>) => {
+  emit('onclick-delete', index, row)
+}
 
 const updateItem = () => {
-  emit('onclick-updateRow', drawerRow.value);
-  cancelEdit();
-};
+  emit('onclick-updateRow', drawerRow.value)
+  cancelEdit()
+}
 
 const cancelEdit = () => {
-  drawerRow.value = {};
-  drawerVisible.value = false;
-  isEdit.value = false;
-};
+  drawerRow.value = {}
+  drawerVisible.value = false
+  isEdit.value = false
+}
 
 const showAdd = () => {
-  cancelEdit();
-  drawerAddRow.value = {};
-  drawerVisibleAdd.value = true;
-};
+  cancelEdit()
+  drawerAddRow.value = {}
+  drawerVisibleAdd.value = true
+}
 
 const handleAdd = () => {
-  emit('onclick-addRow', drawerAddRow.value);
-  cancelAdd();
-};
+  emit('onclick-addRow', drawerAddRow.value)
+  cancelAdd()
+}
 
 const cancelAdd = () => {
-  drawerAddRow.value = {};
-  drawerVisibleAdd.value = false;
-};
-
-const handleImageUploadSuccess = (
-  response: any,
-  prop: string,
-  isAdd = false
-) => {
-  let dataValue = response.data;
-  if (typeof dataValue === 'string' && dataValue.startsWith('"') && dataValue.endsWith('"')) {
-    dataValue = JSON.parse(dataValue);
-  }
-  const uploadUrl = dataValue;
-  if (isAdd) {
-    drawerAddRow.value[prop] = uploadUrl;
-  } else {
-    drawerRow.value[prop] = uploadUrl;
-  }
-};
+  drawerAddRow.value = {}
+  drawerVisibleAdd.value = false
+}
 
 const handleCopyUrl = async (url: string) => {
-  const success = await copyToClipboard(url);
+  const success = await copyToClipboard(url)
   if (success) {
-    ElMessage.success(t('common.copySuccess') || '链接已复制到剪贴板');
+    ElMessage.success(t('common.copySuccess') || '链接已复制到剪贴板')
   } else {
-    ElMessage.error(t('common.copyFail') || '复制失败，请手动复制');
+    ElMessage.error(t('common.copyFail') || '复制失败，请手动复制')
   }
-};
+}
 
-const handleBtnCustom = (index: number, row: any) => {
-  emit('onclick-btnCustom', index, row);
-};
+const handleBtnCustom = (index: number, row: Record<string, unknown>) => {
+  emit('onclick-btnCustom', index, row)
+}
 </script>
 
 <style scoped lang="scss">

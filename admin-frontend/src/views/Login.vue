@@ -6,9 +6,9 @@
         <div class="subtitle">{{ t('common.welcome') }}</div>
       </div>
       <el-form
+        ref="formRef"
         :model="form"
         :rules="rules"
-        ref="formRef"
         label-position="top"
         class="login-form"
       >
@@ -32,7 +32,13 @@
           />
         </el-form-item>
         <el-form-item class="login-actions">
-          <el-button type="primary" size="large" :loading="loading" @click="handleSubmit" class="full-btn">
+          <el-button
+            type="primary"
+            size="large"
+            :loading="loading"
+            class="full-btn"
+            @click="handleSubmit"
+          >
             {{ t('common.login') }}
           </el-button>
         </el-form-item>
@@ -42,44 +48,47 @@
 </template>
 
 <script setup lang="ts">
-import {reactive, ref} from 'vue';
-import {ElForm, ElMessage} from 'element-plus';
-import {useRouter} from 'vue-router';
-import {useUserStore} from '@/stores/user';
-import {useI18n} from 'vue-i18n';
+import {reactive, ref} from 'vue'
+import {ElForm, ElMessage} from 'element-plus'
+import {useRouter} from 'vue-router'
+import {useUserStore} from '@/stores/user'
+import {useI18n} from 'vue-i18n'
 
-const router = useRouter();
-const userStore = useUserStore();
-const {t} = useI18n();
+const router = useRouter()
+const userStore = useUserStore()
+const {t} = useI18n()
 
 const form = reactive({
   username: '',
   password: ''
-});
+})
 
 const rules = {
   username: [{required: true, message: t('auth.username'), trigger: 'blur'}],
   password: [{required: true, message: t('auth.password'), trigger: 'blur'}]
-};
+}
 
-const formRef = ref<InstanceType<typeof ElForm>>();
-const loading = ref(false);
+const formRef = ref<InstanceType<typeof ElForm>>()
+const loading = ref(false)
 
 const handleSubmit = () => {
   formRef.value?.validate(async (valid) => {
-    if (!valid) return;
-    loading.value = true;
+    if (!valid) {
+return
+}
+    loading.value = true
     try {
-      await userStore.login(form);
-      ElMessage.success(t('auth.loginSuccess'));
-      router.push('/');
-    } catch (err: any) {
-      ElMessage.error(err.message || t('auth.loginFail'));
+      await userStore.login(form)
+      ElMessage.success(t('auth.loginSuccess'))
+      router.push('/')
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : t('auth.loginFail')
+      ElMessage.error(message)
     } finally {
-      loading.value = false;
+      loading.value = false
     }
-  });
-};
+  })
+}
 </script>
 
 <style scoped>

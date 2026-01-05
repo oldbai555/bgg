@@ -5,12 +5,16 @@ package file
 
 import (
 	"net/http"
+	"net/url"
+	"path/filepath"
+	"strconv"
 
-	"github.com/zeromicro/go-zero/rest/httpx"
 	"postapocgame/admin-server/internal/logic/file"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+
+	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
 func FileDownloadHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
@@ -28,11 +32,35 @@ func FileDownloadHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		}
 
 		l := file.NewFileDownloadLogic(r.Context(), svcCtx)
-		resp, err := l.FileDownload(&req)
+		fileInfo, filePath, err := l.FileDownload(&req)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
-		} else {
-			httpx.OkJsonCtx(r.Context(), w, resp)
+			return
 		}
+
+		// 设置响应头
+		// 设置文件名（使用原始文件名）
+		fileName := fileInfo.OriginalName
+		// 对文件名进行 URL 编码，确保中文文件名正确显示
+		w.Header().Set("Content-Disposition", `attachment; filename="`+fileName+`"; filename*=UTF-8''`+url.PathEscape(fileName))
+
+		// 设置 Content-Type
+		if fileInfo.MimeType != "" {
+			w.Header().Set("Content-Type", fileInfo.MimeType)
+		} else {
+			// 根据扩展名推断 Content-Type
+			ext := filepath.Ext(fileName)
+			if ext != "" {
+				w.Header().Set("Content-Type", http.DetectContentType([]byte(ext)))
+			}
+		}
+
+		// 设置文件大小（从文件系统获取实际大小）
+		if fileInfo.Size > 0 {
+			w.Header().Set("Content-Length", strconv.FormatUint(fileInfo.Size, 10))
+		}
+
+		// 直接返回文件内容
+		http.ServeFile(w, r, filePath)
 	}
 }

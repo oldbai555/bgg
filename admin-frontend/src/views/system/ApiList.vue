@@ -49,24 +49,37 @@
 </template>
 
 <script setup lang="ts">
-import {reactive, ref, onMounted, computed} from 'vue';
-import {ElMessage, ElMessageBox} from 'element-plus';
-import {apiList, apiCreate, apiUpdate, apiDelete} from '@/api/generated/admin';
-import type {ApiItem, ApiCreateReq, ApiUpdateReq} from '@/api/generated/admin';
-import {useI18n} from 'vue-i18n';
-import D2Table from '@/components/common/D2Table.vue';
-import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table';
+import {reactive, ref, onMounted, computed} from 'vue'
+import {ElMessage, ElMessageBox} from 'element-plus'
+import {apiList, apiCreate, apiUpdate, apiDelete} from '@/api/generated/admin'
+import type {ApiItem, ApiCreateReq, ApiUpdateReq} from '@/api/generated/admin'
+import {useI18n} from 'vue-i18n'
+import D2Table from '@/components/common/D2Table.vue'
+import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table'
+import {useDictOptions} from '@/composables/useDictOptions'
 
-const {t} = useI18n();
+const {t} = useI18n()
+
+// HTTP方法选项（从字典获取）
+const {options: httpMethodOptions} = useDictOptions(
+  'http_method',
+  [
+    {label: 'GET', value: 'GET'},
+    {label: 'POST', value: 'POST'},
+    {label: 'PUT', value: 'PUT'},
+    {label: 'DELETE', value: 'DELETE'},
+    {label: 'PATCH', value: 'PATCH'}
+  ]
+)
 
 const query = reactive({
   page: 1,
   pageSize: 10,
   name: ''
-});
-const list = ref<ApiItem[]>([]);
-const total = ref(0);
-const loading = ref(false);
+})
+const list = ref<ApiItem[]>([])
+const total = ref(0)
+const loading = ref(false)
 
 // 获取HTTP方法的标签类型
 const getMethodType = (method: string): string => {
@@ -76,9 +89,9 @@ const getMethodType = (method: string): string => {
     'PUT': 'primary',
     'DELETE': 'danger',
     'PATCH': 'info'
-  };
-  return methodMap[method] || 'info';
-};
+  }
+  return methodMap[method] || 'info'
+}
 
 // 表格列配置
 const columns = computed<TableColumn[]>(() => [
@@ -88,7 +101,7 @@ const columns = computed<TableColumn[]>(() => [
   {prop: 'path', label: '接口路径'},
   {prop: 'description', label: t('common.description')},
   {prop: 'status', label: t('common.status'), width: 100}
-]);
+])
 
 // 详情/编辑抽屉列配置
 const drawerColumns = computed<DrawerColumn[]>(() => [
@@ -99,13 +112,7 @@ const drawerColumns = computed<DrawerColumn[]>(() => [
     label: 'HTTP方法',
     type: D2TableElemType.Select,
     required: true,
-    options: [
-      {label: 'GET', value: 'GET'},
-      {label: 'POST', value: 'POST'},
-      {label: 'PUT', value: 'PUT'},
-      {label: 'DELETE', value: 'DELETE'},
-      {label: 'PATCH', value: 'PATCH'}
-    ]
+    options: httpMethodOptions.value
   },
   {prop: 'path', label: '接口路径', type: D2TableElemType.EditInput, required: true},
   {prop: 'description', label: t('common.description'), type: D2TableElemType.EditInput},
@@ -118,7 +125,7 @@ const drawerColumns = computed<DrawerColumn[]>(() => [
       {label: t('status.disabled'), value: 0}
     ]
   }
-]);
+])
 
 // 新增抽屉列配置
 const drawerAddColumns = computed<DrawerColumn[]>(() => [
@@ -128,13 +135,7 @@ const drawerAddColumns = computed<DrawerColumn[]>(() => [
     label: 'HTTP方法',
     type: D2TableElemType.Select,
     required: true,
-    options: [
-      {label: 'GET', value: 'GET'},
-      {label: 'POST', value: 'POST'},
-      {label: 'PUT', value: 'PUT'},
-      {label: 'DELETE', value: 'DELETE'},
-      {label: 'PATCH', value: 'PATCH'}
-    ]
+    options: httpMethodOptions.value
   },
   {prop: 'path', label: '接口路径', required: true},
   {prop: 'description', label: t('common.description')},
@@ -147,70 +148,73 @@ const drawerAddColumns = computed<DrawerColumn[]>(() => [
       {label: t('status.disabled'), value: 0}
     ]
   }
-]);
+])
 
 const loadData = async () => {
-  loading.value = true;
+  loading.value = true
   try {
-    const resp = await apiList({...query});
-    list.value = resp.list;
-    total.value = resp.total;
-  } catch (err: any) {
-    ElMessage.error(err.message || t('common.search'));
+    const resp = await apiList({...query})
+    list.value = resp.list
+    total.value = resp.total
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : t('common.search')
+    ElMessage.error(message)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 
 const handleReset = () => {
-  query.page = 1;
-  query.pageSize = 10;
-  query.name = '';
-  loadData();
-};
+  query.page = 1
+  query.pageSize = 10
+  query.name = ''
+  loadData()
+}
 
 const handlePageChange = (page: number) => {
-  query.page = page;
-  loadData();
-};
+  query.page = page
+  loadData()
+}
 
 const handleSizeChange = (size: number) => {
-  query.pageSize = size;
-  query.page = 1;
-  loadData();
-};
+  query.pageSize = size
+  query.page = 1
+  loadData()
+}
 
 const handleUpdate = async (row: ApiItem) => {
   try {
-    await apiUpdate(row as ApiUpdateReq);
-    ElMessage.success('更新成功');
-    loadData();
-  } catch (err: any) {
-    ElMessage.error(err.message || '更新失败');
+    await apiUpdate(row as ApiUpdateReq)
+    ElMessage.success('更新成功')
+    loadData()
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '更新失败'
+    ElMessage.error(message)
   }
-};
+}
 
-const handleAdd = async (row: any) => {
+const handleAdd = async (row: Record<string, unknown>) => {
   try {
-    await apiCreate(row as ApiCreateReq);
-    ElMessage.success('新增成功');
-    loadData();
-  } catch (err: any) {
-    ElMessage.error(err.message || '新增失败');
+    await apiCreate(row as ApiCreateReq)
+    ElMessage.success('新增成功')
+    loadData()
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '新增失败'
+    ElMessage.error(message)
   }
-};
+}
 
 const handleDelete = (index: number, row: ApiItem) => {
   ElMessageBox.confirm(t('common.confirmDelete'), t('common.confirm'), {type: 'warning'})
     .then(async () => {
-      await apiDelete({id: row.id});
-      ElMessage.success(t('common.delete'));
-      loadData();
+      await apiDelete({id: row.id})
+      ElMessage.success(t('common.delete'))
+      loadData()
     })
-    .catch(() => {});
-};
+    .catch(() => {})
+}
 
-onMounted(loadData);
+onMounted(loadData)
 </script>
 
 <style scoped>

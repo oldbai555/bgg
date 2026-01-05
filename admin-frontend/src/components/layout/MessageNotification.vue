@@ -20,8 +20,18 @@
       <div class="message-notification__header">
         <span class="message-notification__title">消息通知</span>
         <div class="message-notification__actions">
-          <el-button text size="small" :loading="readAllLoading" @click="handleMarkAllAsRead">全部已读</el-button>
-          <el-button text size="small" :loading="clearReadLoading" @click="handleClearRead">清除已读</el-button>
+          <el-button
+            text
+            size="small"
+            :loading="readAllLoading"
+            @click="handleMarkAllAsRead"
+          >全部已读</el-button>
+          <el-button
+            text
+            size="small"
+            :loading="clearReadLoading"
+            @click="handleClearRead"
+          >清除已读</el-button>
         </div>
       </div>
 
@@ -74,172 +84,230 @@
 </template>
 
 <script setup lang="ts">
-import {computed, ref, onMounted, watch} from 'vue';
-import {useRouter} from 'vue-router';
-import {Bell, ChatDotRound} from '@element-plus/icons-vue';
-import {notificationList, notificationReadAll, notificationClearRead, notificationRead, dictGet} from '@/api/generated/admin';
-import type {NotificationItem} from '@/api/generated/admin';
-import {ElMessage} from 'element-plus';
-import NoticeReader from '@/components/common/NoticeReader.vue';
+import {computed, ref, onMounted, watch} from 'vue'
+import {useRouter} from 'vue-router'
+import {Bell, ChatDotRound} from '@element-plus/icons-vue'
+import {notificationList, notificationReadAll, notificationClearRead, notificationRead, dictGet} from '@/api/generated/admin'
+import type {NotificationItem} from '@/api/generated/admin'
+import {ElMessage} from 'element-plus'
+import NoticeReader from '@/components/common/NoticeReader.vue'
+import {useWebSocketStore, MessageType} from '@/stores/websocket'
 
-const router = useRouter();
+const router = useRouter()
+const wsStore = useWebSocketStore()
 
-const notifications = ref<NotificationItem[]>([]);
-const loading = ref(false);
-const readAllLoading = ref(false);
-const clearReadLoading = ref(false);
-const noticeReaderVisible = ref(false);
-const noticeNotifications = ref<NotificationItem[]>([]);
+const notifications = ref<NotificationItem[]>([])
+const loading = ref(false)
+const readAllLoading = ref(false)
+const clearReadLoading = ref(false)
+const noticeReaderVisible = ref(false)
+const noticeNotifications = ref<NotificationItem[]>([])
 
-// 只显示未读消息
-const unreadNotifications = computed(() => {
-  return notifications.value.filter(n => n.readStatus === 0);
-});
+// 合并API通知和WebSocket消息
+const allUnreadMessages = computed(() => {
+  const apiNotifications = notifications.value.filter(n => n.readStatus === 0)
+  const wsMessages = wsStore.unreadMessages.filter(m => !m.read && m.type === MessageType.CHAT)
 
-const unreadCount = computed(() => unreadNotifications.value.length);
-const displayMessages = computed(() => unreadNotifications.value.slice(0, 10)); // 最多显示 10 条
+  // 将WebSocket消息转换为通知格式
+  const wsNotifications: NotificationItem[] = wsMessages.map((msg, index) => ({
+    id: Number(msg.id.replace(/\D/g, '')) || Date.now() + index, // 从ID中提取数字
+    userId: 0, // WebSocket消息没有userId
+    sourceType: 'chat',
+    sourceId: 0,
+    title: msg.title,
+    content: msg.content,
+    readStatus: msg.read ? 1 : 0,
+    readAt: 0,
+    createdAt: Math.floor(msg.timestamp / 1000), // 转换为秒级时间戳
+    updatedAt: Math.floor(msg.timestamp / 1000)
+  }))
+
+  // 合并并去重（根据sourceType和content）
+  const merged = [...apiNotifications, ...wsNotifications]
+  const unique = merged.filter((item, index, self) =>
+    index === self.findIndex(t =>
+      t.sourceType === item.sourceType &&
+      t.content === item.content &&
+      Math.abs(t.createdAt - item.createdAt) < 5 // 5秒内的相同消息视为重复
+    )
+  )
+
+  // 按时间倒序排序
+  return unique.sort((a, b) => b.createdAt - a.createdAt)
+})
+
+const unreadCount = computed(() => allUnreadMessages.value.length)
+const displayMessages = computed(() => allUnreadMessages.value.slice(0, 10)) // 最多显示 10 条
 
 // 聊天页面路径（从字典读取）
-const chatPath = ref('/chatroom/chat'); // 默认值
+const chatPath = ref('/chatroom/chat') // 默认值
 
 const formatTime = (timestamp: number) => {
-  if (!timestamp) return '-';
+  if (!timestamp) {
+return '-'
+}
   try {
-    const date = new Date(timestamp * 1000); // 秒级时间戳转换为毫秒
-    const now = new Date();
-    const diff = now.getTime() - date.getTime();
-    const minutes = Math.floor(diff / 60000);
+    const date = new Date(timestamp * 1000) // 秒级时间戳转换为毫秒
+    const now = new Date()
+    const diff = now.getTime() - date.getTime()
+    const minutes = Math.floor(diff / 60000)
 
     if (minutes < 1) {
-      return '刚刚';
+      return '刚刚'
     } else if (minutes < 60) {
-      return `${minutes}分钟前`;
+      return `${minutes}分钟前`
     } else {
       return date.toLocaleString('zh-CN', {
         month: '2-digit',
         day: '2-digit',
         hour: '2-digit',
         minute: '2-digit'
-      });
+      })
     }
   } catch {
-    return timeStr;
+    return timeStr
   }
-};
+}
 
 const loadNotifications = async () => {
-  loading.value = true;
+  loading.value = true
   try {
     // 只查询未读消息（readStatus=0）
     const resp = await notificationList({
       page: 1,
       pageSize: 100,
       readStatus: 0
-    });
-    notifications.value = resp.list || [];
-  } catch (err: any) {
-    console.error('加载消息通知失败:', err);
-    notifications.value = [];
+    })
+    notifications.value = resp.list || []
+  } catch (err: unknown) {
+    console.error('加载消息通知失败:', err)
+    notifications.value = []
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 
 const handlePopoverShow = () => {
-  loadNotifications();
-};
+  loadNotifications()
+}
 
 // 加载聊天页面路径配置
 const loadChatPath = async () => {
   try {
-    const resp = await dictGet({code: 'chat_config'});
+    const resp = await dictGet({code: 'chat_config'})
     if (resp && resp.items && resp.items.length > 0) {
       // 查找"在线聊天页面路径"配置项
-      const pathItem = resp.items.find(item => item.label === '在线聊天页面路径');
+      const pathItem = resp.items.find(item => item.label === '在线聊天页面路径')
       if (pathItem && pathItem.value) {
-        chatPath.value = pathItem.value;
+        chatPath.value = pathItem.value
       }
     }
-  } catch (err: any) {
-    console.warn('加载聊天页面路径配置失败，使用默认值:', err);
-    chatPath.value = '/chatroom/chat';
+  } catch (err: unknown) {
+    console.warn('加载聊天页面路径配置失败，使用默认值:', err)
+    chatPath.value = '/chatroom/chat'
   }
-};
+}
 
 const handleMessageClick = async (message: NotificationItem) => {
   // 根据消息来源类型处理
   if (message.sourceType === 'chat') {
+    // 如果是WebSocket消息（userId为0），标记为已读
+    if (message.userId === 0) {
+      const wsMessage = wsStore.unreadMessages.find(m =>
+        m.type === MessageType.CHAT &&
+        m.title === message.title &&
+        Math.abs(m.timestamp - message.createdAt * 1000) < 5000
+      )
+      if (wsMessage) {
+        wsStore.markAsRead(wsMessage.id)
+      }
+    } else {
+      // API通知，标记为已读
+      try {
+        await notificationRead({id: message.id})
+        await loadNotifications()
+      } catch (err: unknown) {
+        console.error('标记通知已读失败:', err)
+      }
+    }
+
     // 聊天消息：跳转到在线聊天页面
-    router.push(chatPath.value);
+    router.push(chatPath.value)
   } else if (message.sourceType === 'notice') {
     // 公告消息：打开公告阅读框
     // 获取所有未读的公告通知
-    const noticeNotifs = unreadNotifications.value.filter(n => n.sourceType === 'notice');
+    const noticeNotifs = notifications.value.filter(n => n.readStatus === 0 && n.sourceType === 'notice')
     if (noticeNotifs.length > 0) {
-      noticeNotifications.value = noticeNotifs;
-      noticeReaderVisible.value = true;
+      noticeNotifications.value = noticeNotifs
+      noticeReaderVisible.value = true
     }
   }
-};
+}
 
 const handleNoticeRead = async (notificationId: number) => {
   try {
     // 标记单个通知为已读
-    await notificationRead({id: notificationId});
+    await notificationRead({id: notificationId})
     // 重新加载通知列表
-    await loadNotifications();
-  } catch (err: any) {
-    ElMessage.error(err.message || '标记已读失败');
+    await loadNotifications()
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '标记已读失败'
+    ElMessage.error(message)
   }
-};
+}
 
 const handleMarkAllAsRead = async () => {
-  readAllLoading.value = true;
+  readAllLoading.value = true
   try {
-    await notificationReadAll();
-    ElMessage.success('全部已读成功');
-    await loadNotifications();
-  } catch (err: any) {
-    ElMessage.error(err.message || '操作失败');
+    // 标记后端API通知为已读
+    await notificationReadAll()
+    // 标记WebSocket消息为已读
+    wsStore.markAllAsRead()
+    ElMessage.success('全部已读成功')
+    await loadNotifications()
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '操作失败'
+    ElMessage.error(message)
   } finally {
-    readAllLoading.value = false;
+    readAllLoading.value = false
   }
-};
+}
 
 const handleClearRead = async () => {
-  clearReadLoading.value = true;
+  clearReadLoading.value = true
   try {
-    await notificationClearRead();
-    ElMessage.success('清除已读消息成功');
-    await loadNotifications();
-  } catch (err: any) {
-    ElMessage.error(err.message || '操作失败');
+    await notificationClearRead()
+    ElMessage.success('清除已读消息成功')
+    await loadNotifications()
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '操作失败'
+    ElMessage.error(message)
   } finally {
-    clearReadLoading.value = false;
+    clearReadLoading.value = false
   }
-};
+}
 
 const handleViewAll = () => {
-  router.push('/system/notification');
-};
+  router.push('/system/notification')
+}
 
 // 监听公告阅读框关闭
 watch(noticeReaderVisible, (newVal) => {
   if (!newVal) {
     // 关闭时重新加载通知列表
-    loadNotifications();
+    loadNotifications()
   }
-});
+})
 
 onMounted(() => {
-  loadChatPath();
-  loadNotifications();
-  
+  loadChatPath()
+  loadNotifications()
+
   // 定期刷新通知列表（每30秒）
   setInterval(() => {
-    loadNotifications();
-  }, 30000);
-});
+    loadNotifications()
+  }, 30000)
+})
 </script>
 
 <style scoped lang="scss">

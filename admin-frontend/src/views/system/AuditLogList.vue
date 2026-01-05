@@ -10,11 +10,18 @@
           <el-input v-model="query.username" placeholder="用户名" clearable />
         </el-form-item>
         <el-form-item label="审计类型">
-          <el-select v-model="query.auditType" placeholder="审计类型" clearable>
-            <el-option label="权限分配" value="permission_assign" />
-            <el-option label="角色变更" value="role_change" />
-            <el-option label="配置修改" value="config_modify" />
-            <el-option label="数据删除" value="data_delete" />
+          <el-select
+            v-model="query.auditType"
+            placeholder="审计类型"
+            clearable
+            style="width: 200px"
+          >
+            <el-option
+              v-for="item in auditTypeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="String(item.value)"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="审计对象">
@@ -43,7 +50,7 @@
         <el-form-item>
           <el-button type="primary" :loading="loading" @click="loadData">查询</el-button>
           <el-button @click="handleReset">重置</el-button>
-          <el-button type="success" @click="handleExport" v-permission="'audit_log:export'">导出</el-button>
+          <el-button v-permission="'audit_log:export'" type="success" @click="handleExport">导出</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -75,16 +82,14 @@
 </template>
 
 <script setup lang="ts">
-import {reactive, ref, onMounted, computed} from 'vue';
-import {ElMessage} from 'element-plus';
-import { auditLogList } from '@/api/generated/admin';
-import type { AuditLogItem, AuditLogListReq, AuditLogExportReq } from '@/api/generated/admin';
-import {useI18n} from 'vue-i18n';
-import D2Table from '@/components/common/D2Table.vue';
-import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table';
-import request from '@/utils/request';
-
-const {t} = useI18n();
+import {reactive, ref, onMounted, computed} from 'vue'
+import {ElMessage} from 'element-plus'
+import {auditLogList} from '@/api/generated/admin'
+import type {AuditLogItem, AuditLogListReq} from '@/api/generated/admin'
+import D2Table from '@/components/common/D2Table.vue'
+import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table'
+import request from '@/utils/request'
+import {useDictOptions} from '@/composables/useDictOptions'
 
 const query = reactive<AuditLogListReq>({
   page: 1,
@@ -95,21 +100,21 @@ const query = reactive<AuditLogListReq>({
   auditObject: '',
   startTime: '',
   endTime: ''
-});
-const list = ref<AuditLogItem[]>([]);
-const total = ref(0);
-const loading = ref(false);
+})
+const list = ref<AuditLogItem[]>([])
+const total = ref(0)
+const loading = ref(false)
 
-// 审计类型标签映射
-const getAuditTypeLabel = (type: string) => {
-  const map: Record<string, string> = {
-    permission_assign: '权限分配',
-    role_change: '角色变更',
-    config_modify: '配置修改',
-    data_delete: '数据删除'
-  };
-  return map[type] || type;
-};
+// 审计类型选项
+const {options: auditTypeOptions, getLabel: getAuditTypeLabel} = useDictOptions(
+  'audit_type',
+  [
+    {label: '权限分配', value: 'permission_assign'},
+    {label: '角色变更', value: 'role_change'},
+    {label: '配置修改', value: 'config_modify'},
+    {label: '数据删除', value: 'data_delete'}
+  ]
+)
 
 const getAuditTypeTagType = (type: string) => {
   const map: Record<string, string> = {
@@ -117,10 +122,10 @@ const getAuditTypeTagType = (type: string) => {
     role_change: 'warning',
     config_modify: 'info',
     data_delete: 'danger'
-  };
+  }
   // 默认统一用 info，避免传入非法的空字符串导致 Element Plus 报错
-  return map[type] || 'info';
-};
+  return map[type] || 'info'
+}
 
 // 表格列配置
 const columns = computed<TableColumn[]>(() => [
@@ -131,7 +136,7 @@ const columns = computed<TableColumn[]>(() => [
   {prop: 'auditObject', label: '审计对象', width: 150},
   {prop: 'ipAddress', label: 'IP地址', width: 140},
   {prop: 'createdAt', label: '创建时间', width: 180, type: D2TableElemType.ConvertTime}
-]);
+])
 
 // 详情抽屉列配置（只读）
 const drawerColumns = computed<DrawerColumn[]>(() => [
@@ -144,10 +149,10 @@ const drawerColumns = computed<DrawerColumn[]>(() => [
   {prop: 'ipAddress', label: 'IP地址', type: D2TableElemType.Tag},
   {prop: 'userAgent', label: '用户代理', type: D2TableElemType.Textarea},
   {prop: 'createdAt', label: '创建时间', type: D2TableElemType.ConvertTime}
-]);
+])
 
 const loadData = async () => {
-  loading.value = true;
+  loading.value = true
   try {
     const req: AuditLogListReq = {
       page: query.page,
@@ -158,74 +163,88 @@ const loadData = async () => {
       auditObject: query.auditObject || undefined,
       startTime: query.startTime || undefined,
       endTime: query.endTime || undefined
-    };
-    const resp = await auditLogList(req);
-    list.value = resp.list;
-    total.value = resp.total;
-  } catch (err: any) {
-    ElMessage.error(err.message || '查询失败');
+    }
+    const resp = await auditLogList(req)
+    list.value = resp.list
+    total.value = resp.total
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '查询失败'
+    ElMessage.error(message)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 
 const handleReset = () => {
-  query.page = 1;
-  query.pageSize = 20;
-  query.userId = undefined;
-  query.username = '';
-  query.auditType = '';
-  query.auditObject = '';
-  query.startTime = '';
-  query.endTime = '';
-  loadData();
-};
+  query.page = 1
+  query.pageSize = 20
+  query.userId = undefined
+  query.username = ''
+  query.auditType = ''
+  query.auditObject = ''
+  query.startTime = ''
+  query.endTime = ''
+  loadData()
+}
 
 const handlePageChange = (page: number) => {
-  query.page = page;
-  loadData();
-};
+  query.page = page
+  loadData()
+}
 
 const handleSizeChange = (size: number) => {
-  query.pageSize = size;
-  query.page = 1;
-  loadData();
-};
+  query.pageSize = size
+  query.page = 1
+  loadData()
+}
 
 const handleExport = async () => {
   try {
-    const params: any = {};
-    if (query.userId) params.userId = query.userId;
-    if (query.username) params.username = query.username;
-    if (query.auditType) params.auditType = query.auditType;
-    if (query.auditObject) params.auditObject = query.auditObject;
-    if (query.startTime) params.startTime = query.startTime;
-    if (query.endTime) params.endTime = query.endTime;
-    
+    const params: Record<string, unknown> = {}
+    if (query.userId) {
+params.userId = query.userId
+}
+    if (query.username) {
+params.username = query.username
+}
+    if (query.auditType) {
+params.auditType = query.auditType
+}
+    if (query.auditObject) {
+params.auditObject = query.auditObject
+}
+    if (query.startTime) {
+params.startTime = query.startTime
+}
+    if (query.endTime) {
+params.endTime = query.endTime
+}
+
     // 使用 request 下载文件，设置 responseType 为 blob
-    const resp: any = await request.get('/v1/audit-logs/export', {
+    const resp: Blob | unknown = await request.get('/v1/audit-logs/export', {
       params,
       responseType: 'blob'
-    });
-    
-    // 创建 Blob URL（resp 已经是 Blob 类型）
-    const blob = resp instanceof Blob ? resp : new Blob([resp], {type: 'text/csv;charset=utf-8'});
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `审计日志_${new Date().toISOString().slice(0, 10)}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    // 释放 Blob URL
-    window.URL.revokeObjectURL(url);
-    ElMessage.success('导出成功');
-  } catch (err: any) {
-    ElMessage.error(err.message || '导出失败');
-  }
-};
+    })
 
-onMounted(loadData);
+    // 创建 Blob URL（resp 已经是 Blob 类型）
+    const blob = resp instanceof Blob ? resp : new Blob([resp], {type: 'text/csv;charset=utf-8'})
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `审计日志_${new Date().toISOString().slice(0, 10)}.csv`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    // 释放 Blob URL
+    window.URL.revokeObjectURL(url)
+    ElMessage.success('导出成功')
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '导出失败'
+    ElMessage.error(message)
+  }
+}
+
+onMounted(loadData)
 </script>
 
 <style scoped>
@@ -238,5 +257,4 @@ onMounted(loadData);
   margin-bottom: 12px;
 }
 </style>
-
 

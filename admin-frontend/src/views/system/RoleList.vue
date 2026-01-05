@@ -54,72 +54,77 @@
             {{ t('common.assignPermissions') }}
           </el-button>
           <el-tooltip v-else content="超级管理员角色不允许分配权限" placement="top">
-            <el-button type="info" link size="small" disabled>
+            <el-button
+              type="info"
+              link
+              size="small"
+              disabled
+            >
               {{ t('common.assignPermissions') }}
             </el-button>
           </el-tooltip>
         </template>
       </D2Table>
 
-    <!-- 分配权限对话框 -->
-    <el-dialog
-      v-model="permissionDialogVisible"
-      :title="t('common.assignPermissions')"
-      width="600px"
-      @close="handlePermissionDialogClose"
-    >
-      <el-tree
-        ref="permissionTreeRef"
-        :data="permissionTreeData"
-        :props="{label: 'name', children: 'children'}"
-        show-checkbox
-        node-key="id"
-        :default-checked-keys="selectedPermissionIds"
-        :check-strictly="false"
-      />
-      <template #footer>
-        <el-button @click="permissionDialogVisible = false">{{ t('common.cancel') }}</el-button>
-        <el-button type="primary" :loading="permissionLoading" @click="handleSavePermissions">
-          {{ t('common.save') }}
-        </el-button>
-      </template>
-    </el-dialog>
+      <!-- 分配权限对话框 -->
+      <el-dialog
+        v-model="permissionDialogVisible"
+        :title="t('common.assignPermissions')"
+        width="600px"
+        @close="handlePermissionDialogClose"
+      >
+        <el-tree
+          ref="permissionTreeRef"
+          :data="permissionTreeData"
+          :props="{label: 'name', children: 'children'}"
+          show-checkbox
+          node-key="id"
+          :default-checked-keys="selectedPermissionIds"
+          :check-strictly="false"
+        />
+        <template #footer>
+          <el-button @click="permissionDialogVisible = false">{{ t('common.cancel') }}</el-button>
+          <el-button type="primary" :loading="permissionLoading" @click="handleSavePermissions">
+            {{ t('common.save') }}
+          </el-button>
+        </template>
+      </el-dialog>
     </el-card>
   </div>
 </template>
 
 <script setup lang="ts">
-import {reactive, ref, onMounted, computed} from 'vue';
-import {ElMessage, ElMessageBox} from 'element-plus';
-import {roleList, roleCreate, roleUpdate, roleDelete, rolePermissionList, rolePermissionUpdate, permissionList} from '@/api/generated/admin';
-import type {RoleItem, PermissionItem, RoleCreateReq, RoleUpdateReq, RolePermissionUpdateReq} from '@/api/generated/admin';
-import {useI18n} from 'vue-i18n';
-import D2Table from '@/components/common/D2Table.vue';
-import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table';
+import {reactive, ref, onMounted, computed} from 'vue'
+import {ElMessage, ElMessageBox} from 'element-plus'
+import {roleList, roleCreate, roleUpdate, roleDelete, rolePermissionList, rolePermissionUpdate, permissionList} from '@/api/generated/admin'
+import type {RoleItem, PermissionItem, RoleCreateReq, RoleUpdateReq} from '@/api/generated/admin'
+import {useI18n} from 'vue-i18n'
+import D2Table from '@/components/common/D2Table.vue'
+import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table'
 
-const {t} = useI18n();
+const {t} = useI18n()
 
 // 判断是否是超级管理员角色
 const isSuperAdminRole = (role: RoleItem): boolean => {
-  return role.id === 1 || role.code === 'super_admin';
-};
+  return role.id === 1 || role.code === 'super_admin'
+}
 
 const query = reactive({
   page: 1,
   pageSize: 10,
   name: ''
-});
-const list = ref<RoleItem[]>([]);
-const total = ref(0);
-const loading = ref(false);
+})
+const list = ref<RoleItem[]>([])
+const total = ref(0)
+const loading = ref(false)
 
 // 权限分配相关
-const permissionDialogVisible = ref(false);
-const permissionTreeRef = ref();
-const permissionTreeData = ref<any[]>([]);
-const selectedPermissionIds = ref<number[]>([]);
-const currentRoleId = ref<number>(0);
-const permissionLoading = ref(false);
+const permissionDialogVisible = ref(false)
+const permissionTreeRef = ref()
+const permissionTreeData = ref<Array<{id: string; name: string; children: Array<{id: number; name: string; code: string}>}>>([])
+const selectedPermissionIds = ref<number[]>([])
+const currentRoleId = ref<number>(0)
+const permissionLoading = ref(false)
 
 // 表格列配置
 const columns = computed<TableColumn[]>(() => [
@@ -128,7 +133,7 @@ const columns = computed<TableColumn[]>(() => [
   {prop: 'code', label: t('common.code')},
   {prop: 'description', label: t('common.description')},
   {prop: 'status', label: t('common.status'), width: 100}
-]);
+])
 
 // 详情/编辑抽屉列配置
 const drawerColumns = computed<DrawerColumn[]>(() => [
@@ -137,7 +142,7 @@ const drawerColumns = computed<DrawerColumn[]>(() => [
   {prop: 'code', label: t('common.code'), type: D2TableElemType.Tag},
   {prop: 'description', label: t('common.description'), type: D2TableElemType.EditInput},
   {prop: 'status', label: t('common.status'), type: D2TableElemType.Tag}
-]);
+])
 
 // 新增抽屉列配置
 const drawerAddColumns = computed<DrawerColumn[]>(() => [
@@ -153,84 +158,87 @@ const drawerAddColumns = computed<DrawerColumn[]>(() => [
       {label: t('status.disabled'), value: 0}
     ]
   }
-]);
+])
 
 const loadData = async () => {
-  loading.value = true;
+  loading.value = true
   try {
-    const resp = await roleList({...query});
-    list.value = resp.list;
-    total.value = resp.total;
-  } catch (err: any) {
-    ElMessage.error(err.message || t('common.search'));
+    const resp = await roleList({...query})
+    list.value = resp.list
+    total.value = resp.total
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : t('common.search')
+    ElMessage.error(message)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 
 const handleReset = () => {
-  query.page = 1;
-  query.pageSize = 10;
-  query.name = '';
-  loadData();
-};
+  query.page = 1
+  query.pageSize = 10
+  query.name = ''
+  loadData()
+}
 
 const handlePageChange = (page: number) => {
-  query.page = page;
-  loadData();
-};
+  query.page = page
+  loadData()
+}
 
 const handleSizeChange = (size: number) => {
-  query.pageSize = size;
-  query.page = 1;
-  loadData();
-};
+  query.pageSize = size
+  query.page = 1
+  loadData()
+}
 
 const handleUpdate = async (row: RoleItem) => {
   try {
-    await roleUpdate(row as RoleUpdateReq);
-    ElMessage.success('更新成功');
-    loadData();
-  } catch (err: any) {
-    ElMessage.error(err.message || '更新失败');
+    await roleUpdate(row as RoleUpdateReq)
+    ElMessage.success('更新成功')
+    loadData()
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '更新失败'
+    ElMessage.error(message)
   }
-};
+}
 
-const handleAdd = async (row: any) => {
+const handleAdd = async (row: Record<string, unknown>) => {
   try {
-    await roleCreate(row as RoleCreateReq);
-    ElMessage.success('新增成功');
-    loadData();
-  } catch (err: any) {
-    ElMessage.error(err.message || '新增失败');
+    await roleCreate(row as RoleCreateReq)
+    ElMessage.success('新增成功')
+    loadData()
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '新增失败'
+    ElMessage.error(message)
   }
-};
+}
 
 const handleDelete = (index: number, row: RoleItem) => {
   ElMessageBox.confirm(t('common.confirmDelete'), t('common.confirm'), {type: 'warning'})
     .then(async () => {
-      await roleDelete({id: row.id});
-      ElMessage.success(t('common.delete'));
-      loadData();
+      await roleDelete({id: row.id})
+      ElMessage.success(t('common.delete'))
+      loadData()
     })
-    .catch(() => {});
-};
+    .catch(() => {})
+}
 
 // 加载权限列表（扁平结构）
 const loadPermissions = async () => {
   try {
-    const resp = await permissionList({page: 1, pageSize: 1000});
+    const resp = await permissionList({page: 1, pageSize: 1000})
     // 将权限列表转换为树形结构（按模块分组）
-    const permissionMap = new Map<string, PermissionItem[]>();
+    const permissionMap = new Map<string, PermissionItem[]>()
     resp.list.forEach((perm) => {
-      const module = perm.code.split(':')[0] || 'other';
+      const module = perm.code.split(':')[0] || 'other'
       if (!permissionMap.has(module)) {
-        permissionMap.set(module, []);
+        permissionMap.set(module, [])
       }
-      permissionMap.get(module)!.push(perm);
-    });
+      permissionMap.get(module)!.push(perm)
+    })
 
-    const treeData: any[] = [];
+    const treeData: Array<{id: string; name: string; children: Array<{id: number; name: string; code: string}>}> = []
     permissionMap.forEach((perms, module) => {
       treeData.push({
         id: `module_${module}`,
@@ -240,13 +248,14 @@ const loadPermissions = async () => {
           name: p.name,
           code: p.code
         }))
-      });
-    });
-    permissionTreeData.value = treeData;
-  } catch (err: any) {
-    ElMessage.error(err.message || '加载权限列表失败');
+      })
+    })
+    permissionTreeData.value = treeData
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '加载权限列表失败'
+    ElMessage.error(message)
   }
-};
+}
 
 // 获取模块名称
 const getModuleName = (module: string): string => {
@@ -257,61 +266,65 @@ const getModuleName = (module: string): string => {
     menu: '菜单管理',
     user: '用户管理',
     other: '其他'
-  };
-  return moduleMap[module] || module;
-};
+  }
+  return moduleMap[module] || module
+}
 
 // 打开分配权限对话框
 const handleAssignPermissions = async (row: RoleItem) => {
   // 超级管理员角色不允许分配权限
   if (isSuperAdminRole(row)) {
-    ElMessage.warning('超级管理员角色不允许分配权限');
-    return;
+    ElMessage.warning('超级管理员角色不允许分配权限')
+    return
   }
-  currentRoleId.value = row.id;
-  permissionDialogVisible.value = true;
-  
+  currentRoleId.value = row.id
+  permissionDialogVisible.value = true
+
   // 加载权限列表
   if (permissionTreeData.value.length === 0) {
-    await loadPermissions();
+    await loadPermissions()
   }
-  
+
   // 加载当前角色的权限
   try {
-    const resp = await rolePermissionList({roleId: row.id});
-    selectedPermissionIds.value = resp.permissionIds || [];
-  } catch (err: any) {
-    ElMessage.error(err.message || '加载角色权限失败');
+    const resp = await rolePermissionList({roleId: row.id})
+    selectedPermissionIds.value = resp.permissionIds || []
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '加载角色权限失败'
+    ElMessage.error(message)
   }
-};
+}
 
 // 保存权限分配
 const handleSavePermissions = async () => {
-  if (!permissionTreeRef.value) return;
-  
-  const checkedKeys = permissionTreeRef.value.getCheckedKeys(false) as number[];
+  if (!permissionTreeRef.value) {
+return
+}
+
+  const checkedKeys = permissionTreeRef.value.getCheckedKeys(false) as number[]
   // 过滤掉模块节点
-  const permissionIds = checkedKeys.filter((id) => typeof id === 'number');
-  
-  permissionLoading.value = true;
+  const permissionIds = checkedKeys.filter((id) => typeof id === 'number')
+
+  permissionLoading.value = true
   try {
-    await rolePermissionUpdate({roleId: currentRoleId.value, permissionIds});
-    ElMessage.success('权限分配成功');
-    permissionDialogVisible.value = false;
-  } catch (err: any) {
-    ElMessage.error(err.message || '权限分配失败');
+    await rolePermissionUpdate({roleId: currentRoleId.value, permissionIds})
+    ElMessage.success('权限分配成功')
+    permissionDialogVisible.value = false
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '权限分配失败'
+    ElMessage.error(message)
   } finally {
-    permissionLoading.value = false;
+    permissionLoading.value = false
   }
-};
+}
 
 // 关闭权限对话框
 const handlePermissionDialogClose = () => {
-  selectedPermissionIds.value = [];
-  currentRoleId.value = 0;
-};
+  selectedPermissionIds.value = []
+  currentRoleId.value = 0
+}
 
-onMounted(loadData);
+onMounted(loadData)
 </script>
 
 <style scoped>

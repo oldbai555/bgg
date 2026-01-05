@@ -7,11 +7,11 @@
           v-model="videoUrl"
           placeholder="请输入视频链接（支持m3u8、mp4等格式）..."
           clearable
-          @keydown.enter="handlePlay"
           class="url-input"
+          @keydown.enter="handlePlay"
         >
           <template #append>
-            <el-button type="primary" @click="handlePlay" :loading="loading">
+            <el-button type="primary" :loading="loading" @click="handlePlay">
               <el-icon><VideoPlay /></el-icon>
               播放
             </el-button>
@@ -19,9 +19,9 @@
         </el-input>
         <el-button
           v-if="showPlayer"
-          @click="handleReset"
           type="info"
           plain
+          @click="handleReset"
         >
           <el-icon><RefreshLeft /></el-icon>
           重新输入
@@ -29,7 +29,7 @@
       </div>
 
       <!-- 播放器区域 -->
-      <div class="player-container" v-show="showPlayer">
+      <div v-show="showPlayer" class="player-container">
         <video
           ref="videoPlayerRef"
           class="video-js vjs-default-skin vjs-big-play-centered"
@@ -48,73 +48,72 @@
 </template>
 
 <script setup lang="ts">
-import {ref, onMounted, onBeforeUnmount, watch} from 'vue';
-import {useRoute} from 'vue-router';
-import {ElMessage} from 'element-plus';
-import {VideoPlay, RefreshLeft} from '@element-plus/icons-vue';
-import videojs from 'video.js';
-import 'video.js/dist/video-js.css';
-import {videoProxy} from '@/api/generated/admin';
+import {ref, onMounted, onBeforeUnmount, watch} from 'vue'
+import {useRoute} from 'vue-router'
+import {ElMessage} from 'element-plus'
+import {VideoPlay, RefreshLeft} from '@element-plus/icons-vue'
+import videojs from 'video.js'
+import 'video.js/dist/video-js.css'
 
-const route = useRoute();
+const route = useRoute()
 
-const videoUrl = ref('');
-const videoCover = ref('');
-const showPlayer = ref(false);
-const loading = ref(false);
-const videoPlayerRef = ref<HTMLVideoElement | null>(null);
-let player: videojs.Player | null = null;
+const videoUrl = ref('')
+const videoCover = ref('')
+const showPlayer = ref(false)
+const loading = ref(false)
+const videoPlayerRef = ref<HTMLVideoElement | null>(null)
+let player: videojs.Player | null = null
 
 // 从路由参数获取视频URL
 onMounted(() => {
-  const urlParam = route.query.url as string;
+  const urlParam = route.query.url as string
   if (urlParam) {
-    videoUrl.value = decodeURIComponent(urlParam);
-    handlePlay();
+    videoUrl.value = decodeURIComponent(urlParam)
+    handlePlay()
   }
-});
+})
 
 // 监听路由变化
 watch(() => route.query.url, (newUrl) => {
   if (newUrl) {
-    videoUrl.value = decodeURIComponent(newUrl as string);
-    handlePlay();
+    videoUrl.value = decodeURIComponent(newUrl as string)
+    handlePlay()
   }
-});
+})
 
 // 播放视频
 const handlePlay = async () => {
   if (!videoUrl.value || videoUrl.value.trim() === '') {
-    ElMessage.warning('请输入视频链接');
-    return;
+    ElMessage.warning('请输入视频链接')
+    return
   }
 
-  const url = videoUrl.value.trim();
+  const url = videoUrl.value.trim()
 
   // 验证URL格式
   try {
-    new URL(url);
-  } catch (e) {
-    ElMessage.error('视频链接格式不正确');
-    return;
+    new URL(url)
+  } catch {
+    ElMessage.error('视频链接格式不正确')
+    return
   }
 
-  loading.value = true;
-  showPlayer.value = true;
+  loading.value = true
+  showPlayer.value = true
 
   try {
     // 销毁旧的播放器
     if (player) {
-      player.dispose();
-      player = null;
+      player.dispose()
+      player = null
     }
 
     // 等待DOM更新
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise(resolve => setTimeout(resolve, 100))
 
     if (!videoPlayerRef.value) {
-      ElMessage.error('播放器初始化失败');
-      return;
+      ElMessage.error('播放器初始化失败')
+      return
     }
 
     // 初始化播放器
@@ -133,11 +132,7 @@ const handlePlay = async () => {
         nativeAudioTracks: false,
         nativeTextTracks: false
       }
-    });
-
-    // 尝试直接播放
-    let playSource = url;
-    let useProxy = false;
+    })
 
     // 如果是m3u8格式，先尝试直接播放，失败则使用代理
     if (url.includes('.m3u8')) {
@@ -145,113 +140,115 @@ const handlePlay = async () => {
         player.src({
           src: url,
           type: 'application/x-mpegURL'
-        });
-        
+        })
+
         // 监听错误事件
         player.one('error', async () => {
-          const error = player?.error();
+          const error = player?.error()
           if (error && error.code === 4) {
             // 媒体资源无法加载，尝试使用代理
-            ElMessage.info('直接播放失败，尝试使用代理播放...');
-            await tryProxyPlay(url);
+            ElMessage.info('直接播放失败，尝试使用代理播放...')
+            await tryProxyPlay(url)
           } else {
-            ElMessage.error(`播放失败: ${error?.message || '未知错误'}`);
-            loading.value = false;
+            ElMessage.error(`播放失败: ${error?.message || '未知错误'}`)
+            loading.value = false
           }
-        });
+        })
 
         // 监听加载成功
         player.one('loadedmetadata', () => {
-          ElMessage.success('视频加载成功');
-          loading.value = false;
-        });
+          ElMessage.success('视频加载成功')
+          loading.value = false
+        })
 
         // 设置超时
         setTimeout(() => {
           if (loading.value && player?.error()) {
             // 如果还在加载且出现错误，尝试代理
-            tryProxyPlay(url);
+            tryProxyPlay(url)
           }
-        }, 5000);
+        }, 5000)
 
-      } catch (e) {
+      } catch {
         // 直接播放失败，尝试代理
-        await tryProxyPlay(url);
+        await tryProxyPlay(url)
       }
     } else {
       // 非m3u8格式，直接播放
-      player.src(url);
+      player.src(url)
       player.one('loadedmetadata', () => {
-        ElMessage.success('视频加载成功');
-        loading.value = false;
-      });
+        ElMessage.success('视频加载成功')
+        loading.value = false
+      })
       player.one('error', () => {
-        const error = player?.error();
-        ElMessage.error(`播放失败: ${error?.message || '未知错误'}`);
-        loading.value = false;
-      });
+        const error = player?.error()
+        ElMessage.error(`播放失败: ${error?.message || '未知错误'}`)
+        loading.value = false
+      })
     }
 
-  } catch (error: any) {
-    ElMessage.error(`播放失败: ${error.message || '未知错误'}`);
-    loading.value = false;
-    showPlayer.value = false;
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : '未知错误'
+    ElMessage.error(`播放失败: ${message}`)
+    loading.value = false
+    showPlayer.value = false
   }
-};
+}
 
 // 尝试使用代理播放
 const tryProxyPlay = async (url: string) => {
   try {
     // 构建代理URL
-    const proxyUrl = `/api/v1/videos/proxy?url=${encodeURIComponent(url)}`;
-    
+    const proxyUrl = `/api/v1/videos/proxy?url=${encodeURIComponent(url)}`
+
     // 设置播放源为代理URL
     if (player) {
       if (url.includes('.m3u8')) {
         player.src({
           src: proxyUrl,
           type: 'application/x-mpegURL'
-        });
+        })
       } else {
-        player.src(proxyUrl);
+        player.src(proxyUrl)
       }
 
       player.one('loadedmetadata', () => {
-        ElMessage.success('通过代理播放成功');
-        loading.value = false;
-      });
+        ElMessage.success('通过代理播放成功')
+        loading.value = false
+      })
 
       player.one('error', () => {
-        const error = player?.error();
-        ElMessage.error(`代理播放也失败: ${error?.message || '视频链接无法播放'}`);
-        loading.value = false;
-      });
+        const error = player?.error()
+        ElMessage.error(`代理播放也失败: ${error?.message || '视频链接无法播放'}`)
+        loading.value = false
+      })
     }
-  } catch (error: any) {
-    ElMessage.error(`代理播放失败: ${error.message || '未知错误'}`);
-    loading.value = false;
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : '未知错误'
+    ElMessage.error(`代理播放失败: ${message}`)
+    loading.value = false
   }
-};
+}
 
 // 重置播放器
 const handleReset = () => {
   if (player) {
-    player.pause();
-    player.dispose();
-    player = null;
+    player.pause()
+    player.dispose()
+    player = null
   }
-  showPlayer.value = false;
-  videoUrl.value = '';
-  videoCover.value = '';
-};
+  showPlayer.value = false
+  videoUrl.value = ''
+  videoCover.value = ''
+}
 
 // 组件销毁时清理播放器
 onBeforeUnmount(() => {
   if (player) {
-    player.dispose();
-    player = null;
+    player.dispose()
+    player = null
   }
-});
+})
 </script>
 
 <style scoped lang="scss">

@@ -49,26 +49,25 @@
 </template>
 
 <script setup lang="ts">
-import {reactive, ref, onMounted, computed} from 'vue';
-import {ElMessage, ElMessageBox} from 'element-plus';
-import {Refresh} from '@element-plus/icons-vue';
-import {dictTypeList, dictTypeCreate, dictTypeUpdate, dictTypeDelete} from '@/api/generated/admin';
-import type {DictTypeItem, DictTypeCreateReq, DictTypeUpdateReq} from '@/api/generated/admin';
-import {useI18n} from 'vue-i18n';
-import D2Table from '@/components/common/D2Table.vue';
-import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table';
+import {reactive, ref, onMounted, computed} from 'vue'
+import {ElMessage, ElMessageBox} from 'element-plus'
+import {dictTypeList, dictTypeCreate, dictTypeUpdate, dictTypeDelete} from '@/api/generated/admin'
+import type {DictTypeItem, DictTypeCreateReq, DictTypeUpdateReq} from '@/api/generated/admin'
+import {useI18n} from 'vue-i18n'
+import D2Table from '@/components/common/D2Table.vue'
+import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table'
 
-const {t} = useI18n();
+const {t} = useI18n()
 
 const query = reactive({
   page: 1,
   pageSize: 10,
   name: '',
   code: ''
-});
-const list = ref<DictTypeItem[]>([]);
-const total = ref(0);
-const loading = ref(false);
+})
+const list = ref<DictTypeItem[]>([])
+const total = ref(0)
+const loading = ref(false)
 
 // 表格列配置
 const columns = computed<TableColumn[]>(() => [
@@ -77,7 +76,7 @@ const columns = computed<TableColumn[]>(() => [
   {prop: 'code', label: '字典编码'},
   {prop: 'description', label: t('common.description')},
   {prop: 'status', label: t('common.status'), width: 100}
-]);
+])
 
 // 详情/编辑抽屉列配置
 const drawerColumns = computed<DrawerColumn[]>(() => [
@@ -94,7 +93,7 @@ const drawerColumns = computed<DrawerColumn[]>(() => [
       {label: t('status.disabled'), value: 0}
     ]
   }
-]);
+])
 
 // 新增抽屉列配置
 const drawerAddColumns = computed<DrawerColumn[]>(() => [
@@ -110,71 +109,74 @@ const drawerAddColumns = computed<DrawerColumn[]>(() => [
       {label: t('status.disabled'), value: 0}
     ]
   }
-]);
+])
 
 const loadData = async () => {
-  loading.value = true;
+  loading.value = true
   try {
-    const resp = await dictTypeList({...query});
-    list.value = resp.list;
-    total.value = resp.total;
-  } catch (err: any) {
-    ElMessage.error(err.message || t('common.search'));
+    const resp = await dictTypeList({...query})
+    list.value = resp.list
+    total.value = resp.total
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : t('common.search')
+    ElMessage.error(message)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 
 const handleReset = () => {
-  query.page = 1;
-  query.pageSize = 10;
-  query.name = '';
-  query.code = '';
-  loadData();
-};
+  query.page = 1
+  query.pageSize = 10
+  query.name = ''
+  query.code = ''
+  loadData()
+}
 
 const handlePageChange = (page: number) => {
-  query.page = page;
-  loadData();
-};
+  query.page = page
+  loadData()
+}
 
 const handleSizeChange = (size: number) => {
-  query.pageSize = size;
-  query.page = 1;
-  loadData();
-};
+  query.pageSize = size
+  query.page = 1
+  loadData()
+}
 
 const handleUpdate = async (row: DictTypeItem) => {
   try {
-    await dictTypeUpdate(row as DictTypeUpdateReq);
-    ElMessage.success('更新成功');
-    loadData();
-  } catch (err: any) {
-    ElMessage.error(err.message || '更新失败');
+    await dictTypeUpdate(row as DictTypeUpdateReq)
+    ElMessage.success('更新成功')
+    loadData()
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '更新失败'
+    ElMessage.error(message)
   }
-};
+}
 
-const handleAdd = async (row: any) => {
+const handleAdd = async (row: Record<string, unknown>) => {
   try {
-    await dictTypeCreate(row as DictTypeCreateReq);
-    ElMessage.success('新增成功');
-    loadData();
-  } catch (err: any) {
-    ElMessage.error(err.message || '新增失败');
+    await dictTypeCreate(row as DictTypeCreateReq)
+    ElMessage.success('新增成功')
+    loadData()
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '新增失败'
+    ElMessage.error(message)
   }
-};
+}
 
 const handleDelete = (index: number, row: DictTypeItem) => {
   ElMessageBox.confirm(t('common.confirmDelete'), t('common.confirm'), {type: 'warning'})
     .then(async () => {
-      await dictTypeDelete({id: row.id});
-      ElMessage.success(t('common.delete'));
-      loadData();
+      await dictTypeDelete({id: row.id})
+      ElMessage.success(t('common.delete'))
+      loadData()
     })
-    .catch(() => {});
-};
+    .catch(() => {})
+}
 
-onMounted(loadData);
+onMounted(loadData)
 </script>
 
 <style scoped>

@@ -10,23 +10,36 @@
           <el-input v-model="query.username" placeholder="用户名" clearable />
         </el-form-item>
         <el-form-item label="操作类型">
-          <el-select v-model="query.operationType" placeholder="操作类型" clearable>
-            <el-option label="创建" value="create" />
-            <el-option label="更新" value="update" />
-            <el-option label="删除" value="delete" />
-            <el-option label="查询" value="query" />
-            <el-option label="导出" value="export" />
+          <el-select
+            v-model="query.operationType"
+            placeholder="操作类型"
+            clearable
+            style="width: 200px"
+          >
+            <el-option
+              v-for="item in operationTypeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="String(item.value)"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="操作对象">
           <el-input v-model="query.operationObject" placeholder="操作对象" clearable />
         </el-form-item>
         <el-form-item label="请求方法">
-          <el-select v-model="query.method" placeholder="请求方法" clearable>
-            <el-option label="GET" value="GET" />
-            <el-option label="POST" value="POST" />
-            <el-option label="PUT" value="PUT" />
-            <el-option label="DELETE" value="DELETE" />
+          <el-select
+            v-model="query.method"
+            placeholder="请求方法"
+            clearable
+            style="width: 200px"
+          >
+            <el-option
+              v-for="item in httpMethodOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="String(item.value)"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="开始时间">
@@ -71,23 +84,20 @@
         detail-permission="operation_log:detail"
         @size-change="handleSizeChange"
         @current-change="handlePageChange"
-      >
-      </D2Table>
+      />
     </el-card>
   </div>
 </template>
 
 <script setup lang="ts">
-import {reactive, ref, onMounted, computed} from 'vue';
-import {ElMessage} from 'element-plus';
-import { operationLogList } from '@/api/generated/admin';
-import type { OperationLogItem, OperationLogListReq, OperationLogExportReq } from '@/api/generated/admin';
-import {useI18n} from 'vue-i18n';
-import D2Table from '@/components/common/D2Table.vue';
-import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table';
-import request from '@/utils/request';
-
-const {t} = useI18n();
+import {reactive, ref, onMounted, computed} from 'vue'
+import {ElMessage} from 'element-plus'
+import {operationLogList} from '@/api/generated/admin'
+import type {OperationLogItem, OperationLogListReq} from '@/api/generated/admin'
+import D2Table from '@/components/common/D2Table.vue'
+import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table'
+import request from '@/utils/request'
+import {useDictOptions} from '@/composables/useDictOptions'
 
 const query = reactive<OperationLogListReq>({
   page: 1,
@@ -99,10 +109,33 @@ const query = reactive<OperationLogListReq>({
   method: '',
   startTime: '',
   endTime: ''
-});
-const list = ref<OperationLogItem[]>([]);
-const total = ref(0);
-const loading = ref(false);
+})
+const list = ref<OperationLogItem[]>([])
+const total = ref(0)
+const loading = ref(false)
+
+// 操作类型选项
+const {options: operationTypeOptions} = useDictOptions(
+  'operation_type',
+  [
+    {label: '创建', value: 'create'},
+    {label: '更新', value: 'update'},
+    {label: '删除', value: 'delete'},
+    {label: '查询', value: 'query'},
+    {label: '导出', value: 'export'}
+  ]
+)
+
+// HTTP方法选项
+const {options: httpMethodOptions} = useDictOptions(
+  'http_method',
+  [
+    {label: 'GET', value: 'GET'},
+    {label: 'POST', value: 'POST'},
+    {label: 'PUT', value: 'PUT'},
+    {label: 'DELETE', value: 'DELETE'}
+  ]
+)
 
 // 表格列配置
 const columns = computed<TableColumn[]>(() => [
@@ -116,7 +149,7 @@ const columns = computed<TableColumn[]>(() => [
   {prop: 'ipAddress', label: 'IP地址', width: 140},
   {prop: 'duration', label: '耗时(ms)', width: 100},
   {prop: 'createdAt', label: '创建时间', width: 180}
-]);
+])
 
 // 详情抽屉列配置（只读）
 const drawerColumns = computed<DrawerColumn[]>(() => [
@@ -134,10 +167,10 @@ const drawerColumns = computed<DrawerColumn[]>(() => [
   {prop: 'userAgent', label: '用户代理', type: D2TableElemType.Textarea},
   {prop: 'duration', label: '耗时(ms)', type: D2TableElemType.Tag},
   {prop: 'createdAt', label: '创建时间', type: D2TableElemType.Tag}
-]);
+])
 
 const loadData = async () => {
-  loading.value = true;
+  loading.value = true
   try {
     const req: OperationLogListReq = {
       page: query.page,
@@ -149,76 +182,92 @@ const loadData = async () => {
       method: query.method || undefined,
       startTime: query.startTime || undefined,
       endTime: query.endTime || undefined
-    };
-    const resp = await operationLogList(req);
-    list.value = resp.list;
-    total.value = resp.total;
-  } catch (err: any) {
-    ElMessage.error(err.message || '查询失败');
+    }
+    const resp = await operationLogList(req)
+    list.value = resp.list
+    total.value = resp.total
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '查询失败'
+    ElMessage.error(message)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 
 const handleReset = () => {
-  query.page = 1;
-  query.pageSize = 20;
-  query.userId = undefined;
-  query.username = '';
-  query.operationType = '';
-  query.operationObject = '';
-  query.method = '';
-  query.startTime = '';
-  query.endTime = '';
-  loadData();
-};
+  query.page = 1
+  query.pageSize = 20
+  query.userId = undefined
+  query.username = ''
+  query.operationType = ''
+  query.operationObject = ''
+  query.method = ''
+  query.startTime = ''
+  query.endTime = ''
+  loadData()
+}
 
 const handlePageChange = (page: number) => {
-  query.page = page;
-  loadData();
-};
+  query.page = page
+  loadData()
+}
 
 const handleSizeChange = (size: number) => {
-  query.pageSize = size;
-  query.page = 1;
-  loadData();
-};
+  query.pageSize = size
+  query.page = 1
+  loadData()
+}
 
 const handleExport = async () => {
   try {
-    const params: any = {};
-    if (query.userId) params.userId = query.userId;
-    if (query.username) params.username = query.username;
-    if (query.operationType) params.operationType = query.operationType;
-    if (query.operationObject) params.operationObject = query.operationObject;
-    if (query.method) params.method = query.method;
-    if (query.startTime) params.startTime = query.startTime;
-    if (query.endTime) params.endTime = query.endTime;
-    
+    const params: Record<string, unknown> = {}
+    if (query.userId) {
+params.userId = query.userId
+}
+    if (query.username) {
+params.username = query.username
+}
+    if (query.operationType) {
+params.operationType = query.operationType
+}
+    if (query.operationObject) {
+params.operationObject = query.operationObject
+}
+    if (query.method) {
+params.method = query.method
+}
+    if (query.startTime) {
+params.startTime = query.startTime
+}
+    if (query.endTime) {
+params.endTime = query.endTime
+}
+
     // 使用 request 下载文件，设置 responseType 为 blob
-    const resp: any = await request.get('/v1/operation-logs/export', {
+    const resp: Blob | unknown = await request.get('/v1/operation-logs/export', {
       params,
       responseType: 'blob'
-    });
-    
-    // 创建 Blob URL（resp 已经是 Blob 类型）
-    const blob = resp instanceof Blob ? resp : new Blob([resp], {type: 'text/csv;charset=utf-8'});
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `操作日志_${new Date().toISOString().slice(0, 10)}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    // 释放 Blob URL
-    window.URL.revokeObjectURL(url);
-    ElMessage.success('导出成功');
-  } catch (err: any) {
-    ElMessage.error(err.message || '导出失败');
-  }
-};
+    })
 
-onMounted(loadData);
+    // 创建 Blob URL（resp 已经是 Blob 类型）
+    const blob = resp instanceof Blob ? resp : new Blob([resp], {type: 'text/csv;charset=utf-8'})
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `操作日志_${new Date().toISOString().slice(0, 10)}.csv`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    // 释放 Blob URL
+    window.URL.revokeObjectURL(url)
+    ElMessage.success('导出成功')
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '导出失败'
+    ElMessage.error(message)
+  }
+}
+
+onMounted(loadData)
 </script>
 
 <style scoped>
@@ -231,5 +280,4 @@ onMounted(loadData);
   margin-bottom: 12px;
 }
 </style>
-
 

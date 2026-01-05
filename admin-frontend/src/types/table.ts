@@ -22,6 +22,10 @@ export enum D2TableElemType {
   Image = 'image',
   /** 可编辑输入框 */
   EditInput = 'editInput',
+  /** 可编辑文本域 */
+  EditTextarea = 'editTextarea',
+  /** 只读文本域（用于详情显示） */
+  Textarea = 'textarea',
   /** 字节转MB */
   Byte2MB = 'byte2MB',
   /** 下拉选择 */

@@ -3,12 +3,12 @@
     <div class="page-header__content">
       <!-- 面包屑导航 -->
       <Breadcrumb v-if="breadcrumb && breadcrumb.length > 0" :items="breadcrumb" class="page-header__breadcrumb" />
-      
+
       <!-- 标题和操作按钮 -->
       <div class="page-header__title-bar">
         <h2 v-if="title" class="page-header__title">{{ title }}</h2>
         <div v-if="$slots.actions" class="page-header__actions">
-          <slot name="actions" />
+          <slot name="actions"></slot>
         </div>
       </div>
     </div>
@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import Breadcrumb, {type BreadcrumbItem} from './Breadcrumb.vue';
+import Breadcrumb, {type BreadcrumbItem} from './Breadcrumb.vue'
 
 interface Props {
   title?: string;
@@ -26,7 +26,7 @@ interface Props {
 withDefaults(defineProps<Props>(), {
   title: '',
   breadcrumb: () => []
-});
+})
 </script>
 
 <style scoped lang="scss">

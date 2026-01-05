@@ -365,7 +365,7 @@ export interface DemoItem {
 }
 
 export interface DemoListReq {
-	// 注意：GET 请求的查询参数需要同时包含 json 和 form 标签// json 标签用于请求体（POST/PUT/DELETE），form 标签用于查询参数（GET）// 重要：form 标签中必须包含 optional，否则 httpx.Parse 无法正确解析查询参数
+	// 注意：GET 请求的查询参数需要同时包含 json 和 form 标签// json 标签用于请求体（POST/PUT/DELETE），form 标签用于查询参数（GET）// 重要：form 标签中必须包含 optional，否则 httpx.Parse 无法正确解析查询参数
 	page?: number
 	pageSize?: number
 	name?: string
@@ -412,6 +412,14 @@ export interface DepartmentUpdateReq {
 	name: string
 	orderNum?: number
 	status?: number
+}
+
+export interface DictBatchGetReq {
+	codes: Array<string> // 需要获取的字典类型编码列表
+}
+
+export interface DictBatchGetResp {
+	dicts: { [key: string]: DictGetResp } // key为字典类型编码，value为字典数据
 }
 
 export interface DictGetReq {
@@ -533,7 +541,10 @@ export interface FileDownloadResp {
 
 export interface FileItem {
 	id: number
-	name: string
+	name: string // MD5 短链（文件名）
+	originalName: string // 原始文件名
+	path: string // 文件访问路径（相对路径）
+	baseUrl: string // 基础URL
 	status: number
 	createdAt: number // 创建时间(秒级时间戳)
 }

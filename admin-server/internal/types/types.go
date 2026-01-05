@@ -403,6 +403,14 @@ type DepartmentUpdateReq struct {
 	Status   int64  `json:"status,optional"`
 }
 
+type DictBatchGetReq struct {
+	Codes []string `json:"codes"` // 需要获取的字典类型编码列表
+}
+
+type DictBatchGetResp struct {
+	Dicts map[string]DictGetResp `json:"dicts"` // key为字典类型编码，value为字典数据
+}
+
 type DictGetReq struct {
 	Code string `json:"code,optional" form:"code,optional"`
 }
@@ -521,10 +529,13 @@ type FileDownloadResp struct {
 }
 
 type FileItem struct {
-	Id        uint64 `json:"id"`
-	Name      string `json:"name"`
-	Status    int64  `json:"status"`
-	CreatedAt int64  `json:"createdAt"` // 创建时间(秒级时间戳)
+	Id           uint64 `json:"id"`
+	Name         string `json:"name"`         // MD5 短链（文件名）
+	OriginalName string `json:"originalName"` // 原始文件名
+	Path         string `json:"path"`         // 文件访问路径（相对路径）
+	BaseUrl      string `json:"baseUrl"`      // 基础URL
+	Status       int64  `json:"status"`
+	CreatedAt    int64  `json:"createdAt"` // 创建时间(秒级时间戳)
 }
 
 type FileListReq struct {
@@ -1124,11 +1135,6 @@ type VideoListResp struct {
 
 type VideoProxyReq struct {
 	Url string `json:"url" form:"url"` // 要代理的视频URL
-}
-
-type VideoProxyResp struct {
-	Content     string `json:"content"`     // 代理后的内容
-	ContentType string `json:"contentType"` // 内容类型
 }
 
 type VideoUpdateReq struct {

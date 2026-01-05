@@ -161,57 +161,54 @@
 </template>
 
 <script setup lang="ts">
-import {reactive, ref, onMounted, computed} from 'vue';
-import {ElMessage, ElMessageBox} from 'element-plus';
+import {reactive, ref, onMounted, computed} from 'vue'
+import {ElMessage, ElMessageBox} from 'element-plus'
 import {
   chatGroupList,
   chatGroupCreate,
   chatGroupUpdate,
   chatGroupDelete,
-  chatGroupDetail,
   chatGroupMemberList,
   chatGroupMemberAdd,
   chatGroupMemberRemove,
   userList
-} from '@/api/generated/admin';
+} from '@/api/generated/admin'
 import type {
   ChatGroupItem,
   ChatGroupCreateReq,
   ChatGroupUpdateReq,
-  ChatGroupDetailResp,
   ChatGroupMemberItem
-} from '@/api/generated/admin';
-import {useI18n} from 'vue-i18n';
-import D2Table from '@/components/common/D2Table.vue';
-import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table';
-
-const {t} = useI18n();
+} from '@/api/generated/admin'
+import D2Table from '@/components/common/D2Table.vue'
+import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table'
 
 const query = reactive({
   page: 1,
   pageSize: 10,
   name: ''
-});
-const list = ref<ChatGroupItem[]>([]);
-const total = ref(0);
-const loading = ref(false);
+})
+const list = ref<ChatGroupItem[]>([])
+const total = ref(0)
+const loading = ref(false)
 
 // 成员管理相关
-const memberDialogVisible = ref(false);
-const showAddMemberDialog = ref(false);
-const currentGroupId = ref<number>(0);
-const currentGroupName = ref<string>('');
-const memberList = ref<ChatGroupMemberItem[]>([]);
-const availableUsers = ref<any[]>([]);
-const selectedUserIds = ref<number[]>([]);
-const memberLoading = ref(false);
+const memberDialogVisible = ref(false)
+const showAddMemberDialog = ref(false)
+const currentGroupId = ref<number>(0)
+const currentGroupName = ref<string>('')
+const memberList = ref<ChatGroupMemberItem[]>([])
+const availableUsers = ref<Array<{id: number; username: string; nickname: string; departmentName: string; roleNames: string[]}>>([])
+const selectedUserIds = ref<number[]>([])
+const memberLoading = ref(false)
 
 // 格式化时间
 const formatTime = (timestamp: number): string => {
-  if (!timestamp) return '-';
-  const date = new Date(timestamp * 1000);
-  return date.toLocaleString('zh-CN');
-};
+  if (!timestamp) {
+return '-'
+}
+  const date = new Date(timestamp * 1000)
+  return date.toLocaleString('zh-CN')
+}
 
 // 表格列配置
 const columns = computed<TableColumn[]>(() => [
@@ -220,7 +217,7 @@ const columns = computed<TableColumn[]>(() => [
   {prop: 'name', label: '群组名称'},
   {prop: 'description', label: '描述', width: 200},
   {prop: 'createdAt', label: '创建时间', width: 180, type: D2TableElemType.ConvertTime}
-]);
+])
 
 // 详情/编辑抽屉列配置
 const drawerColumns = computed<DrawerColumn[]>(() => [
@@ -229,39 +226,40 @@ const drawerColumns = computed<DrawerColumn[]>(() => [
   {prop: 'avatar', label: '头像', type: D2TableElemType.Image},
   {prop: 'description', label: '描述', type: D2TableElemType.EditInput},
   {prop: 'createdAt', label: '创建时间', type: D2TableElemType.ConvertTime}
-]);
+])
 
 // 新增抽屉列配置
 const drawerAddColumns = computed<DrawerColumn[]>(() => [
   {prop: 'name', label: '群组名称', required: true},
   {prop: 'avatar', label: '头像', type: D2TableElemType.Image},
   {prop: 'description', label: '描述'}
-]);
+])
 
 // 加载群组列表
 const loadData = async () => {
-  loading.value = true;
+  loading.value = true
   try {
     const resp = await chatGroupList({
       page: query.page,
       pageSize: query.pageSize,
       name: query.name || undefined
-    });
-    list.value = resp.list;
-    total.value = resp.total;
-  } catch (err: any) {
-    ElMessage.error(err.message || '加载失败');
+    })
+    list.value = resp.list
+    total.value = resp.total
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '加载失败'
+    ElMessage.error(message)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 
 // 加载用户列表（用于添加成员）
 const loadUsers = async () => {
   try {
-    const resp = await userList({page: 1, pageSize: 1000});
+    const resp = await userList({page: 1, pageSize: 1000})
     // 过滤掉已经在群组中的用户
-    const memberUserIds = memberList.value.map(m => m.userId);
+    const memberUserIds = memberList.value.map(m => m.userId)
     availableUsers.value = resp.list
       .filter(user => !memberUserIds.includes(user.id))
       .map(user => ({
@@ -270,44 +268,46 @@ const loadUsers = async () => {
         nickname: user.nickname,
         departmentName: user.departmentName || '',
         roleNames: user.roleNames || []
-      }));
-  } catch (err: any) {
-    ElMessage.error(err.message || '加载用户列表失败');
+      }))
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '加载用户列表失败'
+    ElMessage.error(message)
   }
-};
+}
 
 // 加载群组成员列表
 const loadMembers = async (groupId: number) => {
-  memberLoading.value = true;
+  memberLoading.value = true
   try {
-    const resp = await chatGroupMemberList({}, groupId);
-    memberList.value = resp.list;
+    const resp = await chatGroupMemberList({}, groupId)
+    memberList.value = resp.list
     // 重新加载用户列表（排除已加入的成员）
-    await loadUsers();
-  } catch (err: any) {
-    ElMessage.error(err.message || '加载成员列表失败');
+    await loadUsers()
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '加载成员列表失败'
+    ElMessage.error(message)
   } finally {
-    memberLoading.value = false;
+    memberLoading.value = false
   }
-};
+}
 
 const handleReset = () => {
-  query.page = 1;
-  query.pageSize = 10;
-  query.name = '';
-  loadData();
-};
+  query.page = 1
+  query.pageSize = 10
+  query.name = ''
+  loadData()
+}
 
 const handlePageChange = (page: number) => {
-  query.page = page;
-  loadData();
-};
+  query.page = page
+  loadData()
+}
 
 const handleSizeChange = (size: number) => {
-  query.pageSize = size;
-  query.page = 1;
-  loadData();
-};
+  query.pageSize = size
+  query.page = 1
+  loadData()
+}
 
 const handleUpdate = async (row: ChatGroupItem) => {
   try {
@@ -316,78 +316,81 @@ const handleUpdate = async (row: ChatGroupItem) => {
       name: row.name,
       avatar: row.avatar,
       description: row.description
-    } as ChatGroupUpdateReq);
-    ElMessage.success('更新成功');
-    loadData();
-  } catch (err: any) {
-    ElMessage.error(err.message || '更新失败');
+    } as ChatGroupUpdateReq)
+    ElMessage.success('更新成功')
+    loadData()
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '更新失败'
+    ElMessage.error(message)
   }
-};
+}
 
-const handleAdd = async (row: any) => {
+const handleAdd = async (row: Record<string, unknown>) => {
   try {
     await chatGroupCreate({
       name: row.name,
       avatar: row.avatar || '',
       description: row.description || '',
       userIds: [] // 初始成员为空，创建后可以添加
-    } as ChatGroupCreateReq);
-    ElMessage.success('创建成功');
-    loadData();
-  } catch (err: any) {
-    ElMessage.error(err.message || '创建失败');
+    } as ChatGroupCreateReq)
+    ElMessage.success('创建成功')
+    loadData()
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '创建失败'
+    ElMessage.error(message)
   }
-};
+}
 
 const handleDelete = (index: number, row: ChatGroupItem) => {
   ElMessageBox.confirm('确定要删除这个群组吗？', '确认删除', {type: 'warning'})
     .then(async () => {
-      await chatGroupDelete({id: row.id});
-      ElMessage.success('删除成功');
-      loadData();
+      await chatGroupDelete({id: row.id})
+      ElMessage.success('删除成功')
+      loadData()
     })
-    .catch(() => {});
-};
+    .catch(() => {})
+}
 
 // 成员管理
 const handleManageMembers = async (row: ChatGroupItem) => {
-  currentGroupId.value = row.id;
-  currentGroupName.value = row.name || '';
-  memberDialogVisible.value = true;
-  await loadMembers(row.id);
-};
+  currentGroupId.value = row.id
+  currentGroupName.value = row.name || ''
+  memberDialogVisible.value = true
+  await loadMembers(row.id)
+}
 
 const handleMemberDialogClose = () => {
-  memberList.value = [];
-  currentGroupId.value = 0;
-  currentGroupName.value = '';
-};
+  memberList.value = []
+  currentGroupId.value = 0
+  currentGroupName.value = ''
+}
 
 const handleAddMemberDialogClose = () => {
-  selectedUserIds.value = [];
-};
+  selectedUserIds.value = []
+}
 
 const handleAddMembers = async () => {
   if (selectedUserIds.value.length === 0) {
-    ElMessage.warning('请选择要添加的用户');
-    return;
+    ElMessage.warning('请选择要添加的用户')
+    return
   }
-  memberLoading.value = true;
+  memberLoading.value = true
   try {
     await chatGroupMemberAdd({
       chatId: currentGroupId.value,
       userIds: selectedUserIds.value
-    });
-    ElMessage.success('添加成员成功');
-    showAddMemberDialog.value = false;
-    selectedUserIds.value = [];
-    await loadMembers(currentGroupId.value);
-  } catch (err: any) {
-    ElMessage.error(err.message || '添加成员失败');
+    })
+    ElMessage.success('添加成员成功')
+    showAddMemberDialog.value = false
+    selectedUserIds.value = []
+    await loadMembers(currentGroupId.value)
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '添加成员失败'
+    ElMessage.error(message)
   } finally {
-    memberLoading.value = false;
+    memberLoading.value = false
   }
-};
+}
 
 const handleRemoveMember = (member: ChatGroupMemberItem) => {
   ElMessageBox.confirm(`确定要将 ${member.nickname || member.username} 移出群组吗？`, '确认移除', {type: 'warning'})
@@ -396,17 +399,18 @@ const handleRemoveMember = (member: ChatGroupMemberItem) => {
         await chatGroupMemberRemove({
           chatId: currentGroupId.value,
           userId: member.userId
-        });
-        ElMessage.success('移除成员成功');
-        await loadMembers(currentGroupId.value);
-      } catch (err: any) {
-        ElMessage.error(err.message || '移除成员失败');
+        })
+        ElMessage.success('移除成员成功')
+        await loadMembers(currentGroupId.value)
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : '移除成员失败'
+        ElMessage.error(message)
       }
     })
-    .catch(() => {});
-};
+    .catch(() => {})
+}
 
-onMounted(loadData);
+onMounted(loadData)
 </script>
 
 <style scoped>

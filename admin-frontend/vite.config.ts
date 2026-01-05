@@ -2,10 +2,9 @@ import {defineConfig} from 'vite';
 import vue from '@vitejs/plugin-vue';
 import {fileURLToPath, URL} from 'node:url';
 
-// 使用函数形式，根据运行模式切换配置
+// Vite 配置：仅负责开发环境的代理配置
+// 生产环境的 API 请求由 Nginx 代理处理，文件上传/下载和 WebSocket 的 baseURL 从字典配置中获取
 export default defineConfig(({mode}) => {
-  // dev 环境：本地后端
-  // prod 环境：线上网关
   const isDev = mode === 'development';
 
   return {
@@ -21,7 +20,7 @@ export default defineConfig(({mode}) => {
       port: 5173,
       proxy: {
         '/api': {
-          target: isDev ? 'http://localhost:8888' : 'https://oldbai.top/gateway',
+          target: isDev ? 'http://localhost:20000' : 'https://oldbai.top/gateway',
           changeOrigin: true
         }
       }

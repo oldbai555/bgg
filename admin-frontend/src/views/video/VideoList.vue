@@ -66,39 +66,41 @@
 </template>
 
 <script setup lang="ts">
-import {reactive, ref, onMounted, computed} from 'vue';
-import {ElMessage, ElMessageBox} from 'element-plus';
-import {useRouter} from 'vue-router';
-import { videoList, videoCreate, videoUpdate, videoDelete } from '@/api/generated/admin';
-import type { VideoItem, VideoCreateReq, VideoUpdateReq, VideoDeleteReq } from '@/api/generated/admin';
-import {useI18n} from 'vue-i18n';
-import D2Table from '@/components/common/D2Table.vue';
-import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table';
-import {formatUnixTime} from '@/utils/date';
+import {reactive, ref, onMounted, computed} from 'vue'
+import {ElMessage, ElMessageBox} from 'element-plus'
+import {useRouter} from 'vue-router'
+import {videoList, videoCreate, videoUpdate, videoDelete} from '@/api/generated/admin'
+import type {VideoItem, VideoCreateReq, VideoUpdateReq} from '@/api/generated/admin'
+import {useI18n} from 'vue-i18n'
+import D2Table from '@/components/common/D2Table.vue'
+import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table'
+import {formatUnixTime} from '@/utils/date'
 
-const {t} = useI18n();
-const router = useRouter();
+const {t} = useI18n()
+const router = useRouter()
 
 const query = reactive({
   page: 1,
   pageSize: 10,
   keyword: ''
-});
-const list = ref<VideoItem[]>([]);
-const total = ref(0);
-const loading = ref(false);
+})
+const list = ref<VideoItem[]>([])
+const total = ref(0)
+const loading = ref(false)
 
 // 格式化时长（秒转时分秒）
 const formatDuration = (seconds: number): string => {
-  if (!seconds || seconds < 0) return '00:00';
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = seconds % 60;
+  if (!seconds || seconds < 0) {
+return '00:00'
+}
+  const h = Math.floor(seconds / 3600)
+  const m = Math.floor((seconds % 3600) / 60)
+  const s = seconds % 60
   if (h > 0) {
-    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
   }
-  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-};
+  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+}
 
 // 表格列配置
 const columns = computed<TableColumn[]>(() => [
@@ -108,7 +110,7 @@ const columns = computed<TableColumn[]>(() => [
   {prop: 'duration', label: '时长', width: 100},
   {prop: 'playUrl', label: '播放链接', minWidth: 300, showOverflowTooltip: true},
   {prop: 'createdAt', label: '创建时间', width: 180}
-]);
+])
 
 // 详情/编辑抽屉列配置
 const drawerColumns = computed<DrawerColumn[]>(() => [
@@ -118,7 +120,7 @@ const drawerColumns = computed<DrawerColumn[]>(() => [
   {prop: 'duration', label: '时长（秒）', type: D2TableElemType.EditInput},
   {prop: 'playUrl', label: '播放链接', type: D2TableElemType.EditInput, required: true},
   {prop: 'description', label: '描述', type: D2TableElemType.EditTextarea}
-]);
+])
 
 // 新增抽屉列配置
 const drawerAddColumns = computed<DrawerColumn[]>(() => [
@@ -127,78 +129,81 @@ const drawerAddColumns = computed<DrawerColumn[]>(() => [
   {prop: 'duration', label: '时长（秒）', type: D2TableElemType.EditInput},
   {prop: 'playUrl', label: '播放链接', type: D2TableElemType.EditInput, required: true},
   {prop: 'description', label: '描述', type: D2TableElemType.EditTextarea}
-]);
+])
 
 const loadData = async () => {
-  loading.value = true;
+  loading.value = true
   try {
-    const resp = await videoList({...query});
-    list.value = resp.list;
-    total.value = resp.total;
-  } catch (err: any) {
-    ElMessage.error(err.message || t('common.search'));
+    const resp = await videoList({...query})
+    list.value = resp.list
+    total.value = resp.total
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : t('common.search')
+    ElMessage.error(message)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 
 const handleReset = () => {
-  query.page = 1;
-  query.pageSize = 10;
-  query.keyword = '';
-  loadData();
-};
+  query.page = 1
+  query.pageSize = 10
+  query.keyword = ''
+  loadData()
+}
 
 const handlePlay = (row: VideoItem) => {
   // 跳转到视频播放器页面，传递视频URL
   router.push({
     path: '/video/player',
     query: {url: row.playUrl}
-  });
-};
+  })
+}
 
 const handlePageChange = (page: number) => {
-  query.page = page;
-  loadData();
-};
+  query.page = page
+  loadData()
+}
 
 const handleSizeChange = (size: number) => {
-  query.pageSize = size;
-  query.page = 1;
-  loadData();
-};
+  query.pageSize = size
+  query.page = 1
+  loadData()
+}
 
 const handleUpdate = async (row: VideoItem) => {
   try {
-    await videoUpdate(row as VideoUpdateReq);
-    ElMessage.success('更新成功');
-    loadData();
-  } catch (err: any) {
-    ElMessage.error(err.message || '更新失败');
+    await videoUpdate(row as VideoUpdateReq)
+    ElMessage.success('更新成功')
+    loadData()
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '更新失败'
+    ElMessage.error(message)
   }
-};
+}
 
-const handleAdd = async (row: any) => {
+const handleAdd = async (row: Record<string, unknown>) => {
   try {
-    await videoCreate(row as VideoCreateReq);
-    ElMessage.success('新增成功');
-    loadData();
-  } catch (err: any) {
-    ElMessage.error(err.message || '新增失败');
+    await videoCreate(row as VideoCreateReq)
+    ElMessage.success('新增成功')
+    loadData()
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '新增失败'
+    ElMessage.error(message)
   }
-};
+}
 
 const handleDelete = (index: number, row: VideoItem) => {
   ElMessageBox.confirm(t('common.confirmDelete'), t('common.confirm'), {type: 'warning'})
     .then(async () => {
-      await videoDelete({id: row.id});
-      ElMessage.success(t('common.delete'));
-      loadData();
+      await videoDelete({id: row.id})
+      ElMessage.success(t('common.delete'))
+      loadData()
     })
-    .catch(() => {});
-};
+    .catch(() => {})
+}
 
-onMounted(loadData);
+onMounted(loadData)
 </script>
 
 <style scoped>

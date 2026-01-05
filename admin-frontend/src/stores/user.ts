@@ -37,6 +37,11 @@ export const useUserStore = defineStore('user', {
       await this.fetchProfile(true);
       await this.fetchMenus(true);
       
+      // 登录后加载字典数据
+      const {useDictStore} = await import('./dict');
+      const dictStore = useDictStore();
+      await dictStore.loadDicts();
+      
       // 登录后自动连接 WebSocket（如果有权限）
       const {useWebSocketStore} = await import('./websocket');
       const wsStore = useWebSocketStore();
@@ -87,6 +92,11 @@ export const useUserStore = defineStore('user', {
       localStorage.removeItem(permKey);
       localStorage.removeItem(menuKey);
       localStorage.removeItem(cacheAtKey);
+      
+      // 退出登录时清除字典数据
+      const {useDictStore} = await import('./dict');
+      const dictStore = useDictStore();
+      dictStore.clearDicts();
     },
     cacheValid() {
       if (!this.cacheAt) return false;

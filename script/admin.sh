@@ -252,31 +252,52 @@ supervisor_manage() {
 
 usage() {
   cat <<EOF
-用法: ./admin.sh <command> [options]
+用法: ./admin.sh <command> [subcommand] [options]
+
+基础说明:
+  建议使用 bash 执行本脚本（避免 sh 在某些系统上的兼容问题）：
+    bash script/admin.sh <command> ...
 
 构建命令:
-  build server      构建后端
-  build frontend    构建前端
-  package server    打包后端（构建+打包）
-  package frontend  打包前端（构建+打包）
+  build server              构建后端二进制到 admin-server/dist
+  build frontend            构建前端到 admin-frontend/dist
+
+打包命令:
+  package server            构建并打包后端，输出到 package/admin-server_<git>.tar.gz
+  package frontend          构建并打包前端，输出到 package/admin-frontend_<git>.tar.gz
 
 前端部署命令（静态文件）:
-  frontend deploy <file>       在当前目录下部署前端，将包内容解压到 ./dist
+  frontend deploy <file>   在当前目录下部署前端，将前端包内容解压到 ./dist
+                          注意：请在 Nginx 对应的 Web 根目录下执行该命令
 
 Supervisor 命令:
-  supervisor gen-conf          生成配置文件
-  supervisor install           安装服务（构建+部署）
-  supervisor deploy <file>     部署打包文件
-  supervisor status            查看服务状态
-  supervisor start             启动服务
-  supervisor stop              停止服务
-  supervisor restart           重启服务
-  supervisor logs              查看日志
+  supervisor gen-conf        仅生成 Supervisor 配置文件（默认使用 \$APP_NAME）
+  supervisor install         一键构建 + 打包 + 部署到 Supervisor 目录
+  supervisor deploy <file>   使用已有的后端包部署到 Supervisor 目录
+  supervisor status          查看服务状态
+  supervisor start           启动服务
+  supervisor stop            停止服务
+  supervisor restart         重启服务
+  supervisor logs            查看最近 100 行 stdout 日志
 
 示例:
-  ./admin.sh build server
-  ./admin.sh package server
-  ./admin.sh supervisor install
+  # 本地构建
+  bash script/admin.sh build server
+  bash script/admin.sh build frontend
+
+  # 本地打包
+  bash script/admin.sh package server
+  bash script/admin.sh package frontend
+
+  # 服务器上部署后端（基于打包文件）
+  bash script/admin.sh supervisor deploy package/admin-server_xxx.tar.gz
+
+  # 服务器上部署前端（在 Nginx Web 根目录下执行）
+  bash script/admin.sh frontend deploy /path/to/package/admin-frontend_xxx.tar.gz
+
+  # 使用 Supervisor 管理服务
+  bash script/admin.sh supervisor status
+  bash script/admin.sh supervisor restart
 EOF
 }
 

@@ -4,7 +4,12 @@
     <el-card class="mb-12">
       <el-form :inline="true" :model="query">
         <el-form-item label="消息来源">
-          <el-select v-model="query.sourceType" placeholder="请选择消息来源" clearable style="width: 150px">
+          <el-select
+            v-model="query.sourceType"
+            placeholder="请选择消息来源"
+            clearable
+            style="width: 150px"
+          >
             <el-option
               v-for="item in sourceTypeOptions"
               :key="item.value"
@@ -14,9 +19,18 @@
           </el-select>
         </el-form-item>
         <el-form-item label="已读状态">
-          <el-select v-model="query.readStatus" placeholder="请选择已读状态" clearable style="width: 120px">
-            <el-option label="未读" :value="0" />
-            <el-option label="已读" :value="1" />
+          <el-select
+            v-model="query.readStatus"
+            placeholder="请选择已读状态"
+            clearable
+            style="width: 200px"
+          >
+            <el-option
+              v-for="item in readStatusOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="Number(item.value)"
+            />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -61,12 +75,17 @@
             {{ getSourceTypeLabel(row.sourceType) }}
           </el-tag>
           <el-tag v-else-if="column.prop === 'readStatus'" :type="row.readStatus === 1 ? 'success' : 'warning'">
-            {{ row.readStatus === 1 ? '已读' : '未读' }}
+            {{ readStatusOptions.find(opt => Number(opt.value) === row.readStatus)?.label || (row.readStatus === 1 ? '已读' : '未读') }}
           </el-tag>
           <span v-else-if="column.prop === 'readAt'">
             {{ row.readAt ? formatTime(row.readAt) : '-' }}
           </span>
-          <el-tooltip v-else-if="column.prop === 'content'" :content="row.content" placement="top" :disabled="!row.content || row.content.length <= 50">
+          <el-tooltip
+            v-else-if="column.prop === 'content'"
+            :content="row.content"
+            placement="top"
+            :disabled="!row.content || row.content.length <= 50"
+          >
             <div class="content-cell">
               {{ row.content }}
             </div>
@@ -78,55 +97,47 @@
 </template>
 
 <script setup lang="ts">
-import {reactive, ref, onMounted, computed} from 'vue';
-import {ElMessage, ElMessageBox} from 'element-plus';
-import { notificationList, notificationDelete, notificationReadAll, notificationClearRead, dictGet } from '@/api/generated/admin';
-import type { NotificationItem, NotificationDeleteReq } from '@/api/generated/admin';
-import {useI18n} from 'vue-i18n';
-import D2Table from '@/components/common/D2Table.vue';
-import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table';
+import {reactive, ref, onMounted, computed} from 'vue'
+import {ElMessage, ElMessageBox} from 'element-plus'
+import {notificationList, notificationDelete, notificationReadAll, notificationClearRead} from '@/api/generated/admin'
+import type {NotificationItem} from '@/api/generated/admin'
+import {useI18n} from 'vue-i18n'
+import D2Table from '@/components/common/D2Table.vue'
+import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table'
+import {useDictOptions} from '@/composables/useDictOptions'
 
-const {t} = useI18n();
+const {t} = useI18n()
 
 const query = reactive({
   page: 1,
   pageSize: 10,
   sourceType: '',
   readStatus: 0
-});
-const list = ref<NotificationItem[]>([]);
-const total = ref(0);
-const loading = ref(false);
-const readAllLoading = ref(false);
-const clearReadLoading = ref(false);
-const sourceTypeOptions = ref<Array<{label: string; value: string}>>([]);
+})
+const list = ref<NotificationItem[]>([])
+const total = ref(0)
+const loading = ref(false)
+const readAllLoading = ref(false)
+const clearReadLoading = ref(false)
 
-// 加载消息来源字典
-const loadSourceTypeOptions = async () => {
-  try {
-    const resp = await dictGet({code: 'notification_source_type'});
-    if (resp && resp.items) {
-      sourceTypeOptions.value = resp.items.map((item: any) => ({
-        label: item.label,
-        value: item.value
-      }));
-    }
-  } catch (err: any) {
-    console.error('加载消息来源字典失败:', err);
-    // 如果字典加载失败，使用默认值
-    sourceTypeOptions.value = [
-      {label: '在线聊天', value: 'chat'},
-      {label: '系统公告', value: 'notice'},
-      {label: '系统通知', value: 'system'}
-    ];
-  }
-};
+// 消息来源选项（使用字典）
+const {options: sourceTypeOptions, getLabel: getSourceTypeLabel} = useDictOptions(
+  'notification_source_type',
+  [
+    {label: '在线聊天', value: 'chat'},
+    {label: '系统公告', value: 'notice'},
+    {label: '系统通知', value: 'system'}
+  ]
+)
 
-// 获取消息来源标签
-const getSourceTypeLabel = (sourceType: string): string => {
-  const option = sourceTypeOptions.value.find(item => item.value === sourceType);
-  return option ? option.label : sourceType;
-};
+// 已读状态选项
+const {options: readStatusOptions} = useDictOptions(
+  'read_status',
+  [
+    {label: '未读', value: '0'},
+    {label: '已读', value: '1'}
+  ]
+)
 
 // 获取消息来源标签颜色
 const getSourceTypeTag = (sourceType: string): string | undefined => {
@@ -134,14 +145,16 @@ const getSourceTypeTag = (sourceType: string): string | undefined => {
     'chat': 'primary',
     'notice': 'warning',
     'system': 'info'
-  };
-  return map[sourceType] || undefined;
-};
+  }
+  return map[sourceType] || undefined
+}
 
 // 格式化时间
 const formatTime = (timestamp: number): string => {
-  if (!timestamp) return '-';
-  const date = new Date(timestamp * 1000);
+  if (!timestamp) {
+return '-'
+}
+  const date = new Date(timestamp * 1000)
   return date.toLocaleString('zh-CN', {
     year: 'numeric',
     month: '2-digit',
@@ -149,8 +162,8 @@ const formatTime = (timestamp: number): string => {
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit'
-  });
-};
+  })
+}
 
 // 表格列配置
 const columns = computed<TableColumn[]>(() => [
@@ -161,7 +174,7 @@ const columns = computed<TableColumn[]>(() => [
   {prop: 'readStatus', label: '已读状态', width: 100},
   {prop: 'readAt', label: '已读时间', width: 180},
   {prop: 'createdAt', label: '创建时间', width: 180, type: D2TableElemType.ConvertTime}
-]);
+])
 
 // 详情抽屉列配置
 const drawerColumns = computed<DrawerColumn[]>(() => [
@@ -172,94 +185,94 @@ const drawerColumns = computed<DrawerColumn[]>(() => [
   {prop: 'readStatus', label: '已读状态', type: D2TableElemType.Tag},
   {prop: 'readAt', label: '已读时间'},
   {prop: 'createdAt', label: '创建时间', type: D2TableElemType.ConvertTime}
-]);
+])
 
 const loadData = async () => {
-  loading.value = true;
+  loading.value = true
   try {
-    const req: any = {
+    const req: Record<string, unknown> = {
       page: query.page,
       pageSize: query.pageSize
-    };
+    }
     if (query.sourceType) {
-      req.sourceType = query.sourceType;
+      req.sourceType = query.sourceType
     }
     if (query.readStatus >= 0) {
-      req.readStatus = query.readStatus;
+      req.readStatus = query.readStatus
     }
-    const resp = await notificationList(req);
-    list.value = resp.list;
-    total.value = resp.total;
-  } catch (err: any) {
-    ElMessage.error(err.message || t('common.searchFailed'));
+    const resp = await notificationList(req)
+    list.value = resp.list
+    total.value = resp.total
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : t('common.searchFailed')
+    ElMessage.error(message)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 
 const handleReset = () => {
-  query.page = 1;
-  query.pageSize = 10;
-  query.sourceType = '';
-  query.readStatus = 0;
-  loadData();
-};
+  query.page = 1
+  query.pageSize = 10
+  query.sourceType = ''
+  query.readStatus = 0
+  loadData()
+}
 
 const handlePageChange = (page: number) => {
-  query.page = page;
-  loadData();
-};
+  query.page = page
+  loadData()
+}
 
 const handleSizeChange = (size: number) => {
-  query.pageSize = size;
-  query.page = 1;
-  loadData();
-};
+  query.pageSize = size
+  query.page = 1
+  loadData()
+}
 
 const handleDelete = (index: number, row: NotificationItem) => {
   ElMessageBox.confirm('确定要删除该消息通知吗？', '确认删除', {type: 'warning'})
     .then(async () => {
-      await notificationDelete({id: row.id});
-      ElMessage.success('删除成功');
-      loadData();
+      await notificationDelete({id: row.id})
+      ElMessage.success('删除成功')
+      loadData()
     })
-    .catch(() => {});
-};
+    .catch(() => {})
+}
 
 const handleReadAll = async () => {
-  readAllLoading.value = true;
+  readAllLoading.value = true
   try {
-    await notificationReadAll();
-    ElMessage.success('全部已读操作成功');
-    loadData();
-  } catch (err: any) {
-    ElMessage.error(err.message || '操作失败');
+    await notificationReadAll()
+    ElMessage.success('全部已读操作成功')
+    loadData()
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '操作失败'
+    ElMessage.error(message)
   } finally {
-    readAllLoading.value = false;
+    readAllLoading.value = false
   }
-};
+}
 
 const handleClearRead = async () => {
   ElMessageBox.confirm('确定要清除所有已读消息吗？此操作不可恢复。', '确认清除', {type: 'warning'})
     .then(async () => {
-      clearReadLoading.value = true;
+      clearReadLoading.value = true
       try {
-        await notificationClearRead();
-        ElMessage.success('清除已读消息成功');
-        loadData();
-      } catch (err: any) {
-        ElMessage.error(err.message || '操作失败');
+        await notificationClearRead()
+        ElMessage.success('清除已读消息成功')
+        loadData()
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : '操作失败'
+        ElMessage.error(message)
       } finally {
-        clearReadLoading.value = false;
+        clearReadLoading.value = false
       }
     })
-    .catch(() => {});
-};
+    .catch(() => {})
+}
 
-onMounted(async () => {
-  await loadSourceTypeOptions();
-  loadData();
-});
+onMounted(loadData)
 </script>
 
 <style scoped>

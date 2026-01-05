@@ -2,6 +2,7 @@ import {defineStore} from 'pinia';
 import {useUserStore} from './user';
 import {usePermission} from '@/hooks/usePermission';
 import {ElMessage} from 'element-plus';
+import {getWebSocketBaseURL} from '@/composables/useAppConfig';
 
 // WebSocket 消息类型
 export enum MessageType {
@@ -75,7 +76,7 @@ export const useWebSocketStore = defineStore('websocket', {
 
   actions: {
     // 连接 WebSocket
-    connect() {
+    async connect() {
       const userStore = useUserStore();
       const {hasPermission} = usePermission();
 
@@ -94,10 +95,17 @@ export const useWebSocketStore = defineStore('websocket', {
 
       this.connecting = true;
 
+      // 从字典获取 WebSocket baseURL
+      let wsBaseURL = await getWebSocketBaseURL();
+      // 如果字典中没有配置，使用默认值
+      if (!wsBaseURL) {
+        // 开发环境默认连接本地服务，生产环境默认连接线上 ws 网关
+        wsBaseURL = import.meta.env.PROD ? 'oldbai.top/ws' : 'localhost:20000';
+      }
+
       // 构建 WebSocket URL
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const wsHost = import.meta.env.VITE_WS_BASE_URL || 'localhost:8888';
-      const wsUrl = `${protocol}//${wsHost}/api/v1/chats/ws?token=${encodeURIComponent(token)}&roomId=default`;
+      const wsUrl = `${protocol}//${wsBaseURL}/api/v1/chats/ws?token=${encodeURIComponent(token)}&roomId=default`;
 
       try {
         const ws = new WebSocket(wsUrl);
@@ -200,19 +208,49 @@ export const useWebSocketStore = defineStore('websocket', {
         return;
       }
 
-      // 检查当前是否在聊天页面
+      // 检查当前是否在聊天页面（支持多种路径格式）
+      // 注意：使用 hash 路由时，路径在 hash 中
       const currentPath = window.location.pathname;
-      const isInChatPage = currentPath.includes('/temp/chat') || currentPath.includes('/chat');
+      const currentHash = window.location.hash;
+      // 检查是否在 ChatList.vue 页面（/chatroom/chat）
+      const isInChatListPage = currentHash === '#/chatroom/chat' || 
+                               currentHash.startsWith('#/chatroom/chat?') ||
+                               currentPath.includes('/chatroom/chat');
+      // 检查是否在其他聊天相关页面
+      const isInOtherChatPage = currentHash.includes('/temp/chat') || 
+                                currentHash.includes('/chat') ||
+                                currentPath.includes('/temp/chat') || 
+                                currentPath.includes('/chat');
+      const isInChatPage = isInChatListPage || isInOtherChatPage;
 
-      // 如果不在聊天页面，添加到未读消息
+      // 如果不在聊天页面，添加到未读消息并显示提示
       if (!isInChatPage) {
+        // 构建消息标题和内容
+        const chatId = data.chatId || 0;
+        const isGroupChat = chatId > 0; // 如果有chatId且大于0，可能是群聊
+        const title = isGroupChat 
+          ? `群聊消息：来自 ${data.fromName || '未知用户'}`
+          : `来自 ${data.fromName || '未知用户'}`;
+        
+        const content = data.content || '';
+        // 如果是图片消息，显示特殊提示
+        const displayContent = data.messageType === 2 ? '[图片]' : content;
+
+        // 添加到未读消息
         this.addUnreadMessage({
-          id: `chat_${data.messageId || Date.now()}`,
+          id: `chat_${data.messageId || Date.now()}_${chatId}`,
           type: MessageType.CHAT,
-          title: `来自 ${data.fromName || '未知用户'}`,
-          content: data.content || '',
+          title: title,
+          content: displayContent,
           timestamp: Date.now(),
           read: false
+        });
+
+        // 显示提示消息
+        ElMessage.info({
+          message: `${title}: ${displayContent}`,
+          duration: 3000,
+          showClose: true
         });
       }
     },

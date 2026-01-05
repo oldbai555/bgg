@@ -16,7 +16,7 @@
 
     <!-- 中间：面包屑导航（可选） -->
     <div class="app-header__center">
-      <slot />
+      <slot></slot>
     </div>
 
     <!-- 右侧：操作按钮 + 用户菜单 -->
@@ -58,7 +58,7 @@
       <MessageNotification />
 
       <!-- 语言切换 -->
-      <el-dropdown @command="handleLangChange" trigger="click">
+      <el-dropdown trigger="click" @command="handleLangChange">
         <el-button text circle class="app-header__action-btn">
           <el-icon><Setting /></el-icon>
         </el-button>
@@ -77,8 +77,8 @@
 </template>
 
 <script setup lang="ts">
-import {computed} from 'vue';
-import {useRouter} from 'vue-router';
+import {computed} from 'vue'
+import {useRouter} from 'vue-router'
 import {
   Fold,
   FullScreen,
@@ -87,14 +87,12 @@ import {
   Sunny,
   Moon,
   Setting
-} from '@element-plus/icons-vue';
-import {ElMessage} from 'element-plus';
-import {useI18n} from 'vue-i18n';
-import {useAppStore} from '@/stores/app';
-import {useUserStore} from '@/stores/user';
-import UserMenu from './UserMenu.vue';
-import MessageNotification from './MessageNotification.vue';
-import type {ProfileResp} from '@/api/generated/admin';
+} from '@element-plus/icons-vue'
+import {useI18n} from 'vue-i18n'
+import {useAppStore} from '@/stores/app'
+import UserMenu from './UserMenu.vue'
+import MessageNotification from './MessageNotification.vue'
+import type {ProfileResp} from '@/api/generated/admin'
 
 interface Props {
   collapsed?: boolean;
@@ -102,55 +100,54 @@ interface Props {
   user?: ProfileResp | null;
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   collapsed: false,
   showCollapseButton: false,
   user: null
-});
+})
 
 const emit = defineEmits<{
   'toggle-collapse': [];
   'logout': [];
-}>();
+}>()
 
-const {t, locale} = useI18n();
-const router = useRouter();
-const appStore = useAppStore();
-const userStore = useUserStore();
+const {t, locale} = useI18n()
+const router = useRouter()
+const appStore = useAppStore()
 
-const theme = computed(() => appStore.theme);
-const lang = computed(() => appStore.lang);
-const fullscreen = computed(() => appStore.fullscreen);
+const theme = computed(() => appStore.theme)
+const lang = computed(() => appStore.lang)
+const fullscreen = computed(() => appStore.fullscreen)
 
 const handleLogoClick = () => {
-  router.push('/');
-};
+  router.push('/')
+}
 
 const handleToggleCollapse = () => {
-  emit('toggle-collapse');
-};
+  emit('toggle-collapse')
+}
 
 const handleFullscreen = () => {
-  appStore.toggleFullscreen();
-};
+  appStore.toggleFullscreen()
+}
 
 const handleRefresh = () => {
-  window.location.reload();
-};
+  window.location.reload()
+}
 
 const handleToggleTheme = () => {
-  const next = theme.value === 'dark' ? 'light' : 'dark';
-  appStore.setTheme(next);
-};
+  const next = theme.value === 'dark' ? 'light' : 'dark'
+  appStore.setTheme(next)
+}
 
 const handleLangChange = (val: string) => {
-  appStore.setLang(val as 'zh' | 'en');
-  locale.value = val;
-};
+  appStore.setLang(val as 'zh' | 'en')
+  locale.value = val
+}
 
 const handleLogout = () => {
-  emit('logout');
-};
+  emit('logout')
+}
 </script>
 
 <style scoped lang="scss">

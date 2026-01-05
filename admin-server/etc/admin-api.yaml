@@ -1,7 +1,6 @@
 Name: admin-api
 Host: 0.0.0.0
 Port: 20000
-BaseURL: "https://oldbai.top/oss"  # API 基础 URL，用于生成文件完整访问路径（生产环境需要修改为实际域名）
 
 # JWT 配置
 JWT:

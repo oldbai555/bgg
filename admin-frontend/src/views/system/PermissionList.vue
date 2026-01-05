@@ -37,19 +37,19 @@
         <!-- 自定义操作列 -->
         <template #action="{row}">
           <el-button
+            v-permission="'permission:update'"
             type="primary"
             link
             size="small"
-            v-permission="'permission:update'"
             @click="handleAssignMenus(row)"
           >
             {{ t('common.assignMenus') }}
           </el-button>
           <el-button
+            v-permission="'permission:update'"
             type="primary"
             link
             size="small"
-            v-permission="'permission:update'"
             @click="handleAssignApis(row)"
           >
             {{ t('common.assignApis') }}
@@ -112,38 +112,38 @@
 </template>
 
 <script setup lang="ts">
-import {reactive, ref, onMounted, computed} from 'vue';
-import {ElMessage, ElMessageBox} from 'element-plus';
-import {permissionList, permissionCreate, permissionUpdate, permissionDelete, permissionMenuList, permissionMenuUpdate, permissionApiList, permissionApiUpdate, menuTree, apiList} from '@/api/generated/admin';
-import type {PermissionItem, MenuItem, ApiItem, PermissionCreateReq, PermissionUpdateReq, PermissionMenuUpdateReq, PermissionApiUpdateReq} from '@/api/generated/admin';
-import {useI18n} from 'vue-i18n';
-import D2Table from '@/components/common/D2Table.vue';
-import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table';
+import {reactive, ref, onMounted, computed} from 'vue'
+import {ElMessage, ElMessageBox} from 'element-plus'
+import {permissionList, permissionCreate, permissionUpdate, permissionDelete, permissionMenuList, permissionMenuUpdate, permissionApiList, permissionApiUpdate, menuTree, apiList} from '@/api/generated/admin'
+import type {PermissionItem, MenuItem, ApiItem, PermissionCreateReq, PermissionUpdateReq} from '@/api/generated/admin'
+import {useI18n} from 'vue-i18n'
+import D2Table from '@/components/common/D2Table.vue'
+import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table'
 
-const {t} = useI18n();
+const {t} = useI18n()
 
 const query = reactive({
   page: 1,
   pageSize: 10,
   name: ''
-});
-const list = ref<PermissionItem[]>([]);
-const total = ref(0);
-const loading = ref(false);
+})
+const list = ref<PermissionItem[]>([])
+const total = ref(0)
+const loading = ref(false)
 
 // 权限-菜单关联相关
-const menuDialogVisible = ref(false);
-const menuTreeRef = ref();
-const menuTreeData = ref<MenuItem[]>([]);
-const selectedMenuIds = ref<number[]>([]);
-const currentPermissionId = ref<number>(0);
-const menuLoading = ref(false);
+const menuDialogVisible = ref(false)
+const menuTreeRef = ref()
+const menuTreeData = ref<MenuItem[]>([])
+const selectedMenuIds = ref<number[]>([])
+const currentPermissionId = ref<number>(0)
+const menuLoading = ref(false)
 
 // 权限-接口关联相关
-const apiDialogVisible = ref(false);
-const apiListData = ref<ApiItem[]>([]);
-const selectedApiIds = ref<number[]>([]);
-const apiLoading = ref(false);
+const apiDialogVisible = ref(false)
+const apiListData = ref<ApiItem[]>([])
+const selectedApiIds = ref<number[]>([])
+const apiLoading = ref(false)
 
 // 获取HTTP方法的标签类型
 const getMethodType = (method: string): string => {
@@ -153,9 +153,9 @@ const getMethodType = (method: string): string => {
     'PUT': 'primary',
     'DELETE': 'danger',
     'PATCH': 'info'
-  };
-  return methodMap[method] || 'info';
-};
+  }
+  return methodMap[method] || 'info'
+}
 
 // 表格列配置
 const columns = computed<TableColumn[]>(() => [
@@ -163,7 +163,7 @@ const columns = computed<TableColumn[]>(() => [
   {prop: 'name', label: t('common.name')},
   {prop: 'code', label: t('common.code')},
   {prop: 'description', label: t('common.description')}
-]);
+])
 
 // 详情/编辑抽屉列配置
 const drawerColumns = computed<DrawerColumn[]>(() => [
@@ -171,179 +171,186 @@ const drawerColumns = computed<DrawerColumn[]>(() => [
   {prop: 'name', label: t('common.name'), type: D2TableElemType.EditInput, required: true},
   {prop: 'code', label: t('common.code'), type: D2TableElemType.Tag},
   {prop: 'description', label: t('common.description'), type: D2TableElemType.EditInput}
-]);
+])
 
 // 新增抽屉列配置
 const drawerAddColumns = computed<DrawerColumn[]>(() => [
   {prop: 'name', label: t('common.name'), required: true},
   {prop: 'code', label: t('common.code'), required: true},
   {prop: 'description', label: t('common.description')}
-]);
+])
 
 const loadData = async () => {
-  loading.value = true;
+  loading.value = true
   try {
-    const resp = await permissionList({...query});
-    list.value = resp.list;
-    total.value = resp.total;
-  } catch (err: any) {
-    ElMessage.error(err.message || t('common.search'));
+    const resp = await permissionList({...query})
+    list.value = resp.list
+    total.value = resp.total
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : t('common.search')
+    ElMessage.error(message)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 
 const handleReset = () => {
-  query.page = 1;
-  query.pageSize = 10;
-  query.name = '';
-  loadData();
-};
+  query.page = 1
+  query.pageSize = 10
+  query.name = ''
+  loadData()
+}
 
 const handlePageChange = (page: number) => {
-  query.page = page;
-  loadData();
-};
+  query.page = page
+  loadData()
+}
 
 const handleSizeChange = (size: number) => {
-  query.pageSize = size;
-  query.page = 1;
-  loadData();
-};
+  query.pageSize = size
+  query.page = 1
+  loadData()
+}
 
 const handleUpdate = async (row: PermissionItem) => {
   try {
-    await permissionUpdate(row as PermissionUpdateReq);
-    ElMessage.success('更新成功');
-    loadData();
-  } catch (err: any) {
-    ElMessage.error(err.message || '更新失败');
+    await permissionUpdate(row as PermissionUpdateReq)
+    ElMessage.success('更新成功')
+    loadData()
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '更新失败'
+    ElMessage.error(message)
   }
-};
+}
 
-const handleAdd = async (row: any) => {
+const handleAdd = async (row: Record<string, unknown>) => {
   try {
-    await permissionCreate(row as PermissionCreateReq);
-    ElMessage.success('新增成功');
-    loadData();
-  } catch (err: any) {
-    ElMessage.error(err.message || '新增失败');
+    await permissionCreate(row as PermissionCreateReq)
+    ElMessage.success('新增成功')
+    loadData()
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '新增失败'
+    ElMessage.error(message)
   }
-};
+}
 
 const handleDelete = (index: number, row: PermissionItem) => {
   ElMessageBox.confirm(t('common.confirmDelete'), t('common.confirm'), {type: 'warning'})
     .then(async () => {
-      await permissionDelete({id: row.id});
-      ElMessage.success(t('common.delete'));
-      loadData();
+      await permissionDelete({id: row.id})
+      ElMessage.success(t('common.delete'))
+      loadData()
     })
-    .catch(() => {});
-};
+    .catch(() => {})
+}
 
 // 加载菜单树
 const loadMenus = async () => {
   try {
-    const resp = await menuTree();
-    menuTreeData.value = resp.list || [];
-  } catch (err: any) {
-    console.error('Failed to load menus:', err);
+    const resp = await menuTree()
+    menuTreeData.value = resp.list || []
+  } catch (err: unknown) {
+    console.error('Failed to load menus:', err)
   }
-};
+}
 
 // 加载接口列表
 const loadApis = async () => {
   try {
-    const resp = await apiList({page: 1, pageSize: 1000});
-    apiListData.value = resp.list || [];
-  } catch (err: any) {
-    console.error('Failed to load apis:', err);
+    const resp = await apiList({page: 1, pageSize: 1000})
+    apiListData.value = resp.list || []
+  } catch (err: unknown) {
+    console.error('Failed to load apis:', err)
   }
-};
+}
 
 // 打开分配菜单对话框
 const handleAssignMenus = async (row: PermissionItem) => {
-  currentPermissionId.value = row.id;
-  menuDialogVisible.value = true;
-  
+  currentPermissionId.value = row.id
+  menuDialogVisible.value = true
+
   // 加载菜单树
   if (menuTreeData.value.length === 0) {
-    await loadMenus();
+    await loadMenus()
   }
-  
+
   // 加载当前权限的菜单
   try {
-    const resp = await permissionMenuList({permissionId: row.id});
-    selectedMenuIds.value = resp.menuIds || [];
-  } catch (err: any) {
-    ElMessage.error(err.message || '加载权限菜单失败');
+    const resp = await permissionMenuList({permissionId: row.id})
+    selectedMenuIds.value = resp.menuIds || []
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '加载权限菜单失败'
+    ElMessage.error(message)
   }
-};
+}
 
 // 保存菜单分配
 const handleSaveMenus = async () => {
-  menuLoading.value = true;
+  menuLoading.value = true
   try {
-    const checkedKeys = menuTreeRef.value?.getCheckedKeys() || [];
-    const halfCheckedKeys = menuTreeRef.value?.getHalfCheckedKeys() || [];
+    const checkedKeys = menuTreeRef.value?.getCheckedKeys() || []
+    const halfCheckedKeys = menuTreeRef.value?.getHalfCheckedKeys() || []
     // 合并选中的和半选中的节点
-    const allKeys = [...checkedKeys, ...halfCheckedKeys];
-    await permissionMenuUpdate({permissionId: currentPermissionId.value, menuIds: allKeys});
-    ElMessage.success('菜单分配成功');
-    menuDialogVisible.value = false;
-  } catch (err: any) {
-    ElMessage.error(err.message || '菜单分配失败');
+    const allKeys = [...checkedKeys, ...halfCheckedKeys]
+    await permissionMenuUpdate({permissionId: currentPermissionId.value, menuIds: allKeys})
+    ElMessage.success('菜单分配成功')
+    menuDialogVisible.value = false
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '菜单分配失败'
+    ElMessage.error(message)
   } finally {
-    menuLoading.value = false;
+    menuLoading.value = false
   }
-};
+}
 
 // 关闭菜单对话框
 const handleMenuDialogClose = () => {
-  selectedMenuIds.value = [];
-  currentPermissionId.value = 0;
-};
+  selectedMenuIds.value = []
+  currentPermissionId.value = 0
+}
 
 // 打开分配接口对话框
 const handleAssignApis = async (row: PermissionItem) => {
-  currentPermissionId.value = row.id;
-  apiDialogVisible.value = true;
-  
+  currentPermissionId.value = row.id
+  apiDialogVisible.value = true
+
   // 加载接口列表
   if (apiListData.value.length === 0) {
-    await loadApis();
+    await loadApis()
   }
-  
+
   // 加载当前权限的接口
   try {
-    const resp = await permissionApiList({permissionId: row.id});
-    selectedApiIds.value = resp.apiIds || [];
-  } catch (err: any) {
-    ElMessage.error(err.message || '加载权限接口失败');
+    const resp = await permissionApiList({permissionId: row.id})
+    selectedApiIds.value = resp.apiIds || []
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '加载权限接口失败'
+    ElMessage.error(message)
   }
-};
+}
 
 // 保存接口分配
 const handleSaveApis = async () => {
-  apiLoading.value = true;
+  apiLoading.value = true
   try {
-    await permissionApiUpdate({permissionId: currentPermissionId.value, apiIds: selectedApiIds.value});
-    ElMessage.success('接口分配成功');
-    apiDialogVisible.value = false;
-  } catch (err: any) {
-    ElMessage.error(err.message || '接口分配失败');
+    await permissionApiUpdate({permissionId: currentPermissionId.value, apiIds: selectedApiIds.value})
+    ElMessage.success('接口分配成功')
+    apiDialogVisible.value = false
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '接口分配失败'
+    ElMessage.error(message)
   } finally {
-    apiLoading.value = false;
+    apiLoading.value = false
   }
-};
+}
 
 // 关闭接口对话框
 const handleApiDialogClose = () => {
-  selectedApiIds.value = [];
-  currentPermissionId.value = 0;
-};
+  selectedApiIds.value = []
+  currentPermissionId.value = 0
+}
 
-onMounted(loadData);
+onMounted(loadData)
 </script>
 
 <style scoped>

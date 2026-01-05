@@ -350,10 +350,13 @@ type (
 	}
 	// 文件管理
 	FileItem {
-		id        uint64 `json:"id"`
-		name      string `json:"name"`
-		status    int64  `json:"status"`
-		createdAt int64  `json:"createdAt"` // 创建时间(秒级时间戳)
+		id           uint64 `json:"id"`
+		name         string `json:"name"` // MD5 短链（文件名）
+		originalName string `json:"originalName"` // 原始文件名
+		path         string `json:"path"` // 文件访问路径（相对路径）
+		baseUrl      string `json:"baseUrl"` // 基础URL
+		status       int64  `json:"status"`
+		createdAt    int64  `json:"createdAt"` // 创建时间(秒级时间戳)
 	}
 	FileListReq {
 		page     int64  `json:"page,optional" form:"page,optional"`
@@ -515,6 +518,13 @@ type (
 	DictGetResp {
 		code  string         `json:"code"`
 		items []DictItemItem `json:"items"`
+	}
+	// 批量获取字典接口（登录后一次性获取所有需要的字典）
+	DictBatchGetReq {
+		codes []string `json:"codes"` // 需要获取的字典类型编码列表
+	}
+	DictBatchGetResp {
+		dicts map[string]DictGetResp `json:"dicts"` // key为字典类型编码，value为字典数据
 	}
 	// 操作日志项
 	OperationLogItem {
@@ -902,6 +912,16 @@ service admin-api {
 service admin-api {
 	@handler DictGet
 	get /dict (DictGetReq) returns (DictGetResp)
+}
+
+@server (
+	group:      dict
+	prefix:     /api/v1
+	middleware: AuthMiddleware
+)
+service admin-api {
+	@handler DictBatchGet
+	post /dict/batch (DictBatchGetReq) returns (DictBatchGetResp)
 }
 
 type (

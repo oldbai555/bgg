@@ -5,6 +5,7 @@ package file
 
 import (
 	"context"
+	"crypto/md5"
 	"database/sql"
 	"fmt"
 	"io"
@@ -12,8 +13,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
+	"postapocgame/admin-server/internal/consts"
 	"postapocgame/admin-server/internal/model"
 	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
@@ -51,22 +52,57 @@ func (l *FileUploadLogic) FileUpload(r *http.Request) (resp *types.FileUploadRes
 	defer file.Close()
 
 	// 创建上传目录（如果不存在）
-	uploadDir := "./uploads"
-	if err := os.MkdirAll(uploadDir, 0755); err != nil {
+	if err := os.MkdirAll(consts.UploadDir, 0755); err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "创建上传目录失败", err)
 	}
 
-	// 生成唯一文件名
-	ext := filepath.Ext(header.Filename)
-	fileName := fmt.Sprintf("%d_%s", time.Now().UnixNano(), header.Filename)
-	// 文件系统路径（用于实际存储）
-	fileSystemPath := filepath.Join(uploadDir, fileName)
-	// 访问路径（相对路径，如 /uploads/xxx，用于拼接 URL）
-	accessPath := fmt.Sprintf("/uploads/%s", fileName)
-	// 获取基础 URL（从配置中读取）
-	baseURL := strings.TrimSuffix(l.svcCtx.Config.BaseURL, "/")
+	// 计算文件的 MD5 哈希值
+	hash := md5.New()
+	if _, err := io.Copy(hash, file); err != nil {
+		return nil, errs.Wrap(errs.CodeInternalError, "计算文件MD5失败", err)
+	}
+	md5Hash := fmt.Sprintf("%x", hash.Sum(nil))
 
-	// 保存文件
+	// 重置文件指针，以便后续读取
+	file.Seek(0, 0)
+
+	// 获取文件扩展名
+	ext := filepath.Ext(header.Filename)
+	// 使用 MD5 + 扩展名作为文件名
+	fileName := md5Hash + ext
+
+	// 获取基础 URL（从字典中读取）
+	baseURL := l.getStorageBaseURL()
+
+	// 检查文件是否已存在（根据 MD5）
+	fileRepo := repository.NewFileRepository(l.svcCtx.Repository)
+	existingFile, err := fileRepo.FindByName(l.ctx, fileName)
+	if err == nil && existingFile != nil {
+		// 文件已存在，直接返回已有记录
+		l.Infof("文件已存在，MD5: %s", md5Hash)
+		proxyPath := fmt.Sprintf("%s/%s", consts.PathFileUploads, fileName)
+		fullURL := proxyPath
+		if baseURL != "" {
+			if strings.HasPrefix(baseURL, "http://") || strings.HasPrefix(baseURL, "https://") {
+				fullURL = fmt.Sprintf("%s%s", baseURL, proxyPath)
+			}
+		}
+
+		return &types.FileUploadResp{
+			Id:           existingFile.Id,
+			Name:         existingFile.Name,
+			OriginalName: existingFile.OriginalName,
+			Path:         proxyPath,
+			BaseUrl:      existingFile.BaseUrl,
+			Url:          fullURL,
+			Size:         existingFile.Size,
+			MimeType:     existingFile.MimeType.String,
+			Ext:          existingFile.Ext.String,
+		}, nil
+	}
+
+	// 文件不存在，保存新文件
+	fileSystemPath := filepath.Join(consts.UploadDir, fileName)
 	dst, err := os.Create(fileSystemPath)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "创建文件失败", err)
@@ -92,10 +128,10 @@ func (l *FileUploadLogic) FileUpload(r *http.Request) (resp *types.FileUploadRes
 
 	// 保存文件记录到数据库
 	fileModel := model.AdminFile{
-		Name:         fileName,
+		Name:         fileName, // MD5 + 扩展名
 		OriginalName: header.Filename,
-		Path:         accessPath, // 访问路径（相对路径）
-		BaseUrl:      baseURL,    // 基础 URL
+		Path:         fmt.Sprintf("%s/%s", consts.PathFileUploads, fileName), // 访问路径
+		BaseUrl:      baseURL,                                                // 基础 URL
 		Size:         uint64(fileInfo.Size()),
 		MimeType:     sql.NullString{String: mimeType, Valid: mimeType != ""},
 		Ext:          sql.NullString{String: strings.TrimPrefix(ext, "."), Valid: ext != ""},
@@ -103,38 +139,57 @@ func (l *FileUploadLogic) FileUpload(r *http.Request) (resp *types.FileUploadRes
 		Status:       1,
 	}
 
-	fileRepo := repository.NewFileRepository(l.svcCtx.Repository)
 	if err := fileRepo.Create(l.ctx, &fileModel); err != nil {
 		// 如果数据库保存失败，删除已上传的文件
 		os.Remove(fileSystemPath)
 		return nil, errs.Wrap(errs.CodeInternalError, "保存文件记录失败", err)
 	}
 
-	// 返回nginx代理路径（用于前端访问）
-	// nginx配置中，/files/uploads/ 路径会代理到后端的 /api/v1/uploads/
-	// 文件访问路径格式：/files/uploads/xxx
-	proxyPath := fmt.Sprintf("/files/uploads/%s", fileName)
-
-	// 兼容字段：如果配置了BaseURL，也返回完整URL
+	// 返回文件访问路径
+	proxyPath := fmt.Sprintf("%s/%s", consts.PathFileUploads, fileName)
 	fullURL := proxyPath
 	if baseURL != "" {
-		// 如果BaseURL包含域名，使用完整URL；否则只返回路径
 		if strings.HasPrefix(baseURL, "http://") || strings.HasPrefix(baseURL, "https://") {
 			fullURL = fmt.Sprintf("%s%s", baseURL, proxyPath)
-		} else {
-			fullURL = proxyPath
 		}
 	}
 
 	return &types.FileUploadResp{
 		Id:           fileModel.Id,
-		Name:         fileModel.Name,
+		Name:         fileModel.Name, // MD5 + 扩展名
 		OriginalName: fileModel.OriginalName,
-		Path:         proxyPath, // 使用nginx代理路径
-		BaseUrl:      "",        // nginx代理不需要BaseURL
-		Url:          fullURL,   // 兼容字段，返回完整 URL
+		Path:         proxyPath,
+		BaseUrl:      baseURL,
+		Url:          fullURL,
 		Size:         fileModel.Size,
 		MimeType:     mimeType,
 		Ext:          strings.TrimPrefix(ext, "."),
 	}, nil
+}
+
+// getStorageBaseURL 从字典中获取存储baseURL
+func (l *FileUploadLogic) getStorageBaseURL() string {
+	// 从字典中获取配置
+	dictTypeRepo := repository.NewDictTypeRepository(l.svcCtx.Repository)
+	dictType, err := dictTypeRepo.FindByCode(l.ctx, "storage_base_url")
+	if err != nil {
+		l.Errorf("获取存储配置字典类型失败: %v", err)
+		return ""
+	}
+
+	dictItemRepo := repository.NewDictItemRepository(l.svcCtx.Repository)
+	items, err := dictItemRepo.FindByTypeID(l.ctx, dictType.Id)
+	if err != nil || len(items) == 0 {
+		l.Errorf("获取存储配置字典项失败: %v", err)
+		return ""
+	}
+
+	// 使用第一个有效的字典项值
+	baseURL := items[0].Value
+	if baseURL == "" {
+		l.Errorf("字典中的baseURL为空")
+		return ""
+	}
+
+	return strings.TrimSuffix(baseURL, "/")
 }

@@ -42,10 +42,13 @@ func (l *FileListLogic) FileList(req *types.FileListReq) (resp *types.FileListRe
 	items := make([]types.FileItem, 0, len(list))
 	for _, f := range list {
 		items = append(items, types.FileItem{
-			Id:        f.Id,
-			Name:      f.Name,
-			Status:    f.Status,
-			CreatedAt: f.CreatedAt,
+			Id:           f.Id,
+			Name:         f.Name,
+			OriginalName: f.OriginalName,
+			Path:         f.Path,
+			BaseUrl:      f.BaseUrl,
+			Status:       f.Status,
+			CreatedAt:    f.CreatedAt,
 		})
 	}
 

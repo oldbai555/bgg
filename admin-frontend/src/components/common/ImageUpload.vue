@@ -45,13 +45,13 @@
 </template>
 
 <script setup lang="ts">
-import {computed, ref} from 'vue';
-import {ElMessage} from 'element-plus';
-import {Picture, Plus} from '@element-plus/icons-vue';
-import {useUserStore} from '@/stores/user';
-import {fileUpload} from '@/api/generated/admin';
-import type {FileUploadResp} from '@/api/generated/admin';
-import {buildFileUrlFromResponse} from '@/utils/file';
+import {computed, onMounted} from 'vue'
+import {ElMessage} from 'element-plus'
+import {Picture, Plus} from '@element-plus/icons-vue'
+import {useUserStore} from '@/stores/user'
+import type {FileUploadResp} from '@/api/generated/admin'
+import {buildFileUrlFromResponse} from '@/utils/file'
+import {useAppConfig} from '@/composables/useAppConfig'
 
 interface Props {
   modelValue?: string; // 图片URL
@@ -67,82 +67,108 @@ const props = withDefaults(defineProps<Props>(), {
   tip: '',
   maxSize: 2,
   accept: 'image/*'
-});
+})
 
 const emit = defineEmits<{
-  'update:modelValue': [value: string];
-  'change': [value: string];
-}>();
+  'update:modelValue': [value: string]
+  'change': [value: string]
+}>()
 
-const userStore = useUserStore();
-const baseUrl = computed(() => import.meta.env.VITE_API_BASE_URL || '');
+const userStore = useUserStore()
+
+// 应用配置
+const {storageBaseURL, initConfig} = useAppConfig()
 
 // 上传URL
-const uploadUrl = computed(() => `${baseUrl.value}/api/v1/files/upload`);
+const uploadUrl = computed(() => {
+  // 开发环境：始终使用 vite 代理路径（避免 CORS）
+  if (import.meta.env.DEV) {
+    return '/api/v1/files/upload'
+  }
+  // 生产环境：使用字典配置的 baseURL
+  if (storageBaseURL.value) {
+    return `${storageBaseURL.value}/api/v1/files/upload`
+  }
+  // 生产环境默认使用网关路径
+  return '/gateway/api/v1/files/upload'
+})
 
 // 上传请求头
 const uploadHeaders = computed(() => ({
   Authorization: `Bearer ${userStore.token}`
-}));
+}))
 
 // 图片URL（优先使用 baseUrl + path，否则使用 url 兼容字段）
 const imageUrl = computed(() => {
-  if (!props.modelValue) return '';
+  if (!props.modelValue) {
+    return ''
+  }
   // 如果已经是完整URL，直接返回
   if (props.modelValue.startsWith('http://') || props.modelValue.startsWith('https://')) {
-    return props.modelValue;
+    return props.modelValue
   }
-  // 如果是相对路径，拼接baseUrl
-  return `${baseUrl.value}${props.modelValue}`;
-});
+  // 如果是相对路径，根据环境选择 baseURL
+  let baseURL = '/api'
+  if (import.meta.env.PROD) {
+    // 生产环境：使用字典配置的 baseURL，如果没有则使用网关路径
+    baseURL = storageBaseURL.value || '/gateway/api'
+  }
+  return `${baseURL}${props.modelValue}`
+})
 
 // 上传前验证
 const beforeUpload = (file: File) => {
   // 验证文件类型
-  const isImage = file.type.startsWith('image/');
+  const isImage = file.type.startsWith('image/')
   if (!isImage) {
-    ElMessage.error('只能上传图片文件！');
-    return false;
+    ElMessage.error('只能上传图片文件！')
+    return false
   }
 
   // 验证文件大小
-  const isValidSize = file.size / 1024 / 1024 < props.maxSize;
+  const isValidSize = file.size / 1024 / 1024 < props.maxSize
   if (!isValidSize) {
-    ElMessage.error(`图片大小不能超过 ${props.maxSize}MB！`);
-    return false;
+    ElMessage.error(`图片大小不能超过 ${props.maxSize}MB！`)
+    return false
   }
 
-  return true;
-};
+  return true
+}
 
 // 上传成功
 const handleUploadSuccess = (response: FileUploadResp) => {
   if (response) {
     // 使用工具函数构建完整 URL
-    const fullUrl = buildFileUrlFromResponse(response);
-    
+    const fullUrl = buildFileUrlFromResponse(response)
+
     if (fullUrl) {
-      emit('update:modelValue', fullUrl);
-      emit('change', fullUrl);
-      ElMessage.success('上传成功');
+      emit('update:modelValue', fullUrl)
+      emit('change', fullUrl)
+      ElMessage.success('上传成功')
     } else {
-      ElMessage.error('上传失败：服务器返回数据格式错误');
+      ElMessage.error('上传失败：服务器返回数据格式错误')
     }
   } else {
-    ElMessage.error('上传失败：服务器返回数据格式错误');
+    ElMessage.error('上传失败：服务器返回数据格式错误')
   }
-};
+}
 
 // 上传失败
-const handleUploadError = (error: any) => {
-  ElMessage.error('上传失败：' + (error.message || '未知错误'));
-};
+const handleUploadError = (error: Error | unknown) => {
+  const message = error instanceof Error ? error.message : '未知错误'
+  ElMessage.error('上传失败：' + message)
+}
 
 // 删除图片
 const handleDelete = () => {
-  emit('update:modelValue', '');
-  emit('change', '');
-};
+  emit('update:modelValue', '')
+  emit('change', '')
+}
+
+// 初始化配置
+onMounted(async () => {
+  await initConfig()
+})
 </script>
 
 <style scoped lang="scss">

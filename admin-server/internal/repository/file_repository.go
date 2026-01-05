@@ -9,6 +9,7 @@ import (
 
 type FileRepository interface {
 	FindByID(ctx context.Context, id uint64) (*model.AdminFile, error)
+	FindByName(ctx context.Context, name string) (*model.AdminFile, error) // 根据 name（MD5）查找文件
 	FindPage(ctx context.Context, page, pageSize int64, name string) ([]model.AdminFile, int64, error)
 	DeleteByID(ctx context.Context, id uint64) error
 	Create(ctx context.Context, file *model.AdminFile) error
@@ -26,6 +27,16 @@ func NewFileRepository(repo *Repository) FileRepository {
 
 func (r *fileRepository) FindByID(ctx context.Context, id uint64) (*model.AdminFile, error) {
 	return r.model.FindOne(ctx, id)
+}
+
+func (r *fileRepository) FindByName(ctx context.Context, name string) (*model.AdminFile, error) {
+	query := "SELECT id, name, original_name, path, base_url, size, mime_type, ext, storage_type, status, created_at, updated_at, deleted_at FROM `admin_file` WHERE `name` = ? AND `deleted_at` = 0 LIMIT 1"
+	var result model.AdminFile
+	err := r.conn.QueryRowCtx(ctx, &result, query, name)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
 }
 
 func (r *fileRepository) FindPage(ctx context.Context, page, pageSize int64, name string) ([]model.AdminFile, int64, error) {

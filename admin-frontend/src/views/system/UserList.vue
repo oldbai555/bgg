@@ -64,7 +64,12 @@
             {{ t('common.assignRoles') }}
           </el-button>
           <el-tooltip v-else content="超级管理员不允许分配角色" placement="top">
-            <el-button type="info" link size="small" disabled>
+            <el-button
+              type="info"
+              link
+              size="small"
+              disabled
+            >
               {{ t('common.assignRoles') }}
             </el-button>
           </el-tooltip>
@@ -99,81 +104,85 @@
 </template>
 
 <script setup lang="ts">
-import {reactive, ref, onMounted, computed} from 'vue';
-import {ElMessage, ElMessageBox} from 'element-plus';
-import {userList, userCreate, userUpdate, userDelete, userRoleList, userRoleUpdate, roleList as getRoleList, departmentTree} from '@/api/generated/admin';
-import type {UserItem, UserCreateReq, UserUpdateReq, DepartmentItem, RoleItem, UserRoleUpdateReq} from '@/api/generated/admin';
-import {useI18n} from 'vue-i18n';
-import D2Table from '@/components/common/D2Table.vue';
-import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table';
+import {reactive, ref, onMounted, computed} from 'vue'
+import {ElMessage, ElMessageBox} from 'element-plus'
+import {userList, userCreate, userUpdate, userDelete, userRoleList, userRoleUpdate, roleList as getRoleList, departmentTree} from '@/api/generated/admin'
+import type {UserItem, UserCreateReq, UserUpdateReq, DepartmentItem, RoleItem} from '@/api/generated/admin'
+import {useI18n} from 'vue-i18n'
+import D2Table from '@/components/common/D2Table.vue'
+import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table'
 
-const {t} = useI18n();
+const {t} = useI18n()
 
 // 判断是否是超级管理员用户
 const isSuperAdminUser = (user: UserItem): boolean => {
-  return user.id === 1;
-};
+  return user.id === 1
+}
 
 const query = reactive({
   page: 1,
   pageSize: 10,
   username: ''
-});
-const list = ref<UserItem[]>([]);
-const total = ref(0);
-const loading = ref(false);
-const departmentList = ref<DepartmentItem[]>([]);
+})
+const list = ref<UserItem[]>([])
+const total = ref(0)
+const loading = ref(false)
+const departmentList = ref<DepartmentItem[]>([])
 
 // 角色分配相关
-const roleDialogVisible = ref(false);
-const roleList = ref<RoleItem[]>([]);
-const selectedRoleIds = ref<number[]>([]);
-const currentUserId = ref<number>(0);
-const roleLoading = ref(false);
-const departmentOptions = ref<{label: string; value: number}[]>([]);
+const roleDialogVisible = ref(false)
+const roleList = ref<RoleItem[]>([])
+const selectedRoleIds = ref<number[]>([])
+const currentUserId = ref<number>(0)
+const roleLoading = ref(false)
+const departmentOptions = ref<{label: string; value: number}[]>([])
 
 // 过滤掉超级管理员角色（id=1），不允许分配
 const availableRoles = computed(() => {
-  return roleList.value.filter(role => role.id !== 1);
-});
+  return roleList.value.filter(role => role.id !== 1)
+})
 
 // 获取部门名称
 const getDepartmentName = (departmentId: number): string => {
   const find = (items: DepartmentItem[], id: number): DepartmentItem | undefined => {
     for (const item of items) {
-      if (item.id === id) return item;
+      if (item.id === id) {
+return item
+}
       if (item.children) {
-        const found = find(item.children, id);
-        if (found) return found;
+        const found = find(item.children, id)
+        if (found) {
+return found
+}
       }
     }
-    return undefined;
-  };
-  return find(departmentList.value, departmentId)?.name || '-';
-};
+    return undefined
+  }
+  return find(departmentList.value, departmentId)?.name || '-'
+}
 
 // 扁平化部门树为选项列表
 const flattenDepartments = (items: DepartmentItem[], prefix = ''): {label: string; value: number}[] => {
-  const result: {label: string; value: number}[] = [];
+  const result: {label: string; value: number}[] = []
   items.forEach((item) => {
-    result.push({label: prefix + item.name, value: item.id});
+    result.push({label: prefix + item.name, value: item.id})
     if (item.children && item.children.length > 0) {
-      result.push(...flattenDepartments(item.children, prefix + item.name + ' / '));
+      result.push(...flattenDepartments(item.children, prefix + item.name + ' / '))
     }
-  });
-  return result;
-};
+  })
+  return result
+}
 
 // 加载部门列表
 const loadDepartments = async () => {
   try {
-    const resp = await departmentTree();
-    departmentList.value = resp.list || [];
-    departmentOptions.value = flattenDepartments(departmentList.value);
-  } catch (err: any) {
-    console.error('Failed to load departments:', err);
+    const resp = await departmentTree()
+    departmentList.value = resp.list || []
+    departmentOptions.value = flattenDepartments(departmentList.value)
+  } catch (err: unknown) {
+    console.error('Failed to load departments:', err)
   }
-};
+}
 
 // 表格列配置
 const columns = computed<TableColumn[]>(() => [
@@ -185,7 +194,7 @@ const columns = computed<TableColumn[]>(() => [
   {prop: 'departmentId', label: t('common.department')},
   {prop: 'status', label: t('common.status'), width: 100},
   {prop: 'createdAt', label: t('common.createdAt'), width: 180, type: D2TableElemType.ConvertTime}
-]);
+])
 
 // 详情/编辑抽屉列配置
 const drawerColumns = computed<DrawerColumn[]>(() => [
@@ -210,7 +219,7 @@ const drawerColumns = computed<DrawerColumn[]>(() => [
     ]
   },
   {prop: 'createdAt', label: t('common.createdAt'), type: D2TableElemType.ConvertTime}
-]);
+])
 
 // 新增抽屉列配置
 const drawerAddColumns = computed<DrawerColumn[]>(() => [
@@ -234,149 +243,155 @@ const drawerAddColumns = computed<DrawerColumn[]>(() => [
       {label: t('status.disabled'), value: 0}
     ]
   }
-]);
+])
 
 const loadData = async () => {
-  loading.value = true;
+  loading.value = true
   try {
-    const resp = await userList({...query});
-    list.value = resp.list;
-    total.value = resp.total;
-  } catch (err: any) {
-    ElMessage.error(err.message || t('common.loadFailed'));
+    const resp = await userList({...query})
+    list.value = resp.list
+    total.value = resp.total
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : t('common.loadFailed')
+    ElMessage.error(message)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 
 const handleReset = () => {
-  query.page = 1;
-  query.pageSize = 10;
-  query.username = '';
-  loadData();
-};
+  query.page = 1
+  query.pageSize = 10
+  query.username = ''
+  loadData()
+}
 
 const handlePageChange = (page: number) => {
-  query.page = page;
-  loadData();
-};
+  query.page = page
+  loadData()
+}
 
 const handleSizeChange = (size: number) => {
-  query.pageSize = size;
-  query.page = 1;
-  loadData();
-};
+  query.pageSize = size
+  query.page = 1
+  loadData()
+}
 
 const handleUpdate = async (row: UserItem) => {
   try {
     // 如果密码为空，则不传递密码字段
-    const updateData: any = {...row};
-    if (!updateData.password || updateData.password.trim() === '') {
-      delete updateData.password;
+    const updateData: Record<string, unknown> = {...row}
+    if (!updateData.password || (typeof updateData.password === 'string' && updateData.password.trim() === '')) {
+      delete updateData.password
     }
-    await userUpdate(updateData as UserUpdateReq);
-    ElMessage.success(t('common.updateSuccess'));
-    loadData();
-  } catch (err: any) {
-    ElMessage.error(err.message || t('common.submitFailed'));
+    await userUpdate(updateData as UserUpdateReq)
+    ElMessage.success(t('common.updateSuccess'))
+    loadData()
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : t('common.submitFailed')
+    ElMessage.error(message)
   }
-};
+}
 
-const handleAdd = async (row: any) => {
+const handleAdd = async (row: Record<string, unknown>) => {
   try {
-    if (!row.password || row.password.trim() === '') {
-      ElMessage.error(t('common.passwordRequired'));
-      return;
+    if (!row.password || (typeof row.password === 'string' && row.password.trim() === '')) {
+      ElMessage.error(t('common.passwordRequired'))
+      return
     }
-    await userCreate(row as UserCreateReq);
-    ElMessage.success(t('common.createSuccess'));
-    loadData();
-  } catch (err: any) {
-    ElMessage.error(err.message || t('common.submitFailed'));
+    await userCreate(row as UserCreateReq)
+    ElMessage.success(t('common.createSuccess'))
+    loadData()
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : t('common.submitFailed')
+    ElMessage.error(message)
   }
-};
+}
 
 const handleDelete = (index: number, row: UserItem) => {
   ElMessageBox.confirm(t('common.confirmDelete'), t('common.confirm'), {type: 'warning'})
     .then(async () => {
-      await userDelete({id: row.id});
-      ElMessage.success(t('common.deleteSuccess'));
-      loadData();
+      await userDelete({id: row.id})
+      ElMessage.success(t('common.deleteSuccess'))
+      loadData()
     })
-    .catch(() => {});
-};
+    .catch(() => {})
+}
 
 // 加载角色列表
 const loadRoles = async () => {
   try {
-    const resp = await getRoleList({page: 1, pageSize: 1000});
-    roleList.value = resp.list || [];
+    const resp = await getRoleList({page: 1, pageSize: 1000})
+    roleList.value = resp.list || []
     if (roleList.value.length === 0) {
-      ElMessage.warning('暂无可用角色，请先在角色管理中创建角色');
+      ElMessage.warning('暂无可用角色，请先在角色管理中创建角色')
     }
-  } catch (err: any) {
-    console.error('Failed to load roles:', err);
-    throw err; // 重新抛出错误，让调用者处理
+  } catch (err: unknown) {
+    console.error('Failed to load roles:', err)
+    throw err // 重新抛出错误，让调用者处理
   }
-};
+}
 
 // 打开分配角色对话框
 const handleAssignRoles = async (row: UserItem) => {
   // 超级管理员用户不允许分配角色
   if (isSuperAdminUser(row)) {
-    ElMessage.warning('超级管理员不允许分配角色');
-    return;
+    ElMessage.warning('超级管理员不允许分配角色')
+    return
   }
-  currentUserId.value = row.id;
-  roleDialogVisible.value = true;
-  
+  currentUserId.value = row.id
+  roleDialogVisible.value = true
+
   // 每次打开对话框时都重新加载角色列表，确保数据最新
   try {
-    await loadRoles();
-  } catch (err: any) {
-    ElMessage.error(err.message || '加载角色列表失败');
-    return;
+    await loadRoles()
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '加载角色列表失败'
+    ElMessage.error(message)
+    return
   }
-  
+
   // 加载当前用户的角色
   try {
-    const resp = await userRoleList({userId: row.id});
-    selectedRoleIds.value = resp.roleIds || [];
-  } catch (err: any) {
-    ElMessage.error(err.message || '加载用户角色失败');
+    const resp = await userRoleList({userId: row.id})
+    selectedRoleIds.value = resp.roleIds || []
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '加载用户角色失败'
+    ElMessage.error(message)
   }
-};
+}
 
 // 保存角色分配
 const handleSaveRoles = async () => {
   // 检查是否包含超级管理员角色
   if (selectedRoleIds.value.includes(1)) {
-    ElMessage.warning('不允许分配超级管理员角色');
-    return;
+    ElMessage.warning('不允许分配超级管理员角色')
+    return
   }
-  
-  roleLoading.value = true;
+
+  roleLoading.value = true
   try {
-    await userRoleUpdate({userId: currentUserId.value, roleIds: selectedRoleIds.value});
-    ElMessage.success('角色分配成功');
-    roleDialogVisible.value = false;
-  } catch (err: any) {
-    ElMessage.error(err.message || '角色分配失败');
+    await userRoleUpdate({userId: currentUserId.value, roleIds: selectedRoleIds.value})
+    ElMessage.success('角色分配成功')
+    roleDialogVisible.value = false
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '角色分配失败'
+    ElMessage.error(message)
   } finally {
-    roleLoading.value = false;
+    roleLoading.value = false
   }
-};
+}
 
 // 关闭角色对话框
 const handleRoleDialogClose = () => {
-  selectedRoleIds.value = [];
-  currentUserId.value = 0;
-};
+  selectedRoleIds.value = []
+  currentUserId.value = 0
+}
 
 onMounted(async () => {
-  await loadDepartments();
-  loadData();
-});
+  await loadDepartments()
+  loadData()
+})
 </script>
 
 <style scoped>

@@ -25,3 +25,4 @@ admin-server/*.exe
 /admin-server/uploads/**
 /history
 /history/**
+/admin-server/uploads/**

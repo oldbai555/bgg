@@ -238,7 +238,7 @@ CREATE TABLE IF NOT EXISTS `admin_file` (
   `name` VARCHAR(255) NOT NULL COMMENT '文件名称',
   `original_name` VARCHAR(255) NOT NULL COMMENT '原始文件名称',
   `path` VARCHAR(512) NOT NULL COMMENT '文件访问路径（相对路径，如 /uploads/xxx）',
-  `base_url` VARCHAR(512) NOT NULL DEFAULT '' COMMENT '基础URL（如 http://localhost:8888），用于拼接完整访问URL',
+  `base_url` VARCHAR(512) NOT NULL DEFAULT '' COMMENT '基础URL',
   `size` BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '文件大小（字节）',
   `mime_type` VARCHAR(128) DEFAULT NULL COMMENT 'MIME类型',
   `ext` VARCHAR(16) DEFAULT NULL COMMENT '文件扩展名',

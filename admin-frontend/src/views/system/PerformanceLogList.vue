@@ -13,9 +13,18 @@
           <el-input v-model.number="query.statusCode" placeholder="HTTP Status Code" clearable />
         </el-form-item>
         <el-form-item label="Slow Flag">
-          <el-select v-model="query.isSlow" placeholder="Slow or not" clearable>
-            <el-option label="Slow" :value="1" />
-            <el-option label="Normal" :value="0" />
+          <el-select
+            v-model="query.isSlow"
+            placeholder="Slow or not"
+            clearable
+            style="width: 200px"
+          >
+            <el-option
+              v-for="item in slowStatusOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="Number(item.value)"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="Start Time">
@@ -63,7 +72,7 @@
         <!-- 自定义慢接口标记列 -->
         <template #cell="{row, column}">
           <el-tag v-if="column.prop === 'isSlow'" :type="row.isSlow === 1 ? 'danger' : 'info'">
-            {{ row.isSlow === 1 ? 'Slow' : 'Normal' }}
+            {{ slowStatusOptions.find(opt => Number(opt.value) === row.isSlow)?.label || (row.isSlow === 1 ? 'Slow' : 'Normal') }}
           </el-tag>
         </template>
       </D2Table>
@@ -72,15 +81,16 @@
 </template>
 
 <script setup lang="ts">
-import {reactive, ref, onMounted, computed} from 'vue';
-import {ElMessage} from 'element-plus';
-import { performanceLogList } from '@/api/generated/admin';
-import type { PerformanceLogItem, PerformanceLogListReq } from '@/api/generated/admin';
-import {useI18n} from 'vue-i18n';
-import D2Table from '@/components/common/D2Table.vue';
-import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table';
+import {reactive, ref, onMounted, computed} from 'vue'
+import {ElMessage} from 'element-plus'
+import {performanceLogList} from '@/api/generated/admin'
+import type {PerformanceLogItem, PerformanceLogListReq} from '@/api/generated/admin'
+import {useI18n} from 'vue-i18n'
+import D2Table from '@/components/common/D2Table.vue'
+import {type TableColumn, type DrawerColumn} from '@/types/table'
+import {useDictOptions} from '@/composables/useDictOptions'
 
-const {t} = useI18n();
+const {t} = useI18n()
 
 const query = reactive<PerformanceLogListReq & { page: number; pageSize: number }>({
   page: 1,
@@ -91,10 +101,19 @@ const query = reactive<PerformanceLogListReq & { page: number; pageSize: number 
   statusCode: undefined,
   startTime: '',
   endTime: ''
-});
-const list = ref<PerformanceLogItem[]>([]);
-const total = ref(0);
-const loading = ref(false);
+})
+const list = ref<PerformanceLogItem[]>([])
+const total = ref(0)
+const loading = ref(false)
+
+// 慢查询状态选项
+const {options: slowStatusOptions} = useDictOptions(
+  'performance_log_slow_status',
+  [
+    {label: 'Normal', value: '0'},
+    {label: 'Slow', value: '1'}
+  ]
+)
 
 // 表格列配置（只读性能日志字段）
 const columns = computed<TableColumn[]>(() => [
@@ -107,49 +126,50 @@ const columns = computed<TableColumn[]>(() => [
   {prop: 'username', label: t('common.username'), width: 140},
   {prop: 'ipAddress', label: 'IP', width: 140},
   {prop: 'createdAt', label: t('common.createdAt'), width: 180}
-]);
+])
 
 // 占位：只读模式但 D2Table 要求必传
-const drawerColumns: DrawerColumn[] = [];
-const drawerAddColumns: DrawerColumn[] = [];
+const drawerColumns: DrawerColumn[] = []
+const drawerAddColumns: DrawerColumn[] = []
 
 const loadData = async () => {
-  loading.value = true;
+  loading.value = true
   try {
-    const resp = await performanceLogList({...query});
-    list.value = resp.list;
-    total.value = resp.total;
-  } catch (err: any) {
-    ElMessage.error(err.message || t('common.search'));
+    const resp = await performanceLogList({...query})
+    list.value = resp.list
+    total.value = resp.total
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : t('common.search')
+    ElMessage.error(message)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 
 const handleReset = () => {
-  query.page = 1;
-  query.pageSize = 10;
-  query.method = '';
-  query.path = '';
-  query.isSlow = undefined;
-  query.statusCode = undefined;
-  query.startTime = '';
-  query.endTime = '';
-  loadData();
-};
+  query.page = 1
+  query.pageSize = 10
+  query.method = ''
+  query.path = ''
+  query.isSlow = undefined
+  query.statusCode = undefined
+  query.startTime = ''
+  query.endTime = ''
+  loadData()
+}
 
 const handlePageChange = (page: number) => {
-  query.page = page;
-  loadData();
-};
+  query.page = page
+  loadData()
+}
 
 const handleSizeChange = (size: number) => {
-  query.pageSize = size;
-  query.page = 1;
-  loadData();
-};
+  query.pageSize = size
+  query.page = 1
+  loadData()
+}
 
-onMounted(loadData);
+onMounted(loadData)
 </script>
 
 <style scoped>
@@ -162,5 +182,4 @@ onMounted(loadData);
   margin-bottom: 12px;
 }
 </style>
-
 

@@ -13,11 +13,11 @@
           <el-button type="primary" :loading="loading" @click="loadData">{{ t('common.search') }}</el-button>
           <el-button @click="handleReset">{{ t('common.reset') }}</el-button>
           <el-button
+            v-permission="'config:update'"
             type="warning"
             :loading="refreshLoading"
-            @click="handleRefreshCache"
             icon="Refresh"
-            v-permission="'config:update'"
+            @click="handleRefreshCache"
           >
             刷新缓存
           </el-button>
@@ -58,26 +58,26 @@
 </template>
 
 <script setup lang="ts">
-import {reactive, ref, onMounted, computed} from 'vue';
-import {ElMessage, ElMessageBox} from 'element-plus';
-import {configList, configCreate, configUpdate, configDelete} from '@/api/generated/admin';
-import type {ConfigItem, ConfigCreateReq, ConfigUpdateReq} from '@/api/generated/admin';
-import {useI18n} from 'vue-i18n';
-import D2Table from '@/components/common/D2Table.vue';
-import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table';
+import {reactive, ref, onMounted, computed} from 'vue'
+import {ElMessage, ElMessageBox} from 'element-plus'
+import {configList, configCreate, configUpdate, configDelete} from '@/api/generated/admin'
+import type {ConfigItem, ConfigCreateReq, ConfigUpdateReq} from '@/api/generated/admin'
+import {useI18n} from 'vue-i18n'
+import D2Table from '@/components/common/D2Table.vue'
+import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table'
 
-const {t} = useI18n();
+const {t} = useI18n()
 
 const query = reactive({
   page: 1,
   pageSize: 10,
   group: '',
   key: ''
-});
-const list = ref<ConfigItem[]>([]);
-const total = ref(0);
-const loading = ref(false);
-const refreshLoading = ref(false);
+})
+const list = ref<ConfigItem[]>([])
+const total = ref(0)
+const loading = ref(false)
+const refreshLoading = ref(false)
 
 // 获取配置类型的标签类型
 const getConfigTypeTag = (type: string): string => {
@@ -86,9 +86,9 @@ const getConfigTypeTag = (type: string): string => {
     'number': 'warning',
     'boolean': 'primary',
     'json': 'info'
-  };
-  return typeMap[type] || 'info';
-};
+  }
+  return typeMap[type] || 'info'
+}
 
 // 表格列配置
 const columns = computed<TableColumn[]>(() => [
@@ -98,7 +98,7 @@ const columns = computed<TableColumn[]>(() => [
   {prop: 'value', label: '配置值'},
   {prop: 'type', label: '配置类型', width: 100},
   {prop: 'description', label: t('common.description')}
-]);
+])
 
 // 详情/编辑抽屉列配置
 const drawerColumns = computed<DrawerColumn[]>(() => [
@@ -108,7 +108,7 @@ const drawerColumns = computed<DrawerColumn[]>(() => [
   {prop: 'value', label: '配置值', type: D2TableElemType.EditInput, required: true},
   {prop: 'type', label: '配置类型', type: D2TableElemType.Tag},
   {prop: 'description', label: t('common.description'), type: D2TableElemType.EditInput}
-]);
+])
 
 // 新增抽屉列配置
 const drawerAddColumns = computed<DrawerColumn[]>(() => [
@@ -127,83 +127,87 @@ const drawerAddColumns = computed<DrawerColumn[]>(() => [
     ]
   },
   {prop: 'description', label: t('common.description')}
-]);
+])
 
 const loadData = async () => {
-  loading.value = true;
+  loading.value = true
   try {
-    const resp = await configList({...query});
-    list.value = resp.list;
-    total.value = resp.total;
-  } catch (err: any) {
-    ElMessage.error(err.message || t('common.search'));
+    const resp = await configList({...query})
+    list.value = resp.list
+    total.value = resp.total
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : t('common.search')
+    ElMessage.error(message)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 
 const handleReset = () => {
-  query.page = 1;
-  query.pageSize = 10;
-  query.group = '';
-  query.key = '';
-  loadData();
-};
+  query.page = 1
+  query.pageSize = 10
+  query.group = ''
+  query.key = ''
+  loadData()
+}
 
 const handlePageChange = (page: number) => {
-  query.page = page;
-  loadData();
-};
+  query.page = page
+  loadData()
+}
 
 const handleSizeChange = (size: number) => {
-  query.pageSize = size;
-  query.page = 1;
-  loadData();
-};
+  query.pageSize = size
+  query.page = 1
+  loadData()
+}
 
 const handleUpdate = async (row: ConfigItem) => {
   try {
-    await configUpdate(row as ConfigUpdateReq);
-    ElMessage.success('更新成功');
-    loadData();
-  } catch (err: any) {
-    ElMessage.error(err.message || '更新失败');
+    await configUpdate(row as ConfigUpdateReq)
+    ElMessage.success('更新成功')
+    loadData()
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '更新失败'
+    ElMessage.error(message)
   }
-};
+}
 
-const handleAdd = async (row: any) => {
+const handleAdd = async (row: Record<string, unknown>) => {
   try {
-    await configCreate(row as ConfigCreateReq);
-    ElMessage.success('新增成功');
-    loadData();
-  } catch (err: any) {
-    ElMessage.error(err.message || '新增失败');
+    await configCreate(row as ConfigCreateReq)
+    ElMessage.success('新增成功')
+    loadData()
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '新增失败'
+    ElMessage.error(message)
   }
-};
+}
 
 const handleDelete = (index: number, row: ConfigItem) => {
   ElMessageBox.confirm(t('common.confirmDelete'), t('common.confirm'), {type: 'warning'})
     .then(async () => {
-      await configDelete({id: row.id});
-      ElMessage.success(t('common.delete'));
-      loadData();
+      await configDelete({id: row.id})
+      ElMessage.success(t('common.delete'))
+      loadData()
     })
-    .catch(() => {});
-};
+    .catch(() => {})
+}
 
 // 刷新缓存
 const handleRefreshCache = async () => {
   try {
-    refreshLoading.value = true;
-    ElMessage.success('缓存刷新成功');
-  } catch (error: any) {
-    ElMessage.error(error.message || '缓存刷新失败');
+    refreshLoading.value = true
+    ElMessage.success('缓存刷新成功')
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : '缓存刷新失败'
+    ElMessage.error(message)
   } finally {
-    refreshLoading.value = false;
+    refreshLoading.value = false
   }
-};
+}
 
-onMounted(loadData);
+onMounted(loadData)
 </script>
 
 <style scoped>

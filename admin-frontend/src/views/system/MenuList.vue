@@ -2,7 +2,7 @@
   <div class="page">
     <el-card>
       <div class="toolbar">
-        <el-button type="success" @click="openCreate()" v-permission="'menu:create'">
+        <el-button v-permission="'menu:create'" type="success" @click="openCreate()">
           {{ t('common.create') }}
         </el-button>
       </div>
@@ -23,13 +23,28 @@
             <el-tag v-else-if="data.type === 3" size="small" type="warning">按钮</el-tag>
           </span>
           <span class="ops">
-            <el-button link type="primary" @click.stop="openCreate(data)" v-permission="'menu:create'">
+            <el-button
+              v-permission="'menu:create'"
+              link
+              type="primary"
+              @click.stop="openCreate(data)"
+            >
               {{ t('common.create') }}
             </el-button>
-            <el-button link type="primary" @click.stop="openEdit(data)" v-permission="'menu:update'">
+            <el-button
+              v-permission="'menu:update'"
+              link
+              type="primary"
+              @click.stop="openEdit(data)"
+            >
               {{ t('common.edit') }}
             </el-button>
-            <el-button link type="danger" @click.stop="handleDelete(data)" v-permission="'menu:delete'">
+            <el-button
+              v-permission="'menu:delete'"
+              link
+              type="danger"
+              @click.stop="handleDelete(data)"
+            >
               {{ t('common.delete') }}
             </el-button>
           </span>
@@ -38,7 +53,12 @@
     </el-card>
 
     <el-dialog v-model="dialogVisible" :title="isEdit ? t('common.edit') : t('common.create')" width="600px">
-      <el-form :model="form" :rules="rules" ref="formRef" label-width="100px">
+      <el-form
+        ref="formRef"
+        :model="form"
+        :rules="rules"
+        label-width="100px"
+      >
         <el-form-item :label="t('common.parent')" prop="parentId">
           <el-tree-select
             v-model="form.parentId"
@@ -57,29 +77,42 @@
                   <component :is="getMenuIcon(data.icon)" />
                 </el-icon>
                 <span>{{ data.name }}</span>
-                <el-tag v-if="data.type === 1" size="small" type="info" style="margin-left: 8px">目录</el-tag>
-                <el-tag v-else-if="data.type === 2" size="small" type="success" style="margin-left: 8px">菜单</el-tag>
+                <el-tag
+                  v-if="data.type === 1"
+                  size="small"
+                  type="info"
+                  style="margin-left: 8px"
+                >目录</el-tag>
+                <el-tag
+                  v-else-if="data.type === 2"
+                  size="small"
+                  type="success"
+                  style="margin-left: 8px"
+                >菜单</el-tag>
               </span>
             </template>
           </el-tree-select>
-          <div class="form-tip" v-if="form.type === 1">目录只能存在于根节点下</div>
-          <div class="form-tip" v-else-if="form.type === 2">菜单可以存在于根节点或目录下</div>
-          <div class="form-tip" v-else-if="form.type === 3">按钮只能存在于菜单下</div>
+          <div v-if="form.type === 1" class="form-tip">目录只能存在于根节点下</div>
+          <div v-else-if="form.type === 2" class="form-tip">菜单可以存在于根节点或目录下</div>
+          <div v-else-if="form.type === 3" class="form-tip">按钮只能存在于菜单下</div>
         </el-form-item>
         <el-form-item :label="t('common.name')" prop="name">
           <el-input v-model="form.name" />
         </el-form-item>
         <el-form-item :label="t('common.type')" prop="type">
           <el-select v-model="form.type" style="width: 100%" @change="handleTypeChange">
-            <el-option :label="t('menu.type.directory')" :value="1" />
-            <el-option :label="t('menu.type.menu')" :value="2" />
-            <el-option :label="t('menu.type.button')" :value="3" />
+            <el-option
+              v-for="item in menuTypeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="Number(item.value)"
+            />
           </el-select>
         </el-form-item>
-        <el-form-item :label="t('menu.path')" prop="path" v-if="form.type !== 3">
+        <el-form-item v-if="form.type !== 3" :label="t('menu.path')" prop="path">
           <el-input v-model="form.path" :placeholder="t('menu.pathPlaceholder')" />
         </el-form-item>
-        <el-form-item :label="t('menu.component')" prop="component" v-if="form.type === 2">
+        <el-form-item v-if="form.type === 2" :label="t('menu.component')" prop="component">
           <el-input v-model="form.component" :placeholder="t('menu.componentPlaceholder')" />
         </el-form-item>
         <el-form-item :label="t('menu.icon')" prop="icon">
@@ -107,21 +140,32 @@
 </template>
 
 <script setup lang="ts">
-import {ref, reactive, onMounted, computed} from 'vue';
-import {ElMessage, ElMessageBox, ElForm} from 'element-plus';
-import * as ElementPlusIconsVue from '@element-plus/icons-vue';
-import {menuTree, menuCreate, menuUpdate, menuDelete} from '@/api/generated/admin';
-import type {MenuItem, MenuCreateReq, MenuUpdateReq} from '@/api/generated/admin';
-import {useI18n} from 'vue-i18n';
+import {ref, reactive, onMounted, computed} from 'vue'
+import {ElMessage, ElMessageBox, ElForm} from 'element-plus'
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+import {menuTree, menuCreate, menuUpdate, menuDelete} from '@/api/generated/admin'
+import type {MenuItem, MenuCreateReq, MenuUpdateReq} from '@/api/generated/admin'
+import {useI18n} from 'vue-i18n'
+import {useDictOptions} from '@/composables/useDictOptions'
 
-const {t} = useI18n();
+const {t} = useI18n()
 
-const treeData = ref<MenuItem[]>([]);
-const loading = ref(false);
+const treeData = ref<MenuItem[]>([])
+const loading = ref(false)
 
-const dialogVisible = ref(false);
-const isEdit = ref(false);
-const formRef = ref<InstanceType<typeof ElForm>>();
+// 菜单类型选项
+const {options: menuTypeOptions} = useDictOptions(
+  'menu_type',
+  [
+    {label: '目录', value: '1'},
+    {label: '菜单', value: '2'},
+    {label: '按钮', value: '3'}
+  ]
+)
+
+const dialogVisible = ref(false)
+const isEdit = ref(false)
+const formRef = ref<InstanceType<typeof ElForm>>()
 const form = reactive({
   id: 0,
   parentId: 0,
@@ -133,7 +177,7 @@ const form = reactive({
   orderNum: 0,
   visible: 1,
   status: 1
-});
+})
 
 // 父级选项（根据菜单类型过滤）
 const parentOptions = computed(() => {
@@ -152,90 +196,95 @@ const parentOptions = computed(() => {
       status: 1,
       children: []
     }
-  ];
+  ]
 
   // 根据菜单类型过滤可选的父级
   const filterTree = (items: MenuItem[], excludeId?: number): MenuItem[] => {
     return items
       .filter(item => item.id !== excludeId) // 排除自己
       .map(item => {
-        let include = false;
-        
+        let include = false
+
         if (form.type === 1) {
           // 目录：只能选择根节点（已经在options中添加了）
-          include = false;
+          include = false
         } else if (form.type === 2) {
           // 菜单：可以选择根节点或目录（type=1）
-          include = item.type === 1;
+          include = item.type === 1
         } else if (form.type === 3) {
           // 按钮：只能选择菜单（type=2）
-          include = item.type === 2;
+          include = item.type === 2
         }
 
         if (!include) {
-          return null;
+          return null
         }
 
-        const children = item.children ? filterTree(item.children, excludeId) : [];
+        const children = item.children ? filterTree(item.children, excludeId) : []
         return {
           ...item,
           children: children.length > 0 ? children : undefined
-        };
+        }
       })
-      .filter((item): item is MenuItem => item !== null);
-  };
+      .filter((item): item is MenuItem => item !== null)
+  }
 
-  const filtered = filterTree(treeData.value, isEdit.value ? form.id : undefined);
-  return [...options, ...filtered];
-});
+  const filtered = filterTree(treeData.value, isEdit.value ? form.id : undefined)
+  return [...options, ...filtered]
+})
 
 // 过滤父级节点（用于搜索）
 const filterParentNode = (value: string, data: MenuItem) => {
-  if (!value) return true;
-  return data.name.toLowerCase().includes(value.toLowerCase());
-};
+  if (!value) {
+return true
+}
+  return data.name.toLowerCase().includes(value.toLowerCase())
+}
 
 const rules = {
   name: [{required: true, message: t('common.nameRequired'), trigger: 'blur'}],
   type: [{required: true, message: t('common.typeRequired'), trigger: 'change'}],
   parentId: [
     {
-      validator: (rule: any, value: number, callback: any) => {
+      validator: (_rule: unknown, value: number, callback: (error?: Error) => void) => {
         if (form.type === 1 && value !== 0) {
-          callback(new Error('目录只能存在于根节点下'));
+          callback(new Error('目录只能存在于根节点下'))
         } else if (form.type === 3 && value === 0) {
-          callback(new Error('按钮只能存在于菜单下'));
+          callback(new Error('按钮只能存在于菜单下'))
         } else {
-          callback();
+          callback()
         }
       },
       trigger: 'change'
     }
   ]
-};
+}
 
 const getMenuIcon = (iconName?: string) => {
-  if (!iconName) return null;
-  const iconMap: Record<string, any> = ElementPlusIconsVue;
+  if (!iconName) {
+return null
+}
+  const iconMap: Record<string, unknown> = ElementPlusIconsVue
   // 处理 icon 名称，可能是 "ele-DataBoard" 格式，需要转换为 "DataBoard"
-  const iconKey = iconName.startsWith('ele-') ? iconName.substring(4) : iconName;
-  return iconMap[iconKey] || null;
-};
+  const iconKey = iconName.startsWith('ele-') ? iconName.substring(4) : iconName
+  return iconMap[iconKey] || null
+}
 
 const loadData = async () => {
-  loading.value = true;
+  loading.value = true
   try {
-    const resp = await menuTree();
-    treeData.value = resp.list || [];
-  } catch (err: any) {
-    ElMessage.error(err.message || t('common.loadFailed'));
+    const resp = await menuTree()
+    treeData.value = resp.list || []
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : t('common.loadFailed')
+    ElMessage.error(message)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 
 const openCreate = (parent?: MenuItem) => {
-  isEdit.value = false;
+  isEdit.value = false
   Object.assign(form, {
     id: 0,
     parentId: parent?.id || 0,
@@ -247,12 +296,12 @@ const openCreate = (parent?: MenuItem) => {
     orderNum: 0,
     visible: 1,
     status: 1
-  });
-  dialogVisible.value = true;
-};
+  })
+  dialogVisible.value = true
+}
 
 const openEdit = (data: MenuItem) => {
-  isEdit.value = true;
+  isEdit.value = true
   Object.assign(form, {
     id: data.id,
     parentId: data.parentId,
@@ -264,58 +313,61 @@ const openEdit = (data: MenuItem) => {
     orderNum: data.orderNum,
     visible: data.visible,
     status: data.status
-  });
-  dialogVisible.value = true;
-};
+  })
+  dialogVisible.value = true
+}
 
-const submitLoading = ref(false);
+const submitLoading = ref(false)
 
 const handleSubmit = () => {
   formRef.value?.validate(async (valid) => {
-    if (!valid) return;
-    submitLoading.value = true;
+    if (!valid) {
+return
+}
+    submitLoading.value = true
     try {
       if (isEdit.value) {
-        await menuUpdate(form as MenuUpdateReq);
-        ElMessage.success(t('common.updateSuccess'));
+        await menuUpdate(form as MenuUpdateReq)
+        ElMessage.success(t('common.updateSuccess'))
       } else {
-        await menuCreate(form as MenuCreateReq);
-        ElMessage.success(t('common.createSuccess'));
+        await menuCreate(form as MenuCreateReq)
+        ElMessage.success(t('common.createSuccess'))
       }
-      dialogVisible.value = false;
-      loadData();
-    } catch (err: any) {
-      ElMessage.error(err.message || t('common.submitFailed'));
+      dialogVisible.value = false
+      loadData()
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : t('common.submitFailed')
+      ElMessage.error(message)
     } finally {
-      submitLoading.value = false;
+      submitLoading.value = false
     }
-  });
-};
+  })
+}
 
 const handleTypeChange = () => {
   // 当菜单类型改变时，自动调整parentId
   if (form.type === 1) {
     // 目录只能存在于根节点
-    form.parentId = 0;
+    form.parentId = 0
   } else if (form.type === 3 && form.parentId === 0) {
     // 按钮不能存在于根节点，如果没有有效的父级，清空parentId让用户选择
     // 这里不清空，让用户手动选择
   }
   // 重新验证
-  formRef.value?.validateField('parentId');
-};
+  formRef.value?.validateField('parentId')
+}
 
 const handleDelete = (data: MenuItem) => {
   ElMessageBox.confirm(t('common.confirmDelete'), t('common.confirm'), {type: 'warning'})
     .then(async () => {
-      await menuDelete({id: data.id});
-      ElMessage.success(t('common.deleteSuccess'));
-      loadData();
+      await menuDelete({id: data.id})
+      ElMessage.success(t('common.deleteSuccess'))
+      loadData()
     })
-    .catch(() => {});
-};
+    .catch(() => {})
+}
 
-onMounted(loadData);
+onMounted(loadData)
 </script>
 
 <style scoped>

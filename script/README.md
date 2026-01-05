@@ -119,7 +119,7 @@ bash script/admin.sh supervisor logs      # 查看日志
 
 服务启动时会进行严格的健康检查：
 1. 检查进程是否存在
-2. 检查端口是否监听（8888）
+2. 检查端口是否监听（默认示例为 20000，实际以配置为准）
 3. 检查健康检查接口（`/api/v1/ping`）是否返回 200
 
 只有所有检查通过，才认为服务启动成功。
@@ -240,13 +240,13 @@ cat /etc/work/redis.json
 ### 健康检查失败
 
 ```bash
-# 手动测试健康检查接口
-curl http://localhost:8888/api/v1/ping
+# 手动测试健康检查接口（请将端口替换为当前后端监听端口，示例使用 20000）
+curl http://localhost:20000/api/v1/ping
 
 # 检查端口是否监听
-netstat -tuln | grep 8888
+netstat -tuln | grep 20000
 # 或
-ss -tuln | grep 8888
+ss -tuln | grep 20000
 ```
 
 ### 配置文件不存在

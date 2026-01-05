@@ -366,6 +366,20 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 
 	server.AddRoutes(
 		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.AuthMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodPost,
+					Path:    "/dict/batch",
+					Handler: dict.DictBatchGetHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
 			[]rest.Middleware{serverCtx.PerformanceMiddleware, serverCtx.RateLimitMiddleware, serverCtx.AuthMiddleware, serverCtx.PermissionMiddleware, serverCtx.OperationLogMiddleware},
 			[]rest.Route{
 				{

@@ -1,5 +1,5 @@
 <template>
-  <el-dropdown @command="handleCommand" trigger="click">
+  <el-dropdown trigger="click" @command="handleCommand">
     <div class="user-menu__trigger">
       <el-avatar :size="32" class="user-menu__avatar" :src="props.user?.avatar">
         {{ userAvatarText }}
@@ -27,48 +27,48 @@
 </template>
 
 <script setup lang="ts">
-import {computed} from 'vue';
-import {useRouter} from 'vue-router';
-import {ArrowDown, User, Lock, SwitchButton} from '@element-plus/icons-vue';
-import {useI18n} from 'vue-i18n';
-import type {ProfileResp} from '@/api/generated/admin';
+import {computed} from 'vue'
+import {useRouter} from 'vue-router'
+import {ArrowDown, User, Lock, SwitchButton} from '@element-plus/icons-vue'
+import {useI18n} from 'vue-i18n'
+import type {ProfileResp} from '@/api/generated/admin'
 
 interface Props {
   user: ProfileResp | null;
 }
 
-const props = defineProps<Props>();
+const props = defineProps<Props>()
 const emit = defineEmits<{
   logout: [];
-}>();
+}>()
 
-const {t} = useI18n();
-const router = useRouter();
+const {t} = useI18n()
+const router = useRouter()
 
 const userName = computed(() => {
-  return props.user?.username || props.user?.nickname || 'User';
-});
+  return props.user?.username || props.user?.nickname || 'User'
+})
 
 const userAvatarText = computed(() => {
-  const name = userName.value;
-  return name.charAt(0).toUpperCase();
-});
+  const name = userName.value
+  return name.charAt(0).toUpperCase()
+})
 
 const handleCommand = (command: string) => {
   switch (command) {
     case 'profile':
       // 跳转到个人信息页面
-      router.push('/system/profile');
-      break;
+      router.push('/system/profile')
+      break
     case 'password':
       // 跳转到个人信息页面（该页面包含修改密码功能）
-      router.push('/system/profile');
-      break;
+      router.push('/system/profile')
+      break
     case 'logout':
-      emit('logout');
-      break;
+      emit('logout')
+      break
   }
-};
+}
 </script>
 
 <style scoped lang="scss">

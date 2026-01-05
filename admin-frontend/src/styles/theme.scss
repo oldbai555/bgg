@@ -38,6 +38,12 @@
   --color-text-secondary: #909399;
 }
 
+html,
+body,
+#app {
+  height: 100%;
+}
+
 body {
   margin: 0;
   background: var(--color-bg);

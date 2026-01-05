@@ -13,10 +13,18 @@
           <el-input v-model="query.roomId" placeholder="请输入聊天室ID" clearable />
         </el-form-item>
         <el-form-item label="消息类型">
-          <el-select v-model="query.messageType" placeholder="请选择消息类型" clearable>
-            <el-option label="文本" :value="1" />
-            <el-option label="图片" :value="2" />
-            <el-option label="文件" :value="3" />
+          <el-select
+            v-model="query.messageType"
+            placeholder="请选择消息类型"
+            clearable
+            style="width: 200px"
+          >
+            <el-option
+              v-for="item in messageTypeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="Number(item.value)"
+            />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -69,7 +77,12 @@
             {{ row.content.length > 50 ? row.content.substring(0, 50) + '...' : row.content }}
           </span>
           <!-- 消息内容：文件消息 -->
-          <el-link v-else-if="column.prop === 'content' && row.messageType === 3" :href="row.content" target="_blank" type="primary">
+          <el-link
+            v-else-if="column.prop === 'content' && row.messageType === 3"
+            :href="row.content"
+            target="_blank"
+            type="primary"
+          >
             查看文件
           </el-link>
           <!-- 发送时间：格式化显示 -->
@@ -83,15 +96,16 @@
 </template>
 
 <script setup lang="ts">
-import {reactive, ref, onMounted, computed} from 'vue';
-import {ElMessage, ElMessageBox} from 'element-plus';
-import {Picture} from '@element-plus/icons-vue';
-import {chatMessageListAdmin, chatMessageDelete} from '@/api/generated/admin';
-import type {ChatMessageItem, ChatMessageListReq} from '@/api/generated/admin';
-import D2Table from '@/components/common/D2Table.vue';
-import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table';
-import {buildFileUrlFromResponse} from '@/utils/file';
-import {formatUnixTime} from '@/utils/date';
+import {reactive, ref, onMounted, computed} from 'vue'
+import {ElMessage, ElMessageBox} from 'element-plus'
+import {Picture} from '@element-plus/icons-vue'
+import {chatMessageListAdmin, chatMessageDelete} from '@/api/generated/admin'
+import type {ChatMessageItem, ChatMessageListReq} from '@/api/generated/admin'
+import D2Table from '@/components/common/D2Table.vue'
+import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table'
+import {buildFileUrlFromResponse} from '@/utils/file'
+import {formatUnixTime} from '@/utils/date'
+import {useDictOptions} from '@/composables/useDictOptions'
 
 const query = reactive<ChatMessageListReq & {fromUserName?: string; toUserName?: string; messageType?: number}>({
   page: 1,
@@ -101,10 +115,20 @@ const query = reactive<ChatMessageListReq & {fromUserName?: string; toUserName?:
   fromUserName: '',
   toUserName: '',
   messageType: undefined
-});
-const list = ref<ChatMessageItem[]>([]);
-const total = ref(0);
-const loading = ref(false);
+})
+const list = ref<ChatMessageItem[]>([])
+const total = ref(0)
+const loading = ref(false)
+
+// 消息类型选项
+const {options: messageTypeOptions, getLabel: getMessageTypeLabelFromDict} = useDictOptions(
+  'chat_message_type',
+  [
+    {label: '文本', value: '1'},
+    {label: '图片', value: '2'},
+    {label: '文件', value: '3'}
+  ]
+)
 
 // 表格列配置
 const columns = computed<TableColumn[]>(() => [
@@ -115,7 +139,7 @@ const columns = computed<TableColumn[]>(() => [
   {prop: 'content', label: '消息内容', minWidth: 200},
   {prop: 'messageType', label: '消息类型', width: 100},
   {prop: 'createdAt', label: '发送时间', width: 180}
-]);
+])
 
 // 详情抽屉列配置（只读）
 const drawerColumns = computed<DrawerColumn[]>(() => [
@@ -126,17 +150,12 @@ const drawerColumns = computed<DrawerColumn[]>(() => [
   {prop: 'content', label: '消息内容'},
   {prop: 'messageType', label: '消息类型'},
   {prop: 'createdAt', label: '发送时间', type: D2TableElemType.ConvertTime}
-]);
+])
 
-// 获取消息类型标签
+// 获取消息类型标签（使用字典）
 const getMessageTypeLabel = (type: number) => {
-  const typeMap: Record<number, string> = {
-    1: '文本',
-    2: '图片',
-    3: '文件'
-  };
-  return typeMap[type] || '未知';
-};
+  return getMessageTypeLabelFromDict(type) || '未知'
+}
 
 // 获取消息类型标签颜色
 const getMessageTypeTagType = (type: number): 'success' | 'warning' | 'info' => {
@@ -144,12 +163,12 @@ const getMessageTypeTagType = (type: number): 'success' | 'warning' | 'info' => 
     1: 'success',
     2: 'warning',
     3: 'info'
-  };
-  return typeMap[type] || 'info';
-};
+  }
+  return typeMap[type] || 'info'
+}
 
 const loadData = async () => {
-  loading.value = true;
+  loading.value = true
   try {
     // 构建查询参数（后端只支持 roomId 和 userId，前端需要先查询用户ID）
     const req: ChatMessageListReq = {
@@ -157,82 +176,84 @@ const loadData = async () => {
       pageSize: query.pageSize,
       roomId: query.roomId || '',
       userId: query.userId || 0
-    };
-    
-    const resp = await chatMessageListAdmin(req);
-    let filteredList = resp.list || [];
-    
+    }
+
+    const resp = await chatMessageListAdmin(req)
+    let filteredList = resp.list || []
+
     // 前端过滤：根据发送用户名和接收用户名过滤
     if (query.fromUserName) {
-      filteredList = filteredList.filter(item => 
+      filteredList = filteredList.filter(item =>
         item.fromUserName?.toLowerCase().includes(query.fromUserName!.toLowerCase())
-      );
+      )
     }
     if (query.toUserName) {
-      filteredList = filteredList.filter(item => 
+      filteredList = filteredList.filter(item =>
         item.toUserName?.toLowerCase().includes(query.toUserName!.toLowerCase())
-      );
+      )
     }
     if (query.messageType !== undefined && query.messageType !== null) {
-      filteredList = filteredList.filter(item => item.messageType === query.messageType);
+      filteredList = filteredList.filter(item => item.messageType === query.messageType)
     }
-    
+
     // 处理图片消息的 URL（如果是相对路径，需要拼接 baseUrl）
     filteredList = filteredList.map(item => {
       if (item.messageType === 2 && item.content && !item.content.startsWith('http')) {
         // 图片消息，如果是相对路径，使用工具函数拼接完整 URL
         // 注意：这里假设 content 存储的是文件路径，实际可能需要从文件表查询
-        item.content = buildFileUrlFromResponse({path: item.content});
+        item.content = buildFileUrlFromResponse({path: item.content})
       }
-      return item;
-    });
-    
-    list.value = filteredList;
-    total.value = filteredList.length; // 注意：这里使用的是过滤后的数量，实际应该从后端获取总数
-  } catch (err: any) {
-    ElMessage.error(err.message || '查询失败');
+      return item
+    })
+
+    list.value = filteredList
+    total.value = filteredList.length // 注意：这里使用的是过滤后的数量，实际应该从后端获取总数
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '查询失败'
+    ElMessage.error(message)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 
 const handleReset = () => {
-  query.page = 1;
-  query.pageSize = 10;
-  query.roomId = '';
-  query.userId = 0;
-  query.fromUserName = '';
-  query.toUserName = '';
-  query.messageType = undefined;
-  loadData();
-};
+  query.page = 1
+  query.pageSize = 10
+  query.roomId = ''
+  query.userId = 0
+  query.fromUserName = ''
+  query.toUserName = ''
+  query.messageType = undefined
+  loadData()
+}
 
 const handlePageChange = (page: number) => {
-  query.page = page;
-  loadData();
-};
+  query.page = page
+  loadData()
+}
 
 const handleSizeChange = (size: number) => {
-  query.pageSize = size;
-  query.page = 1;
-  loadData();
-};
+  query.pageSize = size
+  query.page = 1
+  loadData()
+}
 
 const handleDelete = (index: number, row: ChatMessageItem) => {
   ElMessageBox.confirm('确定要删除这条聊天记录吗？删除后无法恢复。', '确认删除', {type: 'warning'})
     .then(async () => {
       try {
-        await chatMessageDelete({id: row.id});
-        ElMessage.success('删除成功');
-        loadData();
-      } catch (err: any) {
-        ElMessage.error(err.message || '删除失败');
+        await chatMessageDelete({id: row.id})
+        ElMessage.success('删除成功')
+        loadData()
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : '删除失败'
+        ElMessage.error(message)
       }
     })
-    .catch(() => {});
-};
+    .catch(() => {})
+}
 
-onMounted(loadData);
+onMounted(loadData)
 </script>
 
 <style scoped lang="scss">

@@ -355,6 +355,14 @@ export function dictGet(req: components.DictGetReq) {
  * @description 
  * @param req
  */
+export function dictBatchGet(req: components.DictBatchGetReq) {
+	return webapi.post<components.DictBatchGetResp>(`/api/v1/dict/batch`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
 export function dictItemList(req: components.DictItemListReq) {
 	return webapi.get<components.DictItemListResp>(`/api/v1/dict-items`, req)
 }
