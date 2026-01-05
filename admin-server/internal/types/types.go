@@ -1087,3 +1087,55 @@ type UserUpdateReq struct {
 	DepartmentId uint64 `json:"departmentId,optional"`
 	Status       int64  `json:"status,optional"`
 }
+
+type VideoCreateReq struct {
+	Name        string `json:"name"`                 // 视频名称
+	Cover       string `json:"cover,optional"`       // 视频封面URL
+	Duration    int64  `json:"duration,optional"`    // 视频时长（秒）
+	PlayUrl     string `json:"playUrl"`              // 播放链接
+	Description string `json:"description,optional"` // 视频描述
+}
+
+type VideoDeleteReq struct {
+	Id uint64 `json:"id"`
+}
+
+type VideoItem struct {
+	Id          uint64 `json:"id"`
+	Name        string `json:"name"`                 // 视频名称
+	Cover       string `json:"cover,optional"`       // 视频封面URL
+	Duration    int64  `json:"duration"`             // 视频时长（秒）
+	PlayUrl     string `json:"playUrl"`              // 播放链接
+	Description string `json:"description,optional"` // 视频描述
+	CreatedAt   int64  `json:"createdAt"`            // 创建时间(秒级时间戳)
+	UpdatedAt   int64  `json:"updatedAt"`            // 更新时间(秒级时间戳)
+}
+
+type VideoListReq struct {
+	Page     int64  `json:"page,optional" form:"page,optional"`
+	PageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
+	Keyword  string `json:"keyword,optional" form:"keyword,optional"` // 搜索关键词（名称、描述）
+}
+
+type VideoListResp struct {
+	Total int64       `json:"total"`
+	List  []VideoItem `json:"list"`
+}
+
+type VideoProxyReq struct {
+	Url string `json:"url" form:"url"` // 要代理的视频URL
+}
+
+type VideoProxyResp struct {
+	Content     string `json:"content"`     // 代理后的内容
+	ContentType string `json:"contentType"` // 内容类型
+}
+
+type VideoUpdateReq struct {
+	Id          uint64 `json:"id"`
+	Name        string `json:"name,optional"`        // 视频名称
+	Cover       string `json:"cover,optional"`       // 视频封面URL
+	Duration    int64  `json:"duration,optional"`    // 视频时长（秒）
+	PlayUrl     string `json:"playUrl,optional"`     // 播放链接
+	Description string `json:"description,optional"` // 视频描述
+}

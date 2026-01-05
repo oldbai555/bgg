@@ -813,3 +813,43 @@ export function userRoleList(req: components.UserRoleListReq) {
 export function userRoleUpdate(req: components.UserRoleUpdateReq) {
 	return webapi.put<null>(`/api/v1/users/roles`, req)
 }
+
+/**
+ * @description 
+ * @param req
+ */
+export function videoList(req: components.VideoListReq) {
+	return webapi.get<components.VideoListResp>(`/api/v1/videos`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function videoCreate(req: components.VideoCreateReq) {
+	return webapi.post<null>(`/api/v1/videos`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function videoUpdate(req: components.VideoUpdateReq) {
+	return webapi.put<null>(`/api/v1/videos`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function videoDelete(req: components.VideoDeleteReq) {
+	return webapi.delete<null>(`/api/v1/videos`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function videoProxy(req: components.VideoProxyReq) {
+	return webapi.get<null>(`/api/v1/videos/proxy`, req)
+}

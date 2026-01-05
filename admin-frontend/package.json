@@ -13,9 +13,11 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
+    "@types/video.js": "^7.3.58",
     "axios": "^1.6.7",
     "element-plus": "^2.4.2",
     "pinia": "^2.1.7",
+    "video.js": "^8.23.4",
     "vue": "^3.4.14",
     "vue-i18n": "^9.9.0",
     "vue-router": "^4.2.5"

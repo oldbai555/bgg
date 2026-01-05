@@ -978,6 +978,48 @@ type (
 	DailyShortSentenceDeleteReq {
 		id uint64 `json:"id"`
 	}
+	// 视频管理
+	VideoItem {
+		id          uint64 `json:"id"`
+		name        string `json:"name"` // 视频名称
+		cover       string `json:"cover,optional"` // 视频封面URL
+		duration    int64  `json:"duration"` // 视频时长（秒）
+		playUrl     string `json:"playUrl"` // 播放链接
+		description string `json:"description,optional"` // 视频描述
+		createdAt   int64  `json:"createdAt"` // 创建时间(秒级时间戳)
+		updatedAt   int64  `json:"updatedAt"` // 更新时间(秒级时间戳)
+	}
+	VideoListReq {
+		page     int64  `json:"page,optional" form:"page,optional"`
+		pageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		keyword  string `json:"keyword,optional" form:"keyword,optional"` // 搜索关键词（名称、描述）
+	}
+	VideoListResp {
+		total int64       `json:"total"`
+		list  []VideoItem `json:"list"`
+	}
+	VideoCreateReq {
+		name        string `json:"name"` // 视频名称
+		cover       string `json:"cover,optional"` // 视频封面URL
+		duration    int64  `json:"duration,optional"` // 视频时长（秒）
+		playUrl     string `json:"playUrl"` // 播放链接
+		description string `json:"description,optional"` // 视频描述
+	}
+	VideoUpdateReq {
+		id          uint64 `json:"id"`
+		name        string `json:"name,optional"` // 视频名称
+		cover       string `json:"cover,optional"` // 视频封面URL
+		duration    int64  `json:"duration,optional"` // 视频时长（秒）
+		playUrl     string `json:"playUrl,optional"` // 播放链接
+		description string `json:"description,optional"` // 视频描述
+	}
+	VideoDeleteReq {
+		id uint64 `json:"id"`
+	}
+	// 视频代理（直接返回流，不返回JSON）
+	VideoProxyReq {
+		url string `json:"url" form:"url"` // 要代理的视频URL
+	}
 )
 
 @server (
@@ -1016,6 +1058,35 @@ service admin-api {
 
 	@handler DailyShortSentenceDelete
 	delete /daily-short-sentences (DailyShortSentenceDeleteReq)
+}
+
+@server (
+	group:      video
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler VideoList
+	get /videos (VideoListReq) returns (VideoListResp)
+
+	@handler VideoCreate
+	post /videos (VideoCreateReq)
+
+	@handler VideoUpdate
+	put /videos (VideoUpdateReq)
+
+	@handler VideoDelete
+	delete /videos (VideoDeleteReq)
+}
+
+@server (
+	group:      video
+	prefix:     /api/v1
+	middleware: AuthMiddleware
+)
+service admin-api {
+	@handler VideoProxy
+	get /videos/proxy (VideoProxyReq)
 }
 
 type (

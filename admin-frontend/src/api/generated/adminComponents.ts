@@ -365,7 +365,7 @@ export interface DemoItem {
 }
 
 export interface DemoListReq {
-	// 注意：GET 请求的查询参数需要同时包含 json 和 form 标签// json 标签用于请求体（POST/PUT/DELETE），form 标签用于查询参数（GET）// 重要：form 标签中必须包含 optional，否则 httpx.Parse 无法正确解析查询参数
+	// 注意：GET 请求的查询参数需要同时包含 json 和 form 标签// json 标签用于请求体（POST/PUT/DELETE），form 标签用于查询参数（GET）// 重要：form 标签中必须包含 optional，否则 httpx.Parse 无法正确解析查询参数
 	page?: number
 	pageSize?: number
 	name?: string
@@ -1109,5 +1109,52 @@ export interface UserUpdateReq {
 	signature?: string
 	departmentId?: number
 	status?: number
+}
+
+export interface VideoCreateReq {
+	name: string // 视频名称
+	cover?: string // 视频封面URL
+	duration?: number // 视频时长（秒）
+	playUrl: string // 播放链接
+	description?: string // 视频描述
+}
+
+export interface VideoDeleteReq {
+	id: number
+}
+
+export interface VideoItem {
+	id: number
+	name: string // 视频名称
+	cover?: string // 视频封面URL
+	duration: number // 视频时长（秒）
+	playUrl: string // 播放链接
+	description?: string // 视频描述
+	createdAt: number // 创建时间(秒级时间戳)
+	updatedAt: number // 更新时间(秒级时间戳)
+}
+
+export interface VideoListReq {
+	page?: number
+	pageSize?: number
+	keyword?: string // 搜索关键词（名称、描述）
+}
+
+export interface VideoListResp {
+	total: number
+	list: Array<VideoItem>
+}
+
+export interface VideoProxyReq {
+	url: string // 要代理的视频URL
+}
+
+export interface VideoUpdateReq {
+	id: number
+	name?: string // 视频名称
+	cover?: string // 视频封面URL
+	duration?: number // 视频时长（秒）
+	playUrl?: string // 播放链接
+	description?: string // 视频描述
 }
 

@@ -35,6 +35,7 @@ import (
 	role_permission "postapocgame/admin-server/internal/handler/role_permission"
 	user "postapocgame/admin-server/internal/handler/user"
 	user_role "postapocgame/admin-server/internal/handler/user_role"
+	video "postapocgame/admin-server/internal/handler/video"
 	"postapocgame/admin-server/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
@@ -829,6 +830,49 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodPut,
 					Path:    "/users/roles",
 					Handler: user_role.UserRoleUpdateHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.PerformanceMiddleware, serverCtx.RateLimitMiddleware, serverCtx.AuthMiddleware, serverCtx.PermissionMiddleware, serverCtx.OperationLogMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/videos",
+					Handler: video.VideoListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/videos",
+					Handler: video.VideoCreateHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/videos",
+					Handler: video.VideoUpdateHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodDelete,
+					Path:    "/videos",
+					Handler: video.VideoDeleteHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.AuthMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/videos/proxy",
+					Handler: video.VideoProxyHandler(serverCtx),
 				},
 			}...,
 		),

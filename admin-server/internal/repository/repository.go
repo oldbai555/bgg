@@ -43,6 +43,7 @@ type Repository struct {
 	AdminNoticeModel         model.AdminNoticeModel
 	AdminNotificationModel   model.AdminNotificationModel
 	DailyShortSentenceModel  model.DailyShortSentenceModel
+	VideoModel               model.VideoModel
 }
 
 func NewRepository(conn sqlx.SqlConn, cacheConf cache.CacheConf, rdb *redis.Redis) (*Repository, error) {
@@ -82,6 +83,7 @@ func NewRepository(conn sqlx.SqlConn, cacheConf cache.CacheConf, rdb *redis.Redi
 		AdminNoticeModel:         model.NewAdminNoticeModel(conn, cacheConf),
 		AdminNotificationModel:   model.NewAdminNotificationModel(conn, cacheConf),
 		DailyShortSentenceModel:  model.NewDailyShortSentenceModel(conn, cacheConf),
+		VideoModel:               model.NewVideoModel(conn, cacheConf),
 	}, nil
 }
 

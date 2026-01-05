@@ -433,22 +433,25 @@ SQL模板：
 -- 说明：{字典用途说明}
 -- ============================================
 
--- 1. 插入字典类型
-INSERT INTO `admin_dict_type` (`id`, `name`, `code`, `description`, `status`, `created_at`, `updated_at`, `deleted_at`)
+-- 1. 插入字典类型（使用自动增长ID）
+INSERT INTO `admin_dict_type` (`name`, `code`, `description`, `status`, `created_at`, `updated_at`, `deleted_at`)
 VALUES
-  ({id}, '{字典类型名称}', '{dict_code}', '{字典类型描述}', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
+  ('{字典类型名称}', '{dict_code}', '{字典类型描述}', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
 ON DUPLICATE KEY UPDATE
   `name`=VALUES(`name`),
   `description`=VALUES(`description`),
   `updated_at`=UNIX_TIMESTAMP(),
   `deleted_at`=0;
 
--- 2. 插入字典项
-INSERT INTO `admin_dict_item` (`id`, `type_id`, `label`, `value`, `sort`, `status`, `remark`, `created_at`, `updated_at`, `deleted_at`)
+-- 2. 获取字典类型ID（通过code获取）
+SET @dict_type_id = (SELECT `id` FROM `admin_dict_type` WHERE `code` = '{dict_code}' AND `deleted_at` = 0 LIMIT 1);
+
+-- 3. 插入字典项（使用自动增长ID，通过code获取的type_id）
+INSERT INTO `admin_dict_item` (`type_id`, `label`, `value`, `sort`, `status`, `remark`, `created_at`, `updated_at`, `deleted_at`)
 VALUES
-  ({id1}, {type_id}, '{字典项标签1}', '{value1}', 1, 1, '{备注1}', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
-  ({id2}, {type_id}, '{字典项标签2}', '{value2}', 2, 1, '{备注2}', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
-  ({id3}, {type_id}, '{字典项标签3}', '{value3}', 3, 1, '{备注3}', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
+  (@dict_type_id, '{字典项标签1}', '{value1}', 1, 1, '{备注1}', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
+  (@dict_type_id, '{字典项标签2}', '{value2}', 2, 1, '{备注2}', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
+  (@dict_type_id, '{字典项标签3}', '{value3}', 3, 1, '{备注3}', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
 ON DUPLICATE KEY UPDATE
   `label`=VALUES(`label`),
   `value`=VALUES(`value`),
@@ -469,24 +472,27 @@ ON DUPLICATE KEY UPDATE
 -- 说明：订单状态字典，用于订单列表状态筛选和展示
 -- ============================================
 
--- 1. 插入字典类型
-INSERT INTO `admin_dict_type` (`id`, `name`, `code`, `description`, `status`, `created_at`, `updated_at`, `deleted_at`)
+-- 1. 插入字典类型（使用自动增长ID）
+INSERT INTO `admin_dict_type` (`name`, `code`, `description`, `status`, `created_at`, `updated_at`, `deleted_at`)
 VALUES
-  (100, '订单状态', 'order_status', '订单状态字典', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
+  ('订单状态', 'order_status', '订单状态字典', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
 ON DUPLICATE KEY UPDATE
   `name`=VALUES(`name`),
   `description`=VALUES(`description`),
   `updated_at`=UNIX_TIMESTAMP(),
   `deleted_at`=0;
 
--- 2. 插入字典项
-INSERT INTO `admin_dict_item` (`id`, `type_id`, `label`, `value`, `sort`, `status`, `remark`, `created_at`, `updated_at`, `deleted_at`)
+-- 2. 获取字典类型ID（通过code获取）
+SET @dict_type_id = (SELECT `id` FROM `admin_dict_type` WHERE `code` = 'order_status' AND `deleted_at` = 0 LIMIT 1);
+
+-- 3. 插入字典项（使用自动增长ID，通过code获取的type_id）
+INSERT INTO `admin_dict_item` (`type_id`, `label`, `value`, `sort`, `status`, `remark`, `created_at`, `updated_at`, `deleted_at`)
 VALUES
-  (1001, 100, '待支付', 'pending', 1, 1, '订单待支付状态', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
-  (1002, 100, '已支付', 'paid', 2, 1, '订单已支付状态', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
-  (1003, 100, '已发货', 'shipped', 3, 1, '订单已发货状态', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
-  (1004, 100, '已完成', 'completed', 4, 1, '订单已完成状态', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
-  (1005, 100, '已取消', 'cancelled', 5, 1, '订单已取消状态', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
+  (@dict_type_id, '待支付', 'pending', 1, 1, '订单待支付状态', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
+  (@dict_type_id, '已支付', 'paid', 2, 1, '订单已支付状态', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
+  (@dict_type_id, '已发货', 'shipped', 3, 1, '订单已发货状态', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
+  (@dict_type_id, '已完成', 'completed', 4, 1, '订单已完成状态', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
+  (@dict_type_id, '已取消', 'cancelled', 5, 1, '订单已取消状态', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
 ON DUPLICATE KEY UPDATE
   `label`=VALUES(`label`),
   `value`=VALUES(`value`),
@@ -497,15 +503,10 @@ ON DUPLICATE KEY UPDATE
   `deleted_at`=0;
 ```
 
-ID分配规范：
-- 字典类型ID：100-999（按模块分段，如订单100-199，商品200-299）
-- 字典项ID：1000-9999（按类型分段，每个类型预留100个ID）
-
-查询现有最大ID：
-```sql
-SELECT MAX(id) FROM admin_dict_type;
-SELECT MAX(id) FROM admin_dict_item;
-```
+重要说明：
+- **禁止手动指定ID**：字典类型和字典项的ID必须使用自动增长，不能手动指定
+- **通过code获取ID**：使用 `SET @dict_type_id = (SELECT id FROM admin_dict_type WHERE code = 'xxx' AND deleted_at = 0 LIMIT 1)` 获取字典类型ID
+- **幂等性保证**：使用 `ON DUPLICATE KEY UPDATE` 确保SQL可重复执行
 
 执行顺序：
 1. 先执行字典SQL（dict_*.sql）
