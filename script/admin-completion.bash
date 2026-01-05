@@ -26,19 +26,13 @@ _admin_completion() {
 
   # 第一个参数：主命令
   if [ ${COMP_CWORD} -eq ${cmd_index} ]; then
-    COMPREPLY=($(compgen -W "dev build package supervisor" -- "${cur}"))
+    COMPREPLY=($(compgen -W "build package frontend supervisor" -- "${cur}"))
     return 0
   fi
 
   # 第二个参数：子命令
   local main_cmd="${COMP_WORDS[${cmd_index}]}"
   case "${main_cmd}" in
-    dev)
-      if [ ${COMP_CWORD} -eq $((cmd_index + 1)) ]; then
-        COMPREPLY=($(compgen -W "start stop status logs" -- "${cur}"))
-      fi
-      return 0
-      ;;
     build)
       if [ ${COMP_CWORD} -eq $((cmd_index + 1)) ]; then
         COMPREPLY=($(compgen -W "server frontend" -- "${cur}"))
@@ -48,6 +42,12 @@ _admin_completion() {
     package)
       if [ ${COMP_CWORD} -eq $((cmd_index + 1)) ]; then
         COMPREPLY=($(compgen -W "server frontend" -- "${cur}"))
+      fi
+      return 0
+      ;;
+    frontend)
+      if [ ${COMP_CWORD} -eq $((cmd_index + 1)) ]; then
+        COMPREPLY=($(compgen -W "deploy" -- "${cur}"))
       fi
       return 0
       ;;

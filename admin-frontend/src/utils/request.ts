@@ -1,8 +1,13 @@
 import axios from 'axios';
 import {useUserStore} from '@/stores/user';
 
+// 根据环境切换基础地址：
+// - 开发环境：通过 Vite dev server 代理到 http://localhost:8888（baseURL 为 /api）
+// - 生产环境：浏览器直接请求 https://oldbai.top/gateway/api/*
+const baseURL = import.meta.env.PROD ? '/gateway/api' : '/api';
+
 const instance = axios.create({
-  baseURL: '/api',
+  baseURL,
   timeout: 15000
 });
 
