@@ -55,143 +55,6 @@ is_service_running() {
 }
 
 # ============================================
-# 开发工具
-# ============================================
-
-# 检查服务健康状态
-check_service_health() {
-  local max_attempts=30
-  local attempt=0
-  local health_url="http://localhost:8888/api/v1/ping"
-  
-  log_info "等待服务启动..."
-  
-  while [ $attempt -lt $max_attempts ]; do
-    # 检查进程是否存在
-    if ! is_service_running; then
-      log_warning "进程未运行，等待中... ($attempt/$max_attempts)"
-      sleep 1
-      attempt=$((attempt + 1))
-      continue
-    fi
-    
-    # 检查端口是否监听
-    if command -v netstat &> /dev/null; then
-      if ! netstat -tuln 2>/dev/null | grep -q ":8888.*LISTEN"; then
-        log_warning "端口未监听，等待中... ($attempt/$max_attempts)"
-        sleep 1
-        attempt=$((attempt + 1))
-        continue
-      fi
-    elif command -v ss &> /dev/null; then
-      if ! ss -tuln 2>/dev/null | grep -q ":8888"; then
-        log_warning "端口未监听，等待中... ($attempt/$max_attempts)"
-        sleep 1
-        attempt=$((attempt + 1))
-        continue
-      fi
-    fi
-    
-    # 检查健康检查接口
-    if command -v curl &> /dev/null; then
-      local response=$(curl -s -o /dev/null -w "%{http_code}" --max-time 2 "$health_url" 2>/dev/null || echo "000")
-      if [ "$response" = "200" ]; then
-        log_info "服务健康检查通过"
-        return 0
-      fi
-    elif command -v wget &> /dev/null; then
-      local response=$(wget -q -O /dev/null -S --timeout=2 "$health_url" 2>&1 | grep -o "HTTP/[0-9.]* [0-9]*" | awk '{print $2}' || echo "000")
-      if [ "$response" = "200" ]; then
-        log_info "服务健康检查通过"
-        return 0
-      fi
-    else
-      # 如果没有 curl 或 wget，至少检查进程和端口
-      if is_service_running; then
-        log_info "服务进程运行中（无法进行健康检查，请手动验证）"
-        return 0
-      fi
-    fi
-    
-    log_warning "健康检查未通过，等待中... ($attempt/$max_attempts)"
-    sleep 1
-    attempt=$((attempt + 1))
-  done
-  
-  log_error "服务启动超时（${max_attempts}秒）"
-  return 1
-}
-
-dev_start() {
-  log_info "启动后端服务..."
-  
-  # 检查服务是否已在运行
-  if is_service_running; then
-    if check_service_health; then
-      log_warning "服务已在运行中"
-      return 0
-    else
-      log_warning "服务进程存在但未正常响应，尝试重启..."
-      dev_stop
-      sleep 1
-    fi
-  fi
-  
-  cd "$ADMIN_SERVER_DIR" || exit 1
-  [ ! -f "etc/$APP_CONFIG_FILE" ] && { log_error "配置文件不存在: etc/$APP_CONFIG_FILE"; return 1; }
-  
-  # 确保日志目录存在
-  ensure_dir "$PROJECT_ROOT/logs"
-  
-  # 启动服务
-  log_info "正在启动服务..."
-  nohup go run admin.go > "$PROJECT_ROOT/logs/server.log" 2>&1 &
-  local pid=$!
-  
-  # 等待进程启动
-  sleep 1
-  
-  # 检查进程是否启动
-  if ! kill -0 "$pid" 2>/dev/null; then
-    log_error "服务启动失败，请查看日志: $PROJECT_ROOT/logs/server.log"
-    tail -n 20 "$PROJECT_ROOT/logs/server.log" 2>/dev/null || true
-    return 1
-  fi
-  
-  # 等待服务完全启动（健康检查）
-  if check_service_health; then
-    log_info "服务启动成功，PID: $pid"
-    log_info "健康检查接口: http://localhost:8888/api/v1/ping"
-    log_info "日志文件: $PROJECT_ROOT/logs/server.log"
-    return 0
-  else
-    log_error "服务启动失败，请查看日志: $PROJECT_ROOT/logs/server.log"
-    tail -n 30 "$PROJECT_ROOT/logs/server.log" 2>/dev/null || true
-    # 尝试停止失败的进程
-    kill "$pid" 2>/dev/null || true
-    return 1
-  fi
-}
-
-dev_stop() {
-  log_info "停止后端服务..."
-  local pid=$(get_go_pid)
-  [ -z "$pid" ] && { log_warning "服务未运行"; return 0; }
-  kill "$pid" 2>/dev/null || kill -9 "$pid" 2>/dev/null
-  log_info "服务已停止"
-}
-
-dev_status() {
-  local pid=$(get_go_pid)
-  [ -n "$pid" ] && { log_info "服务运行中，PID: $pid"; ps -p "$pid" -o pid,cmd,etime; } || log_warning "服务未运行"
-}
-
-dev_logs() {
-  local lines="${1:-100}"
-  [ -f "$PROJECT_ROOT/logs/server.log" ] && tail -n "$lines" "$PROJECT_ROOT/logs/server.log" || log_error "日志文件不存在"
-}
-
-# ============================================
 # 构建工具
 # ============================================
 
@@ -261,9 +124,40 @@ package_frontend() {
   
   local package_file="$PACKAGE_OUTPUT_DIR/admin-frontend_${version}.tar.gz"
   cd "$ADMIN_FRONTEND_DIR" || return 1
+  # 打包 dist 目录下的所有文件（不包含 dist 这一层），方便在服务器上直接解压到 dist 目录中
   tar -czf "$package_file" -C dist .
   log_info "打包完成: $package_file"
   echo "$package_file"
+}
+
+# ============================================
+# 前端部署（静态文件）
+# ============================================
+
+deploy_frontend() {
+  local package_file="$1"
+
+  [ -z "$package_file" ] && { log_error "请指定前端打包文件"; return 1; }
+  [ ! -f "$package_file" ] && { log_error "前端打包文件不存在: $package_file"; return 1; }
+
+  # 使用当前目录作为前端部署目录
+  local target_dir="$(pwd)"
+  log_info "部署前端到目录: $target_dir"
+
+  cd "$target_dir" || return 1
+
+  # 备份旧的 dist 目录
+  if [ -d "dist" ]; then
+    local backup_dir="dist_$(date +%Y%m%d%H%M%S).bak"
+    mv dist "$backup_dir"
+    log_info "已备份旧的 dist 目录为: $backup_dir"
+  fi
+
+  # 创建新的 dist 目录并解压到其中
+  mkdir -p dist
+  tar -xzf "$package_file" -C dist
+
+  log_info "前端部署完成，访问目录: $target_dir/dist"
 }
 
 # ============================================
@@ -360,17 +254,14 @@ usage() {
   cat <<EOF
 用法: ./admin.sh <command> [options]
 
-开发命令（开发环境建议使用 GoLand，此部分可选）:
-  dev start         启动后端服务（带健康检查）
-  dev stop          停止后端服务
-  dev status        查看服务状态
-  dev logs [行数]   查看日志
-
 构建命令:
   build server      构建后端
   build frontend    构建前端
   package server    打包后端（构建+打包）
   package frontend  打包前端（构建+打包）
+
+前端部署命令（静态文件）:
+  frontend deploy <file>       在当前目录下部署前端，将包内容解压到 ./dist
 
 Supervisor 命令:
   supervisor gen-conf          生成配置文件
@@ -383,7 +274,6 @@ Supervisor 命令:
   supervisor logs              查看日志
 
 示例:
-  ./admin.sh dev start
   ./admin.sh build server
   ./admin.sh package server
   ./admin.sh supervisor install
@@ -397,15 +287,6 @@ main() {
   ensure_dir "$SUPERVISOR_LOG_DIR" 2>/dev/null || true
   
   case "${1:-}" in
-    dev)
-      case "${2:-}" in
-        start) dev_start ;;
-        stop) dev_stop ;;
-        status) dev_status ;;
-        logs) dev_logs "${3:-100}" ;;
-        *) log_error "未知命令: dev $2"; usage; exit 1 ;;
-      esac
-      ;;
     build)
       case "${2:-}" in
         server) build_server ;;
@@ -418,6 +299,12 @@ main() {
         server) package_server ;;
         frontend) package_frontend ;;
         *) log_error "未知命令: package $2"; usage; exit 1 ;;
+      esac
+      ;;
+    frontend)
+      case "${2:-}" in
+        deploy) deploy_frontend "${3:-}" ;;
+        *) log_error "未知命令: frontend $2"; usage; exit 1 ;;
       esac
       ;;
     supervisor)
