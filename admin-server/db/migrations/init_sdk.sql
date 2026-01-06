@@ -201,7 +201,7 @@ VALUES
   (@perm_if_create, @btn_interface_create, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
   (@perm_if_update, @btn_interface_update, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
   (@perm_if_delete, @btn_interface_delete, UNIX_TIMESTAMP(), UNIX_TIMESTAMP())
-ON DUPLICATE KEY UPDATE `updated_at`=UNIX_TIMESTAMP(), `deleted_at`=0;
+ON DUPLICATE KEY UPDATE `updated_at`=UNIX_TIMESTAMP();
 
 -- ============================================
 -- 6. 权限-接口关联
@@ -220,5 +220,5 @@ VALUES
   (@perm_if_create, @api_if_create, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
   (@perm_if_update, @api_if_update, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
   (@perm_if_delete, @api_if_delete, UNIX_TIMESTAMP(), UNIX_TIMESTAMP())
-ON DUPLICATE KEY UPDATE `updated_at`=UNIX_TIMESTAMP(), `deleted_at`=0;
+ON DUPLICATE KEY UPDATE `updated_at`=UNIX_TIMESTAMP();
 
