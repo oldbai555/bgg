@@ -1638,3 +1638,222 @@ service admin-api {
 	delete /notifications (NotificationDeleteReq) returns (Response)
 }
 
+// ================================
+// SDK 管理（API Key / 接口 / 调用记录）
+// ================================
+type (
+	// API Key
+	SdkApiKeyItem {
+		id          uint64 `json:"id"`
+		name        string `json:"name"`
+		apiKey      string `json:"apiKey"`
+		apiSecret   string `json:"apiSecret"`
+		status      int64  `json:"status"`
+		expireAt    int64  `json:"expireAt"`
+		ipWhitelist string `json:"ipWhitelist"`
+		remark      string `json:"remark"`
+		createdAt   int64  `json:"createdAt"`
+	}
+	SdkApiKeyListReq {
+		page     int64  `json:"page,optional" form:"page,optional"`
+		pageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		name     string `json:"name,optional" form:"name,optional"`
+		status   int64  `json:"status,optional" form:"status,optional"`
+	}
+	SdkApiKeyListResp {
+		total int64           `json:"total"`
+		list  []SdkApiKeyItem `json:"list"`
+	}
+	SdkApiKeyCreateReq {
+		name        string `json:"name"`
+		status      int64  `json:"status,optional"`
+		expireAt    int64  `json:"expireAt,optional"`
+		ipWhitelist string `json:"ipWhitelist,optional"`
+		remark      string `json:"remark,optional"`
+	}
+	SdkApiKeyCreateResp {
+		id        uint64 `json:"id"`
+		apiKey    string `json:"apiKey"`
+		apiSecret string `json:"apiSecret"`
+	}
+	SdkApiKeyUpdateReq {
+		id          uint64 `json:"id"`
+		name        string `json:"name,optional"`
+		status      int64  `json:"status,optional"`
+		expireAt    int64  `json:"expireAt,optional"`
+		ipWhitelist string `json:"ipWhitelist,optional"`
+		remark      string `json:"remark,optional"`
+	}
+	SdkApiKeyDeleteReq {
+		id uint64 `json:"id"`
+	}
+	// 接口管理与授权
+	SdkInterfaceItem {
+		id               uint64 `json:"id"`
+		name             string `json:"name"`
+		apiCode          string `json:"apiCode"`
+		path             string `json:"path"`
+		method           string `json:"method"`
+		rateLimitDefault int64  `json:"rateLimitDefault"`
+		status           int64  `json:"status"`
+		remark           string `json:"remark"`
+		createdAt        int64  `json:"createdAt"`
+	}
+	SdkInterfaceListReq {
+		page     int64  `json:"page,optional" form:"page,optional"`
+		pageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		name     string `json:"name,optional" form:"name,optional"`
+		apiCode  string `json:"apiCode,optional" form:"apiCode,optional"`
+		status   int64  `json:"status,optional" form:"status,optional"`
+	}
+	SdkInterfaceListResp {
+		total int64              `json:"total"`
+		list  []SdkInterfaceItem `json:"list"`
+	}
+	SdkInterfaceCreateReq {
+		name             string `json:"name"`
+		apiCode          string `json:"apiCode"`
+		path             string `json:"path"`
+		method           string `json:"method"`
+		rateLimitDefault int64  `json:"rateLimitDefault,optional"`
+		status           int64  `json:"status,optional"`
+		remark           string `json:"remark,optional"`
+	}
+	SdkInterfaceUpdateReq {
+		id               uint64 `json:"id"`
+		name             string `json:"name,optional"`
+		apiCode          string `json:"apiCode,optional"`
+		path             string `json:"path,optional"`
+		method           string `json:"method,optional"`
+		rateLimitDefault int64  `json:"rateLimitDefault,optional"`
+		status           int64  `json:"status,optional"`
+		remark           string `json:"remark,optional"`
+	}
+	SdkInterfaceDeleteReq {
+		id uint64 `json:"id"`
+	}
+	SdkApiKeyBindListReq {
+		sdkKeyId uint64 `json:"sdkKeyId,optional" form:"sdkKeyId,optional"`
+	}
+	SdkApiKeyBindItem {
+		sdkInterfaceId  uint64 `json:"sdkInterfaceId"`
+		apiCode         string `json:"apiCode"`
+		name            string `json:"name"`
+		path            string `json:"path"`
+		method          string `json:"method"`
+		bound           int64  `json:"bound"`
+		rateLimit       int64  `json:"rateLimit"`
+		customRateLimit int64  `json:"customRateLimit"`
+	}
+	SdkApiKeyBindListResp {
+		list []SdkApiKeyBindItem `json:"list"`
+	}
+	SdkApiKeyBindSaveReq {
+		sdkKeyId uint64                  `json:"sdkKeyId"`
+		bindings []SdkApiKeyBindSaveItem `json:"bindings"`
+	}
+	SdkApiKeyBindSaveItem {
+		sdkInterfaceId  uint64 `json:"sdkInterfaceId"`
+		customRateLimit int64  `json:"customRateLimit,optional"`
+	}
+	// 调用记录
+	SdkCallLogItem {
+		id             uint64 `json:"id"`
+		sdkKeyId       uint64 `json:"sdkKeyId"`
+		sdkInterfaceId uint64 `json:"sdkInterfaceId"`
+		apiCode        string `json:"apiCode"`
+		path           string `json:"path"`
+		method         string `json:"method"`
+		ip             string `json:"ip"`
+		respCode       int64  `json:"respCode"`
+		durationMs     int64  `json:"durationMs"`
+		createdAt      int64  `json:"createdAt"`
+	}
+	SdkCallLogListReq {
+		page      int64  `json:"page,optional" form:"page,optional"`
+		pageSize  int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		sdkKeyId  uint64 `json:"sdkKeyId,optional" form:"sdkKeyId,optional"`
+		apiCode   string `json:"apiCode,optional" form:"apiCode,optional"`
+		respCode  int64  `json:"respCode,optional" form:"respCode,optional"`
+		ip        string `json:"ip,optional" form:"ip,optional"`
+		startTime int64  `json:"startTime,optional" form:"startTime,optional"`
+		endTime   int64  `json:"endTime,optional" form:"endTime,optional"`
+	}
+	SdkCallLogListResp {
+		total int64            `json:"total"`
+		list  []SdkCallLogItem `json:"list"`
+	}
+	SdkCallLogExportReq {
+		sdkKeyId  uint64 `json:"sdkKeyId,optional" form:"sdkKeyId,optional"`
+		apiCode   string `json:"apiCode,optional" form:"apiCode,optional"`
+		respCode  int64  `json:"respCode,optional" form:"respCode,optional"`
+		ip        string `json:"ip,optional" form:"ip,optional"`
+		startTime int64  `json:"startTime,optional" form:"startTime,optional"`
+		endTime   int64  `json:"endTime,optional" form:"endTime,optional"`
+	}
+	// SDK 文件上传（对外）
+	SdkFileUploadResp {
+		fileId uint64 `json:"fileId"`
+		url    string `json:"url"`
+		name   string `json:"name"`
+	}
+)
+
+@server (
+	group:      sdk
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	// API Key 管理
+	@handler SdkApiKeyList
+	get /sdk/key/list (SdkApiKeyListReq) returns (SdkApiKeyListResp)
+
+	@handler SdkApiKeyCreate
+	post /sdk/key/create (SdkApiKeyCreateReq) returns (SdkApiKeyCreateResp)
+
+	@handler SdkApiKeyUpdate
+	post /sdk/key/update (SdkApiKeyUpdateReq)
+
+	@handler SdkApiKeyDelete
+	post /sdk/key/delete (SdkApiKeyDeleteReq)
+
+	// 接口授权
+	@handler SdkApiKeyBindList
+	get /sdk/key/apis (SdkApiKeyBindListReq) returns (SdkApiKeyBindListResp)
+
+	@handler SdkApiKeyBindSave
+	post /sdk/key/apis/save (SdkApiKeyBindSaveReq)
+
+	// SDK 接口管理
+	@handler SdkInterfaceList
+	get /sdk/interface/list (SdkInterfaceListReq) returns (SdkInterfaceListResp)
+
+	@handler SdkInterfaceCreate
+	post /sdk/interface/create (SdkInterfaceCreateReq)
+
+	@handler SdkInterfaceUpdate
+	post /sdk/interface/update (SdkInterfaceUpdateReq)
+
+	@handler SdkInterfaceDelete
+	post /sdk/interface/delete (SdkInterfaceDeleteReq)
+
+	// 调用记录
+	@handler SdkCallLogList
+	get /sdk/call/log/list (SdkCallLogListReq) returns (SdkCallLogListResp)
+
+	@handler SdkCallLogExport
+	get /sdk/call/log/export (SdkCallLogExportReq)
+}
+
+// SDK 对外接口组（走 SDK 鉴权/限频/调用记录）
+@server (
+	group:      sdk_public
+	prefix:     /sdk
+	middleware: SDKAuthMiddleware,SDKRateLimitMiddleware,SDKCallLogMiddleware
+)
+service admin-api {
+	@handler SdkFileUpload
+	post /file/upload returns (SdkFileUploadResp)
+}
+

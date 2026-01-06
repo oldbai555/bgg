@@ -50,6 +50,9 @@ func (l *NotificationListLogic) NotificationList(req *types.NotificationListReq)
 
 	// 只查询当前用户的消息通知
 	notificationRepo := repository.NewNotificationRepository(l.svcCtx.Repository)
+
+	// ReadStatus 枚举（字典 read_status）：0 = 全部（不筛选）；1 = 未读；2 = 已读
+	// DB 中 admin_notification.read_status 与枚举值保持一致：1 = 未读，2 = 已读
 	list, total, err := notificationRepo.FindPage(l.ctx, req.Page, req.PageSize, user.UserID, req.SourceType, req.ReadStatus)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询消息通知列表失败", err)

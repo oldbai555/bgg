@@ -48,7 +48,9 @@ func (r *notificationRepository) FindPage(ctx context.Context, page, pageSize in
 		where = append(where, "source_type = ?")
 		args = append(args, sourceType)
 	}
-	if readStatus >= 0 {
+	// readStatus <= 0 表示不筛选，readStatus > 0 时添加筛选条件
+	// 枚举（字典 read_status）：1 = 未读，2 = 已读
+	if readStatus > 0 {
 		where = append(where, "read_status = ?")
 		args = append(args, readStatus)
 	}

@@ -1057,6 +1057,180 @@ export interface RoleUpdateReq {
 	status?: number
 }
 
+export interface SdkApiKeyBindItem {
+	sdkInterfaceId: number
+	apiCode: string
+	name: string
+	path: string
+	method: string
+	bound: number
+	rateLimit: number
+	customRateLimit: number
+}
+
+export interface SdkApiKeyBindListReq {
+	sdkKeyId?: number
+}
+
+export interface SdkApiKeyBindListResp {
+	list: Array<SdkApiKeyBindItem>
+}
+
+export interface SdkApiKeyBindSaveItem {
+	sdkInterfaceId: number
+	customRateLimit?: number
+}
+
+export interface SdkApiKeyBindSaveReq {
+	sdkKeyId: number
+	bindings: Array<SdkApiKeyBindSaveItem>
+}
+
+export interface SdkApiKeyCreateReq {
+	name: string
+	status?: number
+	expireAt?: number
+	ipWhitelist?: string
+	remark?: string
+}
+
+export interface SdkApiKeyCreateResp {
+	id: number
+	apiKey: string
+	apiSecret: string
+}
+
+export interface SdkApiKeyDeleteReq {
+	id: number
+}
+
+export interface SdkApiKeyItem {
+	id: number
+	name: string
+	apiKey: string
+	apiSecret: string
+	status: number
+	expireAt: number
+	ipWhitelist: string
+	remark: string
+	createdAt: number
+}
+
+export interface SdkApiKeyListReq {
+	page?: number
+	pageSize?: number
+	name?: string
+	status?: number
+}
+
+export interface SdkApiKeyListResp {
+	total: number
+	list: Array<SdkApiKeyItem>
+}
+
+export interface SdkApiKeyUpdateReq {
+	id: number
+	name?: string
+	status?: number
+	expireAt?: number
+	ipWhitelist?: string
+	remark?: string
+}
+
+export interface SdkCallLogExportReq {
+	sdkKeyId?: number
+	apiCode?: string
+	respCode?: number
+	ip?: string
+	startTime?: number
+	endTime?: number
+}
+
+export interface SdkCallLogItem {
+	id: number
+	sdkKeyId: number
+	sdkInterfaceId: number
+	apiCode: string
+	path: string
+	method: string
+	ip: string
+	respCode: number
+	durationMs: number
+	createdAt: number
+}
+
+export interface SdkCallLogListReq {
+	page?: number
+	pageSize?: number
+	sdkKeyId?: number
+	apiCode?: string
+	respCode?: number
+	ip?: string
+	startTime?: number
+	endTime?: number
+}
+
+export interface SdkCallLogListResp {
+	total: number
+	list: Array<SdkCallLogItem>
+}
+
+export interface SdkFileUploadResp {
+	fileId: number
+	url: string
+	name: string
+}
+
+export interface SdkInterfaceCreateReq {
+	name: string
+	apiCode: string
+	path: string
+	method: string
+	rateLimitDefault?: number
+	status?: number
+	remark?: string
+}
+
+export interface SdkInterfaceDeleteReq {
+	id: number
+}
+
+export interface SdkInterfaceItem {
+	id: number
+	name: string
+	apiCode: string
+	path: string
+	method: string
+	rateLimitDefault: number
+	status: number
+	remark: string
+	createdAt: number
+}
+
+export interface SdkInterfaceListReq {
+	page?: number
+	pageSize?: number
+	name?: string
+	apiCode?: string
+	status?: number
+}
+
+export interface SdkInterfaceListResp {
+	total: number
+	list: Array<SdkInterfaceItem>
+}
+
+export interface SdkInterfaceUpdateReq {
+	id: number
+	name?: string
+	apiCode?: string
+	path?: string
+	method?: string
+	rateLimitDefault?: number
+	status?: number
+	remark?: string
+}
+
 export interface TokenPair {
 	accessToken: string
 	refreshToken: string

@@ -215,7 +215,7 @@
           <el-select
             v-else-if="column.type === D2TableElemType.Select"
             v-model="drawerRow[column.prop]"
-            :disabled="!isEdit"
+            :disabled="!isEdit || column.disabled"
             style="width: 360px"
           >
             <el-option
@@ -229,7 +229,7 @@
           <el-input
             v-else-if="column.type === D2TableElemType.EditInput"
             v-model="drawerRow[column.prop]"
-            :disabled="!isEdit"
+            :disabled="!isEdit || column.disabled"
             style="width: 360px"
           />
           <!-- 可编辑文本域 -->
@@ -238,6 +238,22 @@
             v-model="drawerRow[column.prop]"
             type="textarea"
             :rows="4"
+            :disabled="!isEdit"
+            style="width: 360px"
+          />
+          <el-input-number
+            v-else-if="column.type === D2TableElemType.Number"
+            v-model="drawerRow[column.prop]"
+            :min="0"
+            :disabled="!isEdit"
+            style="width: 360px"
+          />
+          <el-date-picker
+            v-else-if="column.type === D2TableElemType.Datetime"
+            v-model="drawerRow[column.prop]"
+            type="datetime"
+            value-format="X"
+            :placeholder="column.placeholder"
             :disabled="!isEdit"
             style="width: 360px"
           />
@@ -335,6 +351,20 @@
             v-model="drawerAddRow[column.prop]"
             type="textarea"
             :rows="4"
+            style="width: 360px"
+          />
+          <el-input-number
+            v-else-if="column.type === D2TableElemType.Number"
+            v-model="drawerAddRow[column.prop]"
+            :min="0"
+            style="width: 360px"
+          />
+          <el-date-picker
+            v-else-if="column.type === D2TableElemType.Datetime"
+            v-model="drawerAddRow[column.prop]"
+            type="datetime"
+            value-format="X"
+            :placeholder="column.placeholder"
             style="width: 360px"
           />
           <!-- 默认输入框 -->

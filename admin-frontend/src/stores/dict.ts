@@ -30,7 +30,8 @@ export const REQUIRED_DICT_CODES = [
   'daily_short_sentence_type', // 短句类型
   'notification_source_type', // 消息来源类型
   'storage_base_url', // 存储baseURL（配置）
-  'websocket_base_url' // WebSocket baseURL（配置）
+  'websocket_base_url', // WebSocket baseURL（配置）
+  'sdk_http_method' // SDK 接口管理-HTTP方法
 ] as const;
 
 export const useDictStore = defineStore('dict', {

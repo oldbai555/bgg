@@ -58,9 +58,9 @@ func (r *loginLogRepository) FindPage(ctx context.Context, page, pageSize int64,
 		where = append(where, "username LIKE ?")
 		args = append(args, "%"+username+"%")
 	}
-	// status < 0 表示不筛选，status >= 0 时添加筛选条件
-	// 注意：status 可以是 0（失败）或 1（成功）
-	if status >= 0 {
+	// status <= 0 表示不筛选，status > 0 时添加筛选条件
+	// 枚举（字典 login_status）：1 = 成功，2 = 失败
+	if status > 0 {
 		where = append(where, "status = ?")
 		args = append(args, status)
 	}

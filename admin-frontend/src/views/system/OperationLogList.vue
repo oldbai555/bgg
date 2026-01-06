@@ -148,7 +148,7 @@ const columns = computed<TableColumn[]>(() => [
   {prop: 'path', label: '请求路径', minWidth: 200},
   {prop: 'ipAddress', label: 'IP地址', width: 140},
   {prop: 'duration', label: '耗时(ms)', width: 100},
-  {prop: 'createdAt', label: '创建时间', width: 180}
+  {prop: 'createdAt', label: '创建时间', width: 180, type: D2TableElemType.ConvertTime}
 ])
 
 // 详情抽屉列配置（只读）
@@ -166,7 +166,7 @@ const drawerColumns = computed<DrawerColumn[]>(() => [
   {prop: 'ipAddress', label: 'IP地址', type: D2TableElemType.Tag},
   {prop: 'userAgent', label: '用户代理', type: D2TableElemType.Textarea},
   {prop: 'duration', label: '耗时(ms)', type: D2TableElemType.Tag},
-  {prop: 'createdAt', label: '创建时间', type: D2TableElemType.Tag}
+  {prop: 'createdAt', label: '创建时间', type: D2TableElemType.ConvertTime}
 ])
 
 const loadData = async () => {

@@ -33,6 +33,8 @@ import (
 	ping "postapocgame/admin-server/internal/handler/ping"
 	role "postapocgame/admin-server/internal/handler/role"
 	role_permission "postapocgame/admin-server/internal/handler/role_permission"
+	sdk "postapocgame/admin-server/internal/handler/sdk"
+	sdk_public "postapocgame/admin-server/internal/handler/sdk_public"
 	user "postapocgame/admin-server/internal/handler/user"
 	user_role "postapocgame/admin-server/internal/handler/user_role"
 	video "postapocgame/admin-server/internal/handler/video"
@@ -800,6 +802,89 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			}...,
 		),
 		rest.WithPrefix("/api/v1"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.PerformanceMiddleware, serverCtx.RateLimitMiddleware, serverCtx.AuthMiddleware, serverCtx.PermissionMiddleware, serverCtx.OperationLogMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/sdk/call/log/export",
+					Handler: sdk.SdkCallLogExportHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/sdk/call/log/list",
+					Handler: sdk.SdkCallLogListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/sdk/interface/create",
+					Handler: sdk.SdkInterfaceCreateHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/sdk/interface/delete",
+					Handler: sdk.SdkInterfaceDeleteHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/sdk/interface/list",
+					Handler: sdk.SdkInterfaceListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/sdk/interface/update",
+					Handler: sdk.SdkInterfaceUpdateHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/sdk/key/apis",
+					Handler: sdk.SdkApiKeyBindListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/sdk/key/apis/save",
+					Handler: sdk.SdkApiKeyBindSaveHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/sdk/key/create",
+					Handler: sdk.SdkApiKeyCreateHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/sdk/key/delete",
+					Handler: sdk.SdkApiKeyDeleteHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/sdk/key/list",
+					Handler: sdk.SdkApiKeyListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/sdk/key/update",
+					Handler: sdk.SdkApiKeyUpdateHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.SDKAuthMiddleware, serverCtx.SDKRateLimitMiddleware, serverCtx.SDKCallLogMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodPost,
+					Path:    "/file/upload",
+					Handler: sdk_public.SdkFileUploadHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/sdk"),
 	)
 
 	server.AddRoutes(

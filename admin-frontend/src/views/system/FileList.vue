@@ -120,7 +120,7 @@ const uploadUrl = computed(() => {
     return `${storageBaseURL.value}/api/v1/files/upload`
   }
   // 生产环境默认使用网关路径
-  return '/gateway/api/v1/files/upload'
+  return ''
 })
 
 const userStore = useUserStore()
@@ -282,7 +282,7 @@ const handleDownload = async (row: FileItem) => {
         downloadUrl = `${storageBaseURL.value}/api/v1/files/download?id=${row.id}`
       } else {
         // 生产环境默认使用网关路径
-        downloadUrl = `/gateway/api/v1/files/download?id=${row.id}`
+        downloadUrl = ''
       }
     }
 

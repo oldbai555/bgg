@@ -90,7 +90,7 @@ const uploadUrl = computed(() => {
     return `${storageBaseURL.value}/api/v1/files/upload`
   }
   // 生产环境默认使用网关路径
-  return '/gateway/api/v1/files/upload'
+  return ''
 })
 
 // 上传请求头
@@ -110,8 +110,8 @@ const imageUrl = computed(() => {
   // 如果是相对路径，根据环境选择 baseURL
   let baseURL = '/api'
   if (import.meta.env.PROD) {
-    // 生产环境：使用字典配置的 baseURL，如果没有则使用网关路径
-    baseURL = storageBaseURL.value || '/gateway/api'
+    // 生产环境：使用字典配置的 baseURL
+    baseURL = storageBaseURL.value
   }
   return `${baseURL}${props.modelValue}`
 })

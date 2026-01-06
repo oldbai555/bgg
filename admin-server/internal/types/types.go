@@ -596,7 +596,7 @@ type LoginLogItem struct {
 	Browser   string `json:"browser"`
 	Os        string `json:"os"`
 	UserAgent string `json:"userAgent"`
-	Status    int    `json:"status"` // 0失败 1成功
+	Status    int    `json:"status"` // 登录状态：0 失败，1 成功（DB 字段值）
 	Message   string `json:"message"`
 	LoginAt   int64  `json:"loginAt"`
 	LogoutAt  int64  `json:"logoutAt"`
@@ -604,11 +604,12 @@ type LoginLogItem struct {
 }
 
 type LoginLogListReq struct {
-	Page      int    `json:"page,optional,default=1" form:"page,optional,default=1"`
-	PageSize  int    `json:"pageSize,optional,default=20" form:"pageSize,optional,default=20"`
-	UserId    uint64 `json:"userId,optional" form:"userId,optional"`
-	Username  string `json:"username,optional" form:"username,optional"`
-	Status    int    `json:"status,optional" form:"status,optional"`       // 0失败 1成功
+	Page     int    `json:"page,optional,default=1" form:"page,optional,default=1"`
+	PageSize int    `json:"pageSize,optional,default=20" form:"pageSize,optional,default=20"`
+	UserId   uint64 `json:"userId,optional" form:"userId,optional"`
+	Username string `json:"username,optional" form:"username,optional"`
+	// Status 枚举（字典 login_status）：0 = 全部（不筛选）；1 = 失败；2 = 成功
+	Status    int    `json:"status,optional" form:"status,optional"`
 	StartTime string `json:"startTime,optional" form:"startTime,optional"` // 格式：YYYY-MM-DD HH:mm:ss
 	EndTime   string `json:"endTime,optional" form:"endTime,optional"`     // 格式：YYYY-MM-DD HH:mm:ss
 }
@@ -775,17 +776,19 @@ type NotificationItem struct {
 	SourceId   uint64 `json:"sourceId"`   // 来源ID（如公告ID、聊天消息ID等）
 	Title      string `json:"title"`
 	Content    string `json:"content"`
-	ReadStatus int64  `json:"readStatus"` // 已读状态：1 已读，0 未读
-	ReadAt     int64  `json:"readAt"`     // 已读时间(秒级时间戳)
-	CreatedAt  int64  `json:"createdAt"`  // 创建时间(秒级时间戳)
-	UpdatedAt  int64  `json:"updatedAt"`  // 更新时间(秒级时间戳)
+	// ReadStatus 枚举（字典 read_status）：1 = 未读，2 = 已读
+	ReadStatus int64 `json:"readStatus"`
+	ReadAt     int64 `json:"readAt"`    // 已读时间(秒级时间戳)
+	CreatedAt  int64 `json:"createdAt"` // 创建时间(秒级时间戳)
+	UpdatedAt  int64 `json:"updatedAt"` // 更新时间(秒级时间戳)
 }
 
 type NotificationListReq struct {
 	Page       int64  `json:"page,optional" form:"page,optional"`
 	PageSize   int64  `json:"pageSize,optional" form:"pageSize,optional"`
 	SourceType string `json:"sourceType,optional" form:"sourceType,optional"`
-	ReadStatus int64  `json:"readStatus,optional" form:"readStatus,optional"`
+	// ReadStatus 枚举（字典 read_status）：0 = 全部（不筛选）；1 = 未读；2 = 已读
+	ReadStatus int64 `json:"readStatus,optional" form:"readStatus,optional"`
 }
 
 type NotificationListResp struct {
@@ -1032,6 +1035,188 @@ type RoleUpdateReq struct {
 	Name        string `json:"name"`
 	Description string `json:"description,optional"`
 	Status      int64  `json:"status,optional"`
+}
+
+type SdkApiKeyBindItem struct {
+	SdkInterfaceId  uint64 `json:"sdkInterfaceId"`
+	ApiCode         string `json:"apiCode"`
+	Name            string `json:"name"`
+	Path            string `json:"path"`
+	Method          string `json:"method"`
+	Bound           int64  `json:"bound"`
+	RateLimit       int64  `json:"rateLimit"`
+	CustomRateLimit int64  `json:"customRateLimit"`
+}
+
+type SdkApiKeyBindListReq struct {
+	SdkKeyId uint64 `json:"sdkKeyId,optional" form:"sdkKeyId,optional"`
+}
+
+type SdkApiKeyBindListResp struct {
+	List []SdkApiKeyBindItem `json:"list"`
+}
+
+type SdkApiKeyBindSaveItem struct {
+	SdkInterfaceId  uint64 `json:"sdkInterfaceId"`
+	CustomRateLimit int64  `json:"customRateLimit,optional"`
+}
+
+type SdkApiKeyBindSaveReq struct {
+	SdkKeyId uint64                  `json:"sdkKeyId"`
+	Bindings []SdkApiKeyBindSaveItem `json:"bindings"`
+}
+
+type SdkApiKeyCreateReq struct {
+	Name        string `json:"name"`
+	Status      int64  `json:"status,optional"`
+	ExpireAt    int64  `json:"expireAt,optional"`
+	IpWhitelist string `json:"ipWhitelist,optional"`
+	Remark      string `json:"remark,optional"`
+}
+
+type SdkApiKeyCreateResp struct {
+	Id        uint64 `json:"id"`
+	ApiKey    string `json:"apiKey"`
+	ApiSecret string `json:"apiSecret"`
+}
+
+type SdkApiKeyDeleteReq struct {
+	Id uint64 `json:"id"`
+}
+
+type SdkApiKeyItem struct {
+	Id          uint64 `json:"id"`
+	Name        string `json:"name"`
+	ApiKey      string `json:"apiKey"`
+	ApiSecret   string `json:"apiSecret"`
+	Status      int64  `json:"status"`
+	ExpireAt    int64  `json:"expireAt"`
+	IpWhitelist string `json:"ipWhitelist"`
+	Remark      string `json:"remark"`
+	CreatedAt   int64  `json:"createdAt"`
+}
+
+type SdkApiKeyListReq struct {
+	Page     int64  `json:"page,optional" form:"page,optional"`
+	PageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
+	Name     string `json:"name,optional" form:"name,optional"`
+	// Status 为可选筛选条件：
+	// - 0：不按状态过滤
+	// - 1：只查启用
+	// - 2：只查禁用
+	Status int64 `json:"status,optional" form:"status,optional"`
+}
+
+type SdkApiKeyListResp struct {
+	Total int64           `json:"total"`
+	List  []SdkApiKeyItem `json:"list"`
+}
+
+type SdkApiKeyUpdateReq struct {
+	Id          uint64 `json:"id"`
+	Name        string `json:"name,optional"`
+	Status      int64  `json:"status,optional"`
+	ExpireAt    int64  `json:"expireAt,optional"`
+	IpWhitelist string `json:"ipWhitelist,optional"`
+	Remark      string `json:"remark,optional"`
+}
+
+type SdkCallLogExportReq struct {
+	SdkKeyId  uint64 `json:"sdkKeyId,optional" form:"sdkKeyId,optional"`
+	ApiCode   string `json:"apiCode,optional" form:"apiCode,optional"`
+	RespCode  int64  `json:"respCode,optional" form:"respCode,optional"`
+	Ip        string `json:"ip,optional" form:"ip,optional"`
+	StartTime int64  `json:"startTime,optional" form:"startTime,optional"`
+	EndTime   int64  `json:"endTime,optional" form:"endTime,optional"`
+}
+
+type SdkCallLogItem struct {
+	Id             uint64 `json:"id"`
+	SdkKeyId       uint64 `json:"sdkKeyId"`
+	SdkInterfaceId uint64 `json:"sdkInterfaceId"`
+	ApiCode        string `json:"apiCode"`
+	Path           string `json:"path"`
+	Method         string `json:"method"`
+	Ip             string `json:"ip"`
+	RespCode       int64  `json:"respCode"`
+	DurationMs     int64  `json:"durationMs"`
+	CreatedAt      int64  `json:"createdAt"`
+}
+
+type SdkCallLogListReq struct {
+	Page      int64  `json:"page,optional" form:"page,optional"`
+	PageSize  int64  `json:"pageSize,optional" form:"pageSize,optional"`
+	SdkKeyId  uint64 `json:"sdkKeyId,optional" form:"sdkKeyId,optional"`
+	ApiCode   string `json:"apiCode,optional" form:"apiCode,optional"`
+	RespCode  int64  `json:"respCode,optional" form:"respCode,optional"`
+	Ip        string `json:"ip,optional" form:"ip,optional"`
+	StartTime int64  `json:"startTime,optional" form:"startTime,optional"`
+	EndTime   int64  `json:"endTime,optional" form:"endTime,optional"`
+}
+
+type SdkCallLogListResp struct {
+	Total int64            `json:"total"`
+	List  []SdkCallLogItem `json:"list"`
+}
+
+type SdkFileUploadResp struct {
+	FileId uint64 `json:"fileId"`
+	Url    string `json:"url"`
+	Name   string `json:"name"`
+}
+
+type SdkInterfaceCreateReq struct {
+	Name             string `json:"name"`
+	ApiCode          string `json:"apiCode,optional"` // 后端自动生成，前端无需传入
+	Path             string `json:"path"`
+	Method           string `json:"method"`
+	RateLimitDefault int64  `json:"rateLimitDefault,optional"`
+	Status           int64  `json:"status,optional"`
+	Remark           string `json:"remark,optional"`
+}
+
+type SdkInterfaceDeleteReq struct {
+	Id uint64 `json:"id"`
+}
+
+type SdkInterfaceItem struct {
+	Id               uint64 `json:"id"`
+	Name             string `json:"name"`
+	ApiCode          string `json:"apiCode"`
+	Path             string `json:"path"`
+	Method           string `json:"method"`
+	RateLimitDefault int64  `json:"rateLimitDefault"`
+	Status           int64  `json:"status"`
+	Remark           string `json:"remark"`
+	CreatedAt        int64  `json:"createdAt"`
+}
+
+type SdkInterfaceListReq struct {
+	Page     int64  `json:"page,optional" form:"page,optional"`
+	PageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
+	Name     string `json:"name,optional" form:"name,optional"`
+	ApiCode  string `json:"apiCode,optional" form:"apiCode,optional"`
+	// Status 为可选筛选条件：
+	// - 0：不按状态过滤
+	// - 1：只查启用
+	// - 2：只查禁用
+	Status int64 `json:"status,optional" form:"status,optional"`
+}
+
+type SdkInterfaceListResp struct {
+	Total int64              `json:"total"`
+	List  []SdkInterfaceItem `json:"list"`
+}
+
+type SdkInterfaceUpdateReq struct {
+	Id               uint64 `json:"id"`
+	Name             string `json:"name,optional"`
+	ApiCode          string `json:"apiCode,optional"` // 后端自动生成，前端无需传入
+	Path             string `json:"path,optional"`
+	Method           string `json:"method,optional"`
+	RateLimitDefault int64  `json:"rateLimitDefault,optional"`
+	Status           int64  `json:"status,optional"`
+	Remark           string `json:"remark,optional"`
 }
 
 type TokenPair struct {

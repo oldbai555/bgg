@@ -101,14 +101,11 @@ const list = ref<LoginLogItem[]>([])
 const total = ref(0)
 const loading = ref(false)
 
-// 登录状态选项
-const {options: loginStatusOptions} = useDictOptions(
-  'login_status',
-  [
-    {label: '失败', value: '0'},
-    {label: '成功', value: '1'}
-  ]
-)
+// 登录状态选项（字典 login_status：1=成功，2=失败；0 由前端表示「全部」）
+const {options: loginStatusOptions} = useDictOptions('login_status', [
+  {label: '成功', value: '1'},
+  {label: '失败', value: '2'}
+])
 
 // 表格列配置
 const columns = computed<TableColumn[]>(() => [
@@ -121,7 +118,7 @@ const columns = computed<TableColumn[]>(() => [
   {prop: 'os', label: '操作系统', width: 120},
   {prop: 'status', label: '登录状态', width: 100},
   {prop: 'message', label: '登录消息', minWidth: 150},
-  {prop: 'loginAt', label: '登录时间', width: 180}
+  {prop: 'loginAt', label: '登录时间', width: 180, type: D2TableElemType.ConvertTime}
 ])
 
 // 详情抽屉列配置（只读）
@@ -136,9 +133,9 @@ const drawerColumns = computed<DrawerColumn[]>(() => [
   {prop: 'userAgent', label: '用户代理', type: D2TableElemType.Textarea},
   {prop: 'status', label: '登录状态', type: D2TableElemType.Tag},
   {prop: 'message', label: '登录消息', type: D2TableElemType.Tag},
-  {prop: 'loginAt', label: '登录时间', type: D2TableElemType.Tag},
-  {prop: 'logoutAt', label: '登出时间', type: D2TableElemType.Tag},
-  {prop: 'createdAt', label: '创建时间', type: D2TableElemType.Tag}
+  {prop: 'loginAt', label: '登录时间', type: D2TableElemType.ConvertTime},
+  {prop: 'logoutAt', label: '登出时间', type: D2TableElemType.ConvertTime},
+  {prop: 'createdAt', label: '创建时间', type: D2TableElemType.ConvertTime}
 ])
 
 const loadData = async () => {
@@ -149,7 +146,8 @@ const loadData = async () => {
       pageSize: query.pageSize,
       userId: query.userId,
       username: query.username || undefined,
-      status: query.status,
+      // 0 表示不筛选，其余枚举值（1/2）直接透传给后端，由后端映射到 DB 状态
+      status: query.status ?? 0,
       startTime: query.startTime || undefined,
       endTime: query.endTime || undefined
     }

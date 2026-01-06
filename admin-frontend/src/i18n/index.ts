@@ -66,7 +66,17 @@ const messages = {
       password: '密码',
       department: '部门',
       createdAt: '创建时间',
-      passwordRequired: '请输入密码'
+      passwordRequired: '请输入密码',
+      remark: '备注',
+      neverExpire: '永不过期',
+      method: '请求方法',
+      statusCode: '状态码',
+      export: '导出',
+      exportFail: '导出失败',
+      timeRange: '时间范围',
+      startTime: '开始时间',
+      endTime: '结束时间',
+      all: '全部'
     },
     menu: {
       type: {
@@ -99,6 +109,14 @@ const messages = {
       notFound: '页面不存在',
       noAccess: '无权限访问',
       backHome: '返回首页'
+    },
+    sdk: {
+      expireAt: '过期时间',
+      expireAtPlaceholder: '秒级时间戳，0 表示永不过期',
+      ipWhitelist: 'IP 白名单（每行一个，空表示不限）',
+      durationMs: '耗时 (ms)',
+      rateLimitDefault: '默认限流（次/分）',
+      keyIdPlaceholder: '按 Key ID 过滤（可留空）'
     }
   },
   en: {
@@ -166,7 +184,17 @@ const messages = {
       password: 'Password',
       department: 'Department',
       createdAt: 'Created At',
-      passwordRequired: 'Please enter password'
+      passwordRequired: 'Please enter password',
+      remark: 'Remark',
+      neverExpire: 'Never expire',
+      method: 'Method',
+      statusCode: 'Status Code',
+      export: 'Export',
+      exportFail: 'Export failed',
+      timeRange: 'Time Range',
+      startTime: 'Start Time',
+      endTime: 'End Time',
+      all: 'All'
     },
     menu: {
       type: {
@@ -199,8 +227,16 @@ const messages = {
       notFound: 'Page not found',
       noAccess: 'No access',
       backHome: 'Back home'
+    },
+    sdk: {
+      expireAt: 'Expire At',
+      expireAtPlaceholder: 'Timestamp (sec), 0 means never expire',
+      ipWhitelist: 'IP whitelist (one per line, empty = no limit)',
+      durationMs: 'Duration (ms)',
+      rateLimitDefault: 'Default rate limit (req/min)',
+      keyIdPlaceholder: 'Filter by Key ID (optional)'
     }
-  }
+  },
 };
 
 export const i18n = createI18n({

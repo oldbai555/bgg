@@ -19,7 +19,8 @@ SET @dict_type_id = (SELECT `id` FROM `admin_dict_type` WHERE `code` = 'performa
 
 INSERT INTO `admin_dict_item` (`type_id`, `label`, `value`, `sort`, `status`, `remark`, `created_at`, `updated_at`, `deleted_at`)
 VALUES
-  (@dict_type_id, 'Normal', '0', 1, 1, '正常查询', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
+  -- 枚举从 1 开始，0 预留为「全部/不筛选」
+  (@dict_type_id, 'Normal', '2', 1, 1, '正常查询', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   (@dict_type_id, 'Slow', '1', 2, 1, '慢查询', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
 ON DUPLICATE KEY UPDATE
   `label`=VALUES(`label`),
@@ -70,8 +71,9 @@ SET @dict_type_id = (SELECT `id` FROM `admin_dict_type` WHERE `code` = 'read_sta
 
 INSERT INTO `admin_dict_item` (`type_id`, `label`, `value`, `sort`, `status`, `remark`, `created_at`, `updated_at`, `deleted_at`)
 VALUES
-  (@dict_type_id, '未读', '0', 1, 1, '未读状态', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
-  (@dict_type_id, '已读', '1', 2, 1, '已读状态', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
+  -- 枚举从 1 开始，0 预留为「全部/不筛选」
+  (@dict_type_id, '未读', '1', 1, 1, '未读状态', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
+  (@dict_type_id, '已读', '2', 2, 1, '已读状态', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
 ON DUPLICATE KEY UPDATE
   `label`=VALUES(`label`),
   `value`=VALUES(`value`),
@@ -201,7 +203,8 @@ SET @dict_type_id = (SELECT `id` FROM `admin_dict_type` WHERE `code` = 'login_st
 
 INSERT INTO `admin_dict_item` (`type_id`, `label`, `value`, `sort`, `status`, `remark`, `created_at`, `updated_at`, `deleted_at`)
 VALUES
-  (@dict_type_id, '失败', '0', 1, 1, '登录失败', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
+  -- 枚举从 1 开始，0 预留为「全部/不筛选」
+  (@dict_type_id, '失败', '2', 1, 1, '登录失败', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   (@dict_type_id, '成功', '1', 2, 1, '登录成功', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
 ON DUPLICATE KEY UPDATE
   `label`=VALUES(`label`),

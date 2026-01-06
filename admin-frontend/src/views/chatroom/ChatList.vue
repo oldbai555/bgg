@@ -291,7 +291,7 @@ const uploadUrl = computed(() => {
     return `${storageBaseURL.value}/api/v1/files/upload`
   }
   // 生产环境默认使用网关路径
-  return '/gateway/api/v1/files/upload'
+  return ''
 })
 const uploadHeaders = computed(() => ({
   Authorization: `Bearer ${userStore.token}`

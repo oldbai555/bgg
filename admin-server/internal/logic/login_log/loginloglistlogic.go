@@ -46,15 +46,10 @@ func (l *LoginLogListLogic) LoginLogList(req *types.LoginLogListReq) (resp *type
 
 	loginLogRepo := repository.NewLoginLogRepository(l.svcCtx.Repository)
 
-	// status 参数处理：
-	// -1 表示不筛选（未传递 status 参数）
-	// 0 表示失败
-	// 1 表示成功
-	// Handler 层已经处理了未传递的情况，将 status 设置为 -1
-	status := req.Status
-
+	// Status 枚举（字典 login_status）：0 = 全部（不筛选）；1 = 成功；2 = 失败
+	// DB 中 admin_login_log.status 与枚举值保持一致：1 = 成功，2 = 失败
 	l.Infof("查询登录日志: page=%d, pageSize=%d, userId=%d, username=%s, status=%d, startTime=%s, endTime=%s",
-		req.Page, req.PageSize, req.UserId, req.Username, status, req.StartTime, req.EndTime)
+		req.Page, req.PageSize, req.UserId, req.Username, req.Status, req.StartTime, req.EndTime)
 
 	list, total, err := loginLogRepo.FindPage(
 		l.ctx,
@@ -62,7 +57,7 @@ func (l *LoginLogListLogic) LoginLogList(req *types.LoginLogListReq) (resp *type
 		int64(req.PageSize),
 		req.UserId,
 		req.Username,
-		status,
+		req.Status,
 		req.StartTime,
 		req.EndTime,
 	)

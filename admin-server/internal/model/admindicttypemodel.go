@@ -1,6 +1,8 @@
 package model
 
 import (
+	"context"
+
 	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 )
@@ -12,6 +14,7 @@ type (
 	// and implement the added methods in customAdminDictTypeModel.
 	AdminDictTypeModel interface {
 		adminDictTypeModel
+		FindIdByCode(ctx context.Context, code string) (uint64, error)
 	}
 
 	customAdminDictTypeModel struct {
@@ -24,4 +27,13 @@ func NewAdminDictTypeModel(conn sqlx.SqlConn, c cache.CacheConf, opts ...cache.O
 	return &customAdminDictTypeModel{
 		defaultAdminDictTypeModel: newAdminDictTypeModel(conn, c, opts...),
 	}
+}
+
+// FindIdByCode 返回字典类型 ID，若不存在返回 ErrNotFound
+func (m *customAdminDictTypeModel) FindIdByCode(ctx context.Context, code string) (uint64, error) {
+	data, err := m.FindOneByCode(ctx, code)
+	if err != nil {
+		return 0, err
+	}
+	return data.Id, nil
 }

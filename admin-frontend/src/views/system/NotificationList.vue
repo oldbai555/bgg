@@ -74,8 +74,8 @@
           <el-tag v-if="column.prop === 'sourceType'" :type="getSourceTypeTag(row.sourceType)">
             {{ getSourceTypeLabel(row.sourceType) }}
           </el-tag>
-          <el-tag v-else-if="column.prop === 'readStatus'" :type="row.readStatus === 1 ? 'success' : 'warning'">
-            {{ readStatusOptions.find(opt => Number(opt.value) === row.readStatus)?.label || (row.readStatus === 1 ? '已读' : '未读') }}
+          <el-tag v-else-if="column.prop === 'readStatus'" :type="row.readStatus === 2 ? 'success' : 'warning'">
+            {{ readStatusOptions.find(opt => Number(opt.value) === row.readStatus)?.label || (row.readStatus === 2 ? '已读' : '未读') }}
           </el-tag>
           <span v-else-if="column.prop === 'readAt'">
             {{ row.readAt ? formatTime(row.readAt) : '-' }}
@@ -112,7 +112,8 @@ const query = reactive({
   page: 1,
   pageSize: 10,
   sourceType: '',
-  readStatus: 0
+  // 1 = 未读；2 = 已读；undefined 表示不筛选（与 NoticeList 行为一致）
+  readStatus: undefined as number | undefined
 })
 const list = ref<NotificationItem[]>([])
 const total = ref(0)
@@ -130,14 +131,11 @@ const {options: sourceTypeOptions, getLabel: getSourceTypeLabel} = useDictOption
   ]
 )
 
-// 已读状态选项
-const {options: readStatusOptions} = useDictOptions(
-  'read_status',
-  [
-    {label: '未读', value: '0'},
-    {label: '已读', value: '1'}
-  ]
-)
+// 已读状态选项（字典 read_status：1=未读，2=已读；0 由前端表示「全部」）
+const {options: readStatusOptions} = useDictOptions('read_status', [
+  {label: '未读', value: '1'},
+  {label: '已读', value: '2'}
+])
 
 // 获取消息来源标签颜色
 const getSourceTypeTag = (sourceType: string): string | undefined => {
@@ -197,7 +195,8 @@ const loadData = async () => {
     if (query.sourceType) {
       req.sourceType = query.sourceType
     }
-    if (query.readStatus >= 0) {
+    // readStatus：0 不传表示不筛选，其余（1=未读，2=已读）直接透传给后端（由后端映射到 DB 值）
+    if (query.readStatus > 0) {
       req.readStatus = query.readStatus
     }
     const resp = await notificationList(req)
@@ -215,7 +214,7 @@ const handleReset = () => {
   query.page = 1
   query.pageSize = 10
   query.sourceType = ''
-  query.readStatus = 0
+  query.readStatus = undefined
   loadData()
 }
 

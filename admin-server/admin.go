@@ -72,11 +72,17 @@ func main() {
 	operationLogMiddleware := middleware.NewOperationLogMiddleware(ctx)
 	rateLimitMiddleware := middleware.NewRateLimitMiddleware(ctx)
 	performanceMiddleware := middleware.NewPerformanceMiddleware(ctx)
+	sdkAuthMiddleware := middleware.NewSDKAuthMiddleware(ctx)
+	sdkRateLimitMiddleware := middleware.NewSDKRateLimitMiddleware(ctx)
+	sdkCallLogMiddleware := middleware.NewSDKCallLogMiddleware(ctx)
 	ctx.AuthMiddleware = authMiddleware.Handle
 	ctx.PermissionMiddleware = permissionMiddleware.Handle
 	ctx.OperationLogMiddleware = operationLogMiddleware.Handle
 	ctx.RateLimitMiddleware = rateLimitMiddleware.Handle
 	ctx.PerformanceMiddleware = performanceMiddleware.Handle
+	ctx.SDKAuthMiddleware = sdkAuthMiddleware.Handle
+	ctx.SDKRateLimitMiddleware = sdkRateLimitMiddleware.Handle
+	ctx.SDKCallLogMiddleware = sdkCallLogMiddleware.Handle
 
 	handler.RegisterHandlers(server, ctx)
 	// 注册自定义路由（WebSocket 等）

@@ -436,16 +436,16 @@ ON DUPLICATE KEY UPDATE `deleted_at`=0;
 -- 数据字典项初始化数据
 INSERT INTO `admin_dict_item` (`id`, `type_id`, `label`, `value`, `sort`, `status`, `remark`, `created_at`, `updated_at`, `deleted_at`)
 VALUES
-  -- 用户状态字典项
+  -- 用户状态字典项（枚举从 1 开始，0 预留为「全部/不筛选」）
   (1, 1, '启用', '1', 1, 1, '用户账号启用状态', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
-  (2, 1, '禁用', '0', 2, 1, '用户账号禁用状态', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
-  -- 性别字典项
+  (2, 1, '禁用', '2', 2, 1, '用户账号禁用状态', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
+  -- 性别字典项（枚举从 1 开始，0 不再使用）
   (3, 2, '男', '1', 1, 1, '男性', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   (4, 2, '女', '2', 2, 1, '女性', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
-  (5, 2, '未知', '0', 3, 1, '未知性别', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
-  -- 是否字典项
+  (5, 2, '未知', '3', 3, 1, '未知性别', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
+  -- 是否字典项（枚举从 1 开始，0 不再使用）
   (6, 3, '是', '1', 1, 1, '是', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
-  (7, 3, '否', '0', 2, 1, '否', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
+  (7, 3, '否', '2', 2, 1, '否', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   -- 文件存储类型字典项
   (8, 4, '本地存储', 'local', 1, 1, '本地文件系统存储', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   (9, 4, 'OSS存储', 'oss', 2, 1, '阿里云OSS存储', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),

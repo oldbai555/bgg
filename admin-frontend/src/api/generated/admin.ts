@@ -778,6 +778,109 @@ export function rolePermissionUpdate(req: components.RolePermissionUpdateReq) {
  * @description 
  * @param req
  */
+export function sdkCallLogExport(req: components.SdkCallLogExportReq) {
+	return webapi.get<null>(`/api/v1/sdk/call/log/export`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function sdkCallLogList(req: components.SdkCallLogListReq) {
+	return webapi.get<components.SdkCallLogListResp>(`/api/v1/sdk/call/log/list`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function sdkInterfaceCreate(req: components.SdkInterfaceCreateReq) {
+	return webapi.post<null>(`/api/v1/sdk/interface/create`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function sdkInterfaceDelete(req: components.SdkInterfaceDeleteReq) {
+	return webapi.post<null>(`/api/v1/sdk/interface/delete`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function sdkInterfaceList(req: components.SdkInterfaceListReq) {
+	return webapi.get<components.SdkInterfaceListResp>(`/api/v1/sdk/interface/list`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function sdkInterfaceUpdate(req: components.SdkInterfaceUpdateReq) {
+	return webapi.post<null>(`/api/v1/sdk/interface/update`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function sdkApiKeyBindList(req: components.SdkApiKeyBindListReq) {
+	return webapi.get<components.SdkApiKeyBindListResp>(`/api/v1/sdk/key/apis`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function sdkApiKeyBindSave(req: components.SdkApiKeyBindSaveReq) {
+	return webapi.post<null>(`/api/v1/sdk/key/apis/save`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function sdkApiKeyCreate(req: components.SdkApiKeyCreateReq) {
+	return webapi.post<components.SdkApiKeyCreateResp>(`/api/v1/sdk/key/create`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function sdkApiKeyDelete(req: components.SdkApiKeyDeleteReq) {
+	return webapi.post<null>(`/api/v1/sdk/key/delete`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function sdkApiKeyList(req: components.SdkApiKeyListReq) {
+	return webapi.get<components.SdkApiKeyListResp>(`/api/v1/sdk/key/list`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function sdkApiKeyUpdate(req: components.SdkApiKeyUpdateReq) {
+	return webapi.post<null>(`/api/v1/sdk/key/update`, req)
+}
+
+/**
+ * @description 
+ */
+export function sdkFileUpload() {
+	return webapi.post<components.SdkFileUploadResp>(`/sdk/file/upload`)
+}
+
+/**
+ * @description 
+ * @param req
+ */
 export function userList(req: components.UserListReq) {
 	return webapi.get<components.UserListResp>(`/api/v1/users`, req)
 }

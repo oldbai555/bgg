@@ -22,6 +22,9 @@ type ServiceContext struct {
 	OperationLogMiddleware rest.Middleware
 	RateLimitMiddleware    rest.Middleware
 	PerformanceMiddleware  rest.Middleware
+	SDKAuthMiddleware      rest.Middleware
+	SDKRateLimitMiddleware rest.Middleware
+	SDKCallLogMiddleware   rest.Middleware
 }
 
 func NewServiceContext(c config.Config) (*ServiceContext, error) {

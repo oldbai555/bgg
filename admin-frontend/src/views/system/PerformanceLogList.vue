@@ -106,14 +106,11 @@ const list = ref<PerformanceLogItem[]>([])
 const total = ref(0)
 const loading = ref(false)
 
-// 慢查询状态选项
-const {options: slowStatusOptions} = useDictOptions(
-  'performance_log_slow_status',
-  [
-    {label: 'Normal', value: '0'},
-    {label: 'Slow', value: '1'}
-  ]
-)
+// 慢查询状态选项（字典 performance_log_slow_status：1=Slow，2=Normal；0 由前端表示「全部」）
+const {options: slowStatusOptions} = useDictOptions('performance_log_slow_status', [
+  {label: 'Slow', value: '1'},
+  {label: 'Normal', value: '2'}
+])
 
 // 表格列配置（只读性能日志字段）
 const columns = computed<TableColumn[]>(() => [
@@ -125,7 +122,7 @@ const columns = computed<TableColumn[]>(() => [
   {prop: 'isSlow', label: 'Slow Flag', width: 100},
   {prop: 'username', label: t('common.username'), width: 140},
   {prop: 'ipAddress', label: 'IP', width: 140},
-  {prop: 'createdAt', label: t('common.createdAt'), width: 180}
+  {prop: 'createdAt', label: t('common.createdAt'), width: 180, type: D2TableElemType.ConvertTime}
 ])
 
 // 占位：只读模式但 D2Table 要求必传

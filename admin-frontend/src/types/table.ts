@@ -29,7 +29,11 @@ export enum D2TableElemType {
   /** 字节转MB */
   Byte2MB = 'byte2MB',
   /** 下拉选择 */
-  Select = 'select'
+  Select = 'select',
+  /** 数字输入（el-input-number） */
+  Number = 'number',
+  /** 日期时间选择（秒级时间戳，使用 value-format="X"） */
+  Datetime = 'datetime'
 }
 
 /**
@@ -60,5 +64,7 @@ export interface TableColumn {
 export interface DrawerColumn extends TableColumn {
   /** 是否必填 */
   required?: boolean;
+  /** 是否禁用（只读） */
+  disabled?: boolean;
 }
 

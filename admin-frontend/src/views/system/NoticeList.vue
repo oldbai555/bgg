@@ -156,8 +156,8 @@ const columns = computed<TableColumn[]>(() => [
   {prop: 'title', label: '公告标题', minWidth: 200},
   {prop: 'type', label: '公告类型', width: 120},
   {prop: 'status', label: '状态', width: 100},
-  {prop: 'publishTime', label: '发布时间', width: 180},
-  {prop: 'createdAt', label: t('common.createdAt'), width: 180}
+  {prop: 'publishTime', label: '发布时间', width: 180, type: D2TableElemType.ConvertTime},
+  {prop: 'createdAt', label: t('common.createdAt'), width: 180, type: D2TableElemType.ConvertTime}
 ])
 
 // 详情/编辑抽屉列配置
@@ -178,7 +178,7 @@ const drawerColumns = computed<DrawerColumn[]>(() => [
     options: computed(() => noticeStatusOptions.value.map(opt => ({label: opt.label, value: Number(opt.value)})))
   },
   {prop: 'publishTime', label: '发布时间', type: D2TableElemType.DateTime},
-  {prop: 'createdAt', label: t('common.createdAt')}
+  {prop: 'createdAt', label: t('common.createdAt'), type: D2TableElemType.ConvertTime}
 ])
 
 // 新增抽屉列配置
