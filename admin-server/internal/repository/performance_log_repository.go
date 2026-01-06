@@ -56,8 +56,7 @@ func (r *performanceLogRepository) FindPage(ctx context.Context, page, pageSize 
 		where = append(where, "path LIKE ?")
 		args = append(args, "%"+path+"%")
 	}
-	if isSlow == 0 || isSlow == 1 {
-		// 仅当传入 0 或 1 时启用该条件；其他值表示不按是否慢接口过滤
+	if isSlow != 0 {
 		where = append(where, "is_slow = ?")
 		args = append(args, isSlow)
 	}

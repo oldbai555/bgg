@@ -87,7 +87,7 @@ import {performanceLogList} from '@/api/generated/admin'
 import type {PerformanceLogItem, PerformanceLogListReq} from '@/api/generated/admin'
 import {useI18n} from 'vue-i18n'
 import D2Table from '@/components/common/D2Table.vue'
-import {type TableColumn, type DrawerColumn} from '@/types/table'
+import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table'
 import {useDictOptions} from '@/composables/useDictOptions'
 
 const {t} = useI18n()
