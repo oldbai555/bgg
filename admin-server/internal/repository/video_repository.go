@@ -2,11 +2,11 @@ package repository
 
 import (
 	"context"
-	"fmt"
-	"strings"
 
+	sq "github.com/Masterminds/squirrel"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 	"postapocgame/admin-server/internal/model"
+	"postapocgame/admin-server/pkg/errs"
 )
 
 type VideoRepository interface {
@@ -40,23 +40,23 @@ func (r *videoRepository) FindPage(ctx context.Context, page, pageSize int64, ke
 }
 
 func (r *videoRepository) findPageWithFilter(ctx context.Context, page, pageSize int64, keyword string) ([]model.Video, int64, error) {
-	var whereConditions []string
-	var args []interface{}
-
-	whereConditions = append(whereConditions, "deleted_at = 0")
+	conditions := sq.And{sq.Eq{"deleted_at": 0}}
 
 	if keyword != "" {
-		whereConditions = append(whereConditions, "(name LIKE ? OR description LIKE ?)")
 		keywordPattern := "%" + keyword + "%"
-		args = append(args, keywordPattern, keywordPattern)
+		conditions = append(conditions, sq.Or{
+			sq.Like{"name": keywordPattern},
+			sq.Like{"description": keywordPattern},
+		})
 	}
-
-	whereClause := strings.Join(whereConditions, " AND ")
 
 	// 查询总数
 	var total int64
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM `video` WHERE %s", whereClause)
-	err := r.conn.QueryRowCtx(ctx, &total, countQuery, args...)
+	countSQL, countArgs, err := sq.Select("COUNT(*)").From("`video`").Where(conditions).ToSql()
+	if err != nil {
+		return nil, 0, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+	}
+	err = r.conn.QueryRowCtx(ctx, &total, countSQL, countArgs...)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -70,11 +70,19 @@ func (r *videoRepository) findPageWithFilter(ctx context.Context, page, pageSize
 	}
 	offset := (page - 1) * pageSize
 
-	query := fmt.Sprintf("SELECT id, name, cover, duration, play_url, description, created_at, updated_at, deleted_at FROM `video` WHERE %s ORDER BY id DESC LIMIT ? OFFSET ?", whereClause)
-	args = append(args, pageSize, offset)
+	listSQL, listArgs, err := sq.Select("id", "name", "cover", "duration", "play_url", "description", "created_at", "updated_at", "deleted_at").
+		From("`video`").
+		Where(conditions).
+		OrderBy("id DESC").
+		Limit(uint64(pageSize)).
+		Offset(uint64(offset)).
+		ToSql()
+	if err != nil {
+		return nil, 0, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+	}
 
 	var list []model.Video
-	err = r.conn.QueryRowsCtx(ctx, &list, query, args...)
+	err = r.conn.QueryRowsCtx(ctx, &list, listSQL, listArgs...)
 	if err != nil {
 		return nil, 0, err
 	}

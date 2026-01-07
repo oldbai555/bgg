@@ -3,12 +3,14 @@ package repository
 import (
 	"context"
 	"fmt"
-	"github.com/zeromicro/go-zero/core/logx"
-	"strings"
 	"time"
 
-	"github.com/zeromicro/go-zero/core/stores/sqlx"
 	"postapocgame/admin-server/internal/model"
+	"postapocgame/admin-server/pkg/errs"
+
+	sq "github.com/Masterminds/squirrel"
+	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/core/stores/sqlx"
 )
 
 type LoginLogRepository interface {
@@ -47,53 +49,56 @@ func (r *loginLogRepository) FindPage(ctx context.Context, page, pageSize int64,
 	offset := (page - 1) * pageSize
 
 	// 构建查询条件
-	where := []string{"deleted_at = 0"}
-	args := []interface{}{}
+	conditions := sq.And{sq.Eq{"deleted_at": 0}}
 
 	if userId > 0 {
-		where = append(where, "user_id = ?")
-		args = append(args, userId)
+		conditions = append(conditions, sq.Eq{"user_id": userId})
 	}
 	if username != "" {
-		where = append(where, "username LIKE ?")
-		args = append(args, "%"+username+"%")
+		conditions = append(conditions, sq.Like{"username": "%" + username + "%"})
 	}
 	// status <= 0 表示不筛选，status > 0 时添加筛选条件
 	// 枚举（字典 login_status）：1 = 成功，2 = 失败
 	if status > 0 {
-		where = append(where, "status = ?")
-		args = append(args, status)
+		conditions = append(conditions, sq.Eq{"status": status})
 	}
 	if startTime != "" {
 		// 解析时间字符串为时间戳
 		if t, err := time.Parse("2006-01-02 15:04:05", startTime); err == nil {
-			where = append(where, "login_at >= ?")
-			args = append(args, t.Unix())
+			conditions = append(conditions, sq.GtOrEq{"login_at": t.Unix()})
 		}
 	}
 	if endTime != "" {
 		// 解析时间字符串为时间戳
 		if t, err := time.Parse("2006-01-02 15:04:05", endTime); err == nil {
-			where = append(where, "login_at <= ?")
-			args = append(args, t.Unix())
+			conditions = append(conditions, sq.LtOrEq{"login_at": t.Unix()})
 		}
 	}
 
-	whereClause := strings.Join(where, " AND ")
-
 	// 查询总数
 	var total int64
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM `admin_login_log` WHERE %s", whereClause)
-	err := r.conn.QueryRowCtx(ctx, &total, countQuery, args...)
+	countSQL, countArgs, err := sq.Select("COUNT(*)").From("`admin_login_log`").Where(conditions).ToSql()
+	if err != nil {
+		return nil, 0, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+	}
+	err = r.conn.QueryRowCtx(ctx, &total, countSQL, countArgs...)
 	if err != nil {
 		return nil, 0, err
 	}
 
 	// 查询列表
 	var list []model.AdminLoginLog
-	query := fmt.Sprintf("SELECT * FROM `admin_login_log` WHERE %s ORDER BY login_at DESC LIMIT ? OFFSET ?", whereClause)
-	args = append(args, pageSize, offset)
-	err = r.conn.QueryRowsCtx(ctx, &list, query, args...)
+	listSQL, listArgs, err := sq.Select("*").
+		From("`admin_login_log`").
+		Where(conditions).
+		OrderBy("login_at DESC").
+		Limit(uint64(pageSize)).
+		Offset(uint64(offset)).
+		ToSql()
+	if err != nil {
+		return nil, 0, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+	}
+	err = r.conn.QueryRowsCtx(ctx, &list, listSQL, listArgs...)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -126,16 +131,19 @@ func (r *loginLogRepository) Create(ctx context.Context, log *model.AdminLoginLo
 
 func (r *loginLogRepository) CountByStatus(ctx context.Context, status int) (int64, error) {
 	var count int64
-	var query string
+	var sql string
+	var args []interface{}
 	var err error
 	if status < 0 {
 		// status < 0 表示查询所有状态
-		query = "SELECT COUNT(*) FROM `admin_login_log` WHERE deleted_at = 0"
-		err = r.conn.QueryRowCtx(ctx, &count, query)
+		sql, args, err = sq.Select("COUNT(*)").From("`admin_login_log`").Where(sq.Eq{"deleted_at": 0}).ToSql()
 	} else {
-		query = "SELECT COUNT(*) FROM `admin_login_log` WHERE deleted_at = 0 AND status = ?"
-		err = r.conn.QueryRowCtx(ctx, &count, query, status)
+		sql, args, err = sq.Select("COUNT(*)").From("`admin_login_log`").Where(sq.Eq{"deleted_at": 0, "status": status}).ToSql()
 	}
+	if err != nil {
+		return 0, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+	}
+	err = r.conn.QueryRowCtx(ctx, &count, sql, args...)
 	return count, err
 }
 
@@ -144,8 +152,14 @@ func (r *loginLogRepository) CountToday(ctx context.Context) (int64, error) {
 	// 获取今天的开始时间戳（00:00:00）
 	now := time.Now()
 	todayStart := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location()).Unix()
-	query := "SELECT COUNT(*) FROM `admin_login_log` WHERE deleted_at = 0 AND login_at >= ?"
-	err := r.conn.QueryRowCtx(ctx, &count, query, todayStart)
+	sql, args, err := sq.Select("COUNT(*)").From("`admin_login_log`").Where(sq.And{
+		sq.Eq{"deleted_at": 0},
+		sq.GtOrEq{"login_at": todayStart},
+	}).ToSql()
+	if err != nil {
+		return 0, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+	}
+	err = r.conn.QueryRowCtx(ctx, &count, sql, args...)
 	return count, err
 }
 
@@ -154,7 +168,13 @@ func (r *loginLogRepository) CountTodayByStatus(ctx context.Context, status int)
 	// 获取今天的开始时间戳（00:00:00）
 	now := time.Now()
 	todayStart := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location()).Unix()
-	query := "SELECT COUNT(*) FROM `admin_login_log` WHERE deleted_at = 0 AND status = ? AND login_at >= ?"
-	err := r.conn.QueryRowCtx(ctx, &count, query, status, todayStart)
+	sql, args, err := sq.Select("COUNT(*)").From("`admin_login_log`").Where(sq.And{
+		sq.Eq{"deleted_at": 0, "status": status},
+		sq.GtOrEq{"login_at": todayStart},
+	}).ToSql()
+	if err != nil {
+		return 0, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+	}
+	err = r.conn.QueryRowCtx(ctx, &count, sql, args...)
 	return count, err
 }

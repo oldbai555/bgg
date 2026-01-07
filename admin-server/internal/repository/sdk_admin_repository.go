@@ -3,12 +3,12 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"strconv"
-	"strings"
 	"time"
 
+	sq "github.com/Masterminds/squirrel"
 	"postapocgame/admin-server/internal/model"
+	"postapocgame/admin-server/pkg/errs"
 )
 
 type SdkAdminRepository struct {
@@ -45,30 +45,36 @@ func (r *SdkAdminRepository) ListSdkKeys(ctx context.Context, page, pageSize int
 	}
 	offset := (page - 1) * pageSize
 
-	where := []string{"deleted_at = 0"}
-	args := []interface{}{}
+	conditions := sq.And{sq.Eq{"deleted_at": 0}}
 
 	if name != "" {
-		where = append(where, "name LIKE ?")
-		args = append(args, "%"+name+"%")
+		conditions = append(conditions, sq.Like{"name": "%" + name + "%"})
 	}
 	if status != 0 {
-		where = append(where, "status = ?")
-		args = append(args, status)
+		conditions = append(conditions, sq.Eq{"status": status})
 	}
 
-	whereClause := strings.Join(where, " AND ")
-
 	var total int64
-	countSQL := fmt.Sprintf("SELECT COUNT(*) FROM sdk_key WHERE %s", whereClause)
-	if err := r.repo.DB.QueryRowCtx(ctx, &total, countSQL, args...); err != nil {
+	countSQL, countArgs, err := sq.Select("COUNT(*)").From("sdk_key").Where(conditions).ToSql()
+	if err != nil {
+		return nil, 0, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+	}
+	if err := r.repo.DB.QueryRowCtx(ctx, &total, countSQL, countArgs...); err != nil {
 		return nil, 0, err
 	}
 
-	listSQL := fmt.Sprintf("SELECT * FROM sdk_key WHERE %s ORDER BY id DESC LIMIT ? OFFSET ?", whereClause)
-	argsWithPage := append(args, pageSize, offset)
+	listSQL, listArgs, err := sq.Select("*").
+		From("sdk_key").
+		Where(conditions).
+		OrderBy("id DESC").
+		Limit(uint64(pageSize)).
+		Offset(uint64(offset)).
+		ToSql()
+	if err != nil {
+		return nil, 0, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+	}
 	var list []model.SdkKey
-	if err := r.repo.DB.QueryRowsCtx(ctx, &list, listSQL, argsWithPage...); err != nil {
+	if err := r.repo.DB.QueryRowsCtx(ctx, &list, listSQL, listArgs...); err != nil {
 		return nil, 0, err
 	}
 
@@ -117,34 +123,39 @@ func (r *SdkAdminRepository) ListInterfaces(ctx context.Context, page, pageSize 
 	}
 	offset := (page - 1) * pageSize
 
-	where := []string{"deleted_at = 0"}
-	args := []interface{}{}
+	conditions := sq.And{sq.Eq{"deleted_at": 0}}
 
 	if name != "" {
-		where = append(where, "name LIKE ?")
-		args = append(args, "%"+name+"%")
+		conditions = append(conditions, sq.Like{"name": "%" + name + "%"})
 	}
 	if apiCode != "" {
-		where = append(where, "api_code LIKE ?")
-		args = append(args, "%"+apiCode+"%")
+		conditions = append(conditions, sq.Like{"api_code": "%" + apiCode + "%"})
 	}
 	if status != 0 {
-		where = append(where, "status = ?")
-		args = append(args, status)
+		conditions = append(conditions, sq.Eq{"status": status})
 	}
 
-	whereClause := strings.Join(where, " AND ")
-
 	var total int64
-	countSQL := fmt.Sprintf("SELECT COUNT(*) FROM sdk_interface WHERE %s", whereClause)
-	if err := r.repo.DB.QueryRowCtx(ctx, &total, countSQL, args...); err != nil {
+	countSQL, countArgs, err := sq.Select("COUNT(*)").From("sdk_interface").Where(conditions).ToSql()
+	if err != nil {
+		return nil, 0, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+	}
+	if err := r.repo.DB.QueryRowCtx(ctx, &total, countSQL, countArgs...); err != nil {
 		return nil, 0, err
 	}
 
-	listSQL := fmt.Sprintf("SELECT * FROM sdk_interface WHERE %s ORDER BY id DESC LIMIT ? OFFSET ?", whereClause)
-	argsWithPage := append(args, pageSize, offset)
+	listSQL, listArgs, err := sq.Select("*").
+		From("sdk_interface").
+		Where(conditions).
+		OrderBy("id DESC").
+		Limit(uint64(pageSize)).
+		Offset(uint64(offset)).
+		ToSql()
+	if err != nil {
+		return nil, 0, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+	}
 	var list []model.SdkInterface
-	if err := r.repo.DB.QueryRowsCtx(ctx, &list, listSQL, argsWithPage...); err != nil {
+	if err := r.repo.DB.QueryRowsCtx(ctx, &list, listSQL, listArgs...); err != nil {
 		return nil, 0, err
 	}
 
@@ -212,8 +223,15 @@ type SdkBindingView struct {
 func (r *SdkAdminRepository) SaveBindings(ctx context.Context, sdkKeyId uint64, bindings []model.SdkKeyApi) error {
 	now := time.Now().Unix()
 	// 软删除旧绑定
-	delSQL := "UPDATE sdk_key_api SET deleted_at = ?, updated_at = ? WHERE sdk_key_id = ? AND deleted_at = 0"
-	if _, err := r.repo.DB.ExecCtx(ctx, delSQL, now, now, sdkKeyId); err != nil {
+	delSQL, delArgs, err := sq.Update("sdk_key_api").
+		Set("deleted_at", now).
+		Set("updated_at", now).
+		Where(sq.Eq{"sdk_key_id": sdkKeyId, "deleted_at": 0}).
+		ToSql()
+	if err != nil {
+		return errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+	}
+	if _, err := r.repo.DB.ExecCtx(ctx, delSQL, delArgs...); err != nil {
 		return err
 	}
 
@@ -250,46 +268,48 @@ func (r *SdkAdminRepository) ListCallLogs(ctx context.Context, page, pageSize in
 	}
 	offset := (page - 1) * pageSize
 
-	where := []string{"deleted_at = 0"}
-	args := []interface{}{}
+	conditions := sq.And{sq.Eq{"deleted_at": 0}}
 
 	if sdkKeyId > 0 {
-		where = append(where, "sdk_key_id = ?")
-		args = append(args, sdkKeyId)
+		conditions = append(conditions, sq.Eq{"sdk_key_id": sdkKeyId})
 	}
 	if apiCode != "" {
-		where = append(where, "api_code LIKE ?")
-		args = append(args, "%"+apiCode+"%")
+		conditions = append(conditions, sq.Like{"api_code": "%" + apiCode + "%"})
 	}
 	if respCode != 0 {
-		where = append(where, "resp_code = ?")
-		args = append(args, respCode)
+		conditions = append(conditions, sq.Eq{"resp_code": respCode})
 	}
 	if ip != "" {
-		where = append(where, "ip LIKE ?")
-		args = append(args, "%"+ip+"%")
+		conditions = append(conditions, sq.Like{"ip": "%" + ip + "%"})
 	}
 	if startTime > 0 {
-		where = append(where, "created_at >= ?")
-		args = append(args, startTime)
+		conditions = append(conditions, sq.GtOrEq{"created_at": startTime})
 	}
 	if endTime > 0 {
-		where = append(where, "created_at <= ?")
-		args = append(args, endTime)
+		conditions = append(conditions, sq.LtOrEq{"created_at": endTime})
 	}
 
-	whereClause := strings.Join(where, " AND ")
-
 	var total int64
-	countSQL := fmt.Sprintf("SELECT COUNT(*) FROM sdk_call_log WHERE %s", whereClause)
-	if err := r.repo.DB.QueryRowCtx(ctx, &total, countSQL, args...); err != nil {
+	countSQL, countArgs, err := sq.Select("COUNT(*)").From("sdk_call_log").Where(conditions).ToSql()
+	if err != nil {
+		return nil, 0, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+	}
+	if err := r.repo.DB.QueryRowCtx(ctx, &total, countSQL, countArgs...); err != nil {
 		return nil, 0, err
 	}
 
-	listSQL := fmt.Sprintf("SELECT * FROM sdk_call_log WHERE %s ORDER BY id DESC LIMIT ? OFFSET ?", whereClause)
-	argsWithPage := append(args, pageSize, offset)
+	listSQL, listArgs, err := sq.Select("*").
+		From("sdk_call_log").
+		Where(conditions).
+		OrderBy("id DESC").
+		Limit(uint64(pageSize)).
+		Offset(uint64(offset)).
+		ToSql()
+	if err != nil {
+		return nil, 0, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+	}
 	var list []model.SdkCallLog
-	if err := r.repo.DB.QueryRowsCtx(ctx, &list, listSQL, argsWithPage...); err != nil {
+	if err := r.repo.DB.QueryRowsCtx(ctx, &list, listSQL, listArgs...); err != nil {
 		return nil, 0, err
 	}
 
@@ -301,40 +321,39 @@ func (r *SdkAdminRepository) ExportCallLogs(ctx context.Context, maxRows int64, 
 	if maxRows <= 0 {
 		maxRows = 2000
 	}
-	where := []string{"deleted_at = 0"}
-	args := []interface{}{}
+	conditions := sq.And{sq.Eq{"deleted_at": 0}}
 
 	if sdkKeyId > 0 {
-		where = append(where, "sdk_key_id = ?")
-		args = append(args, sdkKeyId)
+		conditions = append(conditions, sq.Eq{"sdk_key_id": sdkKeyId})
 	}
 	if apiCode != "" {
-		where = append(where, "api_code LIKE ?")
-		args = append(args, "%"+apiCode+"%")
+		conditions = append(conditions, sq.Like{"api_code": "%" + apiCode + "%"})
 	}
 	if respCode != 0 {
-		where = append(where, "resp_code = ?")
-		args = append(args, respCode)
+		conditions = append(conditions, sq.Eq{"resp_code": respCode})
 	}
 	if ip != "" {
-		where = append(where, "ip LIKE ?")
-		args = append(args, "%"+ip+"%")
+		conditions = append(conditions, sq.Like{"ip": "%" + ip + "%"})
 	}
 	if startTime > 0 {
-		where = append(where, "created_at >= ?")
-		args = append(args, startTime)
+		conditions = append(conditions, sq.GtOrEq{"created_at": startTime})
 	}
 	if endTime > 0 {
-		where = append(where, "created_at <= ?")
-		args = append(args, endTime)
+		conditions = append(conditions, sq.LtOrEq{"created_at": endTime})
 	}
 
-	whereClause := strings.Join(where, " AND ")
-	query := fmt.Sprintf("SELECT * FROM sdk_call_log WHERE %s ORDER BY id DESC LIMIT ?", whereClause)
-	args = append(args, maxRows)
+	sql, args, err := sq.Select("*").
+		From("sdk_call_log").
+		Where(conditions).
+		OrderBy("id DESC").
+		Limit(uint64(maxRows)).
+		ToSql()
+	if err != nil {
+		return nil, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+	}
 
 	var list []model.SdkCallLog
-	if err := r.repo.DB.QueryRowsCtx(ctx, &list, query, args...); err != nil {
+	if err := r.repo.DB.QueryRowsCtx(ctx, &list, sql, args...); err != nil {
 		return nil, err
 	}
 	return list, nil

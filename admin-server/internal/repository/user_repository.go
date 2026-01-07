@@ -3,8 +3,10 @@ package repository
 import (
 	"context"
 
+	sq "github.com/Masterminds/squirrel"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 	"postapocgame/admin-server/internal/model"
+	"postapocgame/admin-server/pkg/errs"
 )
 
 type UserRepository interface {
@@ -57,12 +59,33 @@ func (r *userRepository) FindPage(ctx context.Context, page, pageSize int64, nam
 	}
 
 	// 带用户名模糊筛选的自定义查询
-	countQuery := "select count(*) from admin_user where deleted_at = 0 and username like ?"
-	if err := r.conn.QueryRowCtx(ctx, &total, countQuery, "%"+name+"%"); err != nil {
+	countSQL, countArgs, err := sq.Select("count(*)").
+		From("admin_user").
+		Where(sq.And{
+			sq.Eq{"deleted_at": 0},
+			sq.Like{"username": "%" + name + "%"},
+		}).
+		ToSql()
+	if err != nil {
+		return nil, 0, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+	}
+	if err := r.conn.QueryRowCtx(ctx, &total, countSQL, countArgs...); err != nil {
 		return nil, 0, err
 	}
-	query := "select * from admin_user where deleted_at = 0 and username like ? order by id desc limit ? offset ?"
-	if err := r.conn.QueryRowsCtx(ctx, &list, query, "%"+name+"%", pageSize, offset); err != nil {
+	listSQL, listArgs, err := sq.Select("*").
+		From("admin_user").
+		Where(sq.And{
+			sq.Eq{"deleted_at": 0},
+			sq.Like{"username": "%" + name + "%"},
+		}).
+		OrderBy("id desc").
+		Limit(uint64(pageSize)).
+		Offset(uint64(offset)).
+		ToSql()
+	if err != nil {
+		return nil, 0, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+	}
+	if err := r.conn.QueryRowsCtx(ctx, &list, listSQL, listArgs...); err != nil {
 		return nil, 0, err
 	}
 	return list, total, nil

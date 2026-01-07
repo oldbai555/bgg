@@ -4,6 +4,7 @@
 package role_permission
 
 import (
+	"github.com/zeromicro/go-zero/core/logx"
 	"net/http"
 
 	"github.com/zeromicro/go-zero/rest/httpx"
@@ -24,6 +25,7 @@ func RolePermissionUpdateHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		l := rolepermission.NewRolePermissionUpdateLogic(r.Context(), svcCtx)
 		err := l.RolePermissionUpdate(&req)
 		if err != nil {
+			logx.Errorf("err:%v", err)
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {
 			// 记录审计日志：权限分配（角色-权限关联）

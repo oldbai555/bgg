@@ -2,12 +2,12 @@ package repository
 
 import (
 	"context"
-	"fmt"
-	"strings"
 	"time"
 
+	sq "github.com/Masterminds/squirrel"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 	"postapocgame/admin-server/internal/model"
+	"postapocgame/admin-server/pkg/errs"
 )
 
 type NotificationRepository interface {
@@ -37,30 +37,27 @@ func (r *notificationRepository) FindByID(ctx context.Context, id uint64) (*mode
 
 func (r *notificationRepository) FindPage(ctx context.Context, page, pageSize int64, userID uint64, sourceType string, readStatus int64) ([]model.AdminNotification, int64, error) {
 	// 构建查询条件
-	where := []string{"deleted_at = 0"}
-	args := []interface{}{}
+	where := sq.Eq{"deleted_at": 0}
 
 	if userID > 0 {
-		where = append(where, "user_id = ?")
-		args = append(args, userID)
+		where["user_id"] = userID
 	}
 	if sourceType != "" {
-		where = append(where, "source_type = ?")
-		args = append(args, sourceType)
+		where["source_type"] = sourceType
 	}
 	// readStatus <= 0 表示不筛选，readStatus > 0 时添加筛选条件
 	// 枚举（字典 read_status）：1 = 未读，2 = 已读
 	if readStatus > 0 {
-		where = append(where, "read_status = ?")
-		args = append(args, readStatus)
+		where["read_status"] = readStatus
 	}
-
-	whereClause := strings.Join(where, " AND ")
 
 	// 查询总数
 	var total int64
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM `admin_notification` WHERE %s", whereClause)
-	err := r.conn.QueryRowCtx(ctx, &total, countQuery, args...)
+	countSQL, countArgs, err := sq.Select("COUNT(*)").From("`admin_notification`").Where(where).ToSql()
+	if err != nil {
+		return nil, 0, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+	}
+	err = r.conn.QueryRowCtx(ctx, &total, countSQL, countArgs...)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -68,9 +65,17 @@ func (r *notificationRepository) FindPage(ctx context.Context, page, pageSize in
 	// 查询列表
 	var list []model.AdminNotification
 	offset := (page - 1) * pageSize
-	query := fmt.Sprintf("SELECT id, user_id, source_type, source_id, title, content, read_status, read_at, created_at, updated_at, deleted_at FROM `admin_notification` WHERE %s ORDER BY created_at DESC LIMIT ? OFFSET ?", whereClause)
-	args = append(args, pageSize, offset)
-	err = r.conn.QueryRowsCtx(ctx, &list, query, args...)
+	listSQL, listArgs, err := sq.Select("id", "user_id", "source_type", "source_id", "title", "content", "read_status", "read_at", "created_at", "updated_at", "deleted_at").
+		From("`admin_notification`").
+		Where(where).
+		OrderBy("created_at DESC").
+		Limit(uint64(pageSize)).
+		Offset(uint64(offset)).
+		ToSql()
+	if err != nil {
+		return nil, 0, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+	}
+	err = r.conn.QueryRowsCtx(ctx, &list, listSQL, listArgs...)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -93,15 +98,30 @@ func (r *notificationRepository) Update(ctx context.Context, notification *model
 
 func (r *notificationRepository) MarkAllAsRead(ctx context.Context, userID uint64) error {
 	now := time.Now().Unix()
-	query := "UPDATE `admin_notification` SET `read_status` = 1, `read_at` = ?, `updated_at` = ? WHERE `user_id` = ? AND `read_status` = 0 AND `deleted_at` = 0"
-	_, err := r.conn.ExecCtx(ctx, query, now, now, userID)
+	sql, args, err := sq.Update("`admin_notification`").
+		Set("`read_status`", 1).
+		Set("`read_at`", now).
+		Set("`updated_at`", now).
+		Where(sq.Eq{"user_id": userID, "read_status": 0, "deleted_at": 0}).
+		ToSql()
+	if err != nil {
+		return errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+	}
+	_, err = r.conn.ExecCtx(ctx, sql, args...)
 	return err
 }
 
 func (r *notificationRepository) ClearRead(ctx context.Context, userID uint64) error {
 	// 软删除所有已读消息
 	now := time.Now().Unix()
-	query := "UPDATE `admin_notification` SET `deleted_at` = ?, `updated_at` = ? WHERE `user_id` = ? AND `read_status` = 1 AND `deleted_at` = 0"
-	_, err := r.conn.ExecCtx(ctx, query, now, now, userID)
+	sql, args, err := sq.Update("`admin_notification`").
+		Set("`deleted_at`", now).
+		Set("`updated_at`", now).
+		Where(sq.Eq{"user_id": userID, "read_status": 1, "deleted_at": 0}).
+		ToSql()
+	if err != nil {
+		return errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+	}
+	_, err = r.conn.ExecCtx(ctx, sql, args...)
 	return err
 }

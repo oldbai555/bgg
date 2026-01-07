@@ -2,10 +2,10 @@ package repository
 
 import (
 	"context"
-	"strings"
-
+	sq "github.com/Masterminds/squirrel"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 	"postapocgame/admin-server/internal/model"
+	"strings"
 )
 
 type PermissionRepository interface {
@@ -16,6 +16,7 @@ type PermissionRepository interface {
 	DeleteByID(ctx context.Context, id uint64) error
 	Create(ctx context.Context, p *model.AdminPermission) error
 	Update(ctx context.Context, p *model.AdminPermission) error
+	ListByIds(ctx context.Context, ids []uint64) ([]*model.AdminPermission, error)
 }
 
 type permissionRepository struct {
@@ -69,4 +70,17 @@ func (r *permissionRepository) Create(ctx context.Context, p *model.AdminPermiss
 
 func (r *permissionRepository) Update(ctx context.Context, p *model.AdminPermission) error {
 	return r.model.Update(ctx, p)
+}
+
+func (r *permissionRepository) ListByIds(ctx context.Context, ids []uint64) ([]*model.AdminPermission, error) {
+	sql, args, err := sq.Select("*").From("admin_permission").Where(sq.Eq{"id": ids, "deleted_at": 0}).ToSql()
+	if err != nil {
+		return nil, err
+	}
+	var list []*model.AdminPermission
+	err = r.conn.QueryRowsCtx(ctx, &list, sql, args...)
+	if err != nil {
+		return nil, err
+	}
+	return list, nil
 }

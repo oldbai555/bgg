@@ -1,362 +1,6 @@
-# admin-system 前后端一体化 Cursor Prompt
-
-你是 admin-system 的前后端一体化开发助手，严格遵循以下规则。
-
 ---
-
-## 强制执行规则（违反即错误）
-
-### 1. 必读文档（优先级顺序）
-
-后端文档：
-- docs/go-zero实现方案.md
-- docs/后端开发进度.md
-
-前端文档：
-- docs/vue3实现方案.md
-- docs/前端开发进度.md
-
-### 2. 脚本执行规则
-
-AI 必须等待用户执行脚本并确认后才能继续，禁止手动创建应由脚本生成的文件。
-
-脚本列表：
-
-generate-sql.sh
-- 用途：生成表结构/权限SQL
-- 生成内容：create_table_*.sql, init_*.sql, *.api, *.vue
-- 禁止行为：手动创建这些文件
-
-generate-model.sh
-- 用途：生成Model代码
-- 生成内容：internal/model/*
-- 禁止行为：手动创建Model文件
-
-generate-api.sh
-- 用途：生成Handler/Logic
-- 生成内容：internal/handler/*, internal/logic/*
-- 禁止行为：手动创建Handler/Logic
-
-generate-ts.sh
-- 用途：生成TS代码
-- 生成内容：api/generated/*
-- 禁止行为：手动创建/修改generated目录
-
-例外情况：字典SQL例外
-- 字典增量数据需创建独立SQL文件
-- 路径格式：db/migrations/dict_{module}_YYYYMMDD.sql
-
-### 3. 架构分层（不可违背）
-
-后端架构（admin-server）：
-Handler -> Logic -> Repository -> Model
-
-各层职责：
-- Handler: 路由（goctl生成）
-- Logic: 业务逻辑（goctl骨架）
-- Repository: 数据访问（封装Model）
-- Model: DB映射（goctl生成）
-
-前端架构（admin-frontend）：
-Page -> Component -> Store -> API -> Backend
-
-API层说明：
-- API代码位于 api/generated/* 目录
-- 由 goctl 自动生成
-
-### 4. 数据库时间戳规范（强制）
-
-业务表必须包含字段：
-- created_at
-- updated_at
-- deleted_at（软删除）
-
-关联表必须包含字段：
-- created_at
-- updated_at（物理删除）
-
-所有时间戳字段类型：
-- 类型：BIGINT
-- 单位：秒级
-- 默认值：0
-
-### 5. API 时间字段规范（强制）
-
-统一规则：
-- 所有时间字段（createdAt, updatedAt, deletedAt, publishTime, readAt, loginAt, logoutAt 等）
-- 后端统一返回 int64 类型时间戳（秒级）
-- 不做任何格式化
-
-后端实现要求：
-- Logic 层直接返回数据库中的 int64 时间戳
-- 禁止使用 time.Format()
-- 禁止使用 strconv.FormatInt()
-
-前端处理要求：
-- 前端负责时间格式化显示
-- 使用统一工具函数：formatTime, formatDateTime 等
-- 将时间戳转换为可读的日期时间字符串
-
-错误示例：
-```go
-// 错误：后端格式化时间
-CreatedAt: time.Unix(log.CreatedAt, 0).Format("2006-01-02 15:04:05")
-```
-
-正确示例：
-```go
-// 正确：直接返回时间戳
-CreatedAt: log.CreatedAt
-```
-
-### 6. API定义规范（.api文件）
-
-基础规范：
-- Group命名：使用 snake_case（例如：user_role）
-- 禁止使用：驼峰命名（例如：userRole）
-- internal/types/types.go 人工维护，禁止被goctl覆盖
-
-请求参数规范：
-
-禁止使用路径参数（Path Parameters）：
-- 不允许在路径中使用 :id, :name 等路径参数
-- 所有参数必须通过 Query String（查询参数）或 Request Body（请求体）传递
-
-错误示例：
-```go
-// ❌ 错误：使用路径参数
-get /user/:id (UserGetReq) returns (UserGetResp)
-delete /role/:id (RoleDeleteReq) returns (RoleDeleteResp)
-put /config/:id (ConfigUpdateReq) returns (ConfigUpdateResp)
-```
-
-正确示例：
-```go
-// ✅ 正确：GET请求使用 Query String 参数（form tag）
-type ConfigGetReq {
-    Id int64 `form:"id"`
-}
-get /config/get (ConfigGetReq) returns (ConfigGetResp)
-
-// ✅ 正确：POST/PUT/DELETE 请求使用 Request Body（json tag）
-type UserDeleteReq {
-    Id int64 `json:"id"`
-}
-delete /user/delete (UserDeleteReq) returns (UserDeleteResp)
-```
-
-Optional 参数规范：
-
-所有非必传字段必须添加 optional 标签：
-- 查询条件、筛选字段、可选参数都应标记为 optional
-- 必传参数（如 id）不需要 optional 标签
-- optional 标签位置：在类型定义的字段后面，逗号分隔
-
-示例：
-```go
-// 列表查询请求（参考 ConfigListReq）
-type ConfigListReq {
-    Page     int64  `form:"page,optional"`      // 分页参数，可选
-    PageSize int64  `form:"page_size,optional"` // 分页大小，可选
-    Keyword  string `form:"keyword,optional"`   // 搜索关键词，可选
-    Status   int64  `form:"status,optional"`    // 状态筛选，可选
-}
-
-// 详情查询请求（参考 ConfigGetReq）
-type ConfigGetReq {
-    Id int64 `form:"id"` // id 必传，不加 optional
-}
-
-// 创建请求
-type ConfigCreateReq {
-    Name   string `json:"name"`            // 名称必传
-    Value  string `json:"value"`           // 值必传
-    Remark string `json:"remark,optional"` // 备注可选
-}
-
-// 更新请求
-type ConfigUpdateReq {
-    Id     int64  `json:"id"`              // id 必传
-    Name   string `json:"name,optional"`   // 名称可选（部分更新）
-    Value  string `json:"value,optional"`  // 值可选（部分更新）
-    Remark string `json:"remark,optional"` // 备注可选
-}
-```
-
-参数标签（Tag）使用规范：
-
-GET 请求参数标签：
-- 使用 form tag
-- 格式：`form:"字段名,optional"`（可选参数）
-- 格式：`form:"字段名"`（必传参数）
-
-POST/PUT/DELETE 请求参数标签：
-- 使用 json tag
-- 格式：`json:"字段名,optional"`（可选参数）
-- 格式：`json:"字段名"`（必传参数）
-
-路径参数标签（禁止使用）：
-- 不使用 path tag
-- 不使用路径占位符 :id, :name 等
-
-中间件声明规范：
-
-在 @server 注解中使用 middleware: 声明中间件，多个中间件用逗号分隔：
-
-```go
-@server(
-    group: user
-    middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
-)
-```
-
-五大中间件说明：
-
-PerformanceMiddleware
-- 作用：性能监控（请求耗时统计）
-- 使用场景：需要监控性能的接口
-- 是否必需：可选
-
-RateLimitMiddleware
-- 作用：限流控制（防刷、防攻击）
-- 使用场景：高频访问/敏感接口
-- 是否必需：可选
-
-AuthMiddleware
-- 作用：身份认证（JWT验证）
-- 使用场景：需要登录的接口
-- 是否必需：必需（登录后接口）
-
-PermissionMiddleware
-- 作用：权限校验（RBAC）
-- 使用场景：需要权限控制的接口
-- 是否必需：必需（需权限接口）
-
-OperationLogMiddleware
-- 作用：操作日志记录
-- 使用场景：增删改等重要操作
-- 是否必需：可选
-
-中间件组合示例：
-
-示例1：公开接口（无需认证）
-```go
-@server(
-    group: auth
-    // 不声明middleware
-)
-service admin-api {
-    @handler Login
-    post /auth/login (LoginReq) returns (LoginResp)
-}
-```
-
-示例2：普通业务接口（需要认证和权限）
-```go
-@server(
-    group: user
-    middleware: AuthMiddleware,PermissionMiddleware
-)
-service admin-api {
-    @handler UserList
-    get /user/list (UserListReq) returns (UserListResp)
-}
-```
-
-示例3：高频接口（需要限流）
-```go
-@server(
-    group: api
-    middleware: RateLimitMiddleware,AuthMiddleware,PermissionMiddleware
-)
-service admin-api {
-    @handler ApiList
-    get /api/list (ApiListReq) returns (ApiListResp)
-}
-```
-
-示例4：敏感操作（需要记录日志）
-```go
-@server(
-    group: user
-    middleware: AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
-)
-service admin-api {
-    @handler UserDelete
-    delete /user/:id (UserDeleteReq) returns (UserDeleteResp)
-}
-```
-
-示例5：全量中间件（性能监控+限流+认证+权限+日志）
-```go
-@server(
-    group: role
-    middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
-)
-service admin-api {
-    @handler RoleUpdate
-    put /role/:id (RoleUpdateReq) returns (RoleUpdateResp)
-}
-```
-
-中间件选择决策树：
-
-接口是否需要登录？
-- 否：不声明middleware（如登录、注册、公开API）
-- 是：声明 AuthMiddleware
-  - 是否需要权限控制？
-    - 否：AuthMiddleware（如个人信息查询）
-    - 是：AuthMiddleware,PermissionMiddleware
-      - 是否高频访问？
-        - 是：RateLimitMiddleware,AuthMiddleware,PermissionMiddleware
-        - 否：是否需要操作日志？
-          - 是：AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
-          - 否：AuthMiddleware,PermissionMiddleware
-            - 是否需要性能监控？
-              - 是：PerformanceMiddleware,AuthMiddleware,PermissionMiddleware
-              - 否：AuthMiddleware,PermissionMiddleware
-
-中间件执行顺序（按声明顺序执行）：
-1. PerformanceMiddleware - 性能监控开始
-2. RateLimitMiddleware - 限流检查
-3. AuthMiddleware - 身份认证
-4. PermissionMiddleware - 权限校验
-5. OperationLogMiddleware - 操作日志记录
-6. Handler业务逻辑
-7. PerformanceMiddleware - 性能监控结束
-
-常见中间件组合：
-
-公开接口：
-- 中间件组合：无
-- 示例：登录、注册、健康检查
-
-查询接口：
-- 中间件组合：AuthMiddleware,PermissionMiddleware
-- 示例：用户列表、角色列表
-
-新增接口：
-- 中间件组合：AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
-- 示例：创建用户、创建角色
-
-修改接口：
-- 中间件组合：AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
-- 示例：更新用户、更新角色
-
-删除接口：
-- 中间件组合：AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
-- 示例：删除用户、删除角色
-
-高频接口：
-- 中间件组合：RateLimitMiddleware,AuthMiddleware,PermissionMiddleware
-- 示例：接口列表、日志查询
-
-重要接口：
-- 中间件组合：PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
-- 示例：核心业务操作
-
+alwaysApply: true
 ---
-
 ## 标准开发流程（严格按顺序）
 
 功能开发 Checklist：
@@ -409,6 +53,111 @@ service admin-api {
 - 错误处理：统一错误码 + errors.Wrap 追踪栈
 - 缓存策略：热数据用Redis，防穿透/击穿/雪崩
 - 日志规范：logx 分级（Info/Warn/Error）+ 上下文
+
+SQL构建规范（强制）：
+
+所有需要动态构建SQL的地方必须使用 `squirrel` 库，禁止使用 `fmt.Sprintf` 或字符串拼接。
+
+适用范围：
+- Repository 层所有自定义查询方法
+- 需要动态 WHERE 条件的查询
+- 需要动态 ORDER BY、LIMIT、OFFSET 的查询
+- UPDATE、DELETE 等需要动态条件的操作
+
+导入规范：
+```go
+import (
+    sq "github.com/Masterminds/squirrel"
+    "postapocgame/admin-server/pkg/errs"
+)
+```
+
+基本用法示例：
+
+SELECT 查询：
+```go
+// ✅ 正确：使用 squirrel 构建查询
+conditions := sq.And{sq.Eq{"deleted_at": 0}}
+if userId > 0 {
+    conditions = append(conditions, sq.Eq{"user_id": userId})
+}
+if username != "" {
+    conditions = append(conditions, sq.Like{"username": "%" + username + "%"})
+}
+if status > 0 {
+    conditions = append(conditions, sq.Eq{"status": status})
+}
+
+sql, args, err := sq.Select("*").
+    From("`admin_user`").
+    Where(conditions).
+    OrderBy("id DESC").
+    Limit(uint64(pageSize)).
+    Offset(uint64(offset)).
+    ToSql()
+if err != nil {
+    return nil, 0, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+}
+err = r.conn.QueryRowsCtx(ctx, &list, sql, args...)
+```
+
+UPDATE 查询：
+```go
+// ✅ 正确：使用 squirrel 构建更新
+sql, args, err := sq.Update("`admin_notification`").
+    Set("`read_status`", 1).
+    Set("`read_at`", now).
+    Set("`updated_at`", now).
+    Where(sq.Eq{"user_id": userID, "read_status": 0, "deleted_at": 0}).
+    ToSql()
+if err != nil {
+    return errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+}
+_, err = r.conn.ExecCtx(ctx, sql, args...)
+```
+
+条件组合：
+```go
+// ✅ 正确：使用 sq.And 和 sq.Or 组合条件
+conditions := sq.And{
+    sq.Eq{"deleted_at": 0},
+    sq.Or{
+        sq.Eq{"from_user_id": userId},
+        sq.Eq{"to_user_id": userId},
+    },
+}
+
+// ✅ 正确：时间范围查询
+if startTime > 0 {
+    conditions = append(conditions, sq.GtOrEq{"created_at": startTime})
+}
+if endTime > 0 {
+    conditions = append(conditions, sq.LtOrEq{"created_at": endTime})
+}
+```
+
+错误示例：
+```go
+// ❌ 错误：使用 fmt.Sprintf 拼接 SQL
+whereClause := strings.Join(where, " AND ")
+query := fmt.Sprintf("SELECT * FROM `admin_user` WHERE %s", whereClause)
+err = r.conn.QueryRowsCtx(ctx, &list, query, args...)
+
+// ❌ 错误：直接字符串拼接
+query := "SELECT * FROM `admin_user` WHERE deleted_at = 0 AND username LIKE '%" + name + "%'"
+err = r.conn.QueryRowsCtx(ctx, &list, query)
+```
+
+参考实现：
+- 标准实现参考：`admin-server/internal/repository/role_permission_repository.go`
+- 所有 Repository 文件必须遵循此规范
+- 代码生成模板（`.template/model/*.tpl`）也需要使用 squirrel（待更新）
+
+优势：
+- **防止SQL注入**：参数化查询，自动转义
+- **代码可读性**：链式构建，逻辑清晰
+- **类型安全**：编译期检查，减少运行时错误
+- **统一规范**：所有 Repository 层代码风格一致
 
 前端关键点：
 - API调用：统一从 @/api/generated/admin 导入
@@ -618,6 +367,7 @@ admin-frontend/
 禁止9：中间件声明顺序错误（必须按执行顺序声明）
 禁止10：API定义使用路径参数 :id（必须使用 Query/Body 参数）
 禁止11：非必传字段未添加 optional 标签
+禁止12：Repository 层使用 fmt.Sprintf 或字符串拼接构建 SQL（必须使用 squirrel 库）
 
 ---
 

@@ -41,12 +41,12 @@ func (l *RolePermissionUpdateLogic) RolePermissionUpdate(req *types.RolePermissi
 	}
 
 	permissionRepo := repository.NewPermissionRepository(l.svcCtx.Repository)
-	// 验证所有权限是否存在
-	for _, permID := range req.PermissionIds {
-		_, err := permissionRepo.FindByID(l.ctx, permID)
-		if err != nil {
-			return errs.Wrap(errs.CodeBadRequest, "权限不存在", err)
-		}
+	permissions, err := permissionRepo.ListByIds(l.ctx, req.PermissionIds)
+	if err != nil {
+		return errs.Wrap(errs.CodeBadRequest, "权限查询有误", err)
+	}
+	if len(permissions) != len(req.PermissionIds) {
+		return errs.New(errs.CodeBadRequest, "权限不存在")
 	}
 
 	rolePermissionRepo := repository.NewRolePermissionRepository(l.svcCtx.Repository)

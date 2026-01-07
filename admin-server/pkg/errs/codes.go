@@ -10,4 +10,5 @@ const (
 	CodeUnauthorized  = 10003
 	CodeForbidden     = 10004
 	CodeNotFound      = 10005
+	CodeBadDB         = 10006
 )

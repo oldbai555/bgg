@@ -3,11 +3,12 @@ package repository
 import (
 	"context"
 	"fmt"
-	"strings"
 	"time"
 
+	sq "github.com/Masterminds/squirrel"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 	"postapocgame/admin-server/internal/model"
+	"postapocgame/admin-server/pkg/errs"
 )
 
 type AuditLogRepository interface {
@@ -42,54 +43,56 @@ func (r *auditLogRepository) FindPage(ctx context.Context, page, pageSize int64,
 	offset := (page - 1) * pageSize
 
 	// 构建查询条件
-	where := []string{"deleted_at = 0"}
-	args := []interface{}{}
+	conditions := sq.And{sq.Eq{"deleted_at": 0}}
 
 	if userId > 0 {
-		where = append(where, "user_id = ?")
-		args = append(args, userId)
+		conditions = append(conditions, sq.Eq{"user_id": userId})
 	}
 	if username != "" {
-		where = append(where, "username LIKE ?")
-		args = append(args, "%"+username+"%")
+		conditions = append(conditions, sq.Like{"username": "%" + username + "%"})
 	}
 	if auditType != "" {
-		where = append(where, "audit_type = ?")
-		args = append(args, auditType)
+		conditions = append(conditions, sq.Eq{"audit_type": auditType})
 	}
 	if auditObject != "" {
-		where = append(where, "audit_object = ?")
-		args = append(args, auditObject)
+		conditions = append(conditions, sq.Eq{"audit_object": auditObject})
 	}
 	if startTime != "" {
 		// 解析时间字符串为时间戳
 		if t, err := time.Parse("2006-01-02 15:04:05", startTime); err == nil {
-			where = append(where, "created_at >= ?")
-			args = append(args, t.Unix())
+			conditions = append(conditions, sq.GtOrEq{"created_at": t.Unix()})
 		}
 	}
 	if endTime != "" {
 		// 解析时间字符串为时间戳
 		if t, err := time.Parse("2006-01-02 15:04:05", endTime); err == nil {
-			where = append(where, "created_at <= ?")
-			args = append(args, t.Unix())
+			conditions = append(conditions, sq.LtOrEq{"created_at": t.Unix()})
 		}
 	}
 
-	whereClause := strings.Join(where, " AND ")
-
 	// 查询总数
 	var total int64
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM audit_log WHERE %s", whereClause)
-	if err := r.conn.QueryRowCtx(ctx, &total, countQuery, args...); err != nil {
+	countSQL, countArgs, err := sq.Select("COUNT(*)").From("audit_log").Where(conditions).ToSql()
+	if err != nil {
+		return nil, 0, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+	}
+	if err := r.conn.QueryRowCtx(ctx, &total, countSQL, countArgs...); err != nil {
 		return nil, 0, err
 	}
 
 	// 查询列表
 	var list []model.AuditLog
-	query := fmt.Sprintf("SELECT * FROM audit_log WHERE %s ORDER BY id DESC LIMIT ? OFFSET ?", whereClause)
-	args = append(args, pageSize, offset)
-	if err := r.conn.QueryRowsCtx(ctx, &list, query, args...); err != nil {
+	listSQL, listArgs, err := sq.Select("*").
+		From("audit_log").
+		Where(conditions).
+		OrderBy("id DESC").
+		Limit(uint64(pageSize)).
+		Offset(uint64(offset)).
+		ToSql()
+	if err != nil {
+		return nil, 0, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+	}
+	if err := r.conn.QueryRowsCtx(ctx, &list, listSQL, listArgs...); err != nil {
 		return nil, 0, err
 	}
 

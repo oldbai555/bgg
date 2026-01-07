@@ -2,11 +2,11 @@ package repository
 
 import (
 	"context"
-	"fmt"
-	"strings"
 
+	sq "github.com/Masterminds/squirrel"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 	"postapocgame/admin-server/internal/model"
+	"postapocgame/admin-server/pkg/errs"
 )
 
 type DailyShortSentenceRepository interface {
@@ -40,28 +40,27 @@ func (r *dailyShortSentenceRepository) FindPage(ctx context.Context, page, pageS
 }
 
 func (r *dailyShortSentenceRepository) findPageWithFilter(ctx context.Context, page, pageSize int64, keyword string, sentenceType int64) ([]model.DailyShortSentence, int64, error) {
-	var whereConditions []string
-	var args []interface{}
-
-	whereConditions = append(whereConditions, "deleted_at = 0")
+	conditions := sq.And{sq.Eq{"deleted_at": 0}}
 
 	if keyword != "" {
-		whereConditions = append(whereConditions, "(content LIKE ? OR literature_author LIKE ?)")
 		keywordPattern := "%" + keyword + "%"
-		args = append(args, keywordPattern, keywordPattern)
+		conditions = append(conditions, sq.Or{
+			sq.Like{"content": keywordPattern},
+			sq.Like{"literature_author": keywordPattern},
+		})
 	}
 
 	if sentenceType > 0 {
-		whereConditions = append(whereConditions, "type = ?")
-		args = append(args, sentenceType)
+		conditions = append(conditions, sq.Eq{"type": sentenceType})
 	}
-
-	whereClause := strings.Join(whereConditions, " AND ")
 
 	// 查询总数
 	var total int64
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM `daily_short_sentence` WHERE %s", whereClause)
-	err := r.conn.QueryRowCtx(ctx, &total, countQuery, args...)
+	countSQL, countArgs, err := sq.Select("COUNT(*)").From("`daily_short_sentence`").Where(conditions).ToSql()
+	if err != nil {
+		return nil, 0, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+	}
+	err = r.conn.QueryRowCtx(ctx, &total, countSQL, countArgs...)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -75,11 +74,19 @@ func (r *dailyShortSentenceRepository) findPageWithFilter(ctx context.Context, p
 	}
 	offset := (page - 1) * pageSize
 
-	query := fmt.Sprintf("SELECT id, type, content, img, literature_author, convert_img, created_at, updated_at, deleted_at FROM `daily_short_sentence` WHERE %s ORDER BY id DESC LIMIT ? OFFSET ?", whereClause)
-	args = append(args, pageSize, offset)
+	listSQL, listArgs, err := sq.Select("id", "type", "content", "img", "literature_author", "convert_img", "created_at", "updated_at", "deleted_at").
+		From("`daily_short_sentence`").
+		Where(conditions).
+		OrderBy("id DESC").
+		Limit(uint64(pageSize)).
+		Offset(uint64(offset)).
+		ToSql()
+	if err != nil {
+		return nil, 0, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+	}
 
 	var list []model.DailyShortSentence
-	err = r.conn.QueryRowsCtx(ctx, &list, query, args...)
+	err = r.conn.QueryRowsCtx(ctx, &list, listSQL, listArgs...)
 	if err != nil {
 		return nil, 0, err
 	}

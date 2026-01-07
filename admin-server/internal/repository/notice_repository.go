@@ -2,11 +2,11 @@ package repository
 
 import (
 	"context"
-	"fmt"
-	"strings"
 
+	sq "github.com/Masterminds/squirrel"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 	"postapocgame/admin-server/internal/model"
+	"postapocgame/admin-server/pkg/errs"
 )
 
 type NoticeRepository interface {
@@ -34,29 +34,26 @@ func (r *noticeRepository) FindByID(ctx context.Context, id uint64) (*model.Admi
 
 func (r *noticeRepository) FindPage(ctx context.Context, page, pageSize int64, title string, noticeType, status int64) ([]model.AdminNotice, int64, error) {
 	// 构建查询条件
-	where := []string{"deleted_at = 0"}
-	args := []interface{}{}
+	conditions := sq.And{sq.Eq{"deleted_at": 0}}
 
 	if title != "" {
-		where = append(where, "title LIKE ?")
-		args = append(args, "%"+title+"%")
+		conditions = append(conditions, sq.Like{"title": "%" + title + "%"})
 	}
 	if noticeType > 0 {
-		where = append(where, "type = ?")
-		args = append(args, noticeType)
+		conditions = append(conditions, sq.Eq{"type": noticeType})
 	}
 	// status: -1表示未传入（不筛选），1表示草稿，2表示已发布
 	if status > 0 {
-		where = append(where, "status = ?")
-		args = append(args, status)
+		conditions = append(conditions, sq.Eq{"status": status})
 	}
-
-	whereClause := strings.Join(where, " AND ")
 
 	// 查询总数
 	var total int64
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM `admin_notice` WHERE %s", whereClause)
-	err := r.conn.QueryRowCtx(ctx, &total, countQuery, args...)
+	countSQL, countArgs, err := sq.Select("COUNT(*)").From("`admin_notice`").Where(conditions).ToSql()
+	if err != nil {
+		return nil, 0, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+	}
+	err = r.conn.QueryRowCtx(ctx, &total, countSQL, countArgs...)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -64,9 +61,17 @@ func (r *noticeRepository) FindPage(ctx context.Context, page, pageSize int64, t
 	// 查询列表
 	var list []model.AdminNotice
 	offset := (page - 1) * pageSize
-	query := fmt.Sprintf("SELECT id, title, content, type, status, publish_time, created_by, created_at, updated_at, deleted_at FROM `admin_notice` WHERE %s ORDER BY publish_time DESC, created_at DESC LIMIT ? OFFSET ?", whereClause)
-	args = append(args, pageSize, offset)
-	err = r.conn.QueryRowsCtx(ctx, &list, query, args...)
+	listSQL, listArgs, err := sq.Select("id", "title", "content", "type", "status", "publish_time", "created_by", "created_at", "updated_at", "deleted_at").
+		From("`admin_notice`").
+		Where(conditions).
+		OrderBy("publish_time DESC", "created_at DESC").
+		Limit(uint64(pageSize)).
+		Offset(uint64(offset)).
+		ToSql()
+	if err != nil {
+		return nil, 0, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+	}
+	err = r.conn.QueryRowsCtx(ctx, &list, listSQL, listArgs...)
 	if err != nil {
 		return nil, 0, err
 	}
