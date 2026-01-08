@@ -22,6 +22,8 @@ export interface WSMessage {
   content?: string;
   messageId?: number;
   createdAt?: number; // 秒级时间戳
+  chatId?: number; // 聊天ID（用于区分群聊和私聊）
+  messageType?: number; // 消息类型（1=文本，2=图片等）
   // 任务进度相关
   taskId?: string;
   taskName?: string;
@@ -95,17 +97,41 @@ export const useWebSocketStore = defineStore('websocket', {
 
       this.connecting = true;
 
-      // 从字典获取 WebSocket baseURL
-      let wsBaseURL = await getWebSocketBaseURL();
-      // 如果字典中没有配置，使用默认值
-      if (!wsBaseURL) {
-        // 开发环境默认连接本地服务，生产环境默认连接线上 ws 网关
-        wsBaseURL = import.meta.env.PROD ? 'oldbai.top/ws' : 'localhost:20000';
+      // 开发环境强制使用本地服务，忽略字典配置
+      let wsBaseURL: string;
+      if (import.meta.env.DEV) {
+        // 开发环境：直接连接本地后端服务
+        wsBaseURL = 'localhost:20000';
+      } else {
+        // 生产环境：从字典获取配置，如果没有则使用默认值
+        wsBaseURL = await getWebSocketBaseURL();
+        if (!wsBaseURL) {
+          wsBaseURL = 'oldbai.top';
+        }
       }
 
       // 构建 WebSocket URL
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const wsUrl = `${protocol}//${wsBaseURL}/api/v1/chats/ws?token=${encodeURIComponent(token)}&roomId=default`;
+      const wsPath = '/api/v1/chats/ws';
+      let wsUrl: string;
+      
+      // 处理 baseURL：
+      // 开发环境：直接连接后端，路径为 ws://localhost:20000/api/v1/chats/ws
+      // 生产环境：
+      //   1. 如果 baseURL 包含 /ws，说明已经配置了完整的路径（如 oldbai.top/ws）
+      //      那么直接拼接路径：ws://oldbai.top/ws/api/v1/chats/ws
+      //   2. 如果 baseURL 不包含 /ws，说明只配置了域名（如 oldbai.top）
+      //      那么直接连接后端：ws://oldbai.top/api/v1/chats/ws
+      if (import.meta.env.DEV) {
+        // 开发环境：直接连接本地后端，不添加 /ws 前缀
+        wsUrl = `${protocol}//${wsBaseURL}${wsPath}?token=${encodeURIComponent(token)}&roomId=default`;
+      } else if (wsBaseURL.includes('/ws')) {
+        // 生产环境：baseURL 已经包含 /ws，直接拼接
+        wsUrl = `${protocol}//${wsBaseURL}${wsPath}?token=${encodeURIComponent(token)}&roomId=default`;
+      } else {
+        // 生产环境：baseURL 不包含 /ws，直接连接后端（不添加 /ws 前缀）
+        wsUrl = `${protocol}//${wsBaseURL}${wsPath}?token=${encodeURIComponent(token)}&roomId=default`;
+      }
 
       try {
         const ws = new WebSocket(wsUrl);
@@ -115,7 +141,6 @@ export const useWebSocketStore = defineStore('websocket', {
           this.connecting = false;
           this.reconnectAttempts = 0;
           this.reconnectDelay = RECONNECT_DELAY_BASE;
-          console.log('WebSocket 连接成功');
         };
 
         ws.onmessage = (event) => {
@@ -129,6 +154,15 @@ export const useWebSocketStore = defineStore('websocket', {
 
         ws.onerror = (error) => {
           console.error('WebSocket 错误:', error);
+          console.error('WebSocket URL:', wsUrl.replace(/token=[^&]+/, 'token=***'));
+          // 尝试输出更详细的错误信息
+          if (ws.readyState === WebSocket.CLOSED) {
+            console.error('WebSocket 连接已关闭，可能的原因：');
+            console.error('1. 后端服务未运行');
+            console.error('2. Nginx 配置错误（如果通过代理）');
+            console.error('3. 路径不匹配');
+            console.error('4. 防火墙或网络问题');
+          }
           this.connecting = false;
         };
 
@@ -191,7 +225,8 @@ export const useWebSocketStore = defineStore('websocket', {
           this.handleSystemMessage(data);
           break;
         default:
-          console.log('未知消息类型:', data.type);
+          // 未知消息类型，忽略
+          break;
       }
     },
 

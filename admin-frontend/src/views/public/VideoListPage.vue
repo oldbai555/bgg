@@ -41,7 +41,7 @@
               loop
               muted
               playsinline
-            />
+            ></video>
             <div class="play-overlay">
               <div class="play-icon"></div>
             </div>
@@ -100,13 +100,17 @@ const totalPages = computed(() => Math.max(1, Math.ceil(total.value / query.size
 
 // 获取封面URL
 const getCoverUrl = (godNum: string): string => {
-  if (!godNum) return ''
+  if (!godNum) {
+return ''
+}
   return `https://fourhoi.com/${godNum}/cover-t.jpg`
 }
 
 // 获取预览视频URL
 const getPreviewUrl = (godNum: string): string => {
-  if (!godNum) return ''
+  if (!godNum) {
+return ''
+}
   return `https://fourhoi.com/${godNum}/preview.mp4`
 }
 
@@ -152,7 +156,7 @@ const loadData = async () => {
     if (query.content) {
       req.content = query.content
     }
-    
+
     // 响应直接返回数据（无 code/msg 包装），拦截器会直接返回原始数据
     const resp = await publicVideoList(req)
     list.value = resp.list
@@ -196,11 +200,17 @@ onMounted(() => {
   const page = route.query.page
   const size = route.query.size
   const content = route.query.content
-  
-  if (page) query.page = Number(page)
-  if (size) query.size = Number(size)
-  if (content) query.content = String(content)
-  
+
+  if (page) {
+query.page = Number(page)
+}
+  if (size) {
+query.size = Number(size)
+}
+  if (content) {
+query.content = String(content)
+}
+
   loadData()
 })
 </script>

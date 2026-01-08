@@ -26,3 +26,4 @@ admin-server/*.exe
 /history
 /history/**
 /admin-server/uploads/**
+/admin-frontend/eslintcheckresult.txt

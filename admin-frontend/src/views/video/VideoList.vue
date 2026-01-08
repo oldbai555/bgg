@@ -7,7 +7,12 @@
           <el-input v-model="query.keyword" placeholder="搜索视频名称、描述" clearable />
         </el-form-item>
         <el-form-item label="来源类型">
-          <el-select v-model="query.sourceType" placeholder="全部" clearable style="width: 150px">
+          <el-select
+            v-model="query.sourceType"
+            placeholder="全部"
+            clearable
+            style="width: 150px"
+          >
             <el-option label="全部" :value="0" />
             <el-option
               v-for="option in sourceTypeOptions"
@@ -91,7 +96,6 @@ import type {VideoItem, VideoCreateReq, VideoUpdateReq} from '@/api/generated/ad
 import {useI18n} from 'vue-i18n'
 import D2Table from '@/components/common/D2Table.vue'
 import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table'
-import {formatUnixTime} from '@/utils/date'
 import {useDictOptions} from '@/composables/useDictOptions'
 
 const {t} = useI18n()

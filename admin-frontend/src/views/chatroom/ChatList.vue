@@ -353,7 +353,7 @@ const handleChatMessage = (data: Record<string, unknown>) => {
   // 检查是否是当前选中的聊天
   if (selectedChatId.value && data.chatId && Number(data.chatId) === Number(selectedChatId.value)) {
     // 智能判断消息类型：如果 content 是完整的 URL 且看起来是图片，则可能是图片消息
-    let messageType = data.messageType || 1
+    let messageType = Number(data.messageType) || 1
     if (!data.messageType && data.content) {
       // 如果 content 是完整的 URL 且包含图片路径特征，判断为图片消息
       const content = String(data.content)
@@ -365,42 +365,77 @@ const handleChatMessage = (data: Record<string, unknown>) => {
     }
 
     // 检查是否已存在相同的消息（避免重复添加）
-    const messageId = data.messageId || Date.now()
-    const existingIndex = messages.value.findIndex(msg =>
-      msg.id === messageId ||
-      (msg.content === data.content &&
-       Number(msg.fromUserId) === Number(data.fromId) &&
-       Math.abs(msg.createdAt - (data.createdAt || Math.floor(Date.now() / 1000))) < 5) // 5秒内的相同消息视为重复
-    )
+    const messageId = data.messageId && Number(data.messageId) > 0 ? Number(data.messageId) : null
+    const content = String(data.content || '')
+    const fromId = Number(data.fromId || 0)
+    const wsCreatedAt = Number(data.createdAt || Math.floor(Date.now() / 1000))
+
+    // 查找已存在的消息：
+    // 1. 如果 messageId 有效，优先通过 ID 匹配
+    // 2. 如果 messageId 无效（0 或不存在），通过内容+发送者+时间戳匹配（30秒内）
+    // 3. 特别处理：如果是当前用户发送的消息，且内容相同，且时间戳接近，则认为是重复
+    // 查找已存在的消息：通过内容+发送者+时间戳匹配
+    const existingIndex = messages.value.findIndex(msg => {
+      const msgContent = String(msg.content || '')
+      const msgFromId = Number(msg.fromUserId || 0)
+      const msgCreatedAt = Number(msg.createdAt || 0)
+
+      // 首先检查内容+发送者是否匹配
+      if (msgContent !== content || msgFromId !== fromId) {
+        return false
+      }
+
+      // 如果内容+发送者匹配，再检查时间戳（10秒内）
+      const timeDiff = Math.abs(msgCreatedAt - wsCreatedAt)
+      const timeThreshold = 10
+
+      if (timeDiff <= timeThreshold) {
+        // 如果 messageId 有效，也检查 ID 匹配
+        if (messageId) {
+          const msgIdNum = Number(msg.id)
+          if (msgIdNum && msgIdNum === messageId) {
+            return true
+          }
+        }
+
+        // 通过内容+发送者+时间戳匹配
+        return true
+      }
+
+      return false
+    })
 
     if (existingIndex >= 0) {
       // 如果已存在，更新消息（使用服务器返回的ID和类型）
+      const finalMessageId = messageId || messages.value[existingIndex].id
       messages.value[existingIndex] = {
         ...messages.value[existingIndex],
-        id: messageId,
+        id: finalMessageId,
         messageType: messageType,
-        createdAt: data.createdAt || messages.value[existingIndex].createdAt
+        createdAt: wsCreatedAt
       }
+      // 不滚动到底部，避免干扰用户（因为这是更新已有消息，不是新消息）
     } else {
       // 收到新消息，添加到消息列表
+      const finalMessageId = messageId || Date.now()
       const newMessage: ChatMessageItem = {
-        id: messageId,
-        chatId: data.chatId || 0,
-        fromUserId: data.fromId,
-        fromUserName: data.fromName,
-        content: data.content,
+        id: finalMessageId,
+        chatId: Number(data.chatId) || 0,
+        fromUserId: Number(data.fromId) || 0,
+        fromUserName: String(data.fromName || ''),
+        content: content,
         messageType: messageType,
         status: 1,
-        createdAt: data.createdAt || Math.floor(Date.now() / 1000) // 秒级时间戳
+        createdAt: wsCreatedAt
       }
       messages.value.push(newMessage)
+      // 如果消息数量超过限制，只保留最新的N条
+      if (messages.value.length > chatMessageLimit.value) {
+        messages.value = messages.value.slice(-chatMessageLimit.value)
+      }
+      scrollToBottom()
     }
 
-    // 如果消息数量超过限制，只保留最新的N条
-    if (messages.value.length > chatMessageLimit.value) {
-      messages.value = messages.value.slice(-chatMessageLimit.value)
-    }
-    scrollToBottom()
   }
 }
 
@@ -529,18 +564,40 @@ const handleSendMessage = async () => {
       }
       await chatMessageSend(req)
 
-      // 立即在本地添加消息
-      const localMessage: ChatMessageItem = {
-        id: Date.now(), // 临时ID，WebSocket返回后会更新
-        chatId: selectedChatId.value,
-        fromUserId: Number(currentUserId.value),
-        fromUserName: currentUsername.value,
-        content: messageContent,
-        messageType: 1,
-        status: 1,
-        createdAt: Math.floor(Date.now() / 1000)
+      // 检查是否已有相同的消息（WebSocket 可能已经推送了）
+      const localCreatedAt = Math.floor(Date.now() / 1000)
+      const existingIndex = messages.value.findIndex(msg => {
+        const msgContent = String(msg.content || '')
+        const msgFromId = Number(msg.fromUserId || 0)
+        const msgCreatedAt = Number(msg.createdAt || 0)
+
+        // 内容+发送者必须匹配
+        if (msgContent !== messageContent || msgFromId !== Number(currentUserId.value)) {
+          return false
+        }
+
+        // 时间戳差异在 5 秒内（WebSocket 消息可能先到达）
+        const timeDiff = Math.abs(msgCreatedAt - localCreatedAt)
+        return timeDiff <= 5
+      })
+
+      if (existingIndex >= 0) {
+        // 如果已存在相同的消息，说明 WebSocket 已经推送了，不需要添加临时消息
+      } else {
+        // 立即在本地添加消息（使用临时ID，WebSocket返回后会更新或合并）
+        const tempId = Date.now() // 使用时间戳作为临时ID，WebSocket返回后会更新
+        const localMessage: ChatMessageItem = {
+          id: tempId, // 临时ID，WebSocket返回后会更新
+          chatId: selectedChatId.value,
+          fromUserId: Number(currentUserId.value),
+          fromUserName: currentUsername.value,
+          content: messageContent,
+          messageType: 1,
+          status: 1,
+          createdAt: localCreatedAt
+        }
+        messages.value.push(localMessage)
       }
-      messages.value.push(localMessage)
       if (messages.value.length > chatMessageLimit.value) {
         messages.value = messages.value.slice(-chatMessageLimit.value)
       }

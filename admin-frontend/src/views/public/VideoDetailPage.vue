@@ -56,7 +56,7 @@ import {ArrowLeft} from '@element-plus/icons-vue'
 import videojs from 'video.js'
 import 'video.js/dist/video-js.css'
 import {publicVideoDetail} from '@/api/generated/admin'
-import type {PublicVideoDetailResp, PublicVideoDetailReq} from '@/api/generated/admin'
+import type {PublicVideoDetailResp} from '@/api/generated/admin'
 
 const router = useRouter()
 const route = useRoute()
@@ -83,8 +83,8 @@ let player: ReturnType<typeof videojs> | null = null
 const waitForElementInDOM = async (element: HTMLElement, maxAttempts = 20): Promise<boolean> => {
   for (let i = 0; i < maxAttempts; i++) {
     // 检查元素是否在 DOM 中（使用多种方法）
-    if (document.body.contains(element) || 
-        element.isConnected || 
+    if (document.body.contains(element) ||
+        element.isConnected ||
         (element.offsetParent !== null || element.style.display !== 'none')) {
       return true
     }
@@ -113,11 +113,11 @@ const initPlayer = async () => {
 
     // 等待 Vue 完成 DOM 更新
     await nextTick()
-    
+
     // 使用 requestAnimationFrame 确保浏览器已完成渲染
     await new Promise(resolve => requestAnimationFrame(resolve))
     await new Promise(resolve => requestAnimationFrame(resolve))
-    
+
     // 额外等待，确保 loading 状态已更新
     await new Promise(resolve => setTimeout(resolve, 100))
 
@@ -127,14 +127,14 @@ const initPlayer = async () => {
 
     // 等待元素在 DOM 中
     const isInDOM = await waitForElementInDOM(videoPlayerRef.value)
-    
+
     if (!isInDOM) {
       return
     }
-    
+
     // 再次确认元素可见（不是被 v-loading 隐藏）
     const isHidden = videoPlayerRef.value.offsetParent === null && videoPlayerRef.value.style.display === 'none'
-    
+
     if (isHidden) {
       await new Promise(resolve => setTimeout(resolve, 200))
       const stillHidden = videoPlayerRef.value.offsetParent === null && videoPlayerRef.value.style.display === 'none'
@@ -154,7 +154,7 @@ const initPlayer = async () => {
           existingPlayerById.dispose()
         }
       }
-      
+
       // 再通过元素查找
       if (videoElement) {
         try {
@@ -162,18 +162,18 @@ const initPlayer = async () => {
           if (existingPlayer) {
             existingPlayer.dispose()
           }
-        } catch (e) {
+        } catch (_e) {
           // 如果没有已存在的播放器，忽略错误
         }
       }
-    } catch (e) {
+    } catch (_e) {
       // 忽略检查错误
     }
 
     // dispose 后等待 Vue 重新渲染（如果使用了 key，元素会被重新创建）
     await nextTick()
     await new Promise(resolve => setTimeout(resolve, 100))
-    
+
     // 重新获取元素引用（因为 dispose 可能已经移除了旧元素）
     if (!videoPlayerRef.value) {
       // 等待 Vue 重新渲染元素
@@ -184,7 +184,7 @@ const initPlayer = async () => {
         await new Promise(resolve => setTimeout(resolve, 50))
         retryCount++
       }
-      
+
       if (!videoPlayerRef.value) {
         return
       }
@@ -202,7 +202,7 @@ const initPlayer = async () => {
         await new Promise(resolve => setTimeout(resolve, 50))
         retryCount++
       }
-      
+
       if (!videoPlayerRef.value || (!document.body.contains(videoPlayerRef.value) && !videoPlayerRef.value.isConnected)) {
         return
       }
@@ -248,19 +248,21 @@ const initPlayer = async () => {
         // 监听错误，如果直接播放失败，切换到代理地址
         const errorHandler = () => {
           const playerInstance = player
-          if (!playerInstance) return
-          
+          if (!playerInstance) {
+return
+}
+
           // 切换到代理地址
           const proxyUrl = `/api/v1/m3u8/proxy?url=${encodeURIComponent(playUrl)}`
           playerInstance.src({
             src: proxyUrl,
             type: 'application/x-mpegURL'
           })
-          
+
           // 移除错误监听，避免循环
           playerInstance.off('error', errorHandler)
         }
-        
+
         currentPlayer.one('error', errorHandler)
       } else {
         // 非 m3u8 格式，直接播放
@@ -297,7 +299,9 @@ const initPlayer = async () => {
       // 监听最终错误（如果代理也失败）
       currentPlayer.on('error', () => {
         const playerInstance = player
-        if (!playerInstance) return
+        if (!playerInstance) {
+return
+}
         const error = playerInstance.error()
         if (error) {
           ElMessage.error(`播放失败: ${error.message || '未知错误'}`)
@@ -314,7 +318,7 @@ const initPlayer = async () => {
 // 加载视频详情
 const loadData = async () => {
   const id = route.params.id as string
-  
+
   if (!id) {
     ElMessage.error('视频ID不能为空')
     router.push('/public/videos')
@@ -329,7 +333,7 @@ const loadData = async () => {
   }
 
   loading.value = true
-  
+
   try {
     // 响应直接返回数据（无 code/msg 包装），拦截器会直接返回原始数据
     const resp = await publicVideoDetail({id: idNum})
@@ -355,7 +359,7 @@ const copyToClipboard = async (text: string) => {
       // Fallback方法
       fallbackCopy(text)
     }
-  } catch (err) {
+  } catch (_err) {
     fallbackCopy(text)
   }
 }
@@ -372,7 +376,7 @@ const fallbackCopy = (text: string) => {
   try {
     document.execCommand('copy')
     ElMessage.success('已复制到剪贴板 ✓')
-  } catch (err) {
+  } catch (_err) {
     ElMessage.error('复制失败，请手动复制')
   }
 
@@ -406,11 +410,11 @@ onMounted(() => {
       if (existingPlayer) {
         existingPlayer.dispose()
       }
-    } catch (e) {
+    } catch (_e) {
       // 如果没有已存在的播放器，忽略错误
     }
   }
-  
+
   loadData()
 })
 

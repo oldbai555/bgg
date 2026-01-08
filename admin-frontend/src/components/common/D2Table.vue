@@ -175,10 +175,10 @@
       <el-form :model="drawerRow" label-width="120px">
         <el-form-item
           v-for="(column, index) in drawerColumns"
+          v-show="!isEdit || !column.disabled"
           :key="index"
           :label="column.label"
           :required="column.required"
-          v-show="!isEdit || !column.disabled"
         >
           <!-- 下载链接 -->
           <el-link
