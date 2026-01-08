@@ -1,7 +1,7 @@
 -- admin-server 数据库初始化数据脚本
 -- 说明：此脚本包含所有系统初始化数据，所有 INSERT 语句使用 ON DUPLICATE KEY UPDATE 确保幂等性，可重复执行
 -- 注意：此脚本中的数据为系统初始化数据，不可被删除（包括软删、硬删）
--- 
+--
 -- 初始化数据的ID范围（每张表从1开始连续）：
 --   admin_user: id=1-2 (1=超级管理员, 2=admin 业务管理员)
 --   admin_role: id=1-2 (1=super_admin 超级管理员角色, 2=admin 业务管理员角色)
@@ -24,13 +24,13 @@
 -- ============================================
 -- 初始化用户：1=超级管理员 oldbai，2=业务管理员 admin（密码：admin）
 INSERT INTO `admin_user` (`id`, `username`, `password_hash`, `department_id`, `status`, `created_at`, `updated_at`, `deleted_at`)
-VALUES 
+VALUES
   (1, 'oldbai', '$2a$10$TIjB8/yhHDiyNbJn40BUPOACjxeTccaYTD4Ot3p00ZBCKzh7/sL9q', 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   (2, 'admin', '$2a$10$F/GioZ0D2TUl7wQX2kErU.fuqu/IJvU8yd.VtuFXbVfcAYPaZaj7S', 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
-ON DUPLICATE KEY UPDATE 
-  `username`=VALUES(`username`), 
-  `password_hash`=VALUES(`password_hash`), 
-  `status`=VALUES(`status`), 
+ON DUPLICATE KEY UPDATE
+  `username`=VALUES(`username`),
+  `password_hash`=VALUES(`password_hash`),
+  `status`=VALUES(`status`),
   `deleted_at`=0;
 
 -- 根部门
@@ -40,14 +40,14 @@ ON DUPLICATE KEY UPDATE `deleted_at`=0;
 
 -- 初始化角色：1=super_admin 超级管理员角色，2=admin 业务管理员角色
 INSERT INTO `admin_role` (`id`, `name`, `code`, `description`, `status`, `created_at`, `updated_at`, `deleted_at`)
-VALUES 
+VALUES
   (1, '超级管理员', 'super_admin', '系统内置最高权限角色，拥有全部权限', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   (2, 'admin', 'admin', '系统内置业务管理员角色，示例账号使用', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
 ON DUPLICATE KEY UPDATE `deleted_at`=0;
 
 -- 权限列表（完整，ID从1开始连续）
 INSERT INTO `admin_permission` (`id`, `name`, `code`, `description`, `created_at`, `updated_at`, `deleted_at`)
-VALUES 
+VALUES
   -- 超级权限（通配）
   (1, '全部权限', '*', '超级管理员拥有的全量权限通配符', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   -- 角色管理权限
@@ -106,16 +106,16 @@ VALUES
   (44, '群组删除', 'chat:group:delete', '删除群组', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   (45, '群组详情', 'chat:group:detail', '查看群组详情', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   (46, '群组成员管理', 'chat:group:member', '管理群组成员（添加/移除）', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
-ON DUPLICATE KEY UPDATE 
-  `name`=VALUES(`name`), 
-  `code`=VALUES(`code`), 
-  `description`=VALUES(`description`), 
-  `updated_at`=UNIX_TIMESTAMP(), 
+ON DUPLICATE KEY UPDATE
+  `name`=VALUES(`name`),
+  `code`=VALUES(`code`),
+  `description`=VALUES(`description`),
+  `updated_at`=UNIX_TIMESTAMP(),
   `deleted_at`=0;
 
 -- 关联：用户-角色
 INSERT INTO `admin_user_role` (`id`, `user_id`, `role_id`, `created_at`, `updated_at`)
-VALUES 
+VALUES
   (1, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
   (2, 2, 2, UNIX_TIMESTAMP(), UNIX_TIMESTAMP())
 ON DUPLICATE KEY UPDATE `updated_at`=UNIX_TIMESTAMP();
@@ -478,7 +478,7 @@ VALUES (
   UNIX_TIMESTAMP(),
   0
 )
-ON DUPLICATE KEY UPDATE 
+ON DUPLICATE KEY UPDATE
   `title`=VALUES(`title`),
   `content`=VALUES(`content`),
   `type`=VALUES(`type`),
@@ -503,20 +503,20 @@ VALUES (
   UNIX_TIMESTAMP(),
   0
 )
-ON DUPLICATE KEY UPDATE 
-  `name`=VALUES(`name`), 
-  `type`=VALUES(`type`), 
-  `description`=VALUES(`description`), 
-  `updated_at`=UNIX_TIMESTAMP(), 
+ON DUPLICATE KEY UPDATE
+  `name`=VALUES(`name`),
+  `type`=VALUES(`type`),
+  `description`=VALUES(`description`),
+  `updated_at`=UNIX_TIMESTAMP(),
   `deleted_at`=0;
 
 -- 将初始的两个用户（id=1和id=2）都加入默认企业群组
 INSERT INTO `chat_user` (`id`, `chat_id`, `user_id`, `joined_at`, `created_at`, `updated_at`)
-VALUES 
+VALUES
   (1, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), UNIX_TIMESTAMP()), -- 超级管理员加入群组
   (2, 1, 2, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), UNIX_TIMESTAMP())  -- 业务管理员加入群组
-ON DUPLICATE KEY UPDATE 
-  `joined_at`=VALUES(`joined_at`), 
+ON DUPLICATE KEY UPDATE
+  `joined_at`=VALUES(`joined_at`),
   `updated_at`=UNIX_TIMESTAMP();
 
 -- 创建用户1和用户2之间的私聊（id=2，type=1私聊）
@@ -532,24 +532,24 @@ VALUES (
   UNIX_TIMESTAMP(),
   0
 )
-ON DUPLICATE KEY UPDATE 
-  `type`=VALUES(`type`), 
-  `updated_at`=UNIX_TIMESTAMP(), 
+ON DUPLICATE KEY UPDATE
+  `type`=VALUES(`type`),
+  `updated_at`=UNIX_TIMESTAMP(),
   `deleted_at`=0;
 
 -- 将用户1和用户2加入私聊
 INSERT INTO `chat_user` (`id`, `chat_id`, `user_id`, `joined_at`, `created_at`, `updated_at`)
-VALUES 
+VALUES
   (3, 2, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), UNIX_TIMESTAMP()), -- 用户1加入私聊
   (4, 2, 2, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), UNIX_TIMESTAMP())  -- 用户2加入私聊
-ON DUPLICATE KEY UPDATE 
-  `joined_at`=VALUES(`joined_at`), 
+ON DUPLICATE KEY UPDATE
+  `joined_at`=VALUES(`joined_at`),
   `updated_at`=UNIX_TIMESTAMP();
 
 -- 为初始化用户创建公告通知（公告已发布，需要给所有用户创建通知）
 -- 注意：这里只给初始化时已存在的用户创建通知，后续新增的用户会在登录时自动获取未读公告
 INSERT INTO `admin_notification` (`user_id`, `source_type`, `source_id`, `title`, `content`, `read_status`, `read_at`, `created_at`, `updated_at`, `deleted_at`)
-SELECT 
+SELECT
   1, -- 超级管理员（id=1）
   'notice',
   1, -- 公告ID
@@ -561,12 +561,12 @@ SELECT
   UNIX_TIMESTAMP(),
   0
 WHERE NOT EXISTS (
-  SELECT 1 FROM `admin_notification` 
+  SELECT 1 FROM `admin_notification`
   WHERE `user_id` = 1 AND `source_type` = 'notice' AND `source_id` = 1 AND `deleted_at` = 0
 );
 
 INSERT INTO `admin_notification` (`user_id`, `source_type`, `source_id`, `title`, `content`, `read_status`, `read_at`, `created_at`, `updated_at`, `deleted_at`)
-SELECT 
+SELECT
   2, -- admin业务管理员（id=2）
   'notice',
   1, -- 公告ID
@@ -578,7 +578,7 @@ SELECT
   UNIX_TIMESTAMP(),
   0
 WHERE NOT EXISTS (
-  SELECT 1 FROM `admin_notification` 
+  SELECT 1 FROM `admin_notification`
   WHERE `user_id` = 2 AND `source_type` = 'notice' AND `source_id` = 1 AND `deleted_at` = 0
 );
 
@@ -608,7 +608,7 @@ VALUES (
     UNIX_TIMESTAMP(),
     0
 )
-ON DUPLICATE KEY UPDATE 
+ON DUPLICATE KEY UPDATE
     `name`=VALUES(`name`),
     `component`=VALUES(`component`),
     `icon`=VALUES(`icon`),
@@ -619,8 +619,8 @@ ON DUPLICATE KEY UPDATE
     `updated_at`=UNIX_TIMESTAMP(),
     `deleted_at`=0;
 SET @operation_menu_id = (
-  SELECT `id` FROM `admin_menu` 
-  WHERE `path` = '/system/operation-log' AND `deleted_at` = 0 
+  SELECT `id` FROM `admin_menu`
+  WHERE `path` = '/system/operation-log' AND `deleted_at` = 0
   LIMIT 1
 );
 
@@ -640,7 +640,7 @@ VALUES (
     UNIX_TIMESTAMP(),
     0
 )
-ON DUPLICATE KEY UPDATE 
+ON DUPLICATE KEY UPDATE
     `name`=VALUES(`name`),
     `order_num`=VALUES(`order_num`),
     `visible`=VALUES(`visible`),
@@ -649,7 +649,7 @@ ON DUPLICATE KEY UPDATE
     `deleted_at`=0;
 SET @operation_export_button_id = (
   SELECT `id` FROM `admin_menu`
-  WHERE `parent_id` = @operation_menu_id 
+  WHERE `parent_id` = @operation_menu_id
     AND `name` = '操作日志 导出按钮'
     AND `deleted_at` = 0
   LIMIT 1
@@ -657,38 +657,38 @@ SET @operation_export_button_id = (
 
 -- 操作日志权限
 INSERT INTO `admin_permission` (`name`, `code`, `description`, `created_at`, `updated_at`, `deleted_at`)
-VALUES 
+VALUES
   ('操作日志列表', 'operation_log:list', '查看操作日志列表', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   ('操作日志详情', 'operation_log:detail', '查看操作日志详情', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   ('操作日志导出', 'operation_log:export', '导出操作日志', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
-ON DUPLICATE KEY UPDATE 
+ON DUPLICATE KEY UPDATE
   `name`=VALUES(`name`),
   `description`=VALUES(`description`),
   `updated_at`=UNIX_TIMESTAMP(),
   `deleted_at`=0;
 SET @operation_list_permission_id = (
-  SELECT `id` FROM `admin_permission` 
-  WHERE `code` = 'operation_log:list' AND `deleted_at` = 0 
+  SELECT `id` FROM `admin_permission`
+  WHERE `code` = 'operation_log:list' AND `deleted_at` = 0
   LIMIT 1
 );
 SET @operation_detail_permission_id = (
-  SELECT `id` FROM `admin_permission` 
-  WHERE `code` = 'operation_log:detail' AND `deleted_at` = 0 
+  SELECT `id` FROM `admin_permission`
+  WHERE `code` = 'operation_log:detail' AND `deleted_at` = 0
   LIMIT 1
 );
 SET @operation_export_permission_id = (
-  SELECT `id` FROM `admin_permission` 
-  WHERE `code` = 'operation_log:export' AND `deleted_at` = 0 
+  SELECT `id` FROM `admin_permission`
+  WHERE `code` = 'operation_log:export' AND `deleted_at` = 0
   LIMIT 1
 );
 
 -- 操作日志接口
 INSERT INTO `admin_api` (`name`, `method`, `path`, `description`, `status`, `created_at`, `updated_at`, `deleted_at`)
-VALUES 
+VALUES
   ('操作日志列表', 'GET', '/api/v1/operation-logs', '获取操作日志列表', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   ('操作日志详情', 'GET', '/api/v1/operation-logs/detail', '获取操作日志详情', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   ('操作日志导出', 'GET', '/api/v1/operation-logs/export', '导出操作日志', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
-ON DUPLICATE KEY UPDATE 
+ON DUPLICATE KEY UPDATE
   `name`=VALUES(`name`),
   `description`=VALUES(`description`),
   `status`=VALUES(`status`),
@@ -712,14 +712,14 @@ SET @operation_export_api_id = (
 
 -- 操作日志 权限-菜单 关联
 INSERT INTO `admin_permission_menu` (`permission_id`, `menu_id`, `created_at`, `updated_at`)
-VALUES 
+VALUES
   (@operation_list_permission_id, @operation_menu_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
   (@operation_export_permission_id, @operation_export_button_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP())
 ON DUPLICATE KEY UPDATE `updated_at` = UNIX_TIMESTAMP();
 
 -- 操作日志 权限-接口 关联
 INSERT INTO `admin_permission_api` (`permission_id`, `api_id`, `created_at`, `updated_at`)
-VALUES 
+VALUES
   (@operation_list_permission_id, @operation_list_api_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
   (@operation_detail_permission_id, @operation_detail_api_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
   (@operation_export_permission_id, @operation_export_api_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP())
@@ -752,7 +752,7 @@ VALUES (
     UNIX_TIMESTAMP(),
     0
 )
-ON DUPLICATE KEY UPDATE 
+ON DUPLICATE KEY UPDATE
     `name`=VALUES(`name`),
     `component`=VALUES(`component`),
     `icon`=VALUES(`icon`),
@@ -784,7 +784,7 @@ VALUES (
     UNIX_TIMESTAMP(),
     0
 )
-ON DUPLICATE KEY UPDATE 
+ON DUPLICATE KEY UPDATE
     `name`=VALUES(`name`),
     `order_num`=VALUES(`order_num`),
     `visible`=VALUES(`visible`),
@@ -793,7 +793,7 @@ ON DUPLICATE KEY UPDATE
     `deleted_at`=0;
 SET @login_detail_button_id = (
   SELECT `id` FROM `admin_menu`
-  WHERE `parent_id` = @login_menu_id 
+  WHERE `parent_id` = @login_menu_id
     AND `name` = '登录日志 详情按钮'
     AND `deleted_at` = 0
   LIMIT 1
@@ -815,7 +815,7 @@ VALUES (
     UNIX_TIMESTAMP(),
     0
 )
-ON DUPLICATE KEY UPDATE 
+ON DUPLICATE KEY UPDATE
     `name`=VALUES(`name`),
     `order_num`=VALUES(`order_num`),
     `visible`=VALUES(`visible`),
@@ -824,7 +824,7 @@ ON DUPLICATE KEY UPDATE
     `deleted_at`=0;
 SET @login_export_button_id = (
   SELECT `id` FROM `admin_menu`
-  WHERE `parent_id` = @login_menu_id 
+  WHERE `parent_id` = @login_menu_id
     AND `name` = '登录日志 导出按钮'
     AND `deleted_at` = 0
   LIMIT 1
@@ -832,11 +832,11 @@ SET @login_export_button_id = (
 
 -- 登录日志权限
 INSERT INTO `admin_permission` (`name`, `code`, `description`, `created_at`, `updated_at`, `deleted_at`)
-VALUES 
+VALUES
   ('登录日志列表', 'login_log:list', '查看登录日志列表', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   ('登录日志详情', 'login_log:detail', '查看登录日志详情', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   ('登录日志导出', 'login_log:export', '导出登录日志', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
-ON DUPLICATE KEY UPDATE 
+ON DUPLICATE KEY UPDATE
   `name`=VALUES(`name`),
   `description`=VALUES(`description`),
   `updated_at`=UNIX_TIMESTAMP(),
@@ -859,11 +859,11 @@ SET @login_export_permission_id = (
 
 -- 登录日志接口
 INSERT INTO `admin_api` (`name`, `method`, `path`, `description`, `status`, `created_at`, `updated_at`, `deleted_at`)
-VALUES 
+VALUES
   ('登录日志列表', 'GET', '/api/v1/login-logs', '获取登录日志列表', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   ('登录日志详情', 'GET', '/api/v1/login-logs/detail', '获取登录日志详情', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   ('登录日志导出', 'GET', '/api/v1/login-logs/export', '导出登录日志', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
-ON DUPLICATE KEY UPDATE 
+ON DUPLICATE KEY UPDATE
   `name`=VALUES(`name`),
   `description`=VALUES(`description`),
   `status`=VALUES(`status`),
@@ -887,7 +887,7 @@ SET @login_export_api_id = (
 
 -- 登录日志 权限-菜单 关联
 INSERT INTO `admin_permission_menu` (`permission_id`, `menu_id`, `created_at`, `updated_at`)
-VALUES 
+VALUES
   (@login_list_permission_id, @login_menu_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
   (@login_detail_permission_id, @login_detail_button_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
   (@login_export_permission_id, @login_export_button_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP())
@@ -895,7 +895,7 @@ ON DUPLICATE KEY UPDATE `updated_at` = UNIX_TIMESTAMP();
 
 -- 登录日志 权限-接口 关联
 INSERT INTO `admin_permission_api` (`permission_id`, `api_id`, `created_at`, `updated_at`)
-VALUES 
+VALUES
   (@login_list_permission_id, @login_list_api_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
   (@login_detail_permission_id, @login_detail_api_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
   (@login_export_permission_id, @login_export_api_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP())
@@ -928,7 +928,7 @@ VALUES (
     UNIX_TIMESTAMP(),
     0
 )
-ON DUPLICATE KEY UPDATE 
+ON DUPLICATE KEY UPDATE
     `name`=VALUES(`name`),
     `component`=VALUES(`component`),
     `icon`=VALUES(`icon`),
@@ -960,7 +960,7 @@ VALUES (
     UNIX_TIMESTAMP(),
     0
 )
-ON DUPLICATE KEY UPDATE 
+ON DUPLICATE KEY UPDATE
     `name`=VALUES(`name`),
     `order_num`=VALUES(`order_num`),
     `visible`=VALUES(`visible`),
@@ -969,7 +969,7 @@ ON DUPLICATE KEY UPDATE
     `deleted_at`=0;
 SET @audit_export_button_id = (
   SELECT `id` FROM `admin_menu`
-  WHERE `parent_id` = @audit_menu_id 
+  WHERE `parent_id` = @audit_menu_id
     AND `name` = '审计日志 导出按钮'
     AND `deleted_at` = 0
   LIMIT 1
@@ -977,11 +977,11 @@ SET @audit_export_button_id = (
 
 -- 审计日志权限
 INSERT INTO `admin_permission` (`name`, `code`, `description`, `created_at`, `updated_at`, `deleted_at`)
-VALUES 
+VALUES
   ('审计日志列表', 'audit_log:list', '查看审计日志列表', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   ('审计日志详情', 'audit_log:detail', '查看审计日志详情', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   ('审计日志导出', 'audit_log:export', '导出审计日志', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
-ON DUPLICATE KEY UPDATE 
+ON DUPLICATE KEY UPDATE
   `name`=VALUES(`name`),
   `description`=VALUES(`description`),
   `updated_at`=UNIX_TIMESTAMP(),
@@ -1004,11 +1004,11 @@ SET @audit_export_permission_id = (
 
 -- 审计日志接口
 INSERT INTO `admin_api` (`name`, `method`, `path`, `description`, `status`, `created_at`, `updated_at`, `deleted_at`)
-VALUES 
+VALUES
   ('审计日志列表', 'GET', '/api/v1/audit-logs', '获取审计日志列表', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   ('审计日志详情', 'GET', '/api/v1/audit-logs/detail', '获取审计日志详情', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   ('审计日志导出', 'GET', '/api/v1/audit-logs/export', '导出审计日志', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
-ON DUPLICATE KEY UPDATE 
+ON DUPLICATE KEY UPDATE
   `name`=VALUES(`name`),
   `description`=VALUES(`description`),
   `status`=VALUES(`status`),
@@ -1032,14 +1032,14 @@ SET @audit_export_api_id = (
 
 -- 审计日志 权限-菜单 关联
 INSERT INTO `admin_permission_menu` (`permission_id`, `menu_id`, `created_at`, `updated_at`)
-VALUES 
+VALUES
   (@audit_list_permission_id, @audit_menu_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
   (@audit_export_permission_id, @audit_export_button_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP())
 ON DUPLICATE KEY UPDATE `updated_at` = UNIX_TIMESTAMP();
 
 -- 审计日志 权限-接口 关联
 INSERT INTO `admin_permission_api` (`permission_id`, `api_id`, `created_at`, `updated_at`)
-VALUES 
+VALUES
   (@audit_list_permission_id, @audit_list_api_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
   (@audit_detail_permission_id, @audit_detail_api_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
   (@audit_export_permission_id, @audit_export_api_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP())
@@ -1072,7 +1072,7 @@ VALUES (
     UNIX_TIMESTAMP(),
     0
 )
-ON DUPLICATE KEY UPDATE 
+ON DUPLICATE KEY UPDATE
     `name`=VALUES(`name`),
     `component`=VALUES(`component`),
     `icon`=VALUES(`icon`),
@@ -1098,7 +1098,7 @@ VALUES (
     UNIX_TIMESTAMP(),
     0
 )
-ON DUPLICATE KEY UPDATE 
+ON DUPLICATE KEY UPDATE
   `name`=VALUES(`name`),
   `description`=VALUES(`description`),
   `updated_at`=UNIX_TIMESTAMP(),
@@ -1121,7 +1121,7 @@ VALUES (
     UNIX_TIMESTAMP(),
     0
 )
-ON DUPLICATE KEY UPDATE 
+ON DUPLICATE KEY UPDATE
   `name`=VALUES(`name`),
   `description`=VALUES(`description`),
   `status`=VALUES(`status`),
@@ -1167,7 +1167,7 @@ VALUES (
     UNIX_TIMESTAMP(),
     0
 )
-ON DUPLICATE KEY UPDATE 
+ON DUPLICATE KEY UPDATE
     `name`=VALUES(`name`),
     `component`=VALUES(`component`),
     `icon`=VALUES(`icon`),
@@ -1193,7 +1193,7 @@ VALUES (
     UNIX_TIMESTAMP(),
     0
 )
-ON DUPLICATE KEY UPDATE 
+ON DUPLICATE KEY UPDATE
   `name`=VALUES(`name`),
   `description`=VALUES(`description`),
   `updated_at`=UNIX_TIMESTAMP(),
@@ -1206,10 +1206,10 @@ SET @monitor_view_permission_id = (
 
 -- 系统监控接口
 INSERT INTO `admin_api` (`name`, `method`, `path`, `description`, `status`, `created_at`, `updated_at`, `deleted_at`)
-VALUES 
+VALUES
   ('系统监控状态', 'GET', '/api/v1/monitor/status', '获取系统资源使用情况（CPU、内存、磁盘、网络）', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   ('系统统计', 'GET', '/api/v1/monitor/stats', '获取系统统计数据（用户数、角色数、权限数等）', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
-ON DUPLICATE KEY UPDATE 
+ON DUPLICATE KEY UPDATE
   `name`=VALUES(`name`),
   `description`=VALUES(`description`),
   `status`=VALUES(`status`),
@@ -1233,7 +1233,7 @@ ON DUPLICATE KEY UPDATE `updated_at` = UNIX_TIMESTAMP();
 
 -- 系统监控 权限-接口 关联
 INSERT INTO `admin_permission_api` (`permission_id`, `api_id`, `created_at`, `updated_at`)
-VALUES 
+VALUES
   (@monitor_view_permission_id, @monitor_status_api_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
   (@monitor_view_permission_id, @monitor_stats_api_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP())
 ON DUPLICATE KEY UPDATE `updated_at` = UNIX_TIMESTAMP();
@@ -1271,7 +1271,7 @@ SET @chat_message_delete_button_id = (SELECT `id` FROM `admin_menu` WHERE `paren
 
 -- 聊天记录管理权限
 INSERT INTO `admin_permission` (`name`, `code`, `description`, `created_at`, `updated_at`, `deleted_at`)
-VALUES 
+VALUES
   ('聊天记录列表', 'chat_message:list', '查看聊天记录列表', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   ('聊天记录删除', 'chat_message:delete', '删除聊天记录', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
 ON DUPLICATE KEY UPDATE `name`=VALUES(`name`), `description`=VALUES(`description`), `updated_at`=UNIX_TIMESTAMP(), `deleted_at`=0;
@@ -1280,14 +1280,14 @@ SET @chat_message_delete_permission_id = (SELECT `id` FROM `admin_permission` WH
 
 -- 在线聊天接口（无需权限，只需要AuthMiddleware）
 INSERT INTO `admin_api` (`name`, `method`, `path`, `description`, `status`, `created_at`, `updated_at`, `deleted_at`)
-VALUES 
+VALUES
   ('聊天消息发送', 'POST', '/api/v1/chats/messages', '发送聊天消息', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   ('可聊天用户列表', 'GET', '/api/v1/chats/users', '获取可聊天用户列表（包含部门-角色-昵称信息）', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
 ON DUPLICATE KEY UPDATE `name`=VALUES(`name`), `description`=VALUES(`description`), `status`=VALUES(`status`), `updated_at`=UNIX_TIMESTAMP(), `deleted_at`=0;
 
 -- 聊天记录管理接口（需要权限）
 INSERT INTO `admin_api` (`name`, `method`, `path`, `description`, `status`, `created_at`, `updated_at`, `deleted_at`)
-VALUES 
+VALUES
   ('聊天记录列表', 'GET', '/api/v1/chats/messages', '获取聊天记录列表', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   ('聊天记录删除', 'DELETE', '/api/v1/chats/messages', '删除聊天记录', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
 ON DUPLICATE KEY UPDATE `name`=VALUES(`name`), `description`=VALUES(`description`), `status`=VALUES(`status`), `updated_at`=UNIX_TIMESTAMP(), `deleted_at`=0;
@@ -1296,7 +1296,7 @@ SET @chat_message_delete_api_id = (SELECT `id` FROM `admin_api` WHERE `method` =
 
 -- 聊天记录管理 权限-菜单 关联
 INSERT INTO `admin_permission_menu` (`permission_id`, `menu_id`, `created_at`, `updated_at`)
-VALUES 
+VALUES
   (@chat_message_list_permission_id, @chat_message_menu_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
   (@chat_message_delete_permission_id, @chat_message_delete_button_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP())
 ON DUPLICATE KEY UPDATE `updated_at` = UNIX_TIMESTAMP();
@@ -1309,7 +1309,7 @@ SET @chat_group_menu_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/chatro
 
 -- 群组管理按钮
 INSERT INTO `admin_menu` (`parent_id`, `name`, `path`, `component`, `icon`, `type`, `order_num`, `visible`, `status`, `created_at`, `updated_at`, `deleted_at`)
-VALUES 
+VALUES
   (@chat_group_menu_id, '群组管理 新增按钮', '', '', '', 3, 1, 0, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   (@chat_group_menu_id, '群组管理 编辑按钮', '', '', '', 3, 2, 0, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   (@chat_group_menu_id, '群组管理 删除按钮', '', '', '', 3, 3, 0, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
@@ -1324,7 +1324,7 @@ SET @chat_group_create_permission_id = (SELECT `id` FROM `admin_permission` WHER
 SET @chat_group_update_permission_id = (SELECT `id` FROM `admin_permission` WHERE `code` = 'chat:group:update' AND `deleted_at` = 0 LIMIT 1);
 SET @chat_group_delete_permission_id = (SELECT `id` FROM `admin_permission` WHERE `code` = 'chat:group:delete' AND `deleted_at` = 0 LIMIT 1);
 INSERT INTO `admin_permission_menu` (`permission_id`, `menu_id`, `created_at`, `updated_at`)
-VALUES 
+VALUES
   (@chat_group_detail_permission_id, @chat_group_menu_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
   (@chat_group_create_permission_id, @chat_group_create_button_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
   (@chat_group_update_permission_id, @chat_group_update_button_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
@@ -1333,7 +1333,7 @@ ON DUPLICATE KEY UPDATE `updated_at` = UNIX_TIMESTAMP();
 
 -- 聊天记录管理 权限-接口 关联
 INSERT INTO `admin_permission_api` (`permission_id`, `api_id`, `created_at`, `updated_at`)
-VALUES 
+VALUES
   (@chat_message_list_permission_id, @chat_message_list_api_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
   (@chat_message_delete_permission_id, @chat_message_delete_api_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP())
 ON DUPLICATE KEY UPDATE `updated_at` = UNIX_TIMESTAMP();
@@ -1351,7 +1351,7 @@ SET @notice_menu_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/system/not
 
 -- 公告管理按钮
 INSERT INTO `admin_menu` (`parent_id`, `name`, `path`, `component`, `icon`, `type`, `order_num`, `visible`, `status`, `created_at`, `updated_at`, `deleted_at`)
-VALUES 
+VALUES
   (@notice_menu_id, '公告管理 新增按钮', '', '', '', 3, 1, 0, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   (@notice_menu_id, '公告管理 编辑按钮', '', '', '', 3, 2, 0, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   (@notice_menu_id, '公告管理 删除按钮', '', '', '', 3, 3, 0, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
@@ -1362,7 +1362,7 @@ SET @notice_delete_button_id = (SELECT `id` FROM `admin_menu` WHERE `parent_id` 
 
 -- 公告管理权限
 INSERT INTO `admin_permission` (`name`, `code`, `description`, `created_at`, `updated_at`, `deleted_at`)
-VALUES 
+VALUES
   ('公告管理列表', 'notice:list', '查看公告管理列表', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   ('公告管理新增', 'notice:create', '新增公告管理', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   ('公告管理编辑', 'notice:update', '编辑公告管理', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
@@ -1375,7 +1375,7 @@ SET @notice_delete_permission_id = (SELECT `id` FROM `admin_permission` WHERE `c
 
 -- 公告管理接口
 INSERT INTO `admin_api` (`name`, `method`, `path`, `description`, `status`, `created_at`, `updated_at`, `deleted_at`)
-VALUES 
+VALUES
   ('公告管理列表', 'GET', '/api/v1/notices', '获取公告管理列表', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   ('公告管理新增', 'POST', '/api/v1/notices', '新增公告管理', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   ('公告管理编辑', 'PUT', '/api/v1/notices', '编辑公告管理', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
@@ -1388,7 +1388,7 @@ SET @notice_delete_api_id = (SELECT `id` FROM `admin_api` WHERE `method` = 'DELE
 
 -- 公告管理 权限-菜单 关联
 INSERT INTO `admin_permission_menu` (`permission_id`, `menu_id`, `created_at`, `updated_at`)
-VALUES 
+VALUES
   (@notice_list_permission_id, @notice_menu_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
   (@notice_create_permission_id, @notice_create_button_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
   (@notice_update_permission_id, @notice_update_button_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
@@ -1397,7 +1397,7 @@ ON DUPLICATE KEY UPDATE `updated_at`=UNIX_TIMESTAMP();
 
 -- 公告管理 权限-接口 关联
 INSERT INTO `admin_permission_api` (`permission_id`, `api_id`, `created_at`, `updated_at`)
-VALUES 
+VALUES
   (@notice_list_permission_id, @notice_list_api_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
   (@notice_create_permission_id, @notice_create_api_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
   (@notice_update_permission_id, @notice_update_api_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
@@ -1416,7 +1416,7 @@ ON DUPLICATE KEY UPDATE `parent_id`=VALUES(`parent_id`), `name`=VALUES(`name`), 
 
 -- 消息通知管理接口（只需要AuthMiddleware，不需要PermissionMiddleware）
 INSERT INTO `admin_api` (`name`, `method`, `path`, `description`, `status`, `created_at`, `updated_at`, `deleted_at`)
-VALUES 
+VALUES
   ('消息通知管理列表', 'GET', '/api/v1/notifications', '获取消息通知管理列表', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   ('消息通知全部已读', 'PUT', '/api/v1/notifications/read-all', '标记所有消息通知为已读', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   ('消息通知全部已读', 'PUT', '/api/v1/notifications/read-all', '标记所有消息通知为已读', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
@@ -1816,7 +1816,7 @@ VALUES (
     '',
     'ele-Key',
     1,
-    0,
+    40,
     1,
     1,
     UNIX_TIMESTAMP(),

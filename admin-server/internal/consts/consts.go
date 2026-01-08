@@ -62,3 +62,7 @@ const (
 	// NoticeStatusPublished 已发布
 	NoticeStatusPublished int64 = 2
 )
+
+const (
+	Open = 1
+)

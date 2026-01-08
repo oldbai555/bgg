@@ -4,17 +4,24 @@
 package main
 
 import (
+	"context"
+	"database/sql"
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
+	"postapocgame/admin-server/internal/consts"
+	"strings"
 	"syscall"
+	"time"
 
 	"github.com/zeromicro/go-zero/core/logx"
 
 	"postapocgame/admin-server/internal/config"
 	"postapocgame/admin-server/internal/handler"
 	"postapocgame/admin-server/internal/middleware"
+	"postapocgame/admin-server/internal/model"
 	"postapocgame/admin-server/internal/svc"
 
 	"github.com/zeromicro/go-zero/core/conf"
@@ -91,6 +98,8 @@ func main() {
 	handler.RegisterHandlers(server, ctx)
 	// 注册自定义路由（WebSocket 等）
 	handler.RegisterCustomRoutes(server, ctx)
+	// 同步路由到 admin_api 表
+	syncRoutesToAdminAPI(ctx, server)
 
 	// 设置优雅关闭：监听系统信号
 	sigChan := make(chan os.Signal, 1)
@@ -106,4 +115,61 @@ func main() {
 	<-sigChan
 	logx.Infof("收到关闭信号，开始优雅关闭...")
 	logx.Infof("服务器已关闭")
+}
+
+// syncRoutesToAdminAPI 将已注册的路由同步到 admin_api 表（method+path 唯一）
+func syncRoutesToAdminAPI(ctx *svc.ServiceContext, server *rest.Server) {
+	logx.Infof("====== 同步路由到 admin_api 表开始 ======")
+	routes := server.Routes()
+	if len(routes) == 0 {
+		return
+	}
+
+	now := time.Now().Unix()
+	bg := context.Background()
+
+	for _, r := range routes {
+		method := strings.ToUpper(strings.TrimSpace(r.Method))
+		path := strings.TrimSpace(r.Path)
+		if method == "" || path == "" {
+			continue
+		}
+
+		// 已存在则跳过
+		_, err := ctx.Repository.AdminApiModel.FindOneByMethodPath(bg, method, path)
+		if err == nil {
+			continue
+		}
+		if err != model.ErrNotFound {
+			logx.Errorf("检查接口 %s %s 失败: %v", method, path, err)
+			continue
+		}
+
+		apiName := fmt.Sprintf("%s_%s", method, sanitizePathForName(path))
+		data := &model.AdminApi{
+			Name:        apiName,
+			Method:      method,
+			Path:        path,
+			Description: sql.NullString{}, // 由管理员补充
+			Status:      consts.Open,      // 默认启用
+			CreatedAt:   now,
+			UpdatedAt:   now,
+		}
+
+		if _, err = ctx.Repository.AdminApiModel.Insert(bg, data); err != nil {
+			logx.Errorf("写入接口 %s %s 失败: %v", method, path, err)
+		}
+	}
+	logx.Infof("====== 同步路由到 admin_api 表结束 ======")
+}
+
+// sanitizePathForName 将路径转换为名称可用的格式
+func sanitizePathForName(path string) string {
+	path = strings.Trim(path, "/")
+	if path == "" {
+		return "ROOT"
+	}
+	path = strings.ReplaceAll(path, "/", "_")
+	path = strings.ReplaceAll(path, ":", "_")
+	return path
 }
