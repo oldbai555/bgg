@@ -11,6 +11,18 @@ const routes: RouteRecordRaw[] = [
     name: 'Login',
     component: () => import('@/views/Login.vue')
   },
+  // 公开视频列表页（不需要登录）
+  {
+    path: '/public/videos',
+    name: 'PublicVideoList',
+    component: () => import('@/views/public/VideoListPage.vue')
+  },
+  // 公开视频详情页（不需要登录）
+  {
+    path: '/public/videos/:id',
+    name: 'PublicVideoDetail',
+    component: () => import('@/views/public/VideoDetailPage.vue')
+  },
   {
     path: '/',
     name: 'Root',
@@ -181,7 +193,11 @@ router.beforeEach(async (to, _from, next) => {
     const userStore = useUserStore();
     const {hasPermission} = usePermission();
 
-    if (to.path !== '/login' && !userStore.token) {
+    // 公开视频页面不需要登录
+    const publicPaths = ['/public/videos'];
+    const isPublicPath = publicPaths.some(path => to.path.startsWith(path));
+    
+    if (!isPublicPath && to.path !== '/login' && !userStore.token) {
       next('/login');
       return;
     }

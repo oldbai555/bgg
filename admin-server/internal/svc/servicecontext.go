@@ -14,17 +14,19 @@ import (
 )
 
 type ServiceContext struct {
-	Config                 config.Config
-	Repository             *repository.Repository
-	ChatHub                *hub.ChatHub
-	AuthMiddleware         rest.Middleware
-	PermissionMiddleware   rest.Middleware
-	OperationLogMiddleware rest.Middleware
-	RateLimitMiddleware    rest.Middleware
-	PerformanceMiddleware  rest.Middleware
-	SDKAuthMiddleware      rest.Middleware
-	SDKRateLimitMiddleware rest.Middleware
-	SDKCallLogMiddleware   rest.Middleware
+	Config                       config.Config
+	Repository                   *repository.Repository
+	ChatHub                      *hub.ChatHub
+	AuthMiddleware               rest.Middleware
+	ApiEnabledMiddleware         rest.Middleware
+	PermissionMiddleware         rest.Middleware
+	OperationLogMiddleware       rest.Middleware
+	PublicOperationLogMiddleware rest.Middleware
+	RateLimitMiddleware          rest.Middleware
+	PerformanceMiddleware        rest.Middleware
+	SDKAuthMiddleware            rest.Middleware
+	SDKRateLimitMiddleware       rest.Middleware
+	SDKCallLogMiddleware         rest.Middleware
 }
 
 func NewServiceContext(c config.Config) (*ServiceContext, error) {

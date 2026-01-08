@@ -505,6 +505,21 @@ export function loginLogStats() {
  * @description 
  * @param req
  */
+export function m3u8Proxy(req: components.M3u8ProxyReq) {
+	return webapi.get<null>(`/api/v1/m3u8/proxy`, req)
+}
+
+/**
+ * @description 
+ */
+export function m3u8ProxyOptions() {
+	return webapi.options<null>(`/api/v1/m3u8/proxy`)
+}
+
+/**
+ * @description 
+ * @param req
+ */
 export function menuCreate(req: components.MenuCreateReq) {
 	return webapi.post<null>(`/api/v1/menus`, req)
 }
@@ -724,6 +739,22 @@ export function permissionMenuUpdate(req: components.PermissionMenuUpdateReq) {
  */
 export function ping() {
 	return webapi.get<components.PingResp>(`/api/v1/ping`)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function publicVideoDetail(req: components.PublicVideoDetailReq) {
+	return webapi.get<components.PublicVideoDetailResp>(`/api/v1/public/videos/info`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function publicVideoList(req: components.PublicVideoListReq) {
+	return webapi.get<components.PublicVideoListResp>(`/api/v1/public/videos/list`, req)
 }
 
 /**
@@ -963,4 +994,12 @@ export function videoDelete(req: components.VideoDeleteReq) {
  */
 export function videoProxy(req: components.VideoProxyReq) {
 	return webapi.get<null>(`/api/v1/videos/proxy`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function videoCollect(req: components.VideoCollectReq) {
+	return webapi.post<components.VideoCollectResp>(`/api/v1/videos/collect`, req)
 }

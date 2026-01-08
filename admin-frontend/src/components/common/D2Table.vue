@@ -178,6 +178,7 @@
           :key="index"
           :label="column.label"
           :required="column.required"
+          v-show="!isEdit || !column.disabled"
         >
           <!-- 下载链接 -->
           <el-link
@@ -232,12 +233,12 @@
             :disabled="!isEdit || column.disabled"
             style="width: 360px"
           />
-          <!-- 可编辑文本域 -->
+          <!-- 可编辑文本域（详情模式下显示为只读文本域，支持滚动） -->
           <el-input
             v-else-if="column.type === D2TableElemType.EditTextarea"
             v-model="drawerRow[column.prop]"
             type="textarea"
-            :rows="4"
+            :rows="!isEdit ? 8 : 4"
             :disabled="!isEdit"
             style="width: 360px"
           />
@@ -281,21 +282,24 @@
           <!-- 图片 -->
           <div v-else-if="column.type === D2TableElemType.Image" class="d2-table__image">
             <ImageUpload
-              v-if="isEdit"
+              v-if="isEdit && drawerRow[column.prop] !== undefined"
               v-model="drawerRow[column.prop]"
             />
             <el-image
-              v-else
-              style="width: 100px; height: 100px"
+              v-else-if="!isEdit && drawerRow[column.prop]"
+              style="width: 200px; height: 200px; max-width: 100%"
               :src="drawerRow[column.prop]"
-              fit="cover"
+              fit="contain"
+              :preview-src-list="[drawerRow[column.prop]].filter(Boolean)"
             >
               <template #error>
                 <div class="image-slot">
                   <el-icon><Picture /></el-icon>
+                  <span style="font-size: 12px; margin-top: 4px">加载失败</span>
                 </div>
               </template>
             </el-image>
+            <span v-else-if="!isEdit && !drawerRow[column.prop]" style="color: #909399">暂无图片</span>
           </div>
           <!-- 默认标签 -->
           <el-tag v-else>

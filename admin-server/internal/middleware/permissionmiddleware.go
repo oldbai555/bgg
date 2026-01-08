@@ -41,25 +41,12 @@ func (m *PermissionMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 		method := r.Method
 		path := r.URL.Path
 
-		// 移除前缀 /api/v1
-		if strings.HasPrefix(path, "/api/v1") {
-			path = path[len("/api/v1"):]
-		}
-
 		// 查找对应的接口
 		apiRepo := repository.NewApiRepository(m.svcCtx.Repository)
 		api, err := apiRepo.FindByMethodAndPath(r.Context(), method, path)
 		if err != nil {
-			// 如果接口不存在，可能是新接口还未配置，或者路径不匹配
-			// 尝试匹配带参数的路径（如 /users/:id -> /users/123）
-			matchedApi, matchErr := m.findApiByPattern(r.Context(), method, path)
-			if matchErr != nil {
-				// 接口未配置，允许通过（或者返回错误，根据业务需求）
-				// 这里选择允许通过，避免影响未配置的接口
-				next(w, r)
-				return
-			}
-			api = matchedApi
+			response.ErrorCtx(r.Context(), w, errs.New(errs.CodeNotFound, "接口不存在"))
+			return
 		}
 
 		// 如果接口未启用，直接通过（不进行权限检查）

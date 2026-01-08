@@ -11,4 +11,6 @@ const (
 	CodeForbidden     = 10004
 	CodeNotFound      = 10005
 	CodeBadDB         = 10006
+	CodeBadGateway    = 10007 // 网关错误（502）
+	CodeConflict      = 10008 // 冲突错误（409）
 )

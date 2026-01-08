@@ -27,7 +27,8 @@ instance.interceptors.response.use(
     const res = resp.data;
     // 标准包裹结构：code 为数字（统一错误码）时才按 Envelope 处理
     if (res && typeof res === 'object' && 'code' in res && typeof (res as any).code === 'number') {
-      if ((res as any).code === 0) {
+      // 支持 code === 0 和 code === 200 作为成功码
+      if ((res as any).code === 0 || (res as any).code === 200) {
         return (res as any).data;
       }
       const msg = (res as any).msg || '请求失败';

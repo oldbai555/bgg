@@ -44,11 +44,15 @@ type (
 
 	Video struct {
 		Id          uint64         `db:"id"`          // 主键 ID
+		Uuid        sql.NullString `db:"uuid"`        // 唯一标识（采集视频使用，可为空）
 		Name        string         `db:"name"`        // 视频名称
 		Cover       sql.NullString `db:"cover"`       // 视频封面URL
+		GodNum      sql.NullString `db:"god_num"`     // 番号（采集视频使用）
 		Duration    int64          `db:"duration"`    // 视频时长（秒）
 		PlayUrl     string         `db:"play_url"`    // 播放链接
+		XlzzUrls    sql.NullString `db:"xlzz_urls"`   // 磁力链接数组（JSON格式）
 		Description sql.NullString `db:"description"` // 视频描述
+		Type        int64          `db:"type"`        // 来源类型：1=手动添加，2=采集
 		CreatedAt   int64          `db:"created_at"`  // 创建时间(秒级时间戳)
 		UpdatedAt   int64          `db:"updated_at"`  // 更新时间(秒级时间戳)
 		DeletedAt   int64          `db:"deleted_at"`  // 删除时间(秒级时间戳,0表示未删除)

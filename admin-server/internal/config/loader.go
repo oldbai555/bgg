@@ -65,8 +65,8 @@ func LoadMySQLConfig(configPath string) (*DatabaseConf, error) {
 		return nil, errors.Wrapf(err, "解析MySQL配置文件失败: %s", configPath)
 	}
 
-	// 构建 DSN
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true&loc=Local",
+	// 构建 DSN（添加 charset=utf8mb4 以支持中文）
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true&loc=Local&charset=utf8mb4&collation=utf8mb4_unicode_ci",
 		mysqlConfig.Username,
 		mysqlConfig.Password,
 		mysqlConfig.Addr,

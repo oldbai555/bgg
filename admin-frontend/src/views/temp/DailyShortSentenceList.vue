@@ -54,6 +54,33 @@
           <el-tag v-if="column.prop === 'type'" :type="row.type === 2 ? 'success' : 'info'">
             {{ sentenceTypeOptions.find(opt => Number(opt.value) === row.type)?.label || (row.type === 1 ? '普通' : '文学') }}
           </el-tag>
+          <!-- 图片列：优先显示 convertImg，如果没有则显示 img -->
+          <div v-else-if="column.prop === 'image'" class="image-cell">
+            <el-image
+              :src="row.convertImg || row.img || ''"
+              fit="cover"
+              :preview-src-list="[]"
+              class="table-image"
+            >
+              <template #error>
+                <div class="image-error-slot">
+                  <el-icon><Picture /></el-icon>
+                  <span>加载失败</span>
+                </div>
+              </template>
+            </el-image>
+          </div>
+          <!-- 短句内容：截断显示 + 悬停提示 -->
+          <el-tooltip
+            v-else-if="column.prop === 'content'"
+            :content="row.content || ''"
+            placement="top"
+            :disabled="!row.content || row.content.length <= 50"
+          >
+            <div class="content-cell">
+              {{ row.content || '-' }}
+            </div>
+          </el-tooltip>
         </template>
       </D2Table>
     </el-card>
@@ -63,6 +90,7 @@
 <script setup lang="ts">
 import {reactive, ref, onMounted, computed} from 'vue'
 import {ElMessage, ElMessageBox} from 'element-plus'
+import {Picture} from '@element-plus/icons-vue'
 import {dailyShortSentenceList, dailyShortSentenceCreate, dailyShortSentenceUpdate, dailyShortSentenceDelete} from '@/api/generated/admin'
 import type {DailyShortSentenceItem, DailyShortSentenceCreateReq, DailyShortSentenceUpdateReq} from '@/api/generated/admin'
 import {useI18n} from 'vue-i18n'
@@ -94,6 +122,7 @@ const {options: sentenceTypeOptions} = useDictOptions(
 // 表格列配置
 const columns = computed<TableColumn[]>(() => [
   {prop: 'id', label: 'ID', width: 80},
+  {prop: 'image', label: '图片', width: 120},
   {prop: 'content', label: '短句内容', minWidth: 200},
   {prop: 'type', label: '类型', width: 100},
   {prop: 'literatureAuthor', label: '作者', width: 120},
@@ -101,19 +130,25 @@ const columns = computed<TableColumn[]>(() => [
 ])
 
 // 详情/编辑抽屉列配置
-const drawerColumns = computed((): DrawerColumn[] => [
-  {prop: 'id', label: 'ID', type: D2TableElemType.Tag},
-  {
-    prop: 'type',
-    label: '类型',
-    type: D2TableElemType.Select,
-    options: sentenceTypeOptions.value.map(opt => ({label: opt.label, value: Number(opt.value)}))
-  },
-  {prop: 'content', label: '短句内容', type: D2TableElemType.EditTextarea, required: true},
-  {prop: 'literatureAuthor', label: '作者', type: D2TableElemType.EditInput},
-  {prop: 'img', label: '图片URL', type: D2TableElemType.EditInput},
-  {prop: 'convertImg', label: '转换图片URL', type: D2TableElemType.EditInput}
-])
+const drawerColumns = computed((): DrawerColumn[] => {
+  const baseColumns: DrawerColumn[] = [
+    {prop: 'id', label: 'ID', type: D2TableElemType.Tag},
+    {
+      prop: 'type',
+      label: '类型',
+      type: D2TableElemType.Select,
+      options: sentenceTypeOptions.value.map(opt => ({label: opt.label, value: Number(opt.value)}))
+    },
+    // 详情模式使用只读文本域（支持滚动），编辑模式使用可编辑文本域
+    {prop: 'content', label: '短句内容', type: D2TableElemType.EditTextarea, required: true},
+    {prop: 'literatureAuthor', label: '作者', type: D2TableElemType.EditInput},
+    // 图片预览（只在详情模式下显示，编辑模式下隐藏）
+    {prop: 'imagePreview', label: '图片预览', type: D2TableElemType.Image, disabled: true},
+    {prop: 'img', label: '图片URL', type: D2TableElemType.EditInput},
+    {prop: 'convertImg', label: '转换图片URL', type: D2TableElemType.EditInput}
+  ]
+  return baseColumns
+})
 
 // 新增抽屉列配置
 const drawerAddColumns = computed<DrawerColumn[]>(() => [
@@ -138,7 +173,11 @@ const loadData = async () => {
       keyword: query.keyword || undefined,
       type: query.type
     })
-    list.value = resp.list
+    // 为每个数据项添加 imagePreview 字段（优先 convertImg，如果没有则 img）
+    list.value = resp.list.map(item => ({
+      ...item,
+      imagePreview: item.convertImg || item.img || ''
+    }))
     total.value = resp.total
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : t('common.search')
@@ -223,5 +262,50 @@ onMounted(loadData)
 }
 .mb-12 {
   margin-bottom: 12px;
+}
+
+/* 短句内容单元格：截断显示 */
+.content-cell {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  vertical-align: middle;
+  cursor: default;
+}
+
+/* 图片单元格：固定尺寸，避免布局错乱 */
+.image-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100px;
+}
+
+.table-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.image-error-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 100px;
+  background-color: #f5f7fa;
+  color: #909399;
+  font-size: 12px;
+  border-radius: 4px;
+}
+
+.image-error-slot .el-icon {
+  font-size: 24px;
+  margin-bottom: 4px;
 }
 </style>

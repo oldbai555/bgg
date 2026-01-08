@@ -162,7 +162,7 @@ const drawerColumns = computed<DrawerColumn[]>(() => [
   {prop: 'path', label: '请求路径', type: D2TableElemType.Tag},
   {prop: 'requestParams', label: '请求参数', type: D2TableElemType.Textarea},
   {prop: 'responseCode', label: '响应状态码', type: D2TableElemType.Tag},
-  {prop: 'responseMsg', label: '响应消息', type: D2TableElemType.Tag},
+  {prop: 'responseMsg', label: '响应消息', type: D2TableElemType.Textarea},
   {prop: 'ipAddress', label: 'IP地址', type: D2TableElemType.Tag},
   {prop: 'userAgent', label: '用户代理', type: D2TableElemType.Textarea},
   {prop: 'duration', label: '耗时(ms)', type: D2TableElemType.Tag},
@@ -244,13 +244,13 @@ params.endTime = query.endTime
 }
 
     // 使用 request 下载文件，设置 responseType 为 blob
-    const resp: Blob | unknown = await request.get('/v1/operation-logs/export', {
+    const resp = await request.get('/v1/operation-logs/export', {
       params,
       responseType: 'blob'
     })
 
     // 创建 Blob URL（resp 已经是 Blob 类型）
-    const blob = resp instanceof Blob ? resp : new Blob([resp], {type: 'text/csv;charset=utf-8'})
+    const blob = resp instanceof Blob ? resp : new Blob([String(resp)], {type: 'text/csv;charset=utf-8'})
     const url = window.URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url

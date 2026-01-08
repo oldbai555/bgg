@@ -226,17 +226,18 @@ type (
 	}
 	// 菜单管理
 	MenuItem {
-		id        uint64     `json:"id"`
-		parentId  uint64     `json:"parentId"`
-		name      string     `json:"name"`
-		path      string     `json:"path"`
-		component string     `json:"component"`
-		icon      string     `json:"icon"`
-		menuType  int64      `json:"type"` // 1 目录 2 菜单 3 按钮
-		orderNum  int64      `json:"orderNum"`
-		visible   int64      `json:"visible"`
-		status    int64      `json:"status"`
-		children  []MenuItem `json:"children,optional"`
+		id             uint64     `json:"id"`
+		parentId       uint64     `json:"parentId"`
+		name           string     `json:"name"`
+		path           string     `json:"path"`
+		component      string     `json:"component"`
+		icon           string     `json:"icon"`
+		menuType       int64      `json:"type"` // 1 目录 2 菜单 3 按钮
+		orderNum       int64      `json:"orderNum"`
+		visible        int64      `json:"visible"`
+		status         int64      `json:"status"`
+		permissionCode string     `json:"permissionCode,optional"` // 权限编码（菜单绑定的第一个权限编码，用于前端路由权限控制）
+		children       []MenuItem `json:"children,optional"`
 	}
 	MenuTreeResp {
 		list []MenuItem `json:"list"`
@@ -1000,38 +1001,49 @@ type (
 	}
 	// 视频管理
 	VideoItem {
-		id          uint64 `json:"id"`
-		name        string `json:"name"` // 视频名称
-		cover       string `json:"cover,optional"` // 视频封面URL
-		duration    int64  `json:"duration"` // 视频时长（秒）
-		playUrl     string `json:"playUrl"` // 播放链接
-		description string `json:"description,optional"` // 视频描述
-		createdAt   int64  `json:"createdAt"` // 创建时间(秒级时间戳)
-		updatedAt   int64  `json:"updatedAt"` // 更新时间(秒级时间戳)
+		id          uint64   `json:"id"`
+		uuid        string   `json:"uuid,optional"` // 唯一标识（采集视频使用）
+		name        string   `json:"name"` // 视频名称
+		cover       string   `json:"cover,optional"` // 视频封面URL
+		godNum      string   `json:"godNum,optional"` // 番号（采集视频使用）
+		duration    int64    `json:"duration"` // 视频时长（秒）
+		playUrl     string   `json:"playUrl"` // 播放链接
+		xlzzUrls    []string `json:"xlzzUrls,optional"` // 磁力链接数组（采集视频使用）
+		description string   `json:"description,optional"` // 视频描述
+		sourceType  int64    `json:"type"` // 来源类型：1=手动添加，2=采集
+		createdAt   int64    `json:"createdAt"` // 创建时间(秒级时间戳)
+		updatedAt   int64    `json:"updatedAt"` // 更新时间(秒级时间戳)
 	}
 	VideoListReq {
-		page     int64  `json:"page,optional" form:"page,optional"`
-		pageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
-		keyword  string `json:"keyword,optional" form:"keyword,optional"` // 搜索关键词（名称、描述）
+		page       int64  `json:"page,optional" form:"page,optional"`
+		pageSize   int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		keyword    string `json:"keyword,optional" form:"keyword,optional"` // 搜索关键词（名称、描述）
+		sourceType int64  `json:"type,optional" form:"type,optional"` // 来源类型筛选（0=全部，1=手动添加，2=采集）
 	}
 	VideoListResp {
 		total int64       `json:"total"`
 		list  []VideoItem `json:"list"`
 	}
 	VideoCreateReq {
-		name        string `json:"name"` // 视频名称
-		cover       string `json:"cover,optional"` // 视频封面URL
-		duration    int64  `json:"duration,optional"` // 视频时长（秒）
-		playUrl     string `json:"playUrl"` // 播放链接
-		description string `json:"description,optional"` // 视频描述
+		name        string   `json:"name"` // 视频名称
+		cover       string   `json:"cover,optional"` // 视频封面URL
+		godNum      string   `json:"godNum,optional"` // 番号（采集视频使用）
+		duration    int64    `json:"duration,optional"` // 视频时长（秒）
+		playUrl     string   `json:"playUrl"` // 播放链接
+		xlzzUrls    []string `json:"xlzzUrls,optional"` // 磁力链接数组（采集视频使用）
+		description string   `json:"description,optional"` // 视频描述
+		sourceType  int64    `json:"type,optional"` // 来源类型：1=手动添加，2=采集（默认1）
 	}
 	VideoUpdateReq {
-		id          uint64 `json:"id"`
-		name        string `json:"name,optional"` // 视频名称
-		cover       string `json:"cover,optional"` // 视频封面URL
-		duration    int64  `json:"duration,optional"` // 视频时长（秒）
-		playUrl     string `json:"playUrl,optional"` // 播放链接
-		description string `json:"description,optional"` // 视频描述
+		id          uint64   `json:"id"`
+		name        string   `json:"name,optional"` // 视频名称
+		cover       string   `json:"cover,optional"` // 视频封面URL
+		godNum      string   `json:"godNum,optional"` // 番号（采集视频使用）
+		duration    int64    `json:"duration,optional"` // 视频时长（秒）
+		playUrl     string   `json:"playUrl,optional"` // 播放链接
+		xlzzUrls    []string `json:"xlzzUrls,optional"` // 磁力链接数组（采集视频使用）
+		description string   `json:"description,optional"` // 视频描述
+		sourceType  int64    `json:"type,optional"` // 来源类型：1=手动添加，2=采集
 	}
 	VideoDeleteReq {
 		id uint64 `json:"id"`
@@ -1039,6 +1051,62 @@ type (
 	// 视频代理（直接返回流，不返回JSON）
 	VideoProxyReq {
 		url string `json:"url" form:"url"` // 要代理的视频URL
+	}
+	// 视频采集相关
+	VideoCollectReq {
+		uuid      string   `json:"uuid"` // 唯一标识
+		playerUrl string   `json:"playerUrl"` // 播放URL（m3u8地址）
+		name      string   `json:"name"` // 视频名称
+		godNum    string   `json:"godNum,optional"` // 番号
+		xlzzUrls  []string `json:"xlzzUrls,optional"` // 磁力链接数组
+	}
+	VideoCollectResp {
+		code int64     `json:"code"`
+		msg  string    `json:"msg"`
+		data VideoItem `json:"data,omitempty"`
+	}
+	// 公开视频列表请求
+	PublicVideoListReq {
+		page    int64  `json:"page,optional" form:"page,optional"` // 页码，默认1
+		size    int64  `json:"size,optional" form:"size,optional"` // 每页数量，默认10
+		content string `json:"content,optional" form:"content,optional"` // 搜索关键词
+	}
+	// 公开视频列表响应（与项目其他接口保持一致，直接返回数据）
+	PublicVideoListResp {
+		list  []PublicVideoItem `json:"list"`
+		page  int64             `json:"page"`
+		size  int64             `json:"size"`
+		total int64             `json:"total"`
+	}
+	// 公开视频项（列表页使用，字段较少）
+	PublicVideoItem {
+		id     uint64 `json:"id"`
+		uuid   string `json:"uuid"`
+		name   string `json:"name"`
+		godNum string `json:"godNum"`
+	}
+	// 公开视频详情请求
+	PublicVideoDetailReq {
+		id uint64 `json:"id,optional" form:"id,optional"` // 视频ID
+	}
+	// 公开视频详情响应（与项目其他接口保持一致，直接返回数据）
+	PublicVideoDetailResp {
+		id          uint64   `json:"id"`
+		uuid        string   `json:"uuid,optional"` // 唯一标识（采集视频使用）
+		name        string   `json:"name"` // 视频名称
+		cover       string   `json:"cover,optional"` // 视频封面URL
+		godNum      string   `json:"godNum,optional"` // 番号（采集视频使用）
+		duration    int64    `json:"duration"` // 视频时长（秒）
+		playUrl     string   `json:"playUrl"` // 播放链接
+		xlzzUrls    []string `json:"xlzzUrls,optional"` // 磁力链接数组（采集视频使用）
+		description string   `json:"description,optional"` // 视频描述
+		sourceType  int64    `json:"type"` // 来源类型：1=手动添加，2=采集
+		createdAt   int64    `json:"createdAt"` // 创建时间(秒级时间戳)
+		updatedAt   int64    `json:"updatedAt"` // 更新时间(秒级时间戳)
+	}
+	// m3u8代理请求
+	M3u8ProxyReq {
+		url string `json:"url,optional" form:"url,optional"` // 要代理的URL
 	}
 )
 
@@ -1107,6 +1175,45 @@ service admin-api {
 service admin-api {
 	@handler VideoProxy
 	get /videos/proxy (VideoProxyReq)
+}
+
+// m3u8代理服务（无中间件，需要CORS处理）
+@server (
+	group:  m3u8
+	prefix: /api/v1
+)
+service admin-api {
+	@handler M3u8Proxy
+	get /m3u8/proxy (M3u8ProxyReq)
+
+	// 支持OPTIONS请求（CORS预检）
+	@handler M3u8ProxyOptions
+	options /m3u8/proxy
+}
+
+// 视频采集服务
+@server (
+	group:      video_collect
+	prefix:     /api/v1
+	middleware: OperationLogMiddleware
+)
+service admin-api {
+	@handler VideoCollect
+	post /videos/collect (VideoCollectReq) returns (VideoCollectResp)
+}
+
+// 公开视频服务
+@server (
+	group:      public_video
+	prefix:     /api/v1
+	middleware: ApiEnabledMiddleware,PublicOperationLogMiddleware
+)
+service admin-api {
+	@handler PublicVideoList
+	get /public/videos/list (PublicVideoListReq) returns (PublicVideoListResp)
+
+	@handler PublicVideoDetail
+	get /public/videos/info (PublicVideoDetailReq) returns (PublicVideoDetailResp)
 }
 
 type (

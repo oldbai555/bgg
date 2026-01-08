@@ -6,6 +6,17 @@
         <el-form-item label="关键词">
           <el-input v-model="query.keyword" placeholder="搜索视频名称、描述" clearable />
         </el-form-item>
+        <el-form-item label="来源类型">
+          <el-select v-model="query.sourceType" placeholder="全部" clearable style="width: 150px">
+            <el-option label="全部" :value="0" />
+            <el-option
+              v-for="option in sourceTypeOptions"
+              :key="option.value"
+              :label="option.label"
+              :value="Number(option.value)"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" :loading="loading" @click="loadData">{{ t('common.search') }}</el-button>
           <el-button @click="handleReset">{{ t('common.reset') }}</el-button>
@@ -46,8 +57,14 @@
             />
             <span v-else class="no-cover">无封面</span>
           </div>
+          <el-tag
+            v-else-if="column.prop === 'sourceType'"
+            :type="row.sourceType === 1 ? 'primary' : 'success'"
+            size="small"
+          >
+            {{ getSourceTypeLabel(row.sourceType) }}
+          </el-tag>
           <span v-else-if="column.prop === 'duration'">{{ formatDuration(row.duration) }}</span>
-          <span v-else-if="column.prop === 'createdAt'">{{ formatUnixTime(row.createdAt) }}</span>
         </template>
         <!-- 自定义操作列 -->
         <template #action="{row}">
@@ -75,6 +92,7 @@ import {useI18n} from 'vue-i18n'
 import D2Table from '@/components/common/D2Table.vue'
 import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table'
 import {formatUnixTime} from '@/utils/date'
+import {useDictOptions} from '@/composables/useDictOptions'
 
 const {t} = useI18n()
 const router = useRouter()
@@ -82,11 +100,18 @@ const router = useRouter()
 const query = reactive({
   page: 1,
   pageSize: 10,
-  keyword: ''
+  keyword: '',
+  sourceType: 0 as number // 0=全部，1=手动添加，2=采集
 })
 const list = ref<VideoItem[]>([])
 const total = ref(0)
 const loading = ref(false)
+
+// 视频来源类型选项（字典 video_source_type：1=手动添加，2=采集）
+const {options: sourceTypeOptions, getLabel: getSourceTypeLabel} = useDictOptions('video_source_type', [
+  {label: '手动添加', value: '1'},
+  {label: '采集', value: '2'}
+])
 
 // 格式化时长（秒转时分秒）
 const formatDuration = (seconds: number): string => {
@@ -107,9 +132,10 @@ const columns = computed<TableColumn[]>(() => [
   {prop: 'id', label: 'ID', width: 80},
   {prop: 'cover', label: '封面', width: 120},
   {prop: 'name', label: '视频名称', minWidth: 200},
+  {prop: 'sourceType', label: '来源类型', width: 120},
   {prop: 'duration', label: '时长', width: 100},
   {prop: 'playUrl', label: '播放链接', minWidth: 300, showOverflowTooltip: true},
-  {prop: 'createdAt', label: '创建时间', width: 180}
+  {prop: 'createdAt', label: '创建时间', width: 180, type: D2TableElemType.ConvertTime}
 ])
 
 // 详情/编辑抽屉列配置
@@ -117,6 +143,7 @@ const drawerColumns = computed<DrawerColumn[]>(() => [
   {prop: 'id', label: 'ID', type: D2TableElemType.Tag},
   {prop: 'name', label: '视频名称', type: D2TableElemType.EditInput, required: true},
   {prop: 'cover', label: '封面URL', type: D2TableElemType.EditInput},
+  {prop: 'sourceType', label: '来源类型', type: D2TableElemType.EditSelect, options: sourceTypeOptions},
   {prop: 'duration', label: '时长（秒）', type: D2TableElemType.EditInput},
   {prop: 'playUrl', label: '播放链接', type: D2TableElemType.EditInput, required: true},
   {prop: 'description', label: '描述', type: D2TableElemType.EditTextarea}
@@ -126,6 +153,7 @@ const drawerColumns = computed<DrawerColumn[]>(() => [
 const drawerAddColumns = computed<DrawerColumn[]>(() => [
   {prop: 'name', label: '视频名称', type: D2TableElemType.EditInput, required: true},
   {prop: 'cover', label: '封面URL', type: D2TableElemType.EditInput},
+  {prop: 'sourceType', label: '来源类型', type: D2TableElemType.EditSelect, options: sourceTypeOptions, default: 1},
   {prop: 'duration', label: '时长（秒）', type: D2TableElemType.EditInput},
   {prop: 'playUrl', label: '播放链接', type: D2TableElemType.EditInput, required: true},
   {prop: 'description', label: '描述', type: D2TableElemType.EditTextarea}
@@ -134,7 +162,18 @@ const drawerAddColumns = computed<DrawerColumn[]>(() => [
 const loadData = async () => {
   loading.value = true
   try {
-    const resp = await videoList({...query})
+    const req: Record<string, unknown> = {
+      page: query.page,
+      pageSize: query.pageSize
+    }
+    if (query.keyword) {
+      req.keyword = query.keyword
+    }
+    // sourceType：0 不传表示不筛选，其余（1=手动添加，2=采集）直接透传给后端
+    if (query.sourceType > 0) {
+      req.type = query.sourceType
+    }
+    const resp = await videoList(req)
     list.value = resp.list
     total.value = resp.total
   } catch (err: unknown) {
@@ -149,6 +188,7 @@ const handleReset = () => {
   query.page = 1
   query.pageSize = 10
   query.keyword = ''
+  query.sourceType = 0
   loadData()
 }
 
@@ -184,7 +224,12 @@ const handleUpdate = async (row: VideoItem) => {
 
 const handleAdd = async (row: Record<string, unknown>) => {
   try {
-    await videoCreate(row as VideoCreateReq)
+    // 确保sourceType字段正确传递（API使用type字段，默认1=手动添加）
+    const createData = {
+      ...row,
+      type: (row.sourceType as number) || 1
+    } as VideoCreateReq
+    await videoCreate(createData)
     ElMessage.success('新增成功')
     loadData()
   } catch (err: unknown) {

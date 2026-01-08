@@ -116,6 +116,10 @@ func (l *MenuMyTreeLogic) MenuMyTree() (resp *types.MenuTreeResp, err error) {
 		}
 		// 如果菜单没有绑定权限，或者用户有权限，继续处理子菜单
 		filtered := item
+		// 设置权限编码（使用第一个权限编码）
+		if permCodes, hasPerms := menuPermissionMap[item.Id]; hasPerms && len(permCodes) > 0 {
+			filtered.PermissionCode = permCodes[0]
+		}
 		filtered.Children = []types.MenuItem{}
 		for _, child := range item.Children {
 			if filteredChild := filterMenu(child); filteredChild != nil {

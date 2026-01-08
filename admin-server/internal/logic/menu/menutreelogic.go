@@ -45,24 +45,40 @@ func (l *MenuTreeLogic) MenuTree() (resp *types.MenuTreeResp, err error) {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询菜单列表失败", err)
 	}
 
+	// 获取菜单权限编码映射
+	permissionMenuRepo := repository.NewPermissionMenuRepository(l.svcCtx.Repository)
+	menuPermissionMap, err := permissionMenuRepo.ListMenuPermissionCodes(l.ctx)
+	if err != nil {
+		// 如果查询权限关联失败，记录日志但不影响菜单树返回
+		l.Errorf("查询菜单权限关联失败: %v", err)
+		menuPermissionMap = make(map[uint64][]string)
+	}
+
 	// 构建 id → MenuItem 映射
 	nodeMap := make(map[uint64]*types.MenuItem, len(list))
 	var rootPtrs []*types.MenuItem
 
 	// 第一遍：创建所有节点
 	for _, m := range list {
+		// 获取菜单的第一个权限编码（用于前端路由权限控制）
+		var permissionCode string
+		if codes, ok := menuPermissionMap[m.Id]; ok && len(codes) > 0 {
+			permissionCode = codes[0] // 使用第一个权限编码
+		}
+
 		item := &types.MenuItem{
-			Id:        m.Id,
-			ParentId:  m.ParentId,
-			Name:      m.Name,
-			Path:      m.Path,
-			Component: m.Component,
-			Icon:      m.Icon,
-			MenuType:  int64(m.Type),
-			OrderNum:  m.OrderNum,
-			Visible:   m.Visible,
-			Status:    m.Status,
-			Children:  []types.MenuItem{},
+			Id:             m.Id,
+			ParentId:       m.ParentId,
+			Name:           m.Name,
+			Path:           m.Path,
+			Component:      m.Component,
+			Icon:           m.Icon,
+			MenuType:       int64(m.Type),
+			OrderNum:       m.OrderNum,
+			Visible:        m.Visible,
+			Status:         m.Status,
+			PermissionCode: permissionCode,
+			Children:       []types.MenuItem{},
 		}
 		nodeMap[m.Id] = item
 	}

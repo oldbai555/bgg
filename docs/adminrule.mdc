@@ -20,6 +20,11 @@ alwaysApply: true
 步骤5：补齐.api接口参数和中间件声明
 - 根据接口特性选择合适的中间件组合
 - 参考中间件选择决策树
+- **重要：所有 Query 参数和可选字段必须添加 `optional` 标签**
+  - Query 参数：`form:"paramName,optional"`
+  - JSON Body 可选字段：`json:"fieldName,optional"`
+  - 同时存在时：`json:"fieldName,optional" form:"paramName,optional"`
+  - 示例：`id uint64 `json:"id,optional" form:"id,optional"``
 
 步骤6：用户执行 generate-model.sh <sql_file>
 - 等待确认生成：Model代码
@@ -367,6 +372,52 @@ admin-frontend/
 禁止9：中间件声明顺序错误（必须按执行顺序声明）
 禁止10：API定义使用路径参数 :id（必须使用 Query/Body 参数）
 禁止11：非必传字段未添加 optional 标签
+
+### 禁止11详细说明：optional 标签使用规范（必须遵守）
+
+**问题背景**：
+- go-zero 的 `httpx.Parse` 在解析 Query 参数时，如果字段没有 `optional` 标签，会要求该字段必须存在
+- 即使字段在业务逻辑上是必填的，如果通过 Query 参数传递，也必须添加 `optional` 标签
+- 缺少 `optional` 标签会导致 400 错误：参数解析失败
+
+**强制规则**：
+1. **所有 Query 参数必须添加 `optional` 标签**
+   - GET 请求的 Query 参数：`form:"paramName,optional"`
+   - 即使业务逻辑上必填，也必须添加 `optional` 标签
+   - 必填验证在 Logic 层进行，而不是在参数解析层
+
+2. **所有 JSON Body 可选字段必须添加 `optional` 标签**
+   - POST/PUT 请求的可选字段：`json:"fieldName,optional"`
+   - 必填字段不需要 `optional` 标签
+
+3. **同时支持 Query 和 Body 的参数**
+   - 必须同时添加两个标签：`json:"fieldName,optional" form:"fieldName,optional"`
+   - 示例：`id uint64 `json:"id,optional" form:"id,optional"``
+
+4. **常见错误示例**：
+   ```go
+   // ❌ 错误：Query 参数缺少 optional 标签
+   id uint64 `json:"id" form:"id"`
+   
+   // ✅ 正确：Query 参数必须添加 optional
+   id uint64 `json:"id,optional" form:"id,optional"`
+   
+   // ❌ 错误：可选字段缺少 optional 标签
+   name string `json:"name"`
+   
+   // ✅ 正确：可选字段添加 optional
+   name string `json:"name,optional"`
+   ```
+
+5. **验证时机**：
+   - 参数解析层（Handler）：只负责解析，不验证必填
+   - 业务逻辑层（Logic）：验证必填字段，返回明确的错误信息
+
+6. **检查清单**：
+   - [ ] 所有 GET 请求的 Query 参数都添加了 `optional` 标签
+   - [ ] 所有 POST/PUT 请求的可选字段都添加了 `optional` 标签
+   - [ ] 必填验证在 Logic 层实现，而不是依赖参数解析
+
 禁止12：Repository 层使用 fmt.Sprintf 或字符串拼接构建 SQL（必须使用 squirrel 库）
 
 ---

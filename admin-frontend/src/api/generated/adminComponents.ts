@@ -365,7 +365,7 @@ export interface DemoItem {
 }
 
 export interface DemoListReq {
-	// 注意：GET 请求的查询参数需要同时包含 json 和 form 标签// json 标签用于请求体（POST/PUT/DELETE），form 标签用于查询参数（GET）// 重要：form 标签中必须包含 optional，否则 httpx.Parse 无法正确解析查询参数
+	// 注意：GET 请求的查询参数需要同时包含 json 和 form 标签// json 标签用于请求体（POST/PUT/DELETE），form 标签用于查询参数（GET）// 重要：form 标签中必须包含 optional，否则 httpx.Parse 无法正确解析查询参数
 	page?: number
 	pageSize?: number
 	name?: string
@@ -663,6 +663,10 @@ export interface LogoutReq {
 	refreshToken: string
 }
 
+export interface M3u8ProxyReq {
+	url?: string // 要代理的URL
+}
+
 export interface MemoryInfo {
 	total: number // 总内存（字节）
 	used: number // 已用内存（字节）
@@ -697,6 +701,7 @@ export interface MenuItem {
 	orderNum: number
 	visible: number
 	status: number
+	permissionCode?: string // 权限编码（菜单绑定的第一个权限编码，用于前端路由权限控制）
 	children?: Array<MenuItem>
 }
 
@@ -998,6 +1003,45 @@ export interface ProfileUpdateReq {
 	signature?: string
 }
 
+export interface PublicVideoDetailReq {
+	id?: number // 视频ID
+}
+
+export interface PublicVideoDetailResp {
+	id: number
+	uuid?: string // 唯一标识（采集视频使用）
+	name: string // 视频名称
+	cover?: string // 视频封面URL
+	godNum?: string // 番号（采集视频使用）
+	duration: number // 视频时长（秒）
+	playUrl: string // 播放链接
+	xlzzUrls?: Array<string> // 磁力链接数组（采集视频使用）
+	description?: string // 视频描述
+	type: number // 来源类型：1=手动添加，2=采集
+	createdAt: number // 创建时间(秒级时间戳)
+	updatedAt: number // 更新时间(秒级时间戳)
+}
+
+export interface PublicVideoItem {
+	id: number
+	uuid: string
+	name: string
+	godNum: string
+}
+
+export interface PublicVideoListReq {
+	page?: number // 页码，默认1
+	size?: number // 每页数量，默认10
+	content?: string // 搜索关键词
+}
+
+export interface PublicVideoListResp {
+	list: Array<PublicVideoItem>
+	page: number
+	size: number
+	total: number
+}
+
 export interface RefreshReq {
 	refreshToken: string
 }
@@ -1296,12 +1340,29 @@ export interface UserUpdateReq {
 	status?: number
 }
 
+export interface VideoCollectReq {
+	uuid: string // 唯一标识
+	playerUrl: string // 播放URL（m3u8地址）
+	name: string // 视频名称
+	godNum?: string // 番号
+	xlzzUrls?: Array<string> // 磁力链接数组
+}
+
+export interface VideoCollectResp {
+	code: number
+	msg: string
+	data?: VideoItem
+}
+
 export interface VideoCreateReq {
 	name: string // 视频名称
 	cover?: string // 视频封面URL
+	godNum?: string // 番号（采集视频使用）
 	duration?: number // 视频时长（秒）
 	playUrl: string // 播放链接
+	xlzzUrls?: Array<string> // 磁力链接数组（采集视频使用）
 	description?: string // 视频描述
+	type?: number // 来源类型：1=手动添加，2=采集（默认1）
 }
 
 export interface VideoDeleteReq {
@@ -1310,11 +1371,15 @@ export interface VideoDeleteReq {
 
 export interface VideoItem {
 	id: number
+	uuid?: string // 唯一标识（采集视频使用）
 	name: string // 视频名称
 	cover?: string // 视频封面URL
+	godNum?: string // 番号（采集视频使用）
 	duration: number // 视频时长（秒）
 	playUrl: string // 播放链接
+	xlzzUrls?: Array<string> // 磁力链接数组（采集视频使用）
 	description?: string // 视频描述
+	type: number // 来源类型：1=手动添加，2=采集
 	createdAt: number // 创建时间(秒级时间戳)
 	updatedAt: number // 更新时间(秒级时间戳)
 }
@@ -1323,6 +1388,7 @@ export interface VideoListReq {
 	page?: number
 	pageSize?: number
 	keyword?: string // 搜索关键词（名称、描述）
+	type?: number // 来源类型筛选（0=全部，1=手动添加，2=采集）
 }
 
 export interface VideoListResp {
@@ -1338,8 +1404,11 @@ export interface VideoUpdateReq {
 	id: number
 	name?: string // 视频名称
 	cover?: string // 视频封面URL
+	godNum?: string // 番号（采集视频使用）
 	duration?: number // 视频时长（秒）
 	playUrl?: string // 播放链接
+	xlzzUrls?: Array<string> // 磁力链接数组（采集视频使用）
 	description?: string // 视频描述
+	type?: number // 来源类型：1=手动添加，2=采集
 }
 

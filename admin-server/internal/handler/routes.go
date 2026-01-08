@@ -21,6 +21,7 @@ import (
 	dict_type "postapocgame/admin-server/internal/handler/dict_type"
 	file "postapocgame/admin-server/internal/handler/file"
 	login_log "postapocgame/admin-server/internal/handler/login_log"
+	m3u8 "postapocgame/admin-server/internal/handler/m3u8"
 	menu "postapocgame/admin-server/internal/handler/menu"
 	monitor "postapocgame/admin-server/internal/handler/monitor"
 	notice "postapocgame/admin-server/internal/handler/notice"
@@ -31,6 +32,7 @@ import (
 	permission_api "postapocgame/admin-server/internal/handler/permission_api"
 	permission_menu "postapocgame/admin-server/internal/handler/permission_menu"
 	ping "postapocgame/admin-server/internal/handler/ping"
+	public_video "postapocgame/admin-server/internal/handler/public_video"
 	role "postapocgame/admin-server/internal/handler/role"
 	role_permission "postapocgame/admin-server/internal/handler/role_permission"
 	sdk "postapocgame/admin-server/internal/handler/sdk"
@@ -38,6 +40,7 @@ import (
 	user "postapocgame/admin-server/internal/handler/user"
 	user_role "postapocgame/admin-server/internal/handler/user_role"
 	video "postapocgame/admin-server/internal/handler/video"
+	video_collect "postapocgame/admin-server/internal/handler/video_collect"
 	"postapocgame/admin-server/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
@@ -516,6 +519,22 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	)
 
 	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodGet,
+				Path:    "/m3u8/proxy",
+				Handler: m3u8.M3u8ProxyHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodOptions,
+				Path:    "/m3u8/proxy",
+				Handler: m3u8.M3u8ProxyOptionsHandler(serverCtx),
+			},
+		},
+		rest.WithPrefix("/api/v1"),
+	)
+
+	server.AddRoutes(
 		rest.WithMiddlewares(
 			[]rest.Middleware{serverCtx.PerformanceMiddleware, serverCtx.RateLimitMiddleware, serverCtx.AuthMiddleware, serverCtx.PermissionMiddleware, serverCtx.OperationLogMiddleware},
 			[]rest.Route{
@@ -758,6 +777,25 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 
 	server.AddRoutes(
 		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.ApiEnabledMiddleware, serverCtx.PublicOperationLogMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/public/videos/info",
+					Handler: public_video.PublicVideoDetailHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/public/videos/list",
+					Handler: public_video.PublicVideoListHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
 			[]rest.Middleware{serverCtx.PerformanceMiddleware, serverCtx.RateLimitMiddleware, serverCtx.AuthMiddleware, serverCtx.PermissionMiddleware, serverCtx.OperationLogMiddleware},
 			[]rest.Route{
 				{
@@ -972,6 +1010,20 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodGet,
 					Path:    "/videos/proxy",
 					Handler: video.VideoProxyHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.OperationLogMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodPost,
+					Path:    "/videos/collect",
+					Handler: video_collect.VideoCollectHandler(serverCtx),
 				},
 			}...,
 		),

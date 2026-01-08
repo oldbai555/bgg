@@ -68,16 +68,20 @@ func main() {
 
 	// 初始化中间件（避免循环依赖，在外部初始化）
 	authMiddleware := middleware.NewAuthMiddleware(ctx)
+	apiEnabledMiddleware := middleware.NewApiEnabledMiddleware(ctx)
 	permissionMiddleware := middleware.NewPermissionMiddleware(ctx)
 	operationLogMiddleware := middleware.NewOperationLogMiddleware(ctx)
+	publicOperationLogMiddleware := middleware.NewPublicOperationLogMiddleware(ctx)
 	rateLimitMiddleware := middleware.NewRateLimitMiddleware(ctx)
 	performanceMiddleware := middleware.NewPerformanceMiddleware(ctx)
 	sdkAuthMiddleware := middleware.NewSDKAuthMiddleware(ctx)
 	sdkRateLimitMiddleware := middleware.NewSDKRateLimitMiddleware(ctx)
 	sdkCallLogMiddleware := middleware.NewSDKCallLogMiddleware(ctx)
 	ctx.AuthMiddleware = authMiddleware.Handle
+	ctx.ApiEnabledMiddleware = apiEnabledMiddleware.Handle
 	ctx.PermissionMiddleware = permissionMiddleware.Handle
 	ctx.OperationLogMiddleware = operationLogMiddleware.Handle
+	ctx.PublicOperationLogMiddleware = publicOperationLogMiddleware.Handle
 	ctx.RateLimitMiddleware = rateLimitMiddleware.Handle
 	ctx.PerformanceMiddleware = performanceMiddleware.Handle
 	ctx.SDKAuthMiddleware = sdkAuthMiddleware.Handle

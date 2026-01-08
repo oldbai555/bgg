@@ -596,7 +596,7 @@ type LoginLogItem struct {
 	Browser   string `json:"browser"`
 	Os        string `json:"os"`
 	UserAgent string `json:"userAgent"`
-	Status    int    `json:"status"` // 登录状态：0 失败，1 成功（DB 字段值）
+	Status    int    `json:"status"` // 0失败 1成功
 	Message   string `json:"message"`
 	LoginAt   int64  `json:"loginAt"`
 	LogoutAt  int64  `json:"logoutAt"`
@@ -604,12 +604,11 @@ type LoginLogItem struct {
 }
 
 type LoginLogListReq struct {
-	Page     int    `json:"page,optional,default=1" form:"page,optional,default=1"`
-	PageSize int    `json:"pageSize,optional,default=20" form:"pageSize,optional,default=20"`
-	UserId   uint64 `json:"userId,optional" form:"userId,optional"`
-	Username string `json:"username,optional" form:"username,optional"`
-	// Status 枚举（字典 login_status）：0 = 全部（不筛选）；1 = 失败；2 = 成功
-	Status    int    `json:"status,optional" form:"status,optional"`
+	Page      int    `json:"page,optional,default=1" form:"page,optional,default=1"`
+	PageSize  int    `json:"pageSize,optional,default=20" form:"pageSize,optional,default=20"`
+	UserId    uint64 `json:"userId,optional" form:"userId,optional"`
+	Username  string `json:"username,optional" form:"username,optional"`
+	Status    int    `json:"status,optional" form:"status,optional"`       // 0失败 1成功
 	StartTime string `json:"startTime,optional" form:"startTime,optional"` // 格式：YYYY-MM-DD HH:mm:ss
 	EndTime   string `json:"endTime,optional" form:"endTime,optional"`     // 格式：YYYY-MM-DD HH:mm:ss
 }
@@ -641,6 +640,10 @@ type LogoutReq struct {
 	RefreshToken string `json:"refreshToken"`
 }
 
+type M3u8ProxyReq struct {
+	Url string `json:"url,optional" form:"url,optional"` // 要代理的URL
+}
+
 type MemoryInfo struct {
 	Total     uint64  `json:"total"`     // 总内存（字节）
 	Used      uint64  `json:"used"`      // 已用内存（字节）
@@ -665,17 +668,18 @@ type MenuDeleteReq struct {
 }
 
 type MenuItem struct {
-	Id        uint64     `json:"id"`
-	ParentId  uint64     `json:"parentId"`
-	Name      string     `json:"name"`
-	Path      string     `json:"path"`
-	Component string     `json:"component"`
-	Icon      string     `json:"icon"`
-	MenuType  int64      `json:"type"` // 1 目录 2 菜单 3 按钮
-	OrderNum  int64      `json:"orderNum"`
-	Visible   int64      `json:"visible"`
-	Status    int64      `json:"status"`
-	Children  []MenuItem `json:"children,optional"`
+	Id             uint64     `json:"id"`
+	ParentId       uint64     `json:"parentId"`
+	Name           string     `json:"name"`
+	Path           string     `json:"path"`
+	Component      string     `json:"component"`
+	Icon           string     `json:"icon"`
+	MenuType       int64      `json:"type"` // 1 目录 2 菜单 3 按钮
+	OrderNum       int64      `json:"orderNum"`
+	Visible        int64      `json:"visible"`
+	Status         int64      `json:"status"`
+	PermissionCode string     `json:"permissionCode,optional"` // 权限编码（菜单绑定的第一个权限编码，用于前端路由权限控制）
+	Children       []MenuItem `json:"children,optional"`
 }
 
 type MenuTreeResp struct {
@@ -776,19 +780,17 @@ type NotificationItem struct {
 	SourceId   uint64 `json:"sourceId"`   // 来源ID（如公告ID、聊天消息ID等）
 	Title      string `json:"title"`
 	Content    string `json:"content"`
-	// ReadStatus 枚举（字典 read_status）：1 = 未读，2 = 已读
-	ReadStatus int64 `json:"readStatus"`
-	ReadAt     int64 `json:"readAt"`    // 已读时间(秒级时间戳)
-	CreatedAt  int64 `json:"createdAt"` // 创建时间(秒级时间戳)
-	UpdatedAt  int64 `json:"updatedAt"` // 更新时间(秒级时间戳)
+	ReadStatus int64  `json:"readStatus"` // 已读状态：1 已读，0 未读
+	ReadAt     int64  `json:"readAt"`     // 已读时间(秒级时间戳)
+	CreatedAt  int64  `json:"createdAt"`  // 创建时间(秒级时间戳)
+	UpdatedAt  int64  `json:"updatedAt"`  // 更新时间(秒级时间戳)
 }
 
 type NotificationListReq struct {
 	Page       int64  `json:"page,optional" form:"page,optional"`
 	PageSize   int64  `json:"pageSize,optional" form:"pageSize,optional"`
 	SourceType string `json:"sourceType,optional" form:"sourceType,optional"`
-	// ReadStatus 枚举（字典 read_status）：0 = 全部（不筛选）；1 = 未读；2 = 已读
-	ReadStatus int64 `json:"readStatus,optional" form:"readStatus,optional"`
+	ReadStatus int64  `json:"readStatus,optional" form:"readStatus,optional"`
 }
 
 type NotificationListResp struct {
@@ -978,6 +980,45 @@ type ProfileUpdateReq struct {
 	Signature string `json:"signature,optional"`
 }
 
+type PublicVideoDetailReq struct {
+	Id uint64 `json:"id,optional" form:"id,optional"` // 视频ID
+}
+
+type PublicVideoDetailResp struct {
+	Id          uint64   `json:"id"`
+	Uuid        string   `json:"uuid,optional"`        // 唯一标识（采集视频使用）
+	Name        string   `json:"name"`                 // 视频名称
+	Cover       string   `json:"cover,optional"`       // 视频封面URL
+	GodNum      string   `json:"godNum,optional"`      // 番号（采集视频使用）
+	Duration    int64    `json:"duration"`             // 视频时长（秒）
+	PlayUrl     string   `json:"playUrl"`              // 播放链接
+	XlzzUrls    []string `json:"xlzzUrls,optional"`    // 磁力链接数组（采集视频使用）
+	Description string   `json:"description,optional"` // 视频描述
+	SourceType  int64    `json:"type"`                 // 来源类型：1=手动添加，2=采集
+	CreatedAt   int64    `json:"createdAt"`            // 创建时间(秒级时间戳)
+	UpdatedAt   int64    `json:"updatedAt"`            // 更新时间(秒级时间戳)
+}
+
+type PublicVideoItem struct {
+	Id     uint64 `json:"id"`
+	Uuid   string `json:"uuid"`
+	Name   string `json:"name"`
+	GodNum string `json:"godNum"`
+}
+
+type PublicVideoListReq struct {
+	Page    int64  `json:"page,optional" form:"page,optional"`       // 页码，默认1
+	Size    int64  `json:"size,optional" form:"size,optional"`       // 每页数量，默认10
+	Content string `json:"content,optional" form:"content,optional"` // 搜索关键词
+}
+
+type PublicVideoListResp struct {
+	List  []PublicVideoItem `json:"list"`
+	Page  int64             `json:"page"`
+	Size  int64             `json:"size"`
+	Total int64             `json:"total"`
+}
+
 type RefreshReq struct {
 	RefreshToken string `json:"refreshToken"`
 }
@@ -1100,11 +1141,7 @@ type SdkApiKeyListReq struct {
 	Page     int64  `json:"page,optional" form:"page,optional"`
 	PageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
 	Name     string `json:"name,optional" form:"name,optional"`
-	// Status 为可选筛选条件：
-	// - 0：不按状态过滤
-	// - 1：只查启用
-	// - 2：只查禁用
-	Status int64 `json:"status,optional" form:"status,optional"`
+	Status   int64  `json:"status,optional" form:"status,optional"`
 }
 
 type SdkApiKeyListResp struct {
@@ -1167,7 +1204,7 @@ type SdkFileUploadResp struct {
 
 type SdkInterfaceCreateReq struct {
 	Name             string `json:"name"`
-	ApiCode          string `json:"apiCode,optional"` // 后端自动生成，前端无需传入
+	ApiCode          string `json:"apiCode"`
 	Path             string `json:"path"`
 	Method           string `json:"method"`
 	RateLimitDefault int64  `json:"rateLimitDefault,optional"`
@@ -1196,11 +1233,7 @@ type SdkInterfaceListReq struct {
 	PageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
 	Name     string `json:"name,optional" form:"name,optional"`
 	ApiCode  string `json:"apiCode,optional" form:"apiCode,optional"`
-	// Status 为可选筛选条件：
-	// - 0：不按状态过滤
-	// - 1：只查启用
-	// - 2：只查禁用
-	Status int64 `json:"status,optional" form:"status,optional"`
+	Status   int64  `json:"status,optional" form:"status,optional"`
 }
 
 type SdkInterfaceListResp struct {
@@ -1211,7 +1244,7 @@ type SdkInterfaceListResp struct {
 type SdkInterfaceUpdateReq struct {
 	Id               uint64 `json:"id"`
 	Name             string `json:"name,optional"`
-	ApiCode          string `json:"apiCode,optional"` // 后端自动生成，前端无需传入
+	ApiCode          string `json:"apiCode,optional"`
 	Path             string `json:"path,optional"`
 	Method           string `json:"method,optional"`
 	RateLimitDefault int64  `json:"rateLimitDefault,optional"`
@@ -1284,12 +1317,29 @@ type UserUpdateReq struct {
 	Status       int64  `json:"status,optional"`
 }
 
+type VideoCollectReq struct {
+	Uuid      string   `json:"uuid"`              // 唯一标识
+	PlayerUrl string   `json:"playerUrl"`         // 播放URL（m3u8地址）
+	Name      string   `json:"name"`              // 视频名称
+	GodNum    string   `json:"godNum,optional"`   // 番号
+	XlzzUrls  []string `json:"xlzzUrls,optional"` // 磁力链接数组
+}
+
+type VideoCollectResp struct {
+	Code int64     `json:"code"`
+	Msg  string    `json:"msg"`
+	Data VideoItem `json:"data,omitempty"`
+}
+
 type VideoCreateReq struct {
-	Name        string `json:"name"`                 // 视频名称
-	Cover       string `json:"cover,optional"`       // 视频封面URL
-	Duration    int64  `json:"duration,optional"`    // 视频时长（秒）
-	PlayUrl     string `json:"playUrl"`              // 播放链接
-	Description string `json:"description,optional"` // 视频描述
+	Name        string   `json:"name"`                 // 视频名称
+	Cover       string   `json:"cover,optional"`       // 视频封面URL
+	GodNum      string   `json:"godNum,optional"`      // 番号（采集视频使用）
+	Duration    int64    `json:"duration,optional"`    // 视频时长（秒）
+	PlayUrl     string   `json:"playUrl"`              // 播放链接
+	XlzzUrls    []string `json:"xlzzUrls,optional"`    // 磁力链接数组（采集视频使用）
+	Description string   `json:"description,optional"` // 视频描述
+	SourceType  int64    `json:"type,optional"`        // 来源类型：1=手动添加，2=采集（默认1）
 }
 
 type VideoDeleteReq struct {
@@ -1297,20 +1347,25 @@ type VideoDeleteReq struct {
 }
 
 type VideoItem struct {
-	Id          uint64 `json:"id"`
-	Name        string `json:"name"`                 // 视频名称
-	Cover       string `json:"cover,optional"`       // 视频封面URL
-	Duration    int64  `json:"duration"`             // 视频时长（秒）
-	PlayUrl     string `json:"playUrl"`              // 播放链接
-	Description string `json:"description,optional"` // 视频描述
-	CreatedAt   int64  `json:"createdAt"`            // 创建时间(秒级时间戳)
-	UpdatedAt   int64  `json:"updatedAt"`            // 更新时间(秒级时间戳)
+	Id          uint64   `json:"id"`
+	Uuid        string   `json:"uuid,optional"`        // 唯一标识（采集视频使用）
+	Name        string   `json:"name"`                 // 视频名称
+	Cover       string   `json:"cover,optional"`       // 视频封面URL
+	GodNum      string   `json:"godNum,optional"`      // 番号（采集视频使用）
+	Duration    int64    `json:"duration"`             // 视频时长（秒）
+	PlayUrl     string   `json:"playUrl"`              // 播放链接
+	XlzzUrls    []string `json:"xlzzUrls,optional"`    // 磁力链接数组（采集视频使用）
+	Description string   `json:"description,optional"` // 视频描述
+	SourceType  int64    `json:"type"`                 // 来源类型：1=手动添加，2=采集
+	CreatedAt   int64    `json:"createdAt"`            // 创建时间(秒级时间戳)
+	UpdatedAt   int64    `json:"updatedAt"`            // 更新时间(秒级时间戳)
 }
 
 type VideoListReq struct {
-	Page     int64  `json:"page,optional" form:"page,optional"`
-	PageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
-	Keyword  string `json:"keyword,optional" form:"keyword,optional"` // 搜索关键词（名称、描述）
+	Page       int64  `json:"page,optional" form:"page,optional"`
+	PageSize   int64  `json:"pageSize,optional" form:"pageSize,optional"`
+	Keyword    string `json:"keyword,optional" form:"keyword,optional"` // 搜索关键词（名称、描述）
+	SourceType int64  `json:"type,optional" form:"type,optional"`       // 来源类型筛选（0=全部，1=手动添加，2=采集）
 }
 
 type VideoListResp struct {
@@ -1323,10 +1378,13 @@ type VideoProxyReq struct {
 }
 
 type VideoUpdateReq struct {
-	Id          uint64 `json:"id"`
-	Name        string `json:"name,optional"`        // 视频名称
-	Cover       string `json:"cover,optional"`       // 视频封面URL
-	Duration    int64  `json:"duration,optional"`    // 视频时长（秒）
-	PlayUrl     string `json:"playUrl,optional"`     // 播放链接
-	Description string `json:"description,optional"` // 视频描述
+	Id          uint64   `json:"id"`
+	Name        string   `json:"name,optional"`        // 视频名称
+	Cover       string   `json:"cover,optional"`       // 视频封面URL
+	GodNum      string   `json:"godNum,optional"`      // 番号（采集视频使用）
+	Duration    int64    `json:"duration,optional"`    // 视频时长（秒）
+	PlayUrl     string   `json:"playUrl,optional"`     // 播放链接
+	XlzzUrls    []string `json:"xlzzUrls,optional"`    // 磁力链接数组（采集视频使用）
+	Description string   `json:"description,optional"` // 视频描述
+	SourceType  int64    `json:"type,optional"`        // 来源类型：1=手动添加，2=采集
 }
