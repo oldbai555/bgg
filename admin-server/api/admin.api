@@ -622,7 +622,7 @@ service admin-api {
 @server (
 	group:      auth
 	prefix:     /api/v1
-	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,ApiEnabledMiddleware
 )
 service admin-api {
 	@handler Logout
@@ -736,7 +736,7 @@ service admin-api {
 @server (
 	group:      menu
 	prefix:     /api/v1
-	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,ApiEnabledMiddleware
 )
 service admin-api {
 	@handler MenuMyTree
@@ -836,7 +836,7 @@ service admin-api {
 @server (
 	group:      file
 	prefix:     /api/v1
-	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,ApiEnabledMiddleware
 )
 service admin-api {
 	@handler FileUpload
@@ -915,10 +915,21 @@ service admin-api {
 	get /dict (DictGetReq) returns (DictGetResp)
 }
 
+// 公共只读字典接口（白名单 code，例如 video_proxy_url）
+@server (
+	group:      public
+	prefix:     /api/v1
+	middleware: ApiEnabledMiddleware
+)
+service admin-api {
+	@handler PublicDictGet
+	get /public/dict (DictGetReq) returns (DictGetResp)
+}
+
 @server (
 	group:      dict
 	prefix:     /api/v1
-	middleware: AuthMiddleware
+	middleware: AuthMiddleware,ApiEnabledMiddleware
 )
 service admin-api {
 	@handler DictBatchGet
@@ -1170,7 +1181,7 @@ service admin-api {
 @server (
 	group:      video
 	prefix:     /api/v1
-	middleware: AuthMiddleware
+	middleware: AuthMiddleware,ApiEnabledMiddleware
 )
 service admin-api {
 	@handler VideoProxy
@@ -1195,11 +1206,15 @@ service admin-api {
 @server (
 	group:      video_collect
 	prefix:     /api/v1
-	middleware: OperationLogMiddleware
+	middleware: ApiEnabledMiddleware,OperationLogMiddleware
 )
 service admin-api {
 	@handler VideoCollect
 	post /videos/collect (VideoCollectReq) returns (VideoCollectResp)
+
+	// 支持OPTIONS请求（CORS预检）
+	@handler VideoCollectOptions
+	options /videos/collect
 }
 
 // 公开视频服务
@@ -1361,7 +1376,7 @@ type (
 @server (
 	group:      chat
 	prefix:     /api/v1
-	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,ApiEnabledMiddleware
 )
 service admin-api {
 	@handler ChatMessageSend
@@ -1726,7 +1741,7 @@ service admin-api {
 @server (
 	group:      notification
 	prefix:     /api/v1
-	middleware: AuthMiddleware
+	middleware: AuthMiddleware,ApiEnabledMiddleware
 )
 service admin-api {
 	@handler NotificationList

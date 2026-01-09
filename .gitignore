@@ -27,3 +27,4 @@ admin-server/*.exe
 /history/**
 /admin-server/uploads/**
 /admin-frontend/eslintcheckresult.txt
+/docs/视频与移动端改造方案.md

@@ -6,3 +6,4 @@ admin-server
 *.tmp
 *.log
 
+/scripts/test-video-collect.sh

@@ -34,3 +34,10 @@ $shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.08);
  */
 $transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
+/**
+ * 响应式断点（移动端适配规范）
+ */
+$screen-sm: 768px;  // 小屏（移动端）
+$screen-md: 1024px; // 中屏（平板）
+$screen-lg: 1280px; // 大屏（桌面）
+

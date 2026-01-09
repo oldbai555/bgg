@@ -14,14 +14,15 @@ import './styles/layout.scss';
 
 // 全局错误处理：忽略浏览器扩展相关的错误和 Vite HMR 错误
 window.addEventListener('error', (event) => {
-  const errorMessage = event.message || event.filename || '';
+  const errorMessage = event.message || event.filename || event.error?.message || '';
   // 忽略浏览器扩展相关的错误
   if (
     errorMessage.includes('message channel closed') ||
     errorMessage.includes('asynchronous response') ||
     errorMessage.includes('Extension context invalidated') ||
     errorMessage.includes('runtime.lastError') ||
-    errorMessage.includes('message port closed')
+    errorMessage.includes('message port closed') ||
+    errorMessage.includes('The message port closed before a response was received')
   ) {
     event.preventDefault();
     return false;
@@ -34,7 +35,6 @@ window.addEventListener('error', (event) => {
      errorMessage.includes('500'))
   ) {
     // 开发环境下的 HMR 错误可以忽略
-    console.warn('[Dev] 忽略 HMR 错误:', errorMessage);
     event.preventDefault();
     return false;
   }
@@ -49,7 +49,8 @@ window.addEventListener('unhandledrejection', (event) => {
     errorMessage.includes('asynchronous response') ||
     errorMessage.includes('Extension context invalidated') ||
     errorMessage.includes('runtime.lastError') ||
-    errorMessage.includes('message port closed')
+    errorMessage.includes('message port closed') ||
+    errorMessage.includes('The message port closed before a response was received')
   ) {
     event.preventDefault();
     return false;
@@ -61,11 +62,28 @@ window.addEventListener('unhandledrejection', (event) => {
      errorMessage.includes('ERR_ABORTED') ||
      errorMessage.includes('500'))
   ) {
-    console.warn('[Dev] 忽略 HMR Promise 错误:', errorMessage);
     event.preventDefault();
     return false;
   }
 });
+
+// 拦截 console.error，过滤浏览器扩展相关的警告
+const originalConsoleError = console.error;
+console.error = (...args: unknown[]) => {
+  const message = args.join(' ');
+  // 忽略浏览器扩展相关的错误
+  if (
+    message.includes('runtime.lastError') ||
+    message.includes('The message port closed before a response was received') ||
+    message.includes('message channel closed') ||
+    message.includes('Extension context invalidated')
+  ) {
+    // 静默忽略，不输出到控制台
+    return;
+  }
+  // 其他错误正常输出
+  originalConsoleError.apply(console, args);
+};
 
 const app = createApp(App);
 const pinia = createPinia();

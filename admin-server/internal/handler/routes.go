@@ -32,6 +32,7 @@ import (
 	permission_api "postapocgame/admin-server/internal/handler/permission_api"
 	permission_menu "postapocgame/admin-server/internal/handler/permission_menu"
 	ping "postapocgame/admin-server/internal/handler/ping"
+	public "postapocgame/admin-server/internal/handler/public"
 	public_video "postapocgame/admin-server/internal/handler/public_video"
 	role "postapocgame/admin-server/internal/handler/role"
 	role_permission "postapocgame/admin-server/internal/handler/role_permission"
@@ -118,7 +119,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 
 	server.AddRoutes(
 		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.PerformanceMiddleware, serverCtx.RateLimitMiddleware, serverCtx.AuthMiddleware},
+			[]rest.Middleware{serverCtx.PerformanceMiddleware, serverCtx.RateLimitMiddleware, serverCtx.AuthMiddleware, serverCtx.ApiEnabledMiddleware},
 			[]rest.Route{
 				{
 					Method:  http.MethodPost,
@@ -147,7 +148,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 
 	server.AddRoutes(
 		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.PerformanceMiddleware, serverCtx.RateLimitMiddleware, serverCtx.AuthMiddleware},
+			[]rest.Middleware{serverCtx.PerformanceMiddleware, serverCtx.RateLimitMiddleware, serverCtx.AuthMiddleware, serverCtx.ApiEnabledMiddleware},
 			[]rest.Route{
 				{
 					Method:  http.MethodGet,
@@ -371,7 +372,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 
 	server.AddRoutes(
 		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.AuthMiddleware},
+			[]rest.Middleware{serverCtx.AuthMiddleware, serverCtx.ApiEnabledMiddleware},
 			[]rest.Route{
 				{
 					Method:  http.MethodPost,
@@ -472,7 +473,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 
 	server.AddRoutes(
 		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.PerformanceMiddleware, serverCtx.RateLimitMiddleware, serverCtx.AuthMiddleware},
+			[]rest.Middleware{serverCtx.PerformanceMiddleware, serverCtx.RateLimitMiddleware, serverCtx.AuthMiddleware, serverCtx.ApiEnabledMiddleware},
 			[]rest.Route{
 				{
 					Method:  http.MethodGet,
@@ -565,7 +566,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 
 	server.AddRoutes(
 		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.PerformanceMiddleware, serverCtx.RateLimitMiddleware, serverCtx.AuthMiddleware},
+			[]rest.Middleware{serverCtx.PerformanceMiddleware, serverCtx.RateLimitMiddleware, serverCtx.AuthMiddleware, serverCtx.ApiEnabledMiddleware},
 			[]rest.Route{
 				{
 					Method:  http.MethodGet,
@@ -627,7 +628,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 
 	server.AddRoutes(
 		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.AuthMiddleware},
+			[]rest.Middleware{serverCtx.AuthMiddleware, serverCtx.ApiEnabledMiddleware},
 			[]rest.Route{
 				{
 					Method:  http.MethodGet,
@@ -772,6 +773,20 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: ping.PingHandler(serverCtx),
 			},
 		},
+		rest.WithPrefix("/api/v1"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.ApiEnabledMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/public/dict",
+					Handler: public.PublicDictGetHandler(serverCtx),
+				},
+			}...,
+		),
 		rest.WithPrefix("/api/v1"),
 	)
 
@@ -1004,7 +1019,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 
 	server.AddRoutes(
 		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.AuthMiddleware},
+			[]rest.Middleware{serverCtx.AuthMiddleware, serverCtx.ApiEnabledMiddleware},
 			[]rest.Route{
 				{
 					Method:  http.MethodGet,
@@ -1018,12 +1033,17 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 
 	server.AddRoutes(
 		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.OperationLogMiddleware},
+			[]rest.Middleware{serverCtx.ApiEnabledMiddleware, serverCtx.OperationLogMiddleware},
 			[]rest.Route{
 				{
 					Method:  http.MethodPost,
 					Path:    "/videos/collect",
 					Handler: video_collect.VideoCollectHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodOptions,
+					Path:    "/videos/collect",
+					Handler: video_collect.VideoCollectOptionsHandler(serverCtx),
 				},
 			}...,
 		),

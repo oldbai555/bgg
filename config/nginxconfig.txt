@@ -84,6 +84,15 @@ server {
         proxy_http_version 1.1;
         proxy_set_header Connection "";
         proxy_buffering on;
+
+        # 采集与播放相关接口的 CORS 支持（主要用于 /m3u8/collect -> /api/v1/videos/collect）
+        add_header Access-Control-Allow-Origin "https://missav.ai" always;
+        add_header Access-Control-Allow-Methods "GET, POST, OPTIONS" always;
+        add_header Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With" always;
+
+        if ($request_method = OPTIONS) {
+            return 204;
+        }
     }
 
     # 视频播放服务 - 重定向到 Vue 项目的视频页面

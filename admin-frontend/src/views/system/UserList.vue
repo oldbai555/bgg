@@ -2,8 +2,13 @@
   <div class="page">
     <!-- 搜索表单 -->
     <el-card class="mb-12">
-      <el-form :inline="true" :model="query">
-        <el-form-item :label="t('common.username')">
+      <el-form
+        :inline="!isMobile"
+        :model="query"
+        class="search-form"
+        :class="{ 'form-vertical': isMobile }"
+      >
+        <el-form-item :label="t('common.username')" :label-width="isMobile ? '80px' : undefined">
           <el-input v-model="query.username" :placeholder="t('common.search')" />
         </el-form-item>
         <el-form-item>
@@ -15,66 +20,79 @@
 
     <!-- D2Table 组件 -->
     <el-card>
-      <D2Table
-        :columns="columns"
-        :data="list"
-        :total="total"
-        :page-size="query.pageSize"
-        :current-page="query.page"
-        :drawer-columns="drawerColumns"
-        :drawer-add-columns="drawerAddColumns"
-        :have-edit="true"
-        :have-detail="true"
-        create-permission="user:create"
-        update-permission="user:update"
-        delete-permission="user:delete"
-        @size-change="handleSizeChange"
-        @current-change="handlePageChange"
-        @onclick-delete="handleDelete"
-        @onclick-update-row="handleUpdate"
-        @onclick-add-row="handleAdd"
-      >
-        <!-- 自定义状态列 -->
-        <template #cell="{row, column}">
-          <el-tag v-if="column.prop === 'status'" :type="row.status === 1 ? 'success' : 'info'">
-            {{ row.status === 1 ? t('status.enabled') : t('status.disabled') }}
-          </el-tag>
-          <span v-else-if="column.prop === 'departmentId'">
-            {{ getDepartmentName(row.departmentId) }}
-          </span>
-          <el-avatar
-            v-else-if="column.prop === 'avatar'"
-            :size="40"
-            :src="row.avatar"
-          >
-            {{ row.username?.charAt(0).toUpperCase() || 'U' }}
-          </el-avatar>
-        </template>
-        <!-- 自定义操作列 -->
-        <template #action="{row}">
-          <!-- 超级管理员用户（id=1）不允许分配角色 -->
-          <el-button
-            v-if="!isSuperAdminUser(row)"
-            v-permission="'user:update'"
-            type="primary"
-            link
-            size="small"
-            @click="handleAssignRoles(row)"
-          >
-            {{ t('common.assignRoles') }}
-          </el-button>
-          <el-tooltip v-else content="超级管理员不允许分配角色" placement="top">
+      <div class="table-wrapper">
+        <D2Table
+          :columns="columns"
+          :data="list"
+          :total="total"
+          :page-size="query.pageSize"
+          :current-page="query.page"
+          :drawer-columns="drawerColumns"
+          :drawer-add-columns="drawerAddColumns"
+          :have-edit="true"
+          :have-detail="true"
+          create-permission="user:create"
+          update-permission="user:update"
+          delete-permission="user:delete"
+          @size-change="handleSizeChange"
+          @current-change="handlePageChange"
+          @onclick-delete="handleDelete"
+          @onclick-update-row="handleUpdate"
+          @onclick-add-row="handleAdd"
+        >
+          <!-- 自定义状态列 -->
+          <template #cell="{row, column}">
+            <el-tag v-if="column.prop === 'status'" :type="row.status === 1 ? 'success' : 'info'">
+              {{ row.status === 1 ? t('status.enabled') : t('status.disabled') }}
+            </el-tag>
+            <span v-else-if="column.prop === 'departmentId'">
+              {{ getDepartmentName(row.departmentId) }}
+            </span>
+            <!-- 用户名/昵称：截断显示 + 悬停提示 -->
+            <el-tooltip
+              v-else-if="column.prop === 'username' || column.prop === 'nickname'"
+              :content="row[column.prop] || ''"
+              placement="top"
+              :disabled="!row[column.prop] || row[column.prop].length <= 30"
+            >
+              <div class="name-cell">
+                {{ row[column.prop] || '-' }}
+              </div>
+            </el-tooltip>
+            <el-avatar
+              v-else-if="column.prop === 'avatar'"
+              :size="isMobile ? 32 : 40"
+              :src="row.avatar"
+            >
+              {{ row.username?.charAt(0).toUpperCase() || 'U' }}
+            </el-avatar>
+          </template>
+          <!-- 自定义操作列 -->
+          <template #action="{row}">
+            <!-- 超级管理员用户（id=1）不允许分配角色 -->
             <el-button
-              type="info"
+              v-if="!isSuperAdminUser(row)"
+              v-permission="'user:update'"
+              type="primary"
               link
               size="small"
-              disabled
+              @click="handleAssignRoles(row)"
             >
               {{ t('common.assignRoles') }}
             </el-button>
-          </el-tooltip>
-        </template>
-      </D2Table>
+            <el-tooltip v-else content="超级管理员不允许分配角色" placement="top">
+              <el-button
+                type="info"
+                link
+                size="small"
+                disabled
+              >
+                {{ t('common.assignRoles') }}
+              </el-button>
+            </el-tooltip>
+          </template>
+        </D2Table>
+      </div>
     </el-card>
 
     <!-- 分配角色对话框 -->
@@ -104,7 +122,7 @@
 </template>
 
 <script setup lang="ts">
-import {reactive, ref, onMounted, computed} from 'vue'
+import {reactive, ref, onMounted, onUnmounted, computed} from 'vue'
 import {ElMessage, ElMessageBox} from 'element-plus'
 import {userList, userCreate, userUpdate, userDelete, userRoleList, userRoleUpdate, roleList as getRoleList, departmentTree} from '@/api/generated/admin'
 import type {UserItem, UserCreateReq, UserUpdateReq, DepartmentItem, RoleItem} from '@/api/generated/admin'
@@ -128,6 +146,17 @@ const list = ref<UserItem[]>([])
 const total = ref(0)
 const loading = ref(false)
 const departmentList = ref<DepartmentItem[]>([])
+const isMobile = ref(false)
+
+// 检测屏幕尺寸
+const checkMobile = () => {
+  isMobile.value = window.innerWidth <= 768
+}
+
+// 监听窗口大小变化
+const handleResize = () => {
+  checkMobile()
+}
 
 // 角色分配相关
 const roleDialogVisible = ref(false)
@@ -389,19 +418,78 @@ const handleRoleDialogClose = () => {
 }
 
 onMounted(async () => {
+  checkMobile()
+  window.addEventListener('resize', handleResize)
   await loadDepartments()
   loadData()
 })
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
+})
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .page {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  padding: 16px 24px;
+
+  @media (max-width: 768px) {
+    padding: 8px 12px;
+    gap: 8px;
+  }
 }
+
 .mb-12 {
   margin-bottom: 12px;
+
+  @media (max-width: 768px) {
+    margin-bottom: 8px;
+  }
+}
+
+// 搜索表单：移动端垂直布局
+.search-form {
+  &.form-vertical {
+    :deep(.el-form-item) {
+      display: block;
+      margin-bottom: 16px;
+
+      .el-form-item__label {
+        display: block;
+        text-align: left;
+        margin-bottom: 8px;
+      }
+
+      .el-form-item__content {
+        width: 100%;
+      }
+    }
+  }
+}
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+
+  // 确保表格在小屏下有最小宽度，避免列被压扁
+  :deep(.el-table) {
+    min-width: 900px;
+  }
+}
+
+// 用户名/昵称单元格：截断显示
+.name-cell {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  vertical-align: middle;
+  cursor: default;
 }
 </style>
 

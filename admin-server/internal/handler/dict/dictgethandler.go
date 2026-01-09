@@ -29,3 +29,22 @@ func DictGetHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		}
 	}
 }
+
+// PublicDictGetHandler 公共字典查询（仅白名单 code，当前用于 video_proxy_url）
+func PublicDictGetHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req types.DictGetReq
+		if err := httpx.Parse(r, &req); err != nil {
+			httpx.ErrorCtx(r.Context(), w, err)
+			return
+		}
+
+		l := dict.NewDictGetLogic(r.Context(), svcCtx)
+		resp, err := l.PublicDictGet(&req)
+		if err != nil {
+			httpx.ErrorCtx(r.Context(), w, err)
+		} else {
+			httpx.OkJsonCtx(r.Context(), w, resp)
+		}
+	}
+}

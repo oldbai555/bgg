@@ -54,6 +54,7 @@ import {ElMessage} from 'element-plus'
 import {VideoPlay, RefreshLeft} from '@element-plus/icons-vue'
 import videojs from 'video.js'
 import 'video.js/dist/video-js.css'
+import {publicDictGet} from '@/api/public'
 
 const route = useRoute()
 
@@ -63,9 +64,21 @@ const showPlayer = ref(false)
 const loading = ref(false)
 const videoPlayerRef = ref<HTMLVideoElement | null>(null)
 let player: videojs.Player | null = null
+const videoProxyBaseUrl = ref('')
 
-// 从路由参数获取视频URL
-onMounted(() => {
+// 从路由参数获取视频URL & 加载视频代理基础地址
+onMounted(async () => {
+  // 先尝试加载字典中的视频代理地址
+  try {
+    const resp = await publicDictGet({code: 'video_proxy_url'})
+    const first = resp.items && resp.items.length > 0 ? resp.items[0] : undefined
+    videoProxyBaseUrl.value = first?.value || ''
+  } catch (err) {
+    console.error('加载视频代理地址失败:', err)
+    // 加载失败时使用后端默认路由兜底
+    videoProxyBaseUrl.value = '/api/v1/videos/proxy'
+  }
+
   const urlParam = route.query.url as string
   if (urlParam) {
     videoUrl.value = decodeURIComponent(urlParam)
@@ -198,8 +211,9 @@ const handlePlay = async () => {
 // 尝试使用代理播放
 const tryProxyPlay = async (url: string) => {
   try {
-    // 构建代理URL
-    const proxyUrl = `/api/v1/videos/proxy?url=${encodeURIComponent(url)}`
+    // 构建代理URL，优先使用字典中的代理基础地址
+    const base = videoProxyBaseUrl.value || '/api/v1/videos/proxy'
+    const proxyUrl = `${base}?url=${encodeURIComponent(url)}`
 
     // 设置播放源为代理URL
     if (player) {

@@ -2,16 +2,21 @@
   <div class="page">
     <!-- 搜索表单 -->
     <el-card class="mb-12">
-      <el-form :inline="true" :model="query">
-        <el-form-item label="关键词">
+      <el-form
+        :inline="!isMobile"
+        :model="query"
+        class="search-form"
+        :class="{ 'form-vertical': isMobile }"
+      >
+        <el-form-item label="关键词" :label-width="isMobile ? '80px' : undefined">
           <el-input v-model="query.keyword" placeholder="搜索视频名称、描述" clearable />
         </el-form-item>
-        <el-form-item label="来源类型">
+        <el-form-item label="来源类型" :label-width="isMobile ? '80px' : undefined">
           <el-select
             v-model="query.sourceType"
             placeholder="全部"
             clearable
-            style="width: 150px"
+            :style="isMobile ? { width: '100%' } : { width: '150px' }"
           >
             <el-option label="全部" :value="0" />
             <el-option
@@ -31,64 +36,77 @@
 
     <!-- D2Table 组件 -->
     <el-card>
-      <D2Table
-        :columns="columns"
-        :data="list"
-        :total="total"
-        :page-size="query.pageSize"
-        :current-page="query.page"
-        :drawer-columns="drawerColumns"
-        :drawer-add-columns="drawerAddColumns"
-        :have-edit="true"
-        :have-detail="true"
-        create-permission="video:create"
-        update-permission="video:update"
-        delete-permission="video:delete"
-        @size-change="handleSizeChange"
-        @current-change="handlePageChange"
-        @onclick-delete="handleDelete"
-        @onclick-update-row="handleUpdate"
-        @onclick-add-row="handleAdd"
-      >
-        <!-- 自定义列 -->
-        <template #cell="{row, column}">
-          <div v-if="column.prop === 'cover'" class="cover-cell">
-            <el-image
-              v-if="row.cover"
-              :src="row.cover"
-              :preview-src-list="[row.cover]"
-              fit="cover"
-              style="width: 80px; height: 60px; border-radius: 4px;"
-            />
-            <span v-else class="no-cover">无封面</span>
-          </div>
-          <el-tag
-            v-else-if="column.prop === 'sourceType'"
-            :type="row.sourceType === 1 ? 'primary' : 'success'"
-            size="small"
-          >
-            {{ getSourceTypeLabel(row.sourceType) }}
-          </el-tag>
-          <span v-else-if="column.prop === 'duration'">{{ formatDuration(row.duration) }}</span>
-        </template>
-        <!-- 自定义操作列 -->
-        <template #action="{row}">
-          <el-button
-            type="primary"
-            link
-            size="small"
-            @click="handlePlay(row)"
-          >
-            播放
-          </el-button>
-        </template>
-      </D2Table>
+      <div class="table-wrapper">
+        <D2Table
+          :columns="columns"
+          :data="list"
+          :total="total"
+          :page-size="query.pageSize"
+          :current-page="query.page"
+          :drawer-columns="drawerColumns"
+          :drawer-add-columns="drawerAddColumns"
+          :have-edit="true"
+          :have-detail="true"
+          create-permission="video:create"
+          update-permission="video:update"
+          delete-permission="video:delete"
+          @size-change="handleSizeChange"
+          @current-change="handlePageChange"
+          @onclick-delete="handleDelete"
+          @onclick-update-row="handleUpdate"
+          @onclick-add-row="handleAdd"
+        >
+          <!-- 自定义列 -->
+          <template #cell="{row, column}">
+            <div v-if="column.prop === 'cover'" class="cover-cell">
+              <el-image
+                v-if="row.cover"
+                :src="row.cover"
+                :preview-src-list="[row.cover]"
+                fit="cover"
+                style="width: 80px; height: 60px; border-radius: 4px;"
+              />
+              <span v-else class="no-cover">无封面</span>
+            </div>
+            <!-- 视频名称：截断显示 + 悬停提示，参考 DailyShortSentenceList.vue -->
+            <el-tooltip
+              v-else-if="column.prop === 'name'"
+              :content="row.name || ''"
+              placement="top"
+              :disabled="!row.name || row.name.length <= 50"
+            >
+              <div class="name-cell">
+                {{ row.name || '-' }}
+              </div>
+            </el-tooltip>
+            <el-tag
+              v-else-if="column.prop === 'sourceType'"
+              :type="row.sourceType === 1 ? 'primary' : 'success'"
+              size="small"
+            >
+              {{ getSourceTypeLabel(row.sourceType) }}
+            </el-tag>
+            <span v-else-if="column.prop === 'duration'">{{ formatDuration(row.duration) }}</span>
+          </template>
+          <!-- 自定义操作列 -->
+          <template #action="{row}">
+            <el-button
+              type="primary"
+              link
+              size="small"
+              @click="handlePlay(row)"
+            >
+              播放
+            </el-button>
+          </template>
+        </D2Table>
+      </div>
     </el-card>
   </div>
 </template>
 
 <script setup lang="ts">
-import {reactive, ref, onMounted, computed} from 'vue'
+import {reactive, ref, onMounted, onUnmounted, computed} from 'vue'
 import {ElMessage, ElMessageBox} from 'element-plus'
 import {useRouter} from 'vue-router'
 import {videoList, videoCreate, videoUpdate, videoDelete} from '@/api/generated/admin'
@@ -110,6 +128,17 @@ const query = reactive({
 const list = ref<VideoItem[]>([])
 const total = ref(0)
 const loading = ref(false)
+const isMobile = ref(false)
+
+// 检测屏幕尺寸
+const checkMobile = () => {
+  isMobile.value = window.innerWidth <= 768
+}
+
+// 监听窗口大小变化
+const handleResize = () => {
+  checkMobile()
+}
 
 // 视频来源类型选项（字典 video_source_type：1=手动添加，2=采集）
 const {options: sourceTypeOptions, getLabel: getSourceTypeLabel} = useDictOptions('video_source_type', [
@@ -252,25 +281,87 @@ const handleDelete = (index: number, row: VideoItem) => {
     .catch(() => {})
 }
 
-onMounted(loadData)
+onMounted(() => {
+  checkMobile()
+  window.addEventListener('resize', handleResize)
+  loadData()
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
+})
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .page {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  padding: 16px 24px;
+
+  @media (max-width: 768px) {
+    padding: 8px 12px;
+    gap: 8px;
+  }
 }
+
 .mb-12 {
   margin-bottom: 12px;
+
+  @media (max-width: 768px) {
+    margin-bottom: 8px;
+  }
 }
+
+// 搜索表单：移动端垂直布局
+.search-form {
+  &.form-vertical {
+    :deep(.el-form-item) {
+      display: block;
+      margin-bottom: 16px;
+
+      .el-form-item__label {
+        display: block;
+        text-align: left;
+        margin-bottom: 8px;
+      }
+
+      .el-form-item__content {
+        width: 100%;
+      }
+    }
+  }
+}
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+
+  // 确保表格在小屏下有最小宽度，避免列被压扁
+  :deep(.el-table) {
+    min-width: 900px;
+  }
+}
+
 .cover-cell {
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
 .no-cover {
   color: #999;
   font-size: 12px;
+}
+
+.name-cell {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  vertical-align: middle;
+  cursor: default;
 }
 </style>

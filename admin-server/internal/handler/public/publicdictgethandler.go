@@ -1,28 +1,27 @@
 // Code scaffolded by goctl. Safe to edit.
 // goctl 1.9.2
 
-package video_collect
+package public
 
 import (
 	"net/http"
 
-	"postapocgame/admin-server/internal/logic/video_collect"
+	"github.com/zeromicro/go-zero/rest/httpx"
+	"postapocgame/admin-server/internal/logic/public"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
-
-	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
-func VideoCollectHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+func PublicDictGetHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.VideoCollectReq
+		var req types.DictGetReq
 		if err := httpx.Parse(r, &req); err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 			return
 		}
 
-		l := video_collect.NewVideoCollectLogic(r.Context(), svcCtx)
-		resp, err := l.VideoCollect(&req)
+		l := public.NewPublicDictGetLogic(r.Context(), svcCtx)
+		resp, err := l.PublicDictGet(&req)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {

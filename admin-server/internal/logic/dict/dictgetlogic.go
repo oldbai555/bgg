@@ -33,6 +33,30 @@ func (l *DictGetLogic) DictGet(req *types.DictGetReq) (resp *types.DictGetResp, 
 		return nil, errs.New(errs.CodeBadRequest, "字典类型编码不能为空")
 	}
 
+	return l.getDictInternal(req, false)
+}
+
+// PublicDictGet 公共字典查询：仅允许白名单 code
+func (l *DictGetLogic) PublicDictGet(req *types.DictGetReq) (resp *types.DictGetResp, err error) {
+	if req == nil || req.Code == "" {
+		return nil, errs.New(errs.CodeBadRequest, "字典类型编码不能为空")
+	}
+
+	// 白名单校验：当前仅允许 video_proxy_url，后续可按需扩展
+	switch req.Code {
+	case "video_proxy_url":
+		// 允许
+	default:
+		return nil, errs.New(errs.CodeForbidden, "不支持的字典类型")
+	}
+
+	return l.getDictInternal(req, true)
+}
+
+// getDictInternal 复用现有逻辑，isPublic 预留未来差异化处理扩展
+func (l *DictGetLogic) getDictInternal(req *types.DictGetReq, isPublic bool) (resp *types.DictGetResp, err error) {
+	// 当前公共/私有逻辑一致，预留 isPublic 以便未来在这里做额外限制或审计
+
 	dictTypeRepo := repository.NewDictTypeRepository(l.svcCtx.Repository)
 	dictType, err := dictTypeRepo.FindByCode(l.ctx, req.Code)
 	if err != nil {

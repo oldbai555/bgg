@@ -745,6 +745,14 @@ export function ping() {
  * @description 
  * @param req
  */
+export function publicDictGet(req: components.DictGetReq) {
+	return webapi.get<components.DictGetResp>(`/api/v1/public/dict`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
 export function publicVideoDetail(req: components.PublicVideoDetailReq) {
 	return webapi.get<components.PublicVideoDetailResp>(`/api/v1/public/videos/info`, req)
 }
@@ -1002,4 +1010,11 @@ export function videoProxy(req: components.VideoProxyReq) {
  */
 export function videoCollect(req: components.VideoCollectReq) {
 	return webapi.post<components.VideoCollectResp>(`/api/v1/videos/collect`, req)
+}
+
+/**
+ * @description 
+ */
+export function videoCollectOptions() {
+	return webapi.options<null>(`/api/v1/videos/collect`)
 }

@@ -23,9 +23,12 @@
           v-for="video in list"
           :key="video.id"
           class="video-card"
-          @click="goToDetail(video.id)"
         >
-          <div class="video-thumbnail" @mouseenter="handleThumbnailHover(video)" @mouseleave="handleThumbnailLeave(video)">
+          <div
+            class="video-thumbnail"
+            @mouseenter="handleThumbnailHover(video)"
+            @mouseleave="handleThumbnailLeave(video)"
+          >
             <img
               v-if="!hoveringVideoId || hoveringVideoId !== video.id"
               :src="getCoverUrl(video.godNum)"
@@ -47,7 +50,12 @@
             </div>
           </div>
           <div class="video-info">
-            <div class="video-title">{{ video.name || '未命名视频' }}</div>
+            <div
+              class="video-title"
+              @click.stop="goToDetail(video.id)"
+            >
+              {{ video.name || '未命名视频' }}
+            </div>
             <div class="video-code">{{ video.godNum || '-' }}</div>
           </div>
         </div>
@@ -66,7 +74,8 @@
           v-model:page-size="query.size"
           :total="total"
           :page-sizes="[10, 20, 30, 50, 100]"
-          layout="total, sizes, prev, pager, next, jumper"
+          :layout="paginationLayout"
+          :small="isMobile"
           @size-change="handleSizeChange"
           @current-change="handlePageChange"
         />
@@ -76,7 +85,7 @@
 </template>
 
 <script setup lang="ts">
-import {reactive, ref, computed, onMounted} from 'vue'
+import {reactive, ref, computed, onMounted, onUnmounted, nextTick} from 'vue'
 import {useRouter, useRoute} from 'vue-router'
 import {ElMessage} from 'element-plus'
 import {publicVideoList} from '@/api/generated/admin'
@@ -84,6 +93,8 @@ import type {PublicVideoListReq, PublicVideoItem} from '@/api/generated/admin'
 
 const router = useRouter()
 const route = useRoute()
+
+const SCROLL_STATE_KEY = 'public_video_list_state'
 
 const query = reactive({
   page: 1,
@@ -95,8 +106,25 @@ const total = ref(0)
 const loading = ref(false)
 const hoveringVideoId = ref<number | null>(null)
 const videoRefs = ref<Map<number, HTMLVideoElement>>(new Map())
+const pendingScrollTop = ref<number | null>(null)
+const isMobile = ref(false)
 
 const totalPages = computed(() => Math.max(1, Math.ceil(total.value / query.size)))
+
+// 响应式分页 layout：移动端使用简化布局
+const paginationLayout = computed(() => {
+  return isMobile.value ? 'prev, pager, next' : 'total, sizes, prev, pager, next, jumper'
+})
+
+// 检测屏幕尺寸
+const checkMobile = () => {
+  isMobile.value = window.innerWidth <= 768
+}
+
+// 监听窗口大小变化
+const handleResize = () => {
+  checkMobile()
+}
 
 // 获取封面URL
 const getCoverUrl = (godNum: string): string => {
@@ -126,8 +154,8 @@ const handleThumbnailHover = (video: PublicVideoItem) => {
 }
 
 // 设置视频引用
-const setVideoRef = (videoId: number, el: HTMLVideoElement | null) => {
-  if (el) {
+const setVideoRef = (videoId: number, el: unknown) => {
+  if (el && el instanceof HTMLVideoElement) {
     videoRefs.value.set(videoId, el)
   } else {
     videoRefs.value.delete(videoId)
@@ -145,9 +173,36 @@ const handleThumbnailLeave = (video: PublicVideoItem) => {
   }
 }
 
+// 恢复滚动位置（在 DOM 完全渲染后）
+const restoreScrollPosition = async (scrollTop: number) => {
+  // 等待 Vue 完成 DOM 更新
+  await nextTick()
+  // 等待浏览器完成渲染
+  await new Promise(resolve => requestAnimationFrame(resolve))
+  await new Promise(resolve => requestAnimationFrame(resolve))
+  // 额外等待，确保图片等资源加载完成
+  await new Promise(resolve => setTimeout(resolve, 100))
+
+  // 恢复滚动位置
+  window.scrollTo({top: scrollTop, behavior: 'auto'})
+
+  // 如果滚动位置仍然不对，可能是内容高度变化，尝试再次恢复
+  setTimeout(() => {
+    const currentScroll = window.scrollY
+    const diff = Math.abs(currentScroll - scrollTop)
+    if (diff > 50) {
+      // 如果差异较大，再次尝试恢复
+      window.scrollTo({top: scrollTop, behavior: 'auto'})
+    }
+  }, 200)
+}
+
 // 加载数据
 const loadData = async () => {
   loading.value = true
+  const shouldRestoreScroll = pendingScrollTop.value !== null
+  const scrollTopToRestore = pendingScrollTop.value
+
   try {
     const req: PublicVideoListReq = {
       page: query.page,
@@ -166,18 +221,36 @@ const loadData = async () => {
     ElMessage.error(message)
   } finally {
     loading.value = false
+
+    // 如果需要恢复滚动位置，等待 DOM 完全渲染后再恢复
+    if (shouldRestoreScroll && scrollTopToRestore !== null) {
+      pendingScrollTop.value = null
+      await restoreScrollPosition(scrollTopToRestore)
+    }
   }
 }
 
 // 搜索
 const handleSearch = () => {
   query.page = 1
+  updateRouteQuery()
+  // 清除待恢复的滚动位置（因为用户主动搜索了）
+  pendingScrollTop.value = null
+  // 清除 sessionStorage 中的旧状态
+  try {
+    sessionStorage.removeItem(SCROLL_STATE_KEY)
+  } catch {
+    // 忽略清除失败
+  }
   loadData()
 }
 
 // 分页变化
 const handlePageChange = (page: number) => {
   query.page = page
+  updateRouteQuery()
+  // 清除待恢复的滚动位置（因为用户主动切换了页面）
+  pendingScrollTop.value = null
   loadData()
   // 滚动到顶部
   window.scrollTo({top: 0, behavior: 'smooth'})
@@ -187,12 +260,49 @@ const handlePageChange = (page: number) => {
 const handleSizeChange = (size: number) => {
   query.size = size
   query.page = 1
+  updateRouteQuery()
+  // 清除待恢复的滚动位置（因为用户主动改变了每页数量）
+  pendingScrollTop.value = null
   loadData()
 }
 
 // 跳转到详情页
 const goToDetail = (id: number) => {
-  router.push(`/public/videos/${id}`)
+  // 记录当前列表状态与滚动位置，便于返回时恢复
+  try {
+    const state = {
+      page: query.page,
+      size: query.size,
+      content: query.content,
+      scrollTop: window.scrollY,
+      ts: Date.now()
+    }
+    sessionStorage.setItem(SCROLL_STATE_KEY, JSON.stringify(state))
+  } catch {
+    // 忽略存储失败
+  }
+
+  router.push({
+    path: `/public/videos/${id}`,
+    query: {
+      page: String(query.page),
+      size: String(query.size),
+      content: query.content || undefined
+    }
+  })
+}
+
+// 同步路由 query，便于刷新与跨页面返回
+const updateRouteQuery = () => {
+  router.replace({
+    path: route.path,
+    query: {
+      ...route.query,
+      page: String(query.page),
+      size: String(query.size),
+      content: query.content || undefined
+    }
+  })
 }
 
 // 初始化：从路由参数获取查询条件
@@ -202,16 +312,64 @@ onMounted(() => {
   const content = route.query.content
 
   if (page) {
-query.page = Number(page)
-}
+    query.page = Number(page)
+  }
   if (size) {
-query.size = Number(size)
-}
+    query.size = Number(size)
+  }
   if (content) {
-query.content = String(content)
-}
+    query.content = String(content)
+  }
 
+  // 尝试从 sessionStorage 中恢复状态（包括从详情页返回的情况）
+  try {
+    const raw = sessionStorage.getItem(SCROLL_STATE_KEY)
+    if (raw) {
+      const parsed = JSON.parse(raw) as {
+        page?: number
+        size?: number
+        content?: string
+        scrollTop?: number
+        ts?: number
+      }
+      const now = Date.now()
+      // 简单过期控制：1 小时内的记录才恢复
+      if (!parsed.ts || now - parsed.ts < 60 * 60 * 1000) {
+        // 如果路由参数中没有分页信息，使用 sessionStorage 中的
+        if (!page && parsed.page && parsed.page > 0) {
+          query.page = parsed.page
+        }
+        if (!size && parsed.size && parsed.size > 0) {
+          query.size = parsed.size
+        }
+        if (!content && typeof parsed.content === 'string') {
+          query.content = parsed.content
+        }
+        // 如果是从详情页返回（有路由 query），恢复滚动位置
+        if (page || size) {
+          if (typeof parsed.scrollTop === 'number' && parsed.scrollTop > 0) {
+            pendingScrollTop.value = parsed.scrollTop
+          }
+        }
+      } else {
+        // 过期了，清除旧状态
+        sessionStorage.removeItem(SCROLL_STATE_KEY)
+      }
+    }
+  } catch {
+    // 忽略解析错误
+  }
+
+  updateRouteQuery()
   loadData()
+
+  // 初始化移动端检测
+  checkMobile()
+  window.addEventListener('resize', handleResize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
 })
 </script>
 
@@ -364,7 +522,7 @@ query.content = String(content)
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     background: #fff;
     padding: 16px;
     border-radius: 10px;
@@ -373,6 +531,22 @@ query.content = String(content)
     .page-info {
       color: #666;
       font-size: 14px;
+      white-space: nowrap;
+    }
+
+    // 确保分页组件在小屏下有足够空间
+    :deep(.el-pagination) {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    // 移动端隐藏部分元素，避免挤压
+    :deep(.el-pagination__total),
+    :deep(.el-pagination__sizes),
+    :deep(.el-pagination__jump) {
+      @media (max-width: 768px) {
+        display: none;
+      }
     }
   }
 
@@ -380,12 +554,41 @@ query.content = String(content)
     padding: 12px;
 
     h1 {
-      font-size: 1.8rem;
+      font-size: 1.6rem;
+      margin-bottom: 20px;
+    }
+
+    .search-bar {
+      padding: 12px;
+      margin-bottom: 16px;
     }
 
     .video-grid {
       grid-template-columns: 1fr;
       gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .video-title {
+      font-size: 1.4rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .video-code {
+      font-size: 12px;
+    }
+
+    .pagination {
+      padding: 12px;
+      gap: 8px;
+
+      .page-info {
+        font-size: 12px;
+      }
     }
   }
 }

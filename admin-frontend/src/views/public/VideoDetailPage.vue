@@ -3,7 +3,9 @@
     <div class="container">
       <!-- 返回按钮 -->
       <el-button class="back-btn" @click="goBack">
-        <el-icon><ArrowLeft /></el-icon>
+        <el-icon>
+          <ArrowLeft />
+        </el-icon>
         返回列表
       </el-button>
 
@@ -49,14 +51,15 @@
 </template>
 
 <script setup lang="ts">
-import {ref, onMounted, onBeforeUnmount, nextTick, watch} from 'vue'
-import {useRouter, useRoute} from 'vue-router'
+import {nextTick, onBeforeUnmount, onMounted, ref, watch} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
 import {ElMessage} from 'element-plus'
 import {ArrowLeft} from '@element-plus/icons-vue'
 import videojs from 'video.js'
 import 'video.js/dist/video-js.css'
-import {publicVideoDetail} from '@/api/generated/admin'
 import type {PublicVideoDetailResp} from '@/api/generated/admin'
+import {publicVideoDetail} from '@/api/generated/admin'
+import {publicDictGet} from '@/api/public'
 
 const router = useRouter()
 const route = useRoute()
@@ -78,6 +81,7 @@ const video = ref<PublicVideoDetailResp>({
 const loading = ref(false)
 const videoPlayerRef = ref<HTMLVideoElement | null>(null)
 let player: ReturnType<typeof videojs> | null = null
+const videoProxyBaseUrl = ref('')
 
 // 等待元素在 DOM 中
 const waitForElementInDOM = async (element: HTMLElement, maxAttempts = 20): Promise<boolean> => {
@@ -164,10 +168,12 @@ const initPlayer = async () => {
           }
         } catch (_e) {
           // 如果没有已存在的播放器，忽略错误
+          console.log('initPlayer videoElement', _e)
         }
       }
     } catch (_e) {
       // 忽略检查错误
+      console.log('initPlayer', _e)
     }
 
     // dispose 后等待 Vue 重新渲染（如果使用了 key，元素会被重新创建）
@@ -249,11 +255,12 @@ const initPlayer = async () => {
         const errorHandler = () => {
           const playerInstance = player
           if (!playerInstance) {
-return
-}
+            return
+          }
 
-          // 切换到代理地址
-          const proxyUrl = `/api/v1/m3u8/proxy?url=${encodeURIComponent(playUrl)}`
+          // 切换到代理地址，优先使用字典中的代理基础地址
+          const base = videoProxyBaseUrl.value || '/api/v1/videos/proxy'
+          const proxyUrl = `${base}?url=${encodeURIComponent(playUrl)}`
           playerInstance.src({
             src: proxyUrl,
             type: 'application/x-mpegURL'
@@ -287,9 +294,9 @@ return
               const playPromise = playerInstance.play()
               if (playPromise !== undefined) {
                 playPromise
-                  .catch((err) => {
-                    ElMessage.error(`播放失败: ${err.message || '未知错误'}`)
-                  })
+                    .catch((err) => {
+                      ElMessage.error(`播放失败: ${err.message || '未知错误'}`)
+                    })
               }
             }
           })
@@ -300,8 +307,8 @@ return
       currentPlayer.on('error', () => {
         const playerInstance = player
         if (!playerInstance) {
-return
-}
+          return
+        }
         const error = playerInstance.error()
         if (error) {
           ElMessage.error(`播放失败: ${error.message || '未知错误'}`)
@@ -349,6 +356,19 @@ const loadData = async () => {
   }
 }
 
+// 加载视频代理基础地址（字典：video_proxy_url）
+const loadVideoProxyBaseUrl = async () => {
+  try {
+    const resp = await publicDictGet({code: 'video_proxy_url'})
+    const first = resp.items && resp.items.length > 0 ? resp.items[0] : undefined
+    videoProxyBaseUrl.value = first?.value || ''
+  } catch (err) {
+    console.error('加载视频代理地址失败:', err)
+    // 失败时使用后端默认路由兜底
+    videoProxyBaseUrl.value = videoProxyBaseUrl.value || '/api/v1/videos/proxy'
+  }
+}
+
 // 复制到剪贴板
 const copyToClipboard = async (text: string) => {
   try {
@@ -360,6 +380,7 @@ const copyToClipboard = async (text: string) => {
       fallbackCopy(text)
     }
   } catch (_err) {
+    console.log('copyToClipboard', _err)
     fallbackCopy(text)
   }
 }
@@ -377,6 +398,7 @@ const fallbackCopy = (text: string) => {
     document.execCommand('copy')
     ElMessage.success('已复制到剪贴板 ✓')
   } catch (_err) {
+    console.log('fallbackCopy', _err)
     ElMessage.error('复制失败，请手动复制')
   }
 
@@ -385,21 +407,50 @@ const fallbackCopy = (text: string) => {
 
 // 返回列表
 const goBack = () => {
-  router.push('/public/videos')
+  // 优先走浏览器历史，保留列表分页与滚动状态
+  // 如果是从列表页进入的，router.back() 会恢复列表页的状态（包括滚动位置）
+  if (window.history.length > 1) {
+    router.back()
+  } else {
+    // 如果没有历史记录，尝试从 sessionStorage 恢复状态
+    try {
+      const raw = sessionStorage.getItem('public_video_list_state')
+      if (raw) {
+        const parsed = JSON.parse(raw) as {
+          page?: number
+          size?: number
+          content?: string
+        }
+        router.push({
+          path: '/public/videos',
+          query: {
+            ...(parsed.page && {page: String(parsed.page)}),
+            ...(parsed.size && {size: String(parsed.size)}),
+            ...(parsed.content && {content: parsed.content})
+          }
+        })
+        return
+      }
+    } catch {
+      // 忽略解析错误
+    }
+    // 兜底：直接跳转到列表页
+    router.push('/public/videos')
+  }
 }
 
 // 监听 video.playUrl 和 loading 状态，确保在合适的时机初始化播放器
 watch(
-  () => [video.value.playUrl, loading.value],
-  ([playUrl, isLoading]) => {
-    if (playUrl && !isLoading && videoPlayerRef.value) {
-      // 延迟初始化，确保 DOM 已完全更新
-      setTimeout(() => {
-        initPlayer()
-      }, 200)
-    }
-  },
-  {immediate: false}
+    () => [video.value.playUrl, loading.value],
+    ([playUrl, isLoading]) => {
+      if (playUrl && !isLoading && videoPlayerRef.value) {
+        // 延迟初始化，确保 DOM 已完全更新
+        setTimeout(() => {
+          initPlayer()
+        }, 200)
+      }
+    },
+    {immediate: false}
 )
 
 onMounted(() => {
@@ -412,9 +463,11 @@ onMounted(() => {
       }
     } catch (_e) {
       // 如果没有已存在的播放器，忽略错误
+      console.log('onMounted', _e)
     }
   }
 
+  loadVideoProxyBaseUrl()
   loadData()
 })
 
@@ -432,200 +485,209 @@ onBeforeUnmount(() => {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 20px;
 
-  .container {
-    max-width: 1200px;
-    margin: 0 auto;
-  }
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
 
-  .back-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    margin-bottom: 20px;
-    transition: background 0.3s;
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-bottom: 20px;
+  transition: background 0.3s;
 
-    &:hover {
-      background: rgba(255, 255, 255, 0.3);
-    }
-  }
+&
+:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
 
-  .video-container {
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-  }
+}
 
-  .video-wrapper {
-    position: relative;
-    width: 100%;
-    padding-top: 56.25%; /* 16:9 aspect ratio */
-    background: #000;
-    overflow: hidden;
-  }
+.video-container {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
 
-  :deep(.video-js) {
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    padding: 0 !important;
-  }
+.video-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 aspect ratio */
+  background: #000;
+  overflow: hidden;
+}
 
-  :deep(.video-js .vjs-tech) {
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: contain;
-  }
+:deep(.video-js) {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  padding: 0 !important;
+}
 
-  :deep(.video-js .vjs-poster) {
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-  }
+:deep(.video-js .vjs-tech) {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain;
+}
 
-  :deep(.video-js .vjs-big-play-button) {
-    position: absolute !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    margin: 0 !important;
-  }
+:deep(.video-js .vjs-poster) {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
 
-  .video-info-section {
-    padding: 25px;
-  }
+:deep(.video-js .vjs-big-play-button) {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+}
 
-  .video-title {
-    font-size: 24px;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 15px;
-  }
+.video-info-section {
+  padding: 25px;
+}
 
-  .video-meta {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    color: #666;
-    font-size: 14px;
-    margin-bottom: 25px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #e0e0e0;
-  }
+.video-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 15px;
+}
 
-  .video-code {
-    background: #f5f5f5;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-weight: 500;
-  }
+.video-meta {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
 
-  .magnet-section {
-    background: white;
-    border-radius: 12px;
-    padding: 25px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  }
+.video-code {
+  background: #f5f5f5;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 500;
+}
 
-  .section-title {
-    font-size: 20px;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
+.magnet-section {
+  background: white;
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
 
-  .magnet-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
+.section-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
-  .magnet-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 15px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s;
-    border: 2px solid transparent;
+.magnet-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 
-    &:hover {
-      background: #e9ecef;
-      border-color: #667eea;
-      transform: translateX(5px);
-    }
-  }
+.magnet-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: 2px solid transparent;
 
-  .magnet-icon {
-    flex-shrink: 0;
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: 600;
-  }
+&
+:hover {
+  background: #e9ecef;
+  border-color: #667eea;
+  transform: translateX(5px);
+}
 
-  .magnet-text {
-    flex: 1;
-    font-family: monospace;
-    font-size: 13px;
-    color: #333;
-    word-break: break-all;
-    line-height: 1.5;
-  }
+}
 
-  .copy-icon {
-    flex-shrink: 0;
-    width: 36px;
-    height: 36px;
-    background: #667eea;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 18px;
-    transition: background 0.3s;
-  }
+.magnet-icon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+}
 
-  .magnet-item:hover .copy-icon {
-    background: #5568d3;
-  }
+.magnet-text {
+  flex: 1;
+  font-family: monospace;
+  font-size: 13px;
+  color: #333;
+  word-break: break-all;
+  line-height: 1.5;
+}
 
-  .empty-message {
-    text-align: center;
-    color: #999;
-    padding: 40px;
-    font-size: 16px;
-  }
+.copy-icon {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  background: #667eea;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 18px;
+  transition: background 0.3s;
+}
 
-  @media (max-width: 768px) {
-    padding: 12px;
-  }
+.magnet-item:hover .copy-icon {
+  background: #5568d3;
+}
+
+.empty-message {
+  text-align: center;
+  color: #999;
+  padding: 40px;
+  font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  padding:
+
+12px
+
+;
+}
+
 }
 </style>
 
