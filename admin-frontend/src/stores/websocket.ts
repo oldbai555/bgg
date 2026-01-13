@@ -3,6 +3,7 @@ import {useUserStore} from './user';
 import {usePermission} from '@/hooks/usePermission';
 import {ElMessage} from 'element-plus';
 import {getWebSocketBaseURL} from '@/composables/useAppConfig';
+import {taskRecent, type TaskItem} from '@/api/generated/admin';
 
 // WebSocket 消息类型
 export enum MessageType {
@@ -53,6 +54,10 @@ interface WebSocketState {
   ws: WebSocket | null;
   unreadMessages: UnreadMessage[];
   lastMessage: WSMessage | null;
+  // 最近任务列表（用于浮动任务球）
+  recentTasks: TaskItem[];
+  recentTasksLoading: boolean;
+  recentTasksUpdateTimer: number | null;
 }
 
 const RECONNECT_DELAY_BASE = 3000; // 基础重连延迟（毫秒）
@@ -67,7 +72,10 @@ export const useWebSocketStore = defineStore('websocket', {
     reconnectDelay: RECONNECT_DELAY_BASE,
     ws: null,
     unreadMessages: [],
-    lastMessage: null
+    lastMessage: null,
+    recentTasks: [],
+    recentTasksLoading: false,
+    recentTasksUpdateTimer: null
   }),
 
   getters: {
@@ -292,8 +300,9 @@ export const useWebSocketStore = defineStore('websocket', {
 
     // 处理任务进度
     handleTaskProgress(data: WSMessage) {
-      // 可以在这里处理任务进度更新
       console.log('任务进度更新:', data);
+      // 刷新最近任务列表（防抖）
+      this.scheduleRefreshRecentTasks();
       // 如果需要，也可以添加到未读消息
       if (data.taskName) {
         this.addUnreadMessage({
@@ -309,6 +318,11 @@ export const useWebSocketStore = defineStore('websocket', {
 
     // 处理通知消息
     handleNotification(data: WSMessage) {
+      // 如果是任务相关通知（包含 taskId），交给任务通知处理
+      if (data.taskId) {
+        this.handleTaskNotification(data);
+        return;
+      }
       const level = data.level || 'info';
       ElMessage[level](data.content || data.title || '新通知');
 
@@ -355,6 +369,50 @@ export const useWebSocketStore = defineStore('websocket', {
     // 清除已读消息
     clearReadMessages() {
       this.unreadMessages = this.unreadMessages.filter((m) => !m.read);
+    },
+
+    // 任务通知处理（用于浮动任务球）
+    handleTaskNotification(data: WSMessage) {
+      const level = data.level || 'info';
+      // 刷新最近任务列表（防抖）
+      this.scheduleRefreshRecentTasks();
+
+      // 显示任务相关通知
+      ElMessage[level](data.content || data.title || '任务状态已更新');
+
+      // 记录到未读消息列表
+      this.addUnreadMessage({
+        id: `task_notify_${data.taskId || Date.now()}`,
+        type: MessageType.NOTIFICATION,
+        title: data.title || '任务通知',
+        content: data.content || '',
+        timestamp: Date.now(),
+        read: false
+      });
+    },
+
+    // 调用后端接口刷新最近任务列表（带防抖）
+    scheduleRefreshRecentTasks() {
+      if (this.recentTasksUpdateTimer) {
+        clearTimeout(this.recentTasksUpdateTimer);
+      }
+      this.recentTasksUpdateTimer = window.setTimeout(() => {
+        this.refreshRecentTasks().catch((err) => {
+          console.error('刷新最近任务列表失败:', err);
+        });
+      }, 500);
+    },
+
+    async refreshRecentTasks() {
+      const userStore = useUserStore();
+      if (!userStore.token) return;
+      this.recentTasksLoading = true;
+      try {
+        const resp = await taskRecent({});
+        this.recentTasks = resp.list || [];
+      } finally {
+        this.recentTasksLoading = false;
+      }
     },
 
     // 发送消息（如果需要）

@@ -92,11 +92,10 @@
 <script setup lang="ts">
 import {reactive, ref, onMounted, computed} from 'vue'
 import {ElMessage} from 'element-plus'
-import {operationLogList} from '@/api/generated/admin'
-import type {OperationLogItem, OperationLogListReq} from '@/api/generated/admin'
+import {operationLogList, operationLogExport} from '@/api/generated/admin'
+import type {OperationLogItem, OperationLogListReq, OperationLogExportReq} from '@/api/generated/admin'
 import D2Table from '@/components/common/D2Table.vue'
 import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table'
-import request from '@/utils/request'
 import {useDictOptions} from '@/composables/useDictOptions'
 
 const query = reactive<OperationLogListReq>({
@@ -220,47 +219,20 @@ const handleSizeChange = (size: number) => {
 
 const handleExport = async () => {
   try {
-    const params: Record<string, unknown> = {}
-    if (query.userId) {
-params.userId = query.userId
-}
-    if (query.username) {
-params.username = query.username
-}
-    if (query.operationType) {
-params.operationType = query.operationType
-}
-    if (query.operationObject) {
-params.operationObject = query.operationObject
-}
-    if (query.method) {
-params.method = query.method
-}
-    if (query.startTime) {
-params.startTime = query.startTime
-}
-    if (query.endTime) {
-params.endTime = query.endTime
-}
+    const req: OperationLogExportReq = {
+      userId: query.userId || 0,
+      username: query.username || '',
+      operationType: query.operationType || '',
+      operationObject: query.operationObject || '',
+      method: query.method || '',
+      startTime: query.startTime || '',
+      endTime: query.endTime || ''
+    }
 
-    // 使用 request 下载文件，设置 responseType 为 blob
-    const resp = await request.get('/v1/operation-logs/export', {
-      params,
-      responseType: 'blob'
-    })
+    // 调用后端导出接口，创建异步导出任务
+    await operationLogExport(req)
 
-    // 创建 Blob URL（resp 已经是 Blob 类型）
-    const blob = resp instanceof Blob ? resp : new Blob([String(resp)], {type: 'text/csv;charset=utf-8'})
-    const url = window.URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `操作日志_${new Date().toISOString().slice(0, 10)}.csv`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    // 释放 Blob URL
-    window.URL.revokeObjectURL(url)
-    ElMessage.success('导出成功')
+    ElMessage.success('已创建异步导出任务，请在右下角任务列表查看进度')
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : '导出失败'
     ElMessage.error(message)

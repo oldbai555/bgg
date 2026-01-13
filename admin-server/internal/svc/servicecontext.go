@@ -3,20 +3,24 @@ package svc
 import (
 	"os"
 	"path/filepath"
-
-	"postapocgame/admin-server/internal/config"
-	"postapocgame/admin-server/internal/consts"
-	"postapocgame/admin-server/internal/hub"
-	"postapocgame/admin-server/internal/repository"
+	"postapocgame/admin-server/internal/task"
+	"postapocgame/admin-server/internal/task/executors"
 
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/rest"
+	"postapocgame/admin-server/internal/config"
+	"postapocgame/admin-server/internal/consts"
+	"postapocgame/admin-server/internal/hub"
+	"postapocgame/admin-server/internal/interfaces"
+	"postapocgame/admin-server/internal/repository"
 )
 
 type ServiceContext struct {
 	Config                       config.Config
 	Repository                   *repository.Repository
 	ChatHub                      *hub.ChatHub
+	TaskExecutors                map[int]interfaces.TaskExecutor // 任务执行器映射
+	TaskScheduler                *task.TaskScheduler             // 任务调度器
 	AuthMiddleware               rest.Middleware
 	ApiEnabledMiddleware         rest.Middleware
 	PermissionMiddleware         rest.Middleware
@@ -47,10 +51,28 @@ func NewServiceContext(c config.Config) (*ServiceContext, error) {
 	chatHub := hub.NewChatHub()
 	go chatHub.Run()
 
-	return &ServiceContext{
-		Config:     c,
-		Repository: repo,
-		ChatHub:    chatHub,
+	// 初始化任务执行器映射
+	taskExecutors := make(map[int]interfaces.TaskExecutor)
+	// 注册Excel导出执行器（task_type=1）
+	taskExecutors[1] = executors.NewExcelExportExecutor(repo)
+
+	// 创建ServiceContext（先不包含TaskScheduler，避免循环依赖）
+	svcCtx := &ServiceContext{
+		Config:        c,
+		Repository:    repo,
+		ChatHub:       chatHub,
+		TaskExecutors: taskExecutors,
 		// AuthMiddleware 和 PermissionMiddleware 需要在外部初始化，避免循环依赖
-	}, nil
+	}
+
+	// 初始化任务调度器（传入Repository和ChatHub，避免循环依赖）
+	taskScheduler := task.NewTaskScheduler(repo, chatHub, taskExecutors)
+
+	// 启动任务调度器
+	taskScheduler.Start()
+
+	// 将TaskScheduler赋值给ServiceContext
+	svcCtx.TaskScheduler = taskScheduler
+
+	return svcCtx, nil
 }

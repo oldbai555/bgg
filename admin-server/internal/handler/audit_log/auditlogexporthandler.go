@@ -21,9 +21,11 @@ func AuditLogExportHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		}
 
 		l := audit_log.NewAuditLogExportLogic(r.Context(), svcCtx)
-		if err := l.AuditLogExport(w, r, &req); err != nil {
+		resp, err := l.AuditLogExport(&req)
+		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
+		} else {
+			httpx.OkJsonCtx(r.Context(), w, resp)
 		}
-		// 导出逻辑直接写入响应流，不需要返回 JSON
 	}
 }

@@ -38,6 +38,8 @@ import (
 	role_permission "postapocgame/admin-server/internal/handler/role_permission"
 	sdk "postapocgame/admin-server/internal/handler/sdk"
 	sdk_public "postapocgame/admin-server/internal/handler/sdk_public"
+	task "postapocgame/admin-server/internal/handler/task"
+	task_public "postapocgame/admin-server/internal/handler/task_public"
 	user "postapocgame/admin-server/internal/handler/user"
 	user_role "postapocgame/admin-server/internal/handler/user_role"
 	video "postapocgame/admin-server/internal/handler/video"
@@ -360,13 +362,16 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	)
 
 	server.AddRoutes(
-		[]rest.Route{
-			{
-				Method:  http.MethodGet,
-				Path:    "/dict",
-				Handler: dict.DictGetHandler(serverCtx),
-			},
-		},
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.AuthMiddleware, serverCtx.ApiEnabledMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/dict",
+					Handler: dict.DictGetHandler(serverCtx),
+				},
+			}...,
+		),
 		rest.WithPrefix("/api/v1"),
 	)
 
@@ -520,18 +525,16 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	)
 
 	server.AddRoutes(
-		[]rest.Route{
-			{
-				Method:  http.MethodGet,
-				Path:    "/m3u8/proxy",
-				Handler: m3u8.M3u8ProxyHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodOptions,
-				Path:    "/m3u8/proxy",
-				Handler: m3u8.M3u8ProxyOptionsHandler(serverCtx),
-			},
-		},
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.ApiEnabledMiddleware, serverCtx.PublicOperationLogMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/m3u8/proxy",
+					Handler: m3u8.M3u8ProxyHandler(serverCtx),
+				},
+			}...,
+		),
 		rest.WithPrefix("/api/v1"),
 	)
 
@@ -692,6 +695,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodGet,
 					Path:    "/performance-logs",
 					Handler: performance_log.PerformanceLogListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/performance-logs/export",
+					Handler: performance_log.PerformanceLogExportHandler(serverCtx),
 				},
 			}...,
 		),
@@ -946,6 +954,44 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			[]rest.Route{
 				{
 					Method:  http.MethodGet,
+					Path:    "/tasks",
+					Handler: task.TaskListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/tasks/cancel",
+					Handler: task.TaskCancelHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/tasks/detail",
+					Handler: task.TaskDetailHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.PerformanceMiddleware, serverCtx.RateLimitMiddleware, serverCtx.AuthMiddleware, serverCtx.OperationLogMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/tasks/recent",
+					Handler: task_public.TaskRecentHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.PerformanceMiddleware, serverCtx.RateLimitMiddleware, serverCtx.AuthMiddleware, serverCtx.PermissionMiddleware, serverCtx.OperationLogMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
 					Path:    "/users",
 					Handler: user.UserListHandler(serverCtx),
 				},
@@ -1011,20 +1057,6 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodDelete,
 					Path:    "/videos",
 					Handler: video.VideoDeleteHandler(serverCtx),
-				},
-			}...,
-		),
-		rest.WithPrefix("/api/v1"),
-	)
-
-	server.AddRoutes(
-		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.AuthMiddleware, serverCtx.ApiEnabledMiddleware},
-			[]rest.Route{
-				{
-					Method:  http.MethodGet,
-					Path:    "/videos/proxy",
-					Handler: video.VideoProxyHandler(serverCtx),
 				},
 			}...,
 		),

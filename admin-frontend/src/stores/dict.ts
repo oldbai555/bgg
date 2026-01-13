@@ -31,7 +31,11 @@ export const REQUIRED_DICT_CODES = [
   'notification_source_type', // 消息来源类型
   'storage_base_url', // 存储baseURL（配置）
   'websocket_base_url', // WebSocket baseURL（配置）
-  'sdk_http_method' // SDK 接口管理-HTTP方法
+  'sdk_http_method', // SDK 接口管理-HTTP方法
+  'task_type', // 任务类型
+  'task_execution_type', // 任务执行类型
+  'task_status', // 任务状态
+  'task_config' // 任务配置（如最近任务数量）
 ] as const;
 
 export const useDictStore = defineStore('dict', {

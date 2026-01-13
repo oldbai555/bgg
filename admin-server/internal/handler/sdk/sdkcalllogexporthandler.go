@@ -21,11 +21,11 @@ func SdkCallLogExportHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		}
 
 		l := sdk.NewSdkCallLogExportLogic(r.Context(), svcCtx)
-		err := l.SdkCallLogExport(w, r, &req)
+		resp, err := l.SdkCallLogExport(&req)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 			return
 		}
-		// 导出功能直接写入响应流，不需要返回 JSON
+		httpx.OkJsonCtx(r.Context(), w, resp)
 	}
 }

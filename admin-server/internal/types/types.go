@@ -63,7 +63,8 @@ type AuditLogExportReq struct {
 }
 
 type AuditLogExportResp struct {
-	Url string `json:"url"`
+	Code    int64  `json:"code"`
+	Message string `json:"message"`
 }
 
 type AuditLogItem struct {
@@ -584,7 +585,8 @@ type LoginLogExportReq struct {
 }
 
 type LoginLogExportResp struct {
-	Url string `json:"url"`
+	Code    int64  `json:"code"`
+	Message string `json:"message"`
 }
 
 type LoginLogItem struct {
@@ -861,6 +863,20 @@ type OperationLogListResp struct {
 type PasswordChangeReq struct {
 	OldPassword string `json:"oldPassword"`
 	NewPassword string `json:"newPassword"`
+}
+
+type PerformanceLogExportReq struct {
+	Method     string `json:"method,optional" form:"method,optional"`
+	Path       string `json:"path,optional" form:"path,optional"`
+	IsSlow     int64  `json:"isSlow,optional" form:"isSlow,optional"`
+	StatusCode int64  `json:"statusCode,optional" form:"statusCode,optional"`
+	StartTime  string `json:"startTime,optional" form:"startTime,optional"`
+	EndTime    string `json:"endTime,optional" form:"endTime,optional"`
+}
+
+type PerformanceLogExportResp struct {
+	Code    int64  `json:"code"`
+	Message string `json:"message"`
 }
 
 type PerformanceLogItem struct {
@@ -1252,6 +1268,72 @@ type SdkInterfaceUpdateReq struct {
 	Remark           string `json:"remark,optional"`
 }
 
+type TaskCancelReq struct {
+	Id uint64 `json:"id"`
+}
+
+type TaskDetailReq struct {
+	Id uint64 `json:"id" form:"id"`
+}
+
+type TaskDetailResp struct {
+	Id            uint64 `json:"id"`
+	Name          string `json:"name"`
+	TaskType      int64  `json:"type"`
+	ExecutionType int64  `json:"executionType"`
+	Status        int64  `json:"status"`
+	Params        string `json:"params"`       // 参数JSON
+	Result        string `json:"result"`       // 结果JSON
+	ErrorMessage  string `json:"errorMessage"` // 错误信息
+	UserId        uint64 `json:"userId"`
+	ScheduledAt   int64  `json:"scheduledAt"`
+	StartedAt     int64  `json:"startedAt"`
+	FinishedAt    int64  `json:"finishedAt"`
+	CreatedAt     int64  `json:"createdAt"`
+	UpdatedAt     int64  `json:"updatedAt"`
+}
+
+type TaskItem struct {
+	Id            uint64 `json:"id"`
+	Name          string `json:"name"`
+	TaskType      int64  `json:"type"`          // 任务类型（字典：task_type）
+	ExecutionType int64  `json:"executionType"` // 执行类型（字典：task_execution_type）
+	Status        int64  `json:"status"`        // 任务状态（字典：task_status）
+	UserId        uint64 `json:"userId"`        // 创建用户ID
+	ScheduledAt   int64  `json:"scheduledAt"`   // 计划执行时间
+	StartedAt     int64  `json:"startedAt"`     // 开始执行时间
+	FinishedAt    int64  `json:"finishedAt"`    // 完成时间
+	CreatedAt     int64  `json:"createdAt"`     // 创建时间
+	Params        string `json:"params"`        // 任务参数JSON
+	Result        string `json:"result"`        // 任务结果JSON
+	ErrorMessage  string `json:"errorMessage"`  // 错误信息
+}
+
+type TaskListReq struct {
+	Page          int64  `json:"page,optional" form:"page,optional"`
+	PageSize      int64  `json:"pageSize,optional" form:"pageSize,optional"`
+	Name          string `json:"name,optional" form:"name,optional"`
+	TaskType      int64  `json:"type,optional" form:"type,optional"`
+	ExecutionType int64  `json:"executionType,optional" form:"executionType,optional"`
+	Status        int64  `json:"status,optional" form:"status,optional"`
+	UserId        uint64 `json:"userId,optional" form:"userId,optional"`
+	StartTime     int64  `json:"startTime,optional" form:"startTime,optional"`
+	EndTime       int64  `json:"endTime,optional" form:"endTime,optional"`
+}
+
+type TaskListResp struct {
+	Total int64      `json:"total"`
+	List  []TaskItem `json:"list"`
+}
+
+type TaskRecentReq struct {
+	Limit int64 `json:"limit,optional" form:"limit,optional"` // 最近N条任务记录（不传则使用字典配置）
+}
+
+type TaskRecentResp struct {
+	List []TaskItem `json:"list"`
+}
+
 type TokenPair struct {
 	AccessToken  string `json:"accessToken"`
 	RefreshToken string `json:"refreshToken"`
@@ -1371,10 +1453,6 @@ type VideoListReq struct {
 type VideoListResp struct {
 	Total int64       `json:"total"`
 	List  []VideoItem `json:"list"`
-}
-
-type VideoProxyReq struct {
-	Url string `json:"url" form:"url"` // 要代理的视频URL
 }
 
 type VideoUpdateReq struct {

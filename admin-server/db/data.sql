@@ -1604,30 +1604,6 @@ ON DUPLICATE KEY UPDATE
   `updated_at`=UNIX_TIMESTAMP(),
   `deleted_at`=0;
 
--- 8.6 视频代理地址字典
-INSERT INTO `admin_dict_type` (`name`, `code`, `description`, `status`, `created_at`, `updated_at`, `deleted_at`)
-VALUES
-  ('视频代理地址', 'video_proxy_url', '视频代理服务器地址配置，用于代理m3u8等视频流', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
-ON DUPLICATE KEY UPDATE
-  `name`=VALUES(`name`),
-  `description`=VALUES(`description`),
-  `updated_at`=UNIX_TIMESTAMP(),
-  `deleted_at`=0;
-
-SET @dict_type_id = (SELECT `id` FROM `admin_dict_type` WHERE `code` = 'video_proxy_url' AND `deleted_at` = 0 LIMIT 1);
-
-INSERT INTO `admin_dict_item` (`type_id`, `label`, `value`, `sort`, `status`, `remark`, `created_at`, `updated_at`, `deleted_at`)
-VALUES
-  (@dict_type_id, '默认代理', 'http://localhost:8888/api/v1/videos/proxy', 1, 1, '默认视频代理服务器地址', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
-ON DUPLICATE KEY UPDATE
-  `label`=VALUES(`label`),
-  `value`=VALUES(`value`),
-  `sort`=VALUES(`sort`),
-  `status`=VALUES(`status`),
-  `remark`=VALUES(`remark`),
-  `updated_at`=UNIX_TIMESTAMP(),
-  `deleted_at`=0;
-
 -- 8.7 视频来源类型字典
 INSERT INTO `admin_dict_type` (`name`, `code`, `description`, `status`, `created_at`, `updated_at`, `deleted_at`)
 VALUES
@@ -1642,7 +1618,7 @@ SET @dict_type_id = (SELECT `id` FROM `admin_dict_type` WHERE `code` = 'video_so
 
 INSERT INTO `admin_dict_item` (`type_id`, `label`, `value`, `sort`, `status`, `remark`, `created_at`, `updated_at`, `deleted_at`)
 VALUES
-  (@dict_type_id, '手动添加', '1', 1, 1, '手动添加的视频', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
+  (@dict_type_id, '手动添加', '1', 1, 1, '手动添加的视频', UNIX_TIMESTAMP(), UNIXd_TIMESTAMP(), 0),
   (@dict_type_id, '采集', '2', 2, 1, '通过采集接口添加的视频', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
 ON DUPLICATE KEY UPDATE
   `label`=VALUES(`label`),
@@ -2022,7 +1998,6 @@ VALUES
   ('视频列表管理新增', 'POST', '/api/v1/videos', '新增视频列表管理', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   ('视频列表管理编辑', 'PUT', '/api/v1/videos', '编辑视频列表管理', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   ('视频列表管理删除', 'DELETE', '/api/v1/videos', '删除视频列表管理', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
-  ('视频播放器', 'GET', '/api/v1/videos/proxy', '代理m3u8等视频流请求', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   ('视频采集', 'POST', '/api/v1/videos/collect', '采集视频接口（仅记录操作日志）', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   ('m3u8代理', 'GET', '/api/v1/m3u8/proxy', 'm3u8代理服务（无权限控制）', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   ('m3u8代理OPTIONS', 'OPTIONS', '/api/v1/m3u8/proxy', 'm3u8代理CORS预检请求（无权限控制）', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),

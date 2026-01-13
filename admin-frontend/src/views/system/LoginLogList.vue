@@ -81,11 +81,14 @@
 <script setup lang="ts">
 import {reactive, ref, onMounted, computed} from 'vue'
 import {ElMessage} from 'element-plus'
-import {loginLogList} from '@/api/generated/admin'
-import type {LoginLogItem, LoginLogListReq} from '@/api/generated/admin'
+import {loginLogList, loginLogExport} from '@/api/generated/admin'
+import type {
+  LoginLogItem,
+  LoginLogListReq,
+  LoginLogExportReq
+} from '@/api/generated/admin'
 import D2Table from '@/components/common/D2Table.vue'
 import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table'
-import request from '@/utils/request'
 import {useDictOptions} from '@/composables/useDictOptions'
 
 const query = reactive<LoginLogListReq>({
@@ -186,41 +189,15 @@ const handleSizeChange = (size: number) => {
 
 const handleExport = async () => {
   try {
-    const params: Record<string, unknown> = {}
-    if (query.userId) {
-params.userId = query.userId
-}
-    if (query.username) {
-params.username = query.username
-}
-    if (query.status !== undefined) {
-params.status = query.status
-}
-    if (query.startTime) {
-params.startTime = query.startTime
-}
-    if (query.endTime) {
-params.endTime = query.endTime
-}
-
-    // 使用 request 下载文件，设置 responseType 为 blob
-    const resp: Blob | unknown = await request.get('/v1/login-logs/export', {
-      params,
-      responseType: 'blob'
-    })
-
-    // 创建 Blob URL（resp 已经是 Blob 类型）
-    const blob = resp instanceof Blob ? resp : new Blob([resp], {type: 'text/csv;charset=utf-8'})
-    const url = window.URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `登录日志_${new Date().toISOString().slice(0, 10)}.csv`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    // 释放 Blob URL
-    window.URL.revokeObjectURL(url)
-    ElMessage.success('导出成功')
+    const req: LoginLogExportReq = {
+      userId: query.userId,
+      username: query.username || undefined,
+      status: query.status,
+      startTime: query.startTime || undefined,
+      endTime: query.endTime || undefined
+    }
+    await loginLogExport(req)
+    ElMessage.success('已创建异步导出任务，请在右下角任务列表查看进度')
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : '导出失败'
     ElMessage.error(message)

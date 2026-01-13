@@ -20,14 +20,18 @@ const (
 	CacheKeyDictItemsByType = "cache:dict:items:type:"  // 字典项列表（按 type_id）
 	CacheKeyConfigList      = "cache:config:list"       // 配置列表
 	CacheKeyConfigKey       = "cache:config:key:"       // 单个配置（按 key）
+	CacheKeyM3u8Proxy       = "cache:m3u8:proxy:"       // m3u8 代理内容（重写后的 m3u8）
+	CacheKeyProxyResource   = "cache:proxy:resource:"   // 通用代理资源（m3u8/ts/其他）
 
 	// 缓存过期时间（秒）
-	CacheExpireUserPermissions = 30 * 60 // 30分钟
-	CacheExpireUserMenuTree    = 30 * 60 // 30分钟
-	CacheExpireMenuTree        = 30 * 60 // 30分钟
-	CacheExpireDictItems       = 60 * 60 // 1小时
-	CacheExpireConfigList      = 10 * 60 // 10分钟
-	CacheExpireConfigKey       = 10 * 60 // 10分钟
+	CacheExpireUserPermissions = 30 * 60          // 30分钟
+	CacheExpireUserMenuTree    = 30 * 60          // 30分钟
+	CacheExpireMenuTree        = 30 * 60          // 30分钟
+	CacheExpireDictItems       = 60 * 60          // 1小时
+	CacheExpireConfigList      = 10 * 60          // 10分钟
+	CacheExpireConfigKey       = 10 * 60          // 10分钟
+	CacheExpireM3u8Proxy       = 7 * 24 * 60 * 60 // 7天（m3u8 文件缓存时间）
+	CacheExpireProxyResource   = 7 * 24 * 60 * 60 // 7天（所有代理资源统一缓存时间，减少重复请求流量）
 
 	// 缓存过期时间随机范围（秒），用于防止缓存雪崩
 	CacheExpireRandomRange = 300 // 5分钟

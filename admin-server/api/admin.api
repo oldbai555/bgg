@@ -907,8 +907,9 @@ service admin-api {
 }
 
 @server (
-	group:  dict
-	prefix: /api/v1
+	group:      dict
+	prefix:     /api/v1
+	middleware: AuthMiddleware,ApiEnabledMiddleware
 )
 service admin-api {
 	@handler DictGet
@@ -1059,10 +1060,6 @@ type (
 	VideoDeleteReq {
 		id uint64 `json:"id"`
 	}
-	// 视频代理（直接返回流，不返回JSON）
-	VideoProxyReq {
-		url string `json:"url" form:"url"` // 要代理的视频URL
-	}
 	// 视频采集相关
 	VideoCollectReq {
 		uuid      string   `json:"uuid"` // 唯一标识
@@ -1178,28 +1175,15 @@ service admin-api {
 	delete /videos (VideoDeleteReq)
 }
 
+// m3u8代理服务
 @server (
-	group:      video
+	group:      m3u8
 	prefix:     /api/v1
-	middleware: AuthMiddleware,ApiEnabledMiddleware
-)
-service admin-api {
-	@handler VideoProxy
-	get /videos/proxy (VideoProxyReq)
-}
-
-// m3u8代理服务（无中间件，需要CORS处理）
-@server (
-	group:  m3u8
-	prefix: /api/v1
+	middleware: ApiEnabledMiddleware,PublicOperationLogMiddleware
 )
 service admin-api {
 	@handler M3u8Proxy
 	get /m3u8/proxy (M3u8ProxyReq)
-
-	// 支持OPTIONS请求（CORS预检）
-	@handler M3u8ProxyOptions
-	options /m3u8/proxy
 }
 
 // 视频采集服务
@@ -1500,9 +1484,10 @@ type (
 		startTime string `json:"startTime,optional" form:"startTime,optional"`
 		endTime   string `json:"endTime,optional" form:"endTime,optional"`
 	}
-	// 登录日志导出响应（实际在 Handler 中直接返回文件流，此类型仅用于 API 定义）
+	// 登录日志导出响应（异步导出任务创建结果）
 	LoginLogExportResp {
-		url string `json:"url"`
+		code    int64  `json:"code"`
+		message string `json:"message"`
 	}
 	// 登录日志统计响应
 	LoginLogStatsResp {
@@ -1543,6 +1528,19 @@ type (
 	PerformanceLogListResp {
 		total int64                `json:"total"`
 		list  []PerformanceLogItem `json:"list"`
+	}
+	// 性能日志导出
+	PerformanceLogExportReq {
+		method     string `json:"method,optional" form:"method,optional"`
+		path       string `json:"path,optional" form:"path,optional"`
+		isSlow     int64  `json:"isSlow,optional" form:"isSlow,optional"`
+		statusCode int64  `json:"statusCode,optional" form:"statusCode,optional"`
+		startTime  string `json:"startTime,optional" form:"startTime,optional"`
+		endTime    string `json:"endTime,optional" form:"endTime,optional"`
+	}
+	PerformanceLogExportResp {
+		code    int64  `json:"code"`
+		message string `json:"message"`
 	}
 )
 
@@ -1614,9 +1612,10 @@ type (
 		startTime   string `json:"startTime,optional" form:"startTime,optional"`
 		endTime     string `json:"endTime,optional" form:"endTime,optional"`
 	}
-	// 审计日志导出响应（实际在 Handler 中直接返回文件流，此类型仅用于 API 定义）
+	// 审计日志导出响应（异步导出任务创建结果）
 	AuditLogExportResp {
-		url string `json:"url"`
+		code    int64  `json:"code"`
+		message string `json:"message"`
 	}
 )
 
@@ -1644,6 +1643,9 @@ service admin-api {
 service admin-api {
 	@handler PerformanceLogList
 	get /performance-logs (PerformanceLogListReq) returns (PerformanceLogListResp)
+
+	@handler PerformanceLogExport
+	get /performance-logs/export (PerformanceLogExportReq) returns (PerformanceLogExportResp)
 }
 
 type (
@@ -1919,6 +1921,65 @@ type (
 		url    string `json:"url"`
 		name   string `json:"name"`
 	}
+	// 异步任务模块
+	TaskItem {
+		id            uint64 `json:"id"`
+		name          string `json:"name"`
+		taskType      int64  `json:"type"` // 任务类型（字典：task_type）
+		executionType int64  `json:"executionType"` // 执行类型（字典：task_execution_type）
+		status        int64  `json:"status"` // 任务状态（字典：task_status）
+		userId        uint64 `json:"userId"` // 创建用户ID
+		scheduledAt   int64  `json:"scheduledAt"` // 计划执行时间
+		startedAt     int64  `json:"startedAt"` // 开始执行时间
+		finishedAt    int64  `json:"finishedAt"` // 完成时间
+		createdAt     int64  `json:"createdAt"` // 创建时间
+		params        string `json:"params"` // 任务参数JSON
+		result        string `json:"result"` // 任务结果JSON
+		errorMessage  string `json:"errorMessage"` // 错误信息
+	}
+	TaskListReq {
+		page          int64  `json:"page,optional" form:"page,optional"`
+		pageSize      int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		name          string `json:"name,optional" form:"name,optional"`
+		taskType      int64  `json:"type,optional" form:"type,optional"`
+		executionType int64  `json:"executionType,optional" form:"executionType,optional"`
+		status        int64  `json:"status,optional" form:"status,optional"`
+		userId        uint64 `json:"userId,optional" form:"userId,optional"`
+		startTime     int64  `json:"startTime,optional" form:"startTime,optional"`
+		endTime       int64  `json:"endTime,optional" form:"endTime,optional"`
+	}
+	TaskListResp {
+		total int64      `json:"total"`
+		list  []TaskItem `json:"list"`
+	}
+	TaskDetailReq {
+		id uint64 `json:"id" form:"id"`
+	}
+	TaskDetailResp {
+		id            uint64 `json:"id"`
+		name          string `json:"name"`
+		taskType      int64  `json:"type"`
+		executionType int64  `json:"executionType"`
+		status        int64  `json:"status"`
+		params        string `json:"params"` // 参数JSON
+		result        string `json:"result"` // 结果JSON
+		errorMessage  string `json:"errorMessage"` // 错误信息
+		userId        uint64 `json:"userId"`
+		scheduledAt   int64  `json:"scheduledAt"`
+		startedAt     int64  `json:"startedAt"`
+		finishedAt    int64  `json:"finishedAt"`
+		createdAt     int64  `json:"createdAt"`
+		updatedAt     int64  `json:"updatedAt"`
+	}
+	TaskCancelReq {
+		id uint64 `json:"id"`
+	}
+	TaskRecentReq {
+		limit int64 `json:"limit,optional" form:"limit,optional"` // 最近N条任务记录（不传则使用字典配置）
+	}
+	TaskRecentResp {
+		list []TaskItem `json:"list"`
+	}
 )
 
 @server (
@@ -1966,6 +2027,36 @@ service admin-api {
 
 	@handler SdkCallLogExport
 	get /sdk/call/log/export (SdkCallLogExportReq)
+}
+
+@server (
+	group:      task
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	// 任务列表
+	@handler TaskList
+	get /tasks (TaskListReq) returns (TaskListResp)
+
+	// 任务详情
+	@handler TaskDetail
+	get /tasks/detail (TaskDetailReq) returns (TaskDetailResp)
+
+	// 取消任务
+	@handler TaskCancel
+	post /tasks/cancel (TaskCancelReq) returns (Response)
+}
+
+// 最近任务（给前端浮动球使用，登录即可访问）
+@server (
+	group:      task_public
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler TaskRecent
+	get /tasks/recent (TaskRecentReq) returns (TaskRecentResp)
 }
 
 // SDK 对外接口组（走 SDK 鉴权/限频/调用记录）

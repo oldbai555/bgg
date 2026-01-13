@@ -30,13 +30,7 @@
 
       <!-- 播放器区域 -->
       <div v-show="showPlayer" class="player-container">
-        <video
-          ref="videoPlayerRef"
-          class="video-js vjs-default-skin vjs-big-play-centered"
-          controls
-          preload="auto"
-          :poster="videoCover"
-        ></video>
+        <div ref="dplayerRef" class="dplayer-container"></div>
       </div>
 
       <!-- 提示信息 -->
@@ -48,13 +42,11 @@
 </template>
 
 <script setup lang="ts">
-import {ref, onMounted, onBeforeUnmount, watch} from 'vue'
+import {ref, onMounted, onBeforeUnmount, watch, nextTick} from 'vue'
 import {useRoute} from 'vue-router'
 import {ElMessage} from 'element-plus'
 import {VideoPlay, RefreshLeft} from '@element-plus/icons-vue'
-import videojs from 'video.js'
-import 'video.js/dist/video-js.css'
-import {publicDictGet} from '@/api/public'
+import DPlayer from 'dplayer'
 
 const route = useRoute()
 
@@ -62,23 +54,11 @@ const videoUrl = ref('')
 const videoCover = ref('')
 const showPlayer = ref(false)
 const loading = ref(false)
-const videoPlayerRef = ref<HTMLVideoElement | null>(null)
-let player: videojs.Player | null = null
-const videoProxyBaseUrl = ref('')
+const dplayerRef = ref<HTMLDivElement | null>(null)
+let player: DPlayer | null = null
 
-// 从路由参数获取视频URL & 加载视频代理基础地址
-onMounted(async () => {
-  // 先尝试加载字典中的视频代理地址
-  try {
-    const resp = await publicDictGet({code: 'video_proxy_url'})
-    const first = resp.items && resp.items.length > 0 ? resp.items[0] : undefined
-    videoProxyBaseUrl.value = first?.value || ''
-  } catch (err) {
-    console.error('加载视频代理地址失败:', err)
-    // 加载失败时使用后端默认路由兜底
-    videoProxyBaseUrl.value = '/api/v1/videos/proxy'
-  }
-
+// 从路由参数获取视频URL
+onMounted(() => {
   const urlParam = route.query.url as string
   if (urlParam) {
     videoUrl.value = decodeURIComponent(urlParam)
@@ -117,88 +97,27 @@ const handlePlay = async () => {
   try {
     // 销毁旧的播放器
     if (player) {
-      player.dispose()
+      player.destroy()
       player = null
     }
 
     // 等待DOM更新
-    await new Promise(resolve => setTimeout(resolve, 100))
+    await nextTick()
 
-    if (!videoPlayerRef.value) {
-      ElMessage.error('播放器初始化失败')
+    if (!dplayerRef.value) {
+      ElMessage.error('播放器容器初始化失败')
+      loading.value = false
       return
     }
 
-    // 初始化播放器
-    player = videojs(videoPlayerRef.value, {
-      autoplay: false,
-      controls: true,
-      preload: 'auto',
-      fluid: true,
-      responsive: true,
-      playbackRates: [0.5, 1, 1.25, 1.5, 2],
-      html5: {
-        vhs: {
-          overrideNative: true
-        },
-        nativeVideoTracks: false,
-        nativeAudioTracks: false,
-        nativeTextTracks: false
-      }
+    // 判断视频类型
+    const isM3u8 = url.includes('.m3u8')
+    
+    // 直接播放，失败就失败
+    initPlayer({
+      url: url,
+      type: isM3u8 ? 'hls' : 'auto'
     })
-
-    // 如果是m3u8格式，先尝试直接播放，失败则使用代理
-    if (url.includes('.m3u8')) {
-      try {
-        player.src({
-          src: url,
-          type: 'application/x-mpegURL'
-        })
-
-        // 监听错误事件
-        player.one('error', async () => {
-          const error = player?.error()
-          if (error && error.code === 4) {
-            // 媒体资源无法加载，尝试使用代理
-            ElMessage.info('直接播放失败，尝试使用代理播放...')
-            await tryProxyPlay(url)
-          } else {
-            ElMessage.error(`播放失败: ${error?.message || '未知错误'}`)
-            loading.value = false
-          }
-        })
-
-        // 监听加载成功
-        player.one('loadedmetadata', () => {
-          ElMessage.success('视频加载成功')
-          loading.value = false
-        })
-
-        // 设置超时
-        setTimeout(() => {
-          if (loading.value && player?.error()) {
-            // 如果还在加载且出现错误，尝试代理
-            tryProxyPlay(url)
-          }
-        }, 5000)
-
-      } catch {
-        // 直接播放失败，尝试代理
-        await tryProxyPlay(url)
-      }
-    } else {
-      // 非m3u8格式，直接播放
-      player.src(url)
-      player.one('loadedmetadata', () => {
-        ElMessage.success('视频加载成功')
-        loading.value = false
-      })
-      player.one('error', () => {
-        const error = player?.error()
-        ElMessage.error(`播放失败: ${error?.message || '未知错误'}`)
-        loading.value = false
-      })
-    }
 
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : '未知错误'
@@ -208,58 +127,95 @@ const handlePlay = async () => {
   }
 }
 
-// 尝试使用代理播放
-const tryProxyPlay = async (url: string) => {
+// 初始化 DPlayer
+const initPlayer = (options: {url: string; type: 'hls' | 'auto'}) => {
+  if (!dplayerRef.value) {
+    return
+  }
+
+  // 销毁旧播放器
+  if (player) {
+    try {
+      player.destroy()
+    } catch (e) {
+      console.warn('销毁旧播放器失败:', e)
+    }
+    player = null
+  }
+
   try {
-    // 构建代理URL，优先使用字典中的代理基础地址
-    const base = videoProxyBaseUrl.value || '/api/v1/videos/proxy'
-    const proxyUrl = `${base}?url=${encodeURIComponent(url)}`
-
-    // 设置播放源为代理URL
-    if (player) {
-      if (url.includes('.m3u8')) {
-        player.src({
-          src: proxyUrl,
-          type: 'application/x-mpegURL'
-        })
-      } else {
-        player.src(proxyUrl)
+    player = new DPlayer({
+      container: dplayerRef.value,
+      video: {
+        url: options.url,
+        type: options.type,
+        pic: videoCover.value || undefined
+      },
+      autoplay: false,
+      theme: '#b7daff',
+      loop: false,
+      lang: 'zh-cn',
+      screenshot: true,
+      hotkey: true,
+      preload: 'auto',
+      volume: 0.7,
+      mutex: true,
+      playbackSpeed: [0.5, 0.75, 1, 1.25, 1.5, 2],
+      hlsConfig: {
+        // HLS 配置，用于处理 CORS
+        xhrSetup: (xhr: XMLHttpRequest) => {
+          // 设置 CORS 相关请求头
+          xhr.withCredentials = false
+        }
       }
+    })
 
-      player.one('loadedmetadata', () => {
-        ElMessage.success('通过代理播放成功')
+    // 监听播放器事件（使用原生 video 元素的事件）
+    if (player.video) {
+      player.video.addEventListener('loadstart', () => {
+        loading.value = true
+      })
+
+      player.video.addEventListener('canplay', () => {
         loading.value = false
       })
 
-      player.one('error', () => {
-        const error = player?.error()
-        ElMessage.error(`代理播放也失败: ${error?.message || '视频链接无法播放'}`)
+      player.video.addEventListener('error', () => {
         loading.value = false
       })
     }
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : '未知错误'
-    ElMessage.error(`代理播放失败: ${message}`)
+  } catch (error) {
+    console.error('初始化播放器失败:', error)
+    ElMessage.error('播放器初始化失败')
     loading.value = false
+    throw error
   }
 }
 
 // 重置播放器
 const handleReset = () => {
   if (player) {
-    player.pause()
-    player.dispose()
+    try {
+      player.destroy()
+    } catch (e) {
+      console.warn('销毁播放器失败:', e)
+    }
     player = null
   }
   showPlayer.value = false
   videoUrl.value = ''
   videoCover.value = ''
+  loading.value = false
 }
 
 // 组件销毁时清理播放器
 onBeforeUnmount(() => {
   if (player) {
-    player.dispose()
+    try {
+      player.destroy()
+    } catch (e) {
+      console.warn('销毁播放器失败:', e)
+    }
     player = null
   }
 })
@@ -285,16 +241,10 @@ onBeforeUnmount(() => {
     width: 100%;
     min-height: 400px;
 
-    :deep(.video-js) {
+    .dplayer-container {
       width: 100%;
       height: 600px;
       max-width: 100%;
-
-      .vjs-big-play-button {
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-      }
     }
   }
 
@@ -306,4 +256,3 @@ onBeforeUnmount(() => {
   }
 }
 </style>
-

@@ -6,6 +6,7 @@ package public
 import (
 	"context"
 
+	"postapocgame/admin-server/internal/logic/dict"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 
@@ -26,8 +27,9 @@ func NewPublicDictGetLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Pub
 	}
 }
 
+// PublicDictGet 公共字典查询：仅允许白名单 code（如 video_proxy_url）
+// 复用 dict 包的 PublicDictGet 逻辑
 func (l *PublicDictGetLogic) PublicDictGet(req *types.DictGetReq) (resp *types.DictGetResp, err error) {
-	// todo: add your logic here and delete this line
-
-	return
+	dictLogic := dict.NewDictGetLogic(l.ctx, l.svcCtx)
+	return dictLogic.PublicDictGet(req)
 }

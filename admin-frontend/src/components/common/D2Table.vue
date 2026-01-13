@@ -62,6 +62,15 @@
             >
               {{ t('common.copy') }}
             </el-button>
+            <!-- 直接下载链接（完整URL） -->
+            <el-link
+              v-else-if="column.type === D2TableElemType.DownloadLink"
+              type="primary"
+              :href="scope.row[column.prop]"
+              target="_blank"
+            >
+              {{ t('common.download') }}
+            </el-link>
             <!-- 跳转链接 -->
             <el-link
               v-else-if="column.type === D2TableElemType.LinkJump"
@@ -185,6 +194,15 @@
             v-if="column.type === D2TableElemType.DownloadWithSortUrl"
             type="primary"
             :href="`${baseUrl}/${drawerRow[column.prop]}`"
+            target="_blank"
+          >
+            {{ t('common.download') }}
+          </el-link>
+          <!-- 直接下载链接（完整URL） -->
+          <el-link
+            v-else-if="column.type === D2TableElemType.DownloadLink"
+            type="primary"
+            :href="drawerRow[column.prop]"
             target="_blank"
           >
             {{ t('common.download') }}

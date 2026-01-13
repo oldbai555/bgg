@@ -66,6 +66,12 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/system/Profile.vue')
       },
       {
+        path: '/system/task',
+        name: 'TaskListPage',
+        meta: {permission: 'task:list', keepAlive: true},
+        component: () => import('@/views/system/TaskList.vue')
+      },
+      {
         path: '/403',
         name: 'NoAccess',
         component: () => import('@/views/error/NoAccess.vue')

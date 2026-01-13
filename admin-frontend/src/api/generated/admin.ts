@@ -511,13 +511,6 @@ export function m3u8Proxy(req: components.M3u8ProxyReq) {
 
 /**
  * @description 
- */
-export function m3u8ProxyOptions() {
-	return webapi.options<null>(`/api/v1/m3u8/proxy`)
-}
-
-/**
- * @description 
  * @param req
  */
 export function menuCreate(req: components.MenuCreateReq) {
@@ -668,6 +661,14 @@ export function operationLogExport(req: components.OperationLogExportReq) {
  */
 export function performanceLogList(req: components.PerformanceLogListReq) {
 	return webapi.get<components.PerformanceLogListResp>(`/api/v1/performance-logs`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function performanceLogExport(req: components.PerformanceLogExportReq) {
+	return webapi.get<components.PerformanceLogExportResp>(`/api/v1/performance-logs/export`, req)
 }
 
 /**
@@ -920,6 +921,38 @@ export function sdkFileUpload() {
  * @description 
  * @param req
  */
+export function taskList(req: components.TaskListReq) {
+	return webapi.get<components.TaskListResp>(`/api/v1/tasks`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function taskCancel(req: components.TaskCancelReq) {
+	return webapi.post<components.Response>(`/api/v1/tasks/cancel`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function taskDetail(req: components.TaskDetailReq) {
+	return webapi.get<components.TaskDetailResp>(`/api/v1/tasks/detail`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function taskRecent(req: components.TaskRecentReq) {
+	return webapi.get<components.TaskRecentResp>(`/api/v1/tasks/recent`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
 export function userList(req: components.UserListReq) {
 	return webapi.get<components.UserListResp>(`/api/v1/users`, req)
 }
@@ -994,14 +1027,6 @@ export function videoUpdate(req: components.VideoUpdateReq) {
  */
 export function videoDelete(req: components.VideoDeleteReq) {
 	return webapi.delete<null>(`/api/v1/videos`, req)
-}
-
-/**
- * @description 
- * @param req
- */
-export function videoProxy(req: components.VideoProxyReq) {
-	return webapi.get<null>(`/api/v1/videos/proxy`, req)
 }
 
 /**

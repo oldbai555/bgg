@@ -114,6 +114,13 @@ func main() {
 	// 等待关闭信号
 	<-sigChan
 	logx.Infof("收到关闭信号，开始优雅关闭...")
+
+	// 停止任务调度器
+	if ctx.TaskScheduler != nil {
+		ctx.TaskScheduler.Stop()
+		logx.Infof("任务调度器已停止")
+	}
+
 	logx.Infof("服务器已关闭")
 }
 

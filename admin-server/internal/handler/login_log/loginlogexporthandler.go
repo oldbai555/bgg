@@ -21,10 +21,11 @@ func LoginLogExportHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		}
 
 		l := login_log.NewLoginLogExportLogic(r.Context(), svcCtx)
-		err := l.LoginLogExport(w, r, &req)
+		resp, err := l.LoginLogExport(&req)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
+		} else {
+			httpx.OkJsonCtx(r.Context(), w, resp)
 		}
-		// 导出功能直接写入响应流，不需要返回 JSON
 	}
 }

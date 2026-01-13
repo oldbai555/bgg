@@ -16,6 +16,8 @@ export enum D2TableElemType {
   CopyUrl = 'copyUrl',
   /** 跳转链接 */
   LinkJump = 'linkJump',
+  /** 直接下载链接（使用完整URL） */
+  DownloadLink = 'downloadLink',
   /** 图片（带 baseUrl 前缀） */
   ImageWithSortUrl = 'imageWithSortUrl',
   /** 图片 */

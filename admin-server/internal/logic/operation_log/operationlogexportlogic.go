@@ -5,15 +5,19 @@ package operation_log
 
 import (
 	"context"
-	"encoding/csv"
+	"database/sql"
+	"encoding/json"
 	"fmt"
-	"net/http"
+	"postapocgame/admin-server/internal/task"
 	"time"
 
+	"postapocgame/admin-server/internal/consts"
+	"postapocgame/admin-server/internal/model"
 	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	jwthelper "postapocgame/admin-server/pkg/jwt"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -32,75 +36,84 @@ func NewOperationLogExportLogic(ctx context.Context, svcCtx *svc.ServiceContext)
 	}
 }
 
-func (l *OperationLogExportLogic) OperationLogExport(w http.ResponseWriter, r *http.Request, req *types.OperationLogExportReq) error {
+// OperationLogExport 将操作日志导出改为异步任务：
+// 1. 根据筛选条件构造 ExcelExportParams
+// 2. 创建异步任务记录（task_type=异步导出Excel，execution_type=异步）
+// 3. 由任务调度器 + ExcelExportExecutor 实际生成文件，并在任务结果中写入下载URL
+func (l *OperationLogExportLogic) OperationLogExport(req *types.OperationLogExportReq) (*types.OperationLogExportResp, error) {
 	if req == nil {
-		return errs.New(errs.CodeBadRequest, "请求参数不能为空")
+		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	// 查询所有符合条件的日志（不分页）
-	operationLogRepo := repository.NewOperationLogRepository(l.svcCtx.Repository)
-	list, _, err := operationLogRepo.FindPage(
-		l.ctx,
-		1,
-		10000, // 导出最多10000条
-		req.UserId,
-		req.Username,
-		req.OperationType,
-		req.OperationObject,
-		req.Method,
-		req.StartTime,
-		req.EndTime,
-	)
+	// 获取当前登录用户
+	user, ok := jwthelper.FromContext(l.ctx)
+	if !ok {
+		return nil, errs.New(errs.CodeUnauthorized, "未登录或登录已过期")
+	}
+
+	// 构造导出参数（ExcelExportParams）
+	filters := make(map[string]interface{})
+	if req.UserId > 0 {
+		filters["userId"] = req.UserId
+	}
+	if req.Username != "" {
+		filters["username"] = req.Username
+	}
+	if req.OperationType != "" {
+		filters["operationType"] = req.OperationType
+	}
+	if req.OperationObject != "" {
+		filters["operationObject"] = req.OperationObject
+	}
+	if req.Method != "" {
+		filters["method"] = req.Method
+	}
+	if req.StartTime != "" {
+		filters["startTime"] = req.StartTime
+	}
+	if req.EndTime != "" {
+		filters["endTime"] = req.EndTime
+	}
+
+	params := task.ExcelExportParams{
+		TaskParamsReq: task.TaskParamsReq{
+			Module: consts.TaskModuleOperationLog,
+		},
+		Filters: filters,
+	}
+
+	paramsBytes, err := json.Marshal(params)
 	if err != nil {
-		return errs.Wrap(errs.CodeInternalError, "查询操作日志失败", err)
+		return nil, errs.Wrap(errs.CodeInternalError, "构造导出参数失败", err)
 	}
 
-	// 设置响应头，返回 CSV 文件
-	filename := fmt.Sprintf("操作日志_%s.csv", time.Now().Format("20060102_150405"))
-	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", filename))
-	w.Header().Set("Content-Type", "text/csv; charset=utf-8")
-	w.Header().Set("Content-Transfer-Encoding", "binary")
-
-	// 写入 BOM，确保 Excel 正确识别 UTF-8
-	w.Write([]byte{0xEF, 0xBB, 0xBF})
-
-	// 创建 CSV writer
-	writer := csv.NewWriter(w)
-	defer writer.Flush()
-
-	// 写入表头
-	headers := []string{"ID", "用户ID", "用户名", "操作类型", "操作对象", "请求方法", "请求路径", "请求参数", "响应状态码", "响应消息", "IP地址", "用户代理", "耗时(ms)", "创建时间"}
-	if err := writer.Write(headers); err != nil {
-		return errs.Wrap(errs.CodeInternalError, "写入CSV表头失败", err)
+	// 创建任务记录
+	now := time.Now().Unix()
+	taskModel := &model.AdminTask{
+		Name:          fmt.Sprintf("操作日志导出_%s", time.Now().Format("2006-01-02 15:04:05")),
+		Type:          consts.TaskTypeExcelExport,
+		ExecutionType: consts.TaskExecutionTypeAsync,
+		Status:        consts.TaskStatusPending,
+		Params:        sql.NullString{String: string(paramsBytes), Valid: true},
+		UserId:        user.UserID,
+		ScheduledAt:   0,
+		StartedAt:     0,
+		FinishedAt:    0,
+		CreatedAt:     now,
+		UpdatedAt:     now,
+		DeletedAt:     0,
 	}
 
-	// 写入数据
-	for _, log := range list {
-		requestParams := ""
-		if log.RequestParams.Valid {
-			requestParams = log.RequestParams.String
-		}
-
-		row := []string{
-			fmt.Sprintf("%d", log.Id),
-			fmt.Sprintf("%d", log.UserId),
-			log.Username,
-			log.OperationType,
-			log.OperationObject,
-			log.Method,
-			log.Path,
-			requestParams,
-			fmt.Sprintf("%d", log.ResponseCode),
-			log.ResponseMsg,
-			log.IpAddress,
-			log.UserAgent,
-			fmt.Sprintf("%d", log.Duration),
-			time.Unix(log.CreatedAt, 0).Format("2006-01-02 15:04:05"),
-		}
-		if err := writer.Write(row); err != nil {
-			return errs.Wrap(errs.CodeInternalError, "写入CSV数据失败", err)
-		}
+	taskRepo := repository.NewTaskRepository(l.svcCtx.Repository)
+	taskId, err := taskRepo.Create(l.ctx, taskModel)
+	if err != nil {
+		return nil, errs.Wrap(errs.CodeInternalError, "创建导出任务失败", err)
 	}
 
-	return nil
+	logx.Infof("操作日志导出任务已创建: taskId=%d, userId=%d", taskId, user.UserID)
+
+	// 当前接口不直接返回下载URL，URL 由异步任务执行完成后写入任务结果JSON，由前端在任务列表中查看
+	return &types.OperationLogExportResp{
+		Url: "",
+	}, nil
 }

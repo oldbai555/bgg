@@ -50,6 +50,7 @@
         <el-form-item>
           <el-button type="primary" :loading="loading" @click="loadData">Search</el-button>
           <el-button @click="handleReset">Reset</el-button>
+          <el-button type="success" @click="handleExport">Export</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -83,8 +84,12 @@
 <script setup lang="ts">
 import {reactive, ref, onMounted, computed} from 'vue'
 import {ElMessage} from 'element-plus'
-import {performanceLogList} from '@/api/generated/admin'
-import type {PerformanceLogItem, PerformanceLogListReq} from '@/api/generated/admin'
+import {performanceLogList, performanceLogExport} from '@/api/generated/admin'
+import type {
+  PerformanceLogItem,
+  PerformanceLogListReq,
+  PerformanceLogExportReq
+} from '@/api/generated/admin'
 import {useI18n} from 'vue-i18n'
 import D2Table from '@/components/common/D2Table.vue'
 import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table'
@@ -164,6 +169,24 @@ const handleSizeChange = (size: number) => {
   query.pageSize = size
   query.page = 1
   loadData()
+}
+
+const handleExport = async () => {
+  try {
+    const req: PerformanceLogExportReq = {
+      method: query.method || undefined,
+      path: query.path || undefined,
+      isSlow: query.isSlow,
+      statusCode: query.statusCode,
+      startTime: query.startTime || undefined,
+      endTime: query.endTime || undefined
+    }
+    await performanceLogExport(req)
+    ElMessage.success('已创建异步导出任务，请在右下角任务列表查看进度')
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : t('common.exportFail')
+    ElMessage.error(message)
+  }
 }
 
 onMounted(loadData)

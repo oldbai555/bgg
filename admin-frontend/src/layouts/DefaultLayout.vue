@@ -35,6 +35,9 @@
         </div>
       </section>
     </main>
+
+    <!-- 浮动任务球 -->
+    <TaskFloatBall />
   </div>
 </template>
 
@@ -47,11 +50,13 @@ import {useUserStore} from '@/stores/user'
 import {usePermission} from '@/hooks/usePermission'
 import {useAppStore} from '@/stores/app'
 import {useWebSocketStore} from '@/stores/websocket'
+import {useDictStore} from '@/stores/dict'
 import {useAppConfig} from '@/composables/useAppConfig'
 import AppHeader from '@/components/layout/AppHeader.vue'
 import AppSidebar from '@/components/layout/AppSidebar.vue'
 import PageHeader from '@/components/layout/PageHeader.vue'
 import Breadcrumb from '@/components/layout/Breadcrumb.vue'
+import TaskFloatBall from '@/components/common/TaskFloatBall.vue'
 import {generateBreadcrumb} from '@/utils/breadcrumb'
 import type {MenuItem} from '@/api/generated/admin'
 
@@ -61,6 +66,7 @@ const userStore = useUserStore()
 const {hasPermission} = usePermission()
 const appStore = useAppStore()
 const wsStore = useWebSocketStore()
+const dictStore = useDictStore()
 const {t} = useI18n()
 const {initConfig} = useAppConfig()
 
@@ -71,12 +77,21 @@ onMounted(async () => {
   // 初始化应用配置（从字典获取）
   await initConfig()
 
-  if (userStore.token && (!userStore.menus || userStore.menus.length === 0)) {
-    userStore.fetchMenus().catch(() => {})
-  }
-
-  // 登录后自动连接 WebSocket（配置已初始化）
   if (userStore.token) {
+    // 首次加载时，如果已经登录但还未加载字典，则主动加载一次
+    if (!dictStore.loaded) {
+      try {
+        await dictStore.loadDicts()
+      } catch (err) {
+        console.error('初始化加载字典失败:', err)
+      }
+    }
+
+    if (!userStore.menus || userStore.menus.length === 0) {
+      userStore.fetchMenus().catch(() => {})
+    }
+
+    // 登录后自动连接 WebSocket（配置已初始化）
     wsStore.connect()
   }
 })

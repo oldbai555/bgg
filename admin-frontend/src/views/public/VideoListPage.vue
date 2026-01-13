@@ -75,7 +75,7 @@
           :total="total"
           :page-sizes="[10, 20, 30, 50, 100]"
           :layout="paginationLayout"
-          :small="isMobile"
+          :size="isMobile ? 'small' : 'default'"
           @size-change="handleSizeChange"
           @current-change="handlePageChange"
         />

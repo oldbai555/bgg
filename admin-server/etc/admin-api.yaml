@@ -1,6 +1,7 @@
 Name: admin-api
 Host: 0.0.0.0
 Port: 20000
+Timeout: 30000  # 30秒超时（毫秒），避免 m3u8 代理请求超时
 
 # JWT 配置
 JWT:

@@ -172,19 +172,8 @@ const handleExport = async () => {
       startTime: start ? Math.floor(start.getTime() / 1000) : undefined,
       endTime: end ? Math.floor(end.getTime() / 1000) : undefined
     }
-    const params = new URLSearchParams()
-    Object.entries(payload).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== '') {
-        params.append(key, String(value))
-      }
-    })
-    const url = `/api/v1/sdk/call/log/export?${params.toString()}`
-    const link = document.createElement('a')
-    link.href = url
-    link.target = '_blank'
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+    await sdkCallLogExport(payload)
+    ElMessage.success('已创建异步导出任务，请在右下角任务列表查看进度')
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : t('common.exportFail')
     ElMessage.error(message)

@@ -69,7 +69,8 @@ export interface AuditLogExportReq {
 }
 
 export interface AuditLogExportResp {
-	url: string
+	code: number
+	message: string
 }
 
 export interface AuditLogItem {
@@ -365,7 +366,7 @@ export interface DemoItem {
 }
 
 export interface DemoListReq {
-	// 注意：GET 请求的查询参数需要同时包含 json 和 form 标签// json 标签用于请求体（POST/PUT/DELETE），form 标签用于查询参数（GET）// 重要：form 标签中必须包含 optional，否则 httpx.Parse 无法正确解析查询参数
+	// 注意：GET 请求的查询参数需要同时包含 json 和 form 标签// json 标签用于请求体（POST/PUT/DELETE），form 标签用于查询参数（GET）// 重要：form 标签中必须包含 optional，否则 httpx.Parse 无法正确解析查询参数
 	page?: number
 	pageSize?: number
 	name?: string
@@ -607,7 +608,8 @@ export interface LoginLogExportReq {
 }
 
 export interface LoginLogExportResp {
-	url: string
+	code: number
+	message: string
 }
 
 export interface LoginLogItem {
@@ -884,6 +886,20 @@ export interface OperationLogListResp {
 export interface PasswordChangeReq {
 	oldPassword: string
 	newPassword: string
+}
+
+export interface PerformanceLogExportReq {
+	method?: string
+	path?: string
+	isSlow?: number
+	statusCode?: number
+	startTime?: string
+	endTime?: string
+}
+
+export interface PerformanceLogExportResp {
+	code: number
+	message: string
 }
 
 export interface PerformanceLogItem {
@@ -1275,6 +1291,72 @@ export interface SdkInterfaceUpdateReq {
 	remark?: string
 }
 
+export interface TaskCancelReq {
+	id: number
+}
+
+export interface TaskDetailReq {
+	id: number
+}
+
+export interface TaskDetailResp {
+	id: number
+	name: string
+	type: number
+	executionType: number
+	status: number
+	params: string // 参数JSON
+	result: string // 结果JSON
+	errorMessage: string // 错误信息
+	userId: number
+	scheduledAt: number
+	startedAt: number
+	finishedAt: number
+	createdAt: number
+	updatedAt: number
+}
+
+export interface TaskItem {
+	id: number
+	name: string
+	type: number // 任务类型（字典：task_type）
+	executionType: number // 执行类型（字典：task_execution_type）
+	status: number // 任务状态（字典：task_status）
+	userId: number // 创建用户ID
+	scheduledAt: number // 计划执行时间
+	startedAt: number // 开始执行时间
+	finishedAt: number // 完成时间
+	createdAt: number // 创建时间
+	params: string // 任务参数JSON
+	result: string // 任务结果JSON
+	errorMessage: string // 错误信息
+}
+
+export interface TaskListReq {
+	page?: number
+	pageSize?: number
+	name?: string
+	type?: number
+	executionType?: number
+	status?: number
+	userId?: number
+	startTime?: number
+	endTime?: number
+}
+
+export interface TaskListResp {
+	total: number
+	list: Array<TaskItem>
+}
+
+export interface TaskRecentReq {
+	limit?: number // 最近N条任务记录（不传则使用字典配置）
+}
+
+export interface TaskRecentResp {
+	list: Array<TaskItem>
+}
+
 export interface TokenPair {
 	accessToken: string
 	refreshToken: string
@@ -1394,10 +1476,6 @@ export interface VideoListReq {
 export interface VideoListResp {
 	total: number
 	list: Array<VideoItem>
-}
-
-export interface VideoProxyReq {
-	url: string // 要代理的视频URL
 }
 
 export interface VideoUpdateReq {
