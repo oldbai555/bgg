@@ -49,6 +49,10 @@ type Repository struct {
 	SdkKeyApiModel           model.SdkKeyApiModel
 	SdkCallLogModel          model.SdkCallLogModel
 	AdminTaskModel           model.AdminTaskModel
+	BlogTagModel             model.BlogTagModel
+	BlogArticleModel         model.BlogArticleModel
+	BlogArticleTagModel      model.BlogArticleTagModel
+	BlogArticleAuditModel    model.BlogArticleAuditModel
 }
 
 func NewRepository(conn sqlx.SqlConn, cacheConf cache.CacheConf, rdb *redis.Redis) (*Repository, error) {
@@ -94,6 +98,10 @@ func NewRepository(conn sqlx.SqlConn, cacheConf cache.CacheConf, rdb *redis.Redi
 		SdkKeyApiModel:           model.NewSdkKeyApiModel(conn, cacheConf),
 		SdkCallLogModel:          model.NewSdkCallLogModel(conn, cacheConf),
 		AdminTaskModel:           model.NewAdminTaskModel(conn, cacheConf),
+		BlogTagModel:             model.NewBlogTagModel(conn, cacheConf),
+		BlogArticleModel:         model.NewBlogArticleModel(conn, cacheConf),
+		BlogArticleTagModel:      model.NewBlogArticleTagModel(conn, cacheConf),
+		BlogArticleAuditModel:    model.NewBlogArticleAuditModel(conn, cacheConf),
 	}, nil
 }
 

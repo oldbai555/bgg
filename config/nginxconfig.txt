@@ -162,6 +162,37 @@ server {
         	}
     	}
 
+        # ------------------------------------------------------------
+        # 默认入口：访问 oldbai.top/ 自动进入公共博客
+        # ------------------------------------------------------------
+        location = / {
+            return 302 /public/blog;
+        }
+
+        # ------------------------------------------------------------
+        # 公共页面（不需要登录）：/public/*
+        # 与 /admin 共用同一份前端构建产物（dist）
+        # ------------------------------------------------------------
+        location ^~ /public {
+            alias /tmp/admin-cache;
+            index index.html index.htm;
+            try_files $uri $uri/ /admin/index.html =404;
+
+            # 静态资源缓存
+            location ~ ^/public/.*\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+                expires 1y;
+                add_header Cache-Control "public, immutable";
+                access_log off;
+            }
+
+            # HTML文件不缓存
+            location ~ ^/public/.*\.html$ {
+                add_header Cache-Control "no-cache, no-store, must-revalidate";
+                add_header Pragma "no-cache";
+                add_header Expires "0";
+            }
+        }
+
 
 	    # 视频采集服务
     location ^~ /m3u8/ {

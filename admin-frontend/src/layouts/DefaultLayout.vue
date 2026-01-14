@@ -36,6 +36,9 @@
       </section>
     </main>
 
+    <!-- 备案号（全局底部） -->
+    <IcpFooter />
+
     <!-- 浮动任务球 -->
     <TaskFloatBall />
   </div>
@@ -57,6 +60,7 @@ import AppSidebar from '@/components/layout/AppSidebar.vue'
 import PageHeader from '@/components/layout/PageHeader.vue'
 import Breadcrumb from '@/components/layout/Breadcrumb.vue'
 import TaskFloatBall from '@/components/common/TaskFloatBall.vue'
+import IcpFooter from '@/components/common/IcpFooter.vue'
 import {generateBreadcrumb} from '@/utils/breadcrumb'
 import type {MenuItem} from '@/api/generated/admin'
 
@@ -186,6 +190,14 @@ const handleLogout = async () => {
 @use '@/styles/variables.scss' as *;
 
 .app-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+
+  &__main {
+    flex: 1;
+  }
+
   &__page-content {
     flex: 1;
     padding: $spacing-lg;

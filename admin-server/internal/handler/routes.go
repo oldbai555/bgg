@@ -9,6 +9,9 @@ import (
 	api "postapocgame/admin-server/internal/handler/api"
 	audit_log "postapocgame/admin-server/internal/handler/audit_log"
 	auth "postapocgame/admin-server/internal/handler/auth"
+	blog_article "postapocgame/admin-server/internal/handler/blog_article"
+	blog_article_audit "postapocgame/admin-server/internal/handler/blog_article_audit"
+	blog_tag "postapocgame/admin-server/internal/handler/blog_tag"
 	chat "postapocgame/admin-server/internal/handler/chat"
 	chat_group "postapocgame/admin-server/internal/handler/chat_group"
 	chat_message "postapocgame/admin-server/internal/handler/chat_message"
@@ -23,6 +26,8 @@ import (
 	login_log "postapocgame/admin-server/internal/handler/login_log"
 	m3u8 "postapocgame/admin-server/internal/handler/m3u8"
 	menu "postapocgame/admin-server/internal/handler/menu"
+	metric "postapocgame/admin-server/internal/handler/metric"
+	metric_admin "postapocgame/admin-server/internal/handler/metric_admin"
 	monitor "postapocgame/admin-server/internal/handler/monitor"
 	notice "postapocgame/admin-server/internal/handler/notice"
 	notification "postapocgame/admin-server/internal/handler/notification"
@@ -33,6 +38,7 @@ import (
 	permission_menu "postapocgame/admin-server/internal/handler/permission_menu"
 	ping "postapocgame/admin-server/internal/handler/ping"
 	public "postapocgame/admin-server/internal/handler/public"
+	public_blog "postapocgame/admin-server/internal/handler/public_blog"
 	public_video "postapocgame/admin-server/internal/handler/public_video"
 	role "postapocgame/admin-server/internal/handler/role"
 	role_permission "postapocgame/admin-server/internal/handler/role_permission"
@@ -142,6 +148,108 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodPost,
 					Path:    "/profile/password",
 					Handler: auth.PasswordChangeHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.PerformanceMiddleware, serverCtx.RateLimitMiddleware, serverCtx.AuthMiddleware, serverCtx.PermissionMiddleware, serverCtx.OperationLogMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/blog/articles",
+					Handler: blog_article.BlogArticleListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/blog/articles",
+					Handler: blog_article.BlogArticleCreateHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/blog/articles",
+					Handler: blog_article.BlogArticleUpdateHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodDelete,
+					Path:    "/blog/articles",
+					Handler: blog_article.BlogArticleDeleteHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/blog/articles/detail",
+					Handler: blog_article.BlogArticleDetailHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/blog/articles/publish",
+					Handler: blog_article.BlogArticlePublishHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/blog/articles/submit",
+					Handler: blog_article.BlogArticleSubmitHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/blog/articles/unpublish",
+					Handler: blog_article.BlogArticleUnpublishHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.PerformanceMiddleware, serverCtx.RateLimitMiddleware, serverCtx.AuthMiddleware, serverCtx.PermissionMiddleware, serverCtx.OperationLogMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodPost,
+					Path:    "/blog/articles/audit",
+					Handler: blog_article_audit.BlogArticleAuditHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/blog/articles/audit/unpublish",
+					Handler: blog_article_audit.BlogArticleAuditUnpublishHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.PerformanceMiddleware, serverCtx.RateLimitMiddleware, serverCtx.AuthMiddleware, serverCtx.PermissionMiddleware, serverCtx.OperationLogMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/blog/tags",
+					Handler: blog_tag.BlogTagListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/blog/tags",
+					Handler: blog_tag.BlogTagCreateHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/blog/tags",
+					Handler: blog_tag.BlogTagUpdateHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodDelete,
+					Path:    "/blog/tags",
+					Handler: blog_tag.BlogTagDeleteHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/blog/tags/options",
+					Handler: blog_tag.BlogTagOptionsHandler(serverCtx),
 				},
 			}...,
 		),
@@ -583,6 +691,34 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 
 	server.AddRoutes(
 		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.ApiEnabledMiddleware, serverCtx.PublicOperationLogMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodPost,
+					Path:    "/metrics/report",
+					Handler: metric.MetricReportHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.PerformanceMiddleware, serverCtx.RateLimitMiddleware, serverCtx.AuthMiddleware, serverCtx.PermissionMiddleware, serverCtx.OperationLogMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/metrics/stats",
+					Handler: metric_admin.MetricStatsHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
 			[]rest.Middleware{serverCtx.PerformanceMiddleware, serverCtx.RateLimitMiddleware, serverCtx.AuthMiddleware, serverCtx.PermissionMiddleware, serverCtx.OperationLogMiddleware},
 			[]rest.Route{
 				{
@@ -792,6 +928,25 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodGet,
 					Path:    "/public/dict",
 					Handler: public.PublicDictGetHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.ApiEnabledMiddleware, serverCtx.PublicOperationLogMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/public/blog/articles",
+					Handler: public_blog.PublicBlogArticleListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/public/blog/articles/info",
+					Handler: public_blog.PublicBlogArticleDetailHandler(serverCtx),
 				},
 			}...,
 		),

@@ -97,6 +97,152 @@ type AuditLogListResp struct {
 	PageSize int            `json:"pageSize"`
 }
 
+type BlogArticleAuditReq struct {
+	Id     uint64 `json:"id"`              // 文章ID
+	Result int64  `json:"result"`          // 审核结果：3=通过，4=驳回（字典：blog_article_audit_status）
+	Remark string `json:"remark,optional"` // 审核意见
+}
+
+type BlogArticleAuditUnpublishReq struct {
+	Id     uint64 `json:"id"`              // 文章ID
+	Remark string `json:"remark,optional"` // 下架原因
+}
+
+type BlogArticleCreateReq struct {
+	Title   string   `json:"title"`            // 标题
+	Content string   `json:"content"`          // Markdown 内容
+	TagIds  []uint64 `json:"tagIds"`           // 标签ID列表（至少1个）
+	Cover   string   `json:"cover,optional"`   // 封面URL
+	Summary string   `json:"summary,optional"` // 摘要（可选）
+}
+
+type BlogArticleDeleteReq struct {
+	Id uint64 `json:"id"`
+}
+
+type BlogArticleDetailReq struct {
+	Id uint64 `json:"id,optional" form:"id,optional"` // 文章ID（必填，但 query 参数需标记为 optional）
+}
+
+type BlogArticleDetailResp struct {
+	Id          uint64        `json:"id"`
+	Title       string        `json:"title"`
+	Content     string        `json:"content"` // Markdown 原文
+	Status      int64         `json:"status"`
+	AuditStatus int64         `json:"auditStatus"`
+	Cover       string        `json:"cover,optional"`
+	AuthorId    uint64        `json:"authorId"`
+	AuthorName  string        `json:"authorName"`
+	PublishTime int64         `json:"publishTime"`
+	Summary     string        `json:"summary,optional"`
+	Tags        []BlogTagItem `json:"tags,optional"`
+	CreatedAt   int64         `json:"createdAt"`
+	UpdatedAt   int64         `json:"updatedAt"`
+}
+
+type BlogArticleItem struct {
+	Id          uint64   `json:"id"`
+	Title       string   `json:"title"`
+	Status      int64    `json:"status"`      // 字典：blog_article_status
+	AuditStatus int64    `json:"auditStatus"` // 字典：blog_article_audit_status
+	Cover       string   `json:"cover,optional"`
+	AuthorId    uint64   `json:"authorId"`
+	AuthorName  string   `json:"authorName"`
+	TagIds      []uint64 `json:"tagIds,optional"`   // 关联标签ID列表
+	TagNames    []string `json:"tagNames,optional"` // 关联标签名称列表
+	PublishTime int64    `json:"publishTime"`       // 上架时间(秒级时间戳)
+	CreatedAt   int64    `json:"createdAt"`         // 创建时间(秒级时间戳)
+	UpdatedAt   int64    `json:"updatedAt"`         // 更新时间(秒级时间戳)
+}
+
+type BlogArticleListReq struct {
+	Page        int64  `json:"page,optional" form:"page,optional"`
+	PageSize    int64  `json:"pageSize,optional" form:"pageSize,optional"`
+	Title       string `json:"title,optional" form:"title,optional"`             // 标题关键字
+	Status      int64  `json:"status,optional" form:"status,optional"`           // 字典：blog_article_status，0=全部
+	AuditStatus int64  `json:"auditStatus,optional" form:"auditStatus,optional"` // 字典：blog_article_audit_status，0=全部
+	TagId       uint64 `json:"tagId,optional" form:"tagId,optional"`             // 标签筛选
+	StartTime   int64  `json:"startTime,optional" form:"startTime,optional"`     // 创建时间起
+	EndTime     int64  `json:"endTime,optional" form:"endTime,optional"`         // 创建时间止
+}
+
+type BlogArticleListResp struct {
+	Total int64             `json:"total"`
+	List  []BlogArticleItem `json:"list"`
+}
+
+type BlogArticlePublishReq struct {
+	Id uint64 `json:"id"`
+}
+
+type BlogArticleSubmitReq struct {
+	Id uint64 `json:"id"`
+}
+
+type BlogArticleUnpublishReq struct {
+	Id uint64 `json:"id"`
+}
+
+type BlogArticleUpdateReq struct {
+	Id      uint64   `json:"id"`
+	Title   string   `json:"title,optional"`
+	Content string   `json:"content,optional"`
+	TagIds  []uint64 `json:"tagIds,optional"`
+	Cover   string   `json:"cover,optional"`
+	Summary string   `json:"summary,optional"`
+}
+
+type BlogTagCreateReq struct {
+	Name   string `json:"name"`            // 标签名称
+	Status int64  `json:"status,optional"` // 状态（字典：blog_tag_status）
+	Remark string `json:"remark,optional"` // 备注
+}
+
+type BlogTagDeleteReq struct {
+	Id uint64 `json:"id"`
+}
+
+type BlogTagItem struct {
+	Id        uint64 `json:"id"`
+	Name      string `json:"name"`
+	Status    int64  `json:"status"`          // 字典：blog_tag_status
+	Remark    string `json:"remark,optional"` // 备注
+	CreatedAt int64  `json:"createdAt"`       // 创建时间(秒级时间戳)
+	UpdatedAt int64  `json:"updatedAt"`       // 更新时间(秒级时间戳)
+}
+
+type BlogTagListReq struct {
+	Page     int64  `json:"page,optional" form:"page,optional"`
+	PageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
+	Name     string `json:"name,optional" form:"name,optional"`     // 标签名称模糊搜索
+	Status   int64  `json:"status,optional" form:"status,optional"` // 状态筛选：0=全部，>0 对应字典值
+}
+
+type BlogTagListResp struct {
+	Total int64         `json:"total"`
+	List  []BlogTagItem `json:"list"`
+}
+
+type BlogTagOptionItem struct {
+	Id   uint64 `json:"id"`
+	Name string `json:"name"`
+}
+
+type BlogTagOptionsReq struct {
+	Limit int64 `json:"limit,optional" form:"limit,optional"` // 限制数量，默认1000
+}
+
+type BlogTagOptionsResp struct {
+	List []BlogTagOptionItem `json:"list"`
+}
+
+type BlogTagUpdateReq struct {
+	Id     uint64 `json:"id"`
+	Name   string `json:"name,optional"`
+	Status int64  `json:"status,optional"`
+	Remark string `json:"remark,optional"`
+}
+
 type CPUInfo struct {
 	Usage float64 `json:"usage"` // CPU使用率（百分比）
 	Cores int     `json:"cores"` // CPU核心数
@@ -701,6 +847,29 @@ type MenuUpdateReq struct {
 	Status    int64  `json:"status,optional"`
 }
 
+type MetricReportReq struct {
+	Module string `json:"module"`         // 业务模块标识，如 blog_article_list/blog_article_detail/video_list/video_detail
+	BizId  uint64 `json:"bizId,optional"` // 业务ID（文章ID、视频ID等）
+	Event  string `json:"event,optional"` // 事件类型，如 view/play 等
+	Extra  string `json:"extra,optional"` // 额外信息（JSON字符串）
+}
+
+type MetricStatsReq struct {
+	Module string `json:"module,optional" form:"module,optional"` // 业务模块标识，如 blog_article_list/blog_article_detail/video_list/video_detail
+	BizId  uint64 `json:"bizId,optional" form:"bizId,optional"`   // 业务ID（文章ID、视频ID等）
+	Day    string `json:"day,optional" form:"day,optional"`       // 统计日期：YYYYMMDD（默认今天）
+}
+
+type MetricStatsResp struct {
+	Module string `json:"module"`
+	BizId  uint64 `json:"bizId"`
+	Day    string `json:"day"`
+	Pv     int64  `json:"pv"`
+	Uv     int64  `json:"uv"`
+	Vv     int64  `json:"vv"`
+	Ip     int64  `json:"ip"`
+}
+
 type MonitorStatsResp struct {
 	UserCount         int64 `json:"userCount"`         // 用户总数
 	RoleCount         int64 `json:"roleCount"`         // 角色总数
@@ -994,6 +1163,44 @@ type ProfileUpdateReq struct {
 	Nickname  string `json:"nickname,optional"`
 	Avatar    string `json:"avatar,optional"`
 	Signature string `json:"signature,optional"`
+}
+
+type PublicBlogArticleDetailReq struct {
+	Id uint64 `json:"id,optional" form:"id,optional"` // 文章ID
+}
+
+type PublicBlogArticleDetailResp struct {
+	Id          uint64        `json:"id"`
+	Title       string        `json:"title"`
+	Content     string        `json:"content"` // Markdown 原文
+	Cover       string        `json:"cover,optional"`
+	AuthorName  string        `json:"authorName"`
+	PublishTime int64         `json:"publishTime"`
+	Tags        []BlogTagItem `json:"tags,optional"`
+}
+
+type PublicBlogArticleItem struct {
+	Id          uint64   `json:"id"`
+	Title       string   `json:"title"`
+	Cover       string   `json:"cover,optional"`
+	AuthorName  string   `json:"authorName"`
+	Summary     string   `json:"summary"`
+	TagNames    []string `json:"tagNames,optional"`
+	PublishTime int64    `json:"publishTime"`
+}
+
+type PublicBlogArticleListReq struct {
+	Page    int64  `json:"page,optional" form:"page,optional"`       // 页码
+	Size    int64  `json:"size,optional" form:"size,optional"`       // 每页数量
+	TagId   uint64 `json:"tagId,optional" form:"tagId,optional"`     // 标签筛选
+	Keyword string `json:"keyword,optional" form:"keyword,optional"` // 标题/摘要搜索
+}
+
+type PublicBlogArticleListResp struct {
+	List  []PublicBlogArticleItem `json:"list"`
+	Page  int64                   `json:"page"`
+	Size  int64                   `json:"size"`
+	Total int64                   `json:"total"`
 }
 
 type PublicVideoDetailReq struct {

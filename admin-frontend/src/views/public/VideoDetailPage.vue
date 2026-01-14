@@ -1,13 +1,9 @@
 <template>
-  <div class="video-detail-page">
+  <div class="video-detail-page public-detail-page">
+    <MetricReporter module="video_detail" :biz-id="Number(route.params.id) || 0" />
     <div class="container">
       <!-- 返回按钮 -->
-      <el-button class="back-btn" @click="goBack">
-        <el-icon>
-          <ArrowLeft />
-        </el-icon>
-        返回列表
-      </el-button>
+      <div class="back-link" @click="goBack">← 返回列表</div>
 
       <!-- 视频播放器 -->
       <div v-loading="loading" class="video-container">
@@ -41,6 +37,8 @@
         <div v-else class="empty-message">暂无磁力链接</div>
       </div>
     </div>
+
+    <IcpFooter />
   </div>
 </template>
 
@@ -48,10 +46,12 @@
 import {nextTick, onBeforeUnmount, onMounted, ref, watch} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {ElMessage} from 'element-plus'
-import {ArrowLeft} from '@element-plus/icons-vue'
 import DPlayer from 'dplayer'
 import type {PublicVideoDetailResp} from '@/api/generated/admin'
 import {publicVideoDetail} from '@/api/generated/admin'
+import {metricApi} from '@/api/metric'
+import MetricReporter from '@/components/common/MetricReporter.vue'
+import IcpFooter from '@/components/common/IcpFooter.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -74,6 +74,7 @@ const loading = ref(false)
 const dplayerRef = ref<HTMLDivElement | null>(null)
 let player: import('dplayer').default | null = null
 let isInitializing = false // 防止重复初始化的标志
+const hasReportedPlay = ref(false)
 
 // 初始化播放器
 const initPlayer = async () => {
@@ -173,7 +174,7 @@ const initDPlayer = (options: {url: string; type: 'hls' | 'auto'}) => {
   }
 
   try {
-    const hlsConfig: any = {}
+    const hlsConfig: Record<string, unknown> = {}
 
     // 由于已经使用后端代理，不需要自定义 loader
     // 后端代理会处理 CORS 问题
@@ -256,10 +257,22 @@ const initDPlayer = (options: {url: string; type: 'hls' | 'auto'}) => {
         console.log('视频正在播放')
         clearTimeout(loadingTimeout)
         loading.value = false
+
+        // 上报播放事件（每次进入详情页仅上报一次，避免频繁触发）
+        if (!hasReportedPlay.value && video.value.id) {
+          hasReportedPlay.value = true
+          metricApi
+            .report({
+              module: 'video_detail',
+              bizId: video.value.id,
+              event: 'play'
+            })
+            .catch(() => {})
+        }
       })
 
       // 错误处理
-      videoElement.addEventListener('error', (e) => {
+      videoElement.addEventListener('error', (_e) => {
         clearTimeout(loadingTimeout)
         isInitializing = false
         const error = videoElement.error
@@ -324,6 +337,9 @@ const loadData = async () => {
     // 响应直接返回数据（无 code/msg 包装），拦截器会直接返回原始数据
     const resp = await publicVideoDetail({id: idNum})
     video.value = resp
+
+    // 切换视频时重置 play 上报标志
+    hasReportedPlay.value = false
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : '加载失败'
     console.error('加载视频详情失败:', err)
@@ -437,34 +453,10 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
+@import '@/styles/public-detail.scss';
+
+// 视频详情页特定样式
 .video-detail-page {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 20px;
-
-  .container {
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
-  .back-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    margin-bottom: 20px;
-    transition: background 0.3s;
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.3);
-    }
-  }
 
   .video-container {
     background: white;
@@ -608,7 +600,33 @@ onBeforeUnmount(() => {
   }
 
   @media (max-width: 768px) {
-    padding: 12px;
+    .video-info-section {
+      padding: 18px 14px 20px;
+    }
+
+    .video-title {
+      font-size: 20px;
+      line-height: 1.3;
+    }
+
+    .video-meta {
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .magnet-section {
+      padding: 18px 14px 20px;
+    }
+
+    .magnet-item {
+      align-items: flex-start;
+      padding: 12px;
+    }
+
+    .magnet-text {
+      font-size: 12px;
+    }
   }
 }
 </style>

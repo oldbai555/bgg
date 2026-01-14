@@ -17,6 +17,7 @@
     "axios": "^1.6.7",
     "dplayer": "^1.27.1",
     "element-plus": "^2.4.2",
+    "md-editor-v3": "^6.3.1",
     "pinia": "^2.1.7",
     "video.js": "^8.23.4",
     "vue": "^3.4.14",

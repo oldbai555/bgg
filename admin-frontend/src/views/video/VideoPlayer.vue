@@ -112,7 +112,7 @@ const handlePlay = async () => {
 
     // 判断视频类型
     const isM3u8 = url.includes('.m3u8')
-    
+
     // 直接播放，失败就失败
     initPlayer({
       url: url,

@@ -35,7 +35,10 @@ export const REQUIRED_DICT_CODES = [
   'task_type', // 任务类型
   'task_execution_type', // 任务执行类型
   'task_status', // 任务状态
-  'task_config' // 任务配置（如最近任务数量）
+  'task_config', // 任务配置（如最近任务数量）
+  // 博客相关字典
+  'blog_article_status', // 博客文章业务状态
+  'blog_article_audit_status' // 博客文章审核状态
 ] as const;
 
 export const useDictStore = defineStore('dict', {

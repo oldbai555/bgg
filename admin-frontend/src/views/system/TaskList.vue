@@ -136,8 +136,7 @@ const createdTimeRange = ref<[string, string] | []>([])
 // 字典选项
 const {options: taskTypeOptions} = useDictOptions('task_type')
 const {options: executionTypeOptions} = useDictOptions('task_execution_type')
-const {options: statusOptions, getLabel: getStatusLabel} =
-  useDictOptions('task_status')
+const {options: statusOptions} = useDictOptions('task_status')
 
 // 枚举转描述映射
 const taskTypeMap = computed<Record<number, string>>(() => {

@@ -1116,6 +1116,196 @@ type (
 	M3u8ProxyReq {
 		url string `json:"url,optional" form:"url,optional"` // 要代理的URL
 	}
+	// ================================
+	// 博客模块类型定义
+	// ================================
+	// 博客标签
+	BlogTagItem {
+		id        uint64 `json:"id"`
+		name      string `json:"name"`
+		status    int64  `json:"status"` // 字典：blog_tag_status
+		remark    string `json:"remark,optional"` // 备注
+		createdAt int64  `json:"createdAt"` // 创建时间(秒级时间戳)
+		updatedAt int64  `json:"updatedAt"` // 更新时间(秒级时间戳)
+	}
+	BlogTagListReq {
+		page     int64  `json:"page,optional" form:"page,optional"`
+		pageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		name     string `json:"name,optional" form:"name,optional"` // 标签名称模糊搜索
+		status   int64  `json:"status,optional" form:"status,optional"` // 状态筛选：0=全部，>0 对应字典值
+	}
+	BlogTagListResp {
+		total int64         `json:"total"`
+		list  []BlogTagItem `json:"list"`
+	}
+	BlogTagCreateReq {
+		name   string `json:"name"` // 标签名称
+		status int64  `json:"status,optional"` // 状态（字典：blog_tag_status）
+		remark string `json:"remark,optional"` // 备注
+	}
+	BlogTagUpdateReq {
+		id     uint64 `json:"id"`
+		name   string `json:"name,optional"`
+		status int64  `json:"status,optional"`
+		remark string `json:"remark,optional"`
+	}
+	BlogTagDeleteReq {
+		id uint64 `json:"id"`
+	}
+	// 标签下拉选项（仅返回启用标签）
+	BlogTagOptionItem {
+		id   uint64 `json:"id"`
+		name string `json:"name"`
+	}
+	BlogTagOptionsReq {
+		limit int64 `json:"limit,optional" form:"limit,optional"` // 限制数量，默认1000
+	}
+	BlogTagOptionsResp {
+		list []BlogTagOptionItem `json:"list"`
+	}
+	// 博客文章（后台列表项）
+	BlogArticleItem {
+		id          uint64   `json:"id"`
+		title       string   `json:"title"`
+		status      int64    `json:"status"` // 字典：blog_article_status
+		auditStatus int64    `json:"auditStatus"` // 字典：blog_article_audit_status
+		cover       string   `json:"cover,optional"`
+		authorId    uint64   `json:"authorId"`
+		authorName  string   `json:"authorName"`
+		tagIds      []uint64 `json:"tagIds,optional"` // 关联标签ID列表
+		tagNames    []string `json:"tagNames,optional"` // 关联标签名称列表
+		publishTime int64    `json:"publishTime"` // 上架时间(秒级时间戳)
+		createdAt   int64    `json:"createdAt"` // 创建时间(秒级时间戳)
+		updatedAt   int64    `json:"updatedAt"` // 更新时间(秒级时间戳)
+	}
+	BlogArticleListReq {
+		page        int64  `json:"page,optional" form:"page,optional"`
+		pageSize    int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		title       string `json:"title,optional" form:"title,optional"` // 标题关键字
+		status      int64  `json:"status,optional" form:"status,optional"` // 字典：blog_article_status，0=全部
+		auditStatus int64  `json:"auditStatus,optional" form:"auditStatus,optional"` // 字典：blog_article_audit_status，0=全部
+		tagId       uint64 `json:"tagId,optional" form:"tagId,optional"` // 标签筛选
+		startTime   int64  `json:"startTime,optional" form:"startTime,optional"` // 创建时间起
+		endTime     int64  `json:"endTime,optional" form:"endTime,optional"` // 创建时间止
+	}
+	BlogArticleListResp {
+		total int64             `json:"total"`
+		list  []BlogArticleItem `json:"list"`
+	}
+	// 博客文章详情（后台）
+	BlogArticleDetailReq {
+		id uint64 `json:"id,optional" form:"id,optional"` // 文章ID（必填，但 query 参数需标记为 optional）
+	}
+	BlogArticleDetailResp {
+		id          uint64        `json:"id"`
+		title       string        `json:"title"`
+		content     string        `json:"content"` // Markdown 原文
+		status      int64         `json:"status"`
+		auditStatus int64         `json:"auditStatus"`
+		cover       string        `json:"cover,optional"`
+		authorId    uint64        `json:"authorId"`
+		authorName  string        `json:"authorName"`
+		publishTime int64         `json:"publishTime"`
+		summary     string        `json:"summary,optional"`
+		tags        []BlogTagItem `json:"tags,optional"`
+		createdAt   int64         `json:"createdAt"`
+		updatedAt   int64         `json:"updatedAt"`
+	}
+	BlogArticleCreateReq {
+		title   string   `json:"title"` // 标题
+		content string   `json:"content"` // Markdown 内容
+		tagIds  []uint64 `json:"tagIds"` // 标签ID列表（至少1个）
+		cover   string   `json:"cover,optional"` // 封面URL
+		summary string   `json:"summary,optional"` // 摘要（可选）
+	}
+	BlogArticleUpdateReq {
+		id      uint64   `json:"id"`
+		title   string   `json:"title,optional"`
+		content string   `json:"content,optional"`
+		tagIds  []uint64 `json:"tagIds,optional"`
+		cover   string   `json:"cover,optional"`
+		summary string   `json:"summary,optional"`
+	}
+	BlogArticleDeleteReq {
+		id uint64 `json:"id"`
+	}
+	// 文章提交审核/上架/下架
+	BlogArticleSubmitReq {
+		id uint64 `json:"id"`
+	}
+	BlogArticlePublishReq {
+		id uint64 `json:"id"`
+	}
+	BlogArticleUnpublishReq {
+		id uint64 `json:"id"`
+	}
+	// 文章审核请求（通过/驳回）
+	BlogArticleAuditReq {
+		id     uint64 `json:"id"` // 文章ID
+		result int64  `json:"result"` // 审核结果：3=通过，4=驳回（字典：blog_article_audit_status）
+		remark string `json:"remark,optional"` // 审核意见
+	}
+	// 审核员执行下架请求
+	BlogArticleAuditUnpublishReq {
+		id     uint64 `json:"id"` // 文章ID
+		remark string `json:"remark,optional"` // 下架原因
+	}
+	// 公共文章列表/详情 VO
+	PublicBlogArticleItem {
+		id          uint64   `json:"id"`
+		title       string   `json:"title"`
+		cover       string   `json:"cover,optional"`
+		authorName  string   `json:"authorName"`
+		summary     string   `json:"summary"`
+		tagNames    []string `json:"tagNames,optional"`
+		publishTime int64    `json:"publishTime"`
+	}
+	PublicBlogArticleListReq {
+		page    int64  `json:"page,optional" form:"page,optional"` // 页码
+		size    int64  `json:"size,optional" form:"size,optional"` // 每页数量
+		tagId   uint64 `json:"tagId,optional" form:"tagId,optional"` // 标签筛选
+		keyword string `json:"keyword,optional" form:"keyword,optional"` // 标题/摘要搜索
+	}
+	PublicBlogArticleListResp {
+		list  []PublicBlogArticleItem `json:"list"`
+		page  int64                   `json:"page"`
+		size  int64                   `json:"size"`
+		total int64                   `json:"total"`
+	}
+	PublicBlogArticleDetailReq {
+		id uint64 `json:"id,optional" form:"id,optional"` // 文章ID
+	}
+	PublicBlogArticleDetailResp {
+		id          uint64        `json:"id"`
+		title       string        `json:"title"`
+		content     string        `json:"content"` // Markdown 原文
+		cover       string        `json:"cover,optional"`
+		authorName  string        `json:"authorName"`
+		publishTime int64         `json:"publishTime"`
+		tags        []BlogTagItem `json:"tags,optional"`
+	}
+	// 通用打点上报
+	MetricReportReq {
+		module string `json:"module"` // 业务模块标识，如 blog_article_list/blog_article_detail/video_list/video_detail
+		bizId  uint64 `json:"bizId,optional"` // 业务ID（文章ID、视频ID等）
+		event  string `json:"event,optional"` // 事件类型，如 view/play 等
+		extra  string `json:"extra,optional"` // 额外信息（JSON字符串）
+	}
+	// 通用打点统计查询（管理后台使用）
+	MetricStatsReq {
+		module string `json:"module,optional" form:"module,optional"` // 业务模块标识，如 blog_article_list/blog_article_detail/video_list/video_detail
+		bizId  uint64 `json:"bizId,optional" form:"bizId,optional"` // 业务ID（文章ID、视频ID等）
+		day    string `json:"day,optional" form:"day,optional"` // 统计日期：YYYYMMDD（默认今天）
+	}
+	MetricStatsResp {
+		module string `json:"module"`
+		bizId  uint64 `json:"bizId"`
+		day    string `json:"day"`
+		pv     int64  `json:"pv"`
+		uv     int64  `json:"uv"`
+		vv     int64  `json:"vv"`
+		ip     int64  `json:"ip"`
+	}
 )
 
 @server (
@@ -1213,6 +1403,111 @@ service admin-api {
 
 	@handler PublicVideoDetail
 	get /public/videos/info (PublicVideoDetailReq) returns (PublicVideoDetailResp)
+}
+
+// 博客标签管理
+@server (
+	group:      blog_tag
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler BlogTagList
+	get /blog/tags (BlogTagListReq) returns (BlogTagListResp)
+
+	@handler BlogTagOptions
+	get /blog/tags/options (BlogTagOptionsReq) returns (BlogTagOptionsResp)
+
+	@handler BlogTagCreate
+	post /blog/tags (BlogTagCreateReq)
+
+	@handler BlogTagUpdate
+	put /blog/tags (BlogTagUpdateReq)
+
+	@handler BlogTagDelete
+	delete /blog/tags (BlogTagDeleteReq)
+}
+
+// 博客文章管理
+@server (
+	group:      blog_article
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler BlogArticleList
+	get /blog/articles (BlogArticleListReq) returns (BlogArticleListResp)
+
+	@handler BlogArticleDetail
+	get /blog/articles/detail (BlogArticleDetailReq) returns (BlogArticleDetailResp)
+
+	@handler BlogArticleCreate
+	post /blog/articles (BlogArticleCreateReq) returns (Response)
+
+	@handler BlogArticleUpdate
+	put /blog/articles (BlogArticleUpdateReq) returns (Response)
+
+	@handler BlogArticleDelete
+	delete /blog/articles (BlogArticleDeleteReq) returns (Response)
+
+	@handler BlogArticleSubmit
+	post /blog/articles/submit (BlogArticleSubmitReq) returns (Response)
+
+	@handler BlogArticlePublish
+	post /blog/articles/publish (BlogArticlePublishReq) returns (Response)
+
+	@handler BlogArticleUnpublish
+	post /blog/articles/unpublish (BlogArticleUnpublishReq) returns (Response)
+}
+
+// 博客文章审核（审核员）
+@server (
+	group:      blog_article_audit
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler BlogArticleAudit
+	post /blog/articles/audit (BlogArticleAuditReq) returns (Response)
+
+	@handler BlogArticleAuditUnpublish
+	post /blog/articles/audit/unpublish (BlogArticleAuditUnpublishReq) returns (Response)
+}
+
+// 公共博客文章接口（未登录访问）
+@server (
+	group:      public_blog
+	prefix:     /api/v1
+	middleware: ApiEnabledMiddleware,PublicOperationLogMiddleware
+)
+service admin-api {
+	@handler PublicBlogArticleList
+	get /public/blog/articles (PublicBlogArticleListReq) returns (PublicBlogArticleListResp)
+
+	@handler PublicBlogArticleDetail
+	get /public/blog/articles/info (PublicBlogArticleDetailReq) returns (PublicBlogArticleDetailResp)
+}
+
+// 通用打点上报接口（PV/UV/VV/IP，文章与视频共用）
+@server (
+	group:      metric
+	prefix:     /api/v1
+	middleware: ApiEnabledMiddleware,PublicOperationLogMiddleware
+)
+service admin-api {
+	@handler MetricReport
+	post /metrics/report (MetricReportReq) returns (Response)
+}
+
+// 通用打点统计查询（管理后台）
+@server (
+	group:      metric_admin
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler MetricStats
+	get /metrics/stats (MetricStatsReq) returns (MetricStatsResp)
 }
 
 type (

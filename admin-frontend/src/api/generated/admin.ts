@@ -107,6 +107,126 @@ export function passwordChange(req: components.PasswordChangeReq) {
 
 /**
  * @description 
+ * @param req
+ */
+export function blogArticleList(req: components.BlogArticleListReq) {
+	return webapi.get<components.BlogArticleListResp>(`/api/v1/blog/articles`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function blogArticleCreate(req: components.BlogArticleCreateReq) {
+	return webapi.post<components.Response>(`/api/v1/blog/articles`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function blogArticleUpdate(req: components.BlogArticleUpdateReq) {
+	return webapi.put<components.Response>(`/api/v1/blog/articles`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function blogArticleDelete(req: components.BlogArticleDeleteReq) {
+	return webapi.delete<components.Response>(`/api/v1/blog/articles`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function blogArticleDetail(req: components.BlogArticleDetailReq) {
+	return webapi.get<components.BlogArticleDetailResp>(`/api/v1/blog/articles/detail`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function blogArticlePublish(req: components.BlogArticlePublishReq) {
+	return webapi.post<components.Response>(`/api/v1/blog/articles/publish`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function blogArticleSubmit(req: components.BlogArticleSubmitReq) {
+	return webapi.post<components.Response>(`/api/v1/blog/articles/submit`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function blogArticleUnpublish(req: components.BlogArticleUnpublishReq) {
+	return webapi.post<components.Response>(`/api/v1/blog/articles/unpublish`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function blogArticleAudit(req: components.BlogArticleAuditReq) {
+	return webapi.post<components.Response>(`/api/v1/blog/articles/audit`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function blogArticleAuditUnpublish(req: components.BlogArticleAuditUnpublishReq) {
+	return webapi.post<components.Response>(`/api/v1/blog/articles/audit/unpublish`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function blogTagList(req: components.BlogTagListReq) {
+	return webapi.get<components.BlogTagListResp>(`/api/v1/blog/tags`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function blogTagCreate(req: components.BlogTagCreateReq) {
+	return webapi.post<null>(`/api/v1/blog/tags`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function blogTagUpdate(req: components.BlogTagUpdateReq) {
+	return webapi.put<null>(`/api/v1/blog/tags`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function blogTagDelete(req: components.BlogTagDeleteReq) {
+	return webapi.delete<null>(`/api/v1/blog/tags`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function blogTagOptions(req: components.BlogTagOptionsReq) {
+	return webapi.get<components.BlogTagOptionsResp>(`/api/v1/blog/tags/options`, req)
+}
+
+/**
+ * @description 
  */
 export function chatList() {
 	return webapi.get<components.ChatListResp>(`/api/v1/chats`)
@@ -549,6 +669,22 @@ export function menuMyTree() {
 
 /**
  * @description 
+ * @param req
+ */
+export function metricReport(req: components.MetricReportReq) {
+	return webapi.post<components.Response>(`/api/v1/metrics/report`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function metricStats(req: components.MetricStatsReq) {
+	return webapi.get<components.MetricStatsResp>(`/api/v1/metrics/stats`, req)
+}
+
+/**
+ * @description 
  */
 export function monitorStats() {
 	return webapi.get<components.MonitorStatsResp>(`/api/v1/monitor/stats`)
@@ -748,6 +884,22 @@ export function ping() {
  */
 export function publicDictGet(req: components.DictGetReq) {
 	return webapi.get<components.DictGetResp>(`/api/v1/public/dict`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function publicBlogArticleList(req: components.PublicBlogArticleListReq) {
+	return webapi.get<components.PublicBlogArticleListResp>(`/api/v1/public/blog/articles`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function publicBlogArticleDetail(req: components.PublicBlogArticleDetailReq) {
+	return webapi.get<components.PublicBlogArticleDetailResp>(`/api/v1/public/blog/articles/info`, req)
 }
 
 /**

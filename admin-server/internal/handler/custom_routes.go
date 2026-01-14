@@ -88,4 +88,7 @@ func RegisterCustomRoutes(server *rest.Server, serverCtx *svc.ServiceContext) {
 	})
 
 	logx.Infof("静态文件服务已注册: %s/* -> %s", consts.PathFileUploads, consts.UploadDir)
+
+	// 注意：博客标签下拉选项接口 /blog/tags/options 已由 goctl 自动生成到 routes.go
+	// 无需在此重复注册
 }

@@ -11,6 +11,18 @@ const routes: RouteRecordRaw[] = [
     name: 'Login',
     component: () => import('@/views/Login.vue')
   },
+  // 公共博客列表页（不需要登录）
+  {
+    path: '/public/blog',
+    name: 'PublicBlogList',
+    component: () => import('@/views/public/BlogListPage.vue')
+  },
+  // 公共博客详情页（不需要登录）
+  {
+    path: '/public/blog/:id',
+    name: 'PublicBlogDetail',
+    component: () => import('@/views/public/BlogDetailPage.vue')
+  },
   // 公开视频列表页（不需要登录）
   {
     path: '/public/videos',
@@ -34,6 +46,19 @@ const routes: RouteRecordRaw[] = [
         name: 'Dashboard',
         meta: {keepAlive: true},
         component: () => import('@/views/Dashboard.vue')
+      },
+      // 博客文章编辑页（不挂菜单，通过文章列表跳转进入）
+      {
+        path: '/blog/article/edit',
+        name: 'BlogArticleCreate',
+        meta: {permission: 'blog_article:create', keepAlive: false},
+        component: () => import('@/views/blog/BlogArticleEdit.vue')
+      },
+      {
+        path: '/blog/article/edit/:id',
+        name: 'BlogArticleEdit',
+        meta: {permission: 'blog_article:update', keepAlive: false},
+        component: () => import('@/views/blog/BlogArticleEdit.vue')
       },
       {
         path: '/system/role',
@@ -70,6 +95,12 @@ const routes: RouteRecordRaw[] = [
         name: 'TaskListPage',
         meta: {permission: 'task:list', keepAlive: true},
         component: () => import('@/views/system/TaskList.vue')
+      },
+      {
+        path: '/system/metric-stats',
+        name: 'MetricStats',
+        meta: {permission: 'metric:stats', keepAlive: true},
+        component: () => import('@/views/system/MetricStats.vue')
       },
       {
         path: '/403',
@@ -200,7 +231,7 @@ router.beforeEach(async (to, _from, next) => {
     const {hasPermission} = usePermission();
 
     // 公开视频页面不需要登录
-    const publicPaths = ['/public/videos'];
+    const publicPaths = ['/public/videos', '/public/blog'];
     const isPublicPath = publicPaths.some(path => to.path.startsWith(path));
     
     if (!isPublicPath && to.path !== '/login' && !userStore.token) {

@@ -1,31 +1,35 @@
 <template>
-  <div class="video-list-page">
+  <div class="video-list-page public-list-page">
+    <MetricReporter module="video_list" :biz-id="0" />
     <div class="container">
-      <h1>🎬 视频列表</h1>
+      <div class="hero">
+        <div class="hero-title">🎬 视频列表</div>
+        <div class="hero-subtitle">发现精彩视频内容</div>
 
-      <!-- 搜索栏 -->
-      <div class="search-bar">
-        <el-input
-          v-model="query.content"
-          placeholder="搜索视频..."
-          clearable
-          @keydown.enter="handleSearch"
-        >
-          <template #append>
-            <el-button type="primary" :loading="loading" @click="handleSearch">搜索</el-button>
-          </template>
-        </el-input>
+        <!-- 搜索栏 -->
+        <div class="search-bar">
+          <el-input
+            v-model="query.content"
+            placeholder="搜索视频..."
+            clearable
+            @keydown.enter="handleSearch"
+          >
+            <template #append>
+              <el-button type="primary" :loading="loading" @click="handleSearch">搜索</el-button>
+            </template>
+          </el-input>
+        </div>
       </div>
 
       <!-- 视频网格 -->
-      <div v-loading="loading" class="video-grid">
+      <div v-loading="loading" class="list-grid">
         <div
           v-for="video in list"
           :key="video.id"
-          class="video-card"
+          class="list-card video-card"
         >
           <div
-            class="video-thumbnail"
+            class="cover video-thumbnail"
             @mouseenter="handleThumbnailHover(video)"
             @mouseleave="handleThumbnailLeave(video)"
           >
@@ -49,14 +53,14 @@
               <div class="play-icon"></div>
             </div>
           </div>
-          <div class="video-info">
+          <div class="card-content video-info">
             <div
-              class="video-title"
+              class="card-title video-title"
               @click.stop="goToDetail(video.id)"
             >
               {{ video.name || '未命名视频' }}
             </div>
-            <div class="video-code">{{ video.godNum || '-' }}</div>
+            <div class="card-meta video-code">{{ video.godNum || '-' }}</div>
           </div>
         </div>
         <div v-if="!loading && list.length === 0" class="empty-message">
@@ -66,9 +70,6 @@
 
       <!-- 分页 -->
       <div class="pagination">
-        <div class="page-info">
-          共 {{ total }} 条，第 {{ query.page }} / {{ totalPages }} 页
-        </div>
         <el-pagination
           v-model:current-page="query.page"
           v-model:page-size="query.size"
@@ -80,6 +81,8 @@
           @current-change="handlePageChange"
         />
       </div>
+
+      <IcpFooter />
     </div>
   </div>
 </template>
@@ -90,6 +93,8 @@ import {useRouter, useRoute} from 'vue-router'
 import {ElMessage} from 'element-plus'
 import {publicVideoList} from '@/api/generated/admin'
 import type {PublicVideoListReq, PublicVideoItem} from '@/api/generated/admin'
+import MetricReporter from '@/components/common/MetricReporter.vue'
+import IcpFooter from '@/components/common/IcpFooter.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -108,8 +113,6 @@ const hoveringVideoId = ref<number | null>(null)
 const videoRefs = ref<Map<number, HTMLVideoElement>>(new Map())
 const pendingScrollTop = ref<number | null>(null)
 const isMobile = ref(false)
-
-const totalPages = computed(() => Math.max(1, Math.ceil(total.value / query.size)))
 
 // 响应式分页 layout：移动端使用简化布局
 const paginationLayout = computed(() => {
@@ -216,6 +219,7 @@ const loadData = async () => {
     const resp = await publicVideoList(req)
     list.value = resp.list
     total.value = resp.total
+
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : '加载失败'
     ElMessage.error(message)
@@ -374,45 +378,16 @@ onUnmounted(() => {
 </script>
 
 <style scoped lang="scss">
+@import '@/styles/public-list.scss';
+
+// 视频列表页特定样式
 .video-list-page {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 20px;
+  // 覆盖通用列表页背景为暖色渐变
+  background: linear-gradient(135deg, #fff7e6 0%, #ffe9d9 45%, #ffd1a4 100%);
 
-  .container {
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
-  h1 {
-    color: #fff;
-    text-align: center;
-    margin-bottom: 30px;
-    font-size: 2.4rem;
-  }
-
-  .search-bar {
-    background: #fff;
-    border-radius: 12px;
-    padding: 18px;
-    margin-bottom: 24px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-  }
-
-  .video-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 24px;
-    margin-bottom: 32px;
-  }
-
+  // 视频卡片特定样式
   .video-card {
-    background: #fff;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
     transition: transform 0.25s, box-shadow 0.25s;
-    cursor: pointer;
 
     &:hover {
       transform: translateY(-6px);
@@ -420,14 +395,13 @@ onUnmounted(() => {
     }
   }
 
+  // 视频缩略图特定样式
   .video-thumbnail {
     position: relative;
-    width: 100%;
     padding-top: 56.25%; /* 16:9 */
     background: #f0f0f0;
     overflow: hidden;
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
+    border-radius: 10px 0 0 10px;
 
     img,
     video {
@@ -488,16 +462,7 @@ onUnmounted(() => {
     }
   }
 
-  .video-info {
-    padding: 14px;
-  }
-
   .video-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 8px;
-    line-height: 1.2;
     cursor: pointer;
 
     &:hover {
@@ -505,90 +470,9 @@ onUnmounted(() => {
     }
   }
 
-  .video-code {
-    font-size: 14px;
-    color: #666;
-  }
-
-  .empty-message {
-    grid-column: 1 / -1;
-    text-align: center;
-    color: #fff;
-    padding: 30px;
-    font-size: 16px;
-  }
-
-  .pagination {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    background: #fff;
-    padding: 16px;
-    border-radius: 10px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-
-    .page-info {
-      color: #666;
-      font-size: 14px;
-      white-space: nowrap;
-    }
-
-    // 确保分页组件在小屏下有足够空间
-    :deep(.el-pagination) {
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    // 移动端隐藏部分元素，避免挤压
-    :deep(.el-pagination__total),
-    :deep(.el-pagination__sizes),
-    :deep(.el-pagination__jump) {
-      @media (max-width: 768px) {
-        display: none;
-      }
-    }
-  }
-
   @media (max-width: 768px) {
-    padding: 12px;
-
-    h1 {
-      font-size: 1.6rem;
-      margin-bottom: 20px;
-    }
-
-    .search-bar {
-      padding: 12px;
-      margin-bottom: 16px;
-    }
-
-    .video-grid {
-      grid-template-columns: 1fr;
-      gap: 14px;
-      margin-bottom: 20px;
-    }
-
-    .video-title {
-      font-size: 1.4rem;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    .video-code {
-      font-size: 12px;
-    }
-
-    .pagination {
-      padding: 12px;
-      gap: 8px;
-
-      .page-info {
-        font-size: 12px;
-      }
+    .video-thumbnail {
+      border-radius: 10px 0 0 10px;
     }
   }
 }

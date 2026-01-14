@@ -103,6 +103,152 @@ export interface AuditLogListResp {
 	pageSize: number
 }
 
+export interface BlogArticleAuditReq {
+	id: number // 文章ID
+	result: number // 审核结果：3=通过，4=驳回（字典：blog_article_audit_status）
+	remark?: string // 审核意见
+}
+
+export interface BlogArticleAuditUnpublishReq {
+	id: number // 文章ID
+	remark?: string // 下架原因
+}
+
+export interface BlogArticleCreateReq {
+	title: string // 标题
+	content: string // Markdown 内容
+	tagIds: Array<number> // 标签ID列表（至少1个）
+	cover?: string // 封面URL
+	summary?: string // 摘要（可选）
+}
+
+export interface BlogArticleDeleteReq {
+	id: number
+}
+
+export interface BlogArticleDetailReq {
+	id?: number // 文章ID（必填，但 query 参数需标记为 optional）
+}
+
+export interface BlogArticleDetailResp {
+	id: number
+	title: string
+	content: string // Markdown 原文
+	status: number
+	auditStatus: number
+	cover?: string
+	authorId: number
+	authorName: string
+	publishTime: number
+	summary?: string
+	tags?: Array<BlogTagItem>
+	createdAt: number
+	updatedAt: number
+}
+
+export interface BlogArticleItem {
+	id: number
+	title: string
+	status: number // 字典：blog_article_status
+	auditStatus: number // 字典：blog_article_audit_status
+	cover?: string
+	authorId: number
+	authorName: string
+	tagIds?: Array<number> // 关联标签ID列表
+	tagNames?: Array<string> // 关联标签名称列表
+	publishTime: number // 上架时间(秒级时间戳)
+	createdAt: number // 创建时间(秒级时间戳)
+	updatedAt: number // 更新时间(秒级时间戳)
+}
+
+export interface BlogArticleListReq {
+	page?: number
+	pageSize?: number
+	title?: string // 标题关键字
+	status?: number // 字典：blog_article_status，0=全部
+	auditStatus?: number // 字典：blog_article_audit_status，0=全部
+	tagId?: number // 标签筛选
+	startTime?: number // 创建时间起
+	endTime?: number // 创建时间止
+}
+
+export interface BlogArticleListResp {
+	total: number
+	list: Array<BlogArticleItem>
+}
+
+export interface BlogArticlePublishReq {
+	id: number
+}
+
+export interface BlogArticleSubmitReq {
+	id: number
+}
+
+export interface BlogArticleUnpublishReq {
+	id: number
+}
+
+export interface BlogArticleUpdateReq {
+	id: number
+	title?: string
+	content?: string
+	tagIds?: Array<number>
+	cover?: string
+	summary?: string
+}
+
+export interface BlogTagCreateReq {
+	name: string // 标签名称
+	status?: number // 状态（字典：blog_tag_status）
+	remark?: string // 备注
+}
+
+export interface BlogTagDeleteReq {
+	id: number
+}
+
+export interface BlogTagItem {
+	id: number
+	name: string
+	status: number // 字典：blog_tag_status
+	remark?: string // 备注
+	createdAt: number // 创建时间(秒级时间戳)
+	updatedAt: number // 更新时间(秒级时间戳)
+}
+
+export interface BlogTagListReq {
+	page?: number
+	pageSize?: number
+	name?: string // 标签名称模糊搜索
+	status?: number // 状态筛选：0=全部，>0 对应字典值
+}
+
+export interface BlogTagListResp {
+	total: number
+	list: Array<BlogTagItem>
+}
+
+export interface BlogTagOptionItem {
+	id: number
+	name: string
+}
+
+export interface BlogTagOptionsReq {
+	limit?: number // 限制数量，默认1000
+}
+
+export interface BlogTagOptionsResp {
+	list: Array<BlogTagOptionItem>
+}
+
+export interface BlogTagUpdateReq {
+	id: number
+	name?: string
+	status?: number
+	remark?: string
+}
+
 export interface CPUInfo {
 	usage: number // CPU使用率（百分比）
 	cores: number // CPU核心数
@@ -724,6 +870,29 @@ export interface MenuUpdateReq {
 	status?: number
 }
 
+export interface MetricReportReq {
+	module: string // 业务模块标识，如 blog_article_list/blog_article_detail/video_list/video_detail
+	bizId?: number // 业务ID（文章ID、视频ID等）
+	event?: string // 事件类型，如 view/play 等
+	extra?: string // 额外信息（JSON字符串）
+}
+
+export interface MetricStatsReq {
+	module?: string // 业务模块标识，如 blog_article_list/blog_article_detail/video_list/video_detail
+	bizId?: number // 业务ID（文章ID、视频ID等）
+	day?: string // 统计日期：YYYYMMDD（默认今天）
+}
+
+export interface MetricStatsResp {
+	module: string
+	bizId: number
+	day: string
+	pv: number
+	uv: number
+	vv: number
+	ip: number
+}
+
 export interface MonitorStatsResp {
 	userCount: number // 用户总数
 	roleCount: number // 角色总数
@@ -1017,6 +1186,44 @@ export interface ProfileUpdateReq {
 	nickname?: string
 	avatar?: string
 	signature?: string
+}
+
+export interface PublicBlogArticleDetailReq {
+	id?: number // 文章ID
+}
+
+export interface PublicBlogArticleDetailResp {
+	id: number
+	title: string
+	content: string // Markdown 原文
+	cover?: string
+	authorName: string
+	publishTime: number
+	tags?: Array<BlogTagItem>
+}
+
+export interface PublicBlogArticleItem {
+	id: number
+	title: string
+	cover?: string
+	authorName: string
+	summary: string
+	tagNames?: Array<string>
+	publishTime: number
+}
+
+export interface PublicBlogArticleListReq {
+	page?: number // 页码
+	size?: number // 每页数量
+	tagId?: number // 标签筛选
+	keyword?: string // 标题/摘要搜索
+}
+
+export interface PublicBlogArticleListResp {
+	list: Array<PublicBlogArticleItem>
+	page: number
+	size: number
+	total: number
 }
 
 export interface PublicVideoDetailReq {

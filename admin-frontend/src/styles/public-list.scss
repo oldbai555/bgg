@@ -1,0 +1,258 @@
+/**
+ * Public 列表页通用样式模板（小程序风格）
+ * 
+ * 使用方式：
+ * 1. 在组件的 <style scoped lang="scss"> 中引入：
+ *    @import '@/styles/public-list.scss';
+ * 
+ * 2. 在模板根元素上添加 class="public-list-page"
+ * 
+ * 3. 确保 HTML 结构包含：
+ *    - .container（容器）
+ *    - .hero（可选，顶部标题/搜索区域）
+ *    - .list-grid（列表网格）
+ *    - .list-card（列表卡片）
+ *    - .pagination（分页组件）
+ */
+
+.public-list-page {
+  height: 100vh;
+  overflow: hidden; // 禁止整个页面滚动
+  background: linear-gradient(135deg, #fff7e6 0%, #ffe9d9 45%, #ffd1a4 100%);
+  padding: 16px 16px 0;
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    height: 100%; // 固定容器高度，使用 flex 布局
+  }
+
+  // 顶部 Hero 区域（可选）
+  .hero {
+    background: #fff;
+    border-radius: 12px;
+    padding: 14px 14px 12px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+
+    .hero-title {
+      color: #333;
+      font-size: 20px;
+      font-weight: 600;
+      text-align: left;
+    }
+
+    .hero-subtitle {
+      color: #888;
+      text-align: left;
+      margin-top: 4px;
+      font-size: 12px;
+    }
+
+    .search-bar {
+      margin-top: 14px;
+      background: #fff;
+      border-radius: 12px;
+      padding: 12px;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+    }
+  }
+
+  // 列表网格（中间滚动区域）
+  .list-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-auto-rows: minmax(400px, auto); // 固定每行最小高度，确保卡片大小一致
+    gap: 12px;
+    margin-bottom: 12px;
+    flex: 1 1 auto;
+    min-height: 0; // 允许 flex 子元素收缩
+    overflow-y: auto; // 只有中间区域滚动
+    align-content: start; // 网格内容从顶部开始，不拉伸
+  }
+
+  // 列表卡片（固定高度，不因内容多少而拉长）
+  .list-card {
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    transition: background-color 0.15s;
+    display: flex;
+    flex-direction: column;
+    height: 100%; // 卡片填满网格单元格高度
+
+    &:hover {
+      background-color: #f7f7f7;
+    }
+  }
+
+  // 封面图区域
+  .cover {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: #ececec;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #f5f5f5;
+    }
+
+    .cover-fallback {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: 600;
+      color: #fff;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+  }
+
+  // 卡片内容区域（固定高度，超出内容截断）
+  .card-content {
+    padding: 14px 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1 1 auto;
+    min-height: 0; // 允许 flex 子元素收缩
+    overflow: hidden; // 防止内容溢出
+  }
+
+  // 标题
+  .card-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0;
+    color: #222;
+    line-height: 1.25;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  // 元信息（作者、时间等）
+  .card-meta {
+    font-size: 13px;
+    color: #888;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  // 摘要
+  .card-summary {
+    font-size: 14px;
+    color: #444;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  // 标签
+  .card-tags {
+    margin-top: 4px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  // 空状态
+  .empty-message {
+    text-align: center;
+    color: #999;
+    padding: 24px 0;
+  }
+
+  // 分页组件
+  .pagination {
+    display: flex;
+    justify-content: center;
+    background: #fff;
+    padding: 10px 8px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    margin: 4px 0 10px;
+    flex-shrink: 0;
+    margin-top: auto; // 将分页推到底部
+  }
+
+  // 移动端适配（≤768px）
+  @media (max-width: 768px) {
+    padding: 12px 10px 0;
+
+    .list-card {
+      display: flex;
+    }
+
+    .cover {
+      flex: 0 0 110px;
+      height: 84px;
+      aspect-ratio: auto;
+      border-radius: 10px 0 0 10px;
+
+      img,
+      .cover-fallback {
+        border-radius: 10px 0 0 10px;
+      }
+    }
+
+    .list-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .card-content {
+      padding: 10px 10px 12px;
+      gap: 4px;
+    }
+
+    .card-title {
+      font-size: 15px;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+    }
+
+    .card-summary {
+      font-size: 13px;
+      -webkit-line-clamp: 3;
+      line-clamp: 3;
+      color: #555;
+    }
+
+    .pagination {
+      background: transparent;
+      box-shadow: none;
+      padding: 8px 0 12px;
+      margin: 0;
+
+      :deep(.el-pagination) {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      :deep(.el-pagination__total),
+      :deep(.el-pagination__sizes),
+      :deep(.el-pagination__jump) {
+        display: none;
+      }
+    }
+  }
+}

@@ -18,6 +18,10 @@ import (
 type ServiceContext struct {
 	Config                       config.Config
 	Repository                   *repository.Repository
+	BlogTagRepository            repository.BlogTagRepository
+	BlogArticleRepository        repository.BlogArticleRepository
+	BlogArticleTagRepository     repository.BlogArticleTagRepository
+	BlogArticleAuditRepository   repository.BlogArticleAuditRepository
 	ChatHub                      *hub.ChatHub
 	TaskExecutors                map[int]interfaces.TaskExecutor // 任务执行器映射
 	TaskScheduler                *task.TaskScheduler             // 任务调度器
@@ -58,10 +62,14 @@ func NewServiceContext(c config.Config) (*ServiceContext, error) {
 
 	// 创建ServiceContext（先不包含TaskScheduler，避免循环依赖）
 	svcCtx := &ServiceContext{
-		Config:        c,
-		Repository:    repo,
-		ChatHub:       chatHub,
-		TaskExecutors: taskExecutors,
+		Config:                     c,
+		Repository:                 repo,
+		BlogTagRepository:          repository.NewBlogTagRepository(repo),
+		BlogArticleRepository:      repository.NewBlogArticleRepository(repo),
+		BlogArticleTagRepository:   repository.NewBlogArticleTagRepository(repo),
+		BlogArticleAuditRepository: repository.NewBlogArticleAuditRepository(repo),
+		ChatHub:                    chatHub,
+		TaskExecutors:              taskExecutors,
 		// AuthMiddleware 和 PermissionMiddleware 需要在外部初始化，避免循环依赖
 	}
 

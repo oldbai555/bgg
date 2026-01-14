@@ -44,6 +44,8 @@
         </el-form-item>
       </el-form>
     </div>
+
+    <IcpFooter class="login-page__footer" />
   </div>
 </template>
 
@@ -53,6 +55,7 @@ import {ElForm, ElMessage} from 'element-plus'
 import {useRouter} from 'vue-router'
 import {useUserStore} from '@/stores/user'
 import {useI18n} from 'vue-i18n'
+import IcpFooter from '@/components/common/IcpFooter.vue'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -93,15 +96,19 @@ return
 
 <style scoped>
 .login-page {
-  min-height: 100vh;
-  display: flex;
+  height: 100vh;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  justify-items: center;
   align-items: center;
-  justify-content: center;
   background: radial-gradient(120% 120% at 50% 20%, #eef2ff, #f7f9fc);
   padding: 24px;
+  box-sizing: border-box;
+  overflow: hidden; /* 防止出现滚动条 */
 }
+
 .login-card {
-  width: 420px;
+  width: min(420px, calc(100vw - 48px));
   padding: 32px 32px 24px;
   background: var(--color-card, #fff);
   border-radius: 16px;
@@ -131,6 +138,10 @@ return
 }
 .full-btn {
   width: 100%;
+}
+
+.login-page__footer {
+  margin: 0;
 }
 </style>
 
