@@ -94,6 +94,9 @@ func (l *M3u8ProxyLogic) handleM3U8Request(w http.ResponseWriter, r *http.Reques
 		l.Errorf("请求目标失败: %v", err)
 		return errs.New(errs.CodeBadGateway, "请求目标地址失败")
 	}
+	if resp == nil {
+		return errs.New(errs.CodeBadGateway, "请求目标地址失败：响应为空")
+	}
 	defer resp.Body.Close()
 
 	// 检查响应状态
@@ -181,6 +184,9 @@ func (l *M3u8ProxyLogic) handleMediaFileWithRange(w http.ResponseWriter, r *http
 		l.Errorf("请求目标失败: %v", err)
 		return errs.New(errs.CodeBadGateway, "请求目标地址失败")
 	}
+	if resp == nil {
+		return errs.New(errs.CodeBadGateway, "请求目标地址失败：响应为空")
+	}
 	defer resp.Body.Close()
 
 	// 检查响应状态（支持 200 和 206 Partial Content）
@@ -194,6 +200,9 @@ func (l *M3u8ProxyLogic) handleMediaFileWithRange(w http.ResponseWriter, r *http
 
 // handleMediaFile 处理 ts 等媒体文件，直接透传（支持 Range 响应）
 func (l *M3u8ProxyLogic) handleMediaFile(w http.ResponseWriter, resp *http.Response) error {
+	if resp == nil {
+		return errs.New(errs.CodeBadGateway, "响应为空")
+	}
 	// 需要排除的头部
 	excludedHeaders := map[string]bool{
 		"access-control-allow-origin":      true, // CORS 头由 nginx 统一设置

@@ -1175,6 +1175,7 @@ type (
 		tagIds      []uint64 `json:"tagIds,optional"` // 关联标签ID列表
 		tagNames    []string `json:"tagNames,optional"` // 关联标签名称列表
 		publishTime int64    `json:"publishTime"` // 上架时间(秒级时间戳)
+		isTop       int64    `json:"isTop"` // 是否置顶：0=否，1=是
 		createdAt   int64    `json:"createdAt"` // 创建时间(秒级时间戳)
 		updatedAt   int64    `json:"updatedAt"` // 更新时间(秒级时间戳)
 	}
@@ -1259,6 +1260,7 @@ type (
 		summary     string   `json:"summary"`
 		tagNames    []string `json:"tagNames,optional"`
 		publishTime int64    `json:"publishTime"`
+		isTop       int64    `json:"isTop"` // 是否置顶：0=否，1=是
 	}
 	PublicBlogArticleListReq {
 		page    int64  `json:"page,optional" form:"page,optional"` // 页码
@@ -1283,6 +1285,144 @@ type (
 		authorName  string        `json:"authorName"`
 		publishTime int64         `json:"publishTime"`
 		tags        []BlogTagItem `json:"tags,optional"`
+	}
+	// 友情链接管理
+	BlogFriendLinkItem {
+		id        uint64 `json:"id"`
+		name      string `json:"name"`
+		url       string `json:"url"`
+		remark    string `json:"remark,optional"`
+		status    int64  `json:"status"`
+		orderNum  int64  `json:"orderNum"`
+		createdAt int64  `json:"createdAt"`
+		updatedAt int64  `json:"updatedAt"`
+	}
+	BlogFriendLinkListReq {
+		page    int64  `json:"page,optional" form:"page,optional"`
+		size    int64  `json:"size,optional" form:"size,optional"`
+		status  int64  `json:"status,optional" form:"status,optional"` // 状态筛选（0=全部，1=启用，2=禁用）
+		keyword string `json:"keyword,optional" form:"keyword,optional"` // 名称/备注搜索
+	}
+	BlogFriendLinkListResp {
+		list  []BlogFriendLinkItem `json:"list"`
+		page  int64                `json:"page"`
+		size  int64                `json:"size"`
+		total int64                `json:"total"`
+	}
+	BlogFriendLinkCreateReq {
+		name     string `json:"name"` // 链接名称
+		url      string `json:"url"` // 目标链接
+		remark   string `json:"remark,optional"` // 备注
+		status   int64  `json:"status"` // 状态：1=启用，2=禁用
+		orderNum int64  `json:"orderNum,optional"` // 排序值
+	}
+	BlogFriendLinkUpdateReq {
+		id       uint64 `json:"id"`
+		name     string `json:"name,optional"`
+		url      string `json:"url,optional"`
+		remark   string `json:"remark,optional"`
+		status   int64  `json:"status,optional"`
+		orderNum int64  `json:"orderNum,optional"`
+	}
+	BlogFriendLinkDeleteReq {
+		id uint64 `json:"id"`
+	}
+	// 社交信息管理
+	BlogSocialInfoItem {
+		id        uint64 `json:"id"`
+		name      string `json:"name"`
+		url       string `json:"url"`
+		remark    string `json:"remark,optional"`
+		status    int64  `json:"status"`
+		orderNum  int64  `json:"orderNum"`
+		createdAt int64  `json:"createdAt"`
+		updatedAt int64  `json:"updatedAt"`
+	}
+	BlogSocialInfoListReq {
+		page    int64  `json:"page,optional" form:"page,optional"`
+		size    int64  `json:"size,optional" form:"size,optional"`
+		status  int64  `json:"status,optional" form:"status,optional"` // 状态筛选（0=全部，1=启用，2=禁用）
+		keyword string `json:"keyword,optional" form:"keyword,optional"` // 名称/备注搜索
+	}
+	BlogSocialInfoListResp {
+		list  []BlogSocialInfoItem `json:"list"`
+		page  int64                `json:"page"`
+		size  int64                `json:"size"`
+		total int64                `json:"total"`
+	}
+	BlogSocialInfoCreateReq {
+		name     string `json:"name"` // 社交平台名称
+		url      string `json:"url"` // 目标链接
+		remark   string `json:"remark,optional"` // 备注
+		status   int64  `json:"status"` // 状态：1=启用，2=禁用
+		orderNum int64  `json:"orderNum,optional"` // 排序值
+	}
+	BlogSocialInfoUpdateReq {
+		id       uint64 `json:"id"`
+		name     string `json:"name,optional"`
+		url      string `json:"url,optional"`
+		remark   string `json:"remark,optional"`
+		status   int64  `json:"status,optional"`
+		orderNum int64  `json:"orderNum,optional"`
+	}
+	BlogSocialInfoDeleteReq {
+		id uint64 `json:"id"`
+	}
+	// 文章置顶
+	BlogArticleTopReq {
+		id uint64 `json:"id"` // 文章ID
+	}
+	BlogArticleUntopReq {
+		id uint64 `json:"id"` // 文章ID
+	}
+	// 公共接口返回类型
+	PublicBlogFriendLinkItem {
+		id       uint64 `json:"id"`
+		name     string `json:"name"`
+		url      string `json:"url"`
+		remark   string `json:"remark,optional"`
+		orderNum int64  `json:"orderNum"`
+	}
+	PublicBlogFriendLinkListResp {
+		list []PublicBlogFriendLinkItem `json:"list"`
+	}
+	PublicBlogSocialInfoItem {
+		id       uint64 `json:"id"`
+		name     string `json:"name"`
+		url      string `json:"url"`
+		remark   string `json:"remark,optional"`
+		orderNum int64  `json:"orderNum"`
+	}
+	PublicBlogSocialInfoListResp {
+		list []PublicBlogSocialInfoItem `json:"list"`
+	}
+	PublicBlogTagListResp {
+		list []BlogTagItem `json:"list"`
+	}
+	PublicBlogAuthorInfoResp {
+		id        uint64 `json:"id"` // 用户ID（固定为1）
+		nickname  string `json:"nickname"` // 昵称
+		avatar    string `json:"avatar"` // 头像URL
+		signature string `json:"signature"` // 个性签名
+	}
+	PublicBlogArticleStatsResp {
+		totalArticles int64 `json:"totalArticles"` // 文章总数（已发布）
+	}
+	PublicBlogArticlePrevReq {
+		id uint64 `json:"id,optional" form:"id,optional"` // 当前文章ID
+	}
+	PublicBlogArticlePrevResp {
+		id          uint64 `json:"id"` // 文章ID
+		title       string `json:"title"` // 标题
+		publishTime int64  `json:"publishTime"` // 发布时间
+	}
+	PublicBlogArticleNextReq {
+		id uint64 `json:"id,optional" form:"id,optional"` // 当前文章ID
+	}
+	PublicBlogArticleNextResp {
+		id          uint64 `json:"id"` // 文章ID
+		title       string `json:"title"` // 标题
+		publishTime int64  `json:"publishTime"` // 发布时间
 	}
 	// 通用打点上报
 	MetricReportReq {
@@ -1458,6 +1598,12 @@ service admin-api {
 
 	@handler BlogArticleUnpublish
 	post /blog/articles/unpublish (BlogArticleUnpublishReq) returns (Response)
+
+	@handler BlogArticleTop
+	post /blog/articles/top (BlogArticleTopReq) returns (Response)
+
+	@handler BlogArticleUntop
+	post /blog/articles/untop (BlogArticleUntopReq) returns (Response)
 }
 
 // 博客文章审核（审核员）
@@ -1486,6 +1632,67 @@ service admin-api {
 
 	@handler PublicBlogArticleDetail
 	get /public/blog/articles/info (PublicBlogArticleDetailReq) returns (PublicBlogArticleDetailResp)
+
+	@handler PublicBlogFriendLinkList
+	get /public/blog/friend-links returns (PublicBlogFriendLinkListResp)
+
+	@handler PublicBlogSocialInfoList
+	get /public/blog/social-infos returns (PublicBlogSocialInfoListResp)
+
+	@handler PublicBlogTagList
+	get /public/blog/tags returns (PublicBlogTagListResp)
+
+	@handler PublicBlogAuthorInfo
+	get /public/blog/author-info returns (PublicBlogAuthorInfoResp)
+
+	@handler PublicBlogArticleStats
+	get /public/blog/article-stats returns (PublicBlogArticleStatsResp)
+
+	@handler PublicBlogArticlePrev
+	get /public/blog/articles/prev (PublicBlogArticlePrevReq) returns (PublicBlogArticlePrevResp)
+
+	@handler PublicBlogArticleNext
+	get /public/blog/articles/next (PublicBlogArticleNextReq) returns (PublicBlogArticleNextResp)
+}
+
+// 友情链接管理
+@server (
+	group:      blog_friend_link
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler BlogFriendLinkList
+	get /blog/friend-links (BlogFriendLinkListReq) returns (BlogFriendLinkListResp)
+
+	@handler BlogFriendLinkCreate
+	post /blog/friend-links (BlogFriendLinkCreateReq) returns (Response)
+
+	@handler BlogFriendLinkUpdate
+	put /blog/friend-links (BlogFriendLinkUpdateReq) returns (Response)
+
+	@handler BlogFriendLinkDelete
+	delete /blog/friend-links (BlogFriendLinkDeleteReq) returns (Response)
+}
+
+// 社交信息管理
+@server (
+	group:      blog_social_info
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler BlogSocialInfoList
+	get /blog/social-infos (BlogSocialInfoListReq) returns (BlogSocialInfoListResp)
+
+	@handler BlogSocialInfoCreate
+	post /blog/social-infos (BlogSocialInfoCreateReq) returns (Response)
+
+	@handler BlogSocialInfoUpdate
+	put /blog/social-infos (BlogSocialInfoUpdateReq) returns (Response)
+
+	@handler BlogSocialInfoDelete
+	delete /blog/social-infos (BlogSocialInfoDeleteReq) returns (Response)
 }
 
 // 通用打点上报接口（PV/UV/VV/IP，文章与视频共用）

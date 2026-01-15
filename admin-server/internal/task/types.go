@@ -1,3 +1,4 @@
+//staticcheck:ignore SA5008 // "optional" is a go-zero framework extension for JSON tags
 package task
 
 // TaskParamsReq 通用任务参数结构

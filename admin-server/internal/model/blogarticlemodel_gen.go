@@ -51,6 +51,7 @@ type (
 		AuthorName  string `db:"author_name"`  // 作者姓名快照
 		PublishTime int64  `db:"publish_time"` // 上架时间(秒级时间戳,0表示未上架)
 		Summary     string `db:"summary"`      // 文章摘要/简介（可选，公共列表优先使用）
+		IsTop       int64  `db:"is_top"`       // 是否置顶：0=否，1=是
 		CreatedAt   int64  `db:"created_at"`   // 创建时间(秒级时间戳)
 		UpdatedAt   int64  `db:"updated_at"`   // 更新时间(秒级时间戳)
 		DeletedAt   int64  `db:"deleted_at"`   // 删除时间(秒级时间戳,0表示未删除)
@@ -122,8 +123,8 @@ func (m *defaultBlogArticleModel) Insert(ctx context.Context, data *BlogArticle)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		// 手动构建包含 created_at、updated_at 的插入语句
 		// 如果表有 deleted_at 字段，它已经在 RowsExpectAutoSet 中，不需要重复添加
-		query := fmt.Sprintf("insert into %s (%s, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, blogArticleRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.Title, data.Content, data.Status, data.AuditStatus, data.Cover, data.AuthorId, data.AuthorName, data.PublishTime, data.Summary, data.DeletedAt, data.CreatedAt, data.UpdatedAt)
+		query := fmt.Sprintf("insert into %s (%s, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, blogArticleRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.Title, data.Content, data.Status, data.AuditStatus, data.Cover, data.AuthorId, data.AuthorName, data.PublishTime, data.Summary, data.IsTop, data.DeletedAt, data.CreatedAt, data.UpdatedAt)
 	}, blogArticleIdKey)
 	return ret, err
 }
@@ -141,7 +142,7 @@ func (m *defaultBlogArticleModel) Update(ctx context.Context, data *BlogArticle)
 			whereClause += " and deleted_at = 0"
 		}
 		query := fmt.Sprintf("update %s set %s, `updated_at` = %d %s", m.table, blogArticleRowsWithPlaceHolder, data.UpdatedAt, whereClause)
-		return conn.ExecCtx(ctx, query, data.Title, data.Content, data.Status, data.AuditStatus, data.Cover, data.AuthorId, data.AuthorName, data.PublishTime, data.Summary, data.DeletedAt, data.Id)
+		return conn.ExecCtx(ctx, query, data.Title, data.Content, data.Status, data.AuditStatus, data.Cover, data.AuthorId, data.AuthorName, data.PublishTime, data.Summary, data.IsTop, data.DeletedAt, data.Id)
 	}, blogArticleIdKey)
 	return err
 }

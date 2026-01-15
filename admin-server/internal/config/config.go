@@ -1,5 +1,7 @@
 // Code scaffolded by goctl. Safe to edit.
 // goctl 1.9.2
+//
+//staticcheck:ignore SA5008 // "optional" is a go-zero framework extension for JSON tags
 
 package config
 

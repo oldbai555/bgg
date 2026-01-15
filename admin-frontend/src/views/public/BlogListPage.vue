@@ -1,83 +1,84 @@
 <template>
-  <div class="blog-list-page public-list-page">
+  <div class="blog-list-page">
     <MetricReporter module="blog_article_list" :biz-id="0" />
-    <div class="container">
-      <div class="hero">
-        <div class="hero-title">博客文章</div>
-        <div class="hero-subtitle">发现有趣内容 · 持续更新</div>
+    <BlogHeader />
+    <div class="blog-page-container">
+      <div class="blog-content-wrapper">
+        <!-- 左侧分类导航 -->
+        <aside class="blog-sidebar-left">
+          <BlogCategoryNav :selected-tag-id="query.tagId" @select="handleTagSelect" />
+        </aside>
 
-        <!-- 搜索栏 -->
-        <div class="search-bar">
-          <el-input
-            v-model="query.keyword"
-            placeholder="搜索文章标题或内容..."
-            clearable
-            @keydown.enter="handleSearch"
-          >
-            <template #append>
-              <el-button type="primary" :loading="loading" @click="handleSearch">搜索</el-button>
-            </template>
-          </el-input>
-        </div>
-      </div>
+        <!-- 中间文章列表 -->
+        <main class="blog-main">
+          <div v-loading="loading" class="article-list">
+            <div
+              v-for="item in list"
+              :key="item.id"
+              class="blog-article-card"
+              @click="goToDetail(item.id)"
+            >
+              <div class="article-cover">
+                <img
+                  v-if="item.cover"
+                  :src="item.cover"
+                  :alt="item.title"
+                  @error="handleImageError"
+                />
+                <div v-else class="cover-fallback">{{ firstChar(item.title) }}</div>
+                <div v-if="item.isTop === 1" class="top-badge">置顶</div>
+              </div>
+              <div class="article-content">
+                <div class="article-title">
+                  <span v-if="item.isTop === 1" class="top-icon">📌</span>
+                  {{ item.title }}
+                </div>
+                <div class="article-meta">
+                  <span class="author">{{ item.authorName || '匿名' }}</span>
+                  <span class="dot">·</span>
+                  <span class="time">{{ formatTime(item.publishTime) }}</span>
+                </div>
+                <div class="article-summary">{{ item.summary || '暂无摘要' }}</div>
+                <div v-if="item.tagNames?.length" class="article-tags">
+                  <el-tag
+                    v-for="tag in item.tagNames"
+                    :key="tag"
+                    size="small"
+                    effect="plain"
+                  >
+                    {{ tag }}
+                  </el-tag>
+                </div>
+              </div>
+            </div>
 
-      <!-- 文章列表 -->
-      <div v-loading="loading" class="list-grid">
-        <div
-          v-for="item in list"
-          :key="item.id"
-          class="list-card"
-          @click="goToDetail(item.id)"
-        >
-          <div class="cover">
-            <img
-              v-if="item.cover"
-              :src="item.cover"
-              :alt="item.title"
-              @error="handleImageError"
+            <div v-if="!loading && list.length === 0" class="empty-message">暂无文章</div>
+          </div>
+
+          <!-- 分页 -->
+          <div class="pagination-wrapper">
+            <el-pagination
+              v-model:current-page="query.page"
+              v-model:page-size="query.size"
+              :total="total"
+              :page-sizes="[10, 20, 30, 50]"
+              :layout="paginationLayout"
+              :size="isMobile ? 'small' : 'default'"
+              @size-change="handleSizeChange"
+              @current-change="handlePageChange"
             />
-            <div v-else class="cover-fallback">{{ firstChar(item.title) }}</div>
           </div>
-          <div class="card-content">
-            <div class="card-title">{{ item.title }}</div>
-            <div class="card-meta">
-              <span class="author">{{ item.authorName || '匿名' }}</span>
-              <span class="dot">·</span>
-              <span class="time">{{ formatTime(item.publishTime || item.createdAt) }}</span>
-            </div>
-            <div class="card-summary">{{ item.summary || '暂无摘要' }}</div>
-            <div v-if="item.tagNames?.length" class="card-tags">
-              <el-tag
-                v-for="tag in item.tagNames"
-                :key="tag"
-                size="small"
-                effect="plain"
-              >
-                {{ tag }}
-              </el-tag>
-            </div>
-          </div>
-        </div>
+        </main>
 
-        <div v-if="!loading && list.length === 0" class="empty-message">暂无文章</div>
+        <!-- 右侧侧边栏 -->
+        <aside class="blog-sidebar">
+          <BlogAuthorCard />
+          <BlogSocialLinks />
+        </aside>
       </div>
-
-      <!-- 分页 -->
-      <div class="pagination">
-        <el-pagination
-          v-model:current-page="query.page"
-          v-model:page-size="query.size"
-          :total="total"
-          :page-sizes="[10, 20, 30, 50]"
-          :layout="paginationLayout"
-          :small="isMobile"
-          @size-change="handleSizeChange"
-          @current-change="handlePageChange"
-        />
-      </div>
-
-      <IcpFooter />
     </div>
+
+    <IcpFooter />
   </div>
 </template>
 
@@ -86,12 +87,13 @@ import {reactive, ref, computed, onMounted, onUnmounted, nextTick} from 'vue'
 import {useRouter, useRoute} from 'vue-router'
 import {ElMessage} from 'element-plus'
 import {blogApi} from '@/api/blog'
-import type {
-  PublicBlogArticleListReq,
-  PublicBlogArticleItem
-} from '@/api/generated/admin'
+import type {PublicBlogArticleListReq, PublicBlogArticleItem} from '@/api/generated/admin'
 import MetricReporter from '@/components/common/MetricReporter.vue'
 import IcpFooter from '@/components/common/IcpFooter.vue'
+import BlogHeader from '@/components/blog/BlogHeader.vue'
+import BlogCategoryNav from '@/components/blog/BlogCategoryNav.vue'
+import BlogAuthorCard from '@/components/blog/BlogAuthorCard.vue'
+import BlogSocialLinks from '@/components/blog/BlogSocialLinks.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -196,16 +198,10 @@ const updateRouteQuery = () => {
       ...route.query,
       page: String(query.page),
       size: String(query.size),
-      keyword: query.keyword || undefined
+      keyword: query.keyword || undefined,
+      tagId: query.tagId && query.tagId > 0 ? String(query.tagId) : undefined
     }
   })
-}
-
-const handleSearch = () => {
-  query.page = 1
-  updateRouteQuery()
-  pendingScrollTop.value = null
-  loadData()
 }
 
 const handlePageChange = (page: number) => {
@@ -223,84 +219,50 @@ const handleSizeChange = (size: number) => {
   loadData()
 }
 
+const handleTagSelect = (tagId: number) => {
+  query.tagId = tagId
+  query.page = 1
+  updateRouteQuery()
+  pendingScrollTop.value = null
+  loadData()
+}
+
 const goToDetail = (id: number) => {
-  // 进入详情前记录当前查询条件与滚动位置，方便返回时恢复
+  // 保存当前状态
   try {
     const state = {
       page: query.page,
       size: query.size,
       keyword: query.keyword,
-      scrollTop: window.scrollY,
-      ts: Date.now()
+      tagId: query.tagId,
+      scrollTop: window.scrollY
     }
     sessionStorage.setItem(SCROLL_STATE_KEY, JSON.stringify(state))
   } catch {
-    // 忽略存储失败
+    // 忽略存储错误
   }
 
-  router.push({
-    path: `/public/blog/${id}`
-  })
+  router.push(`/public/blog/${id}`)
+}
+
+// 从路由参数初始化查询条件
+const initFromRoute = () => {
+  const page = Number(route.query.page) || 1
+  const size = Number(route.query.size) || 10
+  const keyword = (route.query.keyword as string) || ''
+  const tagId = Number(route.query.tagId) || 0
+
+  query.page = page
+  query.size = size
+  query.keyword = keyword
+  query.tagId = tagId
 }
 
 onMounted(() => {
-  // 优先从路由 query 恢复查询参数
-  const {page, size, keyword} = route.query
-  if (page) {
-    const p = Number(page)
-    if (!Number.isNaN(p) && p > 0) {
-query.page = p
-}
-  }
-  if (size) {
-    const s = Number(size)
-    if (!Number.isNaN(s) && s > 0) {
-query.size = s
-}
-  }
-  if (typeof keyword === 'string') {
-    query.keyword = keyword
-  }
-
-  // 再尝试从 sessionStorage 恢复（例如从详情返回）
-  try {
-    const raw = sessionStorage.getItem(SCROLL_STATE_KEY)
-    if (raw) {
-      const parsed = JSON.parse(raw) as {
-        page?: number;
-        size?: number;
-        keyword?: string;
-        scrollTop?: number;
-        ts?: number;
-      }
-      const now = Date.now()
-      if (!parsed.ts || now - parsed.ts < 60 * 60 * 1000) {
-        if (!page && parsed.page && parsed.page > 0) {
-          query.page = parsed.page
-        }
-        if (!size && parsed.size && parsed.size > 0) {
-          query.size = parsed.size
-        }
-        if (!keyword && typeof parsed.keyword === 'string') {
-          query.keyword = parsed.keyword
-        }
-        if (typeof parsed.scrollTop === 'number' && parsed.scrollTop > 0) {
-          pendingScrollTop.value = parsed.scrollTop
-        }
-      } else {
-        sessionStorage.removeItem(SCROLL_STATE_KEY)
-      }
-    }
-  } catch {
-    // 忽略解析失败
-  }
-
-  updateRouteQuery()
-  loadData()
-
-  // 初始化移动端检测
   checkMobile()
   window.addEventListener('resize', handleResize)
+  initFromRoute()
+  loadData()
 })
 
 onUnmounted(() => {
@@ -309,11 +271,61 @@ onUnmounted(() => {
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/public-list.scss';
+@import '@/styles/blog.scss';
 
-// 博客列表页特定样式（如需覆盖通用样式，可在此添加）
 .blog-list-page {
-  // 保留原有类名以兼容可能的其他引用
+  min-height: 100vh;
+  background: #f5f5f5;
+  // 页面整体可以滚动，但左侧和右侧使用 sticky 定位固定
+
+  .article-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+
+  .cover-fallback {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    font-weight: 600;
+    color: #fff;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  .empty-message {
+    text-align: center;
+    color: #999;
+    padding: 40px 0;
+    font-size: 14px;
+  }
+
+  .pagination-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+  }
+
+  .blog-sidebar-left {
+    // 左侧导航栏样式已在组件内部定义
+    // 使用 sticky 定位，在 blog.scss 中定义
+  }
+}
+
+// 移动端适配
+@media (max-width: 768px) {
+  .blog-list-page {
+    .blog-page-container {
+      padding-top: 50px;
+    }
+
+    .article-list {
+      gap: 16px;
+    }
+  }
 }
 </style>
-

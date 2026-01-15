@@ -53,6 +53,8 @@ type Repository struct {
 	BlogArticleModel         model.BlogArticleModel
 	BlogArticleTagModel      model.BlogArticleTagModel
 	BlogArticleAuditModel    model.BlogArticleAuditModel
+	BlogFriendLinkModel      model.BlogFriendLinkModel
+	BlogSocialInfoModel      model.BlogSocialInfoModel
 }
 
 func NewRepository(conn sqlx.SqlConn, cacheConf cache.CacheConf, rdb *redis.Redis) (*Repository, error) {
@@ -102,6 +104,8 @@ func NewRepository(conn sqlx.SqlConn, cacheConf cache.CacheConf, rdb *redis.Redi
 		BlogArticleModel:         model.NewBlogArticleModel(conn, cacheConf),
 		BlogArticleTagModel:      model.NewBlogArticleTagModel(conn, cacheConf),
 		BlogArticleAuditModel:    model.NewBlogArticleAuditModel(conn, cacheConf),
+		BlogFriendLinkModel:      model.NewBlogFriendLinkModel(conn, cacheConf),
+		BlogSocialInfoModel:      model.NewBlogSocialInfoModel(conn, cacheConf),
 	}, nil
 }
 

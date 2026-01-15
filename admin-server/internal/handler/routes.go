@@ -11,6 +11,8 @@ import (
 	auth "postapocgame/admin-server/internal/handler/auth"
 	blog_article "postapocgame/admin-server/internal/handler/blog_article"
 	blog_article_audit "postapocgame/admin-server/internal/handler/blog_article_audit"
+	blog_friend_link "postapocgame/admin-server/internal/handler/blog_friend_link"
+	blog_social_info "postapocgame/admin-server/internal/handler/blog_social_info"
 	blog_tag "postapocgame/admin-server/internal/handler/blog_tag"
 	chat "postapocgame/admin-server/internal/handler/chat"
 	chat_group "postapocgame/admin-server/internal/handler/chat_group"
@@ -195,8 +197,18 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				},
 				{
 					Method:  http.MethodPost,
+					Path:    "/blog/articles/top",
+					Handler: blog_article.BlogArticleTopHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
 					Path:    "/blog/articles/unpublish",
 					Handler: blog_article.BlogArticleUnpublishHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/blog/articles/untop",
+					Handler: blog_article.BlogArticleUntopHandler(serverCtx),
 				},
 			}...,
 		),
@@ -216,6 +228,64 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodPost,
 					Path:    "/blog/articles/audit/unpublish",
 					Handler: blog_article_audit.BlogArticleAuditUnpublishHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.PerformanceMiddleware, serverCtx.RateLimitMiddleware, serverCtx.AuthMiddleware, serverCtx.PermissionMiddleware, serverCtx.OperationLogMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/blog/friend-links",
+					Handler: blog_friend_link.BlogFriendLinkListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/blog/friend-links",
+					Handler: blog_friend_link.BlogFriendLinkCreateHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/blog/friend-links",
+					Handler: blog_friend_link.BlogFriendLinkUpdateHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodDelete,
+					Path:    "/blog/friend-links",
+					Handler: blog_friend_link.BlogFriendLinkDeleteHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.PerformanceMiddleware, serverCtx.RateLimitMiddleware, serverCtx.AuthMiddleware, serverCtx.PermissionMiddleware, serverCtx.OperationLogMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/blog/social-infos",
+					Handler: blog_social_info.BlogSocialInfoListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/blog/social-infos",
+					Handler: blog_social_info.BlogSocialInfoCreateHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/blog/social-infos",
+					Handler: blog_social_info.BlogSocialInfoUpdateHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodDelete,
+					Path:    "/blog/social-infos",
+					Handler: blog_social_info.BlogSocialInfoDeleteHandler(serverCtx),
 				},
 			}...,
 		),
@@ -940,6 +1010,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			[]rest.Route{
 				{
 					Method:  http.MethodGet,
+					Path:    "/public/blog/article-stats",
+					Handler: public_blog.PublicBlogArticleStatsHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
 					Path:    "/public/blog/articles",
 					Handler: public_blog.PublicBlogArticleListHandler(serverCtx),
 				},
@@ -947,6 +1022,36 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodGet,
 					Path:    "/public/blog/articles/info",
 					Handler: public_blog.PublicBlogArticleDetailHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/public/blog/articles/next",
+					Handler: public_blog.PublicBlogArticleNextHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/public/blog/articles/prev",
+					Handler: public_blog.PublicBlogArticlePrevHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/public/blog/author-info",
+					Handler: public_blog.PublicBlogAuthorInfoHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/public/blog/friend-links",
+					Handler: public_blog.PublicBlogFriendLinkListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/public/blog/social-infos",
+					Handler: public_blog.PublicBlogSocialInfoListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/public/blog/tags",
+					Handler: public_blog.PublicBlogTagListHandler(serverCtx),
 				},
 			}...,
 		),

@@ -165,8 +165,24 @@ export function blogArticleSubmit(req: components.BlogArticleSubmitReq) {
  * @description 
  * @param req
  */
+export function blogArticleTop(req: components.BlogArticleTopReq) {
+	return webapi.post<components.Response>(`/api/v1/blog/articles/top`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
 export function blogArticleUnpublish(req: components.BlogArticleUnpublishReq) {
 	return webapi.post<components.Response>(`/api/v1/blog/articles/unpublish`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function blogArticleUntop(req: components.BlogArticleUntopReq) {
+	return webapi.post<components.Response>(`/api/v1/blog/articles/untop`, req)
 }
 
 /**
@@ -183,6 +199,70 @@ export function blogArticleAudit(req: components.BlogArticleAuditReq) {
  */
 export function blogArticleAuditUnpublish(req: components.BlogArticleAuditUnpublishReq) {
 	return webapi.post<components.Response>(`/api/v1/blog/articles/audit/unpublish`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function blogFriendLinkList(req: components.BlogFriendLinkListReq) {
+	return webapi.get<components.BlogFriendLinkListResp>(`/api/v1/blog/friend-links`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function blogFriendLinkCreate(req: components.BlogFriendLinkCreateReq) {
+	return webapi.post<components.Response>(`/api/v1/blog/friend-links`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function blogFriendLinkUpdate(req: components.BlogFriendLinkUpdateReq) {
+	return webapi.put<components.Response>(`/api/v1/blog/friend-links`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function blogFriendLinkDelete(req: components.BlogFriendLinkDeleteReq) {
+	return webapi.delete<components.Response>(`/api/v1/blog/friend-links`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function blogSocialInfoList(req: components.BlogSocialInfoListReq) {
+	return webapi.get<components.BlogSocialInfoListResp>(`/api/v1/blog/social-infos`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function blogSocialInfoCreate(req: components.BlogSocialInfoCreateReq) {
+	return webapi.post<components.Response>(`/api/v1/blog/social-infos`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function blogSocialInfoUpdate(req: components.BlogSocialInfoUpdateReq) {
+	return webapi.put<components.Response>(`/api/v1/blog/social-infos`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function blogSocialInfoDelete(req: components.BlogSocialInfoDeleteReq) {
+	return webapi.delete<components.Response>(`/api/v1/blog/social-infos`, req)
 }
 
 /**
@@ -888,6 +968,13 @@ export function publicDictGet(req: components.DictGetReq) {
 
 /**
  * @description 
+ */
+export function publicBlogArticleStats() {
+	return webapi.get<components.PublicBlogArticleStatsResp>(`/api/v1/public/blog/article-stats`)
+}
+
+/**
+ * @description 
  * @param req
  */
 export function publicBlogArticleList(req: components.PublicBlogArticleListReq) {
@@ -900,6 +987,50 @@ export function publicBlogArticleList(req: components.PublicBlogArticleListReq) 
  */
 export function publicBlogArticleDetail(req: components.PublicBlogArticleDetailReq) {
 	return webapi.get<components.PublicBlogArticleDetailResp>(`/api/v1/public/blog/articles/info`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function publicBlogArticleNext(req: components.PublicBlogArticleNextReq) {
+	return webapi.get<components.PublicBlogArticleNextResp>(`/api/v1/public/blog/articles/next`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function publicBlogArticlePrev(req: components.PublicBlogArticlePrevReq) {
+	return webapi.get<components.PublicBlogArticlePrevResp>(`/api/v1/public/blog/articles/prev`, req)
+}
+
+/**
+ * @description 
+ */
+export function publicBlogAuthorInfo() {
+	return webapi.get<components.PublicBlogAuthorInfoResp>(`/api/v1/public/blog/author-info`)
+}
+
+/**
+ * @description 
+ */
+export function publicBlogFriendLinkList() {
+	return webapi.get<components.PublicBlogFriendLinkListResp>(`/api/v1/public/blog/friend-links`)
+}
+
+/**
+ * @description 
+ */
+export function publicBlogSocialInfoList() {
+	return webapi.get<components.PublicBlogSocialInfoListResp>(`/api/v1/public/blog/social-infos`)
+}
+
+/**
+ * @description 
+ */
+export function publicBlogTagList() {
+	return webapi.get<components.PublicBlogTagListResp>(`/api/v1/public/blog/tags`)
 }
 
 /**

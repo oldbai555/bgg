@@ -1,11 +1,8 @@
 package middleware
 
 import (
-	"context"
 	"net/http"
-	"strings"
 
-	"postapocgame/admin-server/internal/model"
 	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/pkg/errs"
@@ -114,56 +111,4 @@ func (m *PermissionMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 
 		next(w, r)
 	}
-}
-
-// findApiByPattern 尝试通过模式匹配查找接口（处理路径参数）
-func (m *PermissionMiddleware) findApiByPattern(ctx context.Context, method, path string) (*model.AdminApi, error) {
-	// 获取所有接口
-	apiRepo := repository.NewApiRepository(m.svcCtx.Repository)
-	apis, _, err := apiRepo.FindPage(ctx, 1, 1000, "")
-	if err != nil {
-		return nil, err
-	}
-
-	// 遍历所有接口，尝试匹配
-	for i := range apis {
-		api := &apis[i]
-		if api.Method != method {
-			continue
-		}
-		// 移除 /api/v1 前缀进行匹配
-		apiPath := api.Path
-		if strings.HasPrefix(apiPath, "/api/v1") {
-			apiPath = apiPath[len("/api/v1"):]
-		}
-		if m.matchPath(apiPath, path) {
-			return api, nil
-		}
-	}
-
-	return nil, errs.New(errs.CodeNotFound, "接口不存在")
-}
-
-// matchPath 匹配路径（处理 :id 等参数）
-func (m *PermissionMiddleware) matchPath(pattern, path string) bool {
-	patternParts := strings.Split(strings.Trim(pattern, "/"), "/")
-	pathParts := strings.Split(strings.Trim(path, "/"), "/")
-
-	if len(patternParts) != len(pathParts) {
-		return false
-	}
-
-	for i, patternPart := range patternParts {
-		pathPart := pathParts[i]
-		// 如果是参数（以:开头），跳过
-		if strings.HasPrefix(patternPart, ":") {
-			continue
-		}
-		// 精确匹配
-		if patternPart != pathPart {
-			return false
-		}
-	}
-
-	return true
 }

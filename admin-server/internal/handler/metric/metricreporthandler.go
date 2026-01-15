@@ -14,10 +14,12 @@ import (
 	"postapocgame/admin-server/internal/types"
 )
 
+type contextKey string
+
 const (
-	// IMPORTANT: use plain string keys so handler/logic packages can share the same context values.
-	ctxKeyClientIP  = "client_ip"
-	ctxKeyUserAgent = "user_agent"
+	// IMPORTANT: use custom type for context keys to avoid collisions
+	ctxKeyClientIP  contextKey = "client_ip"
+	ctxKeyUserAgent contextKey = "user_agent"
 )
 
 func MetricReportHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {

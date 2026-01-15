@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -86,6 +87,9 @@ func (r *SdkAdminRepository) CreateSdkKey(ctx context.Context, key *model.SdkKey
 	if err != nil {
 		return 0, err
 	}
+	if res == nil {
+		return 0, fmt.Errorf("创建SDK密钥失败：返回结果为空")
+	}
 	id, err := res.LastInsertId()
 	if err != nil {
 		return 0, err
@@ -166,6 +170,9 @@ func (r *SdkAdminRepository) CreateInterface(ctx context.Context, iface *model.S
 	res, err := r.repo.SdkInterfaceModel.Insert(ctx, iface)
 	if err != nil {
 		return 0, err
+	}
+	if res == nil {
+		return 0, fmt.Errorf("创建SDK接口失败：返回结果为空")
 	}
 	id, err := res.LastInsertId()
 	if err != nil {

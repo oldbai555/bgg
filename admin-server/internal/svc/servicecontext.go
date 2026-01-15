@@ -22,6 +22,9 @@ type ServiceContext struct {
 	BlogArticleRepository        repository.BlogArticleRepository
 	BlogArticleTagRepository     repository.BlogArticleTagRepository
 	BlogArticleAuditRepository   repository.BlogArticleAuditRepository
+	BlogFriendLinkRepository     repository.BlogFriendLinkRepository
+	BlogSocialInfoRepository     repository.BlogSocialInfoRepository
+	UserRepository               repository.UserRepository
 	ChatHub                      *hub.ChatHub
 	TaskExecutors                map[int]interfaces.TaskExecutor // 任务执行器映射
 	TaskScheduler                *task.TaskScheduler             // 任务调度器
@@ -68,6 +71,9 @@ func NewServiceContext(c config.Config) (*ServiceContext, error) {
 		BlogArticleRepository:      repository.NewBlogArticleRepository(repo),
 		BlogArticleTagRepository:   repository.NewBlogArticleTagRepository(repo),
 		BlogArticleAuditRepository: repository.NewBlogArticleAuditRepository(repo),
+		BlogFriendLinkRepository:   repository.NewBlogFriendLinkRepository(repo),
+		BlogSocialInfoRepository:   repository.NewBlogSocialInfoRepository(repo),
+		UserRepository:             repository.NewUserRepository(repo),
 		ChatHub:                    chatHub,
 		TaskExecutors:              taskExecutors,
 		// AuthMiddleware 和 PermissionMiddleware 需要在外部初始化，避免循环依赖

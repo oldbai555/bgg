@@ -20,6 +20,12 @@ type BlogArticleRepository interface {
 	CreateWithTags(ctx context.Context, article *model.BlogArticle, tagIDs []uint64) error
 	UpdateWithTags(ctx context.Context, article *model.BlogArticle, tagIDs []uint64) error
 	Delete(ctx context.Context, id uint64) error
+	UpdateTopStatus(ctx context.Context, id uint64, isTop int64) error
+	FindTopCount(ctx context.Context) (int64, error)
+	FindOldestTopArticle(ctx context.Context) (*model.BlogArticle, error)
+	CountPublishedArticles(ctx context.Context) (int64, error)
+	FindPrevArticle(ctx context.Context, currentPublishTime int64) (*model.BlogArticle, error)
+	FindNextArticle(ctx context.Context, currentPublishTime int64) (*model.BlogArticle, error)
 }
 
 type blogArticleRepository struct {
@@ -96,10 +102,10 @@ func (r *blogArticleRepository) FindPage(ctx context.Context, page, pageSize int
 	offset := (page - 1) * pageSize
 
 	// 查询列表
-	listSQL, listArgs, err := sq.Select("id", "title", "content", "status", "audit_status", "cover", "author_id", "author_name", "publish_time", "summary", "created_at", "updated_at", "deleted_at").
+	listSQL, listArgs, err := sq.Select("id", "title", "content", "status", "audit_status", "cover", "author_id", "author_name", "publish_time", "summary", "is_top", "created_at", "updated_at", "deleted_at").
 		From("`blog_article`").
 		Where(conditions).
-		OrderBy("id DESC").
+		OrderBy("is_top DESC", "id DESC").
 		Limit(uint64(pageSize)).
 		Offset(uint64(offset)).
 		ToSql()
@@ -158,10 +164,10 @@ func (r *blogArticleRepository) FindPublicPage(ctx context.Context, page, pageSi
 	}
 	offset := (page - 1) * pageSize
 
-	listSQL, listArgs, err := sq.Select("id", "title", "content", "status", "audit_status", "cover", "author_id", "author_name", "publish_time", "summary", "created_at", "updated_at", "deleted_at").
+	listSQL, listArgs, err := sq.Select("id", "title", "content", "status", "audit_status", "cover", "author_id", "author_name", "publish_time", "summary", "is_top", "created_at", "updated_at", "deleted_at").
 		From("`blog_article`").
 		Where(conditions).
-		OrderBy("publish_time DESC", "id DESC").
+		OrderBy("is_top DESC", "publish_time DESC", "id DESC").
 		Limit(uint64(pageSize)).
 		Offset(uint64(offset)).
 		ToSql()
@@ -187,9 +193,13 @@ func (r *blogArticleRepository) CreateWithTags(ctx context.Context, article *mod
 	}
 
 	// 使用 squirrel 手动插入，避免依赖事务 session API
+	// 确保 is_top 有默认值
+	if article.IsTop == 0 {
+		article.IsTop = 0 // 默认不置顶
+	}
 	insertSQL, insertArgs, err := sq.Insert("`blog_article`").
-		Columns("`title`", "`content`", "`status`", "`audit_status`", "`cover`", "`author_id`", "`author_name`", "`publish_time`", "`summary`", "`created_at`", "`updated_at`", "`deleted_at`").
-		Values(article.Title, article.Content, article.Status, article.AuditStatus, article.Cover, article.AuthorId, article.AuthorName, article.PublishTime, article.Summary, article.CreatedAt, article.UpdatedAt, article.DeletedAt).
+		Columns("`title`", "`content`", "`status`", "`audit_status`", "`cover`", "`author_id`", "`author_name`", "`publish_time`", "`summary`", "`is_top`", "`created_at`", "`updated_at`", "`deleted_at`").
+		Values(article.Title, article.Content, article.Status, article.AuditStatus, article.Cover, article.AuthorId, article.AuthorName, article.PublishTime, article.Summary, article.IsTop, article.CreatedAt, article.UpdatedAt, article.DeletedAt).
 		ToSql()
 	if err != nil {
 		return errs.Wrap(errs.CodeBadDB, "创建文章 SQL 生成失败", err)
@@ -197,6 +207,9 @@ func (r *blogArticleRepository) CreateWithTags(ctx context.Context, article *mod
 	res, err := r.conn.ExecCtx(ctx, insertSQL, insertArgs...)
 	if err != nil {
 		return errs.Wrap(errs.CodeBadDB, "创建文章失败", err)
+	}
+	if res == nil {
+		return errs.Wrap(errs.CodeBadDB, "创建文章失败：返回结果为空", nil)
 	}
 	lastID, err := res.LastInsertId()
 	if err != nil {
@@ -274,4 +287,148 @@ func (r *blogArticleRepository) Delete(ctx context.Context, id uint64) error {
 		return errs.Wrap(errs.CodeBadDB, "删除文章标签关联失败", err)
 	}
 	return nil
+}
+
+func (r *blogArticleRepository) UpdateTopStatus(ctx context.Context, id uint64, isTop int64) error {
+	now := time.Now().Unix()
+	updateSQL, updateArgs, err := sq.Update("`blog_article`").
+		Set("`is_top`", isTop).
+		Set("`updated_at`", now).
+		Where(sq.Eq{"id": id, "deleted_at": 0}).
+		ToSql()
+	if err != nil {
+		return errs.Wrap(errs.CodeBadDB, "更新文章置顶状态 SQL 生成失败", err)
+	}
+	result, err := r.conn.ExecCtx(ctx, updateSQL, updateArgs...)
+	if err != nil {
+		return errs.Wrap(errs.CodeBadDB, "更新文章置顶状态失败", err)
+	}
+	if result == nil {
+		return errs.Wrap(errs.CodeBadDB, "更新文章置顶状态失败：返回结果为空", nil)
+	}
+	// 检查是否有行被更新
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected == 0 {
+		return errs.Wrap(errs.CodeNotFound, "文章不存在或已被删除", nil)
+	}
+
+	// 清除缓存，确保下次查询时获取最新数据
+	// 通过调用 FindOne 来触发缓存刷新（会从数据库重新查询并更新缓存）
+	_, _ = r.articleModel.FindOne(ctx, id)
+
+	return nil
+}
+
+func (r *blogArticleRepository) FindTopCount(ctx context.Context) (int64, error) {
+	conditions := sq.And{
+		sq.Eq{"deleted_at": 0},
+		sq.Eq{"is_top": 1},
+	}
+	countSQL, countArgs, err := sq.Select("COUNT(*)").From("`blog_article`").Where(conditions).ToSql()
+	if err != nil {
+		return 0, errs.Wrap(errs.CodeBadDB, "查询置顶文章数量 SQL 生成失败", err)
+	}
+	var count int64
+	if err = r.conn.QueryRowCtx(ctx, &count, countSQL, countArgs...); err != nil {
+		return 0, errs.Wrap(errs.CodeBadDB, "查询置顶文章数量失败", err)
+	}
+	return count, nil
+}
+
+func (r *blogArticleRepository) FindOldestTopArticle(ctx context.Context) (*model.BlogArticle, error) {
+	conditions := sq.And{
+		sq.Eq{"deleted_at": 0},
+		sq.Eq{"is_top": 1},
+	}
+	listSQL, listArgs, err := sq.Select("*").
+		From("`blog_article`").
+		Where(conditions).
+		OrderBy("updated_at ASC", "id ASC").
+		Limit(1).
+		ToSql()
+	if err != nil {
+		return nil, errs.Wrap(errs.CodeBadDB, "查询最早置顶文章 SQL 生成失败", err)
+	}
+	var article model.BlogArticle
+	if err = r.conn.QueryRowCtx(ctx, &article, listSQL, listArgs...); err != nil {
+		return nil, errs.Wrap(errs.CodeBadDB, "查询最早置顶文章失败", err)
+	}
+	return &article, nil
+}
+
+// CountPublishedArticles 统计已发布文章总数
+func (r *blogArticleRepository) CountPublishedArticles(ctx context.Context) (int64, error) {
+	conditions := sq.And{
+		sq.Eq{"deleted_at": 0},
+		sq.Eq{"status": consts.BlogArticleStatusPublished},         // 已发布
+		sq.Eq{"audit_status": consts.BlogArticleAuditStatusPassed}, // 审核通过
+	}
+	countSQL, countArgs, err := sq.Select("COUNT(*)").
+		From("`blog_article`").
+		Where(conditions).
+		ToSql()
+	if err != nil {
+		return 0, errs.Wrap(errs.CodeBadDB, "统计已发布文章 SQL 生成失败", err)
+	}
+	var count int64
+	if err = r.conn.QueryRowCtx(ctx, &count, countSQL, countArgs...); err != nil {
+		return 0, errs.Wrap(errs.CodeBadDB, "统计已发布文章失败", err)
+	}
+	return count, nil
+}
+
+// FindPrevArticle 查询上一篇文章（发布时间早于当前文章）
+func (r *blogArticleRepository) FindPrevArticle(ctx context.Context, currentPublishTime int64) (*model.BlogArticle, error) {
+	conditions := sq.And{
+		sq.Eq{"deleted_at": 0},
+		sq.Eq{"status": consts.BlogArticleStatusPublished},         // 已发布
+		sq.Eq{"audit_status": consts.BlogArticleAuditStatusPassed}, // 审核通过
+		sq.Lt{"publish_time": currentPublishTime},                  // 发布时间早于当前文章
+	}
+	listSQL, listArgs, err := sq.Select("*").
+		From("`blog_article`").
+		Where(conditions).
+		OrderBy("publish_time DESC"). // 按发布时间倒序，取最近的一篇
+		Limit(1).
+		ToSql()
+	if err != nil {
+		return nil, errs.Wrap(errs.CodeBadDB, "查询上一篇文章 SQL 生成失败", err)
+	}
+	var article model.BlogArticle
+	if err = r.conn.QueryRowCtx(ctx, &article, listSQL, listArgs...); err != nil {
+		// 如果没有找到记录，返回nil（不是错误）
+		if err.Error() == "sql: no rows in result set" {
+			return nil, nil
+		}
+		return nil, errs.Wrap(errs.CodeBadDB, "查询上一篇文章失败", err)
+	}
+	return &article, nil
+}
+
+// FindNextArticle 查询下一篇文章（发布时间晚于当前文章）
+func (r *blogArticleRepository) FindNextArticle(ctx context.Context, currentPublishTime int64) (*model.BlogArticle, error) {
+	conditions := sq.And{
+		sq.Eq{"deleted_at": 0},
+		sq.Eq{"status": consts.BlogArticleStatusPublished},         // 已发布
+		sq.Eq{"audit_status": consts.BlogArticleAuditStatusPassed}, // 审核通过
+		sq.Gt{"publish_time": currentPublishTime},                  // 发布时间晚于当前文章
+	}
+	listSQL, listArgs, err := sq.Select("*").
+		From("`blog_article`").
+		Where(conditions).
+		OrderBy("publish_time ASC"). // 按发布时间正序，取最早的一篇
+		Limit(1).
+		ToSql()
+	if err != nil {
+		return nil, errs.Wrap(errs.CodeBadDB, "查询下一篇文章 SQL 生成失败", err)
+	}
+	var article model.BlogArticle
+	if err = r.conn.QueryRowCtx(ctx, &article, listSQL, listArgs...); err != nil {
+		// 如果没有找到记录，返回nil（不是错误）
+		if err.Error() == "sql: no rows in result set" {
+			return nil, nil
+		}
+		return nil, errs.Wrap(errs.CodeBadDB, "查询下一篇文章失败", err)
+	}
+	return &article, nil
 }

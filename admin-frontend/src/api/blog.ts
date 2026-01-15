@@ -14,8 +14,17 @@ import {
   blogArticleUnpublish,
   blogArticleAudit,
   blogArticleAuditUnpublish,
+  blogArticleTop,
+  blogArticleUntop,
   publicBlogArticleList,
-  publicBlogArticleDetail
+  publicBlogArticleDetail,
+  publicBlogFriendLinkList,
+  publicBlogSocialInfoList,
+  publicBlogTagList,
+  publicBlogAuthorInfo,
+  publicBlogArticleStats,
+  publicBlogArticlePrev,
+  publicBlogArticleNext
 } from '@/api/generated/admin';
 import type {
   BlogTagListReq,
@@ -37,10 +46,21 @@ import type {
   BlogArticleUnpublishReq,
   BlogArticleAuditReq,
   BlogArticleAuditUnpublishReq,
+  BlogArticleTopReq,
+  BlogArticleUntopReq,
   PublicBlogArticleListReq,
   PublicBlogArticleListResp,
   PublicBlogArticleDetailReq,
   PublicBlogArticleDetailResp,
+  PublicBlogFriendLinkListResp,
+  PublicBlogSocialInfoListResp,
+  PublicBlogTagListResp,
+  PublicBlogAuthorInfoResp,
+  PublicBlogArticleStatsResp,
+  PublicBlogArticlePrevReq,
+  PublicBlogArticlePrevResp,
+  PublicBlogArticleNextReq,
+  PublicBlogArticleNextResp,
   Response
 } from '@/api/generated/admin';
 
@@ -66,10 +86,40 @@ export const blogApi = {
   articleAudit: (req: BlogArticleAuditReq) => blogArticleAudit(req) as Promise<Response>,
   articleAuditUnpublish: (req: BlogArticleAuditUnpublishReq) => blogArticleAuditUnpublish(req) as Promise<Response>,
 
+  // 置顶操作
+  articleTop: (req: BlogArticleTopReq) => blogArticleTop(req) as Promise<Response>,
+  articleUntop: (req: BlogArticleUntopReq) => blogArticleUntop(req) as Promise<Response>,
+
   // 公共文章接口
   publicList: (req: PublicBlogArticleListReq) =>
     publicBlogArticleList(req) as Promise<PublicBlogArticleListResp>,
   publicDetail: (req: PublicBlogArticleDetailReq) =>
-    publicBlogArticleDetail(req) as Promise<PublicBlogArticleDetailResp>
+    publicBlogArticleDetail(req) as Promise<PublicBlogArticleDetailResp>,
+
+  // 公共友情链接接口
+  publicFriendLinkList: () =>
+    publicBlogFriendLinkList() as Promise<PublicBlogFriendLinkListResp>,
+
+  // 公共社交信息接口
+  publicSocialInfoList: () =>
+    publicBlogSocialInfoList() as Promise<PublicBlogSocialInfoListResp>,
+
+  // 公共标签列表接口
+  publicTagList: () =>
+    publicBlogTagList() as Promise<PublicBlogTagListResp>,
+
+  // 公共作者信息接口
+  publicAuthorInfo: () =>
+    publicBlogAuthorInfo() as Promise<PublicBlogAuthorInfoResp>,
+
+  // 公共文章统计接口
+  publicArticleStats: () =>
+    publicBlogArticleStats() as Promise<PublicBlogArticleStatsResp>,
+
+  // 公共相邻文章接口
+  publicArticlePrev: (req: PublicBlogArticlePrevReq) =>
+    publicBlogArticlePrev(req) as Promise<PublicBlogArticlePrevResp>,
+  publicArticleNext: (req: PublicBlogArticleNextReq) =>
+    publicBlogArticleNext(req) as Promise<PublicBlogArticleNextResp>
 };
 

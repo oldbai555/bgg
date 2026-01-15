@@ -80,6 +80,13 @@
           >
             {{ getAuditStatusLabel(row.auditStatus) }}
           </el-tag>
+          <el-tag
+            v-else-if="column.prop === 'isTop'"
+            :type="getIsTopValue(row) === 1 ? 'warning' : 'info'"
+            size="small"
+          >
+            {{ getIsTopValue(row) === 1 ? '置顶' : '普通' }}
+          </el-tag>
           <div v-else-if="column.prop === 'tagNames'" class="tag-names">
             <el-tag
               v-for="tag in row.tagNames || []"
@@ -128,6 +135,26 @@
             @click="handleUnpublish(row)"
           >
             下架
+          </el-button>
+          <el-button
+            v-if="canTop(row)"
+            v-permission="'blog_article:top'"
+            type="warning"
+            link
+            size="small"
+            @click="handleTop(row)"
+          >
+            置顶
+          </el-button>
+          <el-button
+            v-if="canUntop(row)"
+            v-permission="'blog_article:untop'"
+            type="info"
+            link
+            size="small"
+            @click="handleUntop(row)"
+          >
+            取消置顶
           </el-button>
           <el-button
             v-permission="'blog_article:delete'"
@@ -218,6 +245,7 @@ const columns = computed<TableColumn[]>(() => [
   {prop: 'authorName', label: '作者', width: 120},
   {prop: 'status', label: '状态', width: 110},
   {prop: 'auditStatus', label: '审核状态', width: 110},
+  {prop: 'isTop', label: '置顶', width: 80},
   {prop: 'tagNames', label: '标签', minWidth: 180},
   {prop: 'publishTime', label: '上架时间', width: 180, type: D2TableElemType.ConvertTime},
   {prop: 'createdAt', label: '创建时间', width: 180, type: D2TableElemType.ConvertTime}
@@ -303,6 +331,26 @@ const canUnpublish = (row: BlogArticleItem) => {
   return row.status === 4
 }
 
+// 获取 isTop 值（兼容不同数据类型）
+const getIsTopValue = (row: BlogArticleItem): number => {
+  const article = row as BlogArticleItem & {isTop?: number | string}
+  const isTop = article.isTop
+  if (isTop === 1 || isTop === '1' || String(isTop) === '1') {
+    return 1
+  }
+  return 0
+}
+
+const canTop = (row: BlogArticleItem) => {
+  // 已上架且未置顶可以置顶
+  return row.status === 4 && getIsTopValue(row) !== 1
+}
+
+const canUntop = (row: BlogArticleItem) => {
+  // 已置顶可以取消置顶
+  return getIsTopValue(row) === 1
+}
+
 const handleSubmitAudit = async (row: BlogArticleItem) => {
   try {
     await blogApi.articleSubmit({id: row.id})
@@ -332,6 +380,28 @@ const handleUnpublish = async (row: BlogArticleItem) => {
     loadData()
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : '下架失败'
+    ElMessage.error(message)
+  }
+}
+
+const handleTop = async (row: BlogArticleItem) => {
+  try {
+    await blogApi.articleTop({id: row.id})
+    ElMessage.success('已置顶')
+    loadData()
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '置顶失败'
+    ElMessage.error(message)
+  }
+}
+
+const handleUntop = async (row: BlogArticleItem) => {
+  try {
+    await blogApi.articleUntop({id: row.id})
+    ElMessage.success('已取消置顶')
+    loadData()
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '取消置顶失败'
     ElMessage.error(message)
   }
 }

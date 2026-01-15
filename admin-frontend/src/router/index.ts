@@ -1,4 +1,4 @@
-import {createRouter, createWebHashHistory, RouteRecordRaw} from 'vue-router';
+import {createRouter, createWebHistory, RouteRecordRaw} from 'vue-router';
 import {useUserStore} from '@/stores/user';
 import {usePermission} from '@/hooks/usePermission';
 import type {MenuItem} from '@/api/generated/admin';
@@ -117,7 +117,7 @@ const routes: RouteRecordRaw[] = [
 ];
 
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory('/admin/'),
   routes
 });
 

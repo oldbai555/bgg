@@ -82,6 +82,7 @@ func (l *BlogArticleListLogic) BlogArticleList(req *types.BlogArticleListReq) (r
 			TagIds:      tagIDs,
 			TagNames:    tagNames,
 			PublishTime: a.PublishTime,
+			IsTop:       a.IsTop,
 			CreatedAt:   a.CreatedAt,
 			UpdatedAt:   a.UpdatedAt,
 		})

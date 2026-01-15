@@ -38,7 +38,14 @@ const (
 
 // 字典 code 常量
 const (
-	DictCodeBlogTagNameMaxLength      = "blog_tag_name_max_length"      // 标签名称最大长度
-	DictCodeBlogArticleTitleMaxLength = "blog_article_title_max_length" // 文章标题最大长度
-	DictCodeBlogArticleSummaryLength  = "blog_article_summary_length"   // 文章摘要截断长度
+	DictCodeBlogTagNameMaxLength          = "blog_tag_name_max_length"           // 标签名称最大长度
+	DictCodeBlogArticleTitleMaxLength     = "blog_article_title_max_length"      // 文章标题最大长度
+	DictCodeBlogArticleSummaryLength      = "blog_article_summary_length"        // 文章摘要截断长度
+	DictCodeBlogFriendLinkNameMaxLength   = "blog_friend_link_name_max_length"   // 友情链接名称最大长度
+	DictCodeBlogFriendLinkUrlMaxLength    = "blog_friend_link_url_max_length"    // 友情链接URL最大长度
+	DictCodeBlogFriendLinkRemarkMaxLength = "blog_friend_link_remark_max_length" // 友情链接备注最大长度
+	DictCodeBlogSocialInfoNameMaxLength   = "blog_social_info_name_max_length"   // 社交信息名称最大长度
+	DictCodeBlogSocialInfoUrlMaxLength    = "blog_social_info_url_max_length"    // 社交信息URL最大长度
+	DictCodeBlogSocialInfoRemarkMaxLength = "blog_social_info_remark_max_length" // 社交信息备注最大长度
+	DictCodeBlogArticleTopMaxCount        = "blog_article_top_max_count"         // 文章置顶最大数量
 )

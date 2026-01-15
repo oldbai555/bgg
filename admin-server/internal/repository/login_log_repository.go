@@ -123,8 +123,10 @@ func (r *loginLogRepository) Create(ctx context.Context, log *model.AdminLoginLo
 	}
 
 	// 获取插入的 ID（用于调试）
-	if id, err := result.LastInsertId(); err == nil {
-		logx.Infof("成功插入登录日志: id=%d, userId=%d, username=%s", id, log.UserId, log.Username)
+	if result != nil {
+		if id, err := result.LastInsertId(); err == nil {
+			logx.Infof("成功插入登录日志: id=%d, userId=%d, username=%s", id, log.UserId, log.Username)
+		}
 	}
 	return nil
 }

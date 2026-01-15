@@ -157,6 +157,7 @@ export interface BlogArticleItem {
 	tagIds?: Array<number> // 关联标签ID列表
 	tagNames?: Array<string> // 关联标签名称列表
 	publishTime: number // 上架时间(秒级时间戳)
+	isTop: number // 是否置顶：0=否，1=是
 	createdAt: number // 创建时间(秒级时间戳)
 	updatedAt: number // 更新时间(秒级时间戳)
 }
@@ -185,8 +186,16 @@ export interface BlogArticleSubmitReq {
 	id: number
 }
 
+export interface BlogArticleTopReq {
+	id: number // 文章ID
+}
+
 export interface BlogArticleUnpublishReq {
 	id: number
+}
+
+export interface BlogArticleUntopReq {
+	id: number // 文章ID
 }
 
 export interface BlogArticleUpdateReq {
@@ -196,6 +205,98 @@ export interface BlogArticleUpdateReq {
 	tagIds?: Array<number>
 	cover?: string
 	summary?: string
+}
+
+export interface BlogFriendLinkCreateReq {
+	name: string // 链接名称
+	url: string // 目标链接
+	remark?: string // 备注
+	status: number // 状态：1=启用，2=禁用
+	orderNum?: number // 排序值
+}
+
+export interface BlogFriendLinkDeleteReq {
+	id: number
+}
+
+export interface BlogFriendLinkItem {
+	id: number
+	name: string
+	url: string
+	remark?: string
+	status: number
+	orderNum: number
+	createdAt: number
+	updatedAt: number
+}
+
+export interface BlogFriendLinkListReq {
+	page?: number
+	size?: number
+	status?: number // 状态筛选（0=全部，1=启用，2=禁用）
+	keyword?: string // 名称/备注搜索
+}
+
+export interface BlogFriendLinkListResp {
+	list: Array<BlogFriendLinkItem>
+	page: number
+	size: number
+	total: number
+}
+
+export interface BlogFriendLinkUpdateReq {
+	id: number
+	name?: string
+	url?: string
+	remark?: string
+	status?: number
+	orderNum?: number
+}
+
+export interface BlogSocialInfoCreateReq {
+	name: string // 社交平台名称
+	url: string // 目标链接
+	remark?: string // 备注
+	status: number // 状态：1=启用，2=禁用
+	orderNum?: number // 排序值
+}
+
+export interface BlogSocialInfoDeleteReq {
+	id: number
+}
+
+export interface BlogSocialInfoItem {
+	id: number
+	name: string
+	url: string
+	remark?: string
+	status: number
+	orderNum: number
+	createdAt: number
+	updatedAt: number
+}
+
+export interface BlogSocialInfoListReq {
+	page?: number
+	size?: number
+	status?: number // 状态筛选（0=全部，1=启用，2=禁用）
+	keyword?: string // 名称/备注搜索
+}
+
+export interface BlogSocialInfoListResp {
+	list: Array<BlogSocialInfoItem>
+	page: number
+	size: number
+	total: number
+}
+
+export interface BlogSocialInfoUpdateReq {
+	id: number
+	name?: string
+	url?: string
+	remark?: string
+	status?: number
+	orderNum?: number
 }
 
 export interface BlogTagCreateReq {
@@ -1210,6 +1311,7 @@ export interface PublicBlogArticleItem {
 	summary: string
 	tagNames?: Array<string>
 	publishTime: number
+	isTop: number // 是否置顶：0=否，1=是
 }
 
 export interface PublicBlogArticleListReq {
@@ -1224,6 +1326,65 @@ export interface PublicBlogArticleListResp {
 	page: number
 	size: number
 	total: number
+}
+
+export interface PublicBlogArticleNextReq {
+	id?: number // 当前文章ID
+}
+
+export interface PublicBlogArticleNextResp {
+	id: number // 文章ID
+	title: string // 标题
+	publishTime: number // 发布时间
+}
+
+export interface PublicBlogArticlePrevReq {
+	id?: number // 当前文章ID
+}
+
+export interface PublicBlogArticlePrevResp {
+	id: number // 文章ID
+	title: string // 标题
+	publishTime: number // 发布时间
+}
+
+export interface PublicBlogArticleStatsResp {
+	totalArticles: number // 文章总数（已发布）
+}
+
+export interface PublicBlogAuthorInfoResp {
+	id: number // 用户ID（固定为1）
+	nickname: string // 昵称
+	avatar: string // 头像URL
+	signature: string // 个性签名
+}
+
+export interface PublicBlogFriendLinkItem {
+	id: number
+	name: string
+	url: string
+	remark?: string
+	orderNum: number
+}
+
+export interface PublicBlogFriendLinkListResp {
+	list: Array<PublicBlogFriendLinkItem>
+}
+
+export interface PublicBlogSocialInfoItem {
+	id: number
+	name: string
+	url: string
+	remark?: string
+	orderNum: number
+}
+
+export interface PublicBlogSocialInfoListResp {
+	list: Array<PublicBlogSocialInfoItem>
+}
+
+export interface PublicBlogTagListResp {
+	list: Array<BlogTagItem>
 }
 
 export interface PublicVideoDetailReq {

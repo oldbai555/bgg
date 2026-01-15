@@ -57,6 +57,9 @@ func (r *taskRepository) Create(ctx context.Context, task *model.AdminTask) (uin
 	if err != nil {
 		return 0, errs.Wrap(errs.CodeBadDB, "创建任务失败", err)
 	}
+	if result == nil {
+		return 0, errs.Wrap(errs.CodeBadDB, "创建任务失败：返回结果为空", nil)
+	}
 	id, err := result.LastInsertId()
 	if err != nil {
 		return 0, errs.Wrap(errs.CodeBadDB, "获取任务ID失败", err)
