@@ -43,8 +43,8 @@ const friendLinkList = ref<PublicBlogFriendLinkListResp['list']>([])
 
 const normalizeUrl = (url: string): string => {
   if (!url) {
-return ''
-}
+    return ''
+  }
   if (url.startsWith('http://') || url.startsWith('https://')) {
     return url
   }

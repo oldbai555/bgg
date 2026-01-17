@@ -1,17 +1,23 @@
 <template>
   <div class="blog-list-page">
-    <MetricReporter module="blog_article_list" :biz-id="0" />
-    <BlogHeader />
+    <ClientOnly>
+      <MetricReporter module="blog_article_list" :biz-id="0" />
+    </ClientOnly>
+    <ClientOnly>
+      <BlogHeader />
+    </ClientOnly>
     <div class="blog-page-container">
       <div class="blog-content-wrapper">
         <!-- 左侧分类导航 -->
         <aside class="blog-sidebar-left">
-          <BlogCategoryNav :selected-tag-id="query.tagId" @select="handleTagSelect" />
+          <ClientOnly>
+            <BlogCategoryNav :selected-tag-id="query.tagId" @select="handleTagSelect" />
+          </ClientOnly>
         </aside>
 
         <!-- 中间文章列表 -->
         <main class="blog-main">
-          <div v-loading="loading" class="article-list">
+          <div :class="['article-list', { 'is-loading': loading }]">
             <div
               v-for="item in list"
               :key="item.id"
@@ -40,14 +46,16 @@
                 </div>
                 <div class="article-summary">{{ item.summary || '暂无摘要' }}</div>
                 <div v-if="item.tagNames?.length" class="article-tags">
-                  <el-tag
-                    v-for="tag in item.tagNames"
-                    :key="tag"
-                    size="small"
-                    effect="plain"
-                  >
-                    {{ tag }}
-                  </el-tag>
+                  <ClientOnly>
+                    <el-tag
+                      v-for="tag in item.tagNames"
+                      :key="tag"
+                      size="small"
+                      effect="plain"
+                    >
+                      {{ tag }}
+                    </el-tag>
+                  </ClientOnly>
                 </div>
               </div>
             </div>
@@ -57,23 +65,27 @@
 
           <!-- 分页 -->
           <div class="pagination-wrapper">
-            <el-pagination
-              v-model:current-page="query.page"
-              v-model:page-size="query.size"
-              :total="total"
-              :page-sizes="[10, 20, 30, 50]"
-              :layout="paginationLayout"
-              :size="isMobile ? 'small' : 'default'"
-              @size-change="handleSizeChange"
-              @current-change="handlePageChange"
-            />
+            <ClientOnly>
+              <el-pagination
+                v-model:current-page="query.page"
+                v-model:page-size="query.size"
+                :total="total"
+                :page-sizes="[10, 20, 30, 50]"
+                :layout="paginationLayout"
+                :size="isMobile ? 'small' : 'default'"
+                @size-change="handleSizeChange"
+                @current-change="handlePageChange"
+              />
+            </ClientOnly>
           </div>
         </main>
 
         <!-- 右侧侧边栏 -->
         <aside class="blog-sidebar">
-          <BlogAuthorCard />
-          <BlogSocialLinks />
+          <ClientOnly>
+            <BlogAuthorCard />
+            <BlogSocialLinks />
+          </ClientOnly>
         </aside>
       </div>
     </div>
@@ -83,8 +95,8 @@
 </template>
 
 <script setup lang="ts">
+// Nuxt 3 自动导入 composables，无需手动导入 useRouter、useRoute
 import {reactive, ref, computed, onMounted, onUnmounted, nextTick} from 'vue'
-import {useRouter, useRoute} from 'vue-router'
 import {ElMessage} from 'element-plus'
 import {blogApi} from '@/api/blog'
 import type {PublicBlogArticleListReq, PublicBlogArticleItem} from '@/api/generated/admin'
@@ -95,8 +107,14 @@ import BlogCategoryNav from '@/components/blog/BlogCategoryNav.vue'
 import BlogAuthorCard from '@/components/blog/BlogAuthorCard.vue'
 import BlogSocialLinks from '@/components/blog/BlogSocialLinks.vue'
 
+// Nuxt 3 自动导入 useRouter 和 useRoute
 const router = useRouter()
 const route = useRoute()
+
+// 定义页面元数据（Nuxt 3 规范）
+definePageMeta({
+  layout: false
+})
 
 const SCROLL_STATE_KEY = 'public_blog_list_state'
 
@@ -113,8 +131,8 @@ const loading = ref(false)
 
 const formatTime = (ts: number): string => {
   if (!ts) {
-return '-'
-}
+    return '-'
+  }
   const d = new Date(ts * 1000)
   const y = d.getFullYear()
   const m = String(d.getMonth() + 1).padStart(2, '0')
@@ -124,8 +142,8 @@ return '-'
 
 const firstChar = (text: string): string => {
   if (!text) {
-return '文'
-}
+    return '文'
+  }
   return Array.from(text)[0] ?? '文'
 }
 
@@ -156,7 +174,9 @@ const paginationLayout = computed(() =>
 )
 
 const checkMobile = () => {
-  isMobile.value = window.innerWidth <= 768
+  if (typeof window !== 'undefined') {
+    isMobile.value = window.innerWidth <= 768
+  }
 }
 
 const handleResize = () => {
@@ -164,6 +184,9 @@ const handleResize = () => {
 }
 
 const restoreScrollPosition = async (scrollTop: number) => {
+  if (typeof window === 'undefined') {
+    return
+  }
   await nextTick()
   await new Promise((resolve) => requestAnimationFrame(resolve))
   window.scrollTo({top: scrollTop, behavior: 'auto'})
@@ -175,7 +198,7 @@ const loadData = async () => {
   const scrollTopToRestore = pendingScrollTop.value
 
   try {
-    const resp = await blogApi.publicList(buildReq())
+    const resp = await blogApi.publicArticleList(buildReq())
     list.value = resp.list
     total.value = resp.total
   } catch (err: unknown) {
@@ -184,7 +207,7 @@ const loadData = async () => {
   } finally {
     loading.value = false
 
-    if (shouldRestoreScroll && scrollTopToRestore !== null) {
+    if (shouldRestoreScroll && scrollTopToRestore !== null && typeof window !== 'undefined') {
       pendingScrollTop.value = null
       await restoreScrollPosition(scrollTopToRestore)
     }
@@ -229,20 +252,22 @@ const handleTagSelect = (tagId: number) => {
 
 const goToDetail = (id: number) => {
   // 保存当前状态
-  try {
-    const state = {
-      page: query.page,
-      size: query.size,
-      keyword: query.keyword,
-      tagId: query.tagId,
-      scrollTop: window.scrollY
+  if (typeof window !== 'undefined') {
+    try {
+      const state = {
+        page: query.page,
+        size: query.size,
+        keyword: query.keyword,
+        tagId: query.tagId,
+        scrollTop: window.scrollY
+      }
+      sessionStorage.setItem(SCROLL_STATE_KEY, JSON.stringify(state))
+    } catch {
+      // 忽略存储错误
     }
-    sessionStorage.setItem(SCROLL_STATE_KEY, JSON.stringify(state))
-  } catch {
-    // 忽略存储错误
   }
 
-  router.push(`/public/blog/${id}`)
+  router.push(`/blog/${id}`)
 }
 
 // 从路由参数初始化查询条件
@@ -260,23 +285,38 @@ const initFromRoute = () => {
 
 onMounted(() => {
   checkMobile()
-  window.addEventListener('resize', handleResize)
+  if (typeof window !== 'undefined') {
+    window.addEventListener('resize', handleResize)
+  }
   initFromRoute()
   loadData()
 })
 
 onUnmounted(() => {
-  window.removeEventListener('resize', handleResize)
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('resize', handleResize)
+  }
 })
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/blog.scss';
+@import '@/assets/styles/blog.scss';
 
 .blog-list-page {
-  min-height: 100vh;
+  min-height: 100vh; // 使用 min-height，允许内容超出时滚动
   background: #f5f5f5;
-  // 页面整体可以滚动，但左侧和右侧使用 sticky 定位固定
+
+  // PC 端：固定高度，隐藏滚动条
+  @media (min-width: 769px) {
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  // 移动端：允许滚动
+  @media (max-width: 768px) {
+    height: auto;
+    overflow: visible;
+  }
 
   .article-list {
     display: flex;
@@ -308,11 +348,6 @@ onUnmounted(() => {
     display: flex;
     justify-content: center;
     padding: 20px 0;
-  }
-
-  .blog-sidebar-left {
-    // 左侧导航栏样式已在组件内部定义
-    // 使用 sticky 定位，在 blog.scss 中定义
   }
 }
 

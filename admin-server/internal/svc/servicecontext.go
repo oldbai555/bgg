@@ -35,6 +35,7 @@ type ServiceContext struct {
 	PublicOperationLogMiddleware rest.Middleware
 	RateLimitMiddleware          rest.Middleware
 	PerformanceMiddleware        rest.Middleware
+	CorsMiddleware               rest.Middleware
 	SDKAuthMiddleware            rest.Middleware
 	SDKRateLimitMiddleware       rest.Middleware
 	SDKCallLogMiddleware         rest.Middleware

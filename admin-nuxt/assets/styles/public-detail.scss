@@ -3,7 +3,7 @@
  * 
  * 使用方式：
  * 1. 在组件的 <style scoped lang="scss"> 中引入：
- *    @import '@/styles/public-detail.scss';
+ *    @import '@/assets/styles/public-detail.scss';
  * 
  * 2. 在模板根元素上添加 class="public-detail-page"
  * 
@@ -17,7 +17,8 @@
  */
 
 .public-detail-page {
-  min-height: 100vh;
+  height: 100vh; // 固定高度，不使用 min-height，避免出现滚动条
+  overflow: hidden; // 隐藏最外层滚动条
   background: linear-gradient(135deg, #fff7e6 0%, #ffe9d9 45%, #ffd1a4 100%);
   padding: 16px 16px 0;
  

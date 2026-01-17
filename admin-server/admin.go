@@ -81,6 +81,7 @@ func main() {
 	publicOperationLogMiddleware := middleware.NewPublicOperationLogMiddleware(ctx)
 	rateLimitMiddleware := middleware.NewRateLimitMiddleware(ctx)
 	performanceMiddleware := middleware.NewPerformanceMiddleware(ctx)
+	corsMiddleware := middleware.NewCorsMiddleware()
 	sdkAuthMiddleware := middleware.NewSDKAuthMiddleware(ctx)
 	sdkRateLimitMiddleware := middleware.NewSDKRateLimitMiddleware(ctx)
 	sdkCallLogMiddleware := middleware.NewSDKCallLogMiddleware(ctx)
@@ -91,6 +92,7 @@ func main() {
 	ctx.PublicOperationLogMiddleware = publicOperationLogMiddleware.Handle
 	ctx.RateLimitMiddleware = rateLimitMiddleware.Handle
 	ctx.PerformanceMiddleware = performanceMiddleware.Handle
+	ctx.CorsMiddleware = corsMiddleware.Handle
 	ctx.SDKAuthMiddleware = sdkAuthMiddleware.Handle
 	ctx.SDKRateLimitMiddleware = sdkRateLimitMiddleware.Handle
 	ctx.SDKCallLogMiddleware = sdkCallLogMiddleware.Handle

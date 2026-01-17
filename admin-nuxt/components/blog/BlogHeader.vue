@@ -42,12 +42,13 @@
 </template>
 
 <script setup lang="ts">
+// Nuxt 3 自动导入 composables，无需手动导入 useRouter
 import {ref, onMounted} from 'vue'
-import {useRouter} from 'vue-router'
 import {Search} from '@element-plus/icons-vue'
 import {blogApi} from '@/api/blog'
 import type {PublicBlogSocialInfoListResp} from '@/api/generated/admin'
 
+// Nuxt 3 自动导入 useRouter
 const router = useRouter()
 
 const searchKeyword = ref('')
@@ -55,8 +56,8 @@ const socialInfoList = ref<PublicBlogSocialInfoListResp['list']>([])
 
 const normalizeUrl = (url: string): string => {
   if (!url) {
-return ''
-}
+    return ''
+  }
   if (url.startsWith('http://') || url.startsWith('https://')) {
     return url
   }
@@ -67,35 +68,35 @@ const getSocialIconText = (name: string): string => {
   // 返回社交平台名称的首字母或缩写
   const nameLower = name.toLowerCase()
   if (nameLower.includes('github')) {
-return 'G'
-}
+    return 'G'
+  }
   if (nameLower.includes('gitee')) {
-return '码'
-}
+    return '码'
+  }
   if (nameLower.includes('bilibili') || nameLower.includes('b站')) {
-return 'B'
-}
+    return 'B'
+  }
   if (nameLower.includes('wechat') || nameLower.includes('微信')) {
-return '微'
-}
+    return '微'
+  }
   if (nameLower.includes('email') || nameLower.includes('邮件')) {
-return '邮'
-}
+    return '邮'
+  }
   return name.charAt(0).toUpperCase()
 }
 
 const goHome = () => {
-  router.push('/public/blog')
+  router.push('/blog')
 }
 
 const handleSearch = () => {
   if (searchKeyword.value.trim()) {
     router.push({
-      path: '/public/blog',
+      path: '/blog',
       query: {keyword: searchKeyword.value.trim()}
     })
   } else {
-    router.push('/public/blog')
+    router.push('/blog')
   }
 }
 

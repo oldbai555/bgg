@@ -19,7 +19,11 @@ ADMIN_SERVER_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 # 项目根目录（admin-server的父目录）
 PROJECT_ROOT="$(cd "$ADMIN_SERVER_DIR/.." && pwd)"
 ADMIN_FRONTEND_DIR="${PROJECT_ROOT}/admin-frontend"
+ADMIN_NUXT_DIR="${PROJECT_ROOT}/admin-nuxt"
 API_DIR="${ADMIN_SERVER_DIR}/api"
+
+# 默认生成到 admin-frontend（向后兼容）
+FRONTEND_TARGET="admin-frontend"
 GENERATED_DIR="${ADMIN_FRONTEND_DIR}/src/api/generated"
 
 # 解析 goctl 路径（优先环境变量 GOCTL_BIN，其次 PATH，再次 GOPATH/bin/goctl）
@@ -45,7 +49,7 @@ usage() {
     echo -e "${GREEN}go-zero TypeScript 代码生成工具${NC}"
     echo ""
     echo "用法:"
-    echo "  $0 [api_file]"
+    echo "  $0 [选项] [api_file]"
     echo ""
     echo "参数:"
     echo "  api_file          API 文件路径（可选，默认使用 admin-server/api/admin.api）"
@@ -53,28 +57,40 @@ usage() {
     echo ""
     echo "选项:"
     echo "  -h, --help        显示此帮助信息"
+    echo "  -f, --frontend    指定生成目标（admin-frontend 或 admin-nuxt）"
+    echo "                    默认: admin-frontend"
     echo ""
     echo "示例:"
-    echo "  $0                # 使用默认 admin.api"
-    echo "  $0 admin.api      # 指定 API 文件"
-    echo "  $0 api/admin.api  # 相对路径"
-    echo "  $0 /absolute/path/to/admin.api  # 绝对路径"
+    echo "  $0                                # 使用默认 admin.api，生成到 admin-frontend"
+    echo "  $0 admin.api                      # 指定 API 文件，生成到 admin-frontend"
+    echo "  $0 -f admin-nuxt                  # 生成到 admin-nuxt"
+    echo "  $0 --frontend admin-nuxt admin.api # 指定目标和 API 文件"
     echo ""
     echo "注意:"
-    echo "  - 生成的 TypeScript 代码在 admin-frontend/src/api/generated/ 目录"
+    echo "  - 生成的 TypeScript 代码在指定项目的 api/generated/ 目录"
     echo "  - 禁止手动修改 generated/ 目录下的文件"
-    echo "  - 在 src/api/ 中二次封装（错误处理、拦截器集成、统一返回类型）"
+    echo "  - 在 api/ 中二次封装（错误处理、拦截器集成、统一返回类型）"
     echo ""
 }
 
 # 解析参数
 API_FILE=""
+FRONTEND_TARGET="admin-frontend"
 
 while [[ $# -gt 0 ]]; do
     case $1 in
         -h|--help)
             usage
             exit 0
+            ;;
+        -f|--frontend)
+            if [ -z "$2" ]; then
+                echo -e "${RED}错误: --frontend 选项需要指定目标项目${NC}"
+                usage
+                exit 1
+            fi
+            FRONTEND_TARGET="$2"
+            shift 2
             ;;
         *)
             if [ -z "$API_FILE" ]; then
@@ -88,6 +104,23 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+# 根据目标设置输出目录
+case "$FRONTEND_TARGET" in
+    admin-frontend)
+        TARGET_DIR="$ADMIN_FRONTEND_DIR"
+        GENERATED_DIR="${TARGET_DIR}/src/api/generated"
+        ;;
+    admin-nuxt)
+        TARGET_DIR="$ADMIN_NUXT_DIR"
+        GENERATED_DIR="${TARGET_DIR}/api/generated"
+        ;;
+    *)
+        echo -e "${RED}错误: 无效的目标项目: ${FRONTEND_TARGET}${NC}"
+        echo "支持的目标: admin-frontend, admin-nuxt"
+        exit 1
+        ;;
+esac
 
 # 如果没有指定 API 文件，使用默认的 admin.api
 if [ -z "$API_FILE" ]; then
@@ -125,15 +158,16 @@ if [ ! -f "$API_FILE_PATH" ]; then
     exit 1
 fi
 
-# 检查前端目录是否存在
-if [ ! -d "$ADMIN_FRONTEND_DIR" ]; then
-    echo -e "${RED}错误: 前端目录不存在: ${ADMIN_FRONTEND_DIR}${NC}"
+# 检查目标目录是否存在
+if [ ! -d "$TARGET_DIR" ]; then
+    echo -e "${RED}错误: 目标目录不存在: ${TARGET_DIR}${NC}"
     exit 1
 fi
 
 # 显示配置信息
 echo -e "${GREEN}=== go-zero TypeScript 代码生成 ===${NC}"
 echo "项目根目录:  $PROJECT_ROOT"
+echo "目标项目:    $FRONTEND_TARGET"
 echo "API 文件:    $API_FILE_PATH"
 echo "输出目录:    ${GENERATED_DIR}"
 echo "goctl 路径: $GOCTL_BIN"

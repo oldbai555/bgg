@@ -1,6 +1,8 @@
 <template>
   <div class="video-list-page public-list-page">
-    <MetricReporter module="video_list" :biz-id="0" />
+    <ClientOnly>
+      <MetricReporter module="video_list" :biz-id="0" />
+    </ClientOnly>
     <div class="container">
       <div class="hero">
         <div class="hero-title">🎬 视频列表</div>
@@ -88,16 +90,22 @@
 </template>
 
 <script setup lang="ts">
+// Nuxt 3 自动导入 composables，无需手动导入 useRouter、useRoute
 import {reactive, ref, computed, onMounted, onUnmounted, nextTick} from 'vue'
-import {useRouter, useRoute} from 'vue-router'
 import {ElMessage} from 'element-plus'
-import {publicVideoList} from '@/api/generated/admin'
+import {videoApi} from '@/api/video'
 import type {PublicVideoListReq, PublicVideoItem} from '@/api/generated/admin'
 import MetricReporter from '@/components/common/MetricReporter.vue'
 import IcpFooter from '@/components/common/IcpFooter.vue'
 
+// Nuxt 3 自动导入 useRouter 和 useRoute
 const router = useRouter()
 const route = useRoute()
+
+// 定义页面元数据（Nuxt 3 规范）
+definePageMeta({
+  layout: false
+})
 
 const SCROLL_STATE_KEY = 'public_video_list_state'
 
@@ -121,7 +129,9 @@ const paginationLayout = computed(() => {
 
 // 检测屏幕尺寸
 const checkMobile = () => {
-  isMobile.value = window.innerWidth <= 768
+  if (typeof window !== 'undefined') {
+    isMobile.value = window.innerWidth <= 768
+  }
 }
 
 // 监听窗口大小变化
@@ -132,16 +142,16 @@ const handleResize = () => {
 // 获取封面URL
 const getCoverUrl = (godNum: string): string => {
   if (!godNum) {
-return ''
-}
+    return ''
+  }
   return `https://fourhoi.com/${godNum}/cover-t.jpg`
 }
 
 // 获取预览视频URL
 const getPreviewUrl = (godNum: string): string => {
   if (!godNum) {
-return ''
-}
+    return ''
+  }
   return `https://fourhoi.com/${godNum}/preview.mp4`
 }
 
@@ -178,6 +188,9 @@ const handleThumbnailLeave = (video: PublicVideoItem) => {
 
 // 恢复滚动位置（在 DOM 完全渲染后）
 const restoreScrollPosition = async (scrollTop: number) => {
+  if (typeof window === 'undefined') {
+    return
+  }
   // 等待 Vue 完成 DOM 更新
   await nextTick()
   // 等待浏览器完成渲染
@@ -215,8 +228,7 @@ const loadData = async () => {
       req.content = query.content
     }
 
-    // 响应直接返回数据（无 code/msg 包装），拦截器会直接返回原始数据
-    const resp = await publicVideoList(req)
+    const resp = await videoApi.publicList(req)
     list.value = resp.list
     total.value = resp.total
 
@@ -227,7 +239,7 @@ const loadData = async () => {
     loading.value = false
 
     // 如果需要恢复滚动位置，等待 DOM 完全渲染后再恢复
-    if (shouldRestoreScroll && scrollTopToRestore !== null) {
+    if (shouldRestoreScroll && scrollTopToRestore !== null && typeof window !== 'undefined') {
       pendingScrollTop.value = null
       await restoreScrollPosition(scrollTopToRestore)
     }
@@ -241,10 +253,12 @@ const handleSearch = () => {
   // 清除待恢复的滚动位置（因为用户主动搜索了）
   pendingScrollTop.value = null
   // 清除 sessionStorage 中的旧状态
-  try {
-    sessionStorage.removeItem(SCROLL_STATE_KEY)
-  } catch {
-    // 忽略清除失败
+  if (typeof window !== 'undefined') {
+    try {
+      sessionStorage.removeItem(SCROLL_STATE_KEY)
+    } catch {
+      // 忽略清除失败
+    }
   }
   loadData()
 }
@@ -257,7 +271,9 @@ const handlePageChange = (page: number) => {
   pendingScrollTop.value = null
   loadData()
   // 滚动到顶部
-  window.scrollTo({top: 0, behavior: 'smooth'})
+  if (typeof window !== 'undefined') {
+    window.scrollTo({top: 0, behavior: 'smooth'})
+  }
 }
 
 // 每页数量变化
@@ -273,21 +289,23 @@ const handleSizeChange = (size: number) => {
 // 跳转到详情页
 const goToDetail = (id: number) => {
   // 记录当前列表状态与滚动位置，便于返回时恢复
-  try {
-    const state = {
-      page: query.page,
-      size: query.size,
-      content: query.content,
-      scrollTop: window.scrollY,
-      ts: Date.now()
+  if (typeof window !== 'undefined') {
+    try {
+      const state = {
+        page: query.page,
+        size: query.size,
+        content: query.content,
+        scrollTop: window.scrollY,
+        ts: Date.now()
+      }
+      sessionStorage.setItem(SCROLL_STATE_KEY, JSON.stringify(state))
+    } catch {
+      // 忽略存储失败
     }
-    sessionStorage.setItem(SCROLL_STATE_KEY, JSON.stringify(state))
-  } catch {
-    // 忽略存储失败
   }
 
   router.push({
-    path: `/public/videos/${id}`,
+    path: `/videos/${id}`,
     query: {
       page: String(query.page),
       size: String(query.size),
@@ -326,42 +344,44 @@ onMounted(() => {
   }
 
   // 尝试从 sessionStorage 中恢复状态（包括从详情页返回的情况）
-  try {
-    const raw = sessionStorage.getItem(SCROLL_STATE_KEY)
-    if (raw) {
-      const parsed = JSON.parse(raw) as {
-        page?: number
-        size?: number
-        content?: string
-        scrollTop?: number
-        ts?: number
-      }
-      const now = Date.now()
-      // 简单过期控制：1 小时内的记录才恢复
-      if (!parsed.ts || now - parsed.ts < 60 * 60 * 1000) {
-        // 如果路由参数中没有分页信息，使用 sessionStorage 中的
-        if (!page && parsed.page && parsed.page > 0) {
-          query.page = parsed.page
+  if (typeof window !== 'undefined') {
+    try {
+      const raw = sessionStorage.getItem(SCROLL_STATE_KEY)
+      if (raw) {
+        const parsed = JSON.parse(raw) as {
+          page?: number
+          size?: number
+          content?: string
+          scrollTop?: number
+          ts?: number
         }
-        if (!size && parsed.size && parsed.size > 0) {
-          query.size = parsed.size
-        }
-        if (!content && typeof parsed.content === 'string') {
-          query.content = parsed.content
-        }
-        // 如果是从详情页返回（有路由 query），恢复滚动位置
-        if (page || size) {
-          if (typeof parsed.scrollTop === 'number' && parsed.scrollTop > 0) {
-            pendingScrollTop.value = parsed.scrollTop
+        const now = Date.now()
+        // 简单过期控制：1 小时内的记录才恢复
+        if (!parsed.ts || now - parsed.ts < 60 * 60 * 1000) {
+          // 如果路由参数中没有分页信息，使用 sessionStorage 中的
+          if (!page && parsed.page && parsed.page > 0) {
+            query.page = parsed.page
           }
+          if (!size && parsed.size && parsed.size > 0) {
+            query.size = parsed.size
+          }
+          if (!content && typeof parsed.content === 'string') {
+            query.content = parsed.content
+          }
+          // 如果是从详情页返回（有路由 query），恢复滚动位置
+          if (page || size) {
+            if (typeof parsed.scrollTop === 'number' && parsed.scrollTop > 0) {
+              pendingScrollTop.value = parsed.scrollTop
+            }
+          }
+        } else {
+          // 过期了，清除旧状态
+          sessionStorage.removeItem(SCROLL_STATE_KEY)
         }
-      } else {
-        // 过期了，清除旧状态
-        sessionStorage.removeItem(SCROLL_STATE_KEY)
       }
+    } catch {
+      // 忽略解析错误
     }
-  } catch {
-    // 忽略解析错误
   }
 
   updateRouteQuery()
@@ -369,16 +389,20 @@ onMounted(() => {
 
   // 初始化移动端检测
   checkMobile()
-  window.addEventListener('resize', handleResize)
+  if (typeof window !== 'undefined') {
+    window.addEventListener('resize', handleResize)
+  }
 })
 
 onUnmounted(() => {
-  window.removeEventListener('resize', handleResize)
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('resize', handleResize)
+  }
 })
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/public-list.scss';
+@import '@/assets/styles/public-list.scss';
 
 // 视频列表页特定样式
 .video-list-page {
@@ -462,12 +486,27 @@ onUnmounted(() => {
     }
   }
 
+  .video-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px; // 确保标题和元数据之间有间距
+  }
+
   .video-title {
     cursor: pointer;
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0; // 防止标题被压缩
 
     &:hover {
       color: #667eea;
     }
+  }
+
+  .video-code {
+    position: relative;
+    z-index: 0;
+    flex-shrink: 0; // 防止元数据被压缩
   }
 
   @media (max-width: 768px) {
@@ -477,4 +516,3 @@ onUnmounted(() => {
   }
 }
 </style>
-

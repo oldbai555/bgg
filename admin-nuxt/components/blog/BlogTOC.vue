@@ -56,6 +56,10 @@ const extractTOC = (content: string): TOCItem[] => {
 
 // 滚动到锚点
 const scrollToAnchor = (id: string) => {
+  // 确保在客户端环境
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
+    return
+  }
   const element = document.getElementById(id)
   if (element) {
     element.scrollIntoView({behavior: 'smooth', block: 'start'})
@@ -65,14 +69,18 @@ const scrollToAnchor = (id: string) => {
 
 // 监听滚动，高亮当前阅读位置
 const handleScroll = () => {
+  // 确保在客户端环境
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
+    return
+  }
   const headings = tocItems.value.map((item) => ({
     id: item.id,
     element: document.getElementById(item.id)
   })).filter((h) => h.element !== null)
 
   if (headings.length === 0) {
-return
-}
+    return
+  }
 
   // 找到当前视口中最接近顶部的标题
   let currentId = ''
@@ -98,6 +106,10 @@ return
 
 // 为标题添加ID（需要在Markdown渲染后调用）
 const addHeadingIds = () => {
+  // 确保在客户端环境
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
+    return
+  }
   const headings = document.querySelectorAll('.md-editor-preview h1, .md-editor-preview h2, .md-editor-preview h3, .md-editor-preview h4, .md-editor-preview h5, .md-editor-preview h6')
   let index = 0
   headings.forEach((heading) => {
@@ -113,39 +125,76 @@ const addHeadingIds = () => {
   })
 }
 
-watch(() => props.content, (newContent) => {
-  tocItems.value = extractTOC(newContent)
+watch(() => props.content, (newContent, oldContent) => {
+  console.log('[BlogTOC] content watch triggered:', {
+    hasNewContent: !!newContent,
+    hasOldContent: !!oldContent,
+    newContentType: typeof newContent,
+    newContentLength: newContent?.length || 0,
+    newContentPreview: newContent?.substring(0, 100) || 'N/A'
+  })
+  
+  if (!newContent || typeof newContent !== 'string') {
+    console.log('[BlogTOC] 内容无效，清空 TOC')
+    tocItems.value = []
+    return
+  }
+  
+  const extracted = extractTOC(newContent)
+  console.log('[BlogTOC] 提取的 TOC 项:', {
+    count: extracted.length,
+    items: extracted.map(item => ({ id: item.id, text: item.text, level: item.level })),
+    contentHasHeaders: /^#{1,6}\s/m.test(newContent),
+    contentLines: newContent.split('\n').length,
+    firstFewLines: newContent.split('\n').slice(0, 5)
+  })
+  
+  tocItems.value = extracted
+  
   // 延迟执行，等待Markdown渲染完成
-  setTimeout(() => {
-    addHeadingIds()
-    handleScroll()
-  }, 500)
+  if (typeof window !== 'undefined') {
+    console.log('[BlogTOC] 延迟执行 addHeadingIds 和 handleScroll')
+    setTimeout(() => {
+      console.log('[BlogTOC] 执行 addHeadingIds 和 handleScroll')
+      addHeadingIds()
+      handleScroll()
+    }, 500)
+  } else {
+    console.log('[BlogTOC] SSR 环境，跳过 addHeadingIds')
+  }
 }, {immediate: true})
 
 onMounted(() => {
-  window.addEventListener('scroll', handleScroll, {passive: true})
-  setTimeout(() => {
-    addHeadingIds()
-    handleScroll()
-  }, 500)
+  if (typeof window !== 'undefined') {
+    window.addEventListener('scroll', handleScroll, {passive: true})
+    setTimeout(() => {
+      addHeadingIds()
+      handleScroll()
+    }, 500)
+  }
 })
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll)
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('scroll', handleScroll)
+  }
 })
 </script>
 
 <style scoped lang="scss">
 .blog-toc {
-  position: sticky;
-  top: 80px;
-  width: 240px;
+  position: relative; // 改为 relative，因为父容器 blog-sidebar 已经使用了 sticky
+  // 移除 top: 80px，由父容器控制定位
+  width: 100%; // 改为 100%，占满父容器 blog-sidebar 的宽度
+  max-width: 240px; // 最大宽度限制为 240px
   background: #fff;
   border-radius: 8px;
   padding: 16px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   max-height: calc(100vh - 100px);
   overflow-y: auto;
+  overflow-x: visible; // 确保横向不裁剪
+  box-sizing: border-box; // 确保 padding 包含在宽度内
 
   .toc-title {
     font-size: 16px;

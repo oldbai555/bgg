@@ -3,7 +3,7 @@
  * 
  * 使用方式：
  * 1. 在组件的 <style scoped lang="scss"> 中引入：
- *    @import '@/styles/public-list.scss';
+ *    @import '@/assets/styles/public-list.scss';
  * 
  * 2. 在模板根元素上添加 class="public-list-page"
  * 
@@ -143,6 +143,9 @@
     line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0; // 防止标题被压缩
   }
 
   // 元信息（作者、时间等）
@@ -152,6 +155,9 @@
     display: flex;
     align-items: center;
     gap: 4px;
+    position: relative;
+    z-index: 0;
+    flex-shrink: 0; // 防止元数据被压缩
   }
 
   // 摘要

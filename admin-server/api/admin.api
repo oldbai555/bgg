@@ -586,8 +586,9 @@ type (
 )
 
 @server (
-	group:  ping
-	prefix: /api/v1
+	group:      ping
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware
 )
 service admin-api {
 	@handler Ping
@@ -608,8 +609,9 @@ service admin-api {
 }
 
 @server (
-	group:  auth
-	prefix: /api/v1
+	group:      auth
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware
 )
 service admin-api {
 	@handler Login
@@ -909,7 +911,7 @@ service admin-api {
 @server (
 	group:      dict
 	prefix:     /api/v1
-	middleware: AuthMiddleware,ApiEnabledMiddleware
+	middleware: PerformanceMiddleware,AuthMiddleware,ApiEnabledMiddleware
 )
 service admin-api {
 	@handler DictGet
@@ -920,7 +922,7 @@ service admin-api {
 @server (
 	group:      public
 	prefix:     /api/v1
-	middleware: ApiEnabledMiddleware
+	middleware: PerformanceMiddleware,CorsMiddleware,ApiEnabledMiddleware
 )
 service admin-api {
 	@handler PublicDictGet
@@ -930,7 +932,7 @@ service admin-api {
 @server (
 	group:      dict
 	prefix:     /api/v1
-	middleware: AuthMiddleware,ApiEnabledMiddleware
+	middleware: PerformanceMiddleware,AuthMiddleware,ApiEnabledMiddleware
 )
 service admin-api {
 	@handler DictBatchGet
@@ -1509,7 +1511,7 @@ service admin-api {
 @server (
 	group:      m3u8
 	prefix:     /api/v1
-	middleware: ApiEnabledMiddleware,PublicOperationLogMiddleware
+	middleware: PerformanceMiddleware,CorsMiddleware,ApiEnabledMiddleware,PublicOperationLogMiddleware
 )
 service admin-api {
 	@handler M3u8Proxy
@@ -1520,7 +1522,7 @@ service admin-api {
 @server (
 	group:      video_collect
 	prefix:     /api/v1
-	middleware: ApiEnabledMiddleware,OperationLogMiddleware
+	middleware: PerformanceMiddleware,CorsMiddleware,ApiEnabledMiddleware,OperationLogMiddleware
 )
 service admin-api {
 	@handler VideoCollect
@@ -1535,7 +1537,7 @@ service admin-api {
 @server (
 	group:      public_video
 	prefix:     /api/v1
-	middleware: ApiEnabledMiddleware,PublicOperationLogMiddleware
+	middleware: PerformanceMiddleware,CorsMiddleware,ApiEnabledMiddleware,PublicOperationLogMiddleware
 )
 service admin-api {
 	@handler PublicVideoList
@@ -1624,7 +1626,7 @@ service admin-api {
 @server (
 	group:      public_blog
 	prefix:     /api/v1
-	middleware: ApiEnabledMiddleware,PublicOperationLogMiddleware
+	middleware: PerformanceMiddleware,CorsMiddleware,ApiEnabledMiddleware,PublicOperationLogMiddleware
 )
 service admin-api {
 	@handler PublicBlogArticleList
@@ -1699,11 +1701,15 @@ service admin-api {
 @server (
 	group:      metric
 	prefix:     /api/v1
-	middleware: ApiEnabledMiddleware,PublicOperationLogMiddleware
+	middleware: PerformanceMiddleware,CorsMiddleware,ApiEnabledMiddleware,PublicOperationLogMiddleware
 )
 service admin-api {
 	@handler MetricReport
 	post /metrics/report (MetricReportReq) returns (Response)
+
+	// 支持OPTIONS请求（CORS预检）
+	@handler MetricReportOptions
+	options /metrics/report
 }
 
 // 通用打点统计查询（管理后台）
@@ -1922,7 +1928,7 @@ service admin-api {
 @server (
 	group:      operation_log
 	prefix:     /api/v1
-	middleware: RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
 service admin-api {
 	@handler OperationLogList
@@ -2049,7 +2055,7 @@ type (
 @server (
 	group:      login_log
 	prefix:     /api/v1
-	middleware: RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
 service admin-api {
 	@handler LoginLogList
@@ -2124,7 +2130,7 @@ type (
 @server (
 	group:      audit_log
 	prefix:     /api/v1
-	middleware: RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
 service admin-api {
 	@handler AuditLogList
@@ -2245,7 +2251,7 @@ service admin-api {
 @server (
 	group:      notification
 	prefix:     /api/v1
-	middleware: AuthMiddleware,ApiEnabledMiddleware
+	middleware: PerformanceMiddleware,AuthMiddleware,ApiEnabledMiddleware
 )
 service admin-api {
 	@handler NotificationList
@@ -2565,7 +2571,7 @@ service admin-api {
 @server (
 	group:      sdk_public
 	prefix:     /sdk
-	middleware: SDKAuthMiddleware,SDKRateLimitMiddleware,SDKCallLogMiddleware
+	middleware: PerformanceMiddleware,SDKAuthMiddleware,SDKRateLimitMiddleware,SDKCallLogMiddleware
 )
 service admin-api {
 	@handler SdkFileUpload
