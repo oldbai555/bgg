@@ -42,13 +42,12 @@
 </template>
 
 <script setup lang="ts">
-// Nuxt 3 自动导入 composables，无需手动导入 useRouter
 import {ref, onMounted} from 'vue'
+import {useRouter} from 'vue-router'
 import {Search} from '@element-plus/icons-vue'
 import {blogApi} from '@/api/blog'
 import type {PublicBlogSocialInfoListResp} from '@/api/generated/admin'
 
-// Nuxt 3 自动导入 useRouter
 const router = useRouter()
 
 const searchKeyword = ref('')

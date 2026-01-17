@@ -1,18 +1,12 @@
 <template>
   <div class="blog-list-page">
-    <ClientOnly>
-      <MetricReporter module="blog_article_list" :biz-id="0" />
-    </ClientOnly>
-    <ClientOnly>
-      <BlogHeader />
-    </ClientOnly>
+    <MetricReporter module="blog_article_list" :biz-id="0" />
+    <BlogHeader />
     <div class="blog-page-container">
       <div class="blog-content-wrapper">
         <!-- 左侧分类导航 -->
         <aside class="blog-sidebar-left">
-          <ClientOnly>
-            <BlogCategoryNav :selected-tag-id="query.tagId" @select="handleTagSelect" />
-          </ClientOnly>
+          <BlogCategoryNav :selected-tag-id="query.tagId" @select="handleTagSelect" />
         </aside>
 
         <!-- 中间文章列表 -->
@@ -46,16 +40,14 @@
                 </div>
                 <div class="article-summary">{{ item.summary || '暂无摘要' }}</div>
                 <div v-if="item.tagNames?.length" class="article-tags">
-                  <ClientOnly>
-                    <el-tag
-                      v-for="tag in item.tagNames"
-                      :key="tag"
-                      size="small"
-                      effect="plain"
-                    >
-                      {{ tag }}
-                    </el-tag>
-                  </ClientOnly>
+                  <el-tag
+                    v-for="tag in item.tagNames"
+                    :key="tag"
+                    size="small"
+                    effect="plain"
+                  >
+                    {{ tag }}
+                  </el-tag>
                 </div>
               </div>
             </div>
@@ -65,27 +57,23 @@
 
           <!-- 分页 -->
           <div class="pagination-wrapper">
-            <ClientOnly>
-              <el-pagination
-                v-model:current-page="query.page"
-                v-model:page-size="query.size"
-                :total="total"
-                :page-sizes="[10, 20, 30, 50]"
-                :layout="paginationLayout"
-                :size="isMobile ? 'small' : 'default'"
-                @size-change="handleSizeChange"
-                @current-change="handlePageChange"
-              />
-            </ClientOnly>
+            <el-pagination
+              v-model:current-page="query.page"
+              v-model:page-size="query.size"
+              :total="total"
+              :page-sizes="[10, 20, 30, 50]"
+              :layout="paginationLayout"
+              :size="isMobile ? 'small' : 'default'"
+              @size-change="handleSizeChange"
+              @current-change="handlePageChange"
+            />
           </div>
         </main>
 
         <!-- 右侧侧边栏 -->
         <aside class="blog-sidebar">
-          <ClientOnly>
-            <BlogAuthorCard />
-            <BlogSocialLinks />
-          </ClientOnly>
+          <BlogAuthorCard />
+          <BlogSocialLinks />
         </aside>
       </div>
     </div>
@@ -95,8 +83,8 @@
 </template>
 
 <script setup lang="ts">
-// Nuxt 3 自动导入 composables，无需手动导入 useRouter、useRoute
 import {reactive, ref, computed, onMounted, onUnmounted, nextTick} from 'vue'
+import {useRouter, useRoute} from 'vue-router'
 import {ElMessage} from 'element-plus'
 import {blogApi} from '@/api/blog'
 import type {PublicBlogArticleListReq, PublicBlogArticleItem} from '@/api/generated/admin'
@@ -107,14 +95,8 @@ import BlogCategoryNav from '@/components/blog/BlogCategoryNav.vue'
 import BlogAuthorCard from '@/components/blog/BlogAuthorCard.vue'
 import BlogSocialLinks from '@/components/blog/BlogSocialLinks.vue'
 
-// Nuxt 3 自动导入 useRouter 和 useRoute
 const router = useRouter()
 const route = useRoute()
-
-// 定义页面元数据（Nuxt 3 规范）
-definePageMeta({
-  layout: false
-})
 
 const SCROLL_STATE_KEY = 'public_blog_list_state'
 
@@ -300,7 +282,7 @@ onUnmounted(() => {
 </script>
 
 <style scoped lang="scss">
-@import '@/assets/styles/blog.scss';
+@import '@/styles/blog.scss';
 
 .blog-list-page {
   min-height: 100vh; // 使用 min-height，允许内容超出时滚动

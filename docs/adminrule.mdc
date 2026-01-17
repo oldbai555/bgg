@@ -182,53 +182,49 @@ err = r.conn.QueryRowsCtx(ctx, &list, query)
    - 使用 go-zero 框架，提供 RESTful API
    - 所有前端项目统一调用 admin-server 的接口
 
-2. **admin-frontend**（管理后台前端）
-   - **职责**：后台管理系统界面
+2. **admin-frontend**（前端项目）
+   - **职责**：后台管理系统界面 + 公共展示页面
    - **技术栈**：Vue 3 + TypeScript + Vite + Element Plus
-   - **访问路径**：`/admin/*`
+   - **访问路径**：
+     - `/admin/*` - 后台管理功能（需要登录认证）
+     - `/blog/*`、`/videos/*` - 公共展示功能（无需登录）
    - **功能范围**：
      - 系统管理（用户、角色、权限、部门等）
      - 业务管理（博客文章管理、视频管理等）
      - 数据统计和监控
-   - **特点**：需要登录认证，基于权限控制的功能访问
-
-3. **admin-nuxt**（公共展示前端）
-   - **职责**：对外展示的公共页面（博客、视频等）
-   - **技术栈**：Nuxt 3 + TypeScript + Vue 3 + Element Plus
-   - **访问路径**：`/blog/*`、`/videos/*` 等
-   - **功能范围**：
      - 博客列表/详情页（公开访问）
      - 视频列表/详情页（公开访问）
-     - 其他公共展示页面
-   - **特点**：无需登录，SEO 友好（SSR），移动端适配
+   - **特点**：
+     - 后台管理功能需要登录认证，基于权限控制的功能访问
+     - 公共展示功能无需登录，移动端适配
 
 ### 开发规范
 
-- **后台管理功能**：必须在 `admin-frontend` 中开发
-- **公共展示功能**：必须在 `admin-nuxt` 中开发
+- **后台管理功能**：必须在 `admin-frontend/src/views/` 下开发（需要登录）
+- **公共展示功能**：必须在 `admin-frontend/src/views/public/` 下开发（无需登录）
 - **API 接口**：统一从 `admin-server` 调用，不区分来源
-- **代码复用**：公共组件和工具函数可以共享，但页面组件必须按职责划分
+- **代码复用**：公共组件和工具函数可以共享
 
 ### Public 界面开发规范（小程序风格）
 
-- **适用范围**：`admin-nuxt/pages/*` 和 `admin-nuxt/components/*` 下的所有公共页面（博客列表/详情、视频列表/详情等）。
+- **适用范围**：`admin-frontend/src/views/public/*` 和 `admin-frontend/src/components/blog/*` 下的所有公共页面（博客列表/详情、视频列表/详情等）。
 - **统一布局**：
   - 页面根元素必须包含 `public-list-page` 或 `public-detail-page` 类，用于挂载通用样式；
   - 列表页统一使用柔和暖色渐变背景（例如 `linear-gradient(135deg, #fff7e6 0%, #ffe9d9 45%, #ffd1a4 100%)`）+ 白色卡片信息流布局（PC 多列、移动端单列）；
   - 详情页统一为暖色渐变背景 + 中心白色内容卡片（最大宽度约 800px）。
 - **通用样式模板（必须复用，禁止各写一套）**：
-  - 列表页：`@import '@/assets/styles/public-list.scss';`（Nuxt 3 路径），HTML 结构需包含 `.container`、`.hero`（可选）、`.list-grid`、`.list-card`、`.cover`、`.card-content`、`.card-title`、`.card-meta`、`.card-summary` 等类名；
-  - 详情页：`@import '@/assets/styles/public-detail.scss';`（Nuxt 3 路径），HTML 结构需包含 `.container`、`.back-link`、`.title`、`.meta`、`.cover`、`.content` 等类名；
+  - 列表页：`@import '@/styles/public-list.scss';`，HTML 结构需包含 `.container`、`.hero`（可选）、`.list-grid`、`.list-card`、`.cover`、`.card-content`、`.card-title`、`.card-meta`、`.card-summary` 等类名；
+  - 详情页：`@import '@/styles/public-detail.scss';`，HTML 结构需包含 `.container`、`.back-link`、`.title`、`.meta`、`.cover`、`.content` 等类名；
   - 页面自定义样式只能在 `.your-page-class` 下做「小范围覆盖」，不得改写通用模板的整体布局和断点规则。
 - **移动端规范**：
   - 统一断点 `@media (max-width: 768px)`；
   - 列表卡片在移动端自动切换为左图右文信息流（封面固定宽度，高度 84px，标题/摘要 2-3 行截断）；
   - 分页组件在移动端简化为 `prev, pager, next`，隐藏总条数/每页条数/跳转输入框，避免拥挤。
 - **交互与体验**：
-  - 列表页进入详情前，必须将分页参数、搜索条件和滚动位置写入 `sessionStorage`，返回时恢复（参考 `admin-nuxt/pages/blog/index.vue` / `admin-nuxt/pages/videos/index.vue` 实现）；
+  - 列表页进入详情前，必须将分页参数、搜索条件和滚动位置写入 `sessionStorage`，返回时恢复（参考 `admin-frontend/src/views/public/BlogList.vue` / `admin-frontend/src/views/public/VideoList.vue` 实现）；
   - 详情页返回优先使用 `router.back()`，若无历史记录再按存储状态跳转带 query 的列表页；
   - 所有 Public 页面必须通过 `MetricReporter` 统一接入埋点上报（列表 `your_module_list`、详情 `your_module_detail`），避免各写一套 `metricApi.report`；
-  - 所有 `admin-nuxt/pages/*` 页面都必须在底部挂载 `IcpFooter` 组件，确保公网访问时备案信息统一展示。
+  - 所有 `admin-frontend/src/views/public/*` 页面都必须在底部挂载 `IcpFooter` 组件，确保公网访问时备案信息统一展示。
 
 > 详细示例与代码片段见 `docs/前端开发进度.md`「10. Public 界面开发规范（小程序风格）」章节。
 
@@ -389,22 +385,28 @@ admin-frontend/
 │   └── stores/            # Pinia状态管理
 ```
 
-admin-nuxt 目录结构：
+admin-frontend 公共页面目录结构：
 ```
-admin-nuxt/
-├── pages/                  # 页面组件（Nuxt 3 自动路由）
-│   ├── blog/              # 博客相关页面
-│   └── videos/            # 视频相关页面
-├── components/            # 组件（自动导入）
-│   ├── blog/              # 博客相关组件
-│   └── common/            # 通用组件
+admin-frontend/src/
+├── views/public/          # 公共页面（无需登录）
+│   ├── BlogList.vue       # 博客列表页
+│   ├── BlogDetail.vue     # 博客详情页
+│   ├── VideoList.vue      # 视频列表页
+│   └── VideoDetail.vue    # 视频详情页
+├── components/blog/        # 博客相关组件
+│   ├── BlogHeader.vue
+│   ├── BlogCategoryNav.vue
+│   ├── BlogAuthorCard.vue
+│   ├── BlogSocialLinks.vue
+│   └── BlogTOC.vue
 ├── api/                    # API 封装
 │   ├── generated/         # goctl生成TS代码（禁止手动修改）
 │   ├── blog.ts            # 博客API封装
 │   └── video.ts           # 视频API封装
-├── assets/                 # 静态资源
-│   └── styles/            # 样式文件
-└── composables/           # 组合式函数（自动导入）
+└── styles/                # 样式文件
+    ├── public-list.scss   # 公共列表页样式
+    ├── public-detail.scss # 公共详情页样式
+    └── blog.scss          # 博客专用样式
 ```
 
 ---

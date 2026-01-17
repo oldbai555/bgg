@@ -125,42 +125,21 @@ const addHeadingIds = () => {
   })
 }
 
-watch(() => props.content, (newContent, oldContent) => {
-  console.log('[BlogTOC] content watch triggered:', {
-    hasNewContent: !!newContent,
-    hasOldContent: !!oldContent,
-    newContentType: typeof newContent,
-    newContentLength: newContent?.length || 0,
-    newContentPreview: newContent?.substring(0, 100) || 'N/A'
-  })
-  
+watch(() => props.content, (newContent) => {
   if (!newContent || typeof newContent !== 'string') {
-    console.log('[BlogTOC] 内容无效，清空 TOC')
     tocItems.value = []
     return
   }
   
   const extracted = extractTOC(newContent)
-  console.log('[BlogTOC] 提取的 TOC 项:', {
-    count: extracted.length,
-    items: extracted.map(item => ({ id: item.id, text: item.text, level: item.level })),
-    contentHasHeaders: /^#{1,6}\s/m.test(newContent),
-    contentLines: newContent.split('\n').length,
-    firstFewLines: newContent.split('\n').slice(0, 5)
-  })
-  
   tocItems.value = extracted
   
   // 延迟执行，等待Markdown渲染完成
   if (typeof window !== 'undefined') {
-    console.log('[BlogTOC] 延迟执行 addHeadingIds 和 handleScroll')
     setTimeout(() => {
-      console.log('[BlogTOC] 执行 addHeadingIds 和 handleScroll')
       addHeadingIds()
       handleScroll()
     }, 500)
-  } else {
-    console.log('[BlogTOC] SSR 环境，跳过 addHeadingIds')
   }
 }, {immediate: true})
 

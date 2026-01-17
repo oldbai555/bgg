@@ -1,8 +1,6 @@
 <template>
   <div class="video-list-page public-list-page">
-    <ClientOnly>
-      <MetricReporter module="video_list" :biz-id="0" />
-    </ClientOnly>
+    <MetricReporter module="video_list" :biz-id="0" />
     <div class="container">
       <div class="hero">
         <div class="hero-title">🎬 视频列表</div>
@@ -90,22 +88,16 @@
 </template>
 
 <script setup lang="ts">
-// Nuxt 3 自动导入 composables，无需手动导入 useRouter、useRoute
 import {reactive, ref, computed, onMounted, onUnmounted, nextTick} from 'vue'
+import {useRouter, useRoute} from 'vue-router'
 import {ElMessage} from 'element-plus'
 import {videoApi} from '@/api/video'
 import type {PublicVideoListReq, PublicVideoItem} from '@/api/generated/admin'
 import MetricReporter from '@/components/common/MetricReporter.vue'
 import IcpFooter from '@/components/common/IcpFooter.vue'
 
-// Nuxt 3 自动导入 useRouter 和 useRoute
 const router = useRouter()
 const route = useRoute()
-
-// 定义页面元数据（Nuxt 3 规范）
-definePageMeta({
-  layout: false
-})
 
 const SCROLL_STATE_KEY = 'public_video_list_state'
 
@@ -122,24 +114,20 @@ const videoRefs = ref<Map<number, HTMLVideoElement>>(new Map())
 const pendingScrollTop = ref<number | null>(null)
 const isMobile = ref(false)
 
-// 响应式分页 layout：移动端使用简化布局
 const paginationLayout = computed(() => {
   return isMobile.value ? 'prev, pager, next' : 'total, sizes, prev, pager, next, jumper'
 })
 
-// 检测屏幕尺寸
 const checkMobile = () => {
   if (typeof window !== 'undefined') {
     isMobile.value = window.innerWidth <= 768
   }
 }
 
-// 监听窗口大小变化
 const handleResize = () => {
   checkMobile()
 }
 
-// 获取封面URL
 const getCoverUrl = (godNum: string): string => {
   if (!godNum) {
     return ''
@@ -147,7 +135,6 @@ const getCoverUrl = (godNum: string): string => {
   return `https://fourhoi.com/${godNum}/cover-t.jpg`
 }
 
-// 获取预览视频URL
 const getPreviewUrl = (godNum: string): string => {
   if (!godNum) {
     return ''
@@ -155,18 +142,15 @@ const getPreviewUrl = (godNum: string): string => {
   return `https://fourhoi.com/${godNum}/preview.mp4`
 }
 
-// 图片加载失败处理
 const handleImageError = (e: Event) => {
   const img = e.target as HTMLImageElement
   img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjgwIiBoZWlnaHQ9IjE1OCIgdmlld0JveD0iMCAwIDI4MCAxNTgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyODAiIGhlaWdodD0iMTU4IiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0xNDAgNzkuNUwxMzAgODkuNUwxMzAgNjkuNUwxNDAgNzkuNVoiIGZpbGw9IiNDQ0NDQ0MiLz4KPHBhdGggZD0iTTE0MCA3OS41TDE1MCA4OS41TDE1MCA2OS41TDE0MCA3OS41WiIgZmlsbD0iI0NDQ0NDQyIvPgo8L3N2Zz4='
 }
 
-// 鼠标悬停视频卡片
 const handleThumbnailHover = (video: PublicVideoItem) => {
   hoveringVideoId.value = video.id
 }
 
-// 设置视频引用
 const setVideoRef = (videoId: number, el: unknown) => {
   if (el && el instanceof HTMLVideoElement) {
     videoRefs.value.set(videoId, el)
@@ -175,10 +159,8 @@ const setVideoRef = (videoId: number, el: unknown) => {
   }
 }
 
-// 鼠标离开视频卡片
 const handleThumbnailLeave = (video: PublicVideoItem) => {
   hoveringVideoId.value = null
-  // 停止预览视频播放
   const videoEl = videoRefs.value.get(video.id)
   if (videoEl) {
     videoEl.pause()
@@ -186,34 +168,24 @@ const handleThumbnailLeave = (video: PublicVideoItem) => {
   }
 }
 
-// 恢复滚动位置（在 DOM 完全渲染后）
 const restoreScrollPosition = async (scrollTop: number) => {
   if (typeof window === 'undefined') {
     return
   }
-  // 等待 Vue 完成 DOM 更新
   await nextTick()
-  // 等待浏览器完成渲染
   await new Promise(resolve => requestAnimationFrame(resolve))
   await new Promise(resolve => requestAnimationFrame(resolve))
-  // 额外等待，确保图片等资源加载完成
   await new Promise(resolve => setTimeout(resolve, 100))
-
-  // 恢复滚动位置
   window.scrollTo({top: scrollTop, behavior: 'auto'})
-
-  // 如果滚动位置仍然不对，可能是内容高度变化，尝试再次恢复
   setTimeout(() => {
     const currentScroll = window.scrollY
     const diff = Math.abs(currentScroll - scrollTop)
     if (diff > 50) {
-      // 如果差异较大，再次尝试恢复
       window.scrollTo({top: scrollTop, behavior: 'auto'})
     }
   }, 200)
 }
 
-// 加载数据
 const loadData = async () => {
   loading.value = true
   const shouldRestoreScroll = pendingScrollTop.value !== null
@@ -238,7 +210,6 @@ const loadData = async () => {
   } finally {
     loading.value = false
 
-    // 如果需要恢复滚动位置，等待 DOM 完全渲染后再恢复
     if (shouldRestoreScroll && scrollTopToRestore !== null && typeof window !== 'undefined') {
       pendingScrollTop.value = null
       await restoreScrollPosition(scrollTopToRestore)
@@ -246,13 +217,10 @@ const loadData = async () => {
   }
 }
 
-// 搜索
 const handleSearch = () => {
   query.page = 1
   updateRouteQuery()
-  // 清除待恢复的滚动位置（因为用户主动搜索了）
   pendingScrollTop.value = null
-  // 清除 sessionStorage 中的旧状态
   if (typeof window !== 'undefined') {
     try {
       sessionStorage.removeItem(SCROLL_STATE_KEY)
@@ -263,32 +231,25 @@ const handleSearch = () => {
   loadData()
 }
 
-// 分页变化
 const handlePageChange = (page: number) => {
   query.page = page
   updateRouteQuery()
-  // 清除待恢复的滚动位置（因为用户主动切换了页面）
   pendingScrollTop.value = null
   loadData()
-  // 滚动到顶部
   if (typeof window !== 'undefined') {
     window.scrollTo({top: 0, behavior: 'smooth'})
   }
 }
 
-// 每页数量变化
 const handleSizeChange = (size: number) => {
   query.size = size
   query.page = 1
   updateRouteQuery()
-  // 清除待恢复的滚动位置（因为用户主动改变了每页数量）
   pendingScrollTop.value = null
   loadData()
 }
 
-// 跳转到详情页
 const goToDetail = (id: number) => {
-  // 记录当前列表状态与滚动位置，便于返回时恢复
   if (typeof window !== 'undefined') {
     try {
       const state = {
@@ -314,7 +275,6 @@ const goToDetail = (id: number) => {
   })
 }
 
-// 同步路由 query，便于刷新与跨页面返回
 const updateRouteQuery = () => {
   router.replace({
     path: route.path,
@@ -327,7 +287,6 @@ const updateRouteQuery = () => {
   })
 }
 
-// 初始化：从路由参数获取查询条件
 onMounted(() => {
   const page = route.query.page
   const size = route.query.size
@@ -343,7 +302,6 @@ onMounted(() => {
     query.content = String(content)
   }
 
-  // 尝试从 sessionStorage 中恢复状态（包括从详情页返回的情况）
   if (typeof window !== 'undefined') {
     try {
       const raw = sessionStorage.getItem(SCROLL_STATE_KEY)
@@ -356,9 +314,7 @@ onMounted(() => {
           ts?: number
         }
         const now = Date.now()
-        // 简单过期控制：1 小时内的记录才恢复
         if (!parsed.ts || now - parsed.ts < 60 * 60 * 1000) {
-          // 如果路由参数中没有分页信息，使用 sessionStorage 中的
           if (!page && parsed.page && parsed.page > 0) {
             query.page = parsed.page
           }
@@ -368,14 +324,12 @@ onMounted(() => {
           if (!content && typeof parsed.content === 'string') {
             query.content = parsed.content
           }
-          // 如果是从详情页返回（有路由 query），恢复滚动位置
           if (page || size) {
             if (typeof parsed.scrollTop === 'number' && parsed.scrollTop > 0) {
               pendingScrollTop.value = parsed.scrollTop
             }
           }
         } else {
-          // 过期了，清除旧状态
           sessionStorage.removeItem(SCROLL_STATE_KEY)
         }
       }
@@ -387,7 +341,6 @@ onMounted(() => {
   updateRouteQuery()
   loadData()
 
-  // 初始化移动端检测
   checkMobile()
   if (typeof window !== 'undefined') {
     window.addEventListener('resize', handleResize)
@@ -402,14 +355,11 @@ onUnmounted(() => {
 </script>
 
 <style scoped lang="scss">
-@import '@/assets/styles/public-list.scss';
+@import '@/styles/public-list.scss';
 
-// 视频列表页特定样式
 .video-list-page {
-  // 覆盖通用列表页背景为暖色渐变
   background: linear-gradient(135deg, #fff7e6 0%, #ffe9d9 45%, #ffd1a4 100%);
 
-  // 视频卡片特定样式
   .video-card {
     transition: transform 0.25s, box-shadow 0.25s;
 
@@ -419,7 +369,6 @@ onUnmounted(() => {
     }
   }
 
-  // 视频缩略图特定样式
   .video-thumbnail {
     position: relative;
     padding-top: 56.25%; /* 16:9 */
@@ -489,14 +438,14 @@ onUnmounted(() => {
   .video-info {
     display: flex;
     flex-direction: column;
-    gap: 6px; // 确保标题和元数据之间有间距
+    gap: 6px;
   }
 
   .video-title {
     cursor: pointer;
     position: relative;
     z-index: 1;
-    flex-shrink: 0; // 防止标题被压缩
+    flex-shrink: 0;
 
     &:hover {
       color: #667eea;
@@ -506,7 +455,7 @@ onUnmounted(() => {
   .video-code {
     position: relative;
     z-index: 0;
-    flex-shrink: 0; // 防止元数据被压缩
+    flex-shrink: 0;
   }
 
   @media (max-width: 768px) {
