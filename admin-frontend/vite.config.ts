@@ -9,8 +9,30 @@ export default defineConfig(({mode}) => {
 
   return {
     // 生产环境部署在 Nginx 的 /admin 路径下
+    // 开发环境也使用 /admin/ 以保持与生产环境一致
     base: '/admin/',
-    plugins: [vue()],
+    plugins: [
+      vue(),
+      // 开发环境重定向插件：处理 /admin 到 /admin/ 的重定向
+      ...(isDev
+        ? [
+            {
+              name: 'redirect-admin',
+              configureServer(server) {
+                server.middlewares.use((req, res, next) => {
+                  // 如果访问 /admin（不带尾部斜杠），重定向到 /admin/
+                  if (req.url === '/admin' && !req.url.endsWith('/')) {
+                    res.writeHead(301, {Location: '/admin/'})
+                    res.end()
+                    return
+                  }
+                  next()
+                })
+              }
+            }
+          ]
+        : [])
+    ],
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url))
@@ -18,6 +40,8 @@ export default defineConfig(({mode}) => {
     },
     server: {
       port: 5173,
+      // 开发服务器自动打开浏览器时使用正确的路径
+      open: '/admin/',
       proxy: {
         '/api': {
           target: isDev ? 'http://localhost:20000' : 'https://oldbai.top/gateway',

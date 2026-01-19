@@ -42,16 +42,30 @@
 </template>
 
 <script setup lang="ts">
-import {ref, onMounted} from 'vue'
-import {useRouter} from 'vue-router'
+import {ref, onMounted, watch} from 'vue'
+import {useRouter, useRoute} from 'vue-router'
 import {Search} from '@element-plus/icons-vue'
 import {blogApi} from '@/api/blog'
 import type {PublicBlogSocialInfoListResp} from '@/api/generated/admin'
 
 const router = useRouter()
+const route = useRoute()
 
 const searchKeyword = ref('')
 const socialInfoList = ref<PublicBlogSocialInfoListResp['list']>([])
+
+// 从路由参数同步搜索关键词
+watch(
+  () => route.query.keyword,
+  (keyword) => {
+    if (typeof keyword === 'string') {
+      searchKeyword.value = keyword
+    } else if (!keyword) {
+      searchKeyword.value = ''
+    }
+  },
+  {immediate: true}
+)
 
 const normalizeUrl = (url: string): string => {
   if (!url) {
@@ -110,6 +124,10 @@ const loadSocialInfo = async () => {
 
 onMounted(() => {
   loadSocialInfo()
+  // 初始化时从路由参数读取搜索关键词
+  if (route.query.keyword && typeof route.query.keyword === 'string') {
+    searchKeyword.value = route.query.keyword
+  }
 })
 </script>
 

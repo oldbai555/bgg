@@ -83,7 +83,7 @@
 </template>
 
 <script setup lang="ts">
-import {reactive, ref, computed, onMounted, onUnmounted, nextTick} from 'vue'
+import {reactive, ref, computed, onMounted, onUnmounted, nextTick, watch} from 'vue'
 import {useRouter, useRoute} from 'vue-router'
 import {ElMessage} from 'element-plus'
 import {blogApi} from '@/api/blog'
@@ -264,6 +264,17 @@ const initFromRoute = () => {
   query.keyword = keyword
   query.tagId = tagId
 }
+
+// 监听路由参数变化（特别是 keyword 和 tagId），当变化时重新加载数据
+watch(
+  () => route.query,
+  () => {
+    initFromRoute()
+    pendingScrollTop.value = null
+    loadData()
+  },
+  {deep: true}
+)
 
 onMounted(() => {
   checkMobile()

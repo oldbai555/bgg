@@ -389,6 +389,21 @@ onMounted(() => {
   }
 
   .detail-content {
+    // 全局隐藏 rn-wrapper 行号（md-editor-v3 使用的行号包装器）
+    // 在 detail-content 作用域内的所有层级都要隐藏
+    :deep([rn-wrapper]),
+    :deep(span[rn-wrapper]),
+    :deep(*[rn-wrapper]) {
+      display: none !important;
+      visibility: hidden !important;
+      width: 0 !important;
+      height: 0 !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      opacity: 0 !important;
+      position: absolute !important;
+      left: -9999px !important;
+    }
     min-height: 200px;
     width: 100% !important;
     height: auto !important;
@@ -468,6 +483,96 @@ onMounted(() => {
       font-size: 16px !important;
       line-height: 1.8 !important;
       overflow: visible !important;
+
+      // 隐藏 rn-wrapper 行号（md-editor-v3 使用的行号包装器）
+      // 在预览区域内的所有层级都要隐藏
+      [rn-wrapper],
+      span[rn-wrapper],
+      *[rn-wrapper] {
+        display: none !important;
+        visibility: hidden !important;
+        width: 0 !important;
+        height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        opacity: 0 !important;
+      }
+
+      // 隐藏代码块行号（针对 highlight.js 生成的行号）
+      pre {
+        // 隐藏 highlight.js 行号（hljs-ln 是 highlight.js 的行号结构）
+        .hljs-ln-numbers,
+        .hljs-ln-n {
+          display: none !important;
+        }
+
+        // 调整代码区域，移除行号占用的空间
+        .hljs-ln-code,
+        .hljs-ln-line {
+          padding-left: 0 !important;
+          margin-left: 0 !important;
+        }
+
+        // 隐藏行号容器
+        .hljs-ln {
+          .hljs-ln-numbers {
+            display: none !important;
+          }
+        }
+
+        code {
+          // 确保代码内容没有因为行号而添加的 padding
+          padding-left: 0 !important;
+          margin-left: 0 !important;
+        }
+
+        // 隐藏所有可能的行号相关类名
+        [class*='line-number'],
+        [class*='ln-numbers'],
+        [class*='ln-n'] {
+          display: none !important;
+        }
+
+        // 隐藏 rn-wrapper 行号（md-editor-v3 可能使用的行号包装器）
+        [rn-wrapper],
+        span[rn-wrapper] {
+          display: none !important;
+        }
+      }
+
+      // 隐藏 CodeMirror 编辑器相关的行号（如果存在）
+      .cm-gutters,
+      .cm-gutter,
+      .cm-lineNumbers,
+      .cm-gutterElement,
+      .cm-gutter.cm-lineNumbers {
+        display: none !important;
+      }
+
+      // 确保代码内容区域占满空间
+      .cm-content {
+        padding-left: 0 !important;
+      }
+
+      // 隐藏其他可能的行号显示方式
+      .line-number,
+      .code-line-number,
+      .line-numbers {
+        display: none !important;
+      }
+
+      // 隐藏 rn-wrapper 行号（md-editor-v3 使用的行号包装器）
+      // 这个选择器需要在 :deep(.md-editor-preview) 作用域内，但也要匹配所有层级的元素
+      [rn-wrapper],
+      span[rn-wrapper],
+      *[rn-wrapper] {
+        display: none !important;
+        visibility: hidden !important;
+        width: 0 !important;
+        height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
     }
 
     .loading-placeholder,

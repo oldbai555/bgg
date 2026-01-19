@@ -13,31 +13,35 @@ const routes: RouteRecordRaw[] = [
   },
   // 公共页面（不需要登录）
   {
-    path: '/public/blog',
+    path: '/',
+    name: 'Home',
+    component: () => import('@/views/Home.vue')
+  },
+  {
+    path: '/blog',
     name: 'BlogList',
     component: () => import('@/views/public/BlogList.vue')
   },
   {
-    path: '/public/blog/:id',
+    path: '/blog/:id',
     name: 'BlogDetail',
     component: () => import('@/views/public/BlogDetail.vue')
   },
   {
-    path: '/public/videos',
+    path: '/videos',
     name: 'VideoList',
     component: () => import('@/views/public/VideoList.vue')
   },
   {
-    path: '/public/videos/:id',
+    path: '/videos/:id',
     name: 'VideoDetail',
     component: () => import('@/views/public/VideoDetail.vue')
   },
   {
-    path: '/',
+    path: '/layout',
     name: 'Root',
     component: () => import('@/layouts/DefaultLayout.vue'),
     children: [
-      {path: '', name: 'RootRedirect', redirect: '/dashboard'},
       {
         path: '/dashboard',
         name: 'Dashboard',
@@ -227,9 +231,8 @@ router.beforeEach(async (to, _from, next) => {
     const userStore = useUserStore();
     const {hasPermission} = usePermission();
 
-    // 公共页面不需要登录
-    const publicPaths = ['/blog', '/videos'];
-    const isPublicPath = publicPaths.some(path => to.path.startsWith(path));
+    // 公共页面不需要登录（包括导航页）
+    const isPublicPath = to.path === '/' || to.path.startsWith('/blog') || to.path.startsWith('/videos');
 
     if (!isPublicPath && to.path !== '/login' && !userStore.token) {
       next('/login');

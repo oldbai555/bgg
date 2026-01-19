@@ -166,41 +166,11 @@ server {
     }
 
     # ------------------------------------------------------------
-    # 默认入口：访问 oldbai.top/ 自动进入公共博客
-    # Vue 使用 history 路由，base 是 /admin/，所以重定向到 /public/blog
+    # 默认入口：访问 oldbai.top/ 自动进入导航页（Home.vue）
+    # Vue 使用 history 路由，base 是 /admin/，所以重定向到 /admin/
     # ------------------------------------------------------------
     location = / {
-        return 302 /public/blog;
-    }
-
-    # ------------------------------------------------------------
-    # 公共页面（不需要登录）：/public/*
-    # 与 /admin 共用同一份前端构建产物（dist）
-    # 注意：
-    # 1. 前端构建时 base 是 /admin/，所以静态资源路径是 /admin/assets/xxx.js
-    # 2. Vue 使用 history 路由（createWebHistory），base 是 /admin/
-    # 3. 访问 /public/blog 时，需要返回 index.html，然后 Vue Router 处理路由
-    # ------------------------------------------------------------
-    location ^~ /public {
-        alias /tmp/admin-cache;
-        index index.html index.htm;
-        # 对于 SPA，所有 /public/* 路径都回退到 index.html
-        # 使用绝对路径回退到 /admin/index.html（与 /admin location 保持一致）
-        try_files $uri $uri/ /admin/index.html;
-        
-        # 静态资源缓存（虽然静态资源实际在 /admin/assets/ 下，但这里也配置一下以防万一）
-        location ~ ^/public/.*\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
-            expires 1y;
-            add_header Cache-Control "public, immutable";
-            access_log off;
-        }
-        
-        # HTML文件不缓存
-        location ~ ^/public/.*\.html$ {
-            add_header Cache-Control "no-cache, no-store, must-revalidate";
-            add_header Pragma "no-cache";
-            add_header Expires "0";
-        }
+        return 302 /admin/;
     }
 
     # ------------------------------------------------------------
