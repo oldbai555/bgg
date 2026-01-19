@@ -5,7 +5,7 @@ package notification
 
 import (
 	"context"
-
+	"postapocgame/admin-server/internal/logic/logicutil"
 	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
@@ -40,13 +40,7 @@ func (l *NotificationListLogic) NotificationList(req *types.NotificationListReq)
 		return nil, errs.New(errs.CodeUnauthorized, "未登录或登录已过期")
 	}
 
-	// 设置默认值
-	if req.Page <= 0 {
-		req.Page = 1
-	}
-	if req.PageSize <= 0 {
-		req.PageSize = 10
-	}
+	req.Page, req.PageSize = logicutil.NormalizePage(req.Page, req.PageSize, 10, 100)
 
 	// 只查询当前用户的消息通知
 	notificationRepo := repository.NewNotificationRepository(l.svcCtx.Repository)

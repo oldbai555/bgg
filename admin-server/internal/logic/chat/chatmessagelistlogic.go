@@ -5,11 +5,13 @@ package chat
 
 import (
 	"context"
+	"postapocgame/admin-server/internal/logic/logicutil"
 	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 	"strconv"
+	"time"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -33,36 +35,8 @@ func (l *ChatMessageListLogic) ChatMessageList(req *types.ChatMessageListReq) (r
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	// 从字典获取聊天窗口消息数量限制
-	chatMessageLimit := int64(30) // 默认30
-	dictTypeRepo := repository.NewDictTypeRepository(l.svcCtx.Repository)
-	dictType, err := dictTypeRepo.FindByCode(l.ctx, "chat_config")
-	if err == nil && dictType != nil {
-		dictItemRepo := repository.NewDictItemRepository(l.svcCtx.Repository)
-		items, err := dictItemRepo.FindByTypeID(l.ctx, dictType.Id)
-		if err == nil {
-			for _, item := range items {
-				if item.Label == "聊天窗口消息数量" && item.Value != "" {
-					if limit, parseErr := strconv.ParseInt(item.Value, 10, 64); parseErr == nil && limit > 0 {
-						chatMessageLimit = limit
-						break
-					}
-				}
-			}
-		}
-	}
-
-	// 设置默认值
-	if req.Page <= 0 {
-		req.Page = 1
-	}
-	if req.PageSize <= 0 {
-		req.PageSize = chatMessageLimit // 使用从字典获取的限制值
-	}
-	// 限制最大页面大小不超过字典配置的值
-	if req.PageSize > chatMessageLimit {
-		req.PageSize = chatMessageLimit
-	}
+	chatMessageLimit := l.getChatMessageLimitFromCache()
+	req.Page, req.PageSize = logicutil.NormalizePage(req.Page, req.PageSize, chatMessageLimit, chatMessageLimit)
 
 	messageRepo := repository.NewChatMessageRepository(l.svcCtx.Repository)
 	userRepo := repository.NewUserRepository(l.svcCtx.Repository)
@@ -102,4 +76,42 @@ func (l *ChatMessageListLogic) ChatMessageList(req *types.ChatMessageListReq) (r
 		Total: total,
 		List:  items,
 	}, nil
+}
+
+// getChatMessageLimitFromCache 读取聊天消息数量限制，优先使用缓存，兜底字典
+func (l *ChatMessageListLogic) getChatMessageLimitFromCache() int64 {
+	const (
+		cacheKey        = "chat:config:message_limit"
+		defaultLimit    = int64(30)
+		cacheExpireSecs = 600 // 10 分钟
+	)
+
+	// 尝试从业务缓存读取
+	var cached int64
+	if err := l.svcCtx.Repository.BusinessCache.Get(l.ctx, cacheKey, &cached); err == nil && cached > 0 {
+		return cached
+	}
+
+	limit := defaultLimit
+	dictTypeRepo := repository.NewDictTypeRepository(l.svcCtx.Repository)
+	dictType, err := dictTypeRepo.FindByCode(l.ctx, "chat_config")
+	if err == nil && dictType != nil {
+		dictItemRepo := repository.NewDictItemRepository(l.svcCtx.Repository)
+		items, err := dictItemRepo.FindByTypeID(l.ctx, dictType.Id)
+		if err == nil {
+			for _, item := range items {
+				if item.Label == "聊天窗口消息数量" && item.Value != "" {
+					if v, parseErr := strconv.ParseInt(item.Value, 10, 64); parseErr == nil && v > 0 {
+						limit = v
+						break
+					}
+				}
+			}
+		}
+	}
+
+	// 缓存结果，避免频繁查字典
+	_ = l.svcCtx.Repository.BusinessCache.Set(l.ctx, cacheKey, limit, cacheExpireSecs+int(time.Now().Unix()%60))
+
+	return limit
 }

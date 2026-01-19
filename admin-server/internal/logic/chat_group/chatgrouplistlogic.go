@@ -5,7 +5,7 @@ package chat_group
 
 import (
 	"context"
-
+	"postapocgame/admin-server/internal/logic/logicutil"
 	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
@@ -36,16 +36,7 @@ func (l *ChatGroupListLogic) ChatGroupList(req *types.ChatGroupListReq) (resp *t
 		return nil, errs.New(errs.CodeUnauthorized, "未登录或登录已过期")
 	}
 
-	// 参数验证
-	if req.Page <= 0 {
-		req.Page = 1
-	}
-	if req.PageSize <= 0 {
-		req.PageSize = 10
-	}
-	if req.PageSize > 100 {
-		req.PageSize = 100
-	}
+	req.Page, req.PageSize = logicutil.NormalizePage(req.Page, req.PageSize, 10, 100)
 
 	chatRepo := repository.NewChatRepository(l.svcCtx.Repository)
 

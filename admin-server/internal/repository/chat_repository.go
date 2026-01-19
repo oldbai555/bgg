@@ -2,9 +2,11 @@ package repository
 
 import (
 	"context"
-	"postapocgame/admin-server/internal/model"
-	"strings"
 
+	"postapocgame/admin-server/internal/model"
+	"postapocgame/admin-server/pkg/errs"
+
+	sq "github.com/Masterminds/squirrel"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 )
 
@@ -112,38 +114,53 @@ func (r *chatRepository) FindPrivateChatByUserIDs(ctx context.Context, userID1, 
 
 // FindGroups 查询群组列表（分页、搜索）
 func (r *chatRepository) FindGroups(ctx context.Context, page, pageSize int64, name string) ([]model.Chat, int64, error) {
-	// 构建查询条件
-	var conditions []string
-	var args []interface{}
-
-	// 只查询群组（type=2）
-	conditions = append(conditions, "type = 2")
-	conditions = append(conditions, "deleted_at = 0")
-
-	// 名称搜索
-	if name != "" {
-		conditions = append(conditions, "name LIKE ?")
-		args = append(args, "%"+name+"%")
+	if page <= 0 {
+		page = 1
 	}
+	if pageSize <= 0 {
+		pageSize = 20
+	}
+	if pageSize > 100 {
+		pageSize = 100
+	}
+	offset := (page - 1) * pageSize
 
-	whereClause := "WHERE " + strings.Join(conditions, " AND ")
+	// 构建查询条件（使用 squirrel）
+	conditions := sq.And{
+		sq.Eq{"type": 2},
+		sq.Eq{"deleted_at": 0},
+	}
+	if name != "" {
+		conditions = append(conditions, sq.Like{"name": "%" + name + "%"})
+	}
 
 	// 查询总数
 	var total int64
-	countQuery := "SELECT COUNT(*) FROM `chat` " + whereClause
-	err := r.conn.QueryRowCtx(ctx, &total, countQuery, args...)
+	countSQL, countArgs, err := sq.Select("COUNT(*)").
+		From("`chat`").
+		Where(conditions).
+		ToSql()
 	if err != nil {
+		return nil, 0, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+	}
+	if err := r.conn.QueryRowCtx(ctx, &total, countSQL, countArgs...); err != nil {
 		return nil, 0, err
 	}
 
 	// 查询列表
-	offset := (page - 1) * pageSize
-	query := "SELECT * FROM `chat` " + whereClause + " ORDER BY created_at DESC LIMIT ? OFFSET ?"
-	args = append(args, pageSize, offset)
+	listSQL, listArgs, err := sq.Select("*").
+		From("`chat`").
+		Where(conditions).
+		OrderBy("created_at DESC").
+		Limit(uint64(pageSize)).
+		Offset(uint64(offset)).
+		ToSql()
+	if err != nil {
+		return nil, 0, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+	}
 
 	var list []model.Chat
-	err = r.conn.QueryRowsCtx(ctx, &list, query, args...)
-	if err != nil {
+	if err := r.conn.QueryRowsCtx(ctx, &list, listSQL, listArgs...); err != nil {
 		return nil, 0, err
 	}
 

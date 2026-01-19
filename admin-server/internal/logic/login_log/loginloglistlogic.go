@@ -5,7 +5,7 @@ package login_log
 
 import (
 	"context"
-
+	"postapocgame/admin-server/internal/logic/logicutil"
 	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
@@ -33,16 +33,7 @@ func (l *LoginLogListLogic) LoginLogList(req *types.LoginLogListReq) (resp *type
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	// 设置默认值
-	if req.Page <= 0 {
-		req.Page = 1
-	}
-	if req.PageSize <= 0 {
-		req.PageSize = 20
-	}
-	if req.PageSize > 100 {
-		req.PageSize = 100
-	}
+	page, pageSize := logicutil.NormalizePage(int64(req.Page), int64(req.PageSize), 20, 100)
 
 	loginLogRepo := repository.NewLoginLogRepository(l.svcCtx.Repository)
 
@@ -53,8 +44,8 @@ func (l *LoginLogListLogic) LoginLogList(req *types.LoginLogListReq) (resp *type
 
 	list, total, err := loginLogRepo.FindPage(
 		l.ctx,
-		int64(req.Page),
-		int64(req.PageSize),
+		page,
+		pageSize,
 		req.UserId,
 		req.Username,
 		req.Status,

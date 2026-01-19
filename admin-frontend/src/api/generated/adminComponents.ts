@@ -44,7 +44,8 @@ export interface ApiUpdateReq {
 }
 
 export interface AuditLogDetailReq {
-	id: number
+	// 必填，但作为 Query 参数必须标记 optional，必填校验在 Logic 做
+	id?: number
 }
 
 export interface AuditLogDetailResp {
@@ -371,8 +372,7 @@ export interface ChatGroupDeleteReq {
 }
 
 export interface ChatGroupDetailReq {
-}
-export interface ChatGroupDetailReqParams {
+	id?: number // 群组ID（必填，但 Query 需标记 optional）
 }
 
 export interface ChatGroupDetailResp {
@@ -425,8 +425,7 @@ export interface ChatGroupMemberItem {
 }
 
 export interface ChatGroupMemberListReq {
-}
-export interface ChatGroupMemberListReqParams {
+	id?: number // 群组ID（必填，但 Query 需标记 optional）
 }
 
 export interface ChatGroupMemberListResp {
@@ -613,7 +612,7 @@ export interface DemoItem {
 }
 
 export interface DemoListReq {
-	// 注意：GET 请求的查询参数需要同时包含 json 和 form 标签// json 标签用于请求体（POST/PUT/DELETE），form 标签用于查询参数（GET）// 重要：form 标签中必须包含 optional，否则 httpx.Parse 无法正确解析查询参数
+	// 注意：GET 请求的查询参数需要同时包含 json 和 form 标签// json 标签用于请求体（POST/PUT/DELETE），form 标签用于查询参数（GET）// 重要：form 标签中必须包含 optional，否则 httpx.Parse 无法正确解析查询参数
 	page?: number
 	pageSize?: number
 	name?: string
@@ -827,7 +826,8 @@ export interface FileUploadResp {
 }
 
 export interface LoginLogDetailReq {
-	id: number
+	// 必填，但作为 Query 参数必须标记 optional，必填校验在 Logic 做
+	id?: number
 }
 
 export interface LoginLogDetailResp {
@@ -1098,7 +1098,8 @@ export interface NotificationReadReq {
 }
 
 export interface OperationLogDetailReq {
-	id: number
+	// 必填，但作为 Query 参数必须标记 optional，必填校验在 Logic 做
+	id?: number
 }
 
 export interface OperationLogDetailResp {
@@ -1664,7 +1665,8 @@ export interface TaskCancelReq {
 }
 
 export interface TaskDetailReq {
-	id: number
+	// 必填，但作为 Query 参数必须标记 optional，必填校验在 Logic 做
+	id?: number
 }
 
 export interface TaskDetailResp {

@@ -379,12 +379,12 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				},
 				{
 					Method:  http.MethodGet,
-					Path:    "/chats/groups/:id",
+					Path:    "/chats/groups/detail",
 					Handler: chat_group.ChatGroupDetailHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodGet,
-					Path:    "/chats/groups/:id/members",
+					Path:    "/chats/groups/members",
 					Handler: chat_group.ChatGroupMemberListHandler(serverCtx),
 				},
 				{

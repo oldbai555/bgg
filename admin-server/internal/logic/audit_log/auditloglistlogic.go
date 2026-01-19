@@ -5,6 +5,7 @@ package audit_log
 
 import (
 	"context"
+	"postapocgame/admin-server/internal/logic/logicutil"
 	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
@@ -32,22 +33,14 @@ func (l *AuditLogListLogic) AuditLogList(req *types.AuditLogListReq) (resp *type
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	// 设置默认值
-	if req.Page <= 0 {
-		req.Page = 1
-	}
-	if req.PageSize <= 0 {
-		req.PageSize = 20
-	}
-	if req.PageSize > 100 {
-		req.PageSize = 100
-	}
+	// 统一分页参数
+	page, pageSize := logicutil.NormalizePage(int64(req.Page), int64(req.PageSize), 20, 100)
 
 	auditLogRepo := repository.NewAuditLogRepository(l.svcCtx.Repository)
 	list, total, err := auditLogRepo.FindPage(
 		l.ctx,
-		int64(req.Page),
-		int64(req.PageSize),
+		page,
+		pageSize,
 		req.UserId,
 		req.Username,
 		req.AuditType,

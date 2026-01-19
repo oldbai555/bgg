@@ -5,7 +5,7 @@ package sdk
 
 import (
 	"context"
-
+	"postapocgame/admin-server/internal/logic/logicutil"
 	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
@@ -32,15 +32,7 @@ func (l *SdkApiKeyListLogic) SdkApiKeyList(req *types.SdkApiKeyListReq) (resp *t
 	if req == nil {
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
-	if req.Page <= 0 {
-		req.Page = 1
-	}
-	if req.PageSize <= 0 {
-		req.PageSize = 20
-	}
-	if req.PageSize > 100 {
-		req.PageSize = 100
-	}
+	req.Page, req.PageSize = logicutil.NormalizePage(req.Page, req.PageSize, 20, 100)
 
 	repo := repository.NewSdkAdminRepository(l.svcCtx.Repository)
 	// status == 0 表示不按状态过滤，非0才过滤

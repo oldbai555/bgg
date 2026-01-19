@@ -2,11 +2,12 @@ package repository
 
 import (
 	"context"
-	"strings"
 	"time"
 
 	"postapocgame/admin-server/internal/model"
+	"postapocgame/admin-server/pkg/errs"
 
+	sq "github.com/Masterminds/squirrel"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 )
 
@@ -44,53 +45,58 @@ func (r *performanceLogRepository) FindPage(ctx context.Context, page, pageSize 
 	}
 	offset := (page - 1) * pageSize
 
-	// 构建查询条件
-	where := []string{"deleted_at = 0"}
-	args := []interface{}{}
-
+	// 构建查询条件（使用 squirrel）
+	conditions := sq.And{sq.Eq{"deleted_at": 0}}
 	if method != "" {
-		where = append(where, "method = ?")
-		args = append(args, method)
+		conditions = append(conditions, sq.Eq{"method": method})
 	}
 	if path != "" {
-		where = append(where, "path LIKE ?")
-		args = append(args, "%"+path+"%")
+		conditions = append(conditions, sq.Like{"path": "%" + path + "%"})
 	}
 	if isSlow != 0 {
-		where = append(where, "is_slow = ?")
-		args = append(args, isSlow)
+		conditions = append(conditions, sq.Eq{"is_slow": isSlow})
 	}
 	if statusCode > 0 {
-		where = append(where, "status_code = ?")
-		args = append(args, statusCode)
+		conditions = append(conditions, sq.Eq{"status_code": statusCode})
 	}
 	if startTime != "" {
 		if t, err := time.Parse("2006-01-02 15:04:05", startTime); err == nil {
-			where = append(where, "created_at >= ?")
-			args = append(args, t.Unix())
+			conditions = append(conditions, sq.GtOrEq{"created_at": t.Unix()})
 		}
 	}
 	if endTime != "" {
 		if t, err := time.Parse("2006-01-02 15:04:05", endTime); err == nil {
-			where = append(where, "created_at <= ?")
-			args = append(args, t.Unix())
+			conditions = append(conditions, sq.LtOrEq{"created_at": t.Unix()})
 		}
 	}
 
-	whereClause := strings.Join(where, " AND ")
-
 	// 查询总数
 	var total int64
-	countQuery := "SELECT COUNT(*) FROM admin_performance_log WHERE " + whereClause
-	if err := r.conn.QueryRowCtx(ctx, &total, countQuery, args...); err != nil {
+	countSQL, countArgs, err := sq.Select("COUNT(*)").
+		From("`admin_performance_log`").
+		Where(conditions).
+		ToSql()
+	if err != nil {
+		return nil, 0, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+	}
+	if err := r.conn.QueryRowCtx(ctx, &total, countSQL, countArgs...); err != nil {
 		return nil, 0, err
 	}
 
 	// 查询列表
+	listSQL, listArgs, err := sq.Select("*").
+		From("`admin_performance_log`").
+		Where(conditions).
+		OrderBy("id DESC").
+		Limit(uint64(pageSize)).
+		Offset(uint64(offset)).
+		ToSql()
+	if err != nil {
+		return nil, 0, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+	}
+
 	var list []model.AdminPerformanceLog
-	query := "SELECT * FROM admin_performance_log WHERE " + whereClause + " ORDER BY id DESC LIMIT ? OFFSET ?"
-	args = append(args, pageSize, offset)
-	if err := r.conn.QueryRowsCtx(ctx, &list, query, args...); err != nil {
+	if err := r.conn.QueryRowsCtx(ctx, &list, listSQL, listArgs...); err != nil {
 		return nil, 0, err
 	}
 

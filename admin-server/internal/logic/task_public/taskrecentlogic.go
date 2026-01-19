@@ -6,6 +6,7 @@ package task_public
 import (
 	"context"
 	"strconv"
+	"time"
 
 	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
@@ -37,32 +38,7 @@ func (l *TaskRecentLogic) TaskRecent(req *types.TaskRecentReq) (resp *types.Task
 		return nil, errs.New(errs.CodeUnauthorized, "未登录或登录已过期")
 	}
 
-	// 确定查询数量
-	limit := req.Limit
-	if limit <= 0 {
-		// 从字典获取默认值
-		dictTypeRepo := repository.NewDictTypeRepository(l.svcCtx.Repository)
-		dictType, err := dictTypeRepo.FindByCode(l.ctx, "task_config")
-		if err == nil && dictType != nil {
-			dictItemRepo := repository.NewDictItemRepository(l.svcCtx.Repository)
-			items, err := dictItemRepo.FindByTypeID(l.ctx, dictType.Id)
-			if err == nil && len(items) > 0 {
-				// 查找「最近任务数量」配置项
-				for _, item := range items {
-					if item.Label == "最近任务数量" {
-						if parsedLimit, parseErr := strconv.ParseInt(item.Value, 10, 64); parseErr == nil && parsedLimit > 0 {
-							limit = parsedLimit
-							break
-						}
-					}
-				}
-			}
-		}
-		// 如果字典中没有配置或解析失败，使用默认值 10
-		if limit <= 0 {
-			limit = 10
-		}
-	}
+	limit := l.getRecentTaskLimit(req.Limit)
 
 	// 查询最近的任务（只查询当前用户的任务）
 	taskRepo := repository.NewTaskRepository(l.svcCtx.Repository)
@@ -102,4 +78,43 @@ func (l *TaskRecentLogic) TaskRecent(req *types.TaskRecentReq) (resp *types.Task
 	return &types.TaskRecentResp{
 		List: list,
 	}, nil
+}
+
+// getRecentTaskLimit 获取最近任务数量限制，优先使用业务缓存，其次字典，兜底 10
+func (l *TaskRecentLogic) getRecentTaskLimit(requestLimit int64) int64 {
+	if requestLimit > 0 {
+		return requestLimit
+	}
+
+	const (
+		cacheKey        = "task:config:recent_limit"
+		defaultLimit    = int64(10)
+		cacheExpireSecs = 600
+	)
+
+	var cached int64
+	if err := l.svcCtx.Repository.BusinessCache.Get(l.ctx, cacheKey, &cached); err == nil && cached > 0 {
+		return cached
+	}
+
+	limit := defaultLimit
+	dictTypeRepo := repository.NewDictTypeRepository(l.svcCtx.Repository)
+	dictType, err := dictTypeRepo.FindByCode(l.ctx, "task_config")
+	if err == nil && dictType != nil {
+		dictItemRepo := repository.NewDictItemRepository(l.svcCtx.Repository)
+		items, err := dictItemRepo.FindByTypeID(l.ctx, dictType.Id)
+		if err == nil && len(items) > 0 {
+			for _, item := range items {
+				if item.Label == "最近任务数量" {
+					if parsedLimit, parseErr := strconv.ParseInt(item.Value, 10, 64); parseErr == nil && parsedLimit > 0 {
+						limit = parsedLimit
+						break
+					}
+				}
+			}
+		}
+	}
+
+	_ = l.svcCtx.Repository.BusinessCache.Set(l.ctx, cacheKey, limit, cacheExpireSecs+int(time.Now().Unix()%60))
+	return limit
 }

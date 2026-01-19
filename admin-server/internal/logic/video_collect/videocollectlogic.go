@@ -41,11 +41,6 @@ func (l *VideoCollectLogic) VideoCollect(req *types.VideoCollectReq) (resp *type
 		return nil, errs.New(errs.CodeBadRequest, "新增失败: uuid 不能为空")
 	}
 
-	// 调试：打印接收到的原始字节和字符串
-	logx.Infof("video name (string): %s", req.Name)
-	logx.Infof("video name (bytes): %x", []byte(req.Name))
-	logx.Infof("video name (rune count): %d", len([]rune(req.Name)))
-
 	// 验证 playerUrl 包含 uuid（安全检查，防止恶意请求）
 	//if !strings.Contains(req.PlayerUrl, req.Uuid) {
 	//	return nil, errs.New(errs.CodeBadRequest, "链接错误")

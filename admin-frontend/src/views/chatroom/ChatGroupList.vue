@@ -279,7 +279,7 @@ const loadUsers = async () => {
 const loadMembers = async (groupId: number) => {
   memberLoading.value = true
   try {
-    const resp = await chatGroupMemberList({}, groupId)
+    const resp = await chatGroupMemberList({ id: groupId })
     memberList.value = resp.list
     // 重新加载用户列表（排除已加入的成员）
     await loadUsers()

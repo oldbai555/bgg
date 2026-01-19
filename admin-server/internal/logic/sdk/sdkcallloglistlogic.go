@@ -5,7 +5,7 @@ package sdk
 
 import (
 	"context"
-
+	"postapocgame/admin-server/internal/logic/logicutil"
 	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
@@ -32,15 +32,7 @@ func (l *SdkCallLogListLogic) SdkCallLogList(req *types.SdkCallLogListReq) (resp
 	if req == nil {
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
-	if req.Page <= 0 {
-		req.Page = 1
-	}
-	if req.PageSize <= 0 {
-		req.PageSize = 20
-	}
-	if req.PageSize > 200 {
-		req.PageSize = 200
-	}
+	req.Page, req.PageSize = logicutil.NormalizePage(req.Page, req.PageSize, 20, 200)
 
 	repo := repository.NewSdkAdminRepository(l.svcCtx.Repository)
 	list, total, err := repo.ListCallLogs(l.ctx, req.Page, req.PageSize, req.SdkKeyId, req.ApiCode, req.RespCode, req.Ip, req.StartTime, req.EndTime)

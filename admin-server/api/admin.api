@@ -563,7 +563,8 @@ type (
 	}
 	// 操作日志详情请求
 	OperationLogDetailReq {
-		id uint64 `json:"id" form:"id"`
+		// 必填，但作为 Query 参数必须标记 optional，必填校验在 Logic 做
+		id uint64 `json:"id,optional" form:"id,optional"`
 	}
 	// 操作日志详情响应
 	OperationLogDetailResp {
@@ -1820,9 +1821,9 @@ type (
 	ChatGroupDeleteReq {
 		id uint64 `json:"id"` // 群组ID
 	}
-	// 群组详情请求
+	// 群组详情请求（使用 Query 参数，避免路径参数 :id）
 	ChatGroupDetailReq {
-		id uint64 `path:"id"` // 群组ID
+		id uint64 `json:"id,optional" form:"id,optional"` // 群组ID（必填，但 Query 需标记 optional）
 	}
 	// 群组详情响应
 	ChatGroupDetailResp {
@@ -1855,9 +1856,9 @@ type (
 		chatId uint64 `json:"chatId"` // 群组ID
 		userId uint64 `json:"userId"` // 要移除的用户ID
 	}
-	// 群组成员列表请求
+	// 群组成员列表请求（使用 Query 参数，避免路径参数 :id）
 	ChatGroupMemberListReq {
-		id uint64 `path:"id"` // 群组ID
+		id uint64 `json:"id,optional" form:"id,optional"` // 群组ID（必填，但 Query 需标记 optional）
 	}
 	// 群组成员列表响应
 	ChatGroupMemberListResp {
@@ -1900,10 +1901,10 @@ service admin-api {
 	delete /chats/groups (ChatGroupDeleteReq) returns (Response)
 
 	@handler ChatGroupDetail
-	get /chats/groups/:id (ChatGroupDetailReq) returns (ChatGroupDetailResp)
+	get /chats/groups/detail (ChatGroupDetailReq) returns (ChatGroupDetailResp)
 
 	@handler ChatGroupMemberList
-	get /chats/groups/:id/members (ChatGroupMemberListReq) returns (ChatGroupMemberListResp)
+	get /chats/groups/members (ChatGroupMemberListReq) returns (ChatGroupMemberListResp)
 
 	@handler ChatGroupMemberAdd
 	post /chats/groups/members (ChatGroupMemberAddReq) returns (Response)
@@ -1978,7 +1979,8 @@ type (
 	}
 	// 登录日志详情请求
 	LoginLogDetailReq {
-		id uint64 `json:"id" form:"id"`
+		// 必填，但作为 Query 参数必须标记 optional，必填校验在 Logic 做
+		id uint64 `json:"id,optional" form:"id,optional"`
 	}
 	// 登录日志详情响应
 	LoginLogDetailResp {
@@ -2105,7 +2107,8 @@ type (
 	}
 	// 审计日志详情请求
 	AuditLogDetailReq {
-		id uint64 `json:"id" form:"id"`
+		// 必填，但作为 Query 参数必须标记 optional，必填校验在 Logic 做
+		id uint64 `json:"id,optional" form:"id,optional"`
 	}
 	// 审计日志详情响应
 	AuditLogDetailResp {
@@ -2461,7 +2464,8 @@ type (
 		list  []TaskItem `json:"list"`
 	}
 	TaskDetailReq {
-		id uint64 `json:"id" form:"id"`
+		// 必填，但作为 Query 参数必须标记 optional，必填校验在 Logic 做
+		id uint64 `json:"id,optional" form:"id,optional"`
 	}
 	TaskDetailResp {
 		id            uint64 `json:"id"`

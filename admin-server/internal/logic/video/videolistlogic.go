@@ -6,6 +6,7 @@ package video
 import (
 	"context"
 	"encoding/json"
+	"postapocgame/admin-server/internal/logic/logicutil"
 	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
@@ -33,16 +34,8 @@ func (l *VideoListLogic) VideoList(req *types.VideoListReq) (resp *types.VideoLi
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	// 设置默认值
-	if req.Page < 1 {
-		req.Page = 1
-	}
-	if req.PageSize < 1 {
-		req.PageSize = 20
-	}
-	if req.PageSize > 100 {
-		req.PageSize = 100
-	}
+	// 统一分页参数
+	req.Page, req.PageSize = logicutil.NormalizePage(req.Page, req.PageSize, 20, 100)
 
 	repo := repository.NewVideoRepository(l.svcCtx.Repository)
 	// 支持sourceType筛选（0=全部，1=手动添加，2=采集）

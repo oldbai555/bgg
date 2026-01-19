@@ -5,7 +5,7 @@ package notice
 
 import (
 	"context"
-
+	"postapocgame/admin-server/internal/logic/logicutil"
 	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
@@ -33,13 +33,7 @@ func (l *NoticeListLogic) NoticeList(req *types.NoticeListReq) (resp *types.Noti
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	// 设置默认值
-	if req.Page <= 0 {
-		req.Page = 1
-	}
-	if req.PageSize <= 0 {
-		req.PageSize = 10
-	}
+	req.Page, req.PageSize = logicutil.NormalizePage(req.Page, req.PageSize, 10, 100)
 
 	// 处理筛选条件：如果未传入，使用 -1 作为标记
 	noticeType := req.NoticeType

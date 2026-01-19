@@ -5,7 +5,7 @@ package performance_log
 
 import (
 	"context"
-
+	"postapocgame/admin-server/internal/logic/logicutil"
 	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
@@ -29,17 +29,7 @@ func NewPerformanceLogListLogic(ctx context.Context, svcCtx *svc.ServiceContext)
 
 func (l *PerformanceLogListLogic) PerformanceLogList(req *types.PerformanceLogListReq) (resp *types.PerformanceLogListResp, err error) {
 	// 参数兜底处理
-	page := req.Page
-	if page <= 0 {
-		page = 1
-	}
-	pageSize := req.PageSize
-	if pageSize <= 0 {
-		pageSize = 20
-	}
-	if pageSize > 100 {
-		pageSize = 100
-	}
+	page, pageSize := logicutil.NormalizePage(req.Page, req.PageSize, 20, 100)
 
 	// 仓库查询
 	perfRepo := repository.NewPerformanceLogRepository(l.svcCtx.Repository)

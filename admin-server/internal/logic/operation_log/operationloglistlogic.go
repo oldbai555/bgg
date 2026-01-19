@@ -5,7 +5,7 @@ package operation_log
 
 import (
 	"context"
-
+	"postapocgame/admin-server/internal/logic/logicutil"
 	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
@@ -33,16 +33,8 @@ func (l *OperationLogListLogic) OperationLogList(req *types.OperationLogListReq)
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	// 设置默认值
-	if req.Page <= 0 {
-		req.Page = 1
-	}
-	if req.PageSize <= 0 {
-		req.PageSize = 20
-	}
-	if req.PageSize > 100 {
-		req.PageSize = 100
-	}
+	// 统一分页参数
+	req.Page, req.PageSize = logicutil.NormalizePage(req.Page, req.PageSize, 20, 100)
 
 	operationLogRepo := repository.NewOperationLogRepository(l.svcCtx.Repository)
 	list, total, err := operationLogRepo.FindPage(

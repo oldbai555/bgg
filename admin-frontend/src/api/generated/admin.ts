@@ -362,18 +362,18 @@ export function chatGroupDelete(req: components.ChatGroupDeleteReq) {
 
 /**
  * @description 
- * @param params
+ * @param req
  */
-export function chatGroupDetail(params: components.ChatGroupDetailReqParams, id: number) {
-	return webapi.get<components.ChatGroupDetailResp>(`/api/v1/chats/groups/${id}`, params)
+export function chatGroupDetail(req: components.ChatGroupDetailReq) {
+	return webapi.get<components.ChatGroupDetailResp>(`/api/v1/chats/groups/detail`, req)
 }
 
 /**
  * @description 
- * @param params
+ * @param req
  */
-export function chatGroupMemberList(params: components.ChatGroupMemberListReqParams, id: number) {
-	return webapi.get<components.ChatGroupMemberListResp>(`/api/v1/chats/groups/${id}/members`, params)
+export function chatGroupMemberList(req: components.ChatGroupMemberListReq) {
+	return webapi.get<components.ChatGroupMemberListResp>(`/api/v1/chats/groups/members`, req)
 }
 
 /**
@@ -753,6 +753,13 @@ export function menuMyTree() {
  */
 export function metricReport(req: components.MetricReportReq) {
 	return webapi.post<components.Response>(`/api/v1/metrics/report`, req)
+}
+
+/**
+ * @description 
+ */
+export function metricReportOptions() {
+	return webapi.options<null>(`/api/v1/metrics/report`)
 }
 
 /**

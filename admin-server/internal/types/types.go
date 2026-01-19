@@ -46,7 +46,7 @@ type ApiUpdateReq struct {
 }
 
 type AuditLogDetailReq struct {
-	Id uint64 `json:"id" form:"id"`
+	Id uint64 `json:"id,optional" form:"id,optional"`
 }
 
 type AuditLogDetailResp struct {
@@ -365,7 +365,7 @@ type ChatGroupDeleteReq struct {
 }
 
 type ChatGroupDetailReq struct {
-	Id uint64 `path:"id"` // 群组ID
+	Id uint64 `json:"id,optional" form:"id,optional"` // 群组ID（必填，但 Query 需标记 optional）
 }
 
 type ChatGroupDetailResp struct {
@@ -416,7 +416,7 @@ type ChatGroupMemberItem struct {
 }
 
 type ChatGroupMemberListReq struct {
-	Id uint64 `path:"id"` // 群组ID
+	Id uint64 `json:"id,optional" form:"id,optional"` // 群组ID（必填，但 Query 需标记 optional）
 }
 
 type ChatGroupMemberListResp struct {
@@ -816,7 +816,7 @@ type FileUploadResp struct {
 }
 
 type LoginLogDetailReq struct {
-	Id uint64 `json:"id" form:"id"`
+	Id uint64 `json:"id,optional" form:"id,optional"`
 }
 
 type LoginLogDetailResp struct {
@@ -1075,7 +1075,7 @@ type NotificationReadReq struct {
 }
 
 type OperationLogDetailReq struct {
-	Id uint64 `json:"id" form:"id"`
+	Id uint64 `json:"id,optional" form:"id,optional"`
 }
 
 type OperationLogDetailResp struct {
@@ -1641,7 +1641,7 @@ type TaskCancelReq struct {
 }
 
 type TaskDetailReq struct {
-	Id uint64 `json:"id" form:"id"`
+	Id uint64 `json:"id,optional" form:"id,optional"`
 }
 
 type TaskDetailResp struct {

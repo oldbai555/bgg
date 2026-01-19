@@ -5,6 +5,7 @@ package chat_message
 
 import (
 	"context"
+	"postapocgame/admin-server/internal/logic/logicutil"
 	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
@@ -33,16 +34,7 @@ func (l *ChatMessageListLogic) ChatMessageList(req *types.ChatMessageListReq) (r
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	// 设置默认值
-	if req.Page <= 0 {
-		req.Page = 1
-	}
-	if req.PageSize <= 0 {
-		req.PageSize = 20 // 管理页面默认20条
-	}
-	if req.PageSize > 100 {
-		req.PageSize = 100 // 限制最大100条
-	}
+	req.Page, req.PageSize = logicutil.NormalizePage(req.Page, req.PageSize, 20, 100)
 
 	// 获取当前用户（用于权限验证）
 	_, ok := jwthelper.FromContext(l.ctx)

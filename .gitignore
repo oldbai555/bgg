@@ -30,3 +30,4 @@ admin-server/*.exe
 /docs/视频与移动端改造方案.md
 /docs/异步任务功能模块实现方案.md
 /__dummy__
+/docs/admin-server-internal-review.md
