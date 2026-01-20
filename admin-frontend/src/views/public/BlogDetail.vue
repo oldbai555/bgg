@@ -90,6 +90,7 @@
                 <div class="nav-title">没有更多了</div>
               </div>
             </div>
+            <IcpFooter />
           </div>
 
           <div v-else-if="!loading" class="empty">文章不存在或已下架</div>
@@ -102,7 +103,6 @@
       </div>
     </div>
 
-    <IcpFooter />
   </div>
 </template>
 
@@ -206,17 +206,17 @@ const handleContentRendered = (html: string) => {
       if (toolbar) {
         ;(toolbar as HTMLElement).style.display = 'none'
       }
-      
+
       const inputWrapper = document.querySelector('.md-editor-input-wrapper')
       if (inputWrapper) {
         ;(inputWrapper as HTMLElement).style.display = 'none'
       }
-      
+
       const footer = document.querySelector('.md-editor-footer')
       if (footer) {
         ;(footer as HTMLElement).style.display = 'none'
       }
-      
+
       const catalog = document.querySelector('.md-editor-catalog')
       if (catalog) {
         ;(catalog as HTMLElement).style.display = 'none'

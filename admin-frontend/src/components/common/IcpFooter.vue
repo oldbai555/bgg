@@ -24,7 +24,7 @@ withDefaults(
     href?: string
   }>(),
   {
-    text: 'icp: 桂ICP备2023001017号-1',
+    text: 'ICP: 桂ICP备2023001017号-1',
     href: 'https://beian.miit.gov.cn/'
   }
 )

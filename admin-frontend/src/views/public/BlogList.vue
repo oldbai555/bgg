@@ -68,6 +68,7 @@
               @current-change="handlePageChange"
             />
           </div>
+          <IcpFooter />
         </main>
 
         <!-- 右侧侧边栏 -->
@@ -77,8 +78,6 @@
         </aside>
       </div>
     </div>
-
-    <IcpFooter />
   </div>
 </template>
 
