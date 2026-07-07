@@ -26,3 +26,7 @@ admin-server/*.exe
 /admin-server/uploads/**
 /admin-frontend/eslintcheckresult.txt
 /__dummy__
+
+# 本地真实数据库/Redis 连接配置，禁止提交；参考 config/*.json.example 自行创建
+/config/mysql.json
+/config/redis.json
