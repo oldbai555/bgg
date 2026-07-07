@@ -8,13 +8,13 @@ import (
 	"database/sql"
 	"time"
 
-	"postapocgame/admin-server/internal/model"
-	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	"postapocgame/admin-server/internal/model/video"
+	videorepo "postapocgame/admin-server/internal/repository/video"
 )
 
 type VideoCreateLogic struct {
@@ -37,7 +37,7 @@ func (l *VideoCreateLogic) VideoCreate(req *types.VideoCreateReq) error {
 	}
 
 	now := time.Now().Unix()
-	video := model.Video{
+	video := video.Video{
 		Name:      req.Name,
 		Duration:  req.Duration,
 		PlayUrl:   req.PlayUrl,
@@ -54,7 +54,7 @@ func (l *VideoCreateLogic) VideoCreate(req *types.VideoCreateReq) error {
 		video.Description = sql.NullString{String: req.Description, Valid: true}
 	}
 
-	repo := repository.NewVideoRepository(l.svcCtx.Repository)
+	repo := videorepo.NewVideoRepository(l.svcCtx.Repository)
 	if err := repo.Create(l.ctx, &video); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "创建视频失败", err)
 	}

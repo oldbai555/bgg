@@ -7,12 +7,12 @@ import (
 	"context"
 	"strings"
 
-	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	sdkrepo "postapocgame/admin-server/internal/repository/sdk"
 )
 
 type SdkInterfaceUpdateLogic struct {
@@ -34,7 +34,7 @@ func (l *SdkInterfaceUpdateLogic) SdkInterfaceUpdate(req *types.SdkInterfaceUpda
 		return errs.New(errs.CodeBadRequest, "ID 不能为空")
 	}
 
-	repo := repository.NewSdkAdminRepository(l.svcCtx.Repository)
+	repo := sdkrepo.NewSdkAdminRepository(l.svcCtx.Repository)
 	iface, err := repo.FindInterface(l.ctx, req.Id)
 	if err != nil {
 		return errs.Wrap(errs.CodeBadRequest, "接口不存在", err)
@@ -48,7 +48,7 @@ func (l *SdkInterfaceUpdateLogic) SdkInterfaceUpdate(req *types.SdkInterfaceUpda
 	methodChanged := strings.TrimSpace(req.Method) != "" && strings.ToUpper(req.Method) != iface.Method
 	if pathChanged || methodChanged {
 		// 根据新的 path 和 method 生成 API Code
-		sdkRepo := repository.NewSdkRepository(l.svcCtx.Repository)
+		sdkRepo := sdkrepo.NewSdkRepository(l.svcCtx.Repository)
 		newPath := iface.Path
 		newMethod := iface.Method
 		if pathChanged {

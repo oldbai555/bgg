@@ -8,11 +8,11 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 	"postapocgame/admin-server/internal/config"
-	"postapocgame/admin-server/internal/model"
 	"postapocgame/admin-server/internal/repository"
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/stores/sqlc"
+	"postapocgame/admin-server/internal/model/iam"
 )
 
 // 一个简单的种子工具：根据配置连接数据库，创建默认管理员账号和基础角色/权限。
@@ -54,7 +54,7 @@ func main() {
 		log.Fatalf("query admin user failed: %v", err)
 	}
 
-	_, err = userModel.Insert(ctx, &model.AdminUser{
+	_, err = userModel.Insert(ctx, &iam.AdminUser{
 		Username:     *username,
 		PasswordHash: string(hash),
 		Status:       1,

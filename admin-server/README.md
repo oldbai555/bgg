@@ -13,20 +13,18 @@
 
 ```
 admin-server/
-├── api/admin.api      # 唯一 .api 定义文件，所有路由的真源
-├── cmd/adminseed/      # 管理员账号初始化工具
-├── db/                 # tables.sql/data.sql（首次部署）+ migrations/（增量SQL）
-├── etc/                # admin-api.yaml、middleware.yaml
+├── api/admin.api      # 唯一 .api 定义文件，group 格式 <domain>/<module>
 ├── internal/
-│   ├── handler/ logic/  # goctl 生成骨架，按模块分子目录
-│   ├── repository/       # 手写数据访问层（squirrel）
-│   ├── model/             # goctl 生成
-│   ├── middleware/        # 手写中间件
-│   ├── consts/ types/ svc/ config/
-├── pkg/                  # errs/response/jwt/cache/audit/monitor/...
-├── scripts/              # generate-sql.sh / generate-model.sh / generate-api.sh / generate-ts.sh
-└── .template/            # goctl 自定义模板
+│   ├── handler/<domain>/<module>/  # goctl 生成
+│   ├── logic/<domain>/<module>/    # goctl 骨架 + 手写业务
+│   ├── repository/<domain>/        # 手写数据访问（squirrel）
+│   ├── model/<domain>/             # goctl 生成
+│   ├── domain/{iam,task}/          # 领域服务（RBAC、任务调度）
+│   ├── middleware/ svc/ types/ ...
+├── pkg/ scripts/ .template/ db/
 ```
+
+详细维护导航见 [`docs/admin-server-维护导航.md`](../docs/admin-server-维护导航.md)。
 
 详细代码规范（squirrel 用法、中间件顺序、命名规则等）见根目录 [`AGENTS.md`](../AGENTS.md) 与 [`.cursor/rules/10-go-code-style.mdc`](../.cursor/rules/10-go-code-style.mdc)。
 

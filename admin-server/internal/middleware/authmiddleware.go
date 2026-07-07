@@ -4,11 +4,11 @@ import (
 	"net/http"
 	"strings"
 
-	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 	"postapocgame/admin-server/pkg/response"
+	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 // AuthMiddleware 校验 Access Token + 黑名单，并将用户信息写入 context。
@@ -36,7 +36,7 @@ func (m *AuthMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 		token := parts[1]
 
 		// 黑名单校验
-		blackRepo := repository.NewTokenBlacklistRepository(m.svcCtx.Repository)
+		blackRepo := iamrepo.NewTokenBlacklistRepository(m.svcCtx.Repository)
 		blacklisted, err := blackRepo.IsBlacklisted(r.Context(), token)
 		if err != nil {
 			response.ErrorCtx(r.Context(), w, errs.Wrap(errs.CodeInternalError, "检查令牌黑名单失败", err))

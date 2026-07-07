@@ -2,11 +2,11 @@ package middleware
 
 import (
 	"net/http"
-	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/pkg/errs"
 	"postapocgame/admin-server/pkg/response"
 	"strings"
+	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 // ApiEnabledMiddleware 接口启用校验中间件
@@ -25,7 +25,7 @@ func (m *ApiEnabledMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 		method := r.Method
 		path := r.URL.Path
 
-		apiRepo := repository.NewApiRepository(m.svcCtx.Repository)
+		apiRepo := iamrepo.NewApiRepository(m.svcCtx.Repository)
 		api, err := apiRepo.FindByMethodAndPath(r.Context(), method, path)
 		if err != nil {
 			// 接口不存在，直接返回 404

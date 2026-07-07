@@ -7,12 +7,12 @@ import (
 	"context"
 	"strings"
 
-	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	sdkrepo "postapocgame/admin-server/internal/repository/sdk"
 )
 
 type SdkApiKeyUpdateLogic struct {
@@ -37,7 +37,7 @@ func (l *SdkApiKeyUpdateLogic) SdkApiKeyUpdate(req *types.SdkApiKeyUpdateReq) er
 		return errs.New(errs.CodeBadRequest, "ID 不能为空")
 	}
 
-	repo := repository.NewSdkAdminRepository(l.svcCtx.Repository)
+	repo := sdkrepo.NewSdkAdminRepository(l.svcCtx.Repository)
 	data, err := repo.FindSdkKey(l.ctx, req.Id)
 	if err != nil {
 		return errs.Wrap(errs.CodeBadRequest, "API Key 不存在", err)

@@ -7,13 +7,13 @@ import (
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"postapocgame/admin-server/internal/hub"
-	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 	"postapocgame/admin-server/pkg/response"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 var upgrader = websocket.Upgrader{
@@ -54,7 +54,7 @@ func ChatWSHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		}
 
 		// 检查黑名单
-		blackRepo := repository.NewTokenBlacklistRepository(svcCtx.Repository)
+		blackRepo := iamrepo.NewTokenBlacklistRepository(svcCtx.Repository)
 		blacklisted, err := blackRepo.IsBlacklisted(r.Context(), token)
 		if err != nil {
 			response.ErrorCtx(r.Context(), w, errs.Wrap(errs.CodeInternalError, "检查令牌黑名单失败", err))

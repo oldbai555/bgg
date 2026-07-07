@@ -21,11 +21,12 @@ import (
 	"postapocgame/admin-server/internal/config"
 	"postapocgame/admin-server/internal/handler"
 	"postapocgame/admin-server/internal/middleware"
-	"postapocgame/admin-server/internal/model"
 	"postapocgame/admin-server/internal/svc"
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/rest"
+	"postapocgame/admin-server/internal/model"
+	"postapocgame/admin-server/internal/model/iam"
 )
 
 var (
@@ -155,7 +156,7 @@ func syncRoutesToAdminAPI(ctx *svc.ServiceContext, server *rest.Server) {
 		}
 
 		apiName := fmt.Sprintf("%s_%s", method, sanitizePathForName(path))
-		data := &model.AdminApi{
+		data := &iam.AdminApi{
 			Name:        apiName,
 			Method:      method,
 			Path:        path,

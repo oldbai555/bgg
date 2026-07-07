@@ -10,10 +10,10 @@ import (
 	"strings"
 	"time"
 
-	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/pkg/errs"
 	"postapocgame/admin-server/pkg/response"
+	sdkrepo "postapocgame/admin-server/internal/repository/sdk"
 )
 
 type sdkCtxKey string
@@ -42,7 +42,7 @@ func (m *SDKAuthMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		sdkRepo := repository.NewSdkRepository(m.svcCtx.Repository)
+		sdkRepo := sdkrepo.NewSdkRepository(m.svcCtx.Repository)
 		sdkKey, err := sdkRepo.FindKeyByApiKey(r.Context(), apiKey)
 		if err != nil {
 			response.ErrorCtx(r.Context(), w, errs.New(errs.CodeUnauthorized, "无效的 API Key"))

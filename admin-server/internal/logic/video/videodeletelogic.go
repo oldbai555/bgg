@@ -6,12 +6,12 @@ package video
 import (
 	"context"
 
-	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	videorepo "postapocgame/admin-server/internal/repository/video"
 )
 
 type VideoDeleteLogic struct {
@@ -33,7 +33,7 @@ func (l *VideoDeleteLogic) VideoDelete(req *types.VideoDeleteReq) error {
 		return errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	repo := repository.NewVideoRepository(l.svcCtx.Repository)
+	repo := videorepo.NewVideoRepository(l.svcCtx.Repository)
 	if err := repo.DeleteByID(l.ctx, req.Id); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "删除视频失败", err)
 	}

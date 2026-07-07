@@ -10,23 +10,23 @@ import (
 	"strings"
 	"time"
 
-	"postapocgame/admin-server/internal/model"
-	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	"postapocgame/admin-server/internal/model/monitoring"
+	monitoringrepo "postapocgame/admin-server/internal/repository/monitoring"
 )
 
 // PublicOperationLogMiddleware 公共接口操作日志中间件，记录所有公共接口的调用日志（包括 GET 请求）
 type PublicOperationLogMiddleware struct {
 	svcCtx *svc.ServiceContext
-	logCh  chan *model.AdminOperationLog // 异步日志通道
+	logCh  chan *monitoring.AdminOperationLog // 异步日志通道
 }
 
 func NewPublicOperationLogMiddleware(svcCtx *svc.ServiceContext) *PublicOperationLogMiddleware {
 	m := &PublicOperationLogMiddleware{
 		svcCtx: svcCtx,
-		logCh:  make(chan *model.AdminOperationLog, 1000), // 缓冲1000条日志
+		logCh:  make(chan *monitoring.AdminOperationLog, 1000), // 缓冲1000条日志
 	}
 
 	// 启动异步日志写入 goroutine
@@ -102,7 +102,7 @@ func (m *PublicOperationLogMiddleware) Handle(next http.HandlerFunc) http.Handle
 			}
 		}
 
-		operationLog := &model.AdminOperationLog{
+		operationLog := &monitoring.AdminOperationLog{
 			UserId:          userId,
 			Username:        username,
 			OperationType:   operationType,
@@ -231,8 +231,8 @@ func (m *PublicOperationLogMiddleware) getClientIP(r *http.Request) string {
 
 // logWriter 异步日志写入器
 func (m *PublicOperationLogMiddleware) logWriter() {
-	operationLogRepo := repository.NewOperationLogRepository(m.svcCtx.Repository)
-	batch := make([]*model.AdminOperationLog, 0, 100) // 批量写入，每批100条
+	operationLogRepo := monitoringrepo.NewOperationLogRepository(m.svcCtx.Repository)
+	batch := make([]*monitoring.AdminOperationLog, 0, 100) // 批量写入，每批100条
 	ticker := time.NewTicker(5 * time.Second)         // 每5秒写入一次
 	defer ticker.Stop()
 
@@ -256,7 +256,7 @@ func (m *PublicOperationLogMiddleware) logWriter() {
 }
 
 // writeBatch 批量写入日志
-func (m *PublicOperationLogMiddleware) writeBatch(repo repository.OperationLogRepository, logs []*model.AdminOperationLog) {
+func (m *PublicOperationLogMiddleware) writeBatch(repo monitoringrepo.OperationLogRepository, logs []*monitoring.AdminOperationLog) {
 	ctx := context.Background()
 	if len(logs) == 0 {
 		return

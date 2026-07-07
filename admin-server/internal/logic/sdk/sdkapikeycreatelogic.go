@@ -9,13 +9,13 @@ import (
 	"encoding/hex"
 	"strings"
 
-	"postapocgame/admin-server/internal/model"
-	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	"postapocgame/admin-server/internal/model/sdk"
+	sdkrepo "postapocgame/admin-server/internal/repository/sdk"
 )
 
 type SdkApiKeyCreateLogic struct {
@@ -40,7 +40,7 @@ func (l *SdkApiKeyCreateLogic) SdkApiKeyCreate(req *types.SdkApiKeyCreateReq) (r
 		return nil, errs.New(errs.CodeBadRequest, "名称不能为空")
 	}
 
-	repo := repository.NewSdkAdminRepository(l.svcCtx.Repository)
+	repo := sdkrepo.NewSdkAdminRepository(l.svcCtx.Repository)
 
 	apiKey, apiSecret, err := l.generateUniqueKeyPair(repo)
 	if err != nil {
@@ -52,7 +52,7 @@ func (l *SdkApiKeyCreateLogic) SdkApiKeyCreate(req *types.SdkApiKeyCreateReq) (r
 		status = 1 // 默认启用
 	}
 
-	data := &model.SdkKey{
+	data := &sdk.SdkKey{
 		Name:        req.Name,
 		ApiKey:      apiKey,
 		ApiSecret:   apiSecret,
@@ -74,7 +74,7 @@ func (l *SdkApiKeyCreateLogic) SdkApiKeyCreate(req *types.SdkApiKeyCreateReq) (r
 	}, nil
 }
 
-func (l *SdkApiKeyCreateLogic) generateUniqueKeyPair(repo *repository.SdkAdminRepository) (string, string, error) {
+func (l *SdkApiKeyCreateLogic) generateUniqueKeyPair(repo *sdkrepo.SdkAdminRepository) (string, string, error) {
 	for i := 0; i < 5; i++ {
 		key := randomHex(24)
 		secret := randomHex(32)

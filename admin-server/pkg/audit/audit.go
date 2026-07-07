@@ -8,12 +8,12 @@ import (
 	"strings"
 	"time"
 
-	"postapocgame/admin-server/internal/model"
-	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	"postapocgame/admin-server/internal/model/monitoring"
+	monitoringrepo "postapocgame/admin-server/internal/repository/monitoring"
 )
 
 // AuditType 审计类型常量
@@ -69,7 +69,7 @@ func RecordAuditLog(svcCtx *svc.ServiceContext, ctx context.Context, httpReq *ht
 
 	// 构建审计日志
 	now := time.Now().Unix()
-	auditLog := &model.AuditLog{
+	auditLog := &monitoring.AuditLog{
 		UserId:      userId,
 		Username:    username,
 		AuditType:   auditType,
@@ -92,7 +92,7 @@ func RecordAuditLog(svcCtx *svc.ServiceContext, ctx context.Context, httpReq *ht
 			}
 		}()
 
-		auditLogRepo := repository.NewAuditLogRepository(svcCtx.Repository)
+		auditLogRepo := monitoringrepo.NewAuditLogRepository(svcCtx.Repository)
 		if err := auditLogRepo.Create(context.Background(), auditLog); err != nil {
 			logx.Errorf("记录审计日志失败: userId=%d, username=%s, auditType=%s, auditObject=%s, error: %v",
 				userId, username, auditType, auditObject, err)

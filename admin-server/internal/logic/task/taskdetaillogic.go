@@ -6,12 +6,12 @@ package task
 import (
 	"context"
 
-	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	taskrepo "postapocgame/admin-server/internal/repository/task"
 )
 
 type TaskDetailLogic struct {
@@ -34,7 +34,7 @@ func (l *TaskDetailLogic) TaskDetail(req *types.TaskDetailReq) (resp *types.Task
 	}
 
 	// 查询任务详情
-	taskRepo := repository.NewTaskRepository(l.svcCtx.Repository)
+	taskRepo := taskrepo.NewTaskRepository(l.svcCtx.Repository)
 	task, err := taskRepo.FindOne(l.ctx, req.Id)
 	if err != nil {
 		return nil, err

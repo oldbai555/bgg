@@ -6,12 +6,12 @@ package task
 import (
 	"context"
 
-	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	taskrepo "postapocgame/admin-server/internal/repository/task"
 )
 
 type TaskListLogic struct {
@@ -40,7 +40,7 @@ func (l *TaskListLogic) TaskList(req *types.TaskListReq) (resp *types.TaskListRe
 	}
 
 	// 构建查询过滤条件
-	filters := &repository.TaskQueryFilter{
+	filters := &taskrepo.TaskQueryFilter{
 		Name:          req.Name,
 		Type:          req.TaskType,
 		ExecutionType: req.ExecutionType,
@@ -51,7 +51,7 @@ func (l *TaskListLogic) TaskList(req *types.TaskListReq) (resp *types.TaskListRe
 	}
 
 	// 查询任务列表
-	taskRepo := repository.NewTaskRepository(l.svcCtx.Repository)
+	taskRepo := taskrepo.NewTaskRepository(l.svcCtx.Repository)
 	tasks, total, err := taskRepo.FindPage(l.ctx, page, pageSize, filters)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询任务列表失败", err)

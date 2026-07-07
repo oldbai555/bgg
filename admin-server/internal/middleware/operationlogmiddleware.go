@@ -11,24 +11,24 @@ import (
 	"time"
 
 	"postapocgame/admin-server/internal/consts"
-	"postapocgame/admin-server/internal/model"
-	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	"postapocgame/admin-server/internal/model/monitoring"
+	monitoringrepo "postapocgame/admin-server/internal/repository/monitoring"
 )
 
 // OperationLogMiddleware 操作日志中间件，自动记录所有增删改操作的日志
 type OperationLogMiddleware struct {
 	svcCtx *svc.ServiceContext
-	logCh  chan *model.AdminOperationLog // 异步日志通道
+	logCh  chan *monitoring.AdminOperationLog // 异步日志通道
 }
 
 func NewOperationLogMiddleware(svcCtx *svc.ServiceContext) *OperationLogMiddleware {
 	m := &OperationLogMiddleware{
 		svcCtx: svcCtx,
-		logCh:  make(chan *model.AdminOperationLog, 1000), // 缓冲1000条日志
+		logCh:  make(chan *monitoring.AdminOperationLog, 1000), // 缓冲1000条日志
 	}
 
 	// 启动异步日志写入 goroutine
@@ -100,7 +100,7 @@ func (m *OperationLogMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc 
 			requestParams = sql.NullString{String: paramsStr, Valid: true}
 		}
 
-		operationLog := &model.AdminOperationLog{
+		operationLog := &monitoring.AdminOperationLog{
 			UserId:          userId,
 			Username:        username,
 			OperationType:   operationType,
@@ -222,8 +222,8 @@ func (m *OperationLogMiddleware) getClientIP(r *http.Request) string {
 
 // logWriter 异步日志写入器
 func (m *OperationLogMiddleware) logWriter() {
-	operationLogRepo := repository.NewOperationLogRepository(m.svcCtx.Repository)
-	batch := make([]*model.AdminOperationLog, 0, 100) // 批量写入，每批100条
+	operationLogRepo := monitoringrepo.NewOperationLogRepository(m.svcCtx.Repository)
+	batch := make([]*monitoring.AdminOperationLog, 0, 100) // 批量写入，每批100条
 	ticker := time.NewTicker(5 * time.Second)         // 每5秒写入一次
 	defer ticker.Stop()
 
@@ -247,7 +247,7 @@ func (m *OperationLogMiddleware) logWriter() {
 }
 
 // writeBatch 批量写入日志
-func (m *OperationLogMiddleware) writeBatch(repo repository.OperationLogRepository, logs []*model.AdminOperationLog) {
+func (m *OperationLogMiddleware) writeBatch(repo monitoringrepo.OperationLogRepository, logs []*monitoring.AdminOperationLog) {
 	ctx := context.Background()
 	if len(logs) == 0 {
 		return

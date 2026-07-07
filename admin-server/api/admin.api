@@ -587,7 +587,7 @@ type (
 )
 
 @server (
-	group:      ping
+	group:      misc/ping
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware
 )
@@ -597,7 +597,7 @@ service admin-api {
 }
 
 @server (
-	group:      monitor
+	group:      monitoring/monitor
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
@@ -610,7 +610,7 @@ service admin-api {
 }
 
 @server (
-	group:      auth
+	group:      iam/auth
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware
 )
@@ -623,7 +623,7 @@ service admin-api {
 }
 
 @server (
-	group:      auth
+	group:      iam/auth
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,ApiEnabledMiddleware
 )
@@ -642,7 +642,7 @@ service admin-api {
 }
 
 @server (
-	group:      user
+	group:      iam/user
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
@@ -661,7 +661,7 @@ service admin-api {
 }
 
 @server (
-	group:      role
+	group:      iam/role
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
@@ -680,7 +680,7 @@ service admin-api {
 }
 
 @server (
-	group:      permission
+	group:      iam/permission
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
@@ -699,7 +699,7 @@ service admin-api {
 }
 
 @server (
-	group:      department
+	group:      iam/department
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
@@ -718,7 +718,7 @@ service admin-api {
 }
 
 @server (
-	group:      menu
+	group:      iam/menu
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
@@ -737,7 +737,7 @@ service admin-api {
 }
 
 @server (
-	group:      menu
+	group:      iam/menu
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,ApiEnabledMiddleware
 )
@@ -747,7 +747,7 @@ service admin-api {
 }
 
 @server (
-	group:      api
+	group:      iam/api
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
@@ -766,7 +766,7 @@ service admin-api {
 }
 
 @server (
-	group:      user_role
+	group:      iam/user_role
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
@@ -779,7 +779,7 @@ service admin-api {
 }
 
 @server (
-	group:      role_permission
+	group:      iam/role_permission
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
@@ -792,7 +792,7 @@ service admin-api {
 }
 
 @server (
-	group:      permission_menu
+	group:      iam/permission_menu
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
@@ -805,7 +805,7 @@ service admin-api {
 }
 
 @server (
-	group:      permission_api
+	group:      iam/permission_api
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
@@ -818,7 +818,7 @@ service admin-api {
 }
 
 @server (
-	group:      file
+	group:      system/file
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
@@ -837,7 +837,7 @@ service admin-api {
 }
 
 @server (
-	group:      file
+	group:      system/file
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,ApiEnabledMiddleware
 )
@@ -850,7 +850,7 @@ service admin-api {
 }
 
 @server (
-	group:      config
+	group:      system/config
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
@@ -872,7 +872,7 @@ service admin-api {
 }
 
 @server (
-	group:      dict_type
+	group:      system/dict_type
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
@@ -891,7 +891,7 @@ service admin-api {
 }
 
 @server (
-	group:      dict_item
+	group:      system/dict_item
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
@@ -910,7 +910,7 @@ service admin-api {
 }
 
 @server (
-	group:      dict
+	group:      system/dict
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,AuthMiddleware,ApiEnabledMiddleware
 )
@@ -921,7 +921,7 @@ service admin-api {
 
 // 公共只读字典接口（白名单 code，例如 video_proxy_url）
 @server (
-	group:      public
+	group:      misc/public
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,CorsMiddleware,ApiEnabledMiddleware
 )
@@ -931,7 +931,7 @@ service admin-api {
 }
 
 @server (
-	group:      dict
+	group:      system/dict
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,AuthMiddleware,ApiEnabledMiddleware
 )
@@ -1452,7 +1452,7 @@ type (
 )
 
 @server (
-	group:      demo
+	group:      misc/demo
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
@@ -1471,7 +1471,7 @@ service admin-api {
 }
 
 @server (
-	group:      daily_short_sentence
+	group:      misc/daily_short_sentence
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
@@ -1490,7 +1490,7 @@ service admin-api {
 }
 
 @server (
-	group:      video
+	group:      video/video
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
@@ -1510,7 +1510,7 @@ service admin-api {
 
 // m3u8代理服务
 @server (
-	group:      m3u8
+	group:      video/m3u8
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,CorsMiddleware,ApiEnabledMiddleware,PublicOperationLogMiddleware
 )
@@ -1521,7 +1521,7 @@ service admin-api {
 
 // 视频采集服务
 @server (
-	group:      video_collect
+	group:      video/video_collect
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,CorsMiddleware,ApiEnabledMiddleware,OperationLogMiddleware
 )
@@ -1536,7 +1536,7 @@ service admin-api {
 
 // 公开视频服务
 @server (
-	group:      public_video
+	group:      video/public
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,CorsMiddleware,ApiEnabledMiddleware,PublicOperationLogMiddleware
 )
@@ -1550,7 +1550,7 @@ service admin-api {
 
 // 博客标签管理
 @server (
-	group:      blog_tag
+	group:      blog/tag
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
@@ -1573,7 +1573,7 @@ service admin-api {
 
 // 博客文章管理
 @server (
-	group:      blog_article
+	group:      blog/article
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
@@ -1611,7 +1611,7 @@ service admin-api {
 
 // 博客文章审核（审核员）
 @server (
-	group:      blog_article_audit
+	group:      blog/article_audit
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
@@ -1625,7 +1625,7 @@ service admin-api {
 
 // 公共博客文章接口（未登录访问）
 @server (
-	group:      public_blog
+	group:      blog/public
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,CorsMiddleware,ApiEnabledMiddleware,PublicOperationLogMiddleware
 )
@@ -1660,7 +1660,7 @@ service admin-api {
 
 // 友情链接管理
 @server (
-	group:      blog_friend_link
+	group:      blog/friend_link
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
@@ -1680,7 +1680,7 @@ service admin-api {
 
 // 社交信息管理
 @server (
-	group:      blog_social_info
+	group:      blog/social_info
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
@@ -1700,7 +1700,7 @@ service admin-api {
 
 // 通用打点上报接口（PV/UV/VV/IP，文章与视频共用）
 @server (
-	group:      metric
+	group:      monitoring/metric
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,CorsMiddleware,ApiEnabledMiddleware,PublicOperationLogMiddleware
 )
@@ -1715,7 +1715,7 @@ service admin-api {
 
 // 通用打点统计查询（管理后台）
 @server (
-	group:      metric_admin
+	group:      monitoring/metric_admin
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
@@ -1867,7 +1867,7 @@ type (
 )
 
 @server (
-	group:      chat
+	group:      chat/chat
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,ApiEnabledMiddleware
 )
@@ -1883,7 +1883,7 @@ service admin-api {
 }
 
 @server (
-	group:      chat_group
+	group:      chat/group
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
@@ -1914,7 +1914,7 @@ service admin-api {
 }
 
 @server (
-	group:      chat_message
+	group:      chat/message
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
@@ -1927,7 +1927,7 @@ service admin-api {
 }
 
 @server (
-	group:      operation_log
+	group:      monitoring/operation_log
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
@@ -2055,7 +2055,7 @@ type (
 )
 
 @server (
-	group:      login_log
+	group:      monitoring/login_log
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
@@ -2131,7 +2131,7 @@ type (
 )
 
 @server (
-	group:      audit_log
+	group:      monitoring/audit_log
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
@@ -2147,7 +2147,7 @@ service admin-api {
 }
 
 @server (
-	group:      performance_log
+	group:      monitoring/performance_log
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
@@ -2233,7 +2233,7 @@ type (
 )
 
 @server (
-	group:      notice
+	group:      system/notice
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
@@ -2252,7 +2252,7 @@ service admin-api {
 }
 
 @server (
-	group:      notification
+	group:      system/notification
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,AuthMiddleware,ApiEnabledMiddleware
 )
@@ -2495,7 +2495,7 @@ type (
 )
 
 @server (
-	group:      sdk
+	group:      sdk/sdk
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
@@ -2542,7 +2542,7 @@ service admin-api {
 }
 
 @server (
-	group:      task
+	group:      task/task
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
 )
@@ -2562,7 +2562,7 @@ service admin-api {
 
 // 最近任务（给前端浮动球使用，登录即可访问）
 @server (
-	group:      task_public
+	group:      task/public
 	prefix:     /api/v1
 	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,OperationLogMiddleware
 )
@@ -2573,7 +2573,7 @@ service admin-api {
 
 // SDK 对外接口组（走 SDK 鉴权/限频/调用记录）
 @server (
-	group:      sdk_public
+	group:      sdk/public
 	prefix:     /sdk
 	middleware: PerformanceMiddleware,SDKAuthMiddleware,SDKRateLimitMiddleware,SDKCallLogMiddleware
 )

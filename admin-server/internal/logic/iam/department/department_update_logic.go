@@ -1,0 +1,57 @@
+// Code scaffolded by goctl. Safe to edit.
+// goctl 1.10.1
+
+package department
+
+import (
+	"context"
+
+	"postapocgame/admin-server/internal/svc"
+	"postapocgame/admin-server/internal/types"
+	"postapocgame/admin-server/pkg/errs"
+
+	"github.com/zeromicro/go-zero/core/logx"
+	iamrepo "postapocgame/admin-server/internal/repository/iam"
+)
+
+type DepartmentUpdateLogic struct {
+	logx.Logger
+	ctx    context.Context
+	svcCtx *svc.ServiceContext
+}
+
+func NewDepartmentUpdateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *DepartmentUpdateLogic {
+	return &DepartmentUpdateLogic{
+		Logger: logx.WithContext(ctx),
+		ctx:    ctx,
+		svcCtx: svcCtx,
+	}
+}
+
+func (l *DepartmentUpdateLogic) DepartmentUpdate(req *types.DepartmentUpdateReq) error {
+	if req == nil || req.Id == 0 {
+		return errs.New(errs.CodeBadRequest, "部门ID不能为空")
+	}
+
+	deptRepo := iamrepo.NewDepartmentRepository(l.svcCtx.Repository)
+	dept, err := deptRepo.FindByID(l.ctx, req.Id)
+	if err != nil {
+		return errs.Wrap(errs.CodeInternalError, "查询部门失败", err)
+	}
+
+	dept.ParentId = req.ParentId
+	dept.Name = req.Name
+	// OrderNum 字段：0 也是有效值，需要特殊处理
+	if req.OrderNum >= 0 {
+		dept.OrderNum = req.OrderNum
+	}
+	// Status 字段：0 是有效值（禁用），需要特殊处理
+	if req.Status == 0 || req.Status == 1 {
+		dept.Status = req.Status
+	}
+
+	if err := deptRepo.Update(l.ctx, dept); err != nil {
+		return errs.Wrap(errs.CodeInternalError, "更新部门失败", err)
+	}
+	return nil
+}

@@ -8,10 +8,10 @@ import (
 	"net/http"
 	"time"
 
-	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/pkg/errs"
 	"postapocgame/admin-server/pkg/response"
+	sdkrepo "postapocgame/admin-server/internal/repository/sdk"
 )
 
 type SDKRateLimitMiddleware struct {
@@ -34,7 +34,7 @@ func (m *SDKRateLimitMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc 
 			return
 		}
 
-		sdkRepo := repository.NewSdkRepository(m.svcCtx.Repository)
+		sdkRepo := sdkrepo.NewSdkRepository(m.svcCtx.Repository)
 		iface, err := sdkRepo.FindInterfaceByCode(ctx, apiCode)
 		if err != nil || iface == nil {
 			response.ErrorCtx(ctx, w, errs.New(errs.CodeForbidden, "接口不存在"))

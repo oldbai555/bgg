@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"postapocgame/admin-server/internal/consts"
-	chat "postapocgame/admin-server/internal/handler/chat"
+	chathandler "postapocgame/admin-server/internal/handler/chat"
 	"postapocgame/admin-server/internal/svc"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -24,7 +24,7 @@ func RegisterCustomRoutes(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoute(rest.Route{
 		Method:  http.MethodGet,
 		Path:    consts.PathChatWS,
-		Handler: chat.ChatWSHandler(serverCtx),
+		Handler: chathandler.ChatWSHandler(serverCtx),
 	})
 
 	// 静态文件服务：/api/v1/files/uploads/* -> ./uploads/*

@@ -24,7 +24,7 @@ alwaysApply: true
 步骤2：评估是否需要数据字典
 - 需要：创建增量字典 SQL 文件，路径 `admin-server/db/migrations/dict_{module}_YYYYMMDD.sql`
 
-步骤3：**用户**执行 `admin-server/scripts/generate-sql.sh -group <group> -name <name>`
+步骤3：**用户**执行 `admin-server/scripts/generate-sql.sh -group <domain>/<module> -name <name>`
 - 一次性生成整个模块的骨架，AI 不得代替用户执行此脚本，只能在用户确认生成结果后继续
 - 具体产出见下方"新增模块脚手架"一节
 
@@ -56,7 +56,7 @@ alwaysApply: true
 
 # 新增模块脚手架（工程化能力，新模块默认走这条路）
 
-admin-server 和 admin-frontend 从设计之初就是"工程化"的：新增一个标准 CRUD 业务模块（如"订单管理""优惠券管理"）不需要从零手写，`generate-sql.sh -group <group> -name <name>` 一条命令会同时生成整个模块的四块骨架，且相互匹配、可以直接跑通：
+admin-server 和 admin-frontend 从设计之初就是"工程化"的：新增一个标准 CRUD 业务模块（如"订单管理""优惠券管理"）不需要从零手写，`generate-sql.sh -group <domain>/<module> -name <name>` 一条命令会同时生成整个模块的四块骨架，且相互匹配、可以直接跑通：
 
 1. **建表 SQL**：`admin-server/db/create_table_<group>.sql`（`id` 自增主键 + `created_at`/`updated_at`/`deleted_at` + 主键/`deleted_at` 索引，业务字段需手动补充）
 2. **初始化 SQL**：`admin-server/db/init_<group>.sql`（菜单数据「主菜单 + 新增/编辑/删除按钮」、权限数据「list/create/update/delete」、接口数据「GET/POST/PUT/DELETE」、权限-菜单关联、权限-接口关联，全部主键自增、幂等可重复执行；菜单默认挂在"临时目录"下，路径 `/temp/<group>`，后续在菜单管理里手动挪到正式分类）

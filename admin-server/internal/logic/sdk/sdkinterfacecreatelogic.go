@@ -7,13 +7,13 @@ import (
 	"context"
 	"strings"
 
-	"postapocgame/admin-server/internal/model"
-	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	"postapocgame/admin-server/internal/model/sdk"
+	sdkrepo "postapocgame/admin-server/internal/repository/sdk"
 )
 
 type SdkInterfaceCreateLogic struct {
@@ -39,15 +39,15 @@ func (l *SdkInterfaceCreateLogic) SdkInterfaceCreate(req *types.SdkInterfaceCrea
 	}
 
 	// 根据 path 和 method 自动生成 apiCode（与中间件校验逻辑保持一致）
-	sdkRepo := repository.NewSdkRepository(l.svcCtx.Repository)
+	sdkRepo := sdkrepo.NewSdkRepository(l.svcCtx.Repository)
 	apiCode := sdkRepo.BuildInterfaceCode(req.Method, req.Path)
 
-	repo := repository.NewSdkAdminRepository(l.svcCtx.Repository)
+	repo := sdkrepo.NewSdkAdminRepository(l.svcCtx.Repository)
 	if _, err := repo.FindInterfaceByCode(l.ctx, apiCode); err == nil {
 		return errs.New(errs.CodeBadRequest, "该接口路径和方法组合已存在")
 	}
 
-	data := &model.SdkInterface{
+	data := &sdk.SdkInterface{
 		Name:             req.Name,
 		ApiCode:          apiCode, // 后端自动生成
 		Path:             req.Path,

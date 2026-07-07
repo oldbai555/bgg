@@ -4,10 +4,11 @@ import (
 	"context"
 	"strconv"
 
-	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
+"postapocgame/admin-server/internal/repository"
+	systemrepo "postapocgame/admin-server/internal/repository/system"
 )
 
 // GetIntValue 从字典中读取整数值配置
@@ -15,14 +16,14 @@ import (
 // defaultValue: 如果字典不存在或解析失败时的默认值
 // 返回: 字典项的第一个 value 解析为整数，如果失败则返回 defaultValue
 func GetIntValue(ctx context.Context, repo *repository.Repository, code string, defaultValue int) int {
-	dictTypeRepo := repository.NewDictTypeRepository(repo)
+	dictTypeRepo := systemrepo.NewDictTypeRepository(repo)
 	dictType, err := dictTypeRepo.FindByCode(ctx, code)
 	if err != nil {
 		logx.WithContext(ctx).Errorf("查询字典类型失败: code=%s, error=%v, 使用默认值=%d", code, err, defaultValue)
 		return defaultValue
 	}
 
-	dictItemRepo := repository.NewDictItemRepository(repo)
+	dictItemRepo := systemrepo.NewDictItemRepository(repo)
 	items, err := dictItemRepo.FindByTypeID(ctx, dictType.Id)
 	if err != nil {
 		logx.WithContext(ctx).Errorf("查询字典项失败: code=%s, error=%v, 使用默认值=%d", code, err, defaultValue)
@@ -50,14 +51,14 @@ func GetIntValue(ctx context.Context, repo *repository.Repository, code string, 
 // defaultValue: 如果字典不存在时的默认值
 // 返回: 字典项的第一个 value，如果失败则返回 defaultValue
 func GetStringValue(ctx context.Context, repo *repository.Repository, code string, defaultValue string) string {
-	dictTypeRepo := repository.NewDictTypeRepository(repo)
+	dictTypeRepo := systemrepo.NewDictTypeRepository(repo)
 	dictType, err := dictTypeRepo.FindByCode(ctx, code)
 	if err != nil {
 		logx.WithContext(ctx).Errorf("查询字典类型失败: code=%s, error=%v, 使用默认值=%s", code, err, defaultValue)
 		return defaultValue
 	}
 
-	dictItemRepo := repository.NewDictItemRepository(repo)
+	dictItemRepo := systemrepo.NewDictItemRepository(repo)
 	items, err := dictItemRepo.FindByTypeID(ctx, dictType.Id)
 	if err != nil {
 		logx.WithContext(ctx).Errorf("查询字典项失败: code=%s, error=%v, 使用默认值=%s", code, err, defaultValue)

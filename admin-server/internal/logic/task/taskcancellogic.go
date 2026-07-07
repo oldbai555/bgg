@@ -7,13 +7,13 @@ import (
 	"context"
 
 	"postapocgame/admin-server/internal/consts"
-	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	taskrepo "postapocgame/admin-server/internal/repository/task"
 )
 
 type TaskCancelLogic struct {
@@ -42,7 +42,7 @@ func (l *TaskCancelLogic) TaskCancel(req *types.TaskCancelReq) (resp *types.Resp
 	}
 
 	// 查询任务
-	taskRepo := repository.NewTaskRepository(l.svcCtx.Repository)
+	taskRepo := taskrepo.NewTaskRepository(l.svcCtx.Repository)
 	task, err := taskRepo.FindOne(l.ctx, req.Id)
 	if err != nil {
 		return nil, err

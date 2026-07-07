@@ -6,12 +6,12 @@ package sdk
 import (
 	"context"
 	"postapocgame/admin-server/internal/logic/logicutil"
-	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	sdkrepo "postapocgame/admin-server/internal/repository/sdk"
 )
 
 type SdkApiKeyListLogic struct {
@@ -34,7 +34,7 @@ func (l *SdkApiKeyListLogic) SdkApiKeyList(req *types.SdkApiKeyListReq) (resp *t
 	}
 	req.Page, req.PageSize = logicutil.NormalizePage(req.Page, req.PageSize, 20, 100)
 
-	repo := repository.NewSdkAdminRepository(l.svcCtx.Repository)
+	repo := sdkrepo.NewSdkAdminRepository(l.svcCtx.Repository)
 	// status == 0 表示不按状态过滤，非0才过滤
 	statusFilter := req.Status
 	list, total, err := repo.ListSdkKeys(l.ctx, req.Page, req.PageSize, req.Name, statusFilter)

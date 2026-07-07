@@ -2,13 +2,21 @@ package repository
 
 import (
 	"postapocgame/admin-server/internal/config"
-	"postapocgame/admin-server/internal/model"
 	businesscache "postapocgame/admin-server/pkg/cache"
 
 	"github.com/pkg/errors"
 	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/core/stores/redis"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
+	"postapocgame/admin-server/internal/model/blog"
+	"postapocgame/admin-server/internal/model/chat"
+	"postapocgame/admin-server/internal/model/iam"
+	"postapocgame/admin-server/internal/model/misc"
+	"postapocgame/admin-server/internal/model/monitoring"
+	"postapocgame/admin-server/internal/model/sdk"
+	"postapocgame/admin-server/internal/model/system"
+	"postapocgame/admin-server/internal/model/task"
+	"postapocgame/admin-server/internal/model/video"
 )
 
 // Repository 聚合 goctl 生成的 Model，统一数据访问入口。
@@ -18,43 +26,43 @@ type Repository struct {
 	Redis         *redis.Redis                 // go-zero stores/redis 客户端
 	BusinessCache *businesscache.BusinessCache // 业务层缓存工具
 
-	AdminUserModel           model.AdminUserModel
-	AdminRoleModel           model.AdminRoleModel
-	AdminPermissionModel     model.AdminPermissionModel
-	AdminMenuModel           model.AdminMenuModel
-	AdminDepartmentModel     model.AdminDepartmentModel
-	AdminUserRoleModel       model.AdminUserRoleModel
-	AdminRolePermissionModel model.AdminRolePermissionModel
-	AdminApiModel            model.AdminApiModel
-	AdminPermissionMenuModel model.AdminPermissionMenuModel
-	AdminPermissionApiModel  model.AdminPermissionApiModel
-	AdminConfigModel         model.AdminConfigModel
-	AdminDictTypeModel       model.AdminDictTypeModel
-	AdminDictItemModel       model.AdminDictItemModel
-	AdminFileModel           model.AdminFileModel
-	DemoModel                model.DemoModel
-	ChatModel                model.ChatModel
-	ChatUserModel            model.ChatUserModel
-	ChatMessageModel         model.ChatMessageModel
-	AdminOperationLogModel   model.AdminOperationLogModel
-	AdminLoginLogModel       model.AdminLoginLogModel
-	AuditLogModel            model.AuditLogModel
-	AdminPerformanceLogModel model.AdminPerformanceLogModel
-	AdminNoticeModel         model.AdminNoticeModel
-	AdminNotificationModel   model.AdminNotificationModel
-	DailyShortSentenceModel  model.DailyShortSentenceModel
-	VideoModel               model.VideoModel
-	SdkKeyModel              model.SdkKeyModel
-	SdkInterfaceModel        model.SdkInterfaceModel
-	SdkKeyApiModel           model.SdkKeyApiModel
-	SdkCallLogModel          model.SdkCallLogModel
-	AdminTaskModel           model.AdminTaskModel
-	BlogTagModel             model.BlogTagModel
-	BlogArticleModel         model.BlogArticleModel
-	BlogArticleTagModel      model.BlogArticleTagModel
-	BlogArticleAuditModel    model.BlogArticleAuditModel
-	BlogFriendLinkModel      model.BlogFriendLinkModel
-	BlogSocialInfoModel      model.BlogSocialInfoModel
+	AdminUserModel           iam.AdminUserModel
+	AdminRoleModel           iam.AdminRoleModel
+	AdminPermissionModel     iam.AdminPermissionModel
+	AdminMenuModel           iam.AdminMenuModel
+	AdminDepartmentModel     iam.AdminDepartmentModel
+	AdminUserRoleModel       iam.AdminUserRoleModel
+	AdminRolePermissionModel iam.AdminRolePermissionModel
+	AdminApiModel            iam.AdminApiModel
+	AdminPermissionMenuModel iam.AdminPermissionMenuModel
+	AdminPermissionApiModel  iam.AdminPermissionApiModel
+	AdminConfigModel         system.AdminConfigModel
+	AdminDictTypeModel       system.AdminDictTypeModel
+	AdminDictItemModel       system.AdminDictItemModel
+	AdminFileModel           system.AdminFileModel
+	DemoModel                misc.DemoModel
+	ChatModel                chat.ChatModel
+	ChatUserModel            chat.ChatUserModel
+	ChatMessageModel         chat.ChatMessageModel
+	AdminOperationLogModel   monitoring.AdminOperationLogModel
+	AdminLoginLogModel       monitoring.AdminLoginLogModel
+	AuditLogModel            monitoring.AuditLogModel
+	AdminPerformanceLogModel monitoring.AdminPerformanceLogModel
+	AdminNoticeModel         system.AdminNoticeModel
+	AdminNotificationModel   system.AdminNotificationModel
+	DailyShortSentenceModel  misc.DailyShortSentenceModel
+	VideoModel               video.VideoModel
+	SdkKeyModel              sdk.SdkKeyModel
+	SdkInterfaceModel        sdk.SdkInterfaceModel
+	SdkKeyApiModel           sdk.SdkKeyApiModel
+	SdkCallLogModel          sdk.SdkCallLogModel
+	AdminTaskModel           task.AdminTaskModel
+	BlogTagModel             blog.BlogTagModel
+	BlogArticleModel         blog.BlogArticleModel
+	BlogArticleTagModel      blog.BlogArticleTagModel
+	BlogArticleAuditModel    blog.BlogArticleAuditModel
+	BlogFriendLinkModel      blog.BlogFriendLinkModel
+	BlogSocialInfoModel      blog.BlogSocialInfoModel
 }
 
 func NewRepository(conn sqlx.SqlConn, cacheConf cache.CacheConf, rdb *redis.Redis) (*Repository, error) {
@@ -69,43 +77,43 @@ func NewRepository(conn sqlx.SqlConn, cacheConf cache.CacheConf, rdb *redis.Redi
 		CacheConf:                cacheConf,
 		Redis:                    rdb,
 		BusinessCache:            businesscache.NewBusinessCache(rdb),
-		AdminUserModel:           model.NewAdminUserModel(conn, cacheConf),
-		AdminRoleModel:           model.NewAdminRoleModel(conn, cacheConf),
-		AdminPermissionModel:     model.NewAdminPermissionModel(conn, cacheConf),
-		AdminMenuModel:           model.NewAdminMenuModel(conn, cacheConf),
-		AdminDepartmentModel:     model.NewAdminDepartmentModel(conn, cacheConf),
-		AdminUserRoleModel:       model.NewAdminUserRoleModel(conn, cacheConf),
-		AdminRolePermissionModel: model.NewAdminRolePermissionModel(conn, cacheConf),
-		AdminApiModel:            model.NewAdminApiModel(conn, cacheConf),
-		AdminPermissionMenuModel: model.NewAdminPermissionMenuModel(conn, cacheConf),
-		AdminPermissionApiModel:  model.NewAdminPermissionApiModel(conn, cacheConf),
-		AdminConfigModel:         model.NewAdminConfigModel(conn, cacheConf),
-		AdminDictTypeModel:       model.NewAdminDictTypeModel(conn, cacheConf),
-		AdminDictItemModel:       model.NewAdminDictItemModel(conn, cacheConf),
-		AdminFileModel:           model.NewAdminFileModel(conn, cacheConf),
-		DemoModel:                model.NewDemoModel(conn, cacheConf),
-		ChatModel:                model.NewChatModel(conn, cacheConf),
-		ChatUserModel:            model.NewChatUserModel(conn, cacheConf),
-		ChatMessageModel:         model.NewChatMessageModel(conn, cacheConf),
-		AdminOperationLogModel:   model.NewAdminOperationLogModel(conn, cacheConf),
-		AdminLoginLogModel:       model.NewAdminLoginLogModel(conn, cacheConf),
-		AuditLogModel:            model.NewAuditLogModel(conn, cacheConf),
-		AdminPerformanceLogModel: model.NewAdminPerformanceLogModel(conn, cacheConf),
-		AdminNoticeModel:         model.NewAdminNoticeModel(conn, cacheConf),
-		AdminNotificationModel:   model.NewAdminNotificationModel(conn, cacheConf),
-		DailyShortSentenceModel:  model.NewDailyShortSentenceModel(conn, cacheConf),
-		VideoModel:               model.NewVideoModel(conn, cacheConf),
-		SdkKeyModel:              model.NewSdkKeyModel(conn, cacheConf),
-		SdkInterfaceModel:        model.NewSdkInterfaceModel(conn, cacheConf),
-		SdkKeyApiModel:           model.NewSdkKeyApiModel(conn, cacheConf),
-		SdkCallLogModel:          model.NewSdkCallLogModel(conn, cacheConf),
-		AdminTaskModel:           model.NewAdminTaskModel(conn, cacheConf),
-		BlogTagModel:             model.NewBlogTagModel(conn, cacheConf),
-		BlogArticleModel:         model.NewBlogArticleModel(conn, cacheConf),
-		BlogArticleTagModel:      model.NewBlogArticleTagModel(conn, cacheConf),
-		BlogArticleAuditModel:    model.NewBlogArticleAuditModel(conn, cacheConf),
-		BlogFriendLinkModel:      model.NewBlogFriendLinkModel(conn, cacheConf),
-		BlogSocialInfoModel:      model.NewBlogSocialInfoModel(conn, cacheConf),
+		AdminUserModel:           iam.NewAdminUserModel(conn, cacheConf),
+		AdminRoleModel:           iam.NewAdminRoleModel(conn, cacheConf),
+		AdminPermissionModel:     iam.NewAdminPermissionModel(conn, cacheConf),
+		AdminMenuModel:           iam.NewAdminMenuModel(conn, cacheConf),
+		AdminDepartmentModel:     iam.NewAdminDepartmentModel(conn, cacheConf),
+		AdminUserRoleModel:       iam.NewAdminUserRoleModel(conn, cacheConf),
+		AdminRolePermissionModel: iam.NewAdminRolePermissionModel(conn, cacheConf),
+		AdminApiModel:            iam.NewAdminApiModel(conn, cacheConf),
+		AdminPermissionMenuModel: iam.NewAdminPermissionMenuModel(conn, cacheConf),
+		AdminPermissionApiModel:  iam.NewAdminPermissionApiModel(conn, cacheConf),
+		AdminConfigModel:         system.NewAdminConfigModel(conn, cacheConf),
+		AdminDictTypeModel:       system.NewAdminDictTypeModel(conn, cacheConf),
+		AdminDictItemModel:       system.NewAdminDictItemModel(conn, cacheConf),
+		AdminFileModel:           system.NewAdminFileModel(conn, cacheConf),
+		DemoModel:                misc.NewDemoModel(conn, cacheConf),
+		ChatModel:                chat.NewChatModel(conn, cacheConf),
+		ChatUserModel:            chat.NewChatUserModel(conn, cacheConf),
+		ChatMessageModel:         chat.NewChatMessageModel(conn, cacheConf),
+		AdminOperationLogModel:   monitoring.NewAdminOperationLogModel(conn, cacheConf),
+		AdminLoginLogModel:       monitoring.NewAdminLoginLogModel(conn, cacheConf),
+		AuditLogModel:            monitoring.NewAuditLogModel(conn, cacheConf),
+		AdminPerformanceLogModel: monitoring.NewAdminPerformanceLogModel(conn, cacheConf),
+		AdminNoticeModel:         system.NewAdminNoticeModel(conn, cacheConf),
+		AdminNotificationModel:   system.NewAdminNotificationModel(conn, cacheConf),
+		DailyShortSentenceModel:  misc.NewDailyShortSentenceModel(conn, cacheConf),
+		VideoModel:               video.NewVideoModel(conn, cacheConf),
+		SdkKeyModel:              sdk.NewSdkKeyModel(conn, cacheConf),
+		SdkInterfaceModel:        sdk.NewSdkInterfaceModel(conn, cacheConf),
+		SdkKeyApiModel:           sdk.NewSdkKeyApiModel(conn, cacheConf),
+		SdkCallLogModel:          sdk.NewSdkCallLogModel(conn, cacheConf),
+		AdminTaskModel:           task.NewAdminTaskModel(conn, cacheConf),
+		BlogTagModel:             blog.NewBlogTagModel(conn, cacheConf),
+		BlogArticleModel:         blog.NewBlogArticleModel(conn, cacheConf),
+		BlogArticleTagModel:      blog.NewBlogArticleTagModel(conn, cacheConf),
+		BlogArticleAuditModel:    blog.NewBlogArticleAuditModel(conn, cacheConf),
+		BlogFriendLinkModel:      blog.NewBlogFriendLinkModel(conn, cacheConf),
+		BlogSocialInfoModel:      blog.NewBlogSocialInfoModel(conn, cacheConf),
 	}, nil
 }
 

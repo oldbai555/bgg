@@ -6,13 +6,13 @@ import (
 	"strings"
 	"time"
 
-	"postapocgame/admin-server/internal/model"
-	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 	"postapocgame/admin-server/pkg/monitor"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	"postapocgame/admin-server/internal/model/monitoring"
+	monitoringrepo "postapocgame/admin-server/internal/repository/monitoring"
 )
 
 // PerformanceMiddleware 接口性能监控中间件
@@ -101,9 +101,9 @@ func (m *PerformanceMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 				}
 			}()
 
-			performanceLogRepo := repository.NewPerformanceLogRepository(m.svcCtx.Repository)
+			performanceLogRepo := monitoringrepo.NewPerformanceLogRepository(m.svcCtx.Repository)
 			now := time.Now().Unix()
-			log := &model.AdminPerformanceLog{
+			log := &monitoring.AdminPerformanceLog{
 				UserId:        userId,
 				Username:      username,
 				Method:        r.Method,

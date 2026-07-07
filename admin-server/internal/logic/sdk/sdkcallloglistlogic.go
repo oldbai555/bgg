@@ -6,12 +6,12 @@ package sdk
 import (
 	"context"
 	"postapocgame/admin-server/internal/logic/logicutil"
-	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	sdkrepo "postapocgame/admin-server/internal/repository/sdk"
 )
 
 type SdkCallLogListLogic struct {
@@ -34,7 +34,7 @@ func (l *SdkCallLogListLogic) SdkCallLogList(req *types.SdkCallLogListReq) (resp
 	}
 	req.Page, req.PageSize = logicutil.NormalizePage(req.Page, req.PageSize, 20, 200)
 
-	repo := repository.NewSdkAdminRepository(l.svcCtx.Repository)
+	repo := sdkrepo.NewSdkAdminRepository(l.svcCtx.Repository)
 	list, total, err := repo.ListCallLogs(l.ctx, req.Page, req.PageSize, req.SdkKeyId, req.ApiCode, req.RespCode, req.Ip, req.StartTime, req.EndTime)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询调用记录失败", err)

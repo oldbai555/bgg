@@ -6,13 +6,13 @@ package sdk
 import (
 	"context"
 
-	"postapocgame/admin-server/internal/model"
-	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	"postapocgame/admin-server/internal/model/sdk"
+	sdkrepo "postapocgame/admin-server/internal/repository/sdk"
 )
 
 type SdkApiKeyBindSaveLogic struct {
@@ -33,14 +33,14 @@ func (l *SdkApiKeyBindSaveLogic) SdkApiKeyBindSave(req *types.SdkApiKeyBindSaveR
 	if req == nil || req.SdkKeyId == 0 {
 		return errs.New(errs.CodeBadRequest, "sdkKeyId 不能为空")
 	}
-	repo := repository.NewSdkAdminRepository(l.svcCtx.Repository)
+	repo := sdkrepo.NewSdkAdminRepository(l.svcCtx.Repository)
 
-	bindings := make([]model.SdkKeyApi, 0, len(req.Bindings))
+	bindings := make([]sdk.SdkKeyApi, 0, len(req.Bindings))
 	for _, b := range req.Bindings {
 		if b.SdkInterfaceId == 0 {
 			continue
 		}
-		bindings = append(bindings, model.SdkKeyApi{
+		bindings = append(bindings, sdk.SdkKeyApi{
 			SdkKeyId:        req.SdkKeyId,
 			SdkInterfaceId:  b.SdkInterfaceId,
 			CustomRateLimit: b.CustomRateLimit,

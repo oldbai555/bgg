@@ -8,32 +8,28 @@ alwaysApply: false
 
 ```
 admin-server/
-├── api/admin.api          # 唯一 .api 定义文件（所有接口都在这一个文件里，按中文注释分组）
+├── api/admin.api          # 唯一 .api 定义文件（group 格式：<domain>/<module>）
 ├── internal/
-│   ├── handler/           # goctl 生成，路由处理，一个模块一个子目录，禁止手改（除必要适配）
-│   ├── logic/             # goctl 生成骨架 + 手写业务逻辑
-│   ├── repository/        # 手写数据访问层，封装 Model，强制使用 squirrel
-│   ├── model/              # goctl 生成（自定义模板），xxxmodel.go 可手改、xxxmodel_gen.go 禁止手改
-│   ├── middleware/        # 手写中间件（鉴权/权限/限流/日志/性能等）
-│   ├── consts/             # 系统级枚举/常量
-│   ├── config/              # Config 结构体 + 外部配置合并逻辑
-│   ├── svc/servicecontext.go # ServiceContext，聚合所有 repository/middleware/task
-│   └── types/types.go       # 所有请求/响应类型（goctl 生成 + 手工合并），单文件维护
-├── pkg/
-│   ├── errs/                # 统一业务错误类型
-│   ├── response/            # Envelope 响应包装（目前只在 middleware 层使用）
-│   └── jwt/ audit/ cache/ initdata/ monitor/ useragent/
-├── scripts/                 # generate-sql.sh / generate-model.sh / generate-api.sh / generate-ts.sh
-├── .template/                # goctl 自定义模板（model/api/rpc/...）
-└── db/
-    ├── tables.sql / data.sql       # 首次部署用全量 SQL
-    └── migrations/                  # 增量 SQL：dict_*.sql / create_table_*.sql / init_*.sql
+│   ├── handler/<domain>/<module>/  # goctl 生成，禁止手改（custom_routes.go 除外）
+│   ├── logic/<domain>/<module>/    # goctl 生成骨架 + 手写业务逻辑
+│   ├── repository/
+│   │   ├── repository.go           # 跨域基础设施（BuildSources、Model 注册）
+│   │   └── <domain>/*.go           # package <domain>，强制 squirrel
+│   ├── model/<domain>/*.go         # goctl 生成，package <domain>
+│   ├── domain/
+│   │   ├── iam/permission_resolver.go  # RBAC 领域服务
+│   │   └── task/                       # 任务调度领域服务
+│   ├── middleware/        # 手写中间件
+│   ├── consts/ config/ types/ svc/
+├── pkg/ scripts/ .template/ db/
 ```
+
+维护导航见 `docs/admin-server-维护导航.md`。
 
 # 代码生成优先
 
 - 能用 `goctl` 生成的必须用 `goctl` 生成，参见 `admin-server/scripts/README.md` 的完整工作流
-- **新增标准 CRUD 模块默认用 `generate-sql.sh -group <group> -name <name>` 一次性生成表结构+RBAC初始化数据+`.api`草稿+前端列表页骨架**，详见 `00-workflow.mdc`「新增模块脚手架」一节；生成模板在 `scripts/sqlgen/templates/*.tpl`，可按需调整
+- **新增标准 CRUD 模块默认用 `generate-sql.sh -group <domain>/<module> -name <name>`** 一次性生成表结构+RBAC初始化数据+`.api`草稿+前端列表页骨架
 - Model 使用 `goctl model mysql ddl --home .template` + 自定义模板，支持软删除、统一时间戳字段
 - `.api` → Handler/Logic 骨架用 `generate-api.sh`；Types 需要手动合并进 `internal/types/types.go`
 - `.api` → 前端 TS 用 `generate-ts.sh`，产物在 `admin-frontend/src/api/generated/`，同样禁止手改
@@ -42,7 +38,8 @@ admin-server/
 
 - 所有类型定义在同一个 `type (...)` 块内，按业务模块用中文注释分节
 - 每个功能组有独立的 `@server(group: xxx, prefix: /api/v1, middleware: A,B,C)` + `service admin-api {...}` 块
-- Group 名必须 snake_case（如 `user_role`、`dict_type`、`public_blog`）
+- Group 格式 `<domain>/<module>`（如 `iam/user`、`blog/article`、`system/dict_type`），goctl 生成 `handler/<domain>/<module>/` 嵌套目录
+- **禁止**往 `ServiceContext` 添加具名 repository 字段；Logic 内联 `xxxrepo.NewXxxRepository(svcCtx.Repository)`
 - 禁止路径参数 `:id`，一律 Query/Body 参数，或 `/xxx/detail`、`/xxx/get` 子路径
 - `optional` 标签规则：
   - Query 参数：`form:"paramName,optional"`（即使业务上必填，也要加，必填校验放 Logic 层）
@@ -120,7 +117,7 @@ Performance → RateLimit → Auth → Permission → OperationLog
 - Handler：`<module><action>handler.go`（如 `userlisthandler.go`），函数 `<Module><Action>Handler(svcCtx) http.HandlerFunc`
 - Logic：`<module><action>logic.go`（如 `userlistlogic.go`），类型 `<Module><Action>Logic`，构造函数 `New<Module><Action>Logic`，方法名同 action，如 `func (l *UserListLogic) UserList(req *types.UserListReq) (*types.UserListResp, error)`
 - Types：`<Module>Item`、`<Module>ListReq/Resp`、`<Module>CreateReq`、`<Module>UpdateReq`、`<Module>DeleteReq`，CRUD 后缀保持一致
-- Repository：接口 `<Module>Repository` + 私有结构体 `<module>Repository`，构造函数 `New<Module>Repository(repo *Repository)`
+- 构造函数 `New<Module>Repository(repo *repository.Repository)`，定义在 `internal/repository/<domain>/`
 - Model：goctl 标准 `Admin<Table>Model` 接口 + `defaultAdmin<Table>Model`，业务定制写在 `xxxmodel.go`（手改），生成部分在 `xxxmodel_gen.go`（禁止手改）
 
 # 静态检查
