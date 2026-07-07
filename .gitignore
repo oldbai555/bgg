@@ -10,13 +10,11 @@
 /files*.zip
 /admin-server/*.exe
 /Claude*framework_*.json
-/.claude/
 /.vscode/
 /output/
 *.cs.uid
 # Admin server executables
 admin-server/*.exe
-/.cursor/
 **/node_modules
 **/*.exe
 /admin-*/dist/
@@ -27,7 +25,4 @@ admin-server/*.exe
 /history/**
 /admin-server/uploads/**
 /admin-frontend/eslintcheckresult.txt
-/docs/视频与移动端改造方案.md
-/docs/异步任务功能模块实现方案.md
 /__dummy__
-/docs/admin-server-internal-review.md
