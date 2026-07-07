@@ -39,7 +39,7 @@ admin-server/
 - 所有类型定义在同一个 `type (...)` 块内，按业务模块用中文注释分节
 - 每个功能组有独立的 `@server(group: xxx, prefix: /api/v1, middleware: A,B,C)` + `service admin-api {...}` 块
 - Group 格式 `<domain>/<module>`（如 `iam/user`、`blog/article`、`system/dict_type`），goctl 生成 `handler/<domain>/<module>/` 嵌套目录
-- **禁止**往 `ServiceContext` 添加具名 repository 字段；Logic 内联 `xxxrepo.NewXxxRepository(svcCtx.Repository)`
+- **禁止**往 `ServiceContext` 添加多个具名 repository 字段；允许唯一的 `Domain *registry.Domain` 聚合（`internal/repository/registry/`）。Logic 优先 `l.svcCtx.Domain.IAM.User`，旧代码可继续内联 `xxxrepo.NewXxxRepository(svcCtx.Repository)` 直至按域迁移
 - 禁止路径参数 `:id`，一律 Query/Body 参数，或 `/xxx/detail`、`/xxx/get` 子路径
 - `optional` 标签规则：
   - Query 参数：`form:"paramName,optional"`（即使业务上必填，也要加，必填校验放 Logic 层）

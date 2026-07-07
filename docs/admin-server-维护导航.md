@@ -49,13 +49,18 @@
 
 ## 标准调用模式（重构后统一）
 
-**Repository 构造**（Logic 层内联，禁止再往 ServiceContext 加具名字段）：
+**Repository 构造**（两种方式，新代码优先用 Domain 聚合）：
 
 ```go
-import blogrepo "postapocgame/admin-server/internal/repository/blog"
+// 推荐：启动时 Wire 已装配，直接取用（无需每次 New）
+userRepo := l.svcCtx.Domain.IAM.User
 
+// 兼容旧写法：Logic 层内联构造（逐步按域迁移到 Domain）
+import blogrepo "postapocgame/admin-server/internal/repository/blog"
 repo := blogrepo.NewArticleRepository(l.svcCtx.Repository)
 ```
+
+**禁止**在 `ServiceContext` 上挂多个具名 repo 字段；允许唯一的 `Domain *registry.Domain` 聚合（见 `internal/repository/registry/domain.go`）。
 
 **Model 引用**（按域分包，包名 = 域名）：
 
@@ -90,6 +95,21 @@ article := &blog.BlogArticle{...}
 
 goctl 会生成嵌套目录 `internal/handler/<domain>/<module>/`。
 
+## 启动依赖（Google Wire）
+
+组合根依赖由 Wire 编译期注入，**与 goctl 的 `generate-*.sh` 职责分离**：
+
+| 步骤 | 命令 / 文件 |
+|------|-------------|
+| 改 Provider | 编辑 `internal/wire/providers.go` 或 `wire.go` |
+| 重新生成 | `cd admin-server && make wire` |
+| 提交产物 | `internal/wire/wire_gen.go`（**禁止手改**）+ 若变动的 `go.mod`/`go.sum` |
+| 首次安装 CLI | `make init` |
+
+合并 `wire_gen.go` 冲突时：任选一侧后执行 `make wire` 重生。
+
+Handler/Logic 仍通过 `*svc.ServiceContext` 访问依赖；Logic 层 Repository 推荐读 `svcCtx.Domain`（见 `internal/repository/registry/`）。
+
 ## 关键文件索引
 
 | 用途 | 路径 |
@@ -97,7 +117,9 @@ goctl 会生成嵌套目录 `internal/handler/<domain>/<module>/`。
 | API 真源 | `api/admin.api` |
 | 路由注册 | `internal/handler/routes.go`（goctl 生成） |
 | 自定义路由 | `internal/handler/custom_routes.go`（WebSocket、静态文件） |
-| DI 容器 | `internal/svc/servicecontext.go`（仅 `Repository` 句柄 + 横切组件） |
+| DI 容器 | `internal/svc/servicecontext.go`（`Repository` + `Domain` + 横切组件） |
+| 组合根 Wire | `internal/wire/`（改 Provider 后执行 `make wire`，提交 `wire_gen.go`） |
+| 领域 Repo 聚合 | `internal/repository/registry/domain.go` |
 | 跨域 Model 注册 | `internal/repository/repository.go` |
 | 任务调度 | `internal/domain/task/scheduler.go` |
 | 权限解析 | `internal/domain/iam/permission_resolver.go` |

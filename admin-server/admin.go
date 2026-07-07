@@ -20,7 +20,7 @@ import (
 
 	"postapocgame/admin-server/internal/config"
 	"postapocgame/admin-server/internal/handler"
-	"postapocgame/admin-server/internal/middleware"
+	appwire "postapocgame/admin-server/internal/wire"
 	"postapocgame/admin-server/internal/svc"
 
 	"github.com/zeromicro/go-zero/core/conf"
@@ -69,34 +69,11 @@ func main() {
 	server := rest.MustNewServer(c.RestConf)
 	defer server.Stop()
 
-	ctx, err := svc.NewServiceContext(c)
+	ctx, cleanup, err := appwire.InitializeApp(c)
 	if err != nil {
 		log.Fatalf("init service context: %v", err)
 	}
-
-	// 初始化中间件（避免循环依赖，在外部初始化）
-	authMiddleware := middleware.NewAuthMiddleware(ctx)
-	apiEnabledMiddleware := middleware.NewApiEnabledMiddleware(ctx)
-	permissionMiddleware := middleware.NewPermissionMiddleware(ctx)
-	operationLogMiddleware := middleware.NewOperationLogMiddleware(ctx)
-	publicOperationLogMiddleware := middleware.NewPublicOperationLogMiddleware(ctx)
-	rateLimitMiddleware := middleware.NewRateLimitMiddleware(ctx)
-	performanceMiddleware := middleware.NewPerformanceMiddleware(ctx)
-	corsMiddleware := middleware.NewCorsMiddleware()
-	sdkAuthMiddleware := middleware.NewSDKAuthMiddleware(ctx)
-	sdkRateLimitMiddleware := middleware.NewSDKRateLimitMiddleware(ctx)
-	sdkCallLogMiddleware := middleware.NewSDKCallLogMiddleware(ctx)
-	ctx.AuthMiddleware = authMiddleware.Handle
-	ctx.ApiEnabledMiddleware = apiEnabledMiddleware.Handle
-	ctx.PermissionMiddleware = permissionMiddleware.Handle
-	ctx.OperationLogMiddleware = operationLogMiddleware.Handle
-	ctx.PublicOperationLogMiddleware = publicOperationLogMiddleware.Handle
-	ctx.RateLimitMiddleware = rateLimitMiddleware.Handle
-	ctx.PerformanceMiddleware = performanceMiddleware.Handle
-	ctx.CorsMiddleware = corsMiddleware.Handle
-	ctx.SDKAuthMiddleware = sdkAuthMiddleware.Handle
-	ctx.SDKRateLimitMiddleware = sdkRateLimitMiddleware.Handle
-	ctx.SDKCallLogMiddleware = sdkCallLogMiddleware.Handle
+	defer cleanup()
 
 	handler.RegisterHandlers(server, ctx)
 	// 注册自定义路由（WebSocket 等）
@@ -117,12 +94,6 @@ func main() {
 	// 等待关闭信号
 	<-sigChan
 	logx.Infof("收到关闭信号，开始优雅关闭...")
-
-	// 停止任务调度器
-	if ctx.TaskScheduler != nil {
-		ctx.TaskScheduler.Stop()
-		logx.Infof("任务调度器已停止")
-	}
 
 	logx.Infof("服务器已关闭")
 }

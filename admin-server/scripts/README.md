@@ -2,6 +2,24 @@
 
 本目录包含用于生成 go-zero 代码的便捷脚本。
 
+## Wire 依赖注入（组合根）
+
+与下方 `generate-*.sh`（goctl API/Model 层）**职责分离**：Wire 仅负责启动时装配 `ServiceContext`。
+
+```bash
+cd admin-server
+
+# 首次：安装 wire CLI
+make init
+
+# 修改 internal/wire/providers.go 后重新生成
+make wire
+```
+
+- 生成物：`internal/wire/wire_gen.go`（须提交仓库，禁止手改）
+- 合并冲突：任选一侧后 `make wire` 重生
+- 详见 [`docs/admin-server-维护导航.md`](../docs/admin-server-维护导航.md)「启动依赖」一节
+
 ## 脚本列表
 
 ### 1. generate-sql.sh - SQL 脚本生成工具

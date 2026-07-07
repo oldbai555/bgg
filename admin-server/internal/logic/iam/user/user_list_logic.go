@@ -8,7 +8,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 type UserListLogic struct {
@@ -30,7 +29,7 @@ func (l *UserListLogic) UserList(req *types.UserListReq) (resp *types.UserListRe
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	userRepo := iamrepo.NewUserRepository(l.svcCtx.Repository)
+	userRepo := l.svcCtx.Domain.IAM.User
 	list, total, err := userRepo.FindPage(l.ctx, req.Page, req.PageSize, req.Username)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询用户列表失败", err)
