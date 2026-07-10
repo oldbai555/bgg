@@ -20,6 +20,7 @@
 | `CLAUDE.md` | project | Pointer to `AGENTS.md` |
 | `.cursor/rules/00-workflow.mdc` | project | Global workflow, scaffolding, hard prohibitions |
 | `.cursor/rules/05-go-zero-ai-context.mdc` | project | go-zero AI toolchain, rule priority |
+| `.cursor/rules/06-mcp-toolchain.mdc` | project | MCP usage contract (codegraph, engram, context7, go-lsp) |
 | `.cursor/rules/10-go-code-style.mdc` | project | Backend (go-zero) code style |
 | `.cursor/rules/20-frontend.mdc` | project | Frontend (Vue3 + TS) code style |
 | `.cursor/rules/21-public-pages.mdc` | project | Public pages style/interaction contract |

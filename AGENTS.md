@@ -20,6 +20,8 @@ Cursor 用户请注意：本文件内容与 `.cursor/rules/*.mdc` 同源，`.cur
 | 文件 | 内容 | 何时生效 |
 |---|---|---|
 | `.cursor/rules/00-workflow.mdc` / 本文件第 2、2.1、5、6、7 节 | 全局工作流、新增模块脚手架、绝对禁止事项 | 全局 |
+| `.cursor/rules/05-go-zero-ai-context.mdc` | go-zero AI 上下文（zero-skills 子模块） | 编辑 `admin-server/**` 时 |
+| `.cursor/rules/06-mcp-toolchain.mdc` | MCP 工具链使用契约（CodeGraph / Engram / context7 等） | 全局（会话探索代码前） |
 | `.cursor/rules/10-go-code-style.mdc` / 本文件第 3 节 | `admin-server/**` 后端规范 | 编辑后端代码时 |
 | `.cursor/rules/20-frontend.mdc` / 本文件第 4 节 | `admin-frontend/**` 前端规范 | 编辑前端代码时 |
 | `.cursor/rules/21-public-pages.mdc` | 公共展示页样式/交互契约 | 编辑 `views/public/*`、`components/blog/*` 时 |

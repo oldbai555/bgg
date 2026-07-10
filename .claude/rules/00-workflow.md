@@ -6,6 +6,7 @@
 
 规则文件地图：
 - 本文件（`00-workflow.mdc`）：全局工作流 + 绝对禁止事项
+- `06-mcp-toolchain.mdc`：MCP 工具链使用契约（CodeGraph / Engram / context7 等，**会话探索代码前必读**）
 - `10-go-code-style.mdc`：`admin-server/**` 后端规范
 - `20-frontend.mdc`：`admin-frontend/**` 前端规范
 - `21-public-pages.mdc`：公共展示页专属样式/交互契约
