@@ -31,7 +31,7 @@ Claude Code 项目 MCP（.mcp.json 为团队 SSOT，已提交 git）
 
 子命令:
   check (默认)     列出项目 .mcp.json 中的 server，并运行 claude mcp list
-  approve          确保 .claude/settings.json 含 enableAllProjectMcpServers（已提交 git）
+  approve          写入 settings.json + settings.local.json（对话插件 env/批准）
   import-cursor    维护者专用：从 ~/.cursor/mcp.json 导入并规范化路径，更新 .mcp.json
                    加 --dry-run 仅预览
 
@@ -158,7 +158,51 @@ PY
 EOF
   fi
   log_info "已写入 ${SETTINGS_JSON} (enableAllProjectMcpServers: true)"
-  log_info "个人覆盖请写入 ${SETTINGS_LOCAL}（已 gitignore）"
+
+  # 对话插件不继承 shell 的 ~/.zshrc，需在本机 settings.local.json 注入 env
+  python3 - "$SETTINGS_LOCAL" "$TARGET_MCP_JSON" <<'PY'
+import json
+import os
+import sys
+from pathlib import Path
+
+local_path = Path(sys.argv[1])
+mcp_path = Path(sys.argv[2])
+
+data = {}
+if local_path.exists():
+    data = json.loads(local_path.read_text(encoding="utf-8") or "{}")
+
+data["enableAllProjectMcpServers"] = True
+
+servers = []
+if mcp_path.exists():
+    servers = sorted(json.loads(mcp_path.read_text(encoding="utf-8")).get("mcpServers", {}).keys())
+if servers:
+    data["enabledMcpjsonServers"] = servers
+
+env = dict(data.get("env") or {})
+for key in ("GO_ZERO_MCP_PATH", "GOCTL_PATH", "MONGODB_MCP_URI", "REDIS_HOST", "REDIS_PORT"):
+    val = os.environ.get(key)
+    if val:
+        env[key] = val
+if env:
+    data["env"] = env
+
+local_path.parent.mkdir(parents=True, exist_ok=True)
+local_path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+PY
+  log_info "已写入 ${SETTINGS_LOCAL} (env + enabledMcpjsonServers，供对话插件使用)"
+  if [ -z "${GO_ZERO_MCP_PATH:-}" ]; then
+    log_warn "GO_ZERO_MCP_PATH 未设置，插件中 mcp-zero 可能无法连接"
+    log_warn "请 export 后重跑: make sync-claude-mcp-approve"
+  fi
+  echo ""
+  log_info "对话插件生效步骤:"
+  echo "  1. 完全退出并重启 Cursor"
+  echo "  2. 在集成终端执行: cd ${REPO_ROOT} && claude  （首次接受「信任工作区」）"
+  echo "  3. 在插件新对话输入: /mcp"
+  echo "  4. 若仍 not connected: Command Palette → Developer: Reload Window"
 }
 
 run_import_cursor() {

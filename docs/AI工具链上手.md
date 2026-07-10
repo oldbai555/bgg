@@ -193,20 +193,34 @@ bgg/
 | `mongodb` | 本地 Mongo 查询 | `npx` + 本机 MongoDB 在跑 | 可选 |
 | `redis` | 本地 Redis 查询 | `uvx` + 本机 Redis 在跑 | 可选 |
 
-### 第三人必做（Claude Code 插件）
+### 第三人必做（Claude Code 对话插件）
+
+终端 `claude mcp list` 正常 **≠** 对话插件已连通——插件是独立进程，且不继承 `~/.zshrc` 里的环境变量。
 
 ```bash
 git clone <repo> && cd bgg
 make setup-ai
 
 # 若使用 mcp-zero（后端开发）
-export GO_ZERO_MCP_PATH=/path/to/go-zero-mcp   # 写入 ~/.zshrc 持久化
+export GO_ZERO_MCP_PATH=/path/to/go-zero-mcp   # 写入 ~/.zshrc
 
-# 验证（在 Cursor 集成终端，非对话面板）
+# 为对话插件写入 env + MCP 批准（本机 settings.local.json）
+make sync-claude-mcp-approve
+
+# 1) 完全退出并重启 Cursor
+# 2) 集成终端首次信任工作区:
+claude    # 弹出「信任此工作区」时选接受，然后 exit
+
+# 3) 在对话插件新开对话，输入:
+/mcp      # 应看到 engram/codegraph 等 Connected
+
+# CLI 验证（可选）
 make sync-claude-mcp-check
-claude
-/mcp reconnect all
 ```
+
+若插件里 `/mcp reconnect` 报 *MCP controls aren't available*，用 **Command Palette → Developer: Reload Window** 后新开对话，不要在面板里强行走 reconnect。
+
+若 Google Drive/Calendar/Gmail 干扰，在终端 REPL 执行 `/mcp disable claude.ai Gmail` 等逐个禁用，或到 claude.ai 账户设置里移除连接器。
 
 ### 维护者：从 Cursor 更新团队清单
 
