@@ -1,0 +1,43 @@
+{
+  "mcpServers": {
+    "engram": {
+      "command": "engram",
+      "args": ["mcp", "--tools=agent"]
+    },
+    "codegraph": {
+      "command": "codegraph",
+      "args": ["serve", "--mcp", "--path", "${CLAUDE_PROJECT_DIR:-.}"]
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "--package=@upstash/context7-mcp@2.2.5", "--", "context7-mcp"]
+    },
+    "go-lsp": {
+      "command": "mcp-language-server",
+      "args": ["--workspace", "${CLAUDE_PROJECT_DIR:-.}", "--lsp", "gopls"]
+    },
+    "mcp-zero": {
+      "command": "${GO_ZERO_MCP_PATH}",
+      "env": {
+        "GOCTL_PATH": "${GOCTL_PATH:-goctl}"
+      }
+    },
+    "mongodb": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mongodb-mcp-server",
+        "--connectionString",
+        "${MONGODB_MCP_URI:-mongodb://localhost:27017/?replicaSet=rs0}"
+      ]
+    },
+    "redis": {
+      "command": "uvx",
+      "args": ["--from", "git+https://github.com/redis/mcp-redis.git", "redis-mcp-server"],
+      "env": {
+        "REDIS_HOST": "${REDIS_HOST:-127.0.0.1}",
+        "REDIS_PORT": "${REDIS_PORT:-6379}"
+      }
+    }
+  }
+}

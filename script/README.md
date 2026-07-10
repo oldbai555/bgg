@@ -6,11 +6,24 @@
 
 | 脚本 | 功能 | 说明 |
 |------|------|------|
+| `setup_ai_toolchain.sh` | AI 工具链初始化 | 新设备一键配置 Gentle-AI + CodeGraph + Engram，见 `docs/AI工具链上手.md` |
+| `sync_claude_mcp.sh` | Claude Code MCP | `.mcp.json` 团队 SSOT、检查连接、从 Cursor 导入 |
+| `engram_sync.sh` | Engram 记忆同步 | 跨设备导出/导入 `.engram/`，配合 `make engram-sync-*` |
 | `admin.sh` | 统一管理脚本 | 开发、构建、打包、Supervisor管理 |
 | `admin-completion.bash` | Bash 自动补全 | 启用后支持 Tab 键自动补全命令 |
 | `utils.sh` | 工具函数库 | 通用函数（日志、路径、检查等），被 admin.sh 引用 |
 
 ## 🚀 快速开始
+
+### AI 工具链（Gentle-AI + CodeGraph）
+
+换设备或新同事接入时（默认同时配置 **Cursor + Claude Code 插件**），在仓库根目录执行：
+
+```bash
+make setup-ai
+```
+
+详细说明见 [docs/AI工具链上手.md](../docs/AI工具链上手.md)。
 
 ### 启用自动补全（可选）
 

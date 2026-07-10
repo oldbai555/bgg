@@ -10,7 +10,18 @@
 - `20-frontend.mdc`：`admin-frontend/**` 前端规范
 - `21-public-pages.mdc`：公共展示页专属样式/交互契约
 - 根目录 `AGENTS.md`：面向任意 AI 工具的整合版操作手册
+- `docs/AI工具链上手.md`：Gentle-AI / CodeGraph / MCP / Engram 换设备与第三人上手（**新维护者必读**）
 - `docs/后端开发进度.md` / `docs/前端开发进度.md`：已完成功能、技术决策记录、关键代码位置索引（历史/背景，不是规则）
+
+# AI 工具链（新设备 / 新维护者）
+
+日常开发：**Cursor + Claude Code 插件**，生态为 Gentle-AI + CodeGraph + Engram。
+
+1. clone 后执行 `make setup-ai`，完全重启 Cursor
+2. **必须手动完成** `docs/AI工具链上手.md` 中「初始化后必做清单」（`GO_ZERO_MCP_PATH`、`go-lsp` 等 `setup-ai` 不会自动安装）
+3. 修改 `.cursor/rules/` 后执行 `make sync-claude-rules`
+4. 维护者在 Cursor 增删 MCP 后执行 `make sync-claude-mcp-import` 并 **commit `.mcp.json`**
+5. 跨设备收工：`make engram-sync-push` → `git push`；换设备：`make engram-sync-pull`
 
 # 标准开发流程（严格按顺序，新增功能模块必走）
 

@@ -29,6 +29,9 @@ admin-server/*.exe
 /admin-frontend/eslintcheckresult.txt
 /__dummy__
 
+# Claude Code 本机偏好（项目级 MCP 清单见仓库根 .mcp.json，已提交 git）
+.claude/settings.local.json
+
 # 本地真实数据库/Redis 连接配置，禁止提交；参考 config/*.json.example 自行创建
 /config/mysql.json
 /config/redis.json
