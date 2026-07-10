@@ -1,23 +1,42 @@
 {
   "mcpServers": {
-    "engram": {
-      "command": "engram",
-      "args": ["mcp", "--tools=agent"]
-    },
     "codegraph": {
+      "args": [
+        "serve",
+        "--mcp",
+        "--path",
+        "${CLAUDE_PROJECT_DIR:-.}"
+      ],
       "command": "codegraph",
-      "args": ["serve", "--mcp", "--path", "${CLAUDE_PROJECT_DIR:-.}"]
+      "type": "stdio"
     },
     "context7": {
-      "command": "npx",
-      "args": ["-y", "--package=@upstash/context7-mcp@2.2.5", "--", "context7-mcp"]
+      "args": [
+        "-y",
+        "--package=@upstash/context7-mcp@2.2.5",
+        "--",
+        "context7-mcp"
+      ],
+      "command": "npx"
+    },
+    "engram": {
+      "args": [
+        "mcp",
+        "--tools=agent"
+      ],
+      "command": "engram"
     },
     "go-lsp": {
+      "args": [
+        "--workspace",
+        "${CLAUDE_PROJECT_DIR:-.}",
+        "--lsp",
+        "gopls"
+      ],
       "command": "mcp-language-server",
-      "args": ["--workspace", "${CLAUDE_PROJECT_DIR:-.}", "--lsp", "gopls"]
+      "type": "stdio"
     },
     "vue-lsp": {
-      "command": "mcp-language-server",
       "args": [
         "--workspace",
         "${CLAUDE_PROJECT_DIR:-.}/admin-frontend",
@@ -26,11 +45,16 @@
         "--",
         "node_modules/@vue/language-server/bin/vue-language-server.js",
         "--stdio"
-      ]
+      ],
+      "command": "mcp-language-server",
+      "type": "stdio"
     },
     "frontend-ui": {
+      "args": [
+        "${CLAUDE_PROJECT_DIR:-.}/admin-frontend/mcp/dist/index.js"
+      ],
       "command": "node",
-      "args": ["${CLAUDE_PROJECT_DIR:-.}/admin-frontend/mcp/dist/index.js"]
+      "type": "stdio"
     },
     "mcp-zero": {
       "command": "${GO_ZERO_MCP_PATH}",
@@ -39,30 +63,43 @@
       }
     },
     "mongodb": {
-      "command": "npx",
       "args": [
         "-y",
         "mongodb-mcp-server",
         "--connectionString",
         "${MONGODB_MCP_URI:-mongodb://localhost:27017/?replicaSet=rs0}"
-      ]
+      ],
+      "command": "npx",
+      "type": "stdio"
     },
     "redis": {
+      "args": [
+        "--from",
+        "git+https://github.com/redis/mcp-redis.git",
+        "redis-mcp-server"
+      ],
       "command": "uvx",
-      "args": ["--from", "git+https://github.com/redis/mcp-redis.git", "redis-mcp-server"],
       "env": {
         "REDIS_HOST": "${REDIS_HOST:-127.0.0.1}",
         "REDIS_PORT": "${REDIS_PORT:-6379}"
-      }
+      },
+      "type": "stdio"
     },
     "mysql": {
       "command": "bash",
-      "args": ["${CLAUDE_PROJECT_DIR:-.}/script/mysql_mcp.sh"],
+      "args": [
+        "${CLAUDE_PROJECT_DIR:-.}/script/mysql_mcp.sh"
+      ],
       "env": {
         "ALLOW_INSERT_OPERATION": "false",
         "ALLOW_UPDATE_OPERATION": "false",
         "ALLOW_DELETE_OPERATION": "false"
-      }
+      },
+      "type": "stdio"
+    },
+    "admin-mcp": {
+      "command": "${CLAUDE_PROJECT_DIR:-.}/admin-server/tool/admin-mcp/bin/admin-mcp",
+      "type": "stdio"
     }
   }
 }
