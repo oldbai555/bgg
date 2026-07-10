@@ -23,10 +23,10 @@
 | `.cursor/rules/10-go-code-style.mdc` | project | Backend (go-zero) code style |
 | `.cursor/rules/20-frontend.mdc` | project | Frontend (Vue3 + TS) code style |
 | `.cursor/rules/21-public-pages.mdc` | project | Public pages style/interaction contract |
-| `.cursorrules/00-instructions.md` | project | go-zero decision tree and goctl principles |
-| `.cursorrules/workflows.md` | project | API/Model/RPC workflow steps |
-| `.cursorrules/tools.md` | project | goctl command reference |
-| `.cursorrules/patterns.md` | project | Common go-zero code patterns |
+| `.ai-context/zero-skills/SKILL.md` | project | go-zero skills overview and module index |
+| `.ai-context/zero-skills/getting-started/cursor-guide.md` | project | go-zero guide for Cursor |
+| `.ai-context/zero-skills/skill-patterns/generate-service.md` | project | New API/RPC/Model workflow |
+| `.ai-context/zero-skills/references/goctl-commands.md` | project | goctl command reference |
 
 ## Project Skills (prefer over user-level)
 

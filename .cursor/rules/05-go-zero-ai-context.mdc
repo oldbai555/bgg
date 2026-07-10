@@ -6,12 +6,12 @@ alwaysApply: false
 
 # go-zero AI 工具链
 
-本仓库已安装 [zeromicro/ai-context](https://github.com/zeromicro/ai-context) 与 [zeromicro/zero-skills](https://github.com/zeromicro/zero-skills)。
+本仓库通过子模块安装 [zeromicro/zero-skills](https://github.com/zeromicro/zero-skills)（`git submodule update --init .ai-context/zero-skills`）。
 
 ## 规则优先级（冲突时以此为准）
 
 1. **本项目规则**：`.cursor/rules/*.mdc`、`AGENTS.md`（脚手架脚本、errs、squirrel、软删除等）
-2. **go-zero 通用规则**：`.cursorrules/` 与 `.ai-context/zero-skills/`
+2. **go-zero 通用规则**：`.ai-context/zero-skills/`
 
 通用 go-zero 指引不得覆盖本项目的 `generate-*.sh` 工作流、禁止手改生成目录、中间件顺序等约定。
 
@@ -19,10 +19,11 @@ alwaysApply: false
 
 | 文件 | 用途 |
 |------|------|
-| `.cursorrules/00-instructions.md` | 总览、决策树、goctl 使用原则 |
-| `.cursorrules/workflows.md` | 新建/修改 API、RPC、Model 的步骤 |
-| `.cursorrules/tools.md` | goctl 命令速查 |
-| `.cursorrules/patterns.md` | 常用代码模式 |
+| `.ai-context/zero-skills/SKILL.md` | 总览、何时加载各模块 |
+| `.ai-context/zero-skills/getting-started/cursor-guide.md` | Cursor 环境 go-zero 指引 |
+| `.ai-context/zero-skills/skill-patterns/generate-service.md` | 新建 API / RPC / Model 步骤 |
+| `.ai-context/zero-skills/references/goctl-commands.md` | goctl 命令速查 |
+| `.ai-context/zero-skills/references/rest-api-patterns.md` | 常用 REST 代码模式 |
 
 ## 知识层（需要细节时再读）
 
