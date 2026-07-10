@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	iamdomain "postapocgame/admin-server/internal/domain/iam"
-	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 	"postapocgame/admin-server/pkg/response"
@@ -12,11 +11,11 @@ import (
 
 // PermissionMiddleware 权限鉴权中间件
 type PermissionMiddleware struct {
-	svcCtx *svc.ServiceContext
+	resolver *iamdomain.PermissionResolver
 }
 
-func NewPermissionMiddleware(svcCtx *svc.ServiceContext) *PermissionMiddleware {
-	return &PermissionMiddleware{svcCtx: svcCtx}
+func NewPermissionMiddleware(resolver *iamdomain.PermissionResolver) *PermissionMiddleware {
+	return &PermissionMiddleware{resolver: resolver}
 }
 
 func (m *PermissionMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
@@ -27,8 +26,7 @@ func (m *PermissionMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		resolver := iamdomain.NewPermissionResolver(m.svcCtx.Repository)
-		allowed, err := resolver.CanAccess(r.Context(), user.UserID, r.Method, r.URL.Path)
+		allowed, err := m.resolver.CanAccess(r.Context(), user.UserID, r.Method, r.URL.Path)
 		if err != nil {
 			response.ErrorCtx(r.Context(), w, err)
 			return

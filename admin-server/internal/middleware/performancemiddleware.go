@@ -6,7 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"postapocgame/admin-server/internal/svc"
+	"postapocgame/admin-server/internal/config"
+	"postapocgame/admin-server/internal/repository"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 	"postapocgame/admin-server/pkg/monitor"
 
@@ -17,21 +18,21 @@ import (
 
 // PerformanceMiddleware 接口性能监控中间件
 type PerformanceMiddleware struct {
-	svcCtx        *svc.ServiceContext
+	repo          *repository.Repository
 	monitor       *monitor.PerformanceMonitor
 	slowThreshold int64 // 慢接口阈值（毫秒）
 }
 
 // NewPerformanceMiddleware 创建接口性能监控中间件
-func NewPerformanceMiddleware(svcCtx *svc.ServiceContext) *PerformanceMiddleware {
+func NewPerformanceMiddleware(cfg config.Config, repo *repository.Repository) *PerformanceMiddleware {
 	slowThreshold := int64(2000) // 默认 2 秒
-	if svcCtx.Config.Database.SlowQueryThreshold > 0 {
+	if cfg.Database.SlowQueryThreshold > 0 {
 		// 使用数据库慢查询阈值的 2 倍作为接口慢查询阈值
-		slowThreshold = int64(svcCtx.Config.Database.SlowQueryThreshold) * 2
+		slowThreshold = int64(cfg.Database.SlowQueryThreshold) * 2
 	}
 
 	return &PerformanceMiddleware{
-		svcCtx:        svcCtx,
+		repo:          repo,
 		monitor:       monitor.NewPerformanceMonitor(slowThreshold),
 		slowThreshold: slowThreshold,
 	}
@@ -101,7 +102,7 @@ func (m *PerformanceMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 				}
 			}()
 
-			performanceLogRepo := monitoringrepo.NewPerformanceLogRepository(m.svcCtx.Repository)
+			performanceLogRepo := monitoringrepo.NewPerformanceLogRepository(m.repo)
 			now := time.Now().Unix()
 			log := &monitoring.AdminPerformanceLog{
 				UserId:        userId,

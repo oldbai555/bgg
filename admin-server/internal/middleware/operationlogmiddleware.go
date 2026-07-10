@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"postapocgame/admin-server/internal/consts"
-	"postapocgame/admin-server/internal/svc"
+	"postapocgame/admin-server/internal/repository"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -21,14 +21,14 @@ import (
 
 // OperationLogMiddleware 操作日志中间件，自动记录所有增删改操作的日志
 type OperationLogMiddleware struct {
-	svcCtx *svc.ServiceContext
-	logCh  chan *monitoring.AdminOperationLog // 异步日志通道
+	repo  *repository.Repository
+	logCh chan *monitoring.AdminOperationLog // 异步日志通道
 }
 
-func NewOperationLogMiddleware(svcCtx *svc.ServiceContext) *OperationLogMiddleware {
+func NewOperationLogMiddleware(repo *repository.Repository) *OperationLogMiddleware {
 	m := &OperationLogMiddleware{
-		svcCtx: svcCtx,
-		logCh:  make(chan *monitoring.AdminOperationLog, 1000), // 缓冲1000条日志
+		repo:  repo,
+		logCh: make(chan *monitoring.AdminOperationLog, 1000), // 缓冲1000条日志
 	}
 
 	// 启动异步日志写入 goroutine
@@ -222,9 +222,9 @@ func (m *OperationLogMiddleware) getClientIP(r *http.Request) string {
 
 // logWriter 异步日志写入器
 func (m *OperationLogMiddleware) logWriter() {
-	operationLogRepo := monitoringrepo.NewOperationLogRepository(m.svcCtx.Repository)
+	operationLogRepo := monitoringrepo.NewOperationLogRepository(m.repo)
 	batch := make([]*monitoring.AdminOperationLog, 0, 100) // 批量写入，每批100条
-	ticker := time.NewTicker(5 * time.Second)         // 每5秒写入一次
+	ticker := time.NewTicker(5 * time.Second)              // 每5秒写入一次
 	defer ticker.Stop()
 
 	for {

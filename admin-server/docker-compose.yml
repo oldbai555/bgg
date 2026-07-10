@@ -1,0 +1,53 @@
+# 本地开发 / 集成测试用的 compose 编排：一条命令拉起 MySQL + Redis + app。
+# JWT_* 默认值仅供本地开发（见 admin.go 的 fail-fast 检查、docs/01-architecture-target.md A.5），
+# 生产环境必须通过部署环境的真实环境变量覆盖，不能沿用这里的默认值。
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-devroot}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-admin}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./db:/db:ro
+      - ./db/docker-init.sh:/docker-entrypoint-initdb.d/00-init.sh:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-devroot}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-local-dev-access-secret-not-for-prod}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-local-dev-refresh-secret-not-for-prod}
+    # admin.go 强制要求 -mysql-config/-redis-config 指向的 JSON 文件存在（MergeExternalConfig
+    # 找不到文件直接报错退出），etc/dev-mysql.json/etc/dev-redis.json 是仅供本地 compose 使用的
+    # 开发期配置（host 指向本 compose 内的服务名 mysql/redis，密码与上面 MYSQL_ROOT_PASSWORD
+    # 默认值一致），生产环境必须换成 /etc/work/ 下的真实文件，不能沿用这两个文件。
+    command: ["./admin", "-f", "etc/admin-api.yaml", "-mysql-config", "etc/dev-mysql.json", "-redis-config", "etc/dev-redis.json"]
+    ports:
+      - "20000:20000"   # 需与 etc/admin-api.yaml 的 Port 一致
+
+volumes:
+  mysql_data:

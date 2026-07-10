@@ -2,22 +2,23 @@ package middleware
 
 import (
 	"net/http"
-	"postapocgame/admin-server/internal/svc"
+	"postapocgame/admin-server/internal/consts"
+	"postapocgame/admin-server/internal/repository"
+	iamrepo "postapocgame/admin-server/internal/repository/iam"
 	"postapocgame/admin-server/pkg/errs"
 	"postapocgame/admin-server/pkg/response"
 	"strings"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 // ApiEnabledMiddleware 接口启用校验中间件
 // 只负责校验接口是否存在且已启用，不做登录和权限校验。
 // 适用于 public_video 等无需登录但需要通过 AdminApi 配置开关的公共接口。
 type ApiEnabledMiddleware struct {
-	svcCtx *svc.ServiceContext
+	repo *repository.Repository
 }
 
-func NewApiEnabledMiddleware(svcCtx *svc.ServiceContext) *ApiEnabledMiddleware {
-	return &ApiEnabledMiddleware{svcCtx: svcCtx}
+func NewApiEnabledMiddleware(repo *repository.Repository) *ApiEnabledMiddleware {
+	return &ApiEnabledMiddleware{repo: repo}
 }
 
 func (m *ApiEnabledMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
@@ -25,7 +26,7 @@ func (m *ApiEnabledMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 		method := r.Method
 		path := r.URL.Path
 
-		apiRepo := iamrepo.NewApiRepository(m.svcCtx.Repository)
+		apiRepo := iamrepo.NewApiRepository(m.repo)
 		api, err := apiRepo.FindByMethodAndPath(r.Context(), method, path)
 		if err != nil {
 			// 接口不存在，直接返回 404
@@ -36,7 +37,7 @@ func (m *ApiEnabledMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 		}
 
 		// 接口未启用，返回禁止访问
-		if api.Status != 1 {
+		if api.Status != consts.Open {
 			// 对于需要 CORS 的接口（如 m3u8、video_collect），设置 CORS 头
 			m.setCORSIfNeeded(w, path)
 			response.ErrorCtx(r.Context(), w, errs.New(errs.CodeForbidden, "接口未启用"))

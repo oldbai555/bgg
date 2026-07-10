@@ -8,6 +8,7 @@ package wire
 
 import (
 	"postapocgame/admin-server/internal/config"
+	"postapocgame/admin-server/internal/middleware"
 	"postapocgame/admin-server/internal/svc"
 )
 
@@ -23,7 +24,19 @@ func InitializeApp(c config.Config) (*svc.ServiceContext, func(), error) {
 	chatHub := provideChatHub()
 	v := provideTaskExecutors(repository)
 	taskScheduler := provideTaskScheduler(repository, chatHub, v)
-	serviceContext, cleanup := provideServiceContext(c, repository, domain, chatHub, v, taskScheduler)
+	authMiddleware := middleware.NewAuthMiddleware(c, repository)
+	apiEnabledMiddleware := middleware.NewApiEnabledMiddleware(repository)
+	permissionMiddleware := providePermissionMiddleware(domain)
+	operationLogMiddleware := middleware.NewOperationLogMiddleware(repository)
+	publicOperationLogMiddleware := middleware.NewPublicOperationLogMiddleware(repository)
+	rateLimitMiddleware := middleware.NewRateLimitMiddleware(c, repository)
+	performanceMiddleware := middleware.NewPerformanceMiddleware(c, repository)
+	corsMiddleware := middleware.NewCorsMiddleware()
+	sdkAuthMiddleware := middleware.NewSDKAuthMiddleware(repository)
+	sdkRateLimitMiddleware := middleware.NewSDKRateLimitMiddleware(repository)
+	sdkCallLogMiddleware := middleware.NewSDKCallLogMiddleware(repository)
+	middlewareBundle := provideMiddlewareBundle(authMiddleware, apiEnabledMiddleware, permissionMiddleware, operationLogMiddleware, publicOperationLogMiddleware, rateLimitMiddleware, performanceMiddleware, corsMiddleware, sdkAuthMiddleware, sdkRateLimitMiddleware, sdkCallLogMiddleware)
+	serviceContext, cleanup := provideServiceContext(c, repository, domain, chatHub, v, taskScheduler, middlewareBundle)
 	return serviceContext, func() {
 		cleanup()
 	}, nil

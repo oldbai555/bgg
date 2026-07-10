@@ -5,8 +5,8 @@ Timeout: 30000  # 30秒超时（毫秒），避免 m3u8 代理请求超时
 
 # JWT 配置
 JWT:
-  AccessSecret: "replace-with-secure-access-secret"
-  RefreshSecret: "replace-with-secure-refresh-secret"
+  AccessSecret: "${JWT_ACCESS_SECRET}"
+  RefreshSecret: "${JWT_REFRESH_SECRET}"
   AccessExpire: 7200        # 秒
   RefreshExpire: 604800     # 秒
   Issuer: "postapoc-admin"

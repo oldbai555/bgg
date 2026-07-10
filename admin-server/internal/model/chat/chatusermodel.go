@@ -12,6 +12,8 @@ type (
 	// and implement the added methods in customChatUserModel.
 	ChatUserModel interface {
 		chatUserModel
+		// WithSession 返回一个绑定到事务 session 的新 ChatUserModel，供 Repository.withSession 调用。
+		WithSession(session sqlx.Session) ChatUserModel
 	}
 
 	customChatUserModel struct {
@@ -23,5 +25,15 @@ type (
 func NewChatUserModel(conn sqlx.SqlConn, c cache.CacheConf, opts ...cache.Option) ChatUserModel {
 	return &customChatUserModel{
 		defaultChatUserModel: newChatUserModel(conn, c, opts...),
+	}
+}
+
+// WithSession 见接口注释。table 字段直接复用，CachedConn 通过 sqlc.CachedConn.WithSession 换绑。
+func (m *customChatUserModel) WithSession(session sqlx.Session) ChatUserModel {
+	return &customChatUserModel{
+		defaultChatUserModel: &defaultChatUserModel{
+			CachedConn: m.CachedConn.WithSession(session),
+			table:      m.table,
+		},
 	}
 }

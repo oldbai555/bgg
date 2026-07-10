@@ -16,6 +16,8 @@ type (
 	AdminDictItemModel interface {
 		adminDictItemModel
 		FindPageByTypeId(ctx context.Context, typeId uint64, page, pageSize int64) ([]AdminDictItem, int64, error)
+		// WithSession 返回一个绑定到事务 session 的新 AdminDictItemModel，供 Repository.withSession 调用。
+		WithSession(session sqlx.Session) AdminDictItemModel
 	}
 
 	customAdminDictItemModel struct {
@@ -57,4 +59,14 @@ func (m *customAdminDictItemModel) FindPageByTypeId(ctx context.Context, typeId 
 		return nil, 0, err
 	}
 	return list, total, nil
+}
+
+// WithSession 见接口注释。table 字段直接复用，CachedConn 通过 sqlc.CachedConn.WithSession 换绑。
+func (m *customAdminDictItemModel) WithSession(session sqlx.Session) AdminDictItemModel {
+	return &customAdminDictItemModel{
+		defaultAdminDictItemModel: &defaultAdminDictItemModel{
+			CachedConn: m.CachedConn.WithSession(session),
+			table:      m.table,
+		},
+	}
 }

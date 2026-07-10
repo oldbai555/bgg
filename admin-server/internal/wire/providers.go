@@ -26,6 +26,20 @@ var ProviderSet = wire.NewSet(
 	provideChatHub,
 	provideTaskExecutors,
 	provideTaskScheduler,
+
+	middleware.NewAuthMiddleware,
+	middleware.NewApiEnabledMiddleware,
+	providePermissionMiddleware, // 适配函数，不是 middleware.NewPermissionMiddleware 本身，见下方注释
+	middleware.NewOperationLogMiddleware,
+	middleware.NewPublicOperationLogMiddleware,
+	middleware.NewRateLimitMiddleware,
+	middleware.NewPerformanceMiddleware,
+	middleware.NewCorsMiddleware,
+	middleware.NewSDKAuthMiddleware,
+	middleware.NewSDKRateLimitMiddleware,
+	middleware.NewSDKCallLogMiddleware,
+	provideMiddlewareBundle,
+
 	provideServiceContext,
 )
 
@@ -72,6 +86,47 @@ func provideTaskScheduler(
 	return scheduler
 }
 
+// providePermissionMiddleware 是 PermissionMiddleware 的 Wire 适配函数：PermissionMiddleware
+// 构造函数吃的是 *iamdomain.PermissionResolver，但那不是一个独立的 Wire 节点，只是
+// *registry.Domain 结构体里的一个字段（domain.IAM.PermissionResolver）。Wire 没法凭空
+// "生产"出一个游离的 *iamdomain.PermissionResolver，所以需要这一层适配：用已有的
+// *registry.Domain 节点取出字段，再调用 middleware.NewPermissionMiddleware。
+func providePermissionMiddleware(domain *registry.Domain) *middleware.PermissionMiddleware {
+	return middleware.NewPermissionMiddleware(domain.IAM.PermissionResolver)
+}
+
+// provideMiddlewareBundle 是唯一还需要手写的 assembler：MiddlewareBundle 的 11 个字段
+// 类型全部是 rest.Middleware（同一个具名类型），Wire 无法自动区分该把哪个 provider
+// 的结果填进哪个字段，所以仍然需要一个手写函数——区别在于它现在只依赖 11 个互不相同
+// 的具体中间件指针类型，不再依赖尚未构造完成的 svcCtx 本身。
+func provideMiddlewareBundle(
+	auth *middleware.AuthMiddleware,
+	apiEnabled *middleware.ApiEnabledMiddleware,
+	permission *middleware.PermissionMiddleware,
+	operationLog *middleware.OperationLogMiddleware,
+	publicOperationLog *middleware.PublicOperationLogMiddleware,
+	rateLimit *middleware.RateLimitMiddleware,
+	performance *middleware.PerformanceMiddleware,
+	cors *middleware.CorsMiddleware,
+	sdkAuth *middleware.SDKAuthMiddleware,
+	sdkRateLimit *middleware.SDKRateLimitMiddleware,
+	sdkCallLog *middleware.SDKCallLogMiddleware,
+) *MiddlewareBundle {
+	return &MiddlewareBundle{
+		Auth:               auth.Handle,
+		ApiEnabled:         apiEnabled.Handle,
+		Permission:         permission.Handle,
+		OperationLog:       operationLog.Handle,
+		PublicOperationLog: publicOperationLog.Handle,
+		RateLimit:          rateLimit.Handle,
+		Performance:        performance.Handle,
+		Cors:               cors.Handle,
+		SDKAuth:            sdkAuth.Handle,
+		SDKRateLimit:       sdkRateLimit.Handle,
+		SDKCallLog:         sdkCallLog.Handle,
+	}
+}
+
 func provideServiceContext(
 	c config.Config,
 	repo *repository.Repository,
@@ -79,27 +134,27 @@ func provideServiceContext(
 	chatHub *hub.ChatHub,
 	taskExecutors map[int]interfaces.TaskExecutor,
 	taskScheduler *task.TaskScheduler,
+	mw *MiddlewareBundle,
 ) (*svc.ServiceContext, func()) {
 	svcCtx := &svc.ServiceContext{
-		Config:        c,
-		Repository:    repo,
-		Domain:        domain,
-		ChatHub:       chatHub,
-		TaskExecutors: taskExecutors,
-		TaskScheduler: taskScheduler,
+		Config:                       c,
+		Repository:                   repo,
+		Domain:                       domain,
+		ChatHub:                      chatHub,
+		TaskExecutors:                taskExecutors,
+		TaskScheduler:                taskScheduler,
+		AuthMiddleware:               mw.Auth,
+		ApiEnabledMiddleware:         mw.ApiEnabled,
+		PermissionMiddleware:         mw.Permission,
+		OperationLogMiddleware:       mw.OperationLog,
+		PublicOperationLogMiddleware: mw.PublicOperationLog,
+		RateLimitMiddleware:          mw.RateLimit,
+		PerformanceMiddleware:        mw.Performance,
+		CorsMiddleware:               mw.Cors,
+		SDKAuthMiddleware:            mw.SDKAuth,
+		SDKRateLimitMiddleware:       mw.SDKRateLimit,
+		SDKCallLogMiddleware:         mw.SDKCallLog,
 	}
-	mw := buildMiddlewareBundle(svcCtx)
-	svcCtx.AuthMiddleware = mw.Auth
-	svcCtx.ApiEnabledMiddleware = mw.ApiEnabled
-	svcCtx.PermissionMiddleware = mw.Permission
-	svcCtx.OperationLogMiddleware = mw.OperationLog
-	svcCtx.PublicOperationLogMiddleware = mw.PublicOperationLog
-	svcCtx.RateLimitMiddleware = mw.RateLimit
-	svcCtx.PerformanceMiddleware = mw.Performance
-	svcCtx.CorsMiddleware = mw.Cors
-	svcCtx.SDKAuthMiddleware = mw.SDKAuth
-	svcCtx.SDKRateLimitMiddleware = mw.SDKRateLimit
-	svcCtx.SDKCallLogMiddleware = mw.SDKCallLog
 
 	cleanup := func() {
 		if taskScheduler != nil {
@@ -108,20 +163,4 @@ func provideServiceContext(
 		}
 	}
 	return svcCtx, cleanup
-}
-
-func buildMiddlewareBundle(svcCtx *svc.ServiceContext) *MiddlewareBundle {
-	return &MiddlewareBundle{
-		Auth:               middleware.NewAuthMiddleware(svcCtx).Handle,
-		ApiEnabled:         middleware.NewApiEnabledMiddleware(svcCtx).Handle,
-		Permission:         middleware.NewPermissionMiddleware(svcCtx).Handle,
-		OperationLog:       middleware.NewOperationLogMiddleware(svcCtx).Handle,
-		PublicOperationLog: middleware.NewPublicOperationLogMiddleware(svcCtx).Handle,
-		RateLimit:          middleware.NewRateLimitMiddleware(svcCtx).Handle,
-		Performance:        middleware.NewPerformanceMiddleware(svcCtx).Handle,
-		Cors:               middleware.NewCorsMiddleware().Handle,
-		SDKAuth:            middleware.NewSDKAuthMiddleware(svcCtx).Handle,
-		SDKRateLimit:       middleware.NewSDKRateLimitMiddleware(svcCtx).Handle,
-		SDKCallLog:         middleware.NewSDKCallLogMiddleware(svcCtx).Handle,
-	}
 }

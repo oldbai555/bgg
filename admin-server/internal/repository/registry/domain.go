@@ -1,6 +1,9 @@
 package registry
 
 import (
+	"context"
+
+	iamdomain "postapocgame/admin-server/internal/domain/iam"
 	"postapocgame/admin-server/internal/repository"
 	blogrepo "postapocgame/admin-server/internal/repository/blog"
 	chatrepo "postapocgame/admin-server/internal/repository/chat"
@@ -27,17 +30,18 @@ type Domain struct {
 }
 
 type IAMDomain struct {
-	User           iamrepo.UserRepository
-	Role           iamrepo.RoleRepository
-	Permission     iamrepo.PermissionRepository
-	Menu           iamrepo.MenuRepository
-	Department     iamrepo.DepartmentRepository
-	UserRole       iamrepo.UserRoleRepository
-	RolePermission iamrepo.RolePermissionRepository
-	Api            iamrepo.ApiRepository
-	PermissionMenu iamrepo.PermissionMenuRepository
-	PermissionApi  iamrepo.PermissionApiRepository
-	TokenBlacklist iamrepo.TokenBlacklistRepository
+	User               iamrepo.UserRepository
+	Role               iamrepo.RoleRepository
+	Permission         iamrepo.PermissionRepository
+	Menu               iamrepo.MenuRepository
+	Department         iamrepo.DepartmentRepository
+	UserRole           iamrepo.UserRoleRepository
+	RolePermission     iamrepo.RolePermissionRepository
+	Api                iamrepo.ApiRepository
+	PermissionMenu     iamrepo.PermissionMenuRepository
+	PermissionApi      iamrepo.PermissionApiRepository
+	TokenBlacklist     iamrepo.TokenBlacklistRepository
+	PermissionResolver *iamdomain.PermissionResolver
 }
 
 type BlogDomain struct {
@@ -97,17 +101,18 @@ func NewDomain(repo *repository.Repository) *Domain {
 	}
 	return &Domain{
 		IAM: IAMDomain{
-			User:           iamrepo.NewUserRepository(repo),
-			Role:           iamrepo.NewRoleRepository(repo),
-			Permission:     iamrepo.NewPermissionRepository(repo),
-			Menu:           iamrepo.NewMenuRepository(repo),
-			Department:     iamrepo.NewDepartmentRepository(repo),
-			UserRole:       iamrepo.NewUserRoleRepository(repo),
-			RolePermission: iamrepo.NewRolePermissionRepository(repo),
-			Api:            iamrepo.NewApiRepository(repo),
-			PermissionMenu: iamrepo.NewPermissionMenuRepository(repo),
-			PermissionApi:  iamrepo.NewPermissionApiRepository(repo),
-			TokenBlacklist: iamrepo.NewTokenBlacklistRepository(repo),
+			User:               iamrepo.NewUserRepository(repo),
+			Role:               iamrepo.NewRoleRepository(repo),
+			Permission:         iamrepo.NewPermissionRepository(repo),
+			Menu:               iamrepo.NewMenuRepository(repo),
+			Department:         iamrepo.NewDepartmentRepository(repo),
+			UserRole:           iamrepo.NewUserRoleRepository(repo),
+			RolePermission:     iamrepo.NewRolePermissionRepository(repo),
+			Api:                iamrepo.NewApiRepository(repo),
+			PermissionMenu:     iamrepo.NewPermissionMenuRepository(repo),
+			PermissionApi:      iamrepo.NewPermissionApiRepository(repo),
+			TokenBlacklist:     iamrepo.NewTokenBlacklistRepository(repo),
+			PermissionResolver: iamdomain.NewPermissionResolver(repo),
 		},
 		Blog: BlogDomain{
 			Article:      blogrepo.NewBlogArticleRepository(repo),
@@ -152,4 +157,14 @@ func NewDomain(repo *repository.Repository) *Domain {
 			DailyShortSentence: miscrepo.NewDailyShortSentenceRepository(repo),
 		},
 	}
+}
+
+// Transact 在事务内执行 fn。fn 收到的 txDomain 是用换绑过事务 session 的 Repository
+// 重新调用 NewDomain 构造出来的——每个 <domain>repo.NewXxxRepository(repo) 在构造时
+// 就把 repo.DB / repo.XxxModel 捕获进内部字段，事务场景下必须重新构造一遍，不能只换
+// Repository 本身而不重建 Domain。
+func Transact(ctx context.Context, repo *repository.Repository, fn func(ctx context.Context, txDomain *Domain) error) error {
+	return repo.Transact(ctx, func(ctx context.Context, txRepo *repository.Repository) error {
+		return fn(ctx, NewDomain(txRepo))
+	})
 }

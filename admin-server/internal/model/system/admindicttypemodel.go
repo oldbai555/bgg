@@ -15,6 +15,8 @@ type (
 	AdminDictTypeModel interface {
 		adminDictTypeModel
 		FindIdByCode(ctx context.Context, code string) (uint64, error)
+		// WithSession 返回一个绑定到事务 session 的新 AdminDictTypeModel，供 Repository.withSession 调用。
+		WithSession(session sqlx.Session) AdminDictTypeModel
 	}
 
 	customAdminDictTypeModel struct {
@@ -36,4 +38,14 @@ func (m *customAdminDictTypeModel) FindIdByCode(ctx context.Context, code string
 		return 0, err
 	}
 	return data.Id, nil
+}
+
+// WithSession 见接口注释。table 字段直接复用，CachedConn 通过 sqlc.CachedConn.WithSession 换绑。
+func (m *customAdminDictTypeModel) WithSession(session sqlx.Session) AdminDictTypeModel {
+	return &customAdminDictTypeModel{
+		defaultAdminDictTypeModel: &defaultAdminDictTypeModel{
+			CachedConn: m.CachedConn.WithSession(session),
+			table:      m.table,
+		},
+	}
 }

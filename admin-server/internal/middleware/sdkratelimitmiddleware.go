@@ -8,18 +8,18 @@ import (
 	"net/http"
 	"time"
 
-	"postapocgame/admin-server/internal/svc"
+	"postapocgame/admin-server/internal/repository"
+	sdkrepo "postapocgame/admin-server/internal/repository/sdk"
 	"postapocgame/admin-server/pkg/errs"
 	"postapocgame/admin-server/pkg/response"
-	sdkrepo "postapocgame/admin-server/internal/repository/sdk"
 )
 
 type SDKRateLimitMiddleware struct {
-	svcCtx *svc.ServiceContext
+	repo *repository.Repository
 }
 
-func NewSDKRateLimitMiddleware(svcCtx *svc.ServiceContext) *SDKRateLimitMiddleware {
-	return &SDKRateLimitMiddleware{svcCtx: svcCtx}
+func NewSDKRateLimitMiddleware(repo *repository.Repository) *SDKRateLimitMiddleware {
+	return &SDKRateLimitMiddleware{repo: repo}
 }
 
 func (m *SDKRateLimitMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
@@ -34,7 +34,7 @@ func (m *SDKRateLimitMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc 
 			return
 		}
 
-		sdkRepo := sdkrepo.NewSdkRepository(m.svcCtx.Repository)
+		sdkRepo := sdkrepo.NewSdkRepository(m.repo)
 		iface, err := sdkRepo.FindInterfaceByCode(ctx, apiCode)
 		if err != nil || iface == nil {
 			response.ErrorCtx(ctx, w, errs.New(errs.CodeForbidden, "接口不存在"))
@@ -52,7 +52,7 @@ func (m *SDKRateLimitMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc 
 
 		clientIP := clientIPFromRequest(r)
 		now := time.Now()
-		redis := m.svcCtx.Repository.Redis
+		redis := m.repo.Redis
 
 		keys := []string{
 			fmt.Sprintf("sdk:rl:key:%s:%s:%d", apiKey, apiCode, now.Unix()/60),
@@ -67,7 +67,10 @@ func (m *SDKRateLimitMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc 
 				_ = redis.ExpireCtx(ctx, k, 65)
 			}
 			if cnt > int64(limit) {
-				response.ErrorCtx(ctx, w, errs.New(errs.CodeForbidden, "请求过于频繁"))
+				// 与 Admin 侧 RateLimitMiddleware 保持一致：先手动写 429（response.ErrorCtx
+				// 对业务错误统一写 400，net/http 对同一响应重复 WriteHeader 只认第一次）。
+				w.WriteHeader(http.StatusTooManyRequests)
+				response.ErrorCtx(ctx, w, errs.New(errs.CodeTooManyRequests, "请求过于频繁"))
 				return
 			}
 		}

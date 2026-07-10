@@ -10,10 +10,11 @@ import (
 	"strings"
 	"time"
 
-	"postapocgame/admin-server/internal/svc"
+	"postapocgame/admin-server/internal/consts"
+	"postapocgame/admin-server/internal/repository"
+	sdkrepo "postapocgame/admin-server/internal/repository/sdk"
 	"postapocgame/admin-server/pkg/errs"
 	"postapocgame/admin-server/pkg/response"
-	sdkrepo "postapocgame/admin-server/internal/repository/sdk"
 )
 
 type sdkCtxKey string
@@ -26,11 +27,11 @@ const (
 )
 
 type SDKAuthMiddleware struct {
-	svcCtx *svc.ServiceContext
+	repo *repository.Repository
 }
 
-func NewSDKAuthMiddleware(svcCtx *svc.ServiceContext) *SDKAuthMiddleware {
-	return &SDKAuthMiddleware{svcCtx: svcCtx}
+func NewSDKAuthMiddleware(repo *repository.Repository) *SDKAuthMiddleware {
+	return &SDKAuthMiddleware{repo: repo}
 }
 
 func (m *SDKAuthMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
@@ -42,7 +43,7 @@ func (m *SDKAuthMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		sdkRepo := sdkrepo.NewSdkRepository(m.svcCtx.Repository)
+		sdkRepo := sdkrepo.NewSdkRepository(m.repo)
 		sdkKey, err := sdkRepo.FindKeyByApiKey(r.Context(), apiKey)
 		if err != nil {
 			response.ErrorCtx(r.Context(), w, errs.New(errs.CodeUnauthorized, "无效的 API Key"))
@@ -52,7 +53,7 @@ func (m *SDKAuthMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 			response.ErrorCtx(r.Context(), w, errs.New(errs.CodeUnauthorized, "Secret 不匹配"))
 			return
 		}
-		if sdkKey.Status != 1 {
+		if sdkKey.Status != consts.Open {
 			response.ErrorCtx(r.Context(), w, errs.New(errs.CodeUnauthorized, "API Key 已被禁用"))
 			return
 		}
@@ -69,7 +70,7 @@ func (m *SDKAuthMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 
 		apiCode := sdkRepo.BuildInterfaceCode(r.Method, r.URL.Path)
 		sdkInterface, err := sdkRepo.FindInterfaceByCode(r.Context(), apiCode)
-		if err != nil || sdkInterface == nil || sdkInterface.Status != 1 {
+		if err != nil || sdkInterface == nil || sdkInterface.Status != consts.Open {
 			response.ErrorCtx(r.Context(), w, errs.New(errs.CodeForbidden, "接口未开通或已禁用"))
 			return
 		}

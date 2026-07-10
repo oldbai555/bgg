@@ -4,20 +4,22 @@ import (
 	"net/http"
 	"strings"
 
-	"postapocgame/admin-server/internal/svc"
+	"postapocgame/admin-server/internal/config"
+	"postapocgame/admin-server/internal/repository"
+	iamrepo "postapocgame/admin-server/internal/repository/iam"
 	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 	"postapocgame/admin-server/pkg/response"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 // AuthMiddleware 校验 Access Token + 黑名单，并将用户信息写入 context。
 type AuthMiddleware struct {
-	svcCtx *svc.ServiceContext
+	repo      *repository.Repository
+	jwtConfig config.JWTConf
 }
 
-func NewAuthMiddleware(svcCtx *svc.ServiceContext) *AuthMiddleware {
-	return &AuthMiddleware{svcCtx: svcCtx}
+func NewAuthMiddleware(cfg config.Config, repo *repository.Repository) *AuthMiddleware {
+	return &AuthMiddleware{repo: repo, jwtConfig: cfg.JWT}
 }
 
 func (m *AuthMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
@@ -36,7 +38,7 @@ func (m *AuthMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 		token := parts[1]
 
 		// 黑名单校验
-		blackRepo := iamrepo.NewTokenBlacklistRepository(m.svcCtx.Repository)
+		blackRepo := iamrepo.NewTokenBlacklistRepository(m.repo)
 		blacklisted, err := blackRepo.IsBlacklisted(r.Context(), token)
 		if err != nil {
 			response.ErrorCtx(r.Context(), w, errs.Wrap(errs.CodeInternalError, "检查令牌黑名单失败", err))
@@ -48,7 +50,7 @@ func (m *AuthMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 		}
 
 		// 解析 Access Token
-		claims, err := jwthelper.ParseToken(token, m.svcCtx.Config.JWT.AccessSecret)
+		claims, err := jwthelper.ParseToken(token, m.jwtConfig.AccessSecret)
 		if err != nil || claims.IsRefresh {
 			response.ErrorCtx(r.Context(), w, errs.New(errs.CodeUnauthorized, "访问令牌无效或已过期"))
 			return

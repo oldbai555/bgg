@@ -38,7 +38,7 @@
 - 启动日志里不应出现 A.5 提到的"空值 fail-fast 检查"报错（说明环境变量已正确注入且非空）。
 - 用一个测试账号走一次登录 → 拿到 token → 用 token 访问一个受保护接口，确认 token 签发/校验正常（间接验证密钥被正确读取且前后端一致，不是"改了但没生效，实际还在用默认值"）。
 
-**状态**：`TBD`（A.5 代码改动尚未落地，占位）。
+**状态**：`已就绪，待执行`（A.5 代码改动已落地：`etc/admin-api.yaml` 的 `JWT.AccessSecret`/`RefreshSecret` 已改成 `${JWT_ACCESS_SECRET}`/`${JWT_REFRESH_SECRET}`，`admin.go` 的 `conf.MustLoad` 已加 `conf.UseEnv()` 并在其后新增空值 fail-fast 检查；本地开发环境变量由用户自行在 shell/`.env` 里设置任意非空值即可跑通，生产环境的真实高强度密钥值仍需用户按下方步骤在部署环境里生成和设置，AI 不代为生成）。
 
 ### 2 · MySQL/Redis 配置的环境变量化现状确认
 

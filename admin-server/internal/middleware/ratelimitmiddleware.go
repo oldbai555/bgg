@@ -6,8 +6,9 @@ import (
 	"strings"
 	"sync"
 
+	"postapocgame/admin-server/internal/config"
 	"postapocgame/admin-server/internal/consts"
-	"postapocgame/admin-server/internal/svc"
+	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 	"postapocgame/admin-server/pkg/response"
@@ -18,7 +19,8 @@ import (
 
 // RateLimitMiddleware 限流中间件，支持按IP、按用户、按接口限流
 type RateLimitMiddleware struct {
-	svcCtx *svc.ServiceContext
+	repo   *repository.Repository
+	config config.RateLimitConf
 	// 按IP限流器映射
 	ipLimiters map[string]*limit.PeriodLimit
 	// 按用户限流器映射
@@ -61,23 +63,24 @@ type RateLimitConfig struct {
 	} `json:"globalLimit" yaml:"globalLimit"`
 }
 
-func NewRateLimitMiddleware(svcCtx *svc.ServiceContext) *RateLimitMiddleware {
+func NewRateLimitMiddleware(cfg config.Config, repo *repository.Repository) *RateLimitMiddleware {
 	m := &RateLimitMiddleware{
-		svcCtx:       svcCtx,
+		repo:         repo,
+		config:       cfg.RateLimit,
 		ipLimiters:   make(map[string]*limit.PeriodLimit),
 		userLimiters: make(map[uint64]*limit.PeriodLimit),
 		apiLimiters:  make(map[string]*limit.PeriodLimit),
 	}
 
 	// 从配置中读取限流规则
-	config := m.getRateLimitConfig()
+	rlConfig := m.getRateLimitConfig()
 
 	// 初始化全局限流器
-	if config.GlobalLimit.Enabled {
+	if rlConfig.GlobalLimit.Enabled {
 		m.globalLimiter = limit.NewPeriodLimit(
-			config.GlobalLimit.Period,
-			config.GlobalLimit.Quota,
-			svcCtx.Repository.Redis,
+			rlConfig.GlobalLimit.Period,
+			rlConfig.GlobalLimit.Quota,
+			repo.Redis,
 			consts.RedisRateLimitGlobalPrefix,
 		)
 	}
@@ -88,7 +91,7 @@ func NewRateLimitMiddleware(svcCtx *svc.ServiceContext) *RateLimitMiddleware {
 // getRateLimitConfig 获取限流配置（从配置文件或默认值）
 func (m *RateLimitMiddleware) getRateLimitConfig() RateLimitConfig {
 	// 从配置文件读取限流配置
-	cfg := m.svcCtx.Config.RateLimit
+	cfg := m.config
 
 	// 如果配置文件中没有配置，使用默认值
 	config := RateLimitConfig{
@@ -173,7 +176,7 @@ func (m *RateLimitMiddleware) getIPLimiter(ip string, quota, period int) *limit.
 			limiter = limit.NewPeriodLimit(
 				period,
 				quota,
-				m.svcCtx.Repository.Redis,
+				m.repo.Redis,
 				consts.RedisRateLimitIPPrefix+ip,
 			)
 			m.ipLimiters[ip] = limiter
@@ -197,7 +200,7 @@ func (m *RateLimitMiddleware) getUserLimiter(userID uint64, quota, period int) *
 			limiter = limit.NewPeriodLimit(
 				period,
 				quota,
-				m.svcCtx.Repository.Redis,
+				m.repo.Redis,
 				consts.RedisRateLimitUserPrefix+strconv.FormatUint(userID, 10),
 			)
 			m.userLimiters[userID] = limiter
@@ -221,7 +224,7 @@ func (m *RateLimitMiddleware) getAPILimiter(apiKey string, quota, period int) *l
 			limiter = limit.NewPeriodLimit(
 				period,
 				quota,
-				m.svcCtx.Repository.Redis,
+				m.repo.Redis,
 				consts.RedisRateLimitAPIPrefix+apiKey,
 			)
 			m.apiLimiters[apiKey] = limiter
@@ -347,8 +350,9 @@ func (m *RateLimitMiddleware) shouldSkip(path string) bool {
 
 // rateLimitResponse 返回限流响应
 func (m *RateLimitMiddleware) rateLimitResponse(w http.ResponseWriter, r *http.Request, message string) {
-	// 设置HTTP状态码为429
+	// 设置HTTP状态码为429（response.ErrorCtx 对业务错误统一写 400，这里先手动写一次
+	// 429，Go net/http 对同一响应重复 WriteHeader 只认第一次，客户端收到的仍是 429）
 	w.WriteHeader(http.StatusTooManyRequests)
-	// 返回限流错误响应
-	response.ErrorCtx(r.Context(), w, errs.New(http.StatusTooManyRequests, message))
+	// 返回限流错误响应，业务错误码走 pkg/errs 体系，不能拿 HTTP 状态码充当业务码
+	response.ErrorCtx(r.Context(), w, errs.New(errs.CodeTooManyRequests, message))
 }

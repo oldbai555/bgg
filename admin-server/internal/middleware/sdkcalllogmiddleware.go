@@ -10,17 +10,17 @@ import (
 	"net/http"
 	"time"
 
-	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/model/sdk"
+	"postapocgame/admin-server/internal/repository"
 	sdkrepo "postapocgame/admin-server/internal/repository/sdk"
 )
 
 type SDKCallLogMiddleware struct {
-	svcCtx *svc.ServiceContext
+	repo *repository.Repository
 }
 
-func NewSDKCallLogMiddleware(svcCtx *svc.ServiceContext) *SDKCallLogMiddleware {
-	return &SDKCallLogMiddleware{svcCtx: svcCtx}
+func NewSDKCallLogMiddleware(repo *repository.Repository) *SDKCallLogMiddleware {
+	return &SDKCallLogMiddleware{repo: repo}
 }
 
 func (m *SDKCallLogMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
@@ -49,7 +49,7 @@ func (m *SDKCallLogMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 		sdkInterfaceId, _ := ctx.Value(ctxKeySdkInterfaceID).(uint64)
 		clientIP := clientIPFromRequest(r)
 
-		logRepo := sdkrepo.NewSdkRepository(m.svcCtx.Repository)
+		logRepo := sdkrepo.NewSdkRepository(m.repo)
 		_ = logRepo.SaveCallLog(ctx, &sdk.SdkCallLog{
 			SdkKeyId:       sdkKeyId,
 			SdkInterfaceId: sdkInterfaceId,

@@ -20,8 +20,8 @@ import (
 
 	"postapocgame/admin-server/internal/config"
 	"postapocgame/admin-server/internal/handler"
-	appwire "postapocgame/admin-server/internal/wire"
 	"postapocgame/admin-server/internal/svc"
+	appwire "postapocgame/admin-server/internal/wire"
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/rest"
@@ -52,7 +52,11 @@ func main() {
 	}
 
 	var c config.Config
-	conf.MustLoad(*configFile, &c)
+	conf.MustLoad(*configFile, &c, conf.UseEnv())
+
+	if c.JWT.AccessSecret == "" || c.JWT.RefreshSecret == "" {
+		log.Fatalf("JWT_ACCESS_SECRET / JWT_REFRESH_SECRET 未设置，拒绝以空密钥启动")
+	}
 
 	// 从外部文件加载 MySQL、Redis 和中间件配置（如果存在）
 	if err := config.MergeExternalConfig(&c, *mysqlConfigFile, *redisConfigFile, *middlewareConfigFile); err != nil {
