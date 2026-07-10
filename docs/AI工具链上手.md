@@ -192,6 +192,7 @@ bgg/
 | `vue-lsp` | Vue/TS 语言服务（@vue/language-server） | 与 go-lsp 共用 `mcp-language-server` + `cd admin-frontend && pnpm install` | ✅ 前端开发 |
 | `frontend-ui` | 项目 UI 组件与前端约定 | 已提交 `admin-frontend/mcp/dist/`（改源码后 `pnpm mcp:build`） | ✅ 前端开发 |
 | `mcp-zero` | go-zero / goctl 脚手架辅助 | 本机编译 `go-zero-mcp` 并设置 `GO_ZERO_MCP_PATH` | ✅ 后端开发 |
+| `mysql` | 本地 MySQL 查询（默认只读） | `npx` + 本机 MySQL 在跑；连接信息见 `MYSQL_*` 环境变量 | 可选 |
 | `mongodb` | 本地 Mongo 查询 | `npx` + 本机 MongoDB 在跑 | 可选 |
 | `redis` | 本地 Redis 查询 | `uvx` + 本机 Redis 在跑 | 可选 |
 
@@ -281,20 +282,35 @@ cd admin-frontend && pnpm install
 - **`vue-lsp`**：workspace 指向 `admin-frontend/`，通过 `node` 启动 `@vue/language-server`（`node_modules` 内路径相对 workspace）
 - **`frontend-ui`**：Node 直启 `admin-frontend/mcp/dist/index.js`，无需额外安装（dist 已提交 git）
 
-验证：`test -x admin-frontend/node_modules/.bin/vue-ts-lsp && node admin-frontend/mcp/dist/index.js`（后者会挂起等待 stdio，Ctrl+C 退出即可）
+验证：`test -f admin-frontend/node_modules/@vue/language-server/bin/vue-language-server.js && node admin-frontend/mcp/dist/index.js`（后者会挂起等待 stdio，Ctrl+C 退出即可）
 
 ### 4. `context7` / `npx`
 
 需 Node.js 18+。一般开发机已有；无则安装 Node 后 `make sync-claude-mcp-check` 中 `context7` 应显示 Connected。
 
-### 5. `mongodb` / `redis` MCP（可选）
+### 5. `mysql` / `mongodb` / `redis` MCP（可选）
 
 | Server | 前提 | 不用时 |
 |--------|------|--------|
-| `mongodb` | 本机 MongoDB 在跑，连接串可用 | `check` 失败可忽略；团队不用可从 `.mcp.json` 删除后 `import` 同步 |
+| `mysql` | 本机 MySQL 在跑；设置 `MYSQL_HOST`/`MYSQL_PORT`/`MYSQL_USER`/`MYSQL_PASS`/`MYSQL_DB`（可与 `config/mysql.json.example` 或 `/etc/work/mysql.json` 对齐） | `check` 失败可忽略；团队不用可从 `.mcp.json` 删除后 `import` 同步 |
+| `mongodb` | 本机 MongoDB 在跑，连接串可用 | 同上 |
 | `redis` | 本机 Redis 在跑；需 `uv`（`uvx`） | 同上 |
 
-仅做 admin-server MySQL 开发、不查 Mongo/Redis 时，可不启这两个服务。
+`mysql` MCP 默认 **只读**（`ALLOW_*_OPERATION=false`），用于调试联调查表/跑 SELECT，不替代业务代码里的 Repository 层。
+
+示例（写入 `~/.zshrc`，字段名与 `config/mysql.json.example` 对应）：
+
+```bash
+export MYSQL_HOST=127.0.0.1
+export MYSQL_PORT=3306
+export MYSQL_USER=root
+export MYSQL_PASS=your-password
+export MYSQL_DB=postapoc_admin
+```
+
+Claude Code 插件需 `make sync-claude-mcp-approve` 把上述 env 写入 `.claude/settings.local.json`（或在本机创建 `~/.config/bgg/mysql-mcp.env` 后 source 再执行 approve）。
+
+推荐把凭据放在 **`~/.config/bgg/mysql-mcp.env`**（`chmod 600`），`~/.zshrc` 里 source 该文件。Cursor / Claude Code 均通过仓库内 **`script/mysql_mcp.sh`** 启动 `mysql` MCP（自动补全 `HOME` 并 source 上述 env 文件），避免密码写进 mcp.json。
 
 ### 6. Claude Code MCP 重连
 
@@ -396,16 +412,23 @@ CodeGraph 默认**自动同步**文件变更，一般无需手动 `codegraph syn
 ### `vue-lsp` 连接失败
 
 1. 未安装 `mcp-language-server`（与 go-lsp 相同）
-2. 未执行 `cd admin-frontend && pnpm install`（缺少 `vue-ts-lsp`）
-3. `admin-frontend/scripts/vue-lsp.sh` 无执行权限：`chmod +x admin-frontend/scripts/vue-lsp.sh`
+2. 未执行 `cd admin-frontend && pnpm install`（缺少 `@vue/language-server`）
+3. `admin-frontend/node_modules/@vue/language-server/bin/vue-language-server.js` 不存在 → 在 `admin-frontend` 重新 `pnpm install`
 
 ### `frontend-ui` 连接失败
 
 检查 `admin-frontend/mcp/dist/index.js` 是否存在；若改过 `mcp/src/` 需 `cd admin-frontend && pnpm mcp:build` 后 commit dist。
 
-### `mongodb` / `redis` 连接失败
+### `mysql` / `mongodb` / `redis` 连接失败
 
-本机未启动对应服务，或团队不使用——可忽略。若全员不用，维护者从 `.mcp.json` 删除后 commit。
+本机未启动对应服务、连接信息未配置，或团队不使用——可忽略。若全员不用，维护者从 `.mcp.json` 删除后 commit。
+
+**`mysql` 日志出现 `Connection closed`（连上立刻断开）** 常见两类原因：
+
+1. **`mysql-mcp.env` 未加载**（Cursor Shared MCP 常不带 `HOME`，旧版内联 `source $HOME/.config/...` 会静默失败）→ 进程回退连 `127.0.0.1:3306` 后退出。确认 `~/.cursor/mcp.json` 使用 `${workspaceFolder}/script/mysql_mcp.sh`，并执行 `chmod +x script/mysql_mcp.sh`。
+2. **凭据/库名错误** 或目标库不可达。本地调试：`ENABLE_LOGGING=1 bash script/mysql_mcp.sh`（会打印连接目标；Ctrl+C 退出）。远程库（如 SQLPub）一般无需 `MYSQL_SSL=true`；若报 SSL 相关错误再按需配置。
+
+其他：`MYSQL_PASS`/`MYSQL_DB` 与真实库不一致时也会启动失败。
 
 ### GGA pre-commit 导致 commit 失败
 

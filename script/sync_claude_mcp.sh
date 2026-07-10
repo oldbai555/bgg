@@ -107,6 +107,22 @@ def normalize_env(env: dict) -> dict:
             out[key] = "${GOCTL_PATH:-goctl}"
         elif key in ("REDIS_HOST", "REDIS_PORT"):
             out[key] = f"${{{key}:-{value}}}"
+        elif key in ("MYSQL_HOST", "MYSQL_PORT", "MYSQL_USER", "MYSQL_PASS", "MYSQL_DB"):
+            defaults = {
+                "MYSQL_HOST": "127.0.0.1",
+                "MYSQL_PORT": "3306",
+                "MYSQL_USER": "root",
+                "MYSQL_PASS": "",
+                "MYSQL_DB": "postapoc_admin",
+            }
+            default = defaults.get(key, value)
+            out[key] = f"${{{key}:-{default}}}"
+        elif key in (
+            "ALLOW_INSERT_OPERATION",
+            "ALLOW_UPDATE_OPERATION",
+            "ALLOW_DELETE_OPERATION",
+        ):
+            out[key] = "false"
         else:
             out[key] = value
     return out
@@ -183,7 +199,18 @@ if servers:
     data["enabledMcpjsonServers"] = servers
 
 env = dict(data.get("env") or {})
-for key in ("GO_ZERO_MCP_PATH", "GOCTL_PATH", "MONGODB_MCP_URI", "REDIS_HOST", "REDIS_PORT"):
+for key in (
+    "GO_ZERO_MCP_PATH",
+    "GOCTL_PATH",
+    "MONGODB_MCP_URI",
+    "REDIS_HOST",
+    "REDIS_PORT",
+    "MYSQL_HOST",
+    "MYSQL_PORT",
+    "MYSQL_USER",
+    "MYSQL_PASS",
+    "MYSQL_DB",
+):
     val = os.environ.get(key)
     if val:
         env[key] = val
@@ -283,11 +310,6 @@ run_check() {
     echo "  frontend-ui: OK ($fe_root/mcp/dist/index.js)"
   else
     log_warn "frontend-ui 未构建 → 在 admin-frontend 执行: pnpm mcp:build"
-  fi
-  if [ -x "$fe_root/scripts/vue-lsp.sh" ]; then
-    echo "  vue-lsp.sh: OK"
-  else
-    log_warn "vue-lsp.sh 不可执行 → chmod +x admin-frontend/scripts/vue-lsp.sh"
   fi
 
   echo ""

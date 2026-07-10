@@ -54,6 +54,15 @@
         "REDIS_HOST": "${REDIS_HOST:-127.0.0.1}",
         "REDIS_PORT": "${REDIS_PORT:-6379}"
       }
+    },
+    "mysql": {
+      "command": "bash",
+      "args": ["${CLAUDE_PROJECT_DIR:-.}/script/mysql_mcp.sh"],
+      "env": {
+        "ALLOW_INSERT_OPERATION": "false",
+        "ALLOW_UPDATE_OPERATION": "false",
+        "ALLOW_DELETE_OPERATION": "false"
+      }
     }
   }
 }

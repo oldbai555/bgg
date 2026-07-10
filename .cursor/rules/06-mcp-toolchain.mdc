@@ -5,7 +5,7 @@ alwaysApply: true
 
 # MCP 工具链（必读）
 
-本项目配置了 **9 个 MCP server**（清单 SSOT：仓库根 `.mcp.json`；上手见 `docs/AI工具链上手.md`）。
+本项目配置了 **10 个 MCP server**（清单 SSOT：仓库根 `.mcp.json`；上手见 `docs/AI工具链上手.md`）。
 
 | 通道 | MCP 配置来源 |
 |------|----------------|
@@ -32,7 +32,7 @@ alwaysApply: true
 | Vue/TS 符号定义、引用、诊断（`admin-frontend/**`） | **vue-lsp** | `definition` / `references` / `diagnostics` / `hover` |
 | 本项目 UI 组件（D2Table、layout、blog 组件） | **frontend-ui** | `ui_get_component` / `ui_list_components` / `ui_get_patterns` |
 | go-zero 框架概念、goctl 参数、配置校验 | **mcp-zero** | `query_docs`、`validate_config`、`analyze_project` |
-| 查本地 Mongo / Redis 运行数据（调试联调） | **mongodb** / **redis** | 仅在本机服务已启动时使用 |
+| 查本地 MySQL / Mongo / Redis 运行数据（调试联调） | **mysql** / **mongodb** / **redis** | 仅在本机服务已启动时使用；MySQL 默认只读 |
 | 跨会话决策、踩坑、团队约定 | **engram** | `mem_search` / `mem_save` / `mem_context` |
 
 ## 与本项目工作流的边界（硬约束）
@@ -65,7 +65,7 @@ alwaysApply: true
 2. **codegraph** 不可用 → `Grep` + `Read`（范围尽量小）
 3. **context7** 不可用 → 查项目内 `docs/` 与 `.ai-context/zero-skills/`
 4. **engram** 不可用 → 读 `docs/后端开发进度.md` 历史决策
-5. **mongodb/redis** 不可用 → 不查库，改让用户确认或启动本地服务
+5. **mysql/mongodb/redis** 不可用 → 不查库，改让用户确认或启动本地服务
 
 ## 维护者
 
