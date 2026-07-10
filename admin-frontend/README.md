@@ -62,6 +62,25 @@ bash script/admin.sh package frontend   # 或走统一打包脚本
 
 生产环境部署在 Nginx 的 `/admin/` 路径下（参考 [`config/nginxconfig.txt`](../config/nginxconfig.txt)）；静态资源的 tmpfs 缓存技巧见 [`docs/使用tmpfs（内存文件系统）缓存静态文件.md`](../docs/使用tmpfs（内存文件系统）缓存静态文件.md)。
 
+## AI / MCP
+
+本项目为前端开发配置了两个 MCP server（清单见仓库根 [`.mcp.json`](../.mcp.json)）：
+
+| Server | 用途 |
+|--------|------|
+| `vue-lsp` | Vue/TS 语言服务：`definition` / `references` / `diagnostics` / `hover`（workspace 为本目录） |
+| `frontend-ui` | 项目 UI 组件文档与约定：`ui_get_component`、`ui_list_components`、`ui_get_patterns` |
+
+第三人上手：
+
+```bash
+pnpm install                    # 安装 vue-ts-lsp（vue-lsp 依赖）
+# go install mcp-language-server  # 与 go-lsp 相同，若已装可跳过
+make sync-claude-mcp-check      # 在仓库根目录验证 MCP 连接
+```
+
+维护 `frontend-ui` 源码后：`pnpm mcp:build`，并 commit `mcp/dist/`。
+
 ## 更多文档
 
 - 根目录 [`AGENTS.md`](../AGENTS.md)、[`.cursor/rules/20-frontend.mdc`](../.cursor/rules/20-frontend.mdc)、[`.cursor/rules/21-public-pages.mdc`](../.cursor/rules/21-public-pages.mdc)：开发规范

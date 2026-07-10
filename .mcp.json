@@ -16,6 +16,22 @@
       "command": "mcp-language-server",
       "args": ["--workspace", "${CLAUDE_PROJECT_DIR:-.}", "--lsp", "gopls"]
     },
+    "vue-lsp": {
+      "command": "mcp-language-server",
+      "args": [
+        "--workspace",
+        "${CLAUDE_PROJECT_DIR:-.}/admin-frontend",
+        "--lsp",
+        "node",
+        "--",
+        "node_modules/@vue/language-server/bin/vue-language-server.js",
+        "--stdio"
+      ]
+    },
+    "frontend-ui": {
+      "command": "node",
+      "args": ["${CLAUDE_PROJECT_DIR:-.}/admin-frontend/mcp/dist/index.js"]
+    },
     "mcp-zero": {
       "command": "${GO_ZERO_MCP_PATH}",
       "env": {

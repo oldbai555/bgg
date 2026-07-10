@@ -82,6 +82,7 @@ local_bin = str(Path.home() / ".local/bin")
 
 KNOWN_CMDS = {
     "engram", "codegraph", "npx", "uvx", "mcp-language-server",
+    "vue-ts-lsp", "node",
 }
 
 def normalize_command(cmd: str) -> str:
@@ -269,6 +270,25 @@ run_check() {
   echo "  GOCTL_PATH=${GOCTL_PATH:-goctl (默认)}"
   echo "  MONGODB_MCP_URI=${MONGODB_MCP_URI:-mongodb://localhost:27017/?replicaSet=rs0 (默认)}"
   echo "  REDIS_HOST=${REDIS_HOST:-127.0.0.1 (默认)}  REDIS_PORT=${REDIS_PORT:-6379 (默认)}"
+
+  echo ""
+  echo "========== 前端 MCP 依赖 =========="
+  local fe_root="$REPO_ROOT/admin-frontend"
+  if [ -f "$fe_root/node_modules/@vue/language-server/bin/vue-language-server.js" ]; then
+    echo "  @vue/language-server: OK"
+  else
+    log_warn "@vue/language-server 未安装 → 在 admin-frontend 执行: pnpm install"
+  fi
+  if [ -f "$fe_root/mcp/dist/index.js" ]; then
+    echo "  frontend-ui: OK ($fe_root/mcp/dist/index.js)"
+  else
+    log_warn "frontend-ui 未构建 → 在 admin-frontend 执行: pnpm mcp:build"
+  fi
+  if [ -x "$fe_root/scripts/vue-lsp.sh" ]; then
+    echo "  vue-lsp.sh: OK"
+  else
+    log_warn "vue-lsp.sh 不可执行 → chmod +x admin-frontend/scripts/vue-lsp.sh"
+  fi
 
   echo ""
   echo "========== Claude CLI =========="

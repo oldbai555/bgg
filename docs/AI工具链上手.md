@@ -189,6 +189,8 @@ bgg/
 | `codegraph` | 代码知识图谱，精准上下文 | `make setup-ai` | ✅ |
 | `context7` | 查第三方库文档 | 需 Node/`npx`（`make setup-ai` 不单独装） | ✅ |
 | `go-lsp` | Go 语言服务（gopls） | `go install .../mcp-language-server@latest` + `gopls` | ✅ 后端开发 |
+| `vue-lsp` | Vue/TS 语言服务（@vue/language-server） | 与 go-lsp 共用 `mcp-language-server` + `cd admin-frontend && pnpm install` | ✅ 前端开发 |
+| `frontend-ui` | 项目 UI 组件与前端约定 | 已提交 `admin-frontend/mcp/dist/`（改源码后 `pnpm mcp:build`） | ✅ 前端开发 |
 | `mcp-zero` | go-zero / goctl 脚手架辅助 | 本机编译 `go-zero-mcp` 并设置 `GO_ZERO_MCP_PATH` | ✅ 后端开发 |
 | `mongodb` | 本地 Mongo 查询 | `npx` + 本机 MongoDB 在跑 | 可选 |
 | `redis` | 本地 Redis 查询 | `uvx` + 本机 Redis 在跑 | 可选 |
@@ -268,11 +270,24 @@ go install golang.org/x/tools/gopls@latest
 
 验证：`command -v mcp-language-server gopls`
 
-### 3. `context7` / `npx`
+### 3. 前端 MCP（`vue-lsp` + `frontend-ui`，前端开发必需）
+
+`vue-lsp` 与 `go-lsp` 共用 `mcp-language-server`（见上一节）。另需安装前端依赖：
+
+```bash
+cd admin-frontend && pnpm install
+```
+
+- **`vue-lsp`**：workspace 指向 `admin-frontend/`，通过 `node` 启动 `@vue/language-server`（`node_modules` 内路径相对 workspace）
+- **`frontend-ui`**：Node 直启 `admin-frontend/mcp/dist/index.js`，无需额外安装（dist 已提交 git）
+
+验证：`test -x admin-frontend/node_modules/.bin/vue-ts-lsp && node admin-frontend/mcp/dist/index.js`（后者会挂起等待 stdio，Ctrl+C 退出即可）
+
+### 4. `context7` / `npx`
 
 需 Node.js 18+。一般开发机已有；无则安装 Node 后 `make sync-claude-mcp-check` 中 `context7` 应显示 Connected。
 
-### 4. `mongodb` / `redis` MCP（可选）
+### 5. `mongodb` / `redis` MCP（可选）
 
 | Server | 前提 | 不用时 |
 |--------|------|--------|
@@ -281,7 +296,7 @@ go install golang.org/x/tools/gopls@latest
 
 仅做 admin-server MySQL 开发、不查 Mongo/Redis 时，可不启这两个服务。
 
-### 5. Claude Code MCP 重连
+### 6. Claude Code MCP 重连
 
 `setup-ai` 后在 **Cursor 集成终端**（非对话面板）：
 
@@ -293,7 +308,7 @@ claude
 
 期望：必需 server 为 Connected；`mcp-zero` 在设置 `GO_ZERO_MCP_PATH` 后应 Connected。
 
-### 6. 维护者：双通道 MCP 同步纪律
+### 7. 维护者：双通道 MCP 同步纪律
 
 | 你改了什么 | 必须做什么 |
 |------------|------------|
@@ -377,6 +392,16 @@ CodeGraph 默认**自动同步**文件变更，一般无需手动 `codegraph syn
 ### `go-lsp` 连接失败
 
 未安装 `mcp-language-server` 或 `gopls`。见上文「初始化后必做清单」第 2 节。
+
+### `vue-lsp` 连接失败
+
+1. 未安装 `mcp-language-server`（与 go-lsp 相同）
+2. 未执行 `cd admin-frontend && pnpm install`（缺少 `vue-ts-lsp`）
+3. `admin-frontend/scripts/vue-lsp.sh` 无执行权限：`chmod +x admin-frontend/scripts/vue-lsp.sh`
+
+### `frontend-ui` 连接失败
+
+检查 `admin-frontend/mcp/dist/index.js` 是否存在；若改过 `mcp/src/` 需 `cd admin-frontend && pnpm mcp:build` 后 commit dist。
 
 ### `mongodb` / `redis` 连接失败
 
