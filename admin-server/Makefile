@@ -6,7 +6,9 @@ init:
 
 # wire 生成目录（单入口；若未来拆 cmd/task 可扩展为多个）
 WIRE_CMD_DIRS := ./internal/wire
-
+# 将 .cursor/rules/*.mdc（SSOT）转为 .claude/rules/*.md；缺失时自动创建 .claude/skills 软链
+sync-claude-rules:
+	@go run ../script/sync_claude_rules.go
 # 改 providers.go / wire.go 后执行，重生 wire_gen.go
 wire:
 	@echo "Generating wire code..."
