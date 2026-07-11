@@ -4,7 +4,6 @@
 package public
 
 import (
-	blogrepo "postapocgame/admin-server/internal/repository/blog"
 	"context"
 
 	"postapocgame/admin-server/internal/svc"
@@ -34,7 +33,7 @@ func (l *PublicBlogArticleNextLogic) PublicBlogArticleNext(req *types.PublicBlog
 	}
 
 	// 查询当前文章信息
-	currentArticle, err := blogrepo.NewBlogArticleRepository(l.svcCtx.Repository).FindByID(l.ctx, req.Id)
+	currentArticle, err := l.svcCtx.Domain.Blog.Article.FindByID(l.ctx, req.Id)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeBadDB, "查询当前文章失败", err)
 	}
@@ -43,7 +42,7 @@ func (l *PublicBlogArticleNextLogic) PublicBlogArticleNext(req *types.PublicBlog
 	}
 
 	// 查询下一篇文章
-	nextArticle, err := blogrepo.NewBlogArticleRepository(l.svcCtx.Repository).FindNextArticle(l.ctx, currentArticle.PublishTime)
+	nextArticle, err := l.svcCtx.Domain.Blog.Article.FindNextArticle(l.ctx, currentArticle.PublishTime)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeBadDB, "查询下一篇文章失败", err)
 	}

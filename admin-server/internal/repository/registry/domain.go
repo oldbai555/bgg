@@ -3,7 +3,11 @@ package registry
 import (
 	"context"
 
+	"postapocgame/admin-server/internal/consts"
+	chatdomain "postapocgame/admin-server/internal/domain/chat"
+	contentdomain "postapocgame/admin-server/internal/domain/content"
 	iamdomain "postapocgame/admin-server/internal/domain/iam"
+	sdkdomain "postapocgame/admin-server/internal/domain/sdk"
 	"postapocgame/admin-server/internal/repository"
 	blogrepo "postapocgame/admin-server/internal/repository/blog"
 	chatrepo "postapocgame/admin-server/internal/repository/chat"
@@ -42,26 +46,54 @@ type IAMDomain struct {
 	PermissionApi      iamrepo.PermissionApiRepository
 	TokenBlacklist     iamrepo.TokenBlacklistRepository
 	PermissionResolver *iamdomain.PermissionResolver
+	UserService        *iamdomain.UserDomainService
+	RBAC               *iamdomain.RBACService
 }
 
 type BlogDomain struct {
-	Article      blogrepo.BlogArticleRepository
-	ArticleTag   blogrepo.BlogArticleTagRepository
-	ArticleAudit blogrepo.BlogArticleAuditRepository
-	FriendLink   blogrepo.BlogFriendLinkRepository
-	SocialInfo   blogrepo.BlogSocialInfoRepository
-	Tag          blogrepo.BlogTagRepository
+	Article        blogrepo.BlogArticleRepository
+	ArticleTag     blogrepo.BlogArticleTagRepository
+	ArticleAudit   blogrepo.BlogArticleAuditRepository
+	FriendLink     blogrepo.BlogFriendLinkRepository
+	SocialInfo     blogrepo.BlogSocialInfoRepository
+	Tag            blogrepo.BlogTagRepository
+	ArticleService *contentdomain.BlogArticleService
 }
 
 type ChatDomain struct {
 	Chat        chatrepo.ChatRepository
 	ChatUser    chatrepo.ChatUserRepository
 	ChatMessage chatrepo.ChatMessageRepository
+	Onboarding  chatdomain.Onboarding
+}
+
+// iamUserListerAdapter 实现 chatdomain.UserLister，是 registry 包（组合根，允许同时
+// import iam 和 chat 两个域）承担的"翻译"职责：chatdomain 包本身永远不 import
+// internal/repository/iam 或 internal/model/iam。只返回未删除、状态正常的用户，
+// 过滤逻辑放在这里而不是 chatdomain 里，因为"状态正常"是 IAM 的业务语义。
+type iamUserListerAdapter struct {
+	userRepo iamrepo.UserRepository
+}
+
+func (a *iamUserListerAdapter) FindChunk(ctx context.Context, limit int, lastID uint64) ([]chatdomain.UserRef, uint64, error) {
+	users, newLastID, err := a.userRepo.FindChunk(ctx, int64(limit), lastID)
+	if err != nil {
+		return nil, 0, err
+	}
+	refs := make([]chatdomain.UserRef, 0, len(users))
+	for _, u := range users {
+		if u.DeletedAt != 0 || u.Status != consts.UserStatusEnabled {
+			continue
+		}
+		refs = append(refs, chatdomain.UserRef{ID: u.Id})
+	}
+	return refs, newLastID, nil
 }
 
 type SDKDomain struct {
-	Admin  *sdkrepo.SdkAdminRepository
-	Public *sdkrepo.SdkRepository
+	Admin   *sdkrepo.SdkAdminRepository
+	Public  *sdkrepo.SdkRepository
+	Service *sdkdomain.SDKService
 }
 
 type VideoDomain struct {
@@ -99,9 +131,16 @@ func NewDomain(repo *repository.Repository) *Domain {
 	if repo == nil {
 		return nil
 	}
+
+	// chatOnboarding 必须先于 IAM.UserService 构造好（UserService 依赖它）。提到局部变量
+	// 而不是在两处字面量里各构造一次，避免出现两个不同的 *ChatOnboardingService 实例
+	// （IAM 手上那个和 Domain.Chat.Onboarding 对不上，造成理解成本）。
+	userRepo := iamrepo.NewUserRepository(repo)
+	chatOnboarding := chatdomain.NewChatOnboardingService(repo, &iamUserListerAdapter{userRepo: userRepo})
+
 	return &Domain{
 		IAM: IAMDomain{
-			User:               iamrepo.NewUserRepository(repo),
+			User:               userRepo,
 			Role:               iamrepo.NewRoleRepository(repo),
 			Permission:         iamrepo.NewPermissionRepository(repo),
 			Menu:               iamrepo.NewMenuRepository(repo),
@@ -113,23 +152,28 @@ func NewDomain(repo *repository.Repository) *Domain {
 			PermissionApi:      iamrepo.NewPermissionApiRepository(repo),
 			TokenBlacklist:     iamrepo.NewTokenBlacklistRepository(repo),
 			PermissionResolver: iamdomain.NewPermissionResolver(repo),
+			UserService:        iamdomain.NewUserDomainService(repo, chatOnboarding),
+			RBAC:               iamdomain.NewRBACService(repo),
 		},
 		Blog: BlogDomain{
-			Article:      blogrepo.NewBlogArticleRepository(repo),
-			ArticleTag:   blogrepo.NewBlogArticleTagRepository(repo),
-			ArticleAudit: blogrepo.NewBlogArticleAuditRepository(repo),
-			FriendLink:   blogrepo.NewBlogFriendLinkRepository(repo),
-			SocialInfo:   blogrepo.NewBlogSocialInfoRepository(repo),
-			Tag:          blogrepo.NewBlogTagRepository(repo),
+			Article:        blogrepo.NewBlogArticleRepository(repo),
+			ArticleTag:     blogrepo.NewBlogArticleTagRepository(repo),
+			ArticleAudit:   blogrepo.NewBlogArticleAuditRepository(repo),
+			FriendLink:     blogrepo.NewBlogFriendLinkRepository(repo),
+			SocialInfo:     blogrepo.NewBlogSocialInfoRepository(repo),
+			Tag:            blogrepo.NewBlogTagRepository(repo),
+			ArticleService: contentdomain.NewBlogArticleService(repo),
 		},
 		Chat: ChatDomain{
 			Chat:        chatrepo.NewChatRepository(repo),
 			ChatUser:    chatrepo.NewChatUserRepository(repo),
 			ChatMessage: chatrepo.NewChatMessageRepository(repo),
+			Onboarding:  chatOnboarding,
 		},
 		SDK: SDKDomain{
-			Admin:  sdkrepo.NewSdkAdminRepository(repo),
-			Public: sdkrepo.NewSdkRepository(repo),
+			Admin:   sdkrepo.NewSdkAdminRepository(repo),
+			Public:  sdkrepo.NewSdkRepository(repo),
+			Service: sdkdomain.NewSDKService(repo),
 		},
 		Video: VideoDomain{
 			Video: videorepo.NewVideoRepository(repo),

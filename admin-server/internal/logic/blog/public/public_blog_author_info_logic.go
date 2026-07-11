@@ -4,7 +4,6 @@
 package public
 
 import (
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
 	"context"
 
 	"postapocgame/admin-server/internal/svc"
@@ -30,7 +29,8 @@ func NewPublicBlogAuthorInfoLogic(ctx context.Context, svcCtx *svc.ServiceContex
 
 func (l *PublicBlogAuthorInfoLogic) PublicBlogAuthorInfo() (resp *types.PublicBlogAuthorInfoResp, err error) {
 	// 查询超级管理员（id=1）的信息
-	user, err := iamrepo.NewUserRepository(l.svcCtx.Repository).FindByID(l.ctx, 1)
+	// TODO(phase2-content-rpc): 跨域读取 IAM 用户信息，Phase 2 拆分后改为调用 iam-rpc.GetUserProfile
+	user, err := l.svcCtx.Domain.IAM.User.FindByID(l.ctx, 1)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeBadDB, "查询作者信息失败", err)
 	}

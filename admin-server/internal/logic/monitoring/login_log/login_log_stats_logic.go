@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	monitoringrepo "postapocgame/admin-server/internal/repository/monitoring"
 )
 
 type LoginLogStatsLogic struct {
@@ -29,35 +28,34 @@ func NewLoginLogStatsLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Log
 }
 
 func (l *LoginLogStatsLogic) LoginLogStats() (resp *types.LoginLogStatsResp, err error) {
-	loginLogRepo := monitoringrepo.NewLoginLogRepository(l.svcCtx.Repository)
-
 	// 总登录次数（查询所有状态，使用一个大的查询）
+	// 字典值（login_status）：1=成功，2=失败
 	var totalCount int64
 	// 由于 CountByStatus 不支持 -1，我们分别查询成功和失败，然后相加
-	successCount, err := loginLogRepo.CountByStatus(l.ctx, 1)
+	successCount, err := l.svcCtx.Domain.Monitoring.LoginLog.CountByStatus(l.ctx, 1)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询成功次数失败", err)
 	}
-	failureCount, err := loginLogRepo.CountByStatus(l.ctx, 0)
+	failureCount, err := l.svcCtx.Domain.Monitoring.LoginLog.CountByStatus(l.ctx, 2)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询失败次数失败", err)
 	}
 	totalCount = successCount + failureCount
 
 	// 今日登录次数
-	todayCount, err := loginLogRepo.CountToday(l.ctx)
+	todayCount, err := l.svcCtx.Domain.Monitoring.LoginLog.CountToday(l.ctx)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询今日登录次数失败", err)
 	}
 
 	// 今日成功次数
-	todaySuccess, err := loginLogRepo.CountTodayByStatus(l.ctx, 1)
+	todaySuccess, err := l.svcCtx.Domain.Monitoring.LoginLog.CountTodayByStatus(l.ctx, 1)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询今日成功次数失败", err)
 	}
 
 	// 今日失败次数
-	todayFailure, err := loginLogRepo.CountTodayByStatus(l.ctx, 0)
+	todayFailure, err := l.svcCtx.Domain.Monitoring.LoginLog.CountTodayByStatus(l.ctx, 2)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询今日失败次数失败", err)
 	}

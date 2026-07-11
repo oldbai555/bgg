@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 type PermissionMenuUpdateLogic struct {
@@ -33,25 +32,5 @@ func (l *PermissionMenuUpdateLogic) PermissionMenuUpdate(req *types.PermissionMe
 		return errs.New(errs.CodeBadRequest, "权限ID不能为空")
 	}
 
-	permissionRepo := iamrepo.NewPermissionRepository(l.svcCtx.Repository)
-	// 验证权限是否存在
-	_, err := permissionRepo.FindByID(l.ctx, req.PermissionId)
-	if err != nil {
-		return errs.Wrap(errs.CodeBadRequest, "权限不存在", err)
-	}
-
-	menuRepo := iamrepo.NewMenuRepository(l.svcCtx.Repository)
-	// 验证所有菜单是否存在
-	for _, menuID := range req.MenuIds {
-		_, err := menuRepo.FindByID(l.ctx, menuID)
-		if err != nil {
-			return errs.Wrap(errs.CodeBadRequest, "菜单不存在", err)
-		}
-	}
-
-	permissionMenuRepo := iamrepo.NewPermissionMenuRepository(l.svcCtx.Repository)
-	if err := permissionMenuRepo.UpdatePermissionMenus(l.ctx, req.PermissionId, req.MenuIds); err != nil {
-		return errs.Wrap(errs.CodeInternalError, "更新权限菜单失败", err)
-	}
-	return nil
+	return l.svcCtx.Domain.IAM.RBAC.UpdatePermissionMenus(l.ctx, req.PermissionId, req.MenuIds)
 }

@@ -97,8 +97,16 @@ func (r *userRepository) FindChunk(ctx context.Context, limit int64, lastId uint
 }
 
 func (r *userRepository) Create(ctx context.Context, user *iammodel.AdminUser) error {
-	_, err := r.model.Insert(ctx, user)
-	return err
+	result, err := r.model.Insert(ctx, user)
+	if err != nil {
+		return err
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+	user.Id = uint64(id)
+	return nil
 }
 
 func (r *userRepository) Update(ctx context.Context, user *iammodel.AdminUser) error {

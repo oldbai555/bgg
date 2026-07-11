@@ -6,8 +6,9 @@ package metric
 import (
 	"context"
 
-	"github.com/zeromicro/go-zero/core/logx"
 	"postapocgame/admin-server/internal/svc"
+
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type MetricReportOptionsLogic struct {

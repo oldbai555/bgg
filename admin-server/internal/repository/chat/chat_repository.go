@@ -70,8 +70,16 @@ func (r *chatRepository) FindUsersByChatID(ctx context.Context, chatID uint64) (
 }
 
 func (r *chatRepository) Create(ctx context.Context, chat *chatmodel.Chat) error {
-	_, err := r.model.Insert(ctx, chat)
-	return err
+	result, err := r.model.Insert(ctx, chat)
+	if err != nil {
+		return err
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+	chat.Id = uint64(id)
+	return nil
 }
 
 func (r *chatRepository) Update(ctx context.Context, chat *chatmodel.Chat) error {
@@ -85,18 +93,8 @@ func (r *chatRepository) DeleteByID(ctx context.Context, id uint64) error {
 func (r *chatRepository) FindPrivateChatByUserIDs(ctx context.Context, userID1, userID2 uint64) (*chatmodel.Chat, error) {
 	// 查找两个用户之间的私聊（type=1）
 	// 私聊必须包含且仅包含这两个用户
+	// 用子查询正确计算用户数（原先用 JOIN + GROUP BY 的写法有 bug，已废弃）
 	query := `
-		SELECT c.* 
-		FROM chat c
-		INNER JOIN chat_user cu1 ON c.id = cu1.chat_id AND cu1.user_id = ?
-		INNER JOIN chat_user cu2 ON c.id = cu2.chat_id AND cu2.user_id = ?
-		WHERE c.type = 1 AND c.deleted_at = 0
-		GROUP BY c.id
-		HAVING COUNT(DISTINCT cu.user_id) = 2
-		LIMIT 1
-	`
-	// 修复：使用子查询来正确计算用户数
-	query = `
 		SELECT c.* 
 		FROM chat c
 		WHERE c.type = 1 AND c.deleted_at = 0

@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	systemrepo "postapocgame/admin-server/internal/repository/system"
 )
 
 type FileDeleteLogic struct {
@@ -33,9 +32,8 @@ func (l *FileDeleteLogic) FileDelete(req *types.FileDeleteReq) error {
 		return errs.New(errs.CodeBadRequest, "文件ID不能为空")
 	}
 
-	fileRepo := systemrepo.NewFileRepository(l.svcCtx.Repository)
 	// 先查询文件信息，获取文件路径（后续可以扩展删除物理文件）
-	_, err := fileRepo.FindByID(l.ctx, req.Id)
+	_, err := l.svcCtx.Domain.System.File.FindByID(l.ctx, req.Id)
 	if err != nil {
 		return errs.Wrap(errs.CodeInternalError, "查询文件失败", err)
 	}
@@ -47,7 +45,7 @@ func (l *FileDeleteLogic) FileDelete(req *types.FileDeleteReq) error {
 	// }
 
 	// 删除数据库记录（软删除）
-	if err := fileRepo.DeleteByID(l.ctx, req.Id); err != nil {
+	if err := l.svcCtx.Domain.System.File.DeleteByID(l.ctx, req.Id); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "删除文件记录失败", err)
 	}
 	return nil

@@ -12,7 +12,6 @@ import (
 
 	"github.com/zeromicro/go-zero/core/logx"
 	"golang.org/x/crypto/bcrypt"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 type UserUpdateLogic struct {
@@ -34,15 +33,14 @@ func (l *UserUpdateLogic) UserUpdate(req *types.UserUpdateReq) error {
 		return errs.New(errs.CodeBadRequest, "用户ID不能为空")
 	}
 
-	userRepo := iamrepo.NewUserRepository(l.svcCtx.Repository)
-	user, err := userRepo.FindByID(l.ctx, req.Id)
+	user, err := l.svcCtx.Domain.IAM.User.FindByID(l.ctx, req.Id)
 	if err != nil {
 		return errs.Wrap(errs.CodeInternalError, "查询用户失败", err)
 	}
 
 	if req.Username != "" {
 		// 检查新用户名是否已被其他用户使用
-		existing, err := userRepo.FindByUsername(l.ctx, req.Username)
+		existing, err := l.svcCtx.Domain.IAM.User.FindByUsername(l.ctx, req.Username)
 		if err == nil && existing.Id != req.Id {
 			return errs.New(errs.CodeBadRequest, "用户名已被使用")
 		}
@@ -77,7 +75,7 @@ func (l *UserUpdateLogic) UserUpdate(req *types.UserUpdateReq) error {
 		user.Status = req.Status
 	}
 
-	if err := userRepo.Update(l.ctx, user); err != nil {
+	if err := l.svcCtx.Domain.IAM.User.Update(l.ctx, user); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "更新用户失败", err)
 	}
 	return nil

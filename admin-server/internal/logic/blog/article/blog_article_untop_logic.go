@@ -4,7 +4,6 @@
 package article
 
 import (
-	blogrepo "postapocgame/admin-server/internal/repository/blog"
 	"context"
 
 	"postapocgame/admin-server/internal/svc"
@@ -35,7 +34,7 @@ func (l *BlogArticleUntopLogic) BlogArticleUntop(req *types.BlogArticleUntopReq)
 
 	// 直接执行更新，UpdateTopStatus 内部会检查文章是否存在
 	// 这样可以避免缓存问题，直接从数据库查询最新状态
-	if err := blogrepo.NewBlogArticleRepository(l.svcCtx.Repository).UpdateTopStatus(l.ctx, req.Id, 0); err != nil {
+	if err := l.svcCtx.Domain.Blog.Article.UpdateTopStatus(l.ctx, req.Id, 0); err != nil {
 		return nil, err
 	}
 

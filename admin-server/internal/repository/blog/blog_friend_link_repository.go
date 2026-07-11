@@ -124,10 +124,15 @@ func (r *blogFriendLinkRepository) Create(ctx context.Context, link *blogmodel.B
 	link.UpdatedAt = now
 	link.DeletedAt = 0
 
-	_, err := r.model.Insert(ctx, link)
+	result, err := r.model.Insert(ctx, link)
 	if err != nil {
 		return errs.Wrap(errs.CodeBadDB, "创建友情链接失败", err)
 	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return errs.Wrap(errs.CodeBadDB, "获取友情链接自增 ID 失败", err)
+	}
+	link.Id = uint64(id)
 	return nil
 }
 

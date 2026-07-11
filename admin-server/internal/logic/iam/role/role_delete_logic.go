@@ -12,7 +12,6 @@ import (
 	"postapocgame/admin-server/pkg/initdata"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 type RoleDeleteLogic struct {
@@ -38,8 +37,7 @@ func (l *RoleDeleteLogic) RoleDelete(req *types.RoleDeleteReq) error {
 		return errs.New(errs.CodeBadRequest, "初始化数据不可删除")
 	}
 
-	roleRepo := iamrepo.NewRoleRepository(l.svcCtx.Repository)
-	if err := roleRepo.DeleteByID(l.ctx, req.Id); err != nil {
+	if err := l.svcCtx.Domain.IAM.Role.DeleteByID(l.ctx, req.Id); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "删除角色失败", err)
 	}
 	return nil

@@ -4,7 +4,6 @@
 package friend_link
 
 import (
-	blogrepo "postapocgame/admin-server/internal/repository/blog"
 	"context"
 
 	"postapocgame/admin-server/internal/svc"
@@ -40,7 +39,7 @@ func (l *BlogFriendLinkListLogic) BlogFriendLinkList(req *types.BlogFriendLinkLi
 	}
 
 	// 调用仓储层分页查询
-	list, total, err := blogrepo.NewBlogFriendLinkRepository(l.svcCtx.Repository).FindPage(l.ctx, page, pageSize, req.Status, req.Keyword)
+	list, total, err := l.svcCtx.Domain.Blog.FriendLink.FindPage(l.ctx, page, pageSize, req.Status, req.Keyword)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeBadDB, "查询友情链接列表失败", err)
 	}

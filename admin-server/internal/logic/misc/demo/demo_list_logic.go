@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	miscrepo "postapocgame/admin-server/internal/repository/misc"
 )
 
 type DemoListLogic struct {
@@ -33,8 +32,7 @@ func (l *DemoListLogic) DemoList(req *types.DemoListReq) (resp *types.DemoListRe
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	demoRepo := miscrepo.NewDemoRepository(l.svcCtx.Repository)
-	list, total, err := demoRepo.FindPage(l.ctx, req.Page, req.PageSize, req.Name)
+	list, total, err := l.svcCtx.Domain.Misc.Demo.FindPage(l.ctx, req.Page, req.PageSize, req.Name)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询演示功能列表失败", err)
 	}

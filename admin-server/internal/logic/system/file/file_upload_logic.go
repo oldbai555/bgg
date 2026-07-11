@@ -19,9 +19,9 @@ import (
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 
-	"github.com/zeromicro/go-zero/core/logx"
 	"postapocgame/admin-server/internal/model/system"
-	systemrepo "postapocgame/admin-server/internal/repository/system"
+
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type FileUploadLogic struct {
@@ -63,8 +63,11 @@ func (l *FileUploadLogic) FileUpload(r *http.Request) (resp *types.FileUploadRes
 	}
 	md5Hash := fmt.Sprintf("%x", hash.Sum(nil))
 
-	// 重置文件指针，以便后续读取
-	file.Seek(0, 0)
+	// 重置文件指针，以便后续读取；Seek 失败会导致下面的 io.Copy 从错误的偏移量开始，
+	// 落盘内容和用于命名的 MD5 对不上，必须当错误处理而不是静默忽略。
+	if _, err := file.Seek(0, 0); err != nil {
+		return nil, errs.Wrap(errs.CodeInternalError, "重置文件指针失败", err)
+	}
 
 	// 获取文件扩展名
 	ext := filepath.Ext(header.Filename)
@@ -75,8 +78,7 @@ func (l *FileUploadLogic) FileUpload(r *http.Request) (resp *types.FileUploadRes
 	baseURL := l.getStorageBaseURL()
 
 	// 检查文件是否已存在（根据 MD5）
-	fileRepo := systemrepo.NewFileRepository(l.svcCtx.Repository)
-	existingFile, err := fileRepo.FindByName(l.ctx, fileName)
+	existingFile, err := l.svcCtx.Domain.System.File.FindByName(l.ctx, fileName)
 	if err == nil && existingFile != nil {
 		// 文件已存在，直接返回已有记录
 		l.Infof("文件已存在，MD5: %s", md5Hash)
@@ -139,7 +141,7 @@ func (l *FileUploadLogic) FileUpload(r *http.Request) (resp *types.FileUploadRes
 		Status:       1,
 	}
 
-	if err := fileRepo.Create(l.ctx, &fileModel); err != nil {
+	if err := l.svcCtx.Domain.System.File.Create(l.ctx, &fileModel); err != nil {
 		// 如果数据库保存失败，删除已上传的文件
 		os.Remove(fileSystemPath)
 		return nil, errs.Wrap(errs.CodeInternalError, "保存文件记录失败", err)
@@ -170,15 +172,13 @@ func (l *FileUploadLogic) FileUpload(r *http.Request) (resp *types.FileUploadRes
 // getStorageBaseURL 从字典中获取存储baseURL
 func (l *FileUploadLogic) getStorageBaseURL() string {
 	// 从字典中获取配置
-	dictTypeRepo := systemrepo.NewDictTypeRepository(l.svcCtx.Repository)
-	dictType, err := dictTypeRepo.FindByCode(l.ctx, "storage_base_url")
+	dictType, err := l.svcCtx.Domain.System.DictType.FindByCode(l.ctx, "storage_base_url")
 	if err != nil {
 		l.Errorf("获取存储配置字典类型失败: %v", err)
 		return ""
 	}
 
-	dictItemRepo := systemrepo.NewDictItemRepository(l.svcCtx.Repository)
-	items, err := dictItemRepo.FindByTypeID(l.ctx, dictType.Id)
+	items, err := l.svcCtx.Domain.System.DictItem.FindByTypeID(l.ctx, dictType.Id)
 	if err != nil || len(items) == 0 {
 		l.Errorf("获取存储配置字典项失败: %v", err)
 		return ""

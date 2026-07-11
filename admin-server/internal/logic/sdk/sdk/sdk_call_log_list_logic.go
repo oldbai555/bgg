@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	sdkrepo "postapocgame/admin-server/internal/repository/sdk"
 )
 
 type SdkCallLogListLogic struct {
@@ -34,8 +33,7 @@ func (l *SdkCallLogListLogic) SdkCallLogList(req *types.SdkCallLogListReq) (resp
 	}
 	req.Page, req.PageSize = logicutil.NormalizePage(req.Page, req.PageSize, 20, 200)
 
-	repo := sdkrepo.NewSdkAdminRepository(l.svcCtx.Repository)
-	list, total, err := repo.ListCallLogs(l.ctx, req.Page, req.PageSize, req.SdkKeyId, req.ApiCode, req.RespCode, req.Ip, req.StartTime, req.EndTime)
+	list, total, err := l.svcCtx.Domain.SDK.Admin.ListCallLogs(l.ctx, req.Page, req.PageSize, req.SdkKeyId, req.ApiCode, req.RespCode, req.Ip, req.StartTime, req.EndTime)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询调用记录失败", err)
 	}

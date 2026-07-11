@@ -1,7 +1,6 @@
 package tag
 
 import (
-	blogrepo "postapocgame/admin-server/internal/repository/blog"
 	"context"
 
 	"postapocgame/admin-server/internal/svc"
@@ -31,7 +30,7 @@ func (l *BlogTagOptionsLogic) BlogTagOptions(req *types.BlogTagOptionsReq) (resp
 	if req != nil && req.Limit > 0 {
 		limit = req.Limit
 	}
-	list, err := blogrepo.NewBlogTagRepository(l.svcCtx.Repository).FindEnabledList(l.ctx, limit)
+	list, err := l.svcCtx.Domain.Blog.Tag.FindEnabledList(l.ctx, limit)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeBadDB, "查询标签选项失败", err)
 	}

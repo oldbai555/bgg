@@ -38,6 +38,16 @@ func (l *RefreshLogic) Refresh(req *types.RefreshReq) (resp *types.TokenPair, er
 		return nil, errs.New(errs.CodeUnauthorized, "刷新令牌无效或已过期")
 	}
 
+	// 黑名单校验：与 authmiddleware.go 对访问令牌的校验对齐，避免 Logout 之后刷新令牌
+	// 在自然过期前仍能继续换发新的访问令牌。
+	blacklisted, err := l.svcCtx.Domain.IAM.TokenBlacklist.IsBlacklisted(l.ctx, req.RefreshToken)
+	if err != nil {
+		return nil, errs.Wrap(errs.CodeInternalError, "检查令牌黑名单失败", err)
+	}
+	if blacklisted {
+		return nil, errs.New(errs.CodeUnauthorized, "刷新令牌无效或已过期")
+	}
+
 	accessToken, err := jwthelper.GenerateToken(
 		l.svcCtx.Config.JWT.AccessSecret,
 		l.svcCtx.Config.JWT.Issuer,

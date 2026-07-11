@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	miscrepo "postapocgame/admin-server/internal/repository/misc"
 )
 
 type DemoUpdateLogic struct {
@@ -33,8 +32,7 @@ func (l *DemoUpdateLogic) DemoUpdate(req *types.DemoUpdateReq) error {
 		return errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	demoRepo := miscrepo.NewDemoRepository(l.svcCtx.Repository)
-	demo, err := demoRepo.FindByID(l.ctx, req.Id)
+	demo, err := l.svcCtx.Domain.Misc.Demo.FindByID(l.ctx, req.Id)
 	if err != nil {
 		return errs.Wrap(errs.CodeNotFound, "演示功能不存在", err)
 	}
@@ -47,7 +45,7 @@ func (l *DemoUpdateLogic) DemoUpdate(req *types.DemoUpdateReq) error {
 		demo.Status = req.Status
 	}
 
-	if err := demoRepo.Update(l.ctx, demo); err != nil {
+	if err := l.svcCtx.Domain.Misc.Demo.Update(l.ctx, demo); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "更新演示功能失败", err)
 	}
 	return nil

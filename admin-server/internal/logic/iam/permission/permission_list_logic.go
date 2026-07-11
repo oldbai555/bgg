@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 type PermissionListLogic struct {
@@ -33,8 +32,7 @@ func (l *PermissionListLogic) PermissionList(req *types.PermissionListReq) (resp
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	permissionRepo := iamrepo.NewPermissionRepository(l.svcCtx.Repository)
-	list, total, err := permissionRepo.FindPage(l.ctx, req.Page, req.PageSize, req.Name)
+	list, total, err := l.svcCtx.Domain.IAM.Permission.FindPage(l.ctx, req.Page, req.PageSize, req.Name)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询权限列表失败", err)
 	}

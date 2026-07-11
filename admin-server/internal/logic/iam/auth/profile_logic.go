@@ -12,7 +12,6 @@ import (
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 type ProfileLogic struct {
@@ -37,8 +36,7 @@ func (l *ProfileLogic) Profile() (resp *types.ProfileResp, err error) {
 
 	// 获取用户权限
 	// 获取用户详细信息（包括头像和个性签名）
-	userRepo := iamrepo.NewUserRepository(l.svcCtx.Repository)
-	userInfo, err := userRepo.FindByID(l.ctx, user.UserID)
+	userInfo, err := l.svcCtx.Domain.IAM.User.FindByID(l.ctx, user.UserID)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "获取用户信息失败", err)
 	}
@@ -48,14 +46,12 @@ func (l *ProfileLogic) Profile() (resp *types.ProfileResp, err error) {
 	codes, err := cache.GetUserPermissions(l.ctx, user.UserID)
 	if err != nil {
 		// 缓存未命中，从数据库查询
-		userRoleRepo := iamrepo.NewUserRoleRepository(l.svcCtx.Repository)
-		roleIDs, err := userRoleRepo.ListRoleIDsByUserID(l.ctx, user.UserID)
+		roleIDs, err := l.svcCtx.Domain.IAM.UserRole.ListRoleIDsByUserID(l.ctx, user.UserID)
 		if err != nil {
 			return nil, errs.Wrap(errs.CodeInternalError, "获取用户角色失败", err)
 		}
 
-		permissionRepo := iamrepo.NewPermissionRepository(l.svcCtx.Repository)
-		perms, err := permissionRepo.ListByRoleIDs(l.ctx, roleIDs)
+		perms, err := l.svcCtx.Domain.IAM.Permission.ListByRoleIDs(l.ctx, roleIDs)
 		if err != nil {
 			return nil, errs.Wrap(errs.CodeInternalError, "获取用户权限失败", err)
 		}

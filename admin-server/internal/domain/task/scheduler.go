@@ -95,17 +95,16 @@ func (s *TaskScheduler) scanAndExecute() {
 	}()
 
 	ctx := context.Background()
-	taskRepo := taskrepo.NewTaskRepository(s.repo)
 
 	// 1. 扫描待执行的异步任务（execution_type=2, status=1, scheduled_at=0）
-	asyncTasks, err := s.scanAsyncTasks(ctx, taskRepo)
+	asyncTasks, err := s.scanAsyncTasks(ctx)
 	if err != nil {
 		logx.Errorf("扫描异步任务失败: %v", err)
 		return
 	}
 
 	// 2. 扫描待执行的定时任务（execution_type=2, status=1, scheduled_at>0且<=now）
-	scheduledTasks, err := s.scanScheduledTasks(ctx, taskRepo)
+	scheduledTasks, err := s.scanScheduledTasks(ctx)
 	if err != nil {
 		logx.Errorf("扫描定时任务失败: %v", err)
 		return
@@ -129,7 +128,7 @@ func (s *TaskScheduler) scanAndExecute() {
 }
 
 // scanAsyncTasks 扫描异步任务
-func (s *TaskScheduler) scanAsyncTasks(ctx context.Context, taskRepo taskrepo.TaskRepository) ([]taskmodel.AdminTask, error) {
+func (s *TaskScheduler) scanAsyncTasks(ctx context.Context) ([]taskmodel.AdminTask, error) {
 	// 使用自定义SQL查询异步任务
 	// 查询条件：execution_type=2（异步），status=1（未开始），scheduled_at=0（立即执行），deleted_at=0（未删除）
 	conditions := sq.And{
@@ -158,7 +157,7 @@ func (s *TaskScheduler) scanAsyncTasks(ctx context.Context, taskRepo taskrepo.Ta
 }
 
 // scanScheduledTasks 扫描定时任务
-func (s *TaskScheduler) scanScheduledTasks(ctx context.Context, taskRepo taskrepo.TaskRepository) ([]taskmodel.AdminTask, error) {
+func (s *TaskScheduler) scanScheduledTasks(ctx context.Context) ([]taskmodel.AdminTask, error) {
 	now := time.Now().Unix()
 
 	// 使用自定义SQL查询定时任务

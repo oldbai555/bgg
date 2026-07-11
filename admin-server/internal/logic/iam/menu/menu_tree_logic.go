@@ -12,7 +12,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 type MenuTreeLogic struct {
@@ -39,15 +38,13 @@ func (l *MenuTreeLogic) MenuTree() (resp *types.MenuTreeResp, err error) {
 	}
 
 	// 缓存未命中，从数据库查询
-	menuRepo := iamrepo.NewMenuRepository(l.svcCtx.Repository)
-	list, err := menuRepo.ListAll(l.ctx)
+	list, err := l.svcCtx.Domain.IAM.Menu.ListAll(l.ctx)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询菜单列表失败", err)
 	}
 
 	// 获取菜单权限编码映射
-	permissionMenuRepo := iamrepo.NewPermissionMenuRepository(l.svcCtx.Repository)
-	menuPermissionMap, err := permissionMenuRepo.ListMenuPermissionCodes(l.ctx)
+	menuPermissionMap, err := l.svcCtx.Domain.IAM.PermissionMenu.ListMenuPermissionCodes(l.ctx)
 	if err != nil {
 		// 如果查询权限关联失败，记录日志但不影响菜单树返回
 		l.Errorf("查询菜单权限关联失败: %v", err)

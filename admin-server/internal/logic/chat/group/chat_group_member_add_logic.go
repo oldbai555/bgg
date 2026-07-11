@@ -12,10 +12,9 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 
-	"github.com/zeromicro/go-zero/core/logx"
 	chatmodel "postapocgame/admin-server/internal/model/chat"
-	chatrepo "postapocgame/admin-server/internal/repository/chat"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
+
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type ChatGroupMemberAddLogic struct {
@@ -43,12 +42,8 @@ func (l *ChatGroupMemberAddLogic) ChatGroupMemberAdd(req *types.ChatGroupMemberA
 		return nil, errs.New(errs.CodeBadRequest, "用户ID列表不能为空")
 	}
 
-	chatRepo := chatrepo.NewChatRepository(l.svcCtx.Repository)
-	chatUserRepo := chatrepo.NewChatUserRepository(l.svcCtx.Repository)
-	userRepo := iamrepo.NewUserRepository(l.svcCtx.Repository)
-
 	// 查询群组
-	chat, err := chatRepo.FindByID(l.ctx, req.ChatId)
+	chat, err := l.svcCtx.Domain.Chat.Chat.FindByID(l.ctx, req.ChatId)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeNotFound, "群组不存在", err)
 	}
@@ -64,7 +59,7 @@ func (l *ChatGroupMemberAddLogic) ChatGroupMemberAdd(req *types.ChatGroupMemberA
 	}
 
 	// 查询现有成员
-	existingUsers, err := chatUserRepo.FindByChatID(l.ctx, req.ChatId)
+	existingUsers, err := l.svcCtx.Domain.Chat.ChatUser.FindByChatID(l.ctx, req.ChatId)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询群组成员失败", err)
 	}
@@ -85,7 +80,7 @@ func (l *ChatGroupMemberAddLogic) ChatGroupMemberAdd(req *types.ChatGroupMemberA
 		}
 
 		// 验证用户是否存在且未删除
-		user, err := userRepo.FindByID(l.ctx, userId)
+		user, err := l.svcCtx.Domain.IAM.User.FindByID(l.ctx, userId)
 		if err != nil {
 			logx.Errorf("查询用户失败: userId=%d, err=%v", userId, err)
 			continue
@@ -103,7 +98,7 @@ func (l *ChatGroupMemberAddLogic) ChatGroupMemberAdd(req *types.ChatGroupMemberA
 			CreatedAt: now,
 			UpdatedAt: now,
 		}
-		err = chatUserRepo.Create(l.ctx, chatUser)
+		err = l.svcCtx.Domain.Chat.ChatUser.Create(l.ctx, chatUser)
 		if err != nil {
 			logx.Errorf("添加成员到群组失败: userId=%d, err=%v", userId, err)
 			continue

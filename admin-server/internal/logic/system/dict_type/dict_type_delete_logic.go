@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	systemrepo "postapocgame/admin-server/internal/repository/system"
 )
 
 type DictTypeDeleteLogic struct {
@@ -34,14 +33,12 @@ func (l *DictTypeDeleteLogic) DictTypeDelete(req *types.DictTypeDeleteReq) error
 	}
 
 	// 检查是否有字典项关联
-	dictItemRepo := systemrepo.NewDictItemRepository(l.svcCtx.Repository)
-	items, err := dictItemRepo.FindByTypeID(l.ctx, req.Id)
+	items, err := l.svcCtx.Domain.System.DictItem.FindByTypeID(l.ctx, req.Id)
 	if err == nil && len(items) > 0 {
 		return errs.New(errs.CodeBadRequest, "该字典类型下存在字典项，无法删除")
 	}
 
-	dictTypeRepo := systemrepo.NewDictTypeRepository(l.svcCtx.Repository)
-	if err := dictTypeRepo.DeleteByID(l.ctx, req.Id); err != nil {
+	if err := l.svcCtx.Domain.System.DictType.DeleteByID(l.ctx, req.Id); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "删除字典类型失败", err)
 	}
 	return nil

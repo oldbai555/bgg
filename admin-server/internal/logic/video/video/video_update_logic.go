@@ -13,7 +13,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	videorepo "postapocgame/admin-server/internal/repository/video"
 )
 
 type VideoUpdateLogic struct {
@@ -35,8 +34,7 @@ func (l *VideoUpdateLogic) VideoUpdate(req *types.VideoUpdateReq) error {
 		return errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	repo := videorepo.NewVideoRepository(l.svcCtx.Repository)
-	video, err := repo.FindByID(l.ctx, req.Id)
+	video, err := l.svcCtx.Domain.Video.Video.FindByID(l.ctx, req.Id)
 	if err != nil {
 		return errs.Wrap(errs.CodeNotFound, "视频不存在", err)
 	}
@@ -65,7 +63,7 @@ func (l *VideoUpdateLogic) VideoUpdate(req *types.VideoUpdateReq) error {
 
 	video.UpdatedAt = time.Now().Unix()
 
-	if err := repo.Update(l.ctx, video); err != nil {
+	if err := l.svcCtx.Domain.Video.Video.Update(l.ctx, video); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "更新视频失败", err)
 	}
 

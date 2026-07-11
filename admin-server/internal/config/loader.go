@@ -138,7 +138,8 @@ func LoadRedisConfig(configPath string) (*RedisConf, error) {
 	// 解析数据库编号
 	var db int
 	if redisConfig.Database != "" {
-		fmt.Sscanf(redisConfig.Database, "%d", &db)
+		// 解析失败时 db 保持零值默认（Redis DB 0），和字段本就为空时的行为一致。
+		_, _ = fmt.Sscanf(redisConfig.Database, "%d", &db)
 	}
 
 	address := fmt.Sprintf("%s:%s", redisConfig.Host, redisConfig.Port)

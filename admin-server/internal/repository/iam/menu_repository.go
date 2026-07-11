@@ -38,8 +38,16 @@ func (r *menuRepository) FindByID(ctx context.Context, id uint64) (*iammodel.Adm
 }
 
 func (r *menuRepository) Create(ctx context.Context, m *iammodel.AdminMenu) error {
-	_, err := r.model.Insert(ctx, m)
-	return err
+	result, err := r.model.Insert(ctx, m)
+	if err != nil {
+		return err
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+	m.Id = uint64(id)
+	return nil
 }
 
 func (r *menuRepository) Update(ctx context.Context, m *iammodel.AdminMenu) error {

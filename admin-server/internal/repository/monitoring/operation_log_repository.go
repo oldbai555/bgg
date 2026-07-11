@@ -106,8 +106,16 @@ func (r *operationLogRepository) FindPage(ctx context.Context, page, pageSize in
 
 func (r *operationLogRepository) Create(ctx context.Context, log *monitoringmodel.AdminOperationLog) error {
 	// go-zero 生成的 Model 会自动处理 created_at 和 updated_at
-	_, err := r.model.Insert(ctx, log)
-	return err
+	result, err := r.model.Insert(ctx, log)
+	if err != nil {
+		return err
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+	log.Id = uint64(id)
+	return nil
 }
 
 func (r *operationLogRepository) BatchCreate(ctx context.Context, logs []*monitoringmodel.AdminOperationLog) error {
@@ -117,10 +125,15 @@ func (r *operationLogRepository) BatchCreate(ctx context.Context, logs []*monito
 
 	// 批量插入（使用事务或循环插入）
 	for _, log := range logs {
-		_, err := r.model.Insert(ctx, log)
+		result, err := r.model.Insert(ctx, log)
 		if err != nil {
 			return err
 		}
+		id, err := result.LastInsertId()
+		if err != nil {
+			return err
+		}
+		log.Id = uint64(id)
 	}
 	return nil
 }

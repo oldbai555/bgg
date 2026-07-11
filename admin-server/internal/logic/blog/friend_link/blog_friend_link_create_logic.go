@@ -4,7 +4,6 @@
 package friend_link
 
 import (
-	blogrepo "postapocgame/admin-server/internal/repository/blog"
 	"context"
 	"fmt"
 	"strings"
@@ -15,8 +14,9 @@ import (
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 
-	"github.com/zeromicro/go-zero/core/logx"
 	"postapocgame/admin-server/internal/model/blog"
+
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type BlogFriendLinkCreateLogic struct {
@@ -76,7 +76,7 @@ func (l *BlogFriendLinkCreateLogic) BlogFriendLinkCreate(req *types.BlogFriendLi
 		OrderNum: req.OrderNum,
 	}
 
-	if err := blogrepo.NewBlogFriendLinkRepository(l.svcCtx.Repository).Create(l.ctx, link); err != nil {
+	if err := l.svcCtx.Domain.Blog.FriendLink.Create(l.ctx, link); err != nil {
 		return nil, err
 	}
 

@@ -58,6 +58,12 @@
 
 **理由**：日志聚合系统本身是一套需要独立部署、存储、维护的基础设施（Elasticsearch/Loki + 采集端 + 展示端），对独立维护者是显著的额外运维负担。结构化 JSON 日志先落地是关键的前置工作——一旦日志本身是结构化的，以后要接入任何聚合系统都只是配置变更（加一个采集器指向 stdout），不需要回头重写日志埋点。当前用现有的 Supervisor/docker-compose 日志采集方式（`docker logs`/`docker compose logs`）配合 `trace_id` 字段已经能满足排查需求。
 
+## 10. Week 3 Day 5 扫尾发现的直连 Model 调用（新发现，不在本轮处理）
+
+**范围**：`blog_article_publish_logic.go`、`blog_article_unpublish_logic.go`、`blog_article_submit_logic.go` 三个文件都用 `l.svcCtx.Repository.BlogArticleModel.Update(l.ctx, article)` 直接绕过 Repository 层改文章状态字段（仅改 1-2 个字段，单表写，不满足"跨 ≥2 表写"门槛，不需要领域服务）。`06-domain-blog-video-sdk.md` 当时只审计到 `blog_article_audit_logic.go:82` 这一处同类问题并已随 `BlogArticleService` 顺带修掉，这三处是 Day 5 扫尾时才发现的同类遗留，按 `07-domain-monitoring-system-misc.md` 第 4.3 节的规则记录不改。
+
+**理由**：这三处都是单表单字段写，不满足领域服务门槛；Day 5 扫尾的任务边界是"纯路径替换，不改行为"，顺手把直连 Model 改成走 `blogrepo.NewBlogArticleRepository(...).Update(...)`（该方法已经在本轮为 `BlogArticleService` 新增）虽然是低风险小改动，但仍然是行为不变前提下的额外代码改动，按扫尾任务的既定边界不在本轮夹带处理，留给下次专门清理"直连 Model 技术债"的会话统一处理。
+
 ## 完成的定义
 
 本篇是边界声明文档，不需要"完成"。使用方式：Phase 1-3 执行过程中，任何人（AI 或用户）如果考虑"要不要顺手把这个也做了"，先检查这里是否已经列了对应条目并给出了理由；如果理由在具体场景下不再成立，提出来跟用户确认，不要自行决定收回 descope。

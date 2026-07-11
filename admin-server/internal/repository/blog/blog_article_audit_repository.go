@@ -37,10 +37,15 @@ func (r *blogArticleAuditRepository) Create(ctx context.Context, audit *blogmode
 	if audit.UpdatedAt == 0 {
 		audit.UpdatedAt = now
 	}
-	_, err := r.model.Insert(ctx, audit)
+	result, err := r.model.Insert(ctx, audit)
 	if err != nil {
 		return errs.Wrap(errs.CodeBadDB, "创建审核记录失败", err)
 	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return errs.Wrap(errs.CodeBadDB, "获取审核记录自增 ID 失败", err)
+	}
+	audit.Id = uint64(id)
 	return nil
 }
 

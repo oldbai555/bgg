@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	monitoringrepo "postapocgame/admin-server/internal/repository/monitoring"
 )
 
 type AuditLogListLogic struct {
@@ -36,8 +35,7 @@ func (l *AuditLogListLogic) AuditLogList(req *types.AuditLogListReq) (resp *type
 	// 统一分页参数
 	page, pageSize := logicutil.NormalizePage(int64(req.Page), int64(req.PageSize), 20, 100)
 
-	auditLogRepo := monitoringrepo.NewAuditLogRepository(l.svcCtx.Repository)
-	list, total, err := auditLogRepo.FindPage(
+	list, total, err := l.svcCtx.Domain.Monitoring.AuditLog.FindPage(
 		l.ctx,
 		page,
 		pageSize,

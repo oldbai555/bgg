@@ -16,7 +16,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	monitoringrepo "postapocgame/admin-server/internal/repository/monitoring"
 )
 
 type MetricReportLogic struct {
@@ -123,8 +122,7 @@ func (l *MetricReportLogic) MetricReport(req *types.MetricReportReq) (resp *type
 		ctx, cancel := context.WithTimeout(context.Background(), 800*time.Millisecond)
 		defer cancel()
 
-		repo := monitoringrepo.NewMetricRepository(l.svcCtx.Repository)
-		if err := repo.UpsertDailyStats(ctx, module, bizID, day, dpv, duv, dvv, dip); err != nil {
+		if err := l.svcCtx.Domain.Monitoring.Metric.UpsertDailyStats(ctx, module, bizID, day, dpv, duv, dvv, dip); err != nil {
 			logx.Errorf("metric_daily_stats upsert失败: module=%s bizId=%d day=%s err=%v", module, bizID, day, err)
 		}
 	}(module, bizID, day, deltaPv, deltaUv, deltaVv, deltaIp)

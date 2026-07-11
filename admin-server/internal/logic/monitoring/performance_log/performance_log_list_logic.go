@@ -10,7 +10,6 @@ import (
 	"postapocgame/admin-server/internal/types"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	monitoringrepo "postapocgame/admin-server/internal/repository/monitoring"
 )
 
 type PerformanceLogListLogic struct {
@@ -32,8 +31,7 @@ func (l *PerformanceLogListLogic) PerformanceLogList(req *types.PerformanceLogLi
 	page, pageSize := logicutil.NormalizePage(req.Page, req.PageSize, 20, 100)
 
 	// 仓库查询
-	perfRepo := monitoringrepo.NewPerformanceLogRepository(l.svcCtx.Repository)
-	logs, total, err := perfRepo.FindPage(
+	logs, total, err := l.svcCtx.Domain.Monitoring.PerformanceLog.FindPage(
 		l.ctx,
 		page,
 		pageSize,

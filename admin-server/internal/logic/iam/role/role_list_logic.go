@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 type RoleListLogic struct {
@@ -33,8 +32,7 @@ func (l *RoleListLogic) RoleList(req *types.RoleListReq) (resp *types.RoleListRe
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	roleRepo := iamrepo.NewRoleRepository(l.svcCtx.Repository)
-	list, total, err := roleRepo.FindPage(l.ctx, req.Page, req.PageSize, req.Name)
+	list, total, err := l.svcCtx.Domain.IAM.Role.FindPage(l.ctx, req.Page, req.PageSize, req.Name)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询角色列表失败", err)
 	}

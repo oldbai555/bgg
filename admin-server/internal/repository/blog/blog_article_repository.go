@@ -20,6 +20,7 @@ type BlogArticleRepository interface {
 	FindPublicPage(ctx context.Context, page, pageSize int64, keyword string, tagId uint64) ([]blogmodel.BlogArticle, int64, error)
 	CreateWithTags(ctx context.Context, article *blogmodel.BlogArticle, tagIDs []uint64) error
 	UpdateWithTags(ctx context.Context, article *blogmodel.BlogArticle, tagIDs []uint64) error
+	Update(ctx context.Context, article *blogmodel.BlogArticle) error
 	Delete(ctx context.Context, id uint64) error
 	UpdateTopStatus(ctx context.Context, id uint64, isTop int64) error
 	FindTopCount(ctx context.Context) (int64, error)
@@ -218,18 +219,17 @@ func (r *blogArticleRepository) CreateWithTags(ctx context.Context, article *blo
 	}
 	article.Id = uint64(lastID)
 
-	// 插入标签关联
+	// 插入标签关联。失败时不再手动补偿删除文章行——CreateWithTags 现在总是被
+	// 领域服务包在 repo.Transact 里调用，失败直接返回 err 触发整个事务回滚即可。
 	for _, tagID := range tagIDs {
 		relSQL, relArgs, err := sq.Insert("`blog_article_tag`").
 			Columns("`article_id`", "`tag_id`", "`created_at`", "`updated_at`", "`deleted_at`").
 			Values(article.Id, tagID, now, now, 0).
 			ToSql()
 		if err != nil {
-			_ = r.articleModel.Delete(ctx, article.Id)
 			return errs.Wrap(errs.CodeBadDB, "创建文章标签关联 SQL 生成失败", err)
 		}
 		if _, err = r.conn.ExecCtx(ctx, relSQL, relArgs...); err != nil {
-			_ = r.articleModel.Delete(ctx, article.Id)
 			return errs.Wrap(errs.CodeBadDB, "创建文章标签关联失败", err)
 		}
 	}
@@ -270,6 +270,11 @@ func (r *blogArticleRepository) UpdateWithTags(ctx context.Context, article *blo
 	}
 
 	return nil
+}
+
+// Update 只更新文章自身字段，不涉及标签关联（区别于 UpdateWithTags）。
+func (r *blogArticleRepository) Update(ctx context.Context, article *blogmodel.BlogArticle) error {
+	return r.articleModel.Update(ctx, article)
 }
 
 func (r *blogArticleRepository) Delete(ctx context.Context, id uint64) error {

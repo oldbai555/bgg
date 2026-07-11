@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 type RolePermissionUpdateLogic struct {
@@ -33,25 +32,8 @@ func (l *RolePermissionUpdateLogic) RolePermissionUpdate(req *types.RolePermissi
 		return errs.New(errs.CodeBadRequest, "角色ID不能为空")
 	}
 
-	roleRepo := iamrepo.NewRoleRepository(l.svcCtx.Repository)
-	// 验证角色是否存在
-	_, err := roleRepo.FindByID(l.ctx, req.RoleId)
-	if err != nil {
-		return errs.Wrap(errs.CodeBadRequest, "角色不存在", err)
-	}
-
-	permissionRepo := iamrepo.NewPermissionRepository(l.svcCtx.Repository)
-	permissions, err := permissionRepo.ListByIds(l.ctx, req.PermissionIds)
-	if err != nil {
-		return errs.Wrap(errs.CodeBadRequest, "权限查询有误", err)
-	}
-	if len(permissions) != len(req.PermissionIds) {
-		return errs.New(errs.CodeBadRequest, "权限不存在")
-	}
-
-	rolePermissionRepo := iamrepo.NewRolePermissionRepository(l.svcCtx.Repository)
-	if err := rolePermissionRepo.UpdateRolePermissions(l.ctx, req.RoleId, req.PermissionIds); err != nil {
-		return errs.Wrap(errs.CodeInternalError, "更新角色权限失败", err)
+	if err := l.svcCtx.Domain.IAM.RBAC.UpdateRolePermissions(l.ctx, req.RoleId, req.PermissionIds); err != nil {
+		return err
 	}
 
 	// 清除所有拥有该角色的用户的权限和菜单树缓存

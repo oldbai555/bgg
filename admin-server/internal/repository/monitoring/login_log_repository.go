@@ -123,9 +123,9 @@ func (r *loginLogRepository) Create(ctx context.Context, log *monitoringmodel.Ad
 		return fmt.Errorf("插入登录日志失败: %w", err)
 	}
 
-	// 获取插入的 ID（用于调试）
 	if result != nil {
 		if id, err := result.LastInsertId(); err == nil {
+			log.Id = uint64(id)
 			logx.Infof("成功插入登录日志: id=%d, userId=%d, username=%s", id, log.UserId, log.Username)
 		}
 	}

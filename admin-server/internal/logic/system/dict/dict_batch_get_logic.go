@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	systemrepo "postapocgame/admin-server/internal/repository/system"
 )
 
 type DictBatchGetLogic struct {
@@ -35,8 +34,6 @@ func (l *DictBatchGetLogic) DictBatchGet(req *types.DictBatchGetReq) (resp *type
 
 	// 初始化返回结果
 	result := make(map[string]types.DictGetResp)
-	dictTypeRepo := systemrepo.NewDictTypeRepository(l.svcCtx.Repository)
-	dictItemRepo := systemrepo.NewDictItemRepository(l.svcCtx.Repository)
 	cache := l.svcCtx.Repository.BusinessCache
 
 	// 遍历每个字典类型编码
@@ -46,7 +43,7 @@ func (l *DictBatchGetLogic) DictBatchGet(req *types.DictBatchGetReq) (resp *type
 		}
 
 		// 查询字典类型
-		dictType, err := dictTypeRepo.FindByCode(l.ctx, code)
+		dictType, err := l.svcCtx.Domain.System.DictType.FindByCode(l.ctx, code)
 		if err != nil {
 			// 如果字典类型不存在，记录日志但继续处理其他字典
 			l.Errorf("查询字典类型失败: code=%s, error=%v", code, err)
@@ -66,7 +63,7 @@ func (l *DictBatchGetLogic) DictBatchGet(req *types.DictBatchGetReq) (resp *type
 		}
 
 		// 缓存未命中，从数据库查询
-		items, err := dictItemRepo.FindByTypeID(l.ctx, dictType.Id)
+		items, err := l.svcCtx.Domain.System.DictItem.FindByTypeID(l.ctx, dictType.Id)
 		if err != nil {
 			// 查询失败，记录日志但继续处理其他字典
 			l.Errorf("查询字典项失败: code=%s, error=%v", code, err)

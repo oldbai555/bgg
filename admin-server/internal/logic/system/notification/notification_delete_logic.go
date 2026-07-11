@@ -12,7 +12,6 @@ import (
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	systemrepo "postapocgame/admin-server/internal/repository/system"
 )
 
 type NotificationDeleteLogic struct {
@@ -41,8 +40,7 @@ func (l *NotificationDeleteLogic) NotificationDelete(req *types.NotificationDele
 	}
 
 	// 验证消息通知是否属于当前用户
-	notificationRepo := systemrepo.NewNotificationRepository(l.svcCtx.Repository)
-	notification, err := notificationRepo.FindByID(l.ctx, req.Id)
+	notification, err := l.svcCtx.Domain.System.Notification.FindByID(l.ctx, req.Id)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeNotFound, "消息通知不存在", err)
 	}
@@ -50,7 +48,7 @@ func (l *NotificationDeleteLogic) NotificationDelete(req *types.NotificationDele
 		return nil, errs.New(errs.CodeForbidden, "无权删除该消息通知")
 	}
 
-	if err := notificationRepo.DeleteByID(l.ctx, req.Id); err != nil {
+	if err := l.svcCtx.Domain.System.Notification.DeleteByID(l.ctx, req.Id); err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "删除消息通知失败", err)
 	}
 

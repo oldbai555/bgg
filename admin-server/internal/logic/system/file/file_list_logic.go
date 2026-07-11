@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	systemrepo "postapocgame/admin-server/internal/repository/system"
 )
 
 type FileListLogic struct {
@@ -33,8 +32,7 @@ func (l *FileListLogic) FileList(req *types.FileListReq) (resp *types.FileListRe
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	fileRepo := systemrepo.NewFileRepository(l.svcCtx.Repository)
-	list, total, err := fileRepo.FindPage(l.ctx, req.Page, req.PageSize, req.Name)
+	list, total, err := l.svcCtx.Domain.System.File.FindPage(l.ctx, req.Page, req.PageSize, req.Name)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询文件列表失败", err)
 	}

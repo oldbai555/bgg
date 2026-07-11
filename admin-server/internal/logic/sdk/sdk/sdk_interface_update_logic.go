@@ -12,7 +12,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	sdkrepo "postapocgame/admin-server/internal/repository/sdk"
 )
 
 type SdkInterfaceUpdateLogic struct {
@@ -34,8 +33,7 @@ func (l *SdkInterfaceUpdateLogic) SdkInterfaceUpdate(req *types.SdkInterfaceUpda
 		return errs.New(errs.CodeBadRequest, "ID 不能为空")
 	}
 
-	repo := sdkrepo.NewSdkAdminRepository(l.svcCtx.Repository)
-	iface, err := repo.FindInterface(l.ctx, req.Id)
+	iface, err := l.svcCtx.Domain.SDK.Admin.FindInterface(l.ctx, req.Id)
 	if err != nil {
 		return errs.Wrap(errs.CodeBadRequest, "接口不存在", err)
 	}
@@ -48,7 +46,6 @@ func (l *SdkInterfaceUpdateLogic) SdkInterfaceUpdate(req *types.SdkInterfaceUpda
 	methodChanged := strings.TrimSpace(req.Method) != "" && strings.ToUpper(req.Method) != iface.Method
 	if pathChanged || methodChanged {
 		// 根据新的 path 和 method 生成 API Code
-		sdkRepo := sdkrepo.NewSdkRepository(l.svcCtx.Repository)
 		newPath := iface.Path
 		newMethod := iface.Method
 		if pathChanged {
@@ -57,9 +54,9 @@ func (l *SdkInterfaceUpdateLogic) SdkInterfaceUpdate(req *types.SdkInterfaceUpda
 		if methodChanged {
 			newMethod = strings.ToUpper(req.Method)
 		}
-		newApiCode := sdkRepo.BuildInterfaceCode(newMethod, newPath)
+		newApiCode := l.svcCtx.Domain.SDK.Public.BuildInterfaceCode(newMethod, newPath)
 		// 检查新生成的 API Code 是否与其他记录冲突（排除自己）
-		existing, err := repo.FindInterfaceByCode(l.ctx, newApiCode)
+		existing, err := l.svcCtx.Domain.SDK.Admin.FindInterfaceByCode(l.ctx, newApiCode)
 		if err == nil && existing != nil && existing.Id != req.Id {
 			return errs.New(errs.CodeBadRequest, "该接口路径和方法组合已存在")
 		}
@@ -77,7 +74,7 @@ func (l *SdkInterfaceUpdateLogic) SdkInterfaceUpdate(req *types.SdkInterfaceUpda
 		iface.Remark = req.Remark
 	}
 
-	if err := repo.UpdateInterface(l.ctx, iface); err != nil {
+	if err := l.svcCtx.Domain.SDK.Admin.UpdateInterface(l.ctx, iface); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "更新接口失败", err)
 	}
 

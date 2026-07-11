@@ -16,14 +16,12 @@ import (
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 	"postapocgame/admin-server/pkg/useragent"
 
-	"github.com/zeromicro/go-zero/core/logx"
-	"golang.org/x/crypto/bcrypt"
 	"postapocgame/admin-server/internal/model"
 	"postapocgame/admin-server/internal/model/monitoring"
 	"postapocgame/admin-server/internal/model/system"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
-	monitoringrepo "postapocgame/admin-server/internal/repository/monitoring"
-	systemrepo "postapocgame/admin-server/internal/repository/system"
+
+	"github.com/zeromicro/go-zero/core/logx"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type LoginLogic struct {
@@ -47,8 +45,7 @@ func (l *LoginLogic) Login(req *types.LoginReq, httpReq *http.Request) (resp *ty
 		return nil, errs.New(errs.CodeBadRequest, "用户名和密码不能为空")
 	}
 
-	userRepo := iamrepo.NewUserRepository(l.svcCtx.Repository)
-	user, err := userRepo.FindByUsername(l.ctx, req.Username)
+	user, err := l.svcCtx.Domain.IAM.User.FindByUsername(l.ctx, req.Username)
 	if err != nil {
 		// 用户不存在或查询异常统一为未授权，避免枚举用户名。
 		if errors.Is(errors.Unwrap(err), model.ErrNotFound) || errors.Is(err, model.ErrNotFound) {
@@ -129,8 +126,8 @@ func (l *LoginLogic) recordLoginLog(userId uint64, username string, httpReq *htt
 	// 解析浏览器和操作系统
 	browser, os := useragent.ParseUserAgent(userAgent)
 
-	// 登录状态：0失败 1成功
-	status := int64(0)
+	// 登录状态（字典值：1=成功，2=失败）
+	status := int64(2)
 	if success {
 		status = 1
 	}
@@ -165,8 +162,7 @@ func (l *LoginLogic) recordLoginLog(userId uint64, username string, httpReq *htt
 			}
 		}()
 
-		loginLogRepo := monitoringrepo.NewLoginLogRepository(l.svcCtx.Repository)
-		if err := loginLogRepo.Create(context.Background(), loginLog); err != nil {
+		if err := l.svcCtx.Domain.Monitoring.LoginLog.Create(context.Background(), loginLog); err != nil {
 			l.Errorf("记录登录日志失败: userId=%d, username=%s, status=%d, message=%s, error: %v", userId, username, status, message, err)
 		} else {
 			l.Infof("成功记录登录日志: userId=%d, username=%s, status=%d, message=%s", userId, username, status, message)
@@ -182,11 +178,8 @@ func (l *LoginLogic) createUnreadNoticeNotifications(userID uint64) {
 		}
 	}()
 
-	noticeRepo := systemrepo.NewNoticeRepository(l.svcCtx.Repository)
-	notificationRepo := systemrepo.NewNotificationRepository(l.svcCtx.Repository)
-
 	// 查找已发布且用户未读的公告
-	notices, err := noticeRepo.FindPublishedNotReadByUser(context.Background(), userID)
+	notices, err := l.svcCtx.Domain.System.Notice.FindPublishedNotReadByUser(context.Background(), userID)
 	if err != nil {
 		l.Errorf("查询未读公告失败: userId=%d, error: %v", userID, err)
 		return
@@ -199,7 +192,7 @@ func (l *LoginLogic) createUnreadNoticeNotifications(userID uint64) {
 	now := time.Now().Unix()
 	for _, notice := range notices {
 		// 检查是否已存在通知（避免重复创建）
-		notifications, _, err := notificationRepo.FindPage(context.Background(), 1, 100, userID, "notice", -1)
+		notifications, _, err := l.svcCtx.Domain.System.Notification.FindPage(context.Background(), 1, 100, userID, "notice", -1)
 		if err == nil {
 			// 检查是否已有该公告的通知
 			hasNotification := false
@@ -221,14 +214,14 @@ func (l *LoginLogic) createUnreadNoticeNotifications(userID uint64) {
 			SourceId:   notice.Id,
 			Title:      notice.Title,
 			Content:    notice.Content,
-			ReadStatus: 0, // 未读
+			ReadStatus: 1, // 未读（字典值：1=未读，2=已读）
 			ReadAt:     0,
 			CreatedAt:  now,
 			UpdatedAt:  now,
 			DeletedAt:  0,
 		}
 
-		if err := notificationRepo.Create(context.Background(), notification); err != nil {
+		if err := l.svcCtx.Domain.System.Notification.Create(context.Background(), notification); err != nil {
 			l.Errorf("创建公告通知失败: userId=%d, noticeId=%d, error: %v", userID, notice.Id, err)
 		} else {
 			l.Infof("成功创建公告通知: userId=%d, noticeId=%d", userID, notice.Id)

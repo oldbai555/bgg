@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	systemrepo "postapocgame/admin-server/internal/repository/system"
 )
 
 type ConfigGetLogic struct {
@@ -45,8 +44,7 @@ func (l *ConfigGetLogic) ConfigGet(req *types.ConfigGetReq) (resp *types.ConfigG
 	}
 
 	// 缓存未命中，从数据库查询
-	configRepo := systemrepo.NewConfigRepository(l.svcCtx.Repository)
-	config, err := configRepo.FindByKey(l.ctx, req.Key)
+	config, err := l.svcCtx.Domain.System.Config.FindByKey(l.ctx, req.Key)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询配置失败", err)
 	}

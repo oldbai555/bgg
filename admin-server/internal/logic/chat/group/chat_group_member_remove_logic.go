@@ -12,7 +12,6 @@ import (
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	chatrepo "postapocgame/admin-server/internal/repository/chat"
 )
 
 type ChatGroupMemberRemoveLogic struct {
@@ -36,11 +35,8 @@ func (l *ChatGroupMemberRemoveLogic) ChatGroupMemberRemove(req *types.ChatGroupM
 		return nil, errs.New(errs.CodeUnauthorized, "未登录或登录已过期")
 	}
 
-	chatRepo := chatrepo.NewChatRepository(l.svcCtx.Repository)
-	chatUserRepo := chatrepo.NewChatUserRepository(l.svcCtx.Repository)
-
 	// 查询群组
-	chat, err := chatRepo.FindByID(l.ctx, req.ChatId)
+	chat, err := l.svcCtx.Domain.Chat.Chat.FindByID(l.ctx, req.ChatId)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeNotFound, "群组不存在", err)
 	}
@@ -56,7 +52,7 @@ func (l *ChatGroupMemberRemoveLogic) ChatGroupMemberRemove(req *types.ChatGroupM
 	}
 
 	// 检查用户是否在群组中
-	chatUsers, err := chatUserRepo.FindByChatID(l.ctx, req.ChatId)
+	chatUsers, err := l.svcCtx.Domain.Chat.ChatUser.FindByChatID(l.ctx, req.ChatId)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询群组成员失败", err)
 	}
@@ -74,7 +70,7 @@ func (l *ChatGroupMemberRemoveLogic) ChatGroupMemberRemove(req *types.ChatGroupM
 	}
 
 	// 移除成员
-	err = chatUserRepo.DeleteByChatIDAndUserID(l.ctx, req.ChatId, req.UserId)
+	err = l.svcCtx.Domain.Chat.ChatUser.DeleteByChatIDAndUserID(l.ctx, req.ChatId, req.UserId)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "移除成员失败", err)
 	}

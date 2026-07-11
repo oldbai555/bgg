@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	systemrepo "postapocgame/admin-server/internal/repository/system"
 )
 
 type ConfigListLogic struct {
@@ -33,8 +32,7 @@ func (l *ConfigListLogic) ConfigList(req *types.ConfigListReq) (resp *types.Conf
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	configRepo := systemrepo.NewConfigRepository(l.svcCtx.Repository)
-	list, total, err := configRepo.FindPage(l.ctx, req.Page, req.PageSize, req.Group, req.Key)
+	list, total, err := l.svcCtx.Domain.System.Config.FindPage(l.ctx, req.Page, req.PageSize, req.Group, req.Key)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询配置列表失败", err)
 	}

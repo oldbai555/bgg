@@ -4,7 +4,6 @@
 package public
 
 import (
-	blogrepo "postapocgame/admin-server/internal/repository/blog"
 	"context"
 
 	"postapocgame/admin-server/internal/svc"
@@ -30,7 +29,7 @@ func NewPublicBlogSocialInfoListLogic(ctx context.Context, svcCtx *svc.ServiceCo
 
 func (l *PublicBlogSocialInfoListLogic) PublicBlogSocialInfoList() (resp *types.PublicBlogSocialInfoListResp, err error) {
 	// 查询启用的社交信息列表
-	list, err := blogrepo.NewBlogSocialInfoRepository(l.svcCtx.Repository).FindEnabledList(l.ctx)
+	list, err := l.svcCtx.Domain.Blog.SocialInfo.FindEnabledList(l.ctx)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeBadDB, "查询社交信息列表失败", err)
 	}

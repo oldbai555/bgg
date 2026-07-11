@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	monitoringrepo "postapocgame/admin-server/internal/repository/monitoring"
 )
 
 type OperationLogDetailLogic struct {
@@ -35,8 +34,7 @@ func (l *OperationLogDetailLogic) OperationLogDetail(req *types.OperationLogDeta
 
 	id := req.Id
 
-	operationLogRepo := monitoringrepo.NewOperationLogRepository(l.svcCtx.Repository)
-	log, err := operationLogRepo.FindByID(l.ctx, id)
+	log, err := l.svcCtx.Domain.Monitoring.OperationLog.FindByID(l.ctx, id)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询操作日志失败", err)
 	}

@@ -13,7 +13,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	miscrepo "postapocgame/admin-server/internal/repository/misc"
 )
 
 type DailyShortSentenceUpdateLogic struct {
@@ -35,8 +34,7 @@ func (l *DailyShortSentenceUpdateLogic) DailyShortSentenceUpdate(req *types.Dail
 		return errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	repo := miscrepo.NewDailyShortSentenceRepository(l.svcCtx.Repository)
-	sentence, err := repo.FindByID(l.ctx, req.Id)
+	sentence, err := l.svcCtx.Domain.Misc.DailyShortSentence.FindByID(l.ctx, req.Id)
 	if err != nil {
 		return errs.Wrap(errs.CodeNotFound, "每日短句不存在", err)
 	}
@@ -67,7 +65,7 @@ func (l *DailyShortSentenceUpdateLogic) DailyShortSentenceUpdate(req *types.Dail
 
 	sentence.UpdatedAt = time.Now().Unix()
 
-	if err := repo.Update(l.ctx, sentence); err != nil {
+	if err := l.svcCtx.Domain.Misc.DailyShortSentence.Update(l.ctx, sentence); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "更新每日短句失败", err)
 	}
 

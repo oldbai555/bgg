@@ -10,9 +10,9 @@ import (
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 
-	"github.com/zeromicro/go-zero/core/logx"
 	"postapocgame/admin-server/internal/model/sdk"
-	sdkrepo "postapocgame/admin-server/internal/repository/sdk"
+
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type SdkApiKeyBindSaveLogic struct {
@@ -33,8 +33,6 @@ func (l *SdkApiKeyBindSaveLogic) SdkApiKeyBindSave(req *types.SdkApiKeyBindSaveR
 	if req == nil || req.SdkKeyId == 0 {
 		return errs.New(errs.CodeBadRequest, "sdkKeyId 不能为空")
 	}
-	repo := sdkrepo.NewSdkAdminRepository(l.svcCtx.Repository)
-
 	bindings := make([]sdk.SdkKeyApi, 0, len(req.Bindings))
 	for _, b := range req.Bindings {
 		if b.SdkInterfaceId == 0 {
@@ -48,7 +46,7 @@ func (l *SdkApiKeyBindSaveLogic) SdkApiKeyBindSave(req *types.SdkApiKeyBindSaveR
 		})
 	}
 
-	if err := repo.SaveBindings(l.ctx, req.SdkKeyId, bindings); err != nil {
+	if err := l.svcCtx.Domain.SDK.Service.SaveApiKeyBindings(l.ctx, req.SdkKeyId, bindings); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "保存授权失败", err)
 	}
 

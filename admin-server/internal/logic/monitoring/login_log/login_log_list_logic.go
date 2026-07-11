@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	monitoringrepo "postapocgame/admin-server/internal/repository/monitoring"
 )
 
 type LoginLogListLogic struct {
@@ -35,14 +34,12 @@ func (l *LoginLogListLogic) LoginLogList(req *types.LoginLogListReq) (resp *type
 
 	page, pageSize := logicutil.NormalizePage(int64(req.Page), int64(req.PageSize), 20, 100)
 
-	loginLogRepo := monitoringrepo.NewLoginLogRepository(l.svcCtx.Repository)
-
 	// Status 枚举（字典 login_status）：0 = 全部（不筛选）；1 = 成功；2 = 失败
 	// DB 中 admin_login_log.status 与枚举值保持一致：1 = 成功，2 = 失败
 	l.Infof("查询登录日志: page=%d, pageSize=%d, userId=%d, username=%s, status=%d, startTime=%s, endTime=%s",
 		req.Page, req.PageSize, req.UserId, req.Username, req.Status, req.StartTime, req.EndTime)
 
-	list, total, err := loginLogRepo.FindPage(
+	list, total, err := l.svcCtx.Domain.Monitoring.LoginLog.FindPage(
 		l.ctx,
 		page,
 		pageSize,

@@ -14,8 +14,6 @@ import (
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	systemrepo "postapocgame/admin-server/internal/repository/system"
-	taskrepo "postapocgame/admin-server/internal/repository/task"
 )
 
 type TaskRecentLogic struct {
@@ -42,8 +40,7 @@ func (l *TaskRecentLogic) TaskRecent(req *types.TaskRecentReq) (resp *types.Task
 	limit := l.getRecentTaskLimit(req.Limit)
 
 	// 查询最近的任务（只查询当前用户的任务）
-	taskRepo := taskrepo.NewTaskRepository(l.svcCtx.Repository)
-	tasks, err := taskRepo.FindRecent(l.ctx, limit, user.UserID)
+	tasks, err := l.svcCtx.Domain.Task.Task.FindRecent(l.ctx, limit, user.UserID)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询最近任务失败", err)
 	}
@@ -99,11 +96,9 @@ func (l *TaskRecentLogic) getRecentTaskLimit(requestLimit int64) int64 {
 	}
 
 	limit := defaultLimit
-	dictTypeRepo := systemrepo.NewDictTypeRepository(l.svcCtx.Repository)
-	dictType, err := dictTypeRepo.FindByCode(l.ctx, "task_config")
+	dictType, err := l.svcCtx.Domain.System.DictType.FindByCode(l.ctx, "task_config")
 	if err == nil && dictType != nil {
-		dictItemRepo := systemrepo.NewDictItemRepository(l.svcCtx.Repository)
-		items, err := dictItemRepo.FindByTypeID(l.ctx, dictType.Id)
+		items, err := l.svcCtx.Domain.System.DictItem.FindByTypeID(l.ctx, dictType.Id)
 		if err == nil && len(items) > 0 {
 			for _, item := range items {
 				if item.Label == "最近任务数量" {

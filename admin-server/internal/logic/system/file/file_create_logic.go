@@ -11,9 +11,9 @@ import (
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 
-	"github.com/zeromicro/go-zero/core/logx"
 	"postapocgame/admin-server/internal/model/system"
-	systemrepo "postapocgame/admin-server/internal/repository/system"
+
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type FileCreateLogic struct {
@@ -52,8 +52,7 @@ func (l *FileCreateLogic) FileCreate(req *types.FileCreateReq) error {
 		Status:       status,
 	}
 
-	fileRepo := systemrepo.NewFileRepository(l.svcCtx.Repository)
-	if err := fileRepo.Create(l.ctx, &file); err != nil {
+	if err := l.svcCtx.Domain.System.File.Create(l.ctx, &file); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "创建文件记录失败", err)
 	}
 	return nil

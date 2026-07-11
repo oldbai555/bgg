@@ -13,7 +13,6 @@ import (
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	taskrepo "postapocgame/admin-server/internal/repository/task"
 )
 
 type TaskCancelLogic struct {
@@ -42,8 +41,7 @@ func (l *TaskCancelLogic) TaskCancel(req *types.TaskCancelReq) (resp *types.Resp
 	}
 
 	// 查询任务
-	taskRepo := taskrepo.NewTaskRepository(l.svcCtx.Repository)
-	task, err := taskRepo.FindOne(l.ctx, req.Id)
+	task, err := l.svcCtx.Domain.Task.Task.FindOne(l.ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +58,7 @@ func (l *TaskCancelLogic) TaskCancel(req *types.TaskCancelReq) (resp *types.Resp
 
 	// 更新任务状态为失败（取消视为失败）
 	// 注意：这里不更新finished_at，因为任务是被取消的，不是正常完成的
-	err = taskRepo.UpdateStatus(l.ctx, req.Id, consts.TaskStatusFailed, 0, 0)
+	err = l.svcCtx.Domain.Task.Task.UpdateStatus(l.ctx, req.Id, consts.TaskStatusFailed, 0, 0)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "取消任务失败", err)
 	}

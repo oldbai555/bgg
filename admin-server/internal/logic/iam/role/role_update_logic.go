@@ -12,7 +12,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 type RoleUpdateLogic struct {
@@ -34,8 +33,7 @@ func (l *RoleUpdateLogic) RoleUpdate(req *types.RoleUpdateReq) error {
 		return errs.New(errs.CodeBadRequest, "角色ID不能为空")
 	}
 
-	roleRepo := iamrepo.NewRoleRepository(l.svcCtx.Repository)
-	role, err := roleRepo.FindByID(l.ctx, req.Id)
+	role, err := l.svcCtx.Domain.IAM.Role.FindByID(l.ctx, req.Id)
 	if err != nil {
 		return errs.Wrap(errs.CodeInternalError, "查询角色失败", err)
 	}
@@ -49,7 +47,7 @@ func (l *RoleUpdateLogic) RoleUpdate(req *types.RoleUpdateReq) error {
 		role.Status = req.Status
 	}
 
-	if err := roleRepo.Update(l.ctx, role); err != nil {
+	if err := l.svcCtx.Domain.IAM.Role.Update(l.ctx, role); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "更新角色失败", err)
 	}
 	return nil

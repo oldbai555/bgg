@@ -51,8 +51,16 @@ func (r *roleRepository) DeleteByID(ctx context.Context, id uint64) error {
 }
 
 func (r *roleRepository) Create(ctx context.Context, role *iammodel.AdminRole) error {
-	_, err := r.model.Insert(ctx, role)
-	return err
+	result, err := r.model.Insert(ctx, role)
+	if err != nil {
+		return err
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+	role.Id = uint64(id)
+	return nil
 }
 
 func (r *roleRepository) Update(ctx context.Context, role *iammodel.AdminRole) error {

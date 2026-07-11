@@ -12,7 +12,6 @@ import (
 	"postapocgame/admin-server/pkg/initdata"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 type PermissionDeleteLogic struct {
@@ -38,8 +37,7 @@ func (l *PermissionDeleteLogic) PermissionDelete(req *types.PermissionDeleteReq)
 		return errs.New(errs.CodeBadRequest, "初始化数据不可删除")
 	}
 
-	permissionRepo := iamrepo.NewPermissionRepository(l.svcCtx.Repository)
-	if err := permissionRepo.DeleteByID(l.ctx, req.Id); err != nil {
+	if err := l.svcCtx.Domain.IAM.Permission.DeleteByID(l.ctx, req.Id); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "删除权限失败", err)
 	}
 	return nil

@@ -39,8 +39,16 @@ func (r *demoRepository) DeleteByID(ctx context.Context, id uint64) error {
 }
 
 func (r *demoRepository) Create(ctx context.Context, demo *miscmodel.Demo) error {
-	_, err := r.model.Insert(ctx, demo)
-	return err
+	result, err := r.model.Insert(ctx, demo)
+	if err != nil {
+		return err
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+	demo.Id = uint64(id)
+	return nil
 }
 
 func (r *demoRepository) Update(ctx context.Context, demo *miscmodel.Demo) error {

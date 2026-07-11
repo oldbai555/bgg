@@ -89,21 +89,30 @@ func (r *notificationRepository) DeleteByID(ctx context.Context, id uint64) erro
 }
 
 func (r *notificationRepository) Create(ctx context.Context, notification *systemmodel.AdminNotification) error {
-	_, err := r.model.Insert(ctx, notification)
-	return err
+	result, err := r.model.Insert(ctx, notification)
+	if err != nil {
+		return err
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+	notification.Id = uint64(id)
+	return nil
 }
 
 func (r *notificationRepository) Update(ctx context.Context, notification *systemmodel.AdminNotification) error {
 	return r.model.Update(ctx, notification)
 }
 
+// MarkAllAsRead 字典值：1=未读，2=已读。
 func (r *notificationRepository) MarkAllAsRead(ctx context.Context, userID uint64) error {
 	now := time.Now().Unix()
 	sql, args, err := sq.Update("`admin_notification`").
-		Set("`read_status`", 1).
+		Set("`read_status`", 2).
 		Set("`read_at`", now).
 		Set("`updated_at`", now).
-		Where(sq.Eq{"user_id": userID, "read_status": 0, "deleted_at": 0}).
+		Where(sq.Eq{"user_id": userID, "read_status": 1, "deleted_at": 0}).
 		ToSql()
 	if err != nil {
 		return errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
@@ -112,13 +121,13 @@ func (r *notificationRepository) MarkAllAsRead(ctx context.Context, userID uint6
 	return err
 }
 
+// ClearRead 软删除所有已读消息（字典值：1=未读，2=已读）。
 func (r *notificationRepository) ClearRead(ctx context.Context, userID uint64) error {
-	// 软删除所有已读消息
 	now := time.Now().Unix()
 	sql, args, err := sq.Update("`admin_notification`").
 		Set("`deleted_at`", now).
 		Set("`updated_at`", now).
-		Where(sq.Eq{"user_id": userID, "read_status": 1, "deleted_at": 0}).
+		Where(sq.Eq{"user_id": userID, "read_status": 2, "deleted_at": 0}).
 		ToSql()
 	if err != nil {
 		return errs.Wrap(errs.CodeBadDB, "sql生成有误", err)

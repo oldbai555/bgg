@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	miscrepo "postapocgame/admin-server/internal/repository/misc"
 )
 
 type DemoDeleteLogic struct {
@@ -33,8 +32,7 @@ func (l *DemoDeleteLogic) DemoDelete(req *types.DemoDeleteReq) error {
 		return errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	demoRepo := miscrepo.NewDemoRepository(l.svcCtx.Repository)
-	if err := demoRepo.DeleteByID(l.ctx, req.Id); err != nil {
+	if err := l.svcCtx.Domain.Misc.Demo.DeleteByID(l.ctx, req.Id); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "删除演示功能失败", err)
 	}
 	return nil

@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	monitoringrepo "postapocgame/admin-server/internal/repository/monitoring"
 )
 
 type LoginLogDetailLogic struct {
@@ -33,8 +32,7 @@ func (l *LoginLogDetailLogic) LoginLogDetail(req *types.LoginLogDetailReq) (resp
 		return nil, errs.New(errs.CodeBadRequest, "登录日志ID不能为空")
 	}
 
-	loginLogRepo := monitoringrepo.NewLoginLogRepository(l.svcCtx.Repository)
-	log, err := loginLogRepo.FindByID(l.ctx, req.Id)
+	log, err := l.svcCtx.Domain.Monitoring.LoginLog.FindByID(l.ctx, req.Id)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询登录日志详情失败", err)
 	}

@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 type ApiListLogic struct {
@@ -33,8 +32,7 @@ func (l *ApiListLogic) ApiList(req *types.ApiListReq) (resp *types.ApiListResp, 
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	apiRepo := iamrepo.NewApiRepository(l.svcCtx.Repository)
-	list, total, err := apiRepo.FindPage(l.ctx, req.Page, req.PageSize, req.Name)
+	list, total, err := l.svcCtx.Domain.IAM.Api.FindPage(l.ctx, req.Page, req.PageSize, req.Name)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询接口列表失败", err)
 	}

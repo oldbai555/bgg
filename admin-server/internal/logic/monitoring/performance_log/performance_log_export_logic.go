@@ -13,13 +13,12 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 
 	"postapocgame/admin-server/internal/consts"
-	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/domain/task"
+	taskmodel "postapocgame/admin-server/internal/model/task"
+	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
-	taskmodel "postapocgame/admin-server/internal/model/task"
-	taskrepo "postapocgame/admin-server/internal/repository/task"
 )
 
 type PerformanceLogExportLogic struct {
@@ -92,8 +91,8 @@ func (l *PerformanceLogExportLogic) PerformanceLogExport(req *types.PerformanceL
 		DeletedAt:     0,
 	}
 
-	taskRepo := taskrepo.NewTaskRepository(l.svcCtx.Repository)
-	_, err = taskRepo.Create(l.ctx, taskModel)
+	// TODO(phase2-task-rpc): 跨域写入 Task 域（发起导出任务），Phase 2 拆分后改为调用 task-rpc.CreateTask
+	_, err = l.svcCtx.Domain.Task.Task.Create(l.ctx, taskModel)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "创建导出任务失败", err)
 	}

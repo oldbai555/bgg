@@ -11,9 +11,9 @@ import (
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 
-	"github.com/zeromicro/go-zero/core/logx"
 	"postapocgame/admin-server/internal/model/system"
-	systemrepo "postapocgame/admin-server/internal/repository/system"
+
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type DictTypeCreateLogic struct {
@@ -35,9 +35,8 @@ func (l *DictTypeCreateLogic) DictTypeCreate(req *types.DictTypeCreateReq) error
 		return errs.New(errs.CodeBadRequest, "字典类型名称和编码不能为空")
 	}
 
-	dictTypeRepo := systemrepo.NewDictTypeRepository(l.svcCtx.Repository)
 	// 检查编码是否已存在
-	_, err := dictTypeRepo.FindByCode(l.ctx, req.Code)
+	_, err := l.svcCtx.Domain.System.DictType.FindByCode(l.ctx, req.Code)
 	if err == nil {
 		return errs.New(errs.CodeBadRequest, "字典类型编码已存在")
 	}
@@ -54,7 +53,7 @@ func (l *DictTypeCreateLogic) DictTypeCreate(req *types.DictTypeCreateReq) error
 		Status:      status,
 	}
 
-	if err := dictTypeRepo.Create(l.ctx, &dictType); err != nil {
+	if err := l.svcCtx.Domain.System.DictType.Create(l.ctx, &dictType); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "创建字典类型失败", err)
 	}
 	return nil

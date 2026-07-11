@@ -12,7 +12,6 @@ import (
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	chatrepo "postapocgame/admin-server/internal/repository/chat"
 )
 
 type ChatGroupDeleteLogic struct {
@@ -36,10 +35,8 @@ func (l *ChatGroupDeleteLogic) ChatGroupDelete(req *types.ChatGroupDeleteReq) (r
 		return nil, errs.New(errs.CodeUnauthorized, "未登录或登录已过期")
 	}
 
-	chatRepo := chatrepo.NewChatRepository(l.svcCtx.Repository)
-
 	// 查询群组
-	chat, err := chatRepo.FindByID(l.ctx, req.Id)
+	chat, err := l.svcCtx.Domain.Chat.Chat.FindByID(l.ctx, req.Id)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeNotFound, "群组不存在", err)
 	}
@@ -55,7 +52,7 @@ func (l *ChatGroupDeleteLogic) ChatGroupDelete(req *types.ChatGroupDeleteReq) (r
 	}
 
 	// 软删除群组
-	err = chatRepo.DeleteByID(l.ctx, req.Id)
+	err = l.svcCtx.Domain.Chat.Chat.DeleteByID(l.ctx, req.Id)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "删除群组失败", err)
 	}

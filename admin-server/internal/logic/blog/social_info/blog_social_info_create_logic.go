@@ -4,7 +4,6 @@
 package social_info
 
 import (
-	blogrepo "postapocgame/admin-server/internal/repository/blog"
 	"context"
 	"fmt"
 	"strings"
@@ -15,8 +14,9 @@ import (
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 
-	"github.com/zeromicro/go-zero/core/logx"
 	"postapocgame/admin-server/internal/model/blog"
+
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type BlogSocialInfoCreateLogic struct {
@@ -76,7 +76,7 @@ func (l *BlogSocialInfoCreateLogic) BlogSocialInfoCreate(req *types.BlogSocialIn
 		OrderNum: req.OrderNum,
 	}
 
-	if err := blogrepo.NewBlogSocialInfoRepository(l.svcCtx.Repository).Create(l.ctx, info); err != nil {
+	if err := l.svcCtx.Domain.Blog.SocialInfo.Create(l.ctx, info); err != nil {
 		return nil, err
 	}
 

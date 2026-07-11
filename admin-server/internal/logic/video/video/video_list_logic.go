@@ -12,7 +12,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	videorepo "postapocgame/admin-server/internal/repository/video"
 )
 
 type VideoListLogic struct {
@@ -37,10 +36,9 @@ func (l *VideoListLogic) VideoList(req *types.VideoListReq) (resp *types.VideoLi
 	// 统一分页参数
 	req.Page, req.PageSize = logicutil.NormalizePage(req.Page, req.PageSize, 20, 100)
 
-	repo := videorepo.NewVideoRepository(l.svcCtx.Repository)
 	// 支持sourceType筛选（0=全部，1=手动添加，2=采集）
 	sourceType := req.SourceType
-	list, total, err := repo.FindPage(l.ctx, req.Page, req.PageSize, req.Keyword, sourceType)
+	list, total, err := l.svcCtx.Domain.Video.Video.FindPage(l.ctx, req.Page, req.PageSize, req.Keyword, sourceType)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询视频列表失败", err)
 	}

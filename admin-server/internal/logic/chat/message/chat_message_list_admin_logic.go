@@ -12,8 +12,6 @@ import (
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	chatrepo "postapocgame/admin-server/internal/repository/chat"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 type ChatMessageListAdminLogic struct {
@@ -43,11 +41,8 @@ func (l *ChatMessageListAdminLogic) ChatMessageListAdmin(req *types.ChatMessageL
 		return nil, errs.New(errs.CodeUnauthorized, "未登录或登录已过期")
 	}
 
-	messageRepo := chatrepo.NewChatMessageRepository(l.svcCtx.Repository)
-	userRepo := iamrepo.NewUserRepository(l.svcCtx.Repository)
-
 	// 根据 chatId 查询消息，如果 chatId == 0，则查询所有消息（管理页面）
-	list, total, err := messageRepo.FindByChatID(l.ctx, req.Page, req.PageSize, req.ChatId)
+	list, total, err := l.svcCtx.Domain.Chat.ChatMessage.FindByChatID(l.ctx, req.Page, req.PageSize, req.ChatId)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询聊天消息列表失败", err)
 	}
@@ -55,7 +50,7 @@ func (l *ChatMessageListAdminLogic) ChatMessageListAdmin(req *types.ChatMessageL
 	items := make([]types.ChatMessageItem, 0, len(list))
 	for _, msg := range list {
 		// 查询发送用户信息
-		fromUser, _ := userRepo.FindByID(l.ctx, msg.FromUserId)
+		fromUser, _ := l.svcCtx.Domain.IAM.User.FindByID(l.ctx, msg.FromUserId)
 		fromUserName := ""
 		if fromUser != nil {
 			fromUserName = fromUser.Username

@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	systemrepo "postapocgame/admin-server/internal/repository/system"
 )
 
 type DictItemListLogic struct {
@@ -33,8 +32,7 @@ func (l *DictItemListLogic) DictItemList(req *types.DictItemListReq) (resp *type
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	dictItemRepo := systemrepo.NewDictItemRepository(l.svcCtx.Repository)
-	list, total, err := dictItemRepo.FindPage(l.ctx, req.Page, req.PageSize, req.TypeId, req.Label)
+	list, total, err := l.svcCtx.Domain.System.DictItem.FindPage(l.ctx, req.Page, req.PageSize, req.TypeId, req.Label)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询字典项列表失败", err)
 	}

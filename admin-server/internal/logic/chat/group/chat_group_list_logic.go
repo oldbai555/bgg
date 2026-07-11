@@ -12,7 +12,6 @@ import (
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	chatrepo "postapocgame/admin-server/internal/repository/chat"
 )
 
 type ChatGroupListLogic struct {
@@ -38,10 +37,8 @@ func (l *ChatGroupListLogic) ChatGroupList(req *types.ChatGroupListReq) (resp *t
 
 	req.Page, req.PageSize = logicutil.NormalizePage(req.Page, req.PageSize, 10, 100)
 
-	chatRepo := chatrepo.NewChatRepository(l.svcCtx.Repository)
-
 	// 查询群组列表
-	groups, total, err := chatRepo.FindGroups(l.ctx, req.Page, req.PageSize, req.Name)
+	groups, total, err := l.svcCtx.Domain.Chat.Chat.FindGroups(l.ctx, req.Page, req.PageSize, req.Name)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询群组列表失败", err)
 	}
@@ -49,7 +46,7 @@ func (l *ChatGroupListLogic) ChatGroupList(req *types.ChatGroupListReq) (resp *t
 	// 获取每个群组的成员数量
 	items := make([]types.ChatGroupItem, 0, len(groups))
 	for _, group := range groups {
-		memberCount, err := chatRepo.CountMembersByChatID(l.ctx, group.Id)
+		memberCount, err := l.svcCtx.Domain.Chat.Chat.CountMembersByChatID(l.ctx, group.Id)
 		if err != nil {
 			logx.Errorf("统计群组 %d 成员数量失败: %v", group.Id, err)
 			memberCount = 0

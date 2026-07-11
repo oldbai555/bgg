@@ -4,7 +4,6 @@
 package social_info
 
 import (
-	blogrepo "postapocgame/admin-server/internal/repository/blog"
 	"context"
 	"fmt"
 	"strings"
@@ -38,7 +37,7 @@ func (l *BlogSocialInfoUpdateLogic) BlogSocialInfoUpdate(req *types.BlogSocialIn
 	}
 
 	// 查询现有记录
-	info, err := blogrepo.NewBlogSocialInfoRepository(l.svcCtx.Repository).FindByID(l.ctx, req.Id)
+	info, err := l.svcCtx.Domain.Blog.SocialInfo.FindByID(l.ctx, req.Id)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeBadDB, "查询社交信息失败", err)
 	}
@@ -85,7 +84,7 @@ func (l *BlogSocialInfoUpdateLogic) BlogSocialInfoUpdate(req *types.BlogSocialIn
 		info.OrderNum = req.OrderNum
 	}
 
-	if err := blogrepo.NewBlogSocialInfoRepository(l.svcCtx.Repository).Update(l.ctx, info); err != nil {
+	if err := l.svcCtx.Domain.Blog.SocialInfo.Update(l.ctx, info); err != nil {
 		return nil, err
 	}
 

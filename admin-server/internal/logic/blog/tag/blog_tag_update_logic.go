@@ -4,7 +4,6 @@
 package tag
 
 import (
-	blogrepo "postapocgame/admin-server/internal/repository/blog"
 	"context"
 	"postapocgame/admin-server/internal/dict"
 	"strings"
@@ -36,9 +35,7 @@ func (l *BlogTagUpdateLogic) BlogTagUpdate(req *types.BlogTagUpdateReq) error {
 		return errs.New(errs.CodeBadRequest, "标签ID不能为空")
 	}
 
-	tagRepo := blogrepo.NewBlogTagRepository(l.svcCtx.Repository)
-
-	tag, err := tagRepo.FindByID(l.ctx, req.Id)
+	tag, err := l.svcCtx.Domain.Blog.Tag.FindByID(l.ctx, req.Id)
 	if err != nil {
 		return errs.Wrap(errs.CodeBadDB, "查询标签失败", err)
 	}
@@ -59,7 +56,7 @@ func (l *BlogTagUpdateLogic) BlogTagUpdate(req *types.BlogTagUpdateReq) error {
 		tag.Remark = strings.TrimSpace(req.Remark)
 	}
 
-	if err = tagRepo.Update(l.ctx, tag); err != nil {
+	if err = l.svcCtx.Domain.Blog.Tag.Update(l.ctx, tag); err != nil {
 		return err
 	}
 

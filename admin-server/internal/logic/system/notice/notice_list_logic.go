@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	systemrepo "postapocgame/admin-server/internal/repository/system"
 )
 
 type NoticeListLogic struct {
@@ -46,8 +45,7 @@ func (l *NoticeListLogic) NoticeList(req *types.NoticeListReq) (resp *types.Noti
 	}
 	// 状态：1=草稿，2=已发布，0=未定义（不使用）
 
-	noticeRepo := systemrepo.NewNoticeRepository(l.svcCtx.Repository)
-	list, total, err := noticeRepo.FindPage(l.ctx, req.Page, req.PageSize, req.Title, noticeType, status)
+	list, total, err := l.svcCtx.Domain.System.Notice.FindPage(l.ctx, req.Page, req.PageSize, req.Title, noticeType, status)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询公告列表失败", err)
 	}

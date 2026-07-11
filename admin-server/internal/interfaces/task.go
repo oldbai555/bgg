@@ -11,6 +11,8 @@ import (
 // - Excel导出任务执行器
 // - 邮件通知任务执行器
 // - 数据备份任务执行器
+//
+//go:generate mockery --name=TaskExecutor --output=../mocks/interfaces --outpkg=interfaces_mocks
 type TaskExecutor interface {
 	// GetType 获取任务类型（对应字典 task_type 的 value）
 	GetType() int

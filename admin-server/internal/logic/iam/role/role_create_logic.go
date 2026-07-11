@@ -11,9 +11,9 @@ import (
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 
-	"github.com/zeromicro/go-zero/core/logx"
 	"postapocgame/admin-server/internal/model/iam"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
+
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type RoleCreateLogic struct {
@@ -35,7 +35,6 @@ func (l *RoleCreateLogic) RoleCreate(req *types.RoleCreateReq) error {
 		return errs.New(errs.CodeBadRequest, "角色名称和编码不能为空")
 	}
 
-	roleRepo := iamrepo.NewRoleRepository(l.svcCtx.Repository)
 	role := iam.AdminRole{
 		Name:        req.Name,
 		Code:        req.Code,
@@ -43,7 +42,7 @@ func (l *RoleCreateLogic) RoleCreate(req *types.RoleCreateReq) error {
 		Status:      req.Status,
 	}
 
-	if err := roleRepo.Create(l.ctx, &role); err != nil {
+	if err := l.svcCtx.Domain.IAM.Role.Create(l.ctx, &role); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "创建角色失败", err)
 	}
 	return nil

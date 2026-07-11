@@ -15,7 +15,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	systemrepo "postapocgame/admin-server/internal/repository/system"
 )
 
 type FileDownloadLogic struct {
@@ -45,8 +44,7 @@ func (l *FileDownloadLogic) FileDownload(req *types.FileDownloadReq) (fileInfo *
 		return nil, "", errs.New(errs.CodeBadRequest, "文件ID不能为空")
 	}
 
-	fileRepo := systemrepo.NewFileRepository(l.svcCtx.Repository)
-	file, err := fileRepo.FindByID(l.ctx, req.Id)
+	file, err := l.svcCtx.Domain.System.File.FindByID(l.ctx, req.Id)
 	if err != nil {
 		return nil, "", errs.Wrap(errs.CodeNotFound, "文件不存在", err)
 	}

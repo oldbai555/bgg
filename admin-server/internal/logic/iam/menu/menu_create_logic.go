@@ -10,9 +10,10 @@ import (
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 
-	"github.com/zeromicro/go-zero/core/logx"
 	"postapocgame/admin-server/internal/model/iam"
 	iamrepo "postapocgame/admin-server/internal/repository/iam"
+
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type MenuCreateLogic struct {
@@ -34,10 +35,8 @@ func (l *MenuCreateLogic) MenuCreate(req *types.MenuCreateReq) error {
 		return errs.New(errs.CodeBadRequest, "菜单名称和类型不能为空")
 	}
 
-	menuRepo := iamrepo.NewMenuRepository(l.svcCtx.Repository)
-
 	// 验证菜单层级规则（创建时menuId为0，不需要检查循环引用）
-	if err := l.validateMenuHierarchy(0, req.ParentId, req.MenuType, menuRepo); err != nil {
+	if err := l.validateMenuHierarchy(0, req.ParentId, req.MenuType, l.svcCtx.Domain.IAM.Menu); err != nil {
 		return err
 	}
 
@@ -53,7 +52,7 @@ func (l *MenuCreateLogic) MenuCreate(req *types.MenuCreateReq) error {
 		Status:    req.Status,
 	}
 
-	if err := menuRepo.Create(l.ctx, &m); err != nil {
+	if err := l.svcCtx.Domain.IAM.Menu.Create(l.ctx, &m); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "创建菜单失败", err)
 	}
 

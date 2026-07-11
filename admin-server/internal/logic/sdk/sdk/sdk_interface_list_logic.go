@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	sdkrepo "postapocgame/admin-server/internal/repository/sdk"
 )
 
 type SdkInterfaceListLogic struct {
@@ -34,10 +33,9 @@ func (l *SdkInterfaceListLogic) SdkInterfaceList(req *types.SdkInterfaceListReq)
 	}
 	req.Page, req.PageSize = logicutil.NormalizePage(req.Page, req.PageSize, 20, 100)
 
-	repo := sdkrepo.NewSdkAdminRepository(l.svcCtx.Repository)
 	// status == 0 表示不按状态过滤，非0才过滤
 	statusFilter := req.Status
-	list, total, err := repo.ListInterfaces(l.ctx, req.Page, req.PageSize, req.Name, req.ApiCode, statusFilter)
+	list, total, err := l.svcCtx.Domain.SDK.Admin.ListInterfaces(l.ctx, req.Page, req.PageSize, req.Name, req.ApiCode, statusFilter)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询接口列表失败", err)
 	}

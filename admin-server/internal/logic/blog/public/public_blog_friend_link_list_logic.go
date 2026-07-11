@@ -4,7 +4,6 @@
 package public
 
 import (
-	blogrepo "postapocgame/admin-server/internal/repository/blog"
 	"context"
 
 	"postapocgame/admin-server/internal/svc"
@@ -30,7 +29,7 @@ func NewPublicBlogFriendLinkListLogic(ctx context.Context, svcCtx *svc.ServiceCo
 
 func (l *PublicBlogFriendLinkListLogic) PublicBlogFriendLinkList() (resp *types.PublicBlogFriendLinkListResp, err error) {
 	// 查询启用的友情链接列表
-	list, err := blogrepo.NewBlogFriendLinkRepository(l.svcCtx.Repository).FindEnabledList(l.ctx)
+	list, err := l.svcCtx.Domain.Blog.FriendLink.FindEnabledList(l.ctx)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeBadDB, "查询友情链接列表失败", err)
 	}

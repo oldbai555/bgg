@@ -11,9 +11,9 @@ import (
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 
-	"github.com/zeromicro/go-zero/core/logx"
 	"postapocgame/admin-server/internal/model/iam"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
+
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type ApiCreateLogic struct {
@@ -35,9 +35,8 @@ func (l *ApiCreateLogic) ApiCreate(req *types.ApiCreateReq) error {
 		return errs.New(errs.CodeBadRequest, "接口名称、方法和路径不能为空")
 	}
 
-	apiRepo := iamrepo.NewApiRepository(l.svcCtx.Repository)
 	// 检查是否已存在相同的 method+path
-	_, err := apiRepo.FindByMethodAndPath(l.ctx, req.Method, req.Path)
+	_, err := l.svcCtx.Domain.IAM.Api.FindByMethodAndPath(l.ctx, req.Method, req.Path)
 	if err == nil {
 		return errs.New(errs.CodeBadRequest, "该接口已存在")
 	}
@@ -53,7 +52,7 @@ func (l *ApiCreateLogic) ApiCreate(req *types.ApiCreateReq) error {
 		api.Status = 1
 	}
 
-	if err := apiRepo.Create(l.ctx, &api); err != nil {
+	if err := l.svcCtx.Domain.IAM.Api.Create(l.ctx, &api); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "创建接口失败", err)
 	}
 	return nil

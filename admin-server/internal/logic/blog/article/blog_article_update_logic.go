@@ -4,7 +4,6 @@
 package article
 
 import (
-	blogrepo "postapocgame/admin-server/internal/repository/blog"
 	"context"
 	"postapocgame/admin-server/internal/dict"
 	"strings"
@@ -36,7 +35,7 @@ func (l *BlogArticleUpdateLogic) BlogArticleUpdate(req *types.BlogArticleUpdateR
 		return nil, errs.New(errs.CodeBadRequest, "文章ID不能为空")
 	}
 
-	article, err := blogrepo.NewBlogArticleRepository(l.svcCtx.Repository).FindByID(l.ctx, req.Id)
+	article, err := l.svcCtx.Domain.Blog.Article.FindByID(l.ctx, req.Id)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeBadDB, "查询文章失败", err)
 	}
@@ -92,7 +91,7 @@ func (l *BlogArticleUpdateLogic) BlogArticleUpdate(req *types.BlogArticleUpdateR
 		article.AuditStatus = consts.BlogArticleAuditStatusPending
 	}
 
-	if err = blogrepo.NewBlogArticleRepository(l.svcCtx.Repository).UpdateWithTags(l.ctx, article, tagIDs); err != nil {
+	if err = l.svcCtx.Domain.Blog.ArticleService.UpdateArticle(l.ctx, article, tagIDs); err != nil {
 		return nil, err
 	}
 

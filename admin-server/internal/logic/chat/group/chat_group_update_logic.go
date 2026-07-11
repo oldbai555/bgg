@@ -13,7 +13,6 @@ import (
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	chatrepo "postapocgame/admin-server/internal/repository/chat"
 )
 
 type ChatGroupUpdateLogic struct {
@@ -37,10 +36,8 @@ func (l *ChatGroupUpdateLogic) ChatGroupUpdate(req *types.ChatGroupUpdateReq) (r
 		return nil, errs.New(errs.CodeUnauthorized, "未登录或登录已过期")
 	}
 
-	chatRepo := chatrepo.NewChatRepository(l.svcCtx.Repository)
-
 	// 查询群组
-	chat, err := chatRepo.FindByID(l.ctx, req.Id)
+	chat, err := l.svcCtx.Domain.Chat.Chat.FindByID(l.ctx, req.Id)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeNotFound, "群组不存在", err)
 	}
@@ -78,7 +75,7 @@ func (l *ChatGroupUpdateLogic) ChatGroupUpdate(req *types.ChatGroupUpdateReq) (r
 	}
 
 	chat.UpdatedAt = time.Now().Unix()
-	err = chatRepo.Update(l.ctx, chat)
+	err = l.svcCtx.Domain.Chat.Chat.Update(l.ctx, chat)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "更新群组失败", err)
 	}

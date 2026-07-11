@@ -182,10 +182,15 @@ func (r *videoRepository) Create(ctx context.Context, video *videomodel.Video) e
 		return errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
 	}
 
-	_, err = r.conn.ExecCtx(ctx, sql, args...)
+	result, err := r.conn.ExecCtx(ctx, sql, args...)
 	if err != nil {
 		return errs.Wrap(errs.CodeBadDB, "插入视频失败", err)
 	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return errs.Wrap(errs.CodeBadDB, "获取视频自增 ID 失败", err)
+	}
+	video.Id = uint64(id)
 
 	return nil
 }

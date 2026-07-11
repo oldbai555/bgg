@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	systemrepo "postapocgame/admin-server/internal/repository/system"
 )
 
 type FileUpdateLogic struct {
@@ -33,8 +32,7 @@ func (l *FileUpdateLogic) FileUpdate(req *types.FileUpdateReq) error {
 		return errs.New(errs.CodeBadRequest, "文件ID不能为空")
 	}
 
-	fileRepo := systemrepo.NewFileRepository(l.svcCtx.Repository)
-	file, err := fileRepo.FindByID(l.ctx, req.Id)
+	file, err := l.svcCtx.Domain.System.File.FindByID(l.ctx, req.Id)
 	if err != nil {
 		return errs.Wrap(errs.CodeInternalError, "查询文件失败", err)
 	}
@@ -47,7 +45,7 @@ func (l *FileUpdateLogic) FileUpdate(req *types.FileUpdateReq) error {
 		file.Status = req.Status
 	}
 
-	if err := fileRepo.Update(l.ctx, file); err != nil {
+	if err := l.svcCtx.Domain.System.File.Update(l.ctx, file); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "更新文件记录失败", err)
 	}
 	return nil

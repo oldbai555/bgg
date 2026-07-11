@@ -65,8 +65,16 @@ func (r *permissionRepository) DeleteByID(ctx context.Context, id uint64) error 
 }
 
 func (r *permissionRepository) Create(ctx context.Context, p *iammodel.AdminPermission) error {
-	_, err := r.model.Insert(ctx, p)
-	return err
+	result, err := r.model.Insert(ctx, p)
+	if err != nil {
+		return err
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+	p.Id = uint64(id)
+	return nil
 }
 
 func (r *permissionRepository) Update(ctx context.Context, p *iammodel.AdminPermission) error {

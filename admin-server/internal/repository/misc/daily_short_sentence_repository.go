@@ -100,8 +100,16 @@ func (r *dailyShortSentenceRepository) DeleteByID(ctx context.Context, id uint64
 }
 
 func (r *dailyShortSentenceRepository) Create(ctx context.Context, sentence *miscmodel.DailyShortSentence) error {
-	_, err := r.model.Insert(ctx, sentence)
-	return err
+	result, err := r.model.Insert(ctx, sentence)
+	if err != nil {
+		return err
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+	sentence.Id = uint64(id)
+	return nil
 }
 
 func (r *dailyShortSentenceRepository) Update(ctx context.Context, sentence *miscmodel.DailyShortSentence) error {

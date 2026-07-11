@@ -4,7 +4,6 @@
 package article
 
 import (
-	blogrepo "postapocgame/admin-server/internal/repository/blog"
 	"context"
 
 	"postapocgame/admin-server/internal/svc"
@@ -33,7 +32,7 @@ func (l *BlogArticleDetailLogic) BlogArticleDetail(req *types.BlogArticleDetailR
 		return nil, errs.New(errs.CodeBadRequest, "文章ID不能为空")
 	}
 
-	article, err := blogrepo.NewBlogArticleRepository(l.svcCtx.Repository).FindByID(l.ctx, req.Id)
+	article, err := l.svcCtx.Domain.Blog.Article.FindByID(l.ctx, req.Id)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeBadDB, "查询文章失败", err)
 	}
@@ -41,7 +40,7 @@ func (l *BlogArticleDetailLogic) BlogArticleDetail(req *types.BlogArticleDetailR
 		return nil, errs.New(errs.CodeNotFound, "文章不存在")
 	}
 
-	tags, err := blogrepo.NewBlogArticleTagRepository(l.svcCtx.Repository).FindTagsByArticleID(l.ctx, req.Id)
+	tags, err := l.svcCtx.Domain.Blog.ArticleTag.FindTagsByArticleID(l.ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}

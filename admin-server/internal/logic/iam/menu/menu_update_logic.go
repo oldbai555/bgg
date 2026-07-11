@@ -10,8 +10,9 @@ import (
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 
-	"github.com/zeromicro/go-zero/core/logx"
 	iamrepo "postapocgame/admin-server/internal/repository/iam"
+
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type MenuUpdateLogic struct {
@@ -33,14 +34,13 @@ func (l *MenuUpdateLogic) MenuUpdate(req *types.MenuUpdateReq) error {
 		return errs.New(errs.CodeBadRequest, "菜单ID不能为空")
 	}
 
-	menuRepo := iamrepo.NewMenuRepository(l.svcCtx.Repository)
-	m, err := menuRepo.FindByID(l.ctx, req.Id)
+	m, err := l.svcCtx.Domain.IAM.Menu.FindByID(l.ctx, req.Id)
 	if err != nil {
 		return errs.Wrap(errs.CodeInternalError, "查询菜单失败", err)
 	}
 
 	// 验证菜单层级规则
-	if err := l.validateMenuHierarchy(req.Id, req.ParentId, req.MenuType, menuRepo); err != nil {
+	if err := l.validateMenuHierarchy(req.Id, req.ParentId, req.MenuType, l.svcCtx.Domain.IAM.Menu); err != nil {
 		return err
 	}
 
@@ -58,7 +58,7 @@ func (l *MenuUpdateLogic) MenuUpdate(req *types.MenuUpdateReq) error {
 		m.Status = req.Status
 	}
 
-	if err := menuRepo.Update(l.ctx, m); err != nil {
+	if err := l.svcCtx.Domain.IAM.Menu.Update(l.ctx, m); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "更新菜单失败", err)
 	}
 

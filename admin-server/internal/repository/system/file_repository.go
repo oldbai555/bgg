@@ -50,8 +50,16 @@ func (r *fileRepository) DeleteByID(ctx context.Context, id uint64) error {
 }
 
 func (r *fileRepository) Create(ctx context.Context, file *systemmodel.AdminFile) error {
-	_, err := r.model.Insert(ctx, file)
-	return err
+	result, err := r.model.Insert(ctx, file)
+	if err != nil {
+		return err
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+	file.Id = uint64(id)
+	return nil
 }
 
 func (r *fileRepository) Update(ctx context.Context, file *systemmodel.AdminFile) error {

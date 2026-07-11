@@ -44,8 +44,16 @@ func (r *configRepository) DeleteByID(ctx context.Context, id uint64) error {
 }
 
 func (r *configRepository) Create(ctx context.Context, config *systemmodel.AdminConfig) error {
-	_, err := r.model.Insert(ctx, config)
-	return err
+	result, err := r.model.Insert(ctx, config)
+	if err != nil {
+		return err
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+	config.Id = uint64(id)
+	return nil
 }
 
 func (r *configRepository) Update(ctx context.Context, config *systemmodel.AdminConfig) error {

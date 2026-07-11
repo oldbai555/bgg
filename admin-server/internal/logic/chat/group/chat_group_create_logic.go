@@ -7,15 +7,15 @@ import (
 	"context"
 	"time"
 
+	"postapocgame/admin-server/internal/repository/registry"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 
-	"github.com/zeromicro/go-zero/core/logx"
 	chatmodel "postapocgame/admin-server/internal/model/chat"
-	chatrepo "postapocgame/admin-server/internal/repository/chat"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
+
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type ChatGroupCreateLogic struct {
@@ -44,13 +44,10 @@ func (l *ChatGroupCreateLogic) ChatGroupCreate(req *types.ChatGroupCreateReq) (r
 		return nil, errs.New(errs.CodeBadRequest, "群组名称不能为空")
 	}
 
-	chatRepo := chatrepo.NewChatRepository(l.svcCtx.Repository)
-	chatUserRepo := chatrepo.NewChatUserRepository(l.svcCtx.Repository)
-	userRepo := iamrepo.NewUserRepository(l.svcCtx.Repository)
-
 	now := time.Now().Unix()
 
-	// 1. 创建群组（type=2）
+	// 1. 创建群组（type=2）+ 2. 将创建人加入群组，两条写包一个事务：
+	// 避免群组建了但创建人加入失败时留下一个没有任何成员的孤儿群组。
 	chatEntity := &chatmodel.Chat{
 		Name:        req.Name,
 		Type:        2, // 群组类型
@@ -62,21 +59,22 @@ func (l *ChatGroupCreateLogic) ChatGroupCreate(req *types.ChatGroupCreateReq) (r
 		DeletedAt:   0,
 	}
 
-	err = chatRepo.Create(l.ctx, chatEntity)
+	err = registry.Transact(l.ctx, l.svcCtx.Repository, func(ctx context.Context, txDomain *registry.Domain) error {
+		if err := txDomain.Chat.Chat.Create(ctx, chatEntity); err != nil {
+			return errs.Wrap(errs.CodeInternalError, "创建群组失败", err)
+		}
+		return txDomain.Chat.ChatUser.Create(ctx, &chatmodel.ChatUser{
+			ChatId:    chatEntity.Id,
+			UserId:    user.UserID,
+			JoinedAt:  now,
+			CreatedAt: now,
+			UpdatedAt: now,
+		})
+	})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "创建群组失败", err)
-	}
-
-	// 2. 将创建人加入群组
-	chatUser := &chatmodel.ChatUser{
-		ChatId:    chatEntity.Id,
-		UserId:    user.UserID,
-		JoinedAt:  now,
-		CreatedAt: now,
-		UpdatedAt: now,
-	}
-	err = chatUserRepo.Create(l.ctx, chatUser)
-	if err != nil {
+		if bizErr, ok := errs.FromError(err); ok {
+			return nil, bizErr
+		}
 		return nil, errs.Wrap(errs.CodeInternalError, "添加创建人到群组失败", err)
 	}
 
@@ -88,7 +86,7 @@ func (l *ChatGroupCreateLogic) ChatGroupCreate(req *types.ChatGroupCreateReq) (r
 				continue // 跳过创建人
 			}
 
-			u, err := userRepo.FindByID(l.ctx, userId)
+			u, err := l.svcCtx.Domain.IAM.User.FindByID(l.ctx, userId)
 			if err != nil {
 				logx.Errorf("查询用户失败: userId=%d, err=%v", userId, err)
 				continue
@@ -99,7 +97,7 @@ func (l *ChatGroupCreateLogic) ChatGroupCreate(req *types.ChatGroupCreateReq) (r
 			}
 
 			// 检查是否已在群组中
-			existingUsers, _ := chatUserRepo.FindByChatID(l.ctx, chatEntity.Id)
+			existingUsers, _ := l.svcCtx.Domain.Chat.ChatUser.FindByChatID(l.ctx, chatEntity.Id)
 			alreadyInGroup := false
 			for _, cu := range existingUsers {
 				if cu.UserId == userId {
@@ -116,7 +114,7 @@ func (l *ChatGroupCreateLogic) ChatGroupCreate(req *types.ChatGroupCreateReq) (r
 					CreatedAt: now,
 					UpdatedAt: now,
 				}
-				err = chatUserRepo.Create(l.ctx, chatUser)
+				err = l.svcCtx.Domain.Chat.ChatUser.Create(l.ctx, chatUser)
 				if err != nil {
 					logx.Errorf("添加成员到群组失败: userId=%d, err=%v", userId, err)
 					// 继续添加其他成员，不中断流程

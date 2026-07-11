@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	miscrepo "postapocgame/admin-server/internal/repository/misc"
 )
 
 type DailyShortSentenceDeleteLogic struct {
@@ -33,8 +32,7 @@ func (l *DailyShortSentenceDeleteLogic) DailyShortSentenceDelete(req *types.Dail
 		return errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	repo := miscrepo.NewDailyShortSentenceRepository(l.svcCtx.Repository)
-	if err := repo.DeleteByID(l.ctx, req.Id); err != nil {
+	if err := l.svcCtx.Domain.Misc.DailyShortSentence.DeleteByID(l.ctx, req.Id); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "删除每日短句失败", err)
 	}
 

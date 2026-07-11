@@ -4,7 +4,6 @@
 package friend_link
 
 import (
-	blogrepo "postapocgame/admin-server/internal/repository/blog"
 	"context"
 
 	"postapocgame/admin-server/internal/svc"
@@ -34,7 +33,7 @@ func (l *BlogFriendLinkDeleteLogic) BlogFriendLinkDelete(req *types.BlogFriendLi
 	}
 
 	// 检查记录是否存在
-	link, err := blogrepo.NewBlogFriendLinkRepository(l.svcCtx.Repository).FindByID(l.ctx, req.Id)
+	link, err := l.svcCtx.Domain.Blog.FriendLink.FindByID(l.ctx, req.Id)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeBadDB, "查询友情链接失败", err)
 	}
@@ -43,7 +42,7 @@ func (l *BlogFriendLinkDeleteLogic) BlogFriendLinkDelete(req *types.BlogFriendLi
 	}
 
 	// 执行软删除
-	if err := blogrepo.NewBlogFriendLinkRepository(l.svcCtx.Repository).Delete(l.ctx, req.Id); err != nil {
+	if err := l.svcCtx.Domain.Blog.FriendLink.Delete(l.ctx, req.Id); err != nil {
 		return nil, err
 	}
 

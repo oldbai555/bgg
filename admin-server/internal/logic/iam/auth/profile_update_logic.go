@@ -13,7 +13,6 @@ import (
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 type ProfileUpdateLogic struct {
@@ -42,8 +41,7 @@ func (l *ProfileUpdateLogic) ProfileUpdate(req *types.ProfileUpdateReq) error {
 	}
 
 	// 获取用户信息
-	userRepo := iamrepo.NewUserRepository(l.svcCtx.Repository)
-	userInfo, err := userRepo.FindByID(l.ctx, user.UserID)
+	userInfo, err := l.svcCtx.Domain.IAM.User.FindByID(l.ctx, user.UserID)
 	if err != nil {
 		return errs.Wrap(errs.CodeInternalError, "获取用户信息失败", err)
 	}
@@ -62,7 +60,7 @@ func (l *ProfileUpdateLogic) ProfileUpdate(req *types.ProfileUpdateReq) error {
 	userInfo.UpdatedAt = time.Now().Unix()
 
 	// 保存更新
-	err = userRepo.Update(l.ctx, userInfo)
+	err = l.svcCtx.Domain.IAM.User.Update(l.ctx, userInfo)
 	if err != nil {
 		return errs.Wrap(errs.CodeInternalError, "更新个人信息失败", err)
 	}

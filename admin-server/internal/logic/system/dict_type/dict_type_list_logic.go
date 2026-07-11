@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	systemrepo "postapocgame/admin-server/internal/repository/system"
 )
 
 type DictTypeListLogic struct {
@@ -33,8 +32,7 @@ func (l *DictTypeListLogic) DictTypeList(req *types.DictTypeListReq) (resp *type
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	dictTypeRepo := systemrepo.NewDictTypeRepository(l.svcCtx.Repository)
-	list, total, err := dictTypeRepo.FindPage(l.ctx, req.Page, req.PageSize, req.Name, req.Code)
+	list, total, err := l.svcCtx.Domain.System.DictType.FindPage(l.ctx, req.Page, req.PageSize, req.Name, req.Code)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询字典类型列表失败", err)
 	}

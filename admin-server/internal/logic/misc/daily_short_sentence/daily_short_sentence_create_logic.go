@@ -12,9 +12,9 @@ import (
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 
-	"github.com/zeromicro/go-zero/core/logx"
 	"postapocgame/admin-server/internal/model/misc"
-	miscrepo "postapocgame/admin-server/internal/repository/misc"
+
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type DailyShortSentenceCreateLogic struct {
@@ -61,8 +61,7 @@ func (l *DailyShortSentenceCreateLogic) DailyShortSentenceCreate(req *types.Dail
 		sentence.ConvertImg = sql.NullString{String: req.ConvertImg, Valid: true}
 	}
 
-	repo := miscrepo.NewDailyShortSentenceRepository(l.svcCtx.Repository)
-	if err := repo.Create(l.ctx, &sentence); err != nil {
+	if err := l.svcCtx.Domain.Misc.DailyShortSentence.Create(l.ctx, &sentence); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "创建每日短句失败", err)
 	}
 

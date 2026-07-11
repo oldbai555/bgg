@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	sdkrepo "postapocgame/admin-server/internal/repository/sdk"
 )
 
 type SdkApiKeyBindListLogic struct {
@@ -33,8 +32,7 @@ func (l *SdkApiKeyBindListLogic) SdkApiKeyBindList(req *types.SdkApiKeyBindListR
 		return nil, errs.New(errs.CodeBadRequest, "sdkKeyId 不能为空")
 	}
 
-	repo := sdkrepo.NewSdkAdminRepository(l.svcCtx.Repository)
-	list, err := repo.ListBindings(l.ctx, req.SdkKeyId)
+	list, err := l.svcCtx.Domain.SDK.Admin.ListBindings(l.ctx, req.SdkKeyId)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询绑定列表失败", err)
 	}

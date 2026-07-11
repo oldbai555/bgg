@@ -13,7 +13,6 @@ import (
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	systemrepo "postapocgame/admin-server/internal/repository/system"
 )
 
 type NotificationReadLogic struct {
@@ -42,8 +41,7 @@ func (l *NotificationReadLogic) NotificationRead(req *types.NotificationReadReq)
 	}
 
 	// 验证消息通知是否属于当前用户
-	notificationRepo := systemrepo.NewNotificationRepository(l.svcCtx.Repository)
-	notification, err := notificationRepo.FindByID(l.ctx, req.Id)
+	notification, err := l.svcCtx.Domain.System.Notification.FindByID(l.ctx, req.Id)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeNotFound, "消息通知不存在", err)
 	}
@@ -51,13 +49,13 @@ func (l *NotificationReadLogic) NotificationRead(req *types.NotificationReadReq)
 		return nil, errs.New(errs.CodeForbidden, "无权操作该消息通知")
 	}
 
-	// 标记为已读
+	// 标记为已读（字典值：1=未读，2=已读）
 	now := time.Now().Unix()
-	notification.ReadStatus = 1
+	notification.ReadStatus = 2
 	notification.ReadAt = now
 	notification.UpdatedAt = now
 
-	if err := notificationRepo.Update(l.ctx, notification); err != nil {
+	if err := l.svcCtx.Domain.System.Notification.Update(l.ctx, notification); err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "标记已读失败", err)
 	}
 

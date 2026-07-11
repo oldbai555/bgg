@@ -13,10 +13,9 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 
-	"github.com/zeromicro/go-zero/core/logx"
 	"postapocgame/admin-server/internal/model/system"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
-	systemrepo "postapocgame/admin-server/internal/repository/system"
+
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type NoticeCreateLogic struct {
@@ -76,8 +75,7 @@ func (l *NoticeCreateLogic) NoticeCreate(req *types.NoticeCreateReq) (resp *type
 		DeletedAt:   0,
 	}
 
-	noticeRepo := systemrepo.NewNoticeRepository(l.svcCtx.Repository)
-	if err := noticeRepo.Create(l.ctx, notice); err != nil {
+	if err := l.svcCtx.Domain.System.Notice.Create(l.ctx, notice); err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "创建公告失败", err)
 	}
 
@@ -100,16 +98,14 @@ func (l *NoticeCreateLogic) createNotificationsForAllUsers(noticeID uint64, titl
 		}
 	}()
 
-	userRepo := iamrepo.NewUserRepository(l.svcCtx.Repository)
-	notificationRepo := systemrepo.NewNotificationRepository(l.svcCtx.Repository)
-
+	// TODO(phase2-iam-rpc): 跨域读取 IAM 用户列表（只读遍历），Phase 2 拆分后改为调用 iam-rpc.ListUsers
 	// 分批获取所有用户
 	limit := int64(100)
 	lastID := uint64(0)
 	totalCreated := 0
 
 	for {
-		users, newLastID, err := userRepo.FindChunk(context.Background(), limit, lastID)
+		users, newLastID, err := l.svcCtx.Domain.IAM.User.FindChunk(context.Background(), limit, lastID)
 		if err != nil {
 			l.Errorf("查询用户失败: noticeId=%d, error: %v", noticeID, err)
 			break
@@ -122,7 +118,7 @@ func (l *NoticeCreateLogic) createNotificationsForAllUsers(noticeID uint64, titl
 		now := time.Now().Unix()
 		for _, user := range users {
 			// 检查是否已存在通知（避免重复创建）
-			notifications, _, err := notificationRepo.FindPage(context.Background(), 1, 1, user.Id, "notice", -1)
+			notifications, _, err := l.svcCtx.Domain.System.Notification.FindPage(context.Background(), 1, 1, user.Id, "notice", -1)
 			if err == nil {
 				hasNotification := false
 				for _, notif := range notifications {
@@ -143,14 +139,14 @@ func (l *NoticeCreateLogic) createNotificationsForAllUsers(noticeID uint64, titl
 				SourceId:   noticeID,
 				Title:      title,
 				Content:    content,
-				ReadStatus: 0, // 未读
+				ReadStatus: 1, // 未读（字典值：1=未读，2=已读）
 				ReadAt:     0,
 				CreatedAt:  now,
 				UpdatedAt:  now,
 				DeletedAt:  0,
 			}
 
-			if err := notificationRepo.Create(context.Background(), notification); err != nil {
+			if err := l.svcCtx.Domain.System.Notification.Create(context.Background(), notification); err != nil {
 				l.Errorf("创建公告通知失败: userId=%d, noticeId=%d, error: %v", user.Id, noticeID, err)
 			} else {
 				totalCreated++

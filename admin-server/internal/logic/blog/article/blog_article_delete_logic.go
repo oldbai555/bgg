@@ -4,7 +4,6 @@
 package article
 
 import (
-	blogrepo "postapocgame/admin-server/internal/repository/blog"
 	"context"
 
 	"postapocgame/admin-server/internal/svc"
@@ -33,7 +32,7 @@ func (l *BlogArticleDeleteLogic) BlogArticleDelete(req *types.BlogArticleDeleteR
 		return nil, errs.New(errs.CodeBadRequest, "文章ID不能为空")
 	}
 
-	if err := blogrepo.NewBlogArticleRepository(l.svcCtx.Repository).Delete(l.ctx, req.Id); err != nil {
+	if err := l.svcCtx.Domain.Blog.Article.Delete(l.ctx, req.Id); err != nil {
 		return nil, err
 	}
 

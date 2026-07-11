@@ -43,8 +43,16 @@ func (r *departmentRepository) ListChildren(ctx context.Context, parentID uint64
 }
 
 func (r *departmentRepository) Create(ctx context.Context, dept *iammodel.AdminDepartment) error {
-	_, err := r.model.Insert(ctx, dept)
-	return err
+	result, err := r.model.Insert(ctx, dept)
+	if err != nil {
+		return err
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+	dept.Id = uint64(id)
+	return nil
 }
 
 func (r *departmentRepository) Update(ctx context.Context, dept *iammodel.AdminDepartment) error {

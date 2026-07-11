@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 type ApiDeleteLogic struct {
@@ -33,8 +32,7 @@ func (l *ApiDeleteLogic) ApiDelete(req *types.ApiDeleteReq) error {
 		return errs.New(errs.CodeBadRequest, "接口ID不能为空")
 	}
 
-	apiRepo := iamrepo.NewApiRepository(l.svcCtx.Repository)
-	if err := apiRepo.DeleteByID(l.ctx, req.Id); err != nil {
+	if err := l.svcCtx.Domain.IAM.Api.DeleteByID(l.ctx, req.Id); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "删除接口失败", err)
 	}
 	return nil

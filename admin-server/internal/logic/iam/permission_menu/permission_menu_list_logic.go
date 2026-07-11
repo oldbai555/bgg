@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 type PermissionMenuListLogic struct {
@@ -33,15 +32,13 @@ func (l *PermissionMenuListLogic) PermissionMenuList(req *types.PermissionMenuLi
 		return nil, errs.New(errs.CodeBadRequest, "权限ID不能为空")
 	}
 
-	permissionRepo := iamrepo.NewPermissionRepository(l.svcCtx.Repository)
 	// 验证权限是否存在
-	_, err = permissionRepo.FindByID(l.ctx, req.PermissionId)
+	_, err = l.svcCtx.Domain.IAM.Permission.FindByID(l.ctx, req.PermissionId)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeBadRequest, "权限不存在", err)
 	}
 
-	permissionMenuRepo := iamrepo.NewPermissionMenuRepository(l.svcCtx.Repository)
-	menuIDs, err := permissionMenuRepo.ListMenuIDsByPermissionID(l.ctx, req.PermissionId)
+	menuIDs, err := l.svcCtx.Domain.IAM.PermissionMenu.ListMenuIDsByPermissionID(l.ctx, req.PermissionId)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询权限菜单失败", err)
 	}

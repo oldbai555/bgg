@@ -12,7 +12,6 @@ import (
 	"postapocgame/admin-server/pkg/initdata"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 type MenuDeleteLogic struct {
@@ -38,8 +37,7 @@ func (l *MenuDeleteLogic) MenuDelete(req *types.MenuDeleteReq) error {
 		return errs.New(errs.CodeBadRequest, "初始化数据不可删除")
 	}
 
-	menuRepo := iamrepo.NewMenuRepository(l.svcCtx.Repository)
-	if err := menuRepo.DeleteByID(l.ctx, req.Id); err != nil {
+	if err := l.svcCtx.Domain.IAM.Menu.DeleteByID(l.ctx, req.Id); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "删除菜单失败", err)
 	}
 

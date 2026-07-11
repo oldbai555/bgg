@@ -107,6 +107,8 @@ func ChatWSHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			RoomID:   roomID,
 			Content:  claims.Username + " 加入了聊天室",
 		}
-		client.Hub.BroadcastChatMessage(joinMsg)
+		if err := client.Hub.BroadcastChatMessage(joinMsg); err != nil {
+			logx.Errorf("广播加入消息失败: userId=%d, roomId=%s, error: %v", claims.UserID, roomID, err)
+		}
 	}
 }

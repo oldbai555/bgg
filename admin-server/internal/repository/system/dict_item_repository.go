@@ -47,8 +47,16 @@ func (r *dictItemRepository) DeleteByID(ctx context.Context, id uint64) error {
 }
 
 func (r *dictItemRepository) Create(ctx context.Context, dictItem *systemmodel.AdminDictItem) error {
-	_, err := r.model.Insert(ctx, dictItem)
-	return err
+	result, err := r.model.Insert(ctx, dictItem)
+	if err != nil {
+		return err
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+	dictItem.Id = uint64(id)
+	return nil
 }
 
 func (r *dictItemRepository) Update(ctx context.Context, dictItem *systemmodel.AdminDictItem) error {

@@ -69,6 +69,12 @@ const (
 	Open = 1
 )
 
+// 用户状态常量
+const (
+	// UserStatusEnabled 启用
+	UserStatusEnabled int64 = 1
+)
+
 // 任务状态常量（对应字典 task_status 的 value）
 const (
 	// TaskStatusPending 未开始

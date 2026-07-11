@@ -4,17 +4,17 @@
 package public
 
 import (
-	blogrepo "postapocgame/admin-server/internal/repository/blog"
 	"context"
 	"postapocgame/admin-server/internal/dict"
 	"regexp"
 	"strings"
 	"unicode/utf8"
 
-	"github.com/zeromicro/go-zero/core/logx"
 	"postapocgame/admin-server/internal/consts"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
+
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type PublicBlogArticleListLogic struct {
@@ -42,7 +42,7 @@ func (l *PublicBlogArticleListLogic) PublicBlogArticleList(req *types.PublicBlog
 	}
 
 	keyword := strings.TrimSpace(req.Keyword)
-	list, total, err := blogrepo.NewBlogArticleRepository(l.svcCtx.Repository).FindPublicPage(l.ctx, page, size, keyword, req.TagId)
+	list, total, err := l.svcCtx.Domain.Blog.Article.FindPublicPage(l.ctx, page, size, keyword, req.TagId)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (l *PublicBlogArticleListLogic) PublicBlogArticleList(req *types.PublicBlog
 	for _, a := range list {
 		ids = append(ids, a.Id)
 	}
-	tagMap, err := blogrepo.NewBlogArticleTagRepository(l.svcCtx.Repository).FindTagsByArticleIDs(l.ctx, ids)
+	tagMap, err := l.svcCtx.Domain.Blog.ArticleTag.FindTagsByArticleIDs(l.ctx, ids)
 	if err != nil {
 		return nil, err
 	}

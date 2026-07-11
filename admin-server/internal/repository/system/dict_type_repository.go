@@ -44,8 +44,16 @@ func (r *dictTypeRepository) DeleteByID(ctx context.Context, id uint64) error {
 }
 
 func (r *dictTypeRepository) Create(ctx context.Context, dictType *systemmodel.AdminDictType) error {
-	_, err := r.model.Insert(ctx, dictType)
-	return err
+	result, err := r.model.Insert(ctx, dictType)
+	if err != nil {
+		return err
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+	dictType.Id = uint64(id)
+	return nil
 }
 
 func (r *dictTypeRepository) Update(ctx context.Context, dictType *systemmodel.AdminDictType) error {

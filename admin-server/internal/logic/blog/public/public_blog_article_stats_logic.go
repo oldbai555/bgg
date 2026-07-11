@@ -4,7 +4,6 @@
 package public
 
 import (
-	blogrepo "postapocgame/admin-server/internal/repository/blog"
 	"context"
 
 	"postapocgame/admin-server/internal/svc"
@@ -30,7 +29,7 @@ func NewPublicBlogArticleStatsLogic(ctx context.Context, svcCtx *svc.ServiceCont
 
 func (l *PublicBlogArticleStatsLogic) PublicBlogArticleStats() (resp *types.PublicBlogArticleStatsResp, err error) {
 	// 统计已发布文章总数
-	total, err := blogrepo.NewBlogArticleRepository(l.svcCtx.Repository).CountPublishedArticles(l.ctx)
+	total, err := l.svcCtx.Domain.Blog.Article.CountPublishedArticles(l.ctx)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeBadDB, "统计文章总数失败", err)
 	}

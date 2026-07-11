@@ -12,7 +12,6 @@ import (
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	systemrepo "postapocgame/admin-server/internal/repository/system"
 )
 
 type NotificationClearReadLogic struct {
@@ -36,8 +35,7 @@ func (l *NotificationClearReadLogic) NotificationClearRead() (resp *types.Respon
 		return nil, errs.New(errs.CodeUnauthorized, "未登录或登录已过期")
 	}
 
-	notificationRepo := systemrepo.NewNotificationRepository(l.svcCtx.Repository)
-	if err := notificationRepo.ClearRead(l.ctx, user.UserID); err != nil {
+	if err := l.svcCtx.Domain.System.Notification.ClearRead(l.ctx, user.UserID); err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "清除已读消息失败", err)
 	}
 

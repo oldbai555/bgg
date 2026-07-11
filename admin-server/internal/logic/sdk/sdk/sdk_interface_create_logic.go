@@ -11,9 +11,9 @@ import (
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 
-	"github.com/zeromicro/go-zero/core/logx"
 	"postapocgame/admin-server/internal/model/sdk"
-	sdkrepo "postapocgame/admin-server/internal/repository/sdk"
+
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type SdkInterfaceCreateLogic struct {
@@ -39,11 +39,9 @@ func (l *SdkInterfaceCreateLogic) SdkInterfaceCreate(req *types.SdkInterfaceCrea
 	}
 
 	// 根据 path 和 method 自动生成 apiCode（与中间件校验逻辑保持一致）
-	sdkRepo := sdkrepo.NewSdkRepository(l.svcCtx.Repository)
-	apiCode := sdkRepo.BuildInterfaceCode(req.Method, req.Path)
+	apiCode := l.svcCtx.Domain.SDK.Public.BuildInterfaceCode(req.Method, req.Path)
 
-	repo := sdkrepo.NewSdkAdminRepository(l.svcCtx.Repository)
-	if _, err := repo.FindInterfaceByCode(l.ctx, apiCode); err == nil {
+	if _, err := l.svcCtx.Domain.SDK.Admin.FindInterfaceByCode(l.ctx, apiCode); err == nil {
 		return errs.New(errs.CodeBadRequest, "该接口路径和方法组合已存在")
 	}
 
@@ -57,7 +55,7 @@ func (l *SdkInterfaceCreateLogic) SdkInterfaceCreate(req *types.SdkInterfaceCrea
 		Remark:           req.Remark,
 	}
 
-	if _, err := repo.CreateInterface(l.ctx, data); err != nil {
+	if _, err := l.svcCtx.Domain.SDK.Admin.CreateInterface(l.ctx, data); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "创建接口失败", err)
 	}
 

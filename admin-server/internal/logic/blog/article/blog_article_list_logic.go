@@ -4,7 +4,6 @@
 package article
 
 import (
-	blogrepo "postapocgame/admin-server/internal/repository/blog"
 	"context"
 	"strings"
 
@@ -38,7 +37,7 @@ func (l *BlogArticleListLogic) BlogArticleList(req *types.BlogArticleListReq) (r
 		pageSize = 20
 	}
 
-	list, total, err := blogrepo.NewBlogArticleRepository(l.svcCtx.Repository).FindPage(
+	list, total, err := l.svcCtx.Domain.Blog.Article.FindPage(
 		l.ctx,
 		page,
 		pageSize,
@@ -58,7 +57,7 @@ func (l *BlogArticleListLogic) BlogArticleList(req *types.BlogArticleListReq) (r
 		ids = append(ids, a.Id)
 	}
 
-	tagMap, err := blogrepo.NewBlogArticleTagRepository(l.svcCtx.Repository).FindTagsByArticleIDs(l.ctx, ids)
+	tagMap, err := l.svcCtx.Domain.Blog.ArticleTag.FindTagsByArticleIDs(l.ctx, ids)
 	if err != nil {
 		return nil, err
 	}

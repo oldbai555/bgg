@@ -4,7 +4,6 @@
 package tag
 
 import (
-	blogrepo "postapocgame/admin-server/internal/repository/blog"
 	"context"
 
 	"postapocgame/admin-server/internal/svc"
@@ -40,8 +39,7 @@ func (l *BlogTagListLogic) BlogTagList(req *types.BlogTagListReq) (resp *types.B
 	}
 
 	// 调用仓储层分页查询
-	tagRepo := blogrepo.NewBlogTagRepository(l.svcCtx.Repository)
-	list, total, err := tagRepo.FindPage(l.ctx, page, pageSize, req.Name, req.Status)
+	list, total, err := l.svcCtx.Domain.Blog.Tag.FindPage(l.ctx, page, pageSize, req.Name, req.Status)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeBadDB, "查询标签列表失败", err)
 	}

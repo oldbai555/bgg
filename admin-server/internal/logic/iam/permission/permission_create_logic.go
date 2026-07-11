@@ -11,9 +11,9 @@ import (
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 
-	"github.com/zeromicro/go-zero/core/logx"
 	"postapocgame/admin-server/internal/model/iam"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
+
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type PermissionCreateLogic struct {
@@ -35,13 +35,12 @@ func (l *PermissionCreateLogic) PermissionCreate(req *types.PermissionCreateReq)
 		return errs.New(errs.CodeBadRequest, "权限名称和编码不能为空")
 	}
 
-	permissionRepo := iamrepo.NewPermissionRepository(l.svcCtx.Repository)
 	p := iam.AdminPermission{
 		Name:        req.Name,
 		Code:        req.Code,
 		Description: sql.NullString{String: req.Description, Valid: req.Description != ""},
 	}
-	if err := permissionRepo.Create(l.ctx, &p); err != nil {
+	if err := l.svcCtx.Domain.IAM.Permission.Create(l.ctx, &p); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "创建权限失败", err)
 	}
 	return nil

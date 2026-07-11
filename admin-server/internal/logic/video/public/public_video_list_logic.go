@@ -6,11 +6,11 @@ package public
 import (
 	"context"
 
-	"github.com/zeromicro/go-zero/core/logx"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
-	videorepo "postapocgame/admin-server/internal/repository/video"
+
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type PublicVideoListLogic struct {
@@ -46,9 +46,8 @@ func (l *PublicVideoListLogic) PublicVideoList(req *types.PublicVideoListReq) (r
 	}
 
 	// 查询视频列表（只查询采集视频，type=2）
-	videoRepo := videorepo.NewVideoRepository(l.svcCtx.Repository)
 	keyword := req.Content
-	list, total, err := videoRepo.FindPage(l.ctx, page, size, keyword, 2)
+	list, total, err := l.svcCtx.Domain.Video.Video.FindPage(l.ctx, page, size, keyword, 2)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询视频列表失败", err)
 	}

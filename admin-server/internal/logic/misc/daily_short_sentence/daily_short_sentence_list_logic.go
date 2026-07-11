@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	miscrepo "postapocgame/admin-server/internal/repository/misc"
 )
 
 type DailyShortSentenceListLogic struct {
@@ -35,8 +34,7 @@ func (l *DailyShortSentenceListLogic) DailyShortSentenceList(req *types.DailySho
 
 	req.Page, req.PageSize = logicutil.NormalizePage(req.Page, req.PageSize, 20, 100)
 
-	repo := miscrepo.NewDailyShortSentenceRepository(l.svcCtx.Repository)
-	list, total, err := repo.FindPage(l.ctx, req.Page, req.PageSize, req.Keyword, req.SentenceType)
+	list, total, err := l.svcCtx.Domain.Misc.DailyShortSentence.FindPage(l.ctx, req.Page, req.PageSize, req.Keyword, req.SentenceType)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询每日短句列表失败", err)
 	}

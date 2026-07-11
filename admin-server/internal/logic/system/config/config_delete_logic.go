@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	systemrepo "postapocgame/admin-server/internal/repository/system"
 )
 
 type ConfigDeleteLogic struct {
@@ -33,14 +32,13 @@ func (l *ConfigDeleteLogic) ConfigDelete(req *types.ConfigDeleteReq) error {
 		return errs.New(errs.CodeBadRequest, "配置ID不能为空")
 	}
 
-	configRepo := systemrepo.NewConfigRepository(l.svcCtx.Repository)
 	// 先查询配置，获取 key
-	config, err := configRepo.FindByID(l.ctx, req.Id)
+	config, err := l.svcCtx.Domain.System.Config.FindByID(l.ctx, req.Id)
 	if err != nil {
 		return errs.Wrap(errs.CodeInternalError, "查询配置失败", err)
 	}
 
-	if err := configRepo.DeleteByID(l.ctx, req.Id); err != nil {
+	if err := l.svcCtx.Domain.System.Config.DeleteByID(l.ctx, req.Id); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "删除配置失败", err)
 	}
 

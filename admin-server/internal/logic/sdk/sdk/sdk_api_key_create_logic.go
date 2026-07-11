@@ -13,9 +13,10 @@ import (
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 
-	"github.com/zeromicro/go-zero/core/logx"
 	"postapocgame/admin-server/internal/model/sdk"
 	sdkrepo "postapocgame/admin-server/internal/repository/sdk"
+
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type SdkApiKeyCreateLogic struct {
@@ -40,9 +41,7 @@ func (l *SdkApiKeyCreateLogic) SdkApiKeyCreate(req *types.SdkApiKeyCreateReq) (r
 		return nil, errs.New(errs.CodeBadRequest, "名称不能为空")
 	}
 
-	repo := sdkrepo.NewSdkAdminRepository(l.svcCtx.Repository)
-
-	apiKey, apiSecret, err := l.generateUniqueKeyPair(repo)
+	apiKey, apiSecret, err := l.generateUniqueKeyPair(l.svcCtx.Domain.SDK.Admin)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "生成 API Key 失败", err)
 	}
@@ -62,7 +61,7 @@ func (l *SdkApiKeyCreateLogic) SdkApiKeyCreate(req *types.SdkApiKeyCreateReq) (r
 		Remark:      req.Remark,
 	}
 
-	id, err := repo.CreateSdkKey(l.ctx, data)
+	id, err := l.svcCtx.Domain.SDK.Admin.CreateSdkKey(l.ctx, data)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "创建 API Key 失败", err)
 	}

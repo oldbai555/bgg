@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 type DepartmentTreeLogic struct {
@@ -29,8 +28,7 @@ func NewDepartmentTreeLogic(ctx context.Context, svcCtx *svc.ServiceContext) *De
 }
 
 func (l *DepartmentTreeLogic) DepartmentTree() (resp *types.DepartmentTreeResp, err error) {
-	deptRepo := iamrepo.NewDepartmentRepository(l.svcCtx.Repository)
-	list, err := deptRepo.ListAll(l.ctx)
+	list, err := l.svcCtx.Domain.IAM.Department.ListAll(l.ctx)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询部门列表失败", err)
 	}

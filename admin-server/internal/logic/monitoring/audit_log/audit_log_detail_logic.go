@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	monitoringrepo "postapocgame/admin-server/internal/repository/monitoring"
 )
 
 type AuditLogDetailLogic struct {
@@ -33,8 +32,7 @@ func (l *AuditLogDetailLogic) AuditLogDetail(req *types.AuditLogDetailReq) (resp
 		return nil, errs.New(errs.CodeBadRequest, "审计日志ID不能为空")
 	}
 
-	auditLogRepo := monitoringrepo.NewAuditLogRepository(l.svcCtx.Repository)
-	log, err := auditLogRepo.FindByID(l.ctx, req.Id)
+	log, err := l.svcCtx.Domain.Monitoring.AuditLog.FindByID(l.ctx, req.Id)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询审计日志详情失败", err)
 	}

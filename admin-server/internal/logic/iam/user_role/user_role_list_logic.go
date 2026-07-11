@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 type UserRoleListLogic struct {
@@ -33,15 +32,13 @@ func (l *UserRoleListLogic) UserRoleList(req *types.UserRoleListReq) (resp *type
 		return nil, errs.New(errs.CodeBadRequest, "用户ID不能为空")
 	}
 
-	userRepo := iamrepo.NewUserRepository(l.svcCtx.Repository)
 	// 验证用户是否存在
-	_, err = userRepo.FindByID(l.ctx, req.UserId)
+	_, err = l.svcCtx.Domain.IAM.User.FindByID(l.ctx, req.UserId)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeBadRequest, "用户不存在", err)
 	}
 
-	userRoleRepo := iamrepo.NewUserRoleRepository(l.svcCtx.Repository)
-	roleIDs, err := userRoleRepo.ListRoleIDsByUserID(l.ctx, req.UserId)
+	roleIDs, err := l.svcCtx.Domain.IAM.UserRole.ListRoleIDsByUserID(l.ctx, req.UserId)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询用户角色失败", err)
 	}

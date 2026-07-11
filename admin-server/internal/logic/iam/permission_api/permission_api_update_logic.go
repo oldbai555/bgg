@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 type PermissionApiUpdateLogic struct {
@@ -33,25 +32,5 @@ func (l *PermissionApiUpdateLogic) PermissionApiUpdate(req *types.PermissionApiU
 		return errs.New(errs.CodeBadRequest, "权限ID不能为空")
 	}
 
-	permissionRepo := iamrepo.NewPermissionRepository(l.svcCtx.Repository)
-	// 验证权限是否存在
-	_, err := permissionRepo.FindByID(l.ctx, req.PermissionId)
-	if err != nil {
-		return errs.Wrap(errs.CodeBadRequest, "权限不存在", err)
-	}
-
-	apiRepo := iamrepo.NewApiRepository(l.svcCtx.Repository)
-	// 验证所有接口是否存在
-	for _, apiID := range req.ApiIds {
-		_, err := apiRepo.FindByID(l.ctx, apiID)
-		if err != nil {
-			return errs.Wrap(errs.CodeBadRequest, "接口不存在", err)
-		}
-	}
-
-	permissionApiRepo := iamrepo.NewPermissionApiRepository(l.svcCtx.Repository)
-	if err := permissionApiRepo.UpdatePermissionApis(l.ctx, req.PermissionId, req.ApiIds); err != nil {
-		return errs.Wrap(errs.CodeInternalError, "更新权限接口失败", err)
-	}
-	return nil
+	return l.svcCtx.Domain.IAM.RBAC.UpdatePermissionApis(l.ctx, req.PermissionId, req.ApiIds)
 }

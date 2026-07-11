@@ -117,10 +117,15 @@ func (r *auditLogRepository) Create(ctx context.Context, log *monitoringmodel.Au
 		log.DeletedAt = 0
 	}
 
-	_, err := r.model.Insert(ctx, log)
+	result, err := r.model.Insert(ctx, log)
 	if err != nil {
 		return fmt.Errorf("插入审计日志失败: %w", err)
 	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return fmt.Errorf("获取审计日志自增 ID 失败: %w", err)
+	}
+	log.Id = uint64(id)
 
 	return nil
 }

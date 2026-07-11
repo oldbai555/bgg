@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	sdkrepo "postapocgame/admin-server/internal/repository/sdk"
 )
 
 type SdkInterfaceDeleteLogic struct {
@@ -32,8 +31,7 @@ func (l *SdkInterfaceDeleteLogic) SdkInterfaceDelete(req *types.SdkInterfaceDele
 	if req == nil || req.Id == 0 {
 		return errs.New(errs.CodeBadRequest, "ID 不能为空")
 	}
-	repo := sdkrepo.NewSdkAdminRepository(l.svcCtx.Repository)
-	if err := repo.DeleteInterface(l.ctx, req.Id); err != nil {
+	if err := l.svcCtx.Domain.SDK.Admin.DeleteInterface(l.ctx, req.Id); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "删除接口失败", err)
 	}
 

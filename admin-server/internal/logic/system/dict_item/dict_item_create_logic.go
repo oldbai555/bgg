@@ -11,9 +11,9 @@ import (
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 
-	"github.com/zeromicro/go-zero/core/logx"
 	"postapocgame/admin-server/internal/model/system"
-	systemrepo "postapocgame/admin-server/internal/repository/system"
+
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type DictItemCreateLogic struct {
@@ -36,8 +36,7 @@ func (l *DictItemCreateLogic) DictItemCreate(req *types.DictItemCreateReq) error
 	}
 
 	// 检查字典类型是否存在
-	dictTypeRepo := systemrepo.NewDictTypeRepository(l.svcCtx.Repository)
-	_, err := dictTypeRepo.FindByID(l.ctx, req.TypeId)
+	_, err := l.svcCtx.Domain.System.DictType.FindByID(l.ctx, req.TypeId)
 	if err != nil {
 		return errs.Wrap(errs.CodeBadRequest, "字典类型不存在", err)
 	}
@@ -60,8 +59,7 @@ func (l *DictItemCreateLogic) DictItemCreate(req *types.DictItemCreateReq) error
 		Remark: sql.NullString{String: req.Remark, Valid: req.Remark != ""},
 	}
 
-	dictItemRepo := systemrepo.NewDictItemRepository(l.svcCtx.Repository)
-	if err := dictItemRepo.Create(l.ctx, &dictItem); err != nil {
+	if err := l.svcCtx.Domain.System.DictItem.Create(l.ctx, &dictItem); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "创建字典项失败", err)
 	}
 
@@ -69,8 +67,7 @@ func (l *DictItemCreateLogic) DictItemCreate(req *types.DictItemCreateReq) error
 	cache := l.svcCtx.Repository.BusinessCache
 	go func() {
 		// 需要获取字典类型的 code 来清除缓存
-		dictTypeRepo := systemrepo.NewDictTypeRepository(l.svcCtx.Repository)
-		dictType, err := dictTypeRepo.FindByID(context.Background(), req.TypeId)
+		dictType, err := l.svcCtx.Domain.System.DictType.FindByID(context.Background(), req.TypeId)
 		if err == nil {
 			if err := cache.DeleteDictItems(context.Background(), dictType.Code); err != nil {
 				l.Errorf("清除字典项缓存失败: code=%s, error=%v", dictType.Code, err)

@@ -12,7 +12,6 @@ import (
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 type MenuMyTreeLogic struct {
@@ -50,14 +49,12 @@ func (l *MenuMyTreeLogic) MenuMyTree() (resp *types.MenuTreeResp, err error) {
 	}
 
 	// 获取用户权限编码
-	userRoleRepo := iamrepo.NewUserRoleRepository(l.svcCtx.Repository)
-	roleIDs, err := userRoleRepo.ListRoleIDsByUserID(l.ctx, user.UserID)
+	roleIDs, err := l.svcCtx.Domain.IAM.UserRole.ListRoleIDsByUserID(l.ctx, user.UserID)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询用户角色失败", err)
 	}
 
-	permissionRepo := iamrepo.NewPermissionRepository(l.svcCtx.Repository)
-	perms, err := permissionRepo.ListByRoleIDs(l.ctx, roleIDs)
+	perms, err := l.svcCtx.Domain.IAM.Permission.ListByRoleIDs(l.ctx, roleIDs)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询用户权限失败", err)
 	}
@@ -85,8 +82,7 @@ func (l *MenuMyTreeLogic) MenuMyTree() (resp *types.MenuTreeResp, err error) {
 	}
 
 	// 获取「菜单ID -> 绑定的权限编码列表」的完整映射
-	permissionMenuRepo := iamrepo.NewPermissionMenuRepository(l.svcCtx.Repository)
-	menuPermissionMap, err := permissionMenuRepo.ListMenuPermissionCodes(l.ctx)
+	menuPermissionMap, err := l.svcCtx.Domain.IAM.PermissionMenu.ListMenuPermissionCodes(l.ctx)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询菜单权限关联失败", err)
 	}

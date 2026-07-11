@@ -12,7 +12,6 @@ import (
 	"postapocgame/admin-server/pkg/initdata"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 type UserDeleteLogic struct {
@@ -38,8 +37,7 @@ func (l *UserDeleteLogic) UserDelete(req *types.UserDeleteReq) error {
 		return errs.New(errs.CodeBadRequest, "初始化数据不可删除")
 	}
 
-	userRepo := iamrepo.NewUserRepository(l.svcCtx.Repository)
-	if err := userRepo.DeleteByID(l.ctx, req.Id); err != nil {
+	if err := l.svcCtx.Domain.IAM.User.DeleteByID(l.ctx, req.Id); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "删除用户失败", err)
 	}
 	return nil

@@ -12,8 +12,6 @@ import (
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	chatrepo "postapocgame/admin-server/internal/repository/chat"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 type ChatListLogic struct {
@@ -38,21 +36,15 @@ func (l *ChatListLogic) ChatList(req *types.ChatListReq) (resp *types.ChatListRe
 	}
 
 	// 查询用户参与的所有聊天（通过chat_user关联表）
-	chatRepo := chatrepo.NewChatRepository(l.svcCtx.Repository)
-	chats, err := chatRepo.FindByUserID(l.ctx, user.UserID)
+	chats, err := l.svcCtx.Domain.Chat.Chat.FindByUserID(l.ctx, user.UserID)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询聊天列表失败", err)
 	}
 
 	// 查询部门和角色信息（用于私聊显示）
-	deptRepo := iamrepo.NewDepartmentRepository(l.svcCtx.Repository)
-	roleRepo := iamrepo.NewRoleRepository(l.svcCtx.Repository)
-	userRoleRepo := iamrepo.NewUserRoleRepository(l.svcCtx.Repository)
-	userRepo := iamrepo.NewUserRepository(l.svcCtx.Repository)
-
 	// 构建部门ID到名称的映射
 	deptMap := make(map[uint64]string)
-	allDepts, _ := deptRepo.ListAll(l.ctx)
+	allDepts, _ := l.svcCtx.Domain.IAM.Department.ListAll(l.ctx)
 	for _, dept := range allDepts {
 		if dept.DeletedAt == 0 {
 			deptMap[dept.Id] = dept.Name
@@ -61,7 +53,7 @@ func (l *ChatListLogic) ChatList(req *types.ChatListReq) (resp *types.ChatListRe
 
 	// 构建角色ID到名称的映射
 	roleMap := make(map[uint64]string)
-	allRoles, _, _ := roleRepo.FindPage(l.ctx, 1, 10000, "")
+	allRoles, _, _ := l.svcCtx.Domain.IAM.Role.FindPage(l.ctx, 1, 10000, "")
 	for _, role := range allRoles {
 		if role.DeletedAt == 0 {
 			roleMap[role.Id] = role.Name
@@ -81,8 +73,7 @@ func (l *ChatListLogic) ChatList(req *types.ChatListReq) (resp *types.ChatListRe
 		// 如果是私聊（type=1），需要获取对方用户信息
 		if chat.Type == 1 {
 			// 查询私聊中的另一个用户（不是当前用户的那个）
-			chatUserRepo := chatrepo.NewChatUserRepository(l.svcCtx.Repository)
-			chatUsers, err := chatUserRepo.FindByChatID(l.ctx, chat.Id)
+			chatUsers, err := l.svcCtx.Domain.Chat.ChatUser.FindByChatID(l.ctx, chat.Id)
 			if err == nil && len(chatUsers) == 2 {
 				// 找到对方用户ID
 				var otherUserID uint64
@@ -95,7 +86,7 @@ func (l *ChatListLogic) ChatList(req *types.ChatListReq) (resp *types.ChatListRe
 
 				if otherUserID > 0 {
 					// 获取对方用户信息
-					otherUser, err := userRepo.FindByID(l.ctx, otherUserID)
+					otherUser, err := l.svcCtx.Domain.IAM.User.FindByID(l.ctx, otherUserID)
 					if err == nil && otherUser.DeletedAt == 0 && otherUser.Status == 1 {
 						item.UserId = otherUser.Id
 						item.Username = otherUser.Username
@@ -116,7 +107,7 @@ func (l *ChatListLogic) ChatList(req *types.ChatListReq) (resp *types.ChatListRe
 						}
 
 						// 获取角色名称列表
-						roleIDs, _ := userRoleRepo.ListRoleIDsByUserID(l.ctx, otherUser.Id)
+						roleIDs, _ := l.svcCtx.Domain.IAM.UserRole.ListRoleIDsByUserID(l.ctx, otherUser.Id)
 						roleNames := make([]string, 0, len(roleIDs))
 						for _, roleID := range roleIDs {
 							if roleName, ok := roleMap[roleID]; ok {

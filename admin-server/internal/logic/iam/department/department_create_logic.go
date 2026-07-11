@@ -10,9 +10,9 @@ import (
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 
-	"github.com/zeromicro/go-zero/core/logx"
 	"postapocgame/admin-server/internal/model/iam"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
+
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type DepartmentCreateLogic struct {
@@ -34,7 +34,6 @@ func (l *DepartmentCreateLogic) DepartmentCreate(req *types.DepartmentCreateReq)
 		return errs.New(errs.CodeBadRequest, "部门名称不能为空")
 	}
 
-	deptRepo := iamrepo.NewDepartmentRepository(l.svcCtx.Repository)
 	dept := iam.AdminDepartment{
 		ParentId: req.ParentId,
 		Name:     req.Name,
@@ -42,7 +41,7 @@ func (l *DepartmentCreateLogic) DepartmentCreate(req *types.DepartmentCreateReq)
 		Status:   req.Status,
 	}
 
-	if err := deptRepo.Create(l.ctx, &dept); err != nil {
+	if err := l.svcCtx.Domain.IAM.Department.Create(l.ctx, &dept); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "创建部门失败", err)
 	}
 	return nil

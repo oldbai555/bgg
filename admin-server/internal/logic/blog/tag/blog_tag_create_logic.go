@@ -4,7 +4,6 @@
 package tag
 
 import (
-	blogrepo "postapocgame/admin-server/internal/repository/blog"
 	"context"
 	"postapocgame/admin-server/internal/dict"
 	"strings"
@@ -14,8 +13,9 @@ import (
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 
-	"github.com/zeromicro/go-zero/core/logx"
 	"postapocgame/admin-server/internal/model/blog"
+
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type BlogTagCreateLogic struct {
@@ -55,7 +55,7 @@ func (l *BlogTagCreateLogic) BlogTagCreate(req *types.BlogTagCreateReq) error {
 		tag.Status = 1
 	}
 
-	if err := blogrepo.NewBlogTagRepository(l.svcCtx.Repository).Create(l.ctx, tag); err != nil {
+	if err := l.svcCtx.Domain.Blog.Tag.Create(l.ctx, tag); err != nil {
 		return err
 	}
 

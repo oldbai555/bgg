@@ -166,8 +166,16 @@ func (r *chatMessageRepository) FindPrivateMessages(ctx context.Context, page, p
 }
 
 func (r *chatMessageRepository) Create(ctx context.Context, message *chatmodel.ChatMessage) error {
-	_, err := r.model.Insert(ctx, message)
-	return err
+	result, err := r.model.Insert(ctx, message)
+	if err != nil {
+		return err
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+	message.Id = uint64(id)
+	return nil
 }
 
 func (r *chatMessageRepository) Update(ctx context.Context, message *chatmodel.ChatMessage) error {

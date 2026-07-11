@@ -18,9 +18,9 @@ jobs:
         uses: golangci/golangci-lint-action@v6
         with:
           working-directory: admin-server
-          # Phase 1 起步范围，见 admin-server/docs/09-ci-cd-and-deployability.md 第 3 节；
-          # 扩大范围时只改这一行的参数列表
-          args: --timeout=5m ./internal/repository/... ./internal/domain/...
+          # Phase 1 Week 4-5 扩大范围：golangci-lint run ./... 复核全仓库结果是 0 issue，
+          # 直接扫全仓库，不再限制路径（见 admin-server/docs/09-ci-cd-and-deployability.md 第 3 节）。
+          args: --timeout=5m ./...
       - name: go build
         run: cd admin-server && go build ./...
 

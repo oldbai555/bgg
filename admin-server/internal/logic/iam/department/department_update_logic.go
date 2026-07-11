@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 type DepartmentUpdateLogic struct {
@@ -33,8 +32,7 @@ func (l *DepartmentUpdateLogic) DepartmentUpdate(req *types.DepartmentUpdateReq)
 		return errs.New(errs.CodeBadRequest, "部门ID不能为空")
 	}
 
-	deptRepo := iamrepo.NewDepartmentRepository(l.svcCtx.Repository)
-	dept, err := deptRepo.FindByID(l.ctx, req.Id)
+	dept, err := l.svcCtx.Domain.IAM.Department.FindByID(l.ctx, req.Id)
 	if err != nil {
 		return errs.Wrap(errs.CodeInternalError, "查询部门失败", err)
 	}
@@ -50,7 +48,7 @@ func (l *DepartmentUpdateLogic) DepartmentUpdate(req *types.DepartmentUpdateReq)
 		dept.Status = req.Status
 	}
 
-	if err := deptRepo.Update(l.ctx, dept); err != nil {
+	if err := l.svcCtx.Domain.IAM.Department.Update(l.ctx, dept); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "更新部门失败", err)
 	}
 	return nil

@@ -39,10 +39,15 @@ func (r *blogTagRepository) FindByID(ctx context.Context, id uint64) (*blogmodel
 }
 
 func (r *blogTagRepository) Create(ctx context.Context, tag *blogmodel.BlogTag) error {
-	_, err := r.model.Insert(ctx, tag)
+	result, err := r.model.Insert(ctx, tag)
 	if err != nil {
 		return errs.Wrap(errs.CodeBadDB, "创建标签失败", err)
 	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return errs.Wrap(errs.CodeBadDB, "获取标签自增 ID 失败", err)
+	}
+	tag.Id = uint64(id)
 	return nil
 }
 

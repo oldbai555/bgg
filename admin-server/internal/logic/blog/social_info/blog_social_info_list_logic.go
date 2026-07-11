@@ -4,7 +4,6 @@
 package social_info
 
 import (
-	blogrepo "postapocgame/admin-server/internal/repository/blog"
 	"context"
 
 	"postapocgame/admin-server/internal/svc"
@@ -40,7 +39,7 @@ func (l *BlogSocialInfoListLogic) BlogSocialInfoList(req *types.BlogSocialInfoLi
 	}
 
 	// 调用仓储层分页查询
-	list, total, err := blogrepo.NewBlogSocialInfoRepository(l.svcCtx.Repository).FindPage(l.ctx, page, pageSize, req.Status, req.Keyword)
+	list, total, err := l.svcCtx.Domain.Blog.SocialInfo.FindPage(l.ctx, page, pageSize, req.Status, req.Keyword)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeBadDB, "查询社交信息列表失败", err)
 	}

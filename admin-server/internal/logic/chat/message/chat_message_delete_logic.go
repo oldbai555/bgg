@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	chatrepo "postapocgame/admin-server/internal/repository/chat"
 )
 
 type ChatMessageDeleteLogic struct {
@@ -33,10 +32,8 @@ func (l *ChatMessageDeleteLogic) ChatMessageDelete(req *types.ChatMessageDeleteR
 		return nil, errs.New(errs.CodeBadRequest, "消息ID不能为空")
 	}
 
-	messageRepo := chatrepo.NewChatMessageRepository(l.svcCtx.Repository)
-
 	// 检查消息是否存在
-	message, err := messageRepo.FindByID(l.ctx, req.Id)
+	message, err := l.svcCtx.Domain.Chat.ChatMessage.FindByID(l.ctx, req.Id)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeNotFound, "消息不存在", err)
 	}
@@ -45,7 +42,7 @@ func (l *ChatMessageDeleteLogic) ChatMessageDelete(req *types.ChatMessageDeleteR
 	}
 
 	// 删除消息（软删除）
-	if err := messageRepo.DeleteByID(l.ctx, req.Id); err != nil {
+	if err := l.svcCtx.Domain.Chat.ChatMessage.DeleteByID(l.ctx, req.Id); err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "删除消息失败", err)
 	}
 

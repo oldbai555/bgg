@@ -85,8 +85,16 @@ func (r *noticeRepository) DeleteByID(ctx context.Context, id uint64) error {
 }
 
 func (r *noticeRepository) Create(ctx context.Context, notice *systemmodel.AdminNotice) error {
-	_, err := r.model.Insert(ctx, notice)
-	return err
+	result, err := r.model.Insert(ctx, notice)
+	if err != nil {
+		return err
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+	notice.Id = uint64(id)
+	return nil
 }
 
 func (r *noticeRepository) Update(ctx context.Context, notice *systemmodel.AdminNotice) error {

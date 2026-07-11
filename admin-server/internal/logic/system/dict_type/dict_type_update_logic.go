@@ -12,7 +12,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	systemrepo "postapocgame/admin-server/internal/repository/system"
 )
 
 type DictTypeUpdateLogic struct {
@@ -34,8 +33,7 @@ func (l *DictTypeUpdateLogic) DictTypeUpdate(req *types.DictTypeUpdateReq) error
 		return errs.New(errs.CodeBadRequest, "字典类型ID不能为空")
 	}
 
-	dictTypeRepo := systemrepo.NewDictTypeRepository(l.svcCtx.Repository)
-	dictType, err := dictTypeRepo.FindByID(l.ctx, req.Id)
+	dictType, err := l.svcCtx.Domain.System.DictType.FindByID(l.ctx, req.Id)
 	if err != nil {
 		return errs.Wrap(errs.CodeInternalError, "查询字典类型失败", err)
 	}
@@ -51,7 +49,7 @@ func (l *DictTypeUpdateLogic) DictTypeUpdate(req *types.DictTypeUpdateReq) error
 		dictType.Status = req.Status
 	}
 
-	if err := dictTypeRepo.Update(l.ctx, dictType); err != nil {
+	if err := l.svcCtx.Domain.System.DictType.Update(l.ctx, dictType); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "更新字典类型失败", err)
 	}
 	return nil

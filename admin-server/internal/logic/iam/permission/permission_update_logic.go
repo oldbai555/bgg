@@ -12,7 +12,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 type PermissionUpdateLogic struct {
@@ -34,8 +33,7 @@ func (l *PermissionUpdateLogic) PermissionUpdate(req *types.PermissionUpdateReq)
 		return errs.New(errs.CodeBadRequest, "权限ID不能为空")
 	}
 
-	permissionRepo := iamrepo.NewPermissionRepository(l.svcCtx.Repository)
-	p, err := permissionRepo.FindByID(l.ctx, req.Id)
+	p, err := l.svcCtx.Domain.IAM.Permission.FindByID(l.ctx, req.Id)
 	if err != nil {
 		return errs.Wrap(errs.CodeInternalError, "查询权限失败", err)
 	}
@@ -43,7 +41,7 @@ func (l *PermissionUpdateLogic) PermissionUpdate(req *types.PermissionUpdateReq)
 	p.Name = req.Name
 	p.Description = sql.NullString{String: req.Description, Valid: req.Description != ""}
 
-	if err := permissionRepo.Update(l.ctx, p); err != nil {
+	if err := l.svcCtx.Domain.IAM.Permission.Update(l.ctx, p); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "更新权限失败", err)
 	}
 	return nil

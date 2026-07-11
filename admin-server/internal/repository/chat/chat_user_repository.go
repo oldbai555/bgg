@@ -45,8 +45,16 @@ func (r *chatUserRepository) FindByUserID(ctx context.Context, userID uint64) ([
 }
 
 func (r *chatUserRepository) Create(ctx context.Context, chatUser *chatmodel.ChatUser) error {
-	_, err := r.model.Insert(ctx, chatUser)
-	return err
+	result, err := r.model.Insert(ctx, chatUser)
+	if err != nil {
+		return err
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+	chatUser.Id = uint64(id)
+	return nil
 }
 
 func (r *chatUserRepository) DeleteByChatIDAndUserID(ctx context.Context, chatID, userID uint64) error {

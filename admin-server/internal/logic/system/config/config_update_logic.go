@@ -12,7 +12,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	systemrepo "postapocgame/admin-server/internal/repository/system"
 )
 
 type ConfigUpdateLogic struct {
@@ -34,8 +33,7 @@ func (l *ConfigUpdateLogic) ConfigUpdate(req *types.ConfigUpdateReq) error {
 		return errs.New(errs.CodeBadRequest, "配置ID不能为空")
 	}
 
-	configRepo := systemrepo.NewConfigRepository(l.svcCtx.Repository)
-	config, err := configRepo.FindByID(l.ctx, req.Id)
+	config, err := l.svcCtx.Domain.System.Config.FindByID(l.ctx, req.Id)
 	if err != nil {
 		return errs.Wrap(errs.CodeInternalError, "查询配置失败", err)
 	}
@@ -47,7 +45,7 @@ func (l *ConfigUpdateLogic) ConfigUpdate(req *types.ConfigUpdateReq) error {
 		config.Description = sql.NullString{String: req.Description, Valid: true}
 	}
 
-	if err := configRepo.Update(l.ctx, config); err != nil {
+	if err := l.svcCtx.Domain.System.Config.Update(l.ctx, config); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "更新配置失败", err)
 	}
 

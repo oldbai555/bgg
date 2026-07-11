@@ -14,9 +14,9 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 
-	"github.com/zeromicro/go-zero/core/logx"
 	chatmodel "postapocgame/admin-server/internal/model/chat"
-	chatrepo "postapocgame/admin-server/internal/repository/chat"
+
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type ChatMessageSendLogic struct {
@@ -53,8 +53,7 @@ func (l *ChatMessageSendLogic) ChatMessageSend(req *types.ChatMessageSendReq) (r
 	}
 
 	// 验证 chat 是否存在且用户有权限
-	chatRepo := chatrepo.NewChatRepository(l.svcCtx.Repository)
-	chat, err := chatRepo.FindByID(l.ctx, req.ChatId)
+	chat, err := l.svcCtx.Domain.Chat.Chat.FindByID(l.ctx, req.ChatId)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeBadRequest, "聊天不存在", err)
 	}
@@ -63,8 +62,7 @@ func (l *ChatMessageSendLogic) ChatMessageSend(req *types.ChatMessageSendReq) (r
 	}
 
 	// 验证用户是否在聊天中
-	chatUserRepo := chatrepo.NewChatUserRepository(l.svcCtx.Repository)
-	chatUsers, err := chatUserRepo.FindByChatID(l.ctx, req.ChatId)
+	chatUsers, err := l.svcCtx.Domain.Chat.ChatUser.FindByChatID(l.ctx, req.ChatId)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询聊天成员失败", err)
 	}
@@ -97,8 +95,7 @@ func (l *ChatMessageSendLogic) ChatMessageSend(req *types.ChatMessageSendReq) (r
 		DeletedAt:   0,
 	}
 
-	messageRepo := chatrepo.NewChatMessageRepository(l.svcCtx.Repository)
-	err = messageRepo.Create(l.ctx, message)
+	err = l.svcCtx.Domain.Chat.ChatMessage.Create(l.ctx, message)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "发送消息失败", err)
 	}

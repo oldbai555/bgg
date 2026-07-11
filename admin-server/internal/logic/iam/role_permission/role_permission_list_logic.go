@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 type RolePermissionListLogic struct {
@@ -33,15 +32,13 @@ func (l *RolePermissionListLogic) RolePermissionList(req *types.RolePermissionLi
 		return nil, errs.New(errs.CodeBadRequest, "角色ID不能为空")
 	}
 
-	roleRepo := iamrepo.NewRoleRepository(l.svcCtx.Repository)
 	// 验证角色是否存在
-	_, err = roleRepo.FindByID(l.ctx, req.RoleId)
+	_, err = l.svcCtx.Domain.IAM.Role.FindByID(l.ctx, req.RoleId)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeBadRequest, "角色不存在", err)
 	}
 
-	rolePermissionRepo := iamrepo.NewRolePermissionRepository(l.svcCtx.Repository)
-	permissionIDs, err := rolePermissionRepo.ListPermissionIDsByRoleID(l.ctx, req.RoleId)
+	permissionIDs, err := l.svcCtx.Domain.IAM.RolePermission.ListPermissionIDsByRoleID(l.ctx, req.RoleId)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询角色权限失败", err)
 	}

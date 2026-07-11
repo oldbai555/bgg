@@ -11,9 +11,9 @@ import (
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 
-	"github.com/zeromicro/go-zero/core/logx"
 	"postapocgame/admin-server/internal/model/system"
-	systemrepo "postapocgame/admin-server/internal/repository/system"
+
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type ConfigCreateLogic struct {
@@ -35,9 +35,8 @@ func (l *ConfigCreateLogic) ConfigCreate(req *types.ConfigCreateReq) error {
 		return errs.New(errs.CodeBadRequest, "配置分组和键不能为空")
 	}
 
-	configRepo := systemrepo.NewConfigRepository(l.svcCtx.Repository)
 	// 检查配置键是否已存在
-	_, err := configRepo.FindByKey(l.ctx, req.Key)
+	_, err := l.svcCtx.Domain.System.Config.FindByKey(l.ctx, req.Key)
 	if err == nil {
 		return errs.New(errs.CodeBadRequest, "配置键已存在")
 	}
@@ -55,7 +54,7 @@ func (l *ConfigCreateLogic) ConfigCreate(req *types.ConfigCreateReq) error {
 		Description: sql.NullString{String: req.Description, Valid: req.Description != ""},
 	}
 
-	if err := configRepo.Create(l.ctx, &config); err != nil {
+	if err := l.svcCtx.Domain.System.Config.Create(l.ctx, &config); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "创建配置失败", err)
 	}
 

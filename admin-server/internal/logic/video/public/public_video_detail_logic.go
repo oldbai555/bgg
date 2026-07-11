@@ -7,11 +7,11 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/zeromicro/go-zero/core/logx"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
-	videorepo "postapocgame/admin-server/internal/repository/video"
+
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type PublicVideoDetailLogic struct {
@@ -34,8 +34,7 @@ func (l *PublicVideoDetailLogic) PublicVideoDetail(req *types.PublicVideoDetailR
 	}
 
 	// 查询视频详情
-	videoRepo := videorepo.NewVideoRepository(l.svcCtx.Repository)
-	video, err := videoRepo.FindByID(l.ctx, req.Id)
+	video, err := l.svcCtx.Domain.Video.Video.FindByID(l.ctx, req.Id)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeNotFound, "视频不存在", err)
 	}

@@ -9,12 +9,12 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/zeromicro/go-zero/core/logx"
+	"postapocgame/admin-server/internal/model/video"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
-	"postapocgame/admin-server/internal/model/video"
-	videorepo "postapocgame/admin-server/internal/repository/video"
+
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type VideoCollectLogic struct {
@@ -47,8 +47,7 @@ func (l *VideoCollectLogic) VideoCollect(req *types.VideoCollectReq) (resp *type
 	//}
 
 	// 检查 uuid 是否已存在
-	videoRepo := videorepo.NewVideoRepository(l.svcCtx.Repository)
-	existingVideo, err := videoRepo.FindByUuid(l.ctx, req.Uuid)
+	existingVideo, err := l.svcCtx.Domain.Video.Video.FindByUuid(l.ctx, req.Uuid)
 	if err == nil && existingVideo != nil {
 		// uuid 已存在
 		return nil, errs.New(errs.CodeConflict, "新增失败: 该 uuid 已存在")
@@ -93,7 +92,7 @@ func (l *VideoCollectLogic) VideoCollect(req *types.VideoCollectReq) (resp *type
 	video.XlzzUrls = xlzzUrlsJSON
 
 	// 插入数据
-	err = videoRepo.Create(l.ctx, video)
+	err = l.svcCtx.Domain.Video.Video.Create(l.ctx, video)
 	if err != nil {
 		l.Errorf("数据库插入失败: %v", err)
 		return nil, errs.Wrap(errs.CodeInternalError, "数据库插入失败", err)

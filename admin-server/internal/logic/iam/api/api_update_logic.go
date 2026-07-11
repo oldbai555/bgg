@@ -12,7 +12,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 type ApiUpdateLogic struct {
@@ -34,8 +33,7 @@ func (l *ApiUpdateLogic) ApiUpdate(req *types.ApiUpdateReq) error {
 		return errs.New(errs.CodeBadRequest, "接口ID不能为空")
 	}
 
-	apiRepo := iamrepo.NewApiRepository(l.svcCtx.Repository)
-	api, err := apiRepo.FindByID(l.ctx, req.Id)
+	api, err := l.svcCtx.Domain.IAM.Api.FindByID(l.ctx, req.Id)
 	if err != nil {
 		return errs.Wrap(errs.CodeInternalError, "查询接口失败", err)
 	}
@@ -57,7 +55,7 @@ func (l *ApiUpdateLogic) ApiUpdate(req *types.ApiUpdateReq) error {
 		api.Status = req.Status
 	}
 
-	if err := apiRepo.Update(l.ctx, api); err != nil {
+	if err := l.svcCtx.Domain.IAM.Api.Update(l.ctx, api); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "更新接口失败", err)
 	}
 	return nil

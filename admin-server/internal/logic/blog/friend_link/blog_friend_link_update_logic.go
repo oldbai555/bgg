@@ -4,7 +4,6 @@
 package friend_link
 
 import (
-	blogrepo "postapocgame/admin-server/internal/repository/blog"
 	"context"
 	"fmt"
 	"strings"
@@ -38,7 +37,7 @@ func (l *BlogFriendLinkUpdateLogic) BlogFriendLinkUpdate(req *types.BlogFriendLi
 	}
 
 	// 查询现有记录
-	link, err := blogrepo.NewBlogFriendLinkRepository(l.svcCtx.Repository).FindByID(l.ctx, req.Id)
+	link, err := l.svcCtx.Domain.Blog.FriendLink.FindByID(l.ctx, req.Id)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeBadDB, "查询友情链接失败", err)
 	}
@@ -85,7 +84,7 @@ func (l *BlogFriendLinkUpdateLogic) BlogFriendLinkUpdate(req *types.BlogFriendLi
 		link.OrderNum = req.OrderNum
 	}
 
-	if err := blogrepo.NewBlogFriendLinkRepository(l.svcCtx.Repository).Update(l.ctx, link); err != nil {
+	if err := l.svcCtx.Domain.Blog.FriendLink.Update(l.ctx, link); err != nil {
 		return nil, err
 	}
 

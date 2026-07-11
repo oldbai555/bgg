@@ -14,7 +14,6 @@ import (
 
 	"github.com/zeromicro/go-zero/core/logx"
 	"golang.org/x/crypto/bcrypt"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 type PasswordChangeLogic struct {
@@ -54,8 +53,7 @@ func (l *PasswordChangeLogic) PasswordChange(req *types.PasswordChangeReq) error
 	}
 
 	// 获取用户信息
-	userRepo := iamrepo.NewUserRepository(l.svcCtx.Repository)
-	userInfo, err := userRepo.FindByID(l.ctx, user.UserID)
+	userInfo, err := l.svcCtx.Domain.IAM.User.FindByID(l.ctx, user.UserID)
 	if err != nil {
 		return errs.Wrap(errs.CodeInternalError, "获取用户信息失败", err)
 	}
@@ -76,7 +74,7 @@ func (l *PasswordChangeLogic) PasswordChange(req *types.PasswordChangeReq) error
 	userInfo.PasswordHash = string(hashedPassword)
 	userInfo.UpdatedAt = time.Now().Unix()
 
-	err = userRepo.Update(l.ctx, userInfo)
+	err = l.svcCtx.Domain.IAM.User.Update(l.ctx, userInfo)
 	if err != nil {
 		return errs.Wrap(errs.CodeInternalError, "更新密码失败", err)
 	}

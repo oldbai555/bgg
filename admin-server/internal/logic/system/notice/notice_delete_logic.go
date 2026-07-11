@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	systemrepo "postapocgame/admin-server/internal/repository/system"
 )
 
 type NoticeDeleteLogic struct {
@@ -33,8 +32,7 @@ func (l *NoticeDeleteLogic) NoticeDelete(req *types.NoticeDeleteReq) (resp *type
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	noticeRepo := systemrepo.NewNoticeRepository(l.svcCtx.Repository)
-	if err := noticeRepo.DeleteByID(l.ctx, req.Id); err != nil {
+	if err := l.svcCtx.Domain.System.Notice.DeleteByID(l.ctx, req.Id); err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "删除公告失败", err)
 	}
 

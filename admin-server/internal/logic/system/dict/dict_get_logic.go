@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	systemrepo "postapocgame/admin-server/internal/repository/system"
 )
 
 type DictGetLogic struct {
@@ -57,8 +56,7 @@ func (l *DictGetLogic) PublicDictGet(req *types.DictGetReq) (resp *types.DictGet
 func (l *DictGetLogic) getDictInternal(req *types.DictGetReq, isPublic bool) (resp *types.DictGetResp, err error) {
 	// 当前公共/私有逻辑一致，预留 isPublic 以便未来在这里做额外限制或审计
 
-	dictTypeRepo := systemrepo.NewDictTypeRepository(l.svcCtx.Repository)
-	dictType, err := dictTypeRepo.FindByCode(l.ctx, req.Code)
+	dictType, err := l.svcCtx.Domain.System.DictType.FindByCode(l.ctx, req.Code)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询字典类型失败", err)
 	}
@@ -76,8 +74,7 @@ func (l *DictGetLogic) getDictInternal(req *types.DictGetReq, isPublic bool) (re
 	}
 
 	// 缓存未命中，从数据库查询
-	dictItemRepo := systemrepo.NewDictItemRepository(l.svcCtx.Repository)
-	items, err := dictItemRepo.FindByTypeID(l.ctx, dictType.Id)
+	items, err := l.svcCtx.Domain.System.DictItem.FindByTypeID(l.ctx, dictType.Id)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询字典项失败", err)
 	}

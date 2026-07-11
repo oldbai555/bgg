@@ -12,7 +12,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 type LogoutLogic struct {
@@ -34,18 +33,16 @@ func (l *LogoutLogic) Logout(req *types.LogoutReq) error {
 		return errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	blackRepo := iamrepo.NewTokenBlacklistRepository(l.svcCtx.Repository)
-
 	// 访问令牌加入黑名单
 	if req.AccessToken != "" {
-		if err := blackRepo.Blacklist(l.ctx, req.AccessToken, time.Duration(l.svcCtx.Config.JWT.AccessExpire)*time.Second); err != nil {
+		if err := l.svcCtx.Domain.IAM.TokenBlacklist.Blacklist(l.ctx, req.AccessToken, time.Duration(l.svcCtx.Config.JWT.AccessExpire)*time.Second); err != nil {
 			return errs.Wrap(errs.CodeInternalError, "加入访问令牌黑名单失败", err)
 		}
 	}
 
 	// 刷新令牌加入黑名单
 	if req.RefreshToken != "" {
-		if err := blackRepo.Blacklist(l.ctx, req.RefreshToken, time.Duration(l.svcCtx.Config.JWT.RefreshExpire)*time.Second); err != nil {
+		if err := l.svcCtx.Domain.IAM.TokenBlacklist.Blacklist(l.ctx, req.RefreshToken, time.Duration(l.svcCtx.Config.JWT.RefreshExpire)*time.Second); err != nil {
 			return errs.Wrap(errs.CodeInternalError, "加入刷新令牌黑名单失败", err)
 		}
 	}

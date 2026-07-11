@@ -4,7 +4,6 @@
 package public
 
 import (
-	blogrepo "postapocgame/admin-server/internal/repository/blog"
 	"context"
 
 	"postapocgame/admin-server/internal/svc"
@@ -30,7 +29,7 @@ func NewPublicBlogTagListLogic(ctx context.Context, svcCtx *svc.ServiceContext) 
 
 func (l *PublicBlogTagListLogic) PublicBlogTagList() (resp *types.PublicBlogTagListResp, err error) {
 	// 查询启用的标签列表（使用较大的limit，实际业务中可根据需要调整）
-	tagList, err := blogrepo.NewBlogTagRepository(l.svcCtx.Repository).FindEnabledList(l.ctx, 1000)
+	tagList, err := l.svcCtx.Domain.Blog.Tag.FindEnabledList(l.ctx, 1000)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeBadDB, "查询标签列表失败", err)
 	}

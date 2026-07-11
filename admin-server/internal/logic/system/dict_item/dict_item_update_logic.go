@@ -10,7 +10,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	systemrepo "postapocgame/admin-server/internal/repository/system"
 )
 
 type DictItemUpdateLogic struct {
@@ -32,8 +31,7 @@ func (l *DictItemUpdateLogic) DictItemUpdate(req *types.DictItemUpdateReq) error
 		return errs.New(errs.CodeBadRequest, "字典项ID不能为空")
 	}
 
-	dictItemRepo := systemrepo.NewDictItemRepository(l.svcCtx.Repository)
-	dictItem, err := dictItemRepo.FindByID(l.ctx, req.Id)
+	dictItem, err := l.svcCtx.Domain.System.DictItem.FindByID(l.ctx, req.Id)
 	if err != nil {
 		return errs.Wrap(errs.CodeInternalError, "查询字典项失败", err)
 	}
@@ -55,7 +53,7 @@ func (l *DictItemUpdateLogic) DictItemUpdate(req *types.DictItemUpdateReq) error
 		dictItem.Sort = req.Sort
 	}
 
-	if err := dictItemRepo.Update(l.ctx, dictItem); err != nil {
+	if err := l.svcCtx.Domain.System.DictItem.Update(l.ctx, dictItem); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "更新字典项失败", err)
 	}
 
@@ -63,8 +61,7 @@ func (l *DictItemUpdateLogic) DictItemUpdate(req *types.DictItemUpdateReq) error
 	cache := l.svcCtx.Repository.BusinessCache
 	go func() {
 		// 需要获取字典类型的 code 来清除缓存
-		dictTypeRepo := systemrepo.NewDictTypeRepository(l.svcCtx.Repository)
-		dictType, err := dictTypeRepo.FindByID(context.Background(), dictItem.TypeId)
+		dictType, err := l.svcCtx.Domain.System.DictType.FindByID(context.Background(), dictItem.TypeId)
 		if err == nil {
 			if err := cache.DeleteDictItems(context.Background(), dictType.Code); err != nil {
 				l.Errorf("清除字典项缓存失败: code=%s, error=%v", dictType.Code, err)

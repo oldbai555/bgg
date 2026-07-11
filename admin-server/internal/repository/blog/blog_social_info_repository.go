@@ -124,10 +124,15 @@ func (r *blogSocialInfoRepository) Create(ctx context.Context, info *blogmodel.B
 	info.UpdatedAt = now
 	info.DeletedAt = 0
 
-	_, err := r.model.Insert(ctx, info)
+	result, err := r.model.Insert(ctx, info)
 	if err != nil {
 		return errs.Wrap(errs.CodeBadDB, "创建社交信息失败", err)
 	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return errs.Wrap(errs.CodeBadDB, "获取社交信息自增 ID 失败", err)
+	}
+	info.Id = uint64(id)
 	return nil
 }
 

@@ -4,7 +4,6 @@
 package tag
 
 import (
-	blogrepo "postapocgame/admin-server/internal/repository/blog"
 	"context"
 
 	"postapocgame/admin-server/internal/svc"
@@ -35,7 +34,7 @@ func (l *BlogTagDeleteLogic) BlogTagDelete(req *types.BlogTagDeleteReq) error {
 
 	// TODO: 如需限制有文章关联的标签删除，可以在后续通过文章标签关联表进行检查
 
-	if err := blogrepo.NewBlogTagRepository(l.svcCtx.Repository).Delete(l.ctx, req.Id); err != nil {
+	if err := l.svcCtx.Domain.Blog.Tag.Delete(l.ctx, req.Id); err != nil {
 		return err
 	}
 

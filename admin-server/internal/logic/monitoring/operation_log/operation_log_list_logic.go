@@ -11,7 +11,6 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	monitoringrepo "postapocgame/admin-server/internal/repository/monitoring"
 )
 
 type OperationLogListLogic struct {
@@ -36,8 +35,7 @@ func (l *OperationLogListLogic) OperationLogList(req *types.OperationLogListReq)
 	// 统一分页参数
 	req.Page, req.PageSize = logicutil.NormalizePage(req.Page, req.PageSize, 20, 100)
 
-	operationLogRepo := monitoringrepo.NewOperationLogRepository(l.svcCtx.Repository)
-	list, total, err := operationLogRepo.FindPage(
+	list, total, err := l.svcCtx.Domain.Monitoring.OperationLog.FindPage(
 		l.ctx,
 		req.Page,
 		req.PageSize,

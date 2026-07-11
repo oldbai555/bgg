@@ -10,9 +10,9 @@ import (
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 
-	"github.com/zeromicro/go-zero/core/logx"
 	"postapocgame/admin-server/internal/model/misc"
-	miscrepo "postapocgame/admin-server/internal/repository/misc"
+
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type DemoCreateLogic struct {
@@ -44,8 +44,7 @@ func (l *DemoCreateLogic) DemoCreate(req *types.DemoCreateReq) error {
 		Status: status,
 	}
 
-	demoRepo := miscrepo.NewDemoRepository(l.svcCtx.Repository)
-	if err := demoRepo.Create(l.ctx, &demo); err != nil {
+	if err := l.svcCtx.Domain.Misc.Demo.Create(l.ctx, &demo); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "创建演示功能失败", err)
 	}
 	return nil

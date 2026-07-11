@@ -12,7 +12,6 @@ import (
 	"postapocgame/admin-server/pkg/initdata"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 type DepartmentDeleteLogic struct {
@@ -38,8 +37,7 @@ func (l *DepartmentDeleteLogic) DepartmentDelete(req *types.DepartmentDeleteReq)
 		return errs.New(errs.CodeBadRequest, "初始化数据不可删除")
 	}
 
-	deptRepo := iamrepo.NewDepartmentRepository(l.svcCtx.Repository)
-	if err := deptRepo.DeleteByID(l.ctx, req.Id); err != nil {
+	if err := l.svcCtx.Domain.IAM.Department.DeleteByID(l.ctx, req.Id); err != nil {
 		return errs.Wrap(errs.CodeInternalError, "删除部门失败", err)
 	}
 	return nil

@@ -10,8 +10,9 @@ import (
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 
-	"github.com/zeromicro/go-zero/core/logx"
 	taskrepo "postapocgame/admin-server/internal/repository/task"
+
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type TaskListLogic struct {
@@ -51,8 +52,7 @@ func (l *TaskListLogic) TaskList(req *types.TaskListReq) (resp *types.TaskListRe
 	}
 
 	// 查询任务列表
-	taskRepo := taskrepo.NewTaskRepository(l.svcCtx.Repository)
-	tasks, total, err := taskRepo.FindPage(l.ctx, page, pageSize, filters)
+	tasks, total, err := l.svcCtx.Domain.Task.Task.FindPage(l.ctx, page, pageSize, filters)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询任务列表失败", err)
 	}

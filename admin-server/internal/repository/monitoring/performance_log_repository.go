@@ -109,6 +109,14 @@ func (r *performanceLogRepository) Create(ctx context.Context, log *monitoringmo
 	if log == nil {
 		return nil
 	}
-	_, err := r.model.Insert(ctx, log)
-	return err
+	result, err := r.model.Insert(ctx, log)
+	if err != nil {
+		return err
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+	log.Id = uint64(id)
+	return nil
 }

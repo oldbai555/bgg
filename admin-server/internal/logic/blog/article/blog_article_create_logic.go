@@ -4,7 +4,6 @@
 package article
 
 import (
-	blogrepo "postapocgame/admin-server/internal/repository/blog"
 	"context"
 	"postapocgame/admin-server/internal/dict"
 	"strings"
@@ -16,8 +15,9 @@ import (
 	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 
-	"github.com/zeromicro/go-zero/core/logx"
 	"postapocgame/admin-server/internal/model/blog"
+
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type BlogArticleCreateLogic struct {
@@ -68,7 +68,7 @@ func (l *BlogArticleCreateLogic) BlogArticleCreate(req *types.BlogArticleCreateR
 		article.AuthorName = u.Username
 	}
 
-	if err = blogrepo.NewBlogArticleRepository(l.svcCtx.Repository).CreateWithTags(l.ctx, article, req.TagIds); err != nil {
+	if err = l.svcCtx.Domain.Blog.ArticleService.CreateArticle(l.ctx, article, req.TagIds); err != nil {
 		return nil, err
 	}
 

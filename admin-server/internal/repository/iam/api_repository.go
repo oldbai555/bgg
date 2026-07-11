@@ -68,8 +68,16 @@ func (r *apiRepository) FindPage(ctx context.Context, page, pageSize int64, name
 }
 
 func (r *apiRepository) Create(ctx context.Context, api *iammodel.AdminApi) error {
-	_, err := r.model.Insert(ctx, api)
-	return err
+	result, err := r.model.Insert(ctx, api)
+	if err != nil {
+		return err
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+	api.Id = uint64(id)
+	return nil
 }
 
 func (r *apiRepository) Update(ctx context.Context, api *iammodel.AdminApi) error {
