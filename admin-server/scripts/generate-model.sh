@@ -18,7 +18,6 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 ADMIN_SERVER_DIR="${PROJECT_ROOT}"
 TEMPLATE_DIR="${ADMIN_SERVER_DIR}/.template"
-MIGRATIONS_DIR="${ADMIN_SERVER_DIR}/db/migrations"
 MODEL_DIR="${ADMIN_SERVER_DIR}/internal/model"
 
 # 解析 goctl 路径（优先环境变量 GOCTL_BIN，其次 PATH，再尝试 GOPATH/bin/goctl）
@@ -54,7 +53,7 @@ usage() {
     echo "  $0 <migration_file> [options]"
     echo ""
     echo "参数:"
-    echo "  migration_file    迁移文件路径（相对于 db/migrations/ 或绝对路径）"
+    echo "  migration_file    建表 SQL 文件路径（相对于 admin-server/ 的路径，如 db/services/iam/user/create_table_user.sql，或绝对路径）"
     echo ""
     echo "选项:"
     echo "  -c, --cache        启用缓存（默认: 启用）"
@@ -119,9 +118,7 @@ if [[ "$MIGRATION_FILE" == /* ]]; then
     SQL_FILE="$MIGRATION_FILE"
 else
     # 相对路径，尝试多个位置
-    if [ -f "${MIGRATIONS_DIR}/${MIGRATION_FILE}" ]; then
-        SQL_FILE="${MIGRATIONS_DIR}/${MIGRATION_FILE}"
-    elif [ -f "${ADMIN_SERVER_DIR}/${MIGRATION_FILE}" ]; then
+    if [ -f "${ADMIN_SERVER_DIR}/${MIGRATION_FILE}" ]; then
         SQL_FILE="${ADMIN_SERVER_DIR}/${MIGRATION_FILE}"
     elif [ -f "${PROJECT_ROOT}/${MIGRATION_FILE}" ]; then
         SQL_FILE="${PROJECT_ROOT}/${MIGRATION_FILE}"
@@ -130,7 +127,6 @@ else
     else
         echo -e "${RED}错误: 找不到文件: ${MIGRATION_FILE}${NC}"
         echo "尝试过的路径:"
-        echo "  - ${MIGRATIONS_DIR}/${MIGRATION_FILE}"
         echo "  - ${ADMIN_SERVER_DIR}/${MIGRATION_FILE}"
         echo "  - ${PROJECT_ROOT}/${MIGRATION_FILE}"
         echo "  - ${MIGRATION_FILE} (当前目录)"

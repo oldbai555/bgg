@@ -21,11 +21,11 @@ admin-server/
 │   │   └── <domain>/*.go           # package <domain>，强制 squirrel
 │   ├── model/<domain>/*.go         # goctl 生成，package <domain>
 │   ├── domain/
-│   │   ├── iam/permission_resolver.go  # RBAC 领域服务
-│   │   └── task/                       # 任务调度领域服务
+│   │   └── iam/permission_resolver.go  # RBAC 领域服务
 │   ├── middleware/        # 手写中间件
 │   ├── consts/ config/ types/ svc/
 ├── pkg/ scripts/ .template/ db/
+└── services/task/          # Phase 2 拆出的 task-rpc 独立服务（领域代码/repository 已搬出单体）
 ```
 
 维护导航见 `docs/admin-server-维护导航.md`。
@@ -55,7 +55,7 @@ admin-server/
 
 所有需要动态构建 SQL 的地方必须使用 `github.com/Masterminds/squirrel`（别名 `sq`），禁止 `fmt.Sprintf` 或字符串拼接。适用范围：Repository 层所有自定义查询方法、动态 WHERE/ORDER BY/LIMIT/OFFSET、UPDATE/DELETE 的动态条件。
 
-参考实现：`internal/repository/role_permission_repository.go`
+参考实现：`internal/repository/iam/role_permission_repository.go`
 
 ```go
 import (
@@ -110,7 +110,7 @@ Performance → RateLimit → Auth → Permission → OperationLog
 
 - 字典（枚举型）`value` 必须从 1 开始，禁止用 0 表达具体业务含义；0 保留给"全部/不筛选"占位
 - Request 结构体的筛选字段（`Status`、`ReadStatus` 等）统一 `int64`；Logic 层把字典枚举值映射为 DB 实际值，值为 0 或非法时不追加 WHERE 条件；Repository 层只接收 DB 实际值，不感知字典枚举
-- 字典 SQL 独立增量文件：`db/migrations/dict_{module}_YYYYMMDD.sql`，用 `ON DUPLICATE KEY UPDATE` 保证幂等，ID 自增，不手动指定；通过 `code` 反查 `type_id`：
+- 字典 SQL 独立增量文件：`db/services/<service>/<module>/migrations/dict_{module}_YYYYMMDD.sql`，用 `ON DUPLICATE KEY UPDATE` 保证幂等，ID 自增，不手动指定；通过 `code` 反查 `type_id`：
   ```sql
   SET @dict_type_id = (SELECT `id` FROM `admin_dict_type` WHERE `code` = 'xxx' AND `deleted_at` = 0 LIMIT 1);
   ```

@@ -17,18 +17,35 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # 项目根目录（scripts的父目录）
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 SQLGEN_DIR="${PROJECT_ROOT}/scripts/sqlgen"
-# 默认输出到 migrations 目录，作为增量 SQL 管理
-OUTPUT_DIR="${PROJECT_ROOT}/db/migrations"
+# 输出目录按 -group 的 <domain>/<module> 解析后计算，见下方「域→服务映射」
+OUTPUT_DIR=""
+
+# 域→服务映射（15-service-boundaries.md 第 4 节 SSOT）：
+# iam/system/monitoring/misc 四个域合并进 iam-rpc；blog/video 合并进 content-rpc；
+# chat/task/sdk 各自独立成服务。domain 也接受直接写服务名（iam/content/chat/task/sdk）。
+domain_to_service() {
+    case "$1" in
+        iam|system|monitoring|misc) echo "iam" ;;
+        blog|blog_extension|video|content) echo "content" ;;
+        chat) echo "chat" ;;
+        task) echo "task" ;;
+        sdk) echo "sdk" ;;
+        *) echo "" ;;
+    esac
+}
 
 # 显示使用说明
 usage() {
     echo -e "${GREEN}SQL 脚本生成工具${NC}"
     echo ""
     echo "用法:"
-    echo "  $0 -group <group> -name <name>"
+    echo "  $0 -group <domain>/<module> -name <name>"
     echo ""
     echo "参数:"
-    echo "  -group <group>        功能组名（必需，如 user, file）"
+    echo "  -group <domain>/<module>  功能组名（必需，如 iam/user、blog/article、chat/chat）"
+    echo "                            <domain> 决定落进哪个服务的 db/services/<service>/ 目录，"
+    echo "                            取值：iam/system/monitoring/misc → iam；blog/video → content；"
+    echo "                            chat/task/sdk 各自独立；也可以直接写服务名 iam/content/chat/task/sdk"
     echo "  -name <name>          功能名称（必需，如 用户管理, 文件管理）"
     echo ""
     echo "选项:"
@@ -37,13 +54,14 @@ usage() {
     echo "  -h, --help            显示此帮助信息"
     echo ""
     echo "示例:"
-    echo "  $0 -group user -name 用户管理"
-    echo "  $0 -group file -name 文件管理"
-    echo "  $0 -group operation_log -name 操作日志 -parent-path /system"
+    echo "  $0 -group iam/user -name 用户管理"
+    echo "  $0 -group system/file -name 文件管理"
+    echo "  $0 -group monitoring/operation_log -name 操作日志 -parent-path /system"
+    echo "  $0 -group blog/article -name 文章管理"
     echo ""
     echo "注意:"
-    echo "  - 生成的 SQL 文件在 admin-server/db/migrations/ 目录下（增量脚本）"
-    echo "  - 文件名格式: create_table_<group>.sql、init_<group>.sql"
+    echo "  - 生成的 SQL 文件在 admin-server/db/services/<service>/<module>/ 目录下"
+    echo "  - 文件名格式: create_table_<module>.sql、init_<module>.sql"
     echo "  - 主键为自增，不需要手动赋值"
     echo "  - 默认菜单父目录为临时目录 /temp，如需挂到系统管理请使用 -parent-path /system"
     echo "  - 包含菜单、权限、接口及关联关系"
@@ -99,6 +117,26 @@ if [ -z "$GROUP" ] || [ -z "$NAME" ]; then
     exit 1
 fi
 
+# 解析 -group 的 <domain>/<module> 格式，映射到 db/services/<service>/<module>/
+if [[ "$GROUP" != */* ]]; then
+    echo -e "${RED}错误: -group 必须是 <domain>/<module> 格式（如 iam/user），收到: ${GROUP}${NC}"
+    usage
+    exit 1
+fi
+DOMAIN="${GROUP%%/*}"
+MODULE="${GROUP#*/}"
+if [[ -z "$DOMAIN" || -z "$MODULE" || "$MODULE" == */* ]]; then
+    echo -e "${RED}错误: -group 格式不合法: ${GROUP}${NC}"
+    exit 1
+fi
+SERVICE="$(domain_to_service "$DOMAIN")"
+if [ -z "$SERVICE" ]; then
+    echo -e "${RED}错误: 未知 domain: ${DOMAIN}（有效值: iam, system, monitoring, misc, blog, video, chat, task, sdk，或直接写服务名 iam/content/chat/task/sdk）${NC}"
+    exit 1
+fi
+OUTPUT_DIR="${PROJECT_ROOT}/db/services/${SERVICE}/${MODULE}"
+GROUP="$MODULE"
+
 # 检查 sqlgen 目录是否存在
 if [ ! -d "$SQLGEN_DIR" ]; then
     echo -e "${RED}错误: sqlgen 目录不存在: ${SQLGEN_DIR}${NC}"
@@ -150,11 +188,12 @@ go build -o sqlgen main.go
 # 注意：在 Windows 环境下，如果遇到中文乱码问题，请使用 chcp 65001 设置代码页为 UTF-8
 # 或者在 PowerShell 中设置：$OutputEncoding = [System.Text.Encoding]::UTF8
 ./sqlgen -group "$GROUP" -name "$NAME" -output "$OUTPUT_DIR" -template "${SQLGEN_DIR}/templates" -parent-id "$PARENT_ID" -parent-path "$PARENT_PATH"
+SQLGEN_EXIT_CODE=$?
 
 # 清理编译产物
 rm -f sqlgen
 
-if [ $? -eq 0 ]; then
+if [ $SQLGEN_EXIT_CODE -eq 0 ]; then
     echo -e "${GREEN}✓ SQL 脚本生成成功!${NC}"
     echo -e "${YELLOW}注意:${NC}"
     echo -e "  - 生成的 SQL 文件:"

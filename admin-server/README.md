@@ -19,9 +19,10 @@ admin-server/
 │   ├── logic/<domain>/<module>/    # goctl 骨架 + 手写业务
 │   ├── repository/<domain>/        # 手写数据访问（squirrel）
 │   ├── model/<domain>/             # goctl 生成
-│   ├── domain/{iam,task}/          # 领域服务（RBAC、任务调度）
+│   ├── domain/iam/                 # 领域服务（RBAC）
 │   ├── middleware/ svc/ types/ ...
 ├── pkg/ scripts/ .template/ db/
+└── services/task/      # Phase 2 拆出的 task-rpc 独立服务（任务调度域已搬出单体）
 ```
 
 详细维护导航见 [`docs/admin-server-维护导航.md`](../docs/admin-server-维护导航.md)。
@@ -49,12 +50,12 @@ admin-server/
 
 ## 数据库初始化
 
-- 首次部署：执行 `db/tables.sql`（建表）+ `db/data.sql`（初始数据）
-- 后续新增模块/字段：增量 SQL 放 `db/migrations/`（字典SQL → 业务表SQL → 权限SQL 顺序执行）
+- 首次部署：执行 `db/services/init-dev-db.sh`（按 `db/services/<service>/<module>/` 目录树的固定顺序建表 + 初始化数据，见 `docs/15-service-boundaries.md` 第 4 节）
+- 后续新增模块/字段：增量 SQL 放对应模块的 `db/services/<service>/<module>/migrations/`（字典SQL → 业务表SQL → 权限SQL 顺序执行）
 
 ## 本地开发
 
-推荐直接用 IDE（GoLand 等）运行 `admin.go`。也可以用命令行脚本：
+推荐直接用 IDE（GoLand 等）运行 `admin.go`。也可以用命令行脚本（`script/admin.sh` 在仓库根目录，不是 `admin-server/scripts/`，以下命令需在**仓库根目录**执行）：
 
 ```bash
 bash script/admin.sh dev start   # 启动（带健康检查）
@@ -67,7 +68,7 @@ bash script/admin.sh dev stop    # 停止
 
 ## 新增功能模块
 
-项目内置工程化脚手架：`scripts/generate-sql.sh -group <group> -name <name>` 一条命令即可生成建表 SQL、RBAC 初始化数据（菜单/权限/接口）、`.api` 草稿、前端列表页骨架。完整流程见根目录 [`AGENTS.md`](../AGENTS.md) 第 2、2.1 节 或 [`.cursor/rules/00-workflow.mdc`](../.cursor/rules/00-workflow.mdc)，这里不重复。
+项目内置工程化脚手架：`scripts/generate-sql.sh -group <domain>/<module> -name <name>`（如 `-group iam/user -name 用户管理`）一条命令即可生成建表 SQL、RBAC 初始化数据（菜单/权限/接口）、`.api` 草稿、前端列表页骨架。完整流程见根目录 [`AGENTS.md`](../AGENTS.md) 第 2、2.1 节 或 [`.cursor/rules/00-workflow.mdc`](../.cursor/rules/00-workflow.mdc)，这里不重复。
 
 ## 构建与部署
 

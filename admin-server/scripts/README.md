@@ -29,27 +29,27 @@ make wire
 **使用方法：**
 ```bash
 # 可在任何目录下运行，脚本会自动定位项目目录
-./scripts/generate-sql.sh -group <group> -name <name>
+./scripts/generate-sql.sh -group <domain>/<module> -name <name>
 ```
 
 **参数：**
-- `-group <group>`: 功能组名（必需，如 `user`, `file`）
+- `-group <domain>/<module>`: 功能组名（必需，如 `iam/user`, `system/file`）。`<domain>` 决定落进哪个服务的 `db/services/<service>/` 目录：`iam`/`system`/`monitoring`/`misc` → `iam`，`blog`/`video` → `content`，`chat`/`task`/`sdk` 各自独立（也可以直接写服务名）；`<module>` 为 snake_case
 - `-name <name>`: 功能名称（必需，如 `用户管理`, `文件管理`）
 
 **示例：**
 ```bash
-# 生成用户管理模块的 SQL
-./scripts/generate-sql.sh -group user -name 用户管理
+# 生成用户管理模块的 SQL（落进 db/services/iam/user/）
+./scripts/generate-sql.sh -group iam/user -name 用户管理
 
-# 生成文件管理模块的 SQL
-./scripts/generate-sql.sh -group file -name 文件管理
+# 生成文件管理模块的 SQL（落进 db/services/iam/file/）
+./scripts/generate-sql.sh -group system/file -name 文件管理
 ```
 
 **功能说明：**
-- 生成的 SQL 文件位于 `admin-server/db/` 目录下
-- 文件名格式：`init_<group>.sql`
+- 生成的 SQL 文件位于 `admin-server/db/services/<service>/<module>/` 目录下
+- 文件名格式：`init_<module>.sql`
 - 主键为自增，不需要手动赋值
-- 临时目录已在 `data.sql` 中初始化（id=9）
+- 临时目录已在 `db/services/iam/menu/init_menu.sql` 中初始化
 - 生成的菜单默认归类在临时目录下
 - 包含以下内容：
   - 菜单数据（主菜单 + 新增/编辑/删除按钮）
@@ -60,11 +60,11 @@ make wire
 - **同时生成 `.api` 文件内容**，可直接复制追加到 `admin-server/api/admin.api`
 
 **输出内容：**
-1. **建表 SQL 文件**：生成到 `admin-server/db/create_table_<group>.sql`
+1. **建表 SQL 文件**：生成到 `admin-server/db/services/<service>/<module>/create_table_<module>.sql`
    - 包含默认字段：`id`（主键自增）、`created_at`、`updated_at`、`deleted_at`
    - 表名使用 `{{.Group}}`（可根据需要手动修改表名）
    - 包含主键和 `deleted_at` 索引
-2. **初始化 SQL 文件**：生成到 `admin-server/db/init_<group>.sql`
+2. **初始化 SQL 文件**：生成到 `admin-server/db/services/<service>/<module>/init_<module>.sql`
    - 包含菜单、权限、接口等初始化数据
    - 菜单路径：`/temp/<group>`（临时目录下）
    - 前端组件路径：`temp/<GroupUpper>List`
@@ -78,8 +78,8 @@ make wire
 
 **使用步骤：**
 1. 执行脚本生成建表SQL、初始化SQL、.api文件和Vue页面
-2. **先执行建表SQL**：将 `create_table_<group>.sql` 在数据库中执行（或手动添加到 `admin-server/db/tables.sql`）
-3. **再执行初始化SQL**：将 `init_<group>.sql` 在数据库中执行
+2. **先执行建表SQL**：`create_table_<module>.sql` 已生成在 `admin-server/db/services/<service>/<module>/` 下，在数据库中执行
+3. **再执行初始化SQL**：将同目录下的 `init_<module>.sql` 在数据库中执行
 4. **追加 .api 内容**：将 `<group>.api.temp` 文件的内容追加到 `admin-server/api/admin.api` 的：
    - 类型定义部分：追加到 `type (` 块内（在 `)` 之前）
    - 服务定义部分：追加到文件末尾
@@ -108,7 +108,7 @@ make wire
 **注意事项：**
 - 建表SQL中的表名使用 `{{.Group}}`，可根据实际需要手动修改（如添加 `admin_` 前缀等）
 - 建表SQL只包含默认字段，业务字段需要手动添加
-- 建议将建表SQL添加到 `admin-server/db/tables.sql` 中统一管理
+- 建表SQL已自动落在 `admin-server/db/services/<service>/<module>/create_table_<module>.sql`，不需要再手动汇总到一个总文件
 
 ### 2. generate-model.sh
 从 SQL DDL 文件生成 Model 代码（使用自定义模板支持软删除、时间戳字段、分页和分片查询）
@@ -116,10 +116,10 @@ make wire
 **使用方法：**
 ```bash
 # 可在任何目录下运行，脚本会自动定位项目目录
-./scripts/generate-model.sh db/init.sql
+./scripts/generate-model.sh db/services/iam/user/create_table_user.sql
 
 # 或使用相对路径
-./scripts/generate-model.sh init.sql
+./scripts/generate-model.sh create_table_user.sql
 ```
 
 **选项：**
@@ -219,7 +219,7 @@ make wire
   - 分片查询方法（`FindChunk`）
 - 生成的 Model 包含完整的 CRUD 操作方法
 - 确保 SQL 文件中的表包含 `created_at`、`updated_at`、`deleted_at` 字段（BIGINT类型，默认值0）
-- **推荐使用 `db/init.sql` 作为初始化SQL文件**（在未上线时只维护这一份）
+- 每个模块维护自己独立的 `db/services/<service>/<module>/create_table_<module>.sql`，不再汇总到一份总文件
 
 ### API Handler 生成
 - 生成的 Handler 代码在 `internal/handler/` 目录
@@ -236,7 +236,7 @@ make wire
 
 ### 1. 更新数据库初始化文件
 ```sql
--- db/init.sql（在未上线时只维护这一份初始化SQL）
+-- db/services/<service>/<module>/create_table_<module>.sql
 CREATE TABLE IF NOT EXISTS `new_table` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(64) NOT NULL,
@@ -251,7 +251,7 @@ CREATE TABLE IF NOT EXISTS `new_table` (
 ### 2. 生成 Model 代码
 ```bash
 # 可在任何目录下运行
-./scripts/generate-model.sh db/init.sql
+./scripts/generate-model.sh db/services/<service>/<module>/create_table_<module>.sql
 ```
 
 ### 3. 定义 API 文件

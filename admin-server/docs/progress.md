@@ -314,3 +314,50 @@ Git 提交前钩子跑了一次基于 Cursor 的自动代码审查（对照 `AGE
 4. 本轮改动（`task_repository.go` 缓存 bug 修复 + 两个测试文件）尚未 `git commit`，需要用户确认后提交。
 
 **下一步**：Phase 1 收尾确认已完成——`01`~`09` 全部落地、人工冒烟通过、集成测试套件真实验证通过（且过程中修复了一个真实生产 bug）。Phase 1（Week 1-5）达到整体验收标准，可以着手规划 Phase 2（`15-service-boundaries.md` 起）或由用户决定下一步优先级。
+
+---
+
+## 2026-07-11（续四）：Phase 2 启动——`15-service-boundaries.md` 第 1/2/3 项完成的定义全部落地（db/services/ 全量目录重组）
+
+**背景**：用户确认文档 15 第 1 节的 5 条服务合并/拆分理由（iam+system+monitoring+misc→iam-rpc、blog+video→content-rpc、chat/task/sdk 各自独立）按此执行；`db/services/` 目录重组明确要求"现在就做,不要推迟到各服务真正拆分时",且"无需考虑兼容性,优先把系统做好、做简单,时间充足就一次性做透"。会话过程中用户中途分享了一份在 Plan 模式下单独完善的 `task-rpc` 完整拆分计划（Week 6-7,对应 `18-service-extraction-runbook.md`），该计划第 4 节"数据库拆分"原本只打算搬 task 一个域、其余域留在旧 `db/migrations/` 原地——核实后与本条目已经完成的全量重组冲突，用户明确选择"保留已完成的全域拆分,在这个基础上继续做 task-rpc"，本条目记录的是全量重组部分,task-rpc 后续代码拆分见下一条目（若同一会话完成）或以后条目。
+
+**1. `db/tables.sql`（583 行，29 张表建表 DDL）+ `db/data.sql`（2044 行，ID 顺序递增 + 会话变量互相引用的 RBAC 初始化脚本）全部拆分到 `db/services/<service>/<module>/`**：
+
+- 拆分方法：写了一个一次性 Python 脚本（未入库，`/private/tmp/.../split_db.py`），按精确行号区间把 `tables.sql`/`data.sql` 的内容切到目标文件，而不是人工复制粘贴——2000+ 行的脚本靠肉眼摘抄极易出现行漏抄/行重复。拆完后写了一个独立的覆盖率校验脚本：把所有用到的行区间标记出来，扫描原文件里没被覆盖到的非空/非注释行（应为 0，只允许两处被有意替换掉的 `SET @system_menu_id=...` 语句）、以及区间之间的重叠（应为 0）——`tables.sql`（457 有效行覆盖，0 遗漏 0 重叠）、`data.sql`（1956 有效行覆盖，2 处有意替换，0 遗漏 0 重叠）均验证通过。
+- **模块划分原则**：不是机械按"SQL 语句实际写入哪张表"分类，而是按"这段 SQL 逻辑上属于哪个业务模块的骨架"分类——依据是 `db/migrations/init_blog.sql`（Week1 之前就已存在的、`generate-sql.sh` 脚手架产出的真实先例）本身的写法：一个模块的 `init_<module>.sql` 里既写自己的业务表（如有）也写 `admin_menu`/`admin_permission`/`admin_api`/`admin_permission_menu`/`admin_permission_api` 这些**物理上属于 iam 的共享 RBAC 表**——因为菜单/权限/接口元数据的物理归属天然是 iam-rpc（全局权限校验中心），但描述的可能是任何其他服务的路由。所以 `content/video/init_video.sql`、`sdk/sdk/init_sdk.sql`、`chat/chat/init_chat.sql` 里都会出现对 `admin_menu` 等表的 INSERT，这是刻意的、和既有先例一致的设计，不是没拆干净。真正按字面表名精细拆分的只有 iam 自己的核心域（`admin_user`/`admin_role`/`admin_permission`/`admin_menu`/`admin_api` 五张表各自独立成模块，四张纯关联表 `admin_user_role`/`admin_role_permission`/`admin_permission_menu`/`admin_permission_api` 合并成一个 `iam/rbac/` 模块——这个分组和 Week2 已经落地的 `internal/domain/iam/rbac_service.go`（`RBACService` 把这四张表的更新收进同一个领域服务）保持同构，不是新发明的边界）。
+- **最终模块清单**（38 张表，逐一核对无遗漏，与文档 15 第 2 节的实测表数完全对上）：
+  - `iam/`（23 张表）：`user`、`department`、`role`、`permission`、`menu`、`api`、`rbac`（4 张关联表）、`config`、`dict`（`dict_type`+`dict_item`）、`file`、`notice`、`notification`、`operation_log`、`login_log`、`audit_log`、`performance_log`、`monitor`（**无独立表**，纯粹是 `/system/monitor` 系统资源实时状态页的菜单/权限/接口挂载，文档 15 的目录树示例没列出这个模块，是文档示例本身不完整，此处按需补的）、`metric`（`metric_daily_stats`）、`demo`、`daily_short_sentence`。
+  - `content/`（7 张表）：`blog`（4 张：`blog_tag`/`blog_article`/`blog_article_tag`/`blog_article_audit`）、`blog_extension`（2 张：`blog_friend_link`/`blog_social_info`，沿用已有的历史分批命名）、`video`（1 张）。
+  - `chat/chat/`（3 张：`chat`/`chat_user`/`chat_message`）、`task/task/`（1 张：`admin_task`）、`sdk/sdk/`（4 张：`sdk_key`/`sdk_interface`/`sdk_key_api`/`sdk_call_log`）。
+- **顺手修复的一处既有 SQL 笔误**：`data.sql` 原文里视频来源类型字典项一行写的是 `UNIXd_TIMESTAMP()`（多了个 `d`），是拼写错误——分析过程中发现这行如果真的从未被完整执行过会导致 SQL 语法错误直接中断初始化脚本；拆分到 `db/services/iam/dict/init_dict.sql` 时顺手改成了正确的 `UNIX_TIMESTAMP()`。
+- 已有的 5 个模块级迁移文件（`db/migrations/{create_table,init}_{blog,blog_extension,metric,task}.sql`、3 个 `dict_*.sql`、`fix_status_semantics_20260711.sql`）+ `db/demo/{create_table,init}_demo.sql` 全部用 `git mv` 原样搬进对应的 `db/services/<service>/<module>/`（`fix_status_semantics_20260711.sql` 是非幂等的一次性存量数据迁移,放进 `iam/notification/migrations/`,不参与自动初始化流程,和搬迁前的行为一致）。
+
+**2. 新增 `db/services/init-dev-db.sh`，替代原 `db/docker-init.sh` 的 glob 遍历逻辑**：
+
+- 当前 `admin-server` 仍是单体单库（Phase 2 的服务代码拆分还没开始），所有服务的表建在同一个数据库里，所以这个脚本按明确写死的依赖顺序（不是 glob）把全部服务的 SQL 跑一遍：iam 建表 → iam 初始化数据（按 iam 内部真实依赖顺序：`user→department→role→permission→menu→api→rbac→config→dict→file→notice→notification→operation_log→login_log→audit_log→performance_log→monitor→metric→demo→daily_short_sentence`）→ content 建表+初始化 → chat 建表+初始化 → task/sdk 建表+初始化。iam 必须整体排最前是因为其余服务的初始化数据会用 `SELECT` 反查 `admin_permission`/`admin_menu` 里已经存在的行（如 `chat/chat/init_chat.sql` 的群组管理权限关联反查 `chat:group:*` 权限 ID，这些权限行本身在 `iam/permission/init_permission.sql` 里）。
+- `db/docker-init.sh` 改成薄委托，只做 `exec /db/services/init-dev-db.sh`（docker-compose 仍然只挂载这一个文件到 `/docker-entrypoint-initdb.d/00-init.sh`，整个 `db/` 目录挂到 `/db`，机制不变）。
+- `.github/workflows/ci.yml` 的 `integration-test` job 的"初始化测试库"步骤从原来的四段 inline shell（建表→建表增量→data.sql→字典增量→模块初始化）简化成一行调用 `admin-server/db/services/init-dev-db.sh -h127.0.0.1`（新脚本支持可选的 `-h<host>` 透传给 `mysql` 客户端，CI 场景下 mysql client 跑在 runner 上需要连到 service 容器的 `127.0.0.1:3306`；docker-compose 场景下脚本在 MySQL 容器内部跑，不需要 `-h`）。
+
+**3. `scripts/generate-sql.sh` 加上文档 15 第 4 节要求的域→服务映射表，`-group` 改为强制 `<domain>/<module>` 格式**：
+
+- 新增 `domain_to_service()`（`case` 语句实现，不用 bash 关联数组，因为 macOS 系统自带 bash 3.2 不支持）：`iam`/`system`/`monitoring`/`misc` → `iam`；`blog`/`blog_extension`/`video`/`content` → `content`；`chat`/`task`/`sdk` 各自映射到自己。
+- 这解决了 Week1 记录过的一个真实脚本 bug（`progress.md` 2026-07-10 续条目"意外发现,未处理"那一条）：`-group` 此前实测**不支持** `<domain>/<module>` 斜杠格式（传斜杠会因为中间目录不存在直接报错），但 `00-workflow.md`/`10-go-code-style.md` 一直写的是这个格式——现在脚本行为和文档终于对上了，不再是"文档表述有误还是脚本该支持嵌套"的悬案，结论是脚本本该支持，现在补上。
+- 实现方式：shell 层解析 `-group` 拿到 `<domain>` 后查表得到 `<service>`，计算 `OUTPUT_DIR=db/services/<service>/<module>`，再把 `GROUP` 变量重写成裸 `<module>`（不带斜杠）传给 `scripts/sqlgen` 的 Go 程序——`sqlgen/main.go` 本身完全不用改，它的 `-group`/`-output` 本来就是两个独立 flag，`-group` 只用来拼文件名和模板变量（`GroupUpper`/权限 code 前缀等），从来不掺路径语义。
+- `tool/admin-mcp` 的 `generate_sql` tool 描述文本、`generate_model` 的 `migration_file` 描述、`exec.RunWithAutoConfirm` 的 `watchDir` 参数（`db/migrations` → `db/services`）同步更新；`internal/exec/script_test.go` 里的示例路径 fixture 也同步换成 `db/services/...` 风格（这几个 fixture 本身只是测通用字符串 diff 算法，不依赖真实文件存在，但换成新约定的路径避免误导）。`go build ./... && go test ./...`（`admin-mcp` 子 module）全绿。
+
+**4. 旧的 `db/tables.sql`、`db/data.sql` 已删除**，`db/migrations/`、`db/demo/` 两个目录搬空后也删除（含 `db/migrations/.gitkeep`）——用户明确说了"无需考虑兼容性",不留旧文件当兼容层。`AGENTS.md`、`scripts/README.md`、`.cursor/rules/00-workflow.mdc`、`.cursor/rules/10-go-code-style.mdc`、`docs/22-admin-mcp-tool.md` 里对 `db/migrations/dict_*.sql`、`db/tables.sql`、`-group <group>` 旧格式的引用同步改成新路径/新格式。
+
+**已知遗留（未完成，需要用户或下次会话处理）**：
+1. ~~`.claude/rules/00-workflow.md`、`.claude/rules/10-go-code-style.md` 这两份文件本次未能同步更新~~——**订正（同一会话内，非另起条目）**：`Stream closed` 是一次性的会话内瞬时问题（疑似与用户中途误关闭 Cursor、随后把权限模式切到 `edit` 有关，切换后恢复正常），切换模式后已成功补上这两处编辑，现在 `.claude/rules/*.md` 与 `.cursor/rules/*.mdc` 关于"字典 SQL 路径"的表述已经一致（均为 `db/services/<service>/<module>/migrations/...`）。同时顺手补齐了会话最初遗漏的几处次要引用：`admin-server/README.md`（数据库初始化说明）、`admin-server/scripts/migrate-menu.sh`/`generate-model.sh`（帮助文本与路径解析逻辑，`generate-model.sh` 顺手删掉了指向已不存在的 `db/migrations/` 的一段死代码分支）、`admin-server/docs/22-admin-mcp-tool.md`（两处遗漏）、根目录 `script/prompt.md`（一份疑似已被 `AGENTS.md` 取代但仍留存的旧版 Cursor prompt 文档，6 处路径引用一并改成新约定，未改写其"`-group <name>`"这类与新版脱节的其他内容，超出本次范围）。`go build ./...`、`go vet ./...` 全绿。
+2. `db/services/iam/notification/migrations/fix_status_semantics_20260711.sql` 移动后路径变了，如果之前有任何文档/脚本引用过它的旧路径 `db/migrations/fix_status_semantics_20260711.sql`，需要留意（搜索确认目前仅 `progress.md` 历史条目提到过文件名，未提到路径，不受影响）。
+3. `docs/09-ci-cd-and-deployability.md`、`docs/14-production-deployment-checklist.md` 里少量提到 `db/tables.sql` 的段落属于历史规划文档（写的时候明确说"本篇写的是当前已知路径,后续变了要跟着更新"），本次没有逐句改，不影响功能，如果之后有人对着这两篇文档做部署验证时发现路径不对，直接改成 `db/services/init-dev-db.sh` 即可。
+
+**文档 15（`15-service-boundaries.md`）"完成的定义"核对**：
+1. `db/services/` 目录树按第 4 节结构建好（含 `iam/metric/` 补充目录），38 张表逐一核对不遗漏 ✅（本条目）。
+2. `scripts/generate-sql.sh` 域→服务映射表已加上，新建模块跑 `-group iam/xxx` 会落进 `db/services/iam/xxx/` ✅（本条目；受限于本机无 MySQL，只验证了脚本逻辑本身和路径计算，没有跑一次真实生成做端到端确认，建议下次会话或用户在有数据库的环境里跑一次 `-group iam/_smoke_test -name 冒烟测试` 验证后删除产物）。
+3. 第 3 节列出的每一处跨域越界 import，在 `16-rpc-conventions.md`/`17-async-eventing.md` 里都能找到对应处理方式 ✅（核对结果：16 文档第 4 节 `BatchGetUserProfiles`/`GetUserProfile` 覆盖 `chat→iam`/`content→iam`；17 文档第 1 节 `TaskCallback` 覆盖 `monitoring/sdk→task`；17 文档第 2 节两个 Stream 覆盖 `iam→chat` 和 gateway 中间件写日志；`iam↔system`/`iam↔monitoring` 因合并进同一服务不需要处理——这一核对是读文档确认,不是本条目新做的工作)。
+4. 团队（用户本人）过一遍第 1 节的 5 条合并/拆分理由，确认认可 ✅（会话开始时已确认）。
+
+**下一步**：文档 15 全部 4 项完成的定义达标，Phase 2 可以正式进入 `18-service-extraction-runbook.md` 的实际执行阶段。用户已经在 Plan 模式下写好了第一个具体执行计划（`/Users/rookie/.claude/plans/admin-server-docs-progress-md-phase-2-15-magical-steele.md`，task-rpc 完整拆分，Week 6-7），第 4 节"数据库拆分"已被本条目的全量重组覆盖并超集完成，其余 6 个步骤（通用脚手架落地 `generate-rpc.sh`→`pkg/taskcallback` 契约→`services/task/` 骨架与领域代码搬迁→跨服务调用接入→部署配置→验证）尚未开始——这是一个体量不小于本条目的独立工作量（新增 RPC 服务骨架、proto 编译、单体内嵌 TaskCallback server、领域代码整体搬迁、docker-compose 新增服务），建议作为下一次会话的独立起点，直接读该计划文件继续，不需要重新梳理服务边界。
+
+---

@@ -151,7 +151,7 @@ func RunWithAutoConfirm(repoRoot, scriptPath string, args []string, watchDir str
 }
 ```
 
-`gitStatusSnapshot`/`diffFiles` 内部就是 `git status --porcelain=v1 -- <watchDir>` 跑两次做差集（新增的 `??` 条目 + 状态从无到有的 `M`/`A` 条目）。**`repoRoot` 固定传 `admin-server/`**（这个工具本身也在 `admin-server/tool/admin-mcp/` 下，`cmd.Dir` 设成 `admin-server/` 和 `scripts/generate-*.sh` 一贯的"在 `admin-server/` 下运行"约定一致），`watchDir` 因此必须是相对 `admin-server/` 的路径——`generate_sql`/`generate_model`/`generate_api` 三个的产物都在 `admin-server/` 内部，直接写 `db/migrations`/`internal/model`/`internal/handler internal/types` 没问题；**`generate_ts` 例外**：产物在 `admin-frontend/src/api/generated`，是 `admin-server/` 的**同级目录**，不是子目录，相对 `repoRoot=admin-server/` 必须写成 `../admin-frontend/src/api/generated`（多一层 `..`），直接写 `admin-frontend/src/api/generated` 会被 `git status` 解析成 `admin-server/admin-frontend/src/api/generated`，一个不存在的路径，`generated_files` 会一直是空数组。
+`gitStatusSnapshot`/`diffFiles` 内部就是 `git status --porcelain=v1 -- <watchDir>` 跑两次做差集（新增的 `??` 条目 + 状态从无到有的 `M`/`A` 条目）。**`repoRoot` 固定传 `admin-server/`**（这个工具本身也在 `admin-server/tool/admin-mcp/` 下，`cmd.Dir` 设成 `admin-server/` 和 `scripts/generate-*.sh` 一贯的"在 `admin-server/` 下运行"约定一致），`watchDir` 因此必须是相对 `admin-server/` 的路径——`generate_sql`/`generate_model`/`generate_api` 三个的产物都在 `admin-server/` 内部，直接写 `db/services`/`internal/model`/`internal/handler internal/types` 没问题；**`generate_ts` 例外**：产物在 `admin-frontend/src/api/generated`，是 `admin-server/` 的**同级目录**，不是子目录，相对 `repoRoot=admin-server/` 必须写成 `../admin-frontend/src/api/generated`（多一层 `..`），直接写 `admin-frontend/src/api/generated` 会被 `git status` 解析成 `admin-server/admin-frontend/src/api/generated`，一个不存在的路径，`generated_files` 会一直是空数组。
 
 **已知脚本 bug，不在本工具里掩盖**：`12-scripts-standardization.md` 已经点出 `generate-sql.sh` 里 `rm -f sqlgen` 之后立刻判断 `$?`，实际拿到的是 `rm` 的退出码而不是 `sqlgen` 程序本身的——这意味着 `ExitCode`/`Success` 字段在这一个脚本上不完全可信，**这是脚本本身的 bug，按 12 文档的任务修复，本工具不做绕过式的特殊处理**；`GeneratedFiles` 字段（基于 git diff，不依赖脚本退出码）在这个 bug 修复前是判断"这次调用到底生成没生成文件"更可靠的信号，调用方（AI）应该优先看 `generated_files` 是否非空，而不是只看 `success`。
 
@@ -159,8 +159,8 @@ func RunWithAutoConfirm(repoRoot, scriptPath string, args []string, watchDir str
 
 | Tool 名 | 对应脚本 | 参数 | 说明 |
 |---|---|---|---|
-| `generate_sql` | `scripts/generate-sql.sh` | `group`（必填，`<domain>/<module>` snake_case）、`name`（必填，中文功能名）、`parent_id`（可选）、`parent_path`（可选，默认 `/temp`） | 映射到 `-group -name -parent-id -parent-path`；`watchDir=db/migrations` |
-| `generate_model` | `scripts/generate-model.sh` | `migration_file`（必填，相对 `db/migrations/` 或绝对路径）、`dir`（可选，默认 `internal/model`）、`cache`（可选 bool，默认 true） | 映射到位置参数 + `-d`/`-c`；`watchDir=internal/model` |
+| `generate_sql` | `scripts/generate-sql.sh` | `group`（必填，`<domain>/<module>` snake_case，`<domain>` 决定落进哪个服务目录）、`name`（必填，中文功能名）、`parent_id`（可选）、`parent_path`（可选，默认 `/temp`） | 映射到 `-group -name -parent-id -parent-path`；`watchDir=db/services` |
+| `generate_model` | `scripts/generate-model.sh` | `migration_file`（必填，相对 `db/services/<service>/<module>/` 或绝对路径）、`dir`（可选，默认 `internal/model`）、`cache`（可选 bool，默认 true） | 映射到位置参数 + `-d`/`-c`；`watchDir=internal/model` |
 | `generate_api` | `scripts/generate-api.sh` | `api_file`（必填，相对 `api/` 或绝对路径） | 映射到位置参数；`watchDir="internal/handler internal/types"` |
 | `generate_ts` | `scripts/generate-ts.sh` | `api_file`（可选，默认 `admin.api`） | 映射到位置参数；`watchDir=../admin-frontend/src/api/generated`（注意开头的 `../`，见上方说明） |
 | `generate_rpc` | `scripts/generate-rpc.sh`（**尚不存在**） | 同上占位 | 见 4.3 节，返回 stub |
@@ -358,5 +358,5 @@ rules:
    - 调 `query_service_boundary(domain="blog")`，确认返回 `content-rpc`。
    - 调 `query_progress()`，确认能读到 `progress.md` 当前最新一条记录的标题。
    - 调 `query_deployment_checklist(pending_only=true)`，确认返回条目数与手工数 `14-production-deployment-checklist.md` 里状态非"已执行"的条目数一致。
-   - 在一个**测试用**的临时 `-group temp/mcp_smoke_test -name MCP冒烟测试`上调一次 `generate_sql`，确认自动确认生效（没有卡在等待交互输入）、`generated_files` 字段里出现 `db/migrations/create_table_temp_mcp_smoke_test.sql`/`init_temp_mcp_smoke_test.sql`，之后手动删除这两个测试文件（不要把冒烟测试产物留在仓库里）。
+   - 在一个**测试用**的临时 `-group system/mcp_smoke_test -name MCP冒烟测试`上调一次 `generate_sql`，确认自动确认生效（没有卡在等待交互输入）、`generated_files` 字段里出现 `db/services/iam/mcp_smoke_test/create_table_mcp_smoke_test.sql`/`init_mcp_smoke_test.sql`，之后手动删除这两个测试文件（不要把冒烟测试产物留在仓库里）。
    - 调 `generate_rpc`，确认返回的是第 4.3 节描述的"未实现"结构化错误，而不是进程崩溃或空响应。

@@ -55,7 +55,8 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./db:/docker-entrypoint-initdb.d:ro   # 首次启动自动跑 db/tables.sql 等初始化脚本
+      - ./db:/db:ro                                          # 整个 db/ 只读挂载，供下面的入口脚本引用
+      - ./db/docker-init.sh:/docker-entrypoint-initdb.d/00-init.sh:ro   # 唯一入口，委托给 db/services/init-dev-db.sh 按显式依赖顺序执行，不依赖 MySQL 官方镜像对 initdb.d 下多文件的字典序
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-devroot}"]
       interval: 5s
@@ -85,7 +86,7 @@ services:
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-local-dev-access-secret-not-for-prod}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-local-dev-refresh-secret-not-for-prod}
     ports:
-      - "8888:8888"   # 端口需与 etc/admin-api.yaml 的 Port 一致，写文件时核实
+      - "20000:20000"   # 与 etc/admin-api.yaml 的 Port 一致
 
 volumes:
   mysql_data:
@@ -93,7 +94,7 @@ volumes:
 
 要点说明：
 - **healthcheck 是硬要求**：`app` 必须等 MySQL/Redis 真正可用（不是容器起来就行，是端口能连、能查询）才启动，否则 `admin.go` 里 `conf.MustLoad`/连接初始化阶段会直接崩溃退出，在 CI 里表现为间歇性失败，排查成本高。
-- `db/` 目录整个挂载到 MySQL 的 `docker-entrypoint-initdb.d`——但当前 `db/` 下有多个 `.sql` 文件（`tables.sql`、`init_*.sql`、`migrations/*`），MySQL 官方镜像会按文件名字典序执行**所有** `.sql`/`.sh` 文件，需要确认执行顺序是否符合"建表→字典→初始化"的依赖顺序；如果不符合，改用一个显式的 `docker-entrypoint-initdb.d/00-init.sh` 脚本按正确顺序 `source` 各文件，而不是依赖裸挂载的字典序。这一点留给实际写 compose 文件时验证，不在本篇里下结论。
+- `db/` 目录整个挂载到 MySQL 的 `docker-entrypoint-initdb.d`：`db/services/` 拆分后已经不裸挂多个散落 `.sql` 文件靠字典序执行，而是 `db/docker-init.sh` 作为唯一入口委托给 `db/services/init-dev-db.sh`（显式依赖顺序：iam 各表 create→init，再按 content/chat/task/sdk 顺序 create→init），字典序问题已解决，不再是需要写 compose 时验证的开放问题。
 - 本地开发用的 JWT 密钥给了默认值（`local-dev-*-not-for-prod`），按 `10-dev-execution-and-review-points.md` 的口径可以直接生成使用，注释里必须写清楚"仅供本地开发，生产环境必须通过环境变量覆盖"。
 
 ## 3. .golangci.yml（新增，最小化起步）
@@ -200,7 +201,7 @@ jobs:
         with:
           go-version: "1.24"
       - name: 初始化测试库
-        run: mysql -h127.0.0.1 -uroot -proot admin_test < admin-server/db/tables.sql
+        run: MYSQL_ROOT_PASSWORD=root MYSQL_DATABASE=admin_test admin-server/db/services/init-dev-db.sh -h127.0.0.1
       - name: go test (integration)
         run: cd admin-server && go test -tags=integration ./... -count=1
         env:
@@ -212,7 +213,7 @@ jobs:
 - `unit-test`/`integration-test` 都 `needs: lint-build`，编译不过或 lint 不过直接短路，不浪费 CI 时间跑测试。
 - `integration-test` 用 GitHub Actions 的 `services:` 字段起 MySQL/Redis（这是 CI 环境的标准做法，不同于本地开发用 docker-compose——两者殊途同归，都是"给测试提供真实 MySQL/Redis"，不需要统一成同一份 yaml）。
 - 环境变量名（`TEST_MYSQL_DSN`/`TEST_REDIS_ADDR`）是占位建议，落地时要和 `08-testing-strategy.md` 里集成测试实际读取配置的方式对齐，不要出现 CI 传一套名字、代码读另一套名字的错配。
-- `db/tables.sql` 用作测试库初始化文件——如果 Phase 1 执行过程中 `db/` 目录结构发生变化（如按 B.2 提前做服务目录拆分），这一步要跟着更新，本篇写的是当前已知路径。
+- 测试库初始化已改为调用 `db/services/init-dev-db.sh`（`15-service-boundaries.md` 第 4 节的 `db/services/` 目录拆分落地后的统一入口，替代了本篇最初写的 `db/tables.sql`），与 `.github/workflows/ci.yml` 保持同步。
 
 ## 5. 与 Phase 3 的衔接
 
