@@ -269,3 +269,48 @@ Git 提交前钩子跑了一次基于 Cursor 的自动代码审查（对照 `AGE
 5. 本次会话已执行 `git commit`（单个提交，涵盖 Week2-5 全部改动），未 `push`。
 
 **下一步**：Phase 1 Week 4-5 已完成，Phase 1（Week 1-5）整体验收条件基本具备（`01`~`09` 全部落地），下一步是 Phase 1 收尾确认（人工冒烟 + Week4-5 遗留的集成测试真实验证）后，决定是否进入 Phase 2（`15-service-boundaries.md` 起）。
+
+---
+
+## 2026-07-11（续三）：Phase 1 收尾确认——人工冒烟 + 集成测试套件真实验证，发现并修复一个真实缓存 bug
+
+本轮目标：完成上一条目遗留的两项验证（人工冒烟、`internal/integration/` 集成测试真实连接数据库跑一遍），本机无 Docker，按用户指示先尝试装本机 MySQL，装不成则退回用户已有的远程 MySQL（`~/.config/bgg/mysql-mcp.env`，sqlpub.com 托管，库名 `oldbai`，已是本项目 `mysql` MCP 的连接目标）。
+
+**1. 本机 MySQL 安装受阻，改用用户提供的远程库**：macOS 26（Tahoe）刚发布，`arm64_tahoe` 平台的预编译 bottle 在 Aliyun 镜像和 ghcr.io 上游都还没有（`brew install mysql@8.0`/`mysql` 反复报 `No such file or directory`，实为 bottle 缺失导致的哈希校验失败，不是网络问题），`--build-from-source` 需要连带把 cmake/bison 等构建依赖也从源码编译，成本过高。用户改指示直接用远程库 `oldbai`（sqlpub.com 云托管 MySQL 8.0.41），该库已有真实数据（2 个真实管理员账号 `oldbai`/`admin`、29 篇真实博客文章等），不是空库/一次性测试库——用户确认"直接跑，事后清理"。本地 Redis 已有现成实例，直接复用。
+
+**2. 环境搭建**：新增 `admin-server/etc/local-mysql.json`（指向远程 oldbai）+ `local-redis.json`（指向本机 Redis），均已加入 `.gitignore`（`/admin-server/etc/local-mysql.json`、`/admin-server/etc/local-redis.json`），测试完成后已删除这两个文件本身（凭据本来就在用户的 `~/.config/bgg/mysql-mcp.env` 里，不需要在仓库里再留一份）。`admin-server` 编译后用 `-mysql-config`/`-redis-config` 指向这两个文件启动，`JWT_ACCESS_SECRET`/`JWT_REFRESH_SECRET` 设临时值，`/api/v1/ping` 返回 `database:ok, redis:ok`，路由同步到 `admin_api` 表正常。
+
+**3. 人工冒烟测试（真实 HTTP 请求，不是 Go 层面直调）**：用项目自身的 `UserDomainService.CreateUser`/`RBACService` 领域服务代码（不手写 SQL）引导了一个 `smoke_test_admin_*` 测试管理员账号（角色绑定权限 id=1"全部权限"），逐一验证：
+- 登录 → 拿到 access/refresh token，`/api/v1/profile` 用 token 访问返回 200，不带 token / 伪造 token 均正确返回 401 语义（业务码 10003，HTTP 400）。
+- **Refresh Token 黑名单安全修复（Week4-5 引入）真实链路验证通过**：登出后，原 access token 访问受保护接口返回"令牌已失效"，原 refresh token 换取新 token 返回"刷新令牌无效或已过期"——此前的漏洞（登出形同虚设）在真实 Redis 黑名单上确认已修复。
+- **建群聊事务修复（Week4-5 引入）验证通过**：`POST /chats/groups` 建群后查真实库，群组的 `chat_user` 成员数=1（创建人），不是孤儿群组。
+- **Blog 全生命周期跑通**：创建（草稿）→ 提交审核 → 审核通过 → 置顶 → 上架 → 审核员下架，`blog_article.status` 依次正确流转（1→2→3→4→5），`is_top` 正确置位/复位，`blog_article_audit` 审核记录数=2（审核通过 + 下架各一条），`UnpublishArticle`/`AuditArticle` 的事务包裹在真实 MySQL 上行为正确。
+- SDK Key 绑定（`SaveApiKeyBindings`）：oldbai 库里 `sdk_key`/`sdk_interface` 均为空表（该域未实际使用），跳过真实链路冒烟，该方法的 happy/rollback path 已有 sqlmock 覆盖，判断风险可接受。
+
+**4. 集成测试套件（`internal/integration/` 6 个 + `scheduler_integration_test.go`）首次真实跑通，过程中发现两个真实 bug**：
+
+- **Bug 1（真实生产 bug，已修复）：`TaskRepository.UpdateStatus`/`UpdateResult` 用裸 squirrel SQL + `r.repo.DB.ExecCtx` 直接执行更新，绕过了 goctl 生成的 `AdminTaskModel` 的 Redis 缓存失效机制**（`Insert`/`Update` 走 `m.ExecCtx(ctx, fn, cacheKey)` 会自动删缓存，裸 SQL 不会）。真实现象：调度器把任务状态从"待执行"改到"已完成"，`admin_task` 表里的数据是对的，但只要在这之前有任何一次 `FindOne(id)` 把这条记录读进过 Redis 缓存，后续所有 `FindOne`/列表页读到的都是缓存里的旧状态（sqlmock 单测测不出这个问题，因为 sqlmock 场景下走的是 miniredis，缓存键的生命周期恰好被测试用例的独立性掩盖了；只有接了真实 Redis、真实跑一个"改状态又读状态"的完整周期才会露出来）——集成测试 `TestIntegration_TaskScheduler_FullCycle`（真实起调度器跑一个周期）第一次真实执行就复现了：数据库里 `status` 已经是 3（已完成），但断言读到的是 1（未开始）。生产环境影响：任务管理页面的状态/结果在 Redis 缓存 TTL 到期前会显示过期状态。
+  - 修复：`internal/repository/task/task_repository.go` 的 `UpdateStatus`/`UpdateResult` 改成 `r.model.FindOne` 取当前行 → 改字段 → `r.model.Update`（走生成 Model 的缓存感知路径），不再手写 squirrel UPDATE。
+  - 连带修复 `internal/domain/task/scheduler_test.go` 三个 sqlmock 测试的 mock 序列（`TestExecuteTask_Success`/`ExecutorNotFound`/`ExecutorPanic`）：新代码路径下第一次状态更新前的 `FindOne` 命中上一步已缓存的记录（miniredis 缓存命中，不再打 DB，不需要新增 mock），但第二次状态更新前的 `FindOne`（因为第一次 `Update` 已经让缓存失效）会真的查一次 DB，补了对应的 `ExpectQuery`。
+
+- **Bug 2（测试自身的问题，已修复，非生产代码 bug）：`TestIntegration_RBAC_Allowed`/`TestIntegration_RBAC_Denied` 用固定字符串路径**（`/api/v1/integration-test/rbac-allowed`/`-denied`）**新建 `admin_api` 行，没有像文件里其余测试一样带 `uniqueSuffix()`**。`admin_api` 表对 `(method, path)` 有唯一索引，这两个测试只在"绝对空库、从未跑过"时才能过，针对任何持久化的库（哪怕只是自己重跑第二次）都会因为 `Duplicate entry` 报错——本轮第一次跑通过，第二次立刻复现。修复：两个测试的 `path` 都补上 `+ uniqueSuffix()`，和文件里其他测试的既有模式对齐。
+
+- 三轮修复后重新跑 `go test -tags=integration ./... -count=1`：**全部 12 个包 `ok`，无一失败**，包括 6 个 `internal/integration/*_test.go` 场景 + `scheduler_integration_test.go` + 之前已用 sqlmock 覆盖、这次顺带在真实 DSN 环境下重跑确认的其余包。
+- `go test ./... -race -count=1`（不带 integration tag，纯 sqlmock/miniredis）：全绿。`go build ./...`、`go vet ./...`、`golangci-lint run ./...`：全绿、0 issue。
+
+**5. 测试数据清理**：人工冒烟 + 4 轮集成测试套件在 oldbai 库上累计留下 15 个测试用户、4 个测试角色、16 个测试群聊/私聊、6 条测试 `admin_api` 路由、4 条测试任务、1 篇测试博客文章（含 2 条审核记录）。写了一次性清理脚本（未入库）按 `it_`/`smoke_test_` 前缀 + 可追溯 ID 精确删除，删除前用只读查询核对了每类的行数与预期完全一致，删除后复核 `admin_user`/`admin_role`/`chat`/`blog_article`/`admin_task` 的行数已经精确回到测试开始前的基线（2/2/2/29/1），未误删任何真实数据。
+
+**完成的定义核对（对照 `08`/`09` 两篇 + Phase 1 整体验收标准）**：
+1. 人工冒烟（登录、权限放行/拒绝、Refresh Token 黑名单、建群聊事务、Blog 全生命周期事务）✅，SDK Key 绑定因该域测试库无数据跳过真实链路、保留 sqlmock 覆盖 ⚠️。
+2. `go test -tags=integration ./... -count=1` 真实连接 MySQL + Redis 全绿 ✅（此前只验证过编译，这是本条目最核心的产出）。
+3. 集成测试暴露的 1 个生产代码真实 bug（任务状态更新不失效缓存）+ 1 个测试自身 bug（RBAC 测试路径不唯一）均已修复 ✅。
+4. `go build`/`go vet`/`go test -race`/`golangci-lint run ./...` 全绿 ✅。
+5. 测试数据已从共享库清理干净，复核行数与基线一致 ✅。
+
+**遗留/需要用户关注的点**：
+1. 本机仍未安装 MySQL（macOS Tahoe bottle 问题未解决），下次需要本机数据库时建议：等 Homebrew/ghcr 补齐 `arm64_tahoe` bottle，或改用官方 MySQL 二进制 tarball 直装（不经 Homebrew），或改用 Docker（用户本次明确要求跳过）。
+2. `04` 文档任务 6（`AuthDomainService.Login` 下沉）仍未做，优先级低，与 Phase 2 启动与否无强绑定，可继续推迟。
+3. SDK Key 绑定域（`sdk_key`/`sdk_interface`）在 oldbai 库里从未有真实数据，真实链路从未被人工验证过，只有 sqlmock 覆盖，后续如果这个域要实际上线使用，建议单独找一批真实数据测一遍。
+4. 本轮改动（`task_repository.go` 缓存 bug 修复 + 两个测试文件）尚未 `git commit`，需要用户确认后提交。
+
+**下一步**：Phase 1 收尾确认已完成——`01`~`09` 全部落地、人工冒烟通过、集成测试套件真实验证通过（且过程中修复了一个真实生产 bug）。Phase 1（Week 1-5）达到整体验收标准，可以着手规划 Phase 2（`15-service-boundaries.md` 起）或由用户决定下一步优先级。

@@ -1,15 +1,16 @@
 package task
 
 import (
-	"postapocgame/admin-server/internal/repository"
 	"context"
+	"database/sql"
 
 	sq "github.com/Masterminds/squirrel"
 
 	"postapocgame/admin-server/internal/consts"
-	"postapocgame/admin-server/pkg/errs"
 	"postapocgame/admin-server/internal/model"
 	taskmodel "postapocgame/admin-server/internal/model/task"
+	"postapocgame/admin-server/internal/repository"
+	"postapocgame/admin-server/pkg/errs"
 )
 
 // TaskRepository 任务仓储接口
@@ -167,27 +168,23 @@ func (r *taskRepository) FindPage(ctx context.Context, page, pageSize int64, fil
 }
 
 // UpdateStatus 更新任务状态
+// 注意：必须走 r.model.Update（而不是裸 squirrel + r.repo.DB.ExecCtx），否则不会失效
+// FindOne 的 Redis 缓存（cache:adminTask:id:<id>），调度器改完状态后轮询读到的仍是旧缓存。
 func (r *taskRepository) UpdateStatus(ctx context.Context, id uint64, status int64, startedAt, finishedAt int64) error {
-	builder := sq.Update("`admin_task`").
-		Set("`status`", status).
-		Set("`updated_at`", sq.Expr("UNIX_TIMESTAMP()")).
-		Where(sq.Eq{"id": id, "deleted_at": 0})
+	task, err := r.model.FindOne(ctx, id)
+	if err != nil {
+		return errs.Wrap(errs.CodeBadDB, "更新任务状态失败：查询任务不存在", err)
+	}
 
-	// 根据状态设置开始/结束时间
+	task.Status = status
 	if status == consts.TaskStatusRunning && startedAt > 0 {
-		builder = builder.Set("`started_at`", startedAt)
+		task.StartedAt = startedAt
 	}
 	if (status == consts.TaskStatusCompleted || status == consts.TaskStatusFailed) && finishedAt > 0 {
-		builder = builder.Set("`finished_at`", finishedAt)
+		task.FinishedAt = finishedAt
 	}
 
-	sqlStr, args, err := builder.ToSql()
-	if err != nil {
-		return errs.Wrap(errs.CodeBadDB, "更新任务状态SQL生成有误", err)
-	}
-
-	_, err = r.repo.DB.ExecCtx(ctx, sqlStr, args...)
-	if err != nil {
+	if err := r.model.Update(ctx, task); err != nil {
 		return errs.Wrap(errs.CodeBadDB, "更新任务状态失败", err)
 	}
 
@@ -195,25 +192,21 @@ func (r *taskRepository) UpdateStatus(ctx context.Context, id uint64, status int
 }
 
 // UpdateResult 更新任务结果
+// 同 UpdateStatus，走 r.model.Update 以正确失效缓存。
 func (r *taskRepository) UpdateResult(ctx context.Context, id uint64, status int64, result, errorMessage string, finishedAt int64) error {
-	builder := sq.Update("`admin_task`").
-		Set("`status`", status).
-		Set("`result`", result).
-		Set("`error_message`", errorMessage).
-		Set("`updated_at`", sq.Expr("UNIX_TIMESTAMP()")).
-		Where(sq.Eq{"id": id, "deleted_at": 0})
+	task, err := r.model.FindOne(ctx, id)
+	if err != nil {
+		return errs.Wrap(errs.CodeBadDB, "更新任务结果失败：查询任务不存在", err)
+	}
 
+	task.Status = status
+	task.Result = sql.NullString{String: result, Valid: result != ""}
+	task.ErrorMessage = errorMessage
 	if finishedAt > 0 {
-		builder = builder.Set("`finished_at`", finishedAt)
+		task.FinishedAt = finishedAt
 	}
 
-	sqlStr, args, err := builder.ToSql()
-	if err != nil {
-		return errs.Wrap(errs.CodeBadDB, "更新任务结果SQL生成有误", err)
-	}
-
-	_, err = r.repo.DB.ExecCtx(ctx, sqlStr, args...)
-	if err != nil {
+	if err := r.model.Update(ctx, task); err != nil {
 		return errs.Wrap(errs.CodeBadDB, "更新任务结果失败", err)
 	}
 

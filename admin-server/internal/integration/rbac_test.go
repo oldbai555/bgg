@@ -4,6 +4,7 @@ package integration
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -14,20 +15,24 @@ import (
 
 	"postapocgame/admin-server/internal/middleware"
 	iammodel "postapocgame/admin-server/internal/model/iam"
+	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 )
 
 // buildProtectedHandler 组一条 AuthMiddleware -> PermissionMiddleware -> 200 的最小请求链，
 // 和 admin.api 里 middleware: Auth,Permission 的声明顺序一致（见 00-workflow.md 中间件顺序要求）。
-func buildProtectedHandler(t *testing.T, env *testEnv) http.HandlerFunc {
+// 返回的 *bool 记录下游 handler 是否被放行调用到，供拒绝场景断言"没有放行"。
+func buildProtectedHandler(t *testing.T, env *testEnv) (http.HandlerFunc, *bool) {
 	t.Helper()
 	authMw := middleware.NewAuthMiddleware(env.SvcCtx.Config, env.Repo)
 	permMw := middleware.NewPermissionMiddleware(env.Domain.IAM.PermissionResolver)
 
+	called := false
 	final := func(w http.ResponseWriter, r *http.Request) {
+		called = true
 		w.WriteHeader(http.StatusOK)
 	}
-	return authMw.Handle(permMw.Handle(final))
+	return authMw.Handle(permMw.Handle(final)), &called
 }
 
 // createTestUserWithToken 建一个真实用户并签发一个真实 access token，返回用户和 token。
@@ -60,7 +65,10 @@ func TestIntegration_RBAC_Allowed(t *testing.T) {
 	env := setupTestEnv(t)
 	ctx := context.Background()
 
-	const method, path = "GET", "/api/v1/integration-test/rbac-allowed"
+	// path 带 uniqueSuffix：admin_api 的 (method,path) 有唯一索引，测试库不是每次都从空库跑
+	// （例如直接对着开发库跑集成测试），固定路径重跑会撞 Duplicate entry。
+	const method = "GET"
+	path := "/api/v1/integration-test/rbac-allowed-" + uniqueSuffix()
 
 	api := &iammodel.AdminApi{Name: "集成测试-允许", Method: method, Path: path, Status: 1}
 	require.NoError(t, env.Domain.IAM.Api.Create(ctx, api))
@@ -75,7 +83,7 @@ func TestIntegration_RBAC_Allowed(t *testing.T) {
 	user, token := createTestUserWithToken(t, env, "it_rbac_allow")
 	require.NoError(t, env.Domain.IAM.UserRole.UpdateUserRoles(ctx, user.Id, []uint64{role.Id}))
 
-	handler := buildProtectedHandler(t, env)
+	handler, called := buildProtectedHandler(t, env)
 	req := httptest.NewRequest(method, path, nil)
 	req.Header.Set("Authorization", "Bearer "+token)
 	rec := httptest.NewRecorder()
@@ -83,6 +91,7 @@ func TestIntegration_RBAC_Allowed(t *testing.T) {
 	handler(rec, req)
 
 	assert.Equal(t, http.StatusOK, rec.Code)
+	assert.True(t, *called, "有权限时应该放行到下一个 handler")
 }
 
 // 08-testing-strategy.md §5 场景 3：RBAC 拒绝的请求——无权限用户访问受保护接口，返回 403（业务码）。
@@ -90,7 +99,8 @@ func TestIntegration_RBAC_Denied(t *testing.T) {
 	env := setupTestEnv(t)
 	ctx := context.Background()
 
-	const method, path = "GET", "/api/v1/integration-test/rbac-denied"
+	const method = "GET"
+	path := "/api/v1/integration-test/rbac-denied-" + uniqueSuffix()
 
 	api := &iammodel.AdminApi{Name: "集成测试-拒绝", Method: method, Path: path, Status: 1}
 	require.NoError(t, env.Domain.IAM.Api.Create(ctx, api))
@@ -98,7 +108,7 @@ func TestIntegration_RBAC_Denied(t *testing.T) {
 	// 用户没有任何角色，CanAccess 在 ListRoleIDsByUserID 返回空之后直接判定 false。
 	_, token := createTestUserWithToken(t, env, "it_rbac_deny")
 
-	handler := buildProtectedHandler(t, env)
+	handler, called := buildProtectedHandler(t, env)
 	req := httptest.NewRequest(method, path, nil)
 	req.Header.Set("Authorization", "Bearer "+token)
 	rec := httptest.NewRecorder()
@@ -108,4 +118,11 @@ func TestIntegration_RBAC_Denied(t *testing.T) {
 	// pkg/response.ErrorCtx 对业务错误统一写 HTTP 400，业务错误码在响应体里，
 	// 与 internal/middleware/permissionmiddleware_test.go 的断言口径一致。
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
+	assert.False(t, *called, "无权限时不应该放行到下一个 handler")
+
+	var body struct {
+		Code int `json:"code"`
+	}
+	require.NoError(t, json.Unmarshal(rec.Body.Bytes(), &body))
+	assert.Equal(t, errs.CodeForbidden, body.Code)
 }

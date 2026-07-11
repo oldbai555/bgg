@@ -98,15 +98,19 @@ func TestExecuteTask_Success(t *testing.T) {
 
 	task := taskmodel.AdminTask{Id: 1, Name: "导出任务", Type: 1, Status: consts.TaskStatusPending, UserId: 7}
 
-	// 1. FindOne 双重检查
+	// 1. FindOne 双重检查（结果会被 model 缓存进 miniredis）
 	sqlMock.ExpectQuery("(?i)from `admin_task`").
 		WillReturnRows(sqlmock.NewRows(adminTaskColumns).
 			AddRow(1, "导出任务", 1, consts.TaskExecutionTypeAsync, consts.TaskStatusPending, nil, nil, "", 7, 0, 0, 0, 0, 0, 0))
-	// 2. UpdateStatus -> 进行中
+	// 2. UpdateStatus -> 进行中：内部先 r.model.FindOne 再 r.model.Update（task_repository.go），
+	// 但上一步的 FindOne 已经把这条记录缓存进 miniredis，这次 FindOne 命中缓存，不会再打一次 DB。
 	sqlMock.ExpectExec("(?i)update `admin_task`").WillReturnResult(sqlmock.NewResult(0, 1))
 	// 3. 通知：进行中（写 admin_notification）
 	sqlMock.ExpectExec(regexp.QuoteMeta("insert into `admin_notification`")).WillReturnResult(sqlmock.NewResult(1, 1))
-	// 4. UpdateResult -> 已完成
+	// 4. UpdateResult -> 已完成：上一步 Update 已让 model 缓存失效，这里的内部 FindOne 会真的查一次 DB。
+	sqlMock.ExpectQuery("(?i)from `admin_task`").
+		WillReturnRows(sqlmock.NewRows(adminTaskColumns).
+			AddRow(1, "导出任务", 1, consts.TaskExecutionTypeAsync, consts.TaskStatusRunning, nil, nil, "", 7, 0, 0, 0, 0, 0, 0))
 	sqlMock.ExpectExec("(?i)update `admin_task`").WillReturnResult(sqlmock.NewResult(0, 1))
 	// 5. 通知：已完成
 	sqlMock.ExpectExec(regexp.QuoteMeta("insert into `admin_notification`")).WillReturnResult(sqlmock.NewResult(2, 1))
@@ -148,9 +152,13 @@ func TestExecuteTask_ExecutorNotFound(t *testing.T) {
 	sqlMock.ExpectQuery("(?i)from `admin_task`").
 		WillReturnRows(sqlmock.NewRows(adminTaskColumns).
 			AddRow(3, "未知任务", 99, consts.TaskExecutionTypeAsync, consts.TaskStatusPending, nil, nil, "", 0, 0, 0, 0, 0, 0, 0))
+	// UpdateStatus 内部 FindOne 命中上一步缓存，不再打 DB。
 	sqlMock.ExpectExec("(?i)update `admin_task`").WillReturnResult(sqlmock.NewResult(0, 1))
 	sqlMock.ExpectExec(regexp.QuoteMeta("insert into `admin_notification`")).WillReturnResult(sqlmock.NewResult(1, 1))
 	// handleTaskError -> UpdateResult(失败) + 通知
+	sqlMock.ExpectQuery("(?i)from `admin_task`").
+		WillReturnRows(sqlmock.NewRows(adminTaskColumns).
+			AddRow(3, "未知任务", 99, consts.TaskExecutionTypeAsync, consts.TaskStatusRunning, nil, nil, "", 0, 0, 0, 0, 0, 0, 0))
 	sqlMock.ExpectExec("(?i)update `admin_task`").WillReturnResult(sqlmock.NewResult(0, 1))
 	sqlMock.ExpectExec(regexp.QuoteMeta("insert into `admin_notification`")).WillReturnResult(sqlmock.NewResult(2, 1))
 
@@ -169,9 +177,13 @@ func TestExecuteTask_ExecutorPanic(t *testing.T) {
 	sqlMock.ExpectQuery("(?i)from `admin_task`").
 		WillReturnRows(sqlmock.NewRows(adminTaskColumns).
 			AddRow(4, "会panic的任务", 1, consts.TaskExecutionTypeAsync, consts.TaskStatusPending, nil, nil, "", 0, 0, 0, 0, 0, 0, 0))
+	// UpdateStatus 内部 FindOne 命中上一步缓存，不再打 DB。
 	sqlMock.ExpectExec("(?i)update `admin_task`").WillReturnResult(sqlmock.NewResult(0, 1))
 	sqlMock.ExpectExec(regexp.QuoteMeta("insert into `admin_notification`")).WillReturnResult(sqlmock.NewResult(1, 1))
 	// executeTask 自身的 recover() 捕获 panic 后调用 handleTaskError -> UpdateResult(失败) + 通知
+	sqlMock.ExpectQuery("(?i)from `admin_task`").
+		WillReturnRows(sqlmock.NewRows(adminTaskColumns).
+			AddRow(4, "会panic的任务", 1, consts.TaskExecutionTypeAsync, consts.TaskStatusRunning, nil, nil, "", 0, 0, 0, 0, 0, 0, 0))
 	sqlMock.ExpectExec("(?i)update `admin_task`").WillReturnResult(sqlmock.NewResult(0, 1))
 	sqlMock.ExpectExec(regexp.QuoteMeta("insert into `admin_notification`")).WillReturnResult(sqlmock.NewResult(2, 1))
 
