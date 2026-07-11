@@ -19,12 +19,17 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 
 	"postapocgame/admin-server/internal/config"
+	"postapocgame/admin-server/internal/consumer"
 	"postapocgame/admin-server/internal/handler"
+	taskcallbacksrv "postapocgame/admin-server/internal/rpcserver/taskcallback"
 	"postapocgame/admin-server/internal/svc"
 	appwire "postapocgame/admin-server/internal/wire"
+	taskcallbackpb "postapocgame/admin-server/pkg/taskcallback/pb"
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/rest"
+	"github.com/zeromicro/go-zero/zrpc"
+	"google.golang.org/grpc"
 	"postapocgame/admin-server/internal/model"
 	"postapocgame/admin-server/internal/model/iam"
 )
@@ -57,6 +62,9 @@ func main() {
 	if c.JWT.AccessSecret == "" || c.JWT.RefreshSecret == "" {
 		log.Fatalf("JWT_ACCESS_SECRET / JWT_REFRESH_SECRET 未设置，拒绝以空密钥启动")
 	}
+	if len(c.TaskRPCConf.Endpoints) == 0 || c.TaskRPCConf.Endpoints[0] == "" {
+		log.Fatalf("TASK_RPC_ENDPOINT 未设置，拒绝以空 task-rpc 地址启动")
+	}
 
 	// 从外部文件加载 MySQL、Redis 和中间件配置（如果存在）
 	if err := config.MergeExternalConfig(&c, *mysqlConfigFile, *redisConfigFile, *middlewareConfigFile); err != nil {
@@ -85,6 +93,20 @@ func main() {
 	// 同步路由到 admin_api 表
 	syncRoutesToAdminAPI(ctx, server)
 
+	// TaskCallback zrpc server：与 REST server 并存，供 services/task/（task-rpc）回调取导出
+	// 数据/登记导出文件。见 16-rpc-conventions.md、17-async-eventing.md 第 1 节；Phase 2
+	// iam-rpc/sdk-rpc 真正拆分后原样搬过去。
+	taskCallbackServer := zrpc.MustNewServer(c.TaskCallbackRPCConf, func(grpcServer *grpc.Server) {
+		taskcallbackpb.RegisterTaskCallbackServer(grpcServer, taskcallbacksrv.NewServer(ctx.Repository))
+	})
+	defer taskCallbackServer.Stop()
+
+	// task 通知消费者：消费 task-rpc 发布的 stream:task.notification，写 admin_notification +
+	// 推 WS。见 internal/consumer/task_notification_consumer.go 包注释、17-async-eventing.md。
+	taskNotificationConsumer := consumer.NewTaskNotificationConsumer(ctx.Repository.Redis, ctx.Repository, ctx.ChatHub)
+	taskNotificationConsumer.Start()
+	defer taskNotificationConsumer.Stop()
+
 	// 设置优雅关闭：监听系统信号
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
@@ -93,6 +115,10 @@ func main() {
 	go func() {
 		logx.Infof("Starting server at %s:%d...", c.Host, c.Port)
 		server.Start()
+	}()
+	go func() {
+		logx.Infof("Starting TaskCallback rpc server at %s...", c.TaskCallbackRPCConf.ListenOn)
+		taskCallbackServer.Start()
 	}()
 
 	// 等待关闭信号

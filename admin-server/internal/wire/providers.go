@@ -6,17 +6,16 @@ import (
 
 	"postapocgame/admin-server/internal/config"
 	"postapocgame/admin-server/internal/consts"
-	"postapocgame/admin-server/internal/domain/task"
-	"postapocgame/admin-server/internal/domain/task/executors"
 	"postapocgame/admin-server/internal/hub"
-	"postapocgame/admin-server/internal/interfaces"
 	"postapocgame/admin-server/internal/middleware"
 	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/repository/registry"
 	"postapocgame/admin-server/internal/svc"
+	"postapocgame/admin-server/services/task/taskclient"
 
 	"github.com/google/wire"
 	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/zrpc"
 )
 
 // ProviderSet 组合根依赖注入集合。
@@ -24,8 +23,7 @@ var ProviderSet = wire.NewSet(
 	provideRepository,
 	provideDomain,
 	provideChatHub,
-	provideTaskExecutors,
-	provideTaskScheduler,
+	provideTaskRPC,
 
 	middleware.NewAuthMiddleware,
 	middleware.NewApiEnabledMiddleware,
@@ -70,20 +68,10 @@ func provideChatHub() *hub.ChatHub {
 	return chatHub
 }
 
-func provideTaskExecutors(repo *repository.Repository) map[int]interfaces.TaskExecutor {
-	executorsMap := make(map[int]interfaces.TaskExecutor)
-	executorsMap[1] = executors.NewExcelExportExecutor(repo)
-	return executorsMap
-}
-
-func provideTaskScheduler(
-	repo *repository.Repository,
-	chatHub *hub.ChatHub,
-	executorsMap map[int]interfaces.TaskExecutor,
-) *task.TaskScheduler {
-	scheduler := task.NewTaskScheduler(repo, chatHub, executorsMap)
-	scheduler.Start()
-	return scheduler
+// provideTaskRPC 连到 task-rpc（services/task/）。task 域已经拆分成独立服务，gateway
+// 侧不再直接持有 TaskExecutors/TaskScheduler，改成一个 zrpc client。
+func provideTaskRPC(c config.Config) taskclient.Task {
+	return taskclient.NewTask(zrpc.MustNewClient(c.TaskRPCConf))
 }
 
 // providePermissionMiddleware 是 PermissionMiddleware 的 Wire 适配函数：PermissionMiddleware
@@ -132,8 +120,7 @@ func provideServiceContext(
 	repo *repository.Repository,
 	domain *registry.Domain,
 	chatHub *hub.ChatHub,
-	taskExecutors map[int]interfaces.TaskExecutor,
-	taskScheduler *task.TaskScheduler,
+	taskRPC taskclient.Task,
 	mw *MiddlewareBundle,
 ) (*svc.ServiceContext, func()) {
 	svcCtx := &svc.ServiceContext{
@@ -141,8 +128,7 @@ func provideServiceContext(
 		Repository:                   repo,
 		Domain:                       domain,
 		ChatHub:                      chatHub,
-		TaskExecutors:                taskExecutors,
-		TaskScheduler:                taskScheduler,
+		TaskRPC:                      taskRPC,
 		AuthMiddleware:               mw.Auth,
 		ApiEnabledMiddleware:         mw.ApiEnabled,
 		PermissionMiddleware:         mw.Permission,
@@ -156,11 +142,6 @@ func provideServiceContext(
 		SDKCallLogMiddleware:         mw.SDKCallLog,
 	}
 
-	cleanup := func() {
-		if taskScheduler != nil {
-			taskScheduler.Stop()
-			logx.Infof("任务调度器已停止")
-		}
-	}
+	cleanup := func() {}
 	return svcCtx, cleanup
 }

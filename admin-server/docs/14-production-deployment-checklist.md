@@ -54,7 +54,7 @@
 
 **触发条件**：`04-domain-iam-chat.md` 任务 1（`user_create_logic.go` 修复）+ `01-architecture-target.md` A.1（`Repository.Transact`）落地后，"新用户加入默认群 + 批量私聊初始化"这部分逻辑会从同步改成异步（通过 `internal/domain/task` 现有调度器派发）。如果这个改造过程中涉及新增/调整任何 RBAC 权限种子数据（比如新的任务类型需要对应的操作权限，或者默认群组 `chat_id=1` 这类硬编码 ID 的初始化数据在生产环境是否已存在需要核实），这里要记一条。
 
-**部署时要做什么**：**TBD——待 Phase 1 Week 2 实际执行 IAM+Chat 域改造时，根据当时产生的真实 SQL 差异填写这里的具体命令**，本篇现在不预先编造内容。填写时要包含：具体的 `INSERT`/`UPDATE` SQL 语句（或指向 `db/migrations/` 下具体文件名）、执行顺序（是否依赖条目 1 的密钥改动先生效）。
+**部署时要做什么**：**TBD——待 Phase 1 Week 2 实际执行 IAM+Chat 域改造时，根据当时产生的真实 SQL 差异填写这里的具体命令**，本篇现在不预先编造内容。填写时要包含：具体的 `INSERT`/`UPDATE` SQL 语句（或指向 `db/services/<service>/<module>/migrations/` 下具体文件名）、执行顺序（是否依赖条目 1 的密钥改动先生效）。
 
 **如何验证生效**：TBD，随上面一起补全。
 
@@ -71,6 +71,22 @@
 **状态**：`TBD`（待用户决定切换时机）。
 
 ---
+
+### 5 · task-rpc 拆分（Phase 2 第一个落地的服务）
+
+**触发条件**：`services/task/` 完整拆分完成（`docs/progress.md` 对应条目），task-rpc 成为独立部署单元。
+
+**部署时要做什么**：
+1. 建 `admin_task` schema（逻辑隔离，物理上和主库同一个 MySQL 实例）：`mysql -uroot -p<pass> -e "CREATE DATABASE IF NOT EXISTS admin_task CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"`，然后跑 `db/services/task/task/create_table_task.sql`（**只需要这一个文件**——`init_task.sql`/`dict_task_20250115.sql` 写的是 `admin_menu`/`admin_permission`/`admin_api`，物理属于主库 iam 部分，已经在主库初始化时跑过，不属于 `admin_task` schema）。docker-compose 场景下这一步已经自动化，见 `db/services/init-task-db.sh` + `docker-compose.yml` 的 mysql 服务第二个 init 脚本挂载。
+2. 生产环境实际地址配置（三处，均通过环境变量，`conf.UseEnv()` 已接入，fail-fast 不给静默默认值，和 `JWT_ACCESS_SECRET` 同一套约定）：
+   - `TASK_RPC_ENDPOINT`（gateway 侧 `etc/admin-api.yaml` 的 `TaskRpc.Endpoints`，指向 task-rpc 实际监听地址）
+   - `TASK_CALLBACK_ENDPOINT`（task-rpc 侧 `services/task/etc/task.yaml` 的 `TaskCallbackRpc.Endpoints`，指向承载 `pkg/taskcallback` server 的进程——当前阶段是单体 gateway 自己）
+   - `TASK_MYSQL_DSN`、`TASK_REDIS_ADDRESS`、`TASK_REDIS_PASSWORD`（task-rpc 侧 `services/task/etc/task.yaml`）
+3. `uploads` 共享卷：task-rpc 生成导出文件、gateway 的 `/api/v1/files/uploads/*` 对外提供下载，两个进程必须能读到同一份物理文件。docker-compose 已经配好一个命名卷 `uploads` 同时挂载给 `app`/`task` 两个服务；非容器化部署（Supervisor 方式）需要保证两个进程的 `consts.UploadDir`（`./uploads`，两边 `internal/consts`/`services/task/internal/consts` 各自定义，值必须一致）指向同一个物理目录，比如都软链到同一个共享路径。
+
+**如何验证生效**：`docs/progress.md` 本轮条目记录了一次真实端到端验证（借用远程 MySQL，起 task-rpc + 单体真实连上，提交一个操作日志导出任务，确认状态流转、文件生成、`admin_notification` 记录三方面都符合预期，验证完已清理测试数据）——生产部署时按同样的路径（提交一个真实导出任务、检查任务详情接口的 `result` 字段、检查下载链接可访问）复核一遍即可，不需要重新设计验证方法。
+
+**状态**：`已就绪，待生产环境实际部署时执行`（本机无 Docker，`docker compose up` 本身未做容器化实测,只做过非容器化的直接进程验证）。
 
 ## Phase 2/3 预留条目类型（占位，届时按真实改动追加，现在不编造内容）
 

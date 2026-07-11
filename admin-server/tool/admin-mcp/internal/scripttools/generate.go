@@ -17,8 +17,9 @@ import (
 func Register(s *server.MCPServer, repoRoot string) {
 	s.AddTool(mcp.NewTool("generate_sql",
 		mcp.WithDescription("封装 scripts/generate-sql.sh：一次性生成表结构 SQL、RBAC 初始化数据 SQL、.api 草稿、前端列表页骨架"),
-		mcp.WithString("group", mcp.Required(), mcp.Description("功能组名，扁平 snake_case，不支持斜杠嵌套（如 blog_article、user），"+
-			"注意这和 .api 文件 @server(group:...) 的 <domain>/<module> 格式是两个不同的概念，传斜杠会因为中间目录不存在而生成失败")),
+		mcp.WithString("group", mcp.Required(), mcp.Description("功能组名，格式 <domain>/<module>（如 iam/user、blog/article），与 .api 文件 "+
+			"@server(group:...) 的格式一致。<domain> 决定落进哪个服务的 db/services/<service>/ 目录（iam/system/monitoring/misc→iam，"+
+			"blog/video→content，chat/task/sdk 各自独立），module 为 snake_case")),
 		mcp.WithString("name", mcp.Required(), mcp.Description("功能中文名称，如 用户管理")),
 		mcp.WithString("parent_id", mcp.Description("父菜单 ID，可选，优先级最高")),
 		mcp.WithString("parent_path", mcp.Description("前端父目录路径，可选，默认 /temp")),
@@ -26,7 +27,7 @@ func Register(s *server.MCPServer, repoRoot string) {
 
 	s.AddTool(mcp.NewTool("generate_model",
 		mcp.WithDescription("封装 scripts/generate-model.sh：从建表 SQL 生成 goctl Model 代码"),
-		mcp.WithString("migration_file", mcp.Required(), mcp.Description("迁移文件路径，相对 db/migrations/ 或绝对路径")),
+		mcp.WithString("migration_file", mcp.Required(), mcp.Description("建表 SQL 文件路径，相对 db/services/<service>/<module>/ 或绝对路径")),
 		mcp.WithString("dir", mcp.Description("输出目录，可选，默认 internal/model")),
 		mcp.WithBoolean("cache", mcp.Description("是否启用缓存，可选，默认 true")),
 	), handleGenerateModel(repoRoot))
@@ -44,9 +45,10 @@ func Register(s *server.MCPServer, repoRoot string) {
 	), handleGenerateTS(repoRoot))
 
 	s.AddTool(mcp.NewTool("generate_rpc",
-		mcp.WithDescription("占位 stub：scripts/generate-rpc.sh 尚未实现，计划于 Phase 2（约 Week 6-7）"),
-		mcp.WithString("service_name", mcp.Description("Phase 2 落地后的预期参数，当前调用无实际效果")),
-	), handleGenerateRPCStub)
+		mcp.WithDescription("封装 scripts/generate-rpc.sh：从 .proto 文件生成 services/<service_name>/ 下的 pb/client/server/logic 骨架"),
+		mcp.WithString("service_name", mcp.Required(), mcp.Description("服务名，如 iam/content/chat/task/sdk")),
+		mcp.WithString("proto_file", mcp.Description("proto 文件路径，可选，默认 services/<service_name>/rpc/<service_name>.proto")),
+	), handleGenerateRPC(repoRoot))
 
 	s.AddTool(mcp.NewTool("generate_swagger",
 		mcp.WithDescription("占位 stub：scripts/generate-swagger.sh 尚未实现，计划于 Phase 3"),
@@ -71,7 +73,7 @@ func handleGenerateSQL(repoRoot string) server.ToolHandlerFunc {
 			args = append(args, "-parent-path", v)
 		}
 
-		result, err := exec.RunWithAutoConfirm(repoRoot, filepath.Join(repoRoot, "scripts", "generate-sql.sh"), args, "db/migrations")
+		result, err := exec.RunWithAutoConfirm(repoRoot, filepath.Join(repoRoot, "scripts", "generate-sql.sh"), args, "db/services")
 		if err != nil {
 			return mcp.NewToolResultErrorFromErr("执行 generate-sql.sh 失败", err), nil
 		}
@@ -137,11 +139,23 @@ func handleGenerateTS(repoRoot string) server.ToolHandlerFunc {
 	}
 }
 
-func handleGenerateRPCStub(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	return mcp.NewToolResultError(
-		"generate_rpc 尚未实现：scripts/generate-rpc.sh 要到 Phase 2（约 Week 6-7，task-rpc 拆分时）才会创建，" +
-			"设计见 admin-server/docs/16-rpc-conventions.md。当前调用是提前占位，不代表功能已就绪。",
-	), nil
+func handleGenerateRPC(repoRoot string) server.ToolHandlerFunc {
+	return func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		serviceName, err := req.RequireString("service_name")
+		if err != nil {
+			return mcp.NewToolResultError(err.Error()), nil
+		}
+		args := []string{serviceName}
+		if v := req.GetString("proto_file", ""); v != "" {
+			args = append(args, "-f", v)
+		}
+
+		result, err := exec.RunWithAutoConfirm(repoRoot, filepath.Join(repoRoot, "scripts", "generate-rpc.sh"), args, filepath.Join("services", serviceName))
+		if err != nil {
+			return mcp.NewToolResultErrorFromErr("执行 generate-rpc.sh 失败", err), nil
+		}
+		return mcp.NewToolResultStructured(result, result.Stdout), nil
+	}
 }
 
 func handleGenerateSwaggerStub(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {

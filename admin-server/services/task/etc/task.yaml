@@ -1,0 +1,21 @@
+Name: task.rpc
+ListenOn: 0.0.0.0:8090
+Mode: pro
+
+Mysql:
+  DSN: "${TASK_MYSQL_DSN}" # 指向 admin_task schema，见 db/services/task/task/
+
+TaskRedis:
+  Address: "${TASK_REDIS_ADDRESS}" # 与 gateway 共享同一个 Redis 实例（缓存/锁/队列不拆分）
+  Password: "${TASK_REDIS_PASSWORD}"
+
+# 单体内嵌的 TaskCallback server（见 internal/rpcserver/taskcallback/、etc/admin-api.yaml
+# 的 TaskCallbackRpc 段）。Phase 2 iam-rpc/sdk-rpc 真正拆分后这里改成指向那两个服务。
+# TASK_CALLBACK_ENDPOINT 必须显式设置：本机同进程调试用 127.0.0.1:9001，docker-compose
+# 用服务名 app:9001（gateway 所在容器）。
+TaskCallbackRpc:
+  Endpoints:
+    - "${TASK_CALLBACK_ENDPOINT}"
+  NonBlock: true
+
+RecentTaskLimit: 10

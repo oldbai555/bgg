@@ -9,8 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
-
-	taskrepo "postapocgame/admin-server/internal/repository/task"
+	"postapocgame/admin-server/services/task/taskclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -29,65 +28,45 @@ func NewTaskListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *TaskList
 	}
 }
 
+// TaskList 薄胶水：解析 HTTP 请求 -> 拼一次 TaskRPC 请求 -> 映射响应，task 域的实际
+// 业务逻辑已经搬进 services/task/internal/logic/tasklistlogic.go。
 func (l *TaskListLogic) TaskList(req *types.TaskListReq) (resp *types.TaskListResp, err error) {
-	// 参数默认值
-	page := req.Page
-	if page <= 0 {
-		page = 1
-	}
-	pageSize := req.PageSize
-	if pageSize <= 0 {
-		pageSize = 20
-	}
-
-	// 构建查询过滤条件
-	filters := &taskrepo.TaskQueryFilter{
+	rpcResp, err := l.svcCtx.TaskRPC.TaskList(l.ctx, &taskclient.TaskListRequest{
+		Page:          req.Page,
+		PageSize:      req.PageSize,
 		Name:          req.Name,
-		Type:          req.TaskType,
+		TaskType:      req.TaskType,
 		ExecutionType: req.ExecutionType,
 		Status:        req.Status,
 		UserId:        req.UserId,
 		StartTime:     req.StartTime,
 		EndTime:       req.EndTime,
-	}
-
-	// 查询任务列表
-	tasks, total, err := l.svcCtx.Domain.Task.Task.FindPage(l.ctx, page, pageSize, filters)
+	})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "查询任务列表失败", err)
+		return nil, errs.WrapGRPCError("查询任务列表失败", err)
 	}
 
-	// 转换为响应格式
-	list := make([]types.TaskItem, 0, len(tasks))
-	for _, task := range tasks {
-		params := ""
-		if task.Params.Valid {
-			params = task.Params.String
-		}
-		result := ""
-		if task.Result.Valid {
-			result = task.Result.String
-		}
-
+	list := make([]types.TaskItem, 0, len(rpcResp.List))
+	for _, item := range rpcResp.List {
 		list = append(list, types.TaskItem{
-			Id:            task.Id,
-			Name:          task.Name,
-			TaskType:      task.Type,
-			ExecutionType: task.ExecutionType,
-			Status:        task.Status,
-			UserId:        task.UserId,
-			ScheduledAt:   task.ScheduledAt,
-			StartedAt:     task.StartedAt,
-			FinishedAt:    task.FinishedAt,
-			CreatedAt:     task.CreatedAt,
-			Params:        params,
-			Result:        result,
-			ErrorMessage:  task.ErrorMessage,
+			Id:            item.Id,
+			Name:          item.Name,
+			TaskType:      item.TaskType,
+			ExecutionType: item.ExecutionType,
+			Status:        item.Status,
+			UserId:        item.UserId,
+			ScheduledAt:   item.ScheduledAt,
+			StartedAt:     item.StartedAt,
+			FinishedAt:    item.FinishedAt,
+			CreatedAt:     item.CreatedAt,
+			Params:        item.Params,
+			Result:        item.Result,
+			ErrorMessage:  item.ErrorMessage,
 		})
 	}
 
 	return &types.TaskListResp{
-		Total: total,
+		Total: rpcResp.Total,
 		List:  list,
 	}, nil
 }

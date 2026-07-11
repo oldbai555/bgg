@@ -17,7 +17,6 @@ import (
 	"postapocgame/admin-server/internal/model/monitoring"
 	"postapocgame/admin-server/internal/model/sdk"
 	"postapocgame/admin-server/internal/model/system"
-	"postapocgame/admin-server/internal/model/task"
 	"postapocgame/admin-server/internal/model/video"
 )
 
@@ -58,7 +57,6 @@ type Repository struct {
 	SdkInterfaceModel        sdk.SdkInterfaceModel
 	SdkKeyApiModel           sdk.SdkKeyApiModel
 	SdkCallLogModel          sdk.SdkCallLogModel
-	AdminTaskModel           task.AdminTaskModel
 	BlogTagModel             blog.BlogTagModel
 	BlogArticleModel         blog.BlogArticleModel
 	BlogArticleTagModel      blog.BlogArticleTagModel
@@ -109,7 +107,6 @@ func NewRepository(conn sqlx.SqlConn, cacheConf cache.CacheConf, rdb *redis.Redi
 		SdkInterfaceModel:        sdk.NewSdkInterfaceModel(conn, cacheConf),
 		SdkKeyApiModel:           sdk.NewSdkKeyApiModel(conn, cacheConf),
 		SdkCallLogModel:          sdk.NewSdkCallLogModel(conn, cacheConf),
-		AdminTaskModel:           task.NewAdminTaskModel(conn, cacheConf),
 		BlogTagModel:             blog.NewBlogTagModel(conn, cacheConf),
 		BlogArticleModel:         blog.NewBlogArticleModel(conn, cacheConf),
 		BlogArticleTagModel:      blog.NewBlogArticleTagModel(conn, cacheConf),
@@ -187,7 +184,6 @@ func (r *Repository) withSession(session sqlx.Session) *Repository {
 		SdkInterfaceModel:        r.SdkInterfaceModel.WithSession(session),
 		SdkKeyApiModel:           r.SdkKeyApiModel.WithSession(session),
 		SdkCallLogModel:          r.SdkCallLogModel.WithSession(session),
-		AdminTaskModel:           r.AdminTaskModel.WithSession(session),
 		BlogTagModel:             r.BlogTagModel.WithSession(session),
 		BlogArticleModel:         r.BlogArticleModel.WithSession(session),
 		BlogArticleTagModel:      r.BlogArticleTagModel.WithSession(session),

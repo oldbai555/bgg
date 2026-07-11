@@ -5,7 +5,10 @@
 
 package config
 
-import "github.com/zeromicro/go-zero/rest"
+import (
+	"github.com/zeromicro/go-zero/rest"
+	"github.com/zeromicro/go-zero/zrpc"
+)
 
 // Config 聚合服务配置，RestConf 内嵌以支持 go-zero HTTP 配置。
 type Config struct {
@@ -15,6 +18,14 @@ type Config struct {
 	JWT           JWTConf       `json:"jwt,optional" yaml:"jwt" mapstructure:"jwt"`
 	Bcrypt        BcryptConf    `json:"bcrypt,optional" yaml:"bcrypt" mapstructure:"bcrypt"`
 	RateLimit     RateLimitConf `json:"rateLimit,optional" yaml:"rateLimit" mapstructure:"rateLimit"`
+	// TaskCallbackRPCConf 单体内嵌的 pkg/taskcallback.TaskCallback zrpc server 监听配置，
+	// 供 services/task/（task-rpc）回调取导出数据/登记导出文件。见 16-rpc-conventions.md、
+	// 17-async-eventing.md 第 1 节。Phase 2 iam-rpc/sdk-rpc 真正拆分后这个 server 原样搬过去。
+	TaskCallbackRPCConf zrpc.RpcServerConf `json:"taskCallbackRpc,optional" yaml:"taskCallbackRpc" mapstructure:"taskCallbackRpc"`
+	// TaskRPCConf 连到 task-rpc（services/task/）的 zrpc client 配置。task 域已拆分成独立
+	// 服务，gateway 侧的 TaskList/TaskDetail/TaskCancel/TaskRecent 和 5 个导出 logic 都通过
+	// 这个 client 调用，不再直接持有 Domain.Task。见 16-rpc-conventions.md 第 5 节。
+	TaskRPCConf zrpc.RpcClientConf `json:"taskRpc,optional" yaml:"taskRpc" mapstructure:"taskRpc"`
 }
 
 type DatabaseConf struct {

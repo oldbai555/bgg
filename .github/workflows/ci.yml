@@ -35,7 +35,10 @@ jobs:
       - name: go test (unit)
         # 范围严格对齐 08-testing-strategy.md 的口径：只跑领域服务 + repository 层，
         # 不是 go test ./...；集成测试（//go:build integration）默认不会被这条命令带上。
-        run: cd admin-server && go test ./internal/domain/... ./internal/repository/... -race -count=1
+        # services/task/... 是 Phase 2 拆出的 task-rpc（task 域的领域服务/repository 已经
+        # 搬到这里，不再在 internal/domain/...、internal/repository/... 下），一并跑。
+        # internal/rpcserver/... 是单体内嵌的 TaskCallback server 实现，同理需要跑。
+        run: cd admin-server && go test ./internal/domain/... ./internal/repository/... ./internal/rpcserver/... ./services/task/... -race -count=1
 
   integration-test:
     runs-on: ubuntu-latest
@@ -60,24 +63,10 @@ jobs:
         with:
           go-version: "1.24"
       - name: 初始化测试库
-        # 顺序与 admin-server/db/docker-init.sh 保持一致：建表（含增量建表）→ 基础数据 →
-        # 字典增量数据 → 模块初始化数据，两处如果后续调整需要同步改。
+        # 顺序与 admin-server/db/services/init-dev-db.sh 保持一致，两处如果后续调整需要同步改。
         run: |
-          MYSQL="mysql -h127.0.0.1 -uroot -proot admin_test"
-          $MYSQL < admin-server/db/tables.sql
-          for f in admin-server/db/migrations/create_table_*.sql; do
-            [ -e "$f" ] || continue
-            $MYSQL < "$f"
-          done
-          $MYSQL < admin-server/db/data.sql
-          for f in admin-server/db/migrations/dict_*.sql; do
-            [ -e "$f" ] || continue
-            $MYSQL < "$f"
-          done
-          for f in admin-server/db/migrations/init_*.sql; do
-            [ -e "$f" ] || continue
-            $MYSQL < "$f"
-          done
+          MYSQL_ROOT_PASSWORD=root MYSQL_DATABASE=admin_test \
+            admin-server/db/services/init-dev-db.sh -h127.0.0.1
       - name: go test (integration)
         run: cd admin-server && go test -tags=integration ./... -count=1
         env:

@@ -22,8 +22,7 @@ func InitializeApp(c config.Config) (*svc.ServiceContext, func(), error) {
 	}
 	domain := provideDomain(repository)
 	chatHub := provideChatHub()
-	v := provideTaskExecutors(repository)
-	taskScheduler := provideTaskScheduler(repository, chatHub, v)
+	task := provideTaskRPC(c)
 	authMiddleware := middleware.NewAuthMiddleware(c, repository)
 	apiEnabledMiddleware := middleware.NewApiEnabledMiddleware(repository)
 	permissionMiddleware := providePermissionMiddleware(domain)
@@ -36,7 +35,7 @@ func InitializeApp(c config.Config) (*svc.ServiceContext, func(), error) {
 	sdkRateLimitMiddleware := middleware.NewSDKRateLimitMiddleware(repository)
 	sdkCallLogMiddleware := middleware.NewSDKCallLogMiddleware(repository)
 	middlewareBundle := provideMiddlewareBundle(authMiddleware, apiEnabledMiddleware, permissionMiddleware, operationLogMiddleware, publicOperationLogMiddleware, rateLimitMiddleware, performanceMiddleware, corsMiddleware, sdkAuthMiddleware, sdkRateLimitMiddleware, sdkCallLogMiddleware)
-	serviceContext, cleanup := provideServiceContext(c, repository, domain, chatHub, v, taskScheduler, middlewareBundle)
+	serviceContext, cleanup := provideServiceContext(c, repository, domain, chatHub, task, middlewareBundle)
 	return serviceContext, func() {
 		cleanup()
 	}, nil

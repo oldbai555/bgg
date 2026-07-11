@@ -3,6 +3,23 @@ Host: 0.0.0.0
 Port: 20000
 Timeout: 30000  # 30秒超时（毫秒），避免 m3u8 代理请求超时
 
+# TaskCallback zrpc server：与上面的 REST server 并存，供 services/task/（task-rpc）
+# 回调取导出数据/登记导出文件。监听 0.0.0.0 而不是 127.0.0.1——docker-compose 场景下
+# task 容器要能通过服务名 app:9001 连进来，127.0.0.1 只在同一个网络命名空间内可达。
+TaskCallbackRpc:
+  Name: admin-api.taskcallback
+  ListenOn: 0.0.0.0:9001
+  Mode: pro
+
+# task-rpc（services/task/）的 zrpc client 配置。task 域已拆分成独立服务，见
+# 16-rpc-conventions.md 第 5 节"gateway 变薄机制"。初期用静态 Endpoints，不引入 etcd。
+# TASK_RPC_ENDPOINT 必须显式设置（和 JWT_ACCESS_SECRET 一样走 fail-fast，不给静默默认值）：
+# 本机同进程调试用 127.0.0.1:8090，docker-compose 用服务名 task:8090。
+TaskRpc:
+  Endpoints:
+    - "${TASK_RPC_ENDPOINT}"
+  NonBlock: true
+
 # JWT 配置
 JWT:
   AccessSecret: "${JWT_ACCESS_SECRET}"

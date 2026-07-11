@@ -5,18 +5,16 @@ package audit_log
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"fmt"
-	"postapocgame/admin-server/internal/domain/task"
 	"time"
 
 	"postapocgame/admin-server/internal/consts"
-	taskmodel "postapocgame/admin-server/internal/model/task"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
+	"postapocgame/admin-server/services/task/taskclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -45,57 +43,46 @@ func (l *AuditLogExportLogic) AuditLogExport(req *types.AuditLogExportReq) (*typ
 		return nil, errs.New(errs.CodeUnauthorized, "未登录或登录已过期")
 	}
 
-	// 构造任务参数
-	params := task.ExcelExportParams{
-		TaskParamsReq: task.TaskParamsReq{Module: consts.TaskModuleAuditLog},
-		Filters:       make(map[string]interface{}),
-	}
-
+	filters := make(map[string]interface{})
 	if req.UserId > 0 {
-		params.Filters[consts.TaskFilterUserId] = req.UserId
+		filters[consts.TaskFilterUserId] = req.UserId
 	}
 	if req.Username != "" {
-		params.Filters[consts.TaskFilterUsername] = req.Username
+		filters[consts.TaskFilterUsername] = req.Username
 	}
 	if req.AuditType != "" {
-		params.Filters[consts.TaskFilterAuditType] = req.AuditType
+		filters[consts.TaskFilterAuditType] = req.AuditType
 	}
 	if req.AuditObject != "" {
-		params.Filters[consts.TaskFilterAuditObject] = req.AuditObject
+		filters[consts.TaskFilterAuditObject] = req.AuditObject
 	}
 	if req.StartTime != "" {
-		params.Filters[consts.TaskFilterStartTime] = req.StartTime
+		filters[consts.TaskFilterStartTime] = req.StartTime
 	}
 	if req.EndTime != "" {
-		params.Filters[consts.TaskFilterEndTime] = req.EndTime
+		filters[consts.TaskFilterEndTime] = req.EndTime
 	}
 
-	paramsJSON, err := json.Marshal(params)
+	paramsJSON, err := json.Marshal(map[string]interface{}{
+		"module":  consts.TaskModuleAuditLog,
+		"filters": filters,
+	})
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "序列化任务参数失败", err)
 	}
 
-	now := time.Now().Unix()
-	taskModel := &taskmodel.AdminTask{
+	resp, err := l.svcCtx.TaskRPC.SubmitTask(l.ctx, &taskclient.SubmitTaskRequest{
 		Name:          fmt.Sprintf("审计日志导出_%s", time.Now().Format("2006-01-02 15:04:05")),
-		Type:          consts.TaskTypeExcelExport,
+		TaskType:      consts.TaskTypeExcelExport,
 		ExecutionType: consts.TaskExecutionTypeAsync,
-		Status:        consts.TaskStatusPending,
-		Params:        sql.NullString{String: string(paramsJSON), Valid: true},
+		Params:        string(paramsJSON),
 		UserId:        user.UserID,
-		ScheduledAt:   0,
-		StartedAt:     0,
-		FinishedAt:    0,
-		CreatedAt:     now,
-		UpdatedAt:     now,
-		DeletedAt:     0,
+	})
+	if err != nil {
+		return nil, errs.WrapGRPCError("创建导出任务失败", err)
 	}
 
-	// TODO(phase2-task-rpc): 跨域写入 Task 域（发起导出任务），Phase 2 拆分后改为调用 task-rpc.CreateTask
-	_, err = l.svcCtx.Domain.Task.Task.Create(l.ctx, taskModel)
-	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "创建导出任务失败", err)
-	}
+	logx.Infof("审计日志导出任务已创建: taskId=%d, userId=%d", resp.TaskId, user.UserID)
 
 	return &types.Response{
 		Code:    0,

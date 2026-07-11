@@ -16,18 +16,18 @@ import (
 	monitoringrepo "postapocgame/admin-server/internal/repository/monitoring"
 	sdkrepo "postapocgame/admin-server/internal/repository/sdk"
 	systemrepo "postapocgame/admin-server/internal/repository/system"
-	taskrepo "postapocgame/admin-server/internal/repository/task"
 	videorepo "postapocgame/admin-server/internal/repository/video"
 )
 
 // Domain 聚合各领域 Repository，启动时构造一次，Logic 通过 svcCtx.Domain 访问。
+// 不再有 Task 字段：task 域已拆成独立的 task-rpc（services/task/），gateway 侧改成走
+// svcCtx.TaskRPC 这个 zrpc client，不通过 Domain 聚合根访问。
 type Domain struct {
 	IAM        IAMDomain
 	Blog       BlogDomain
 	Chat       ChatDomain
 	SDK        SDKDomain
 	Video      VideoDomain
-	Task       TaskDomain
 	Monitoring MonitoringDomain
 	System     SystemDomain
 	Misc       MiscDomain
@@ -98,10 +98,6 @@ type SDKDomain struct {
 
 type VideoDomain struct {
 	Video videorepo.VideoRepository
-}
-
-type TaskDomain struct {
-	Task taskrepo.TaskRepository
 }
 
 type MonitoringDomain struct {
@@ -177,9 +173,6 @@ func NewDomain(repo *repository.Repository) *Domain {
 		},
 		Video: VideoDomain{
 			Video: videorepo.NewVideoRepository(repo),
-		},
-		Task: TaskDomain{
-			Task: taskrepo.NewTaskRepository(repo),
 		},
 		Monitoring: MonitoringDomain{
 			OperationLog:   monitoringrepo.NewOperationLogRepository(repo),

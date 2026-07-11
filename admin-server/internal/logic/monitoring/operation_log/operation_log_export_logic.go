@@ -5,10 +5,8 @@ package operation_log
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"fmt"
-	"postapocgame/admin-server/internal/domain/task"
 	"time"
 
 	"postapocgame/admin-server/internal/consts"
@@ -16,8 +14,7 @@ import (
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
-
-	taskmodel "postapocgame/admin-server/internal/model/task"
+	"postapocgame/admin-server/services/task/taskclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -37,80 +34,64 @@ func NewOperationLogExportLogic(ctx context.Context, svcCtx *svc.ServiceContext)
 }
 
 // OperationLogExport 将操作日志导出改为异步任务：
-// 1. 根据筛选条件构造 ExcelExportParams
-// 2. 创建异步任务记录（task_type=异步导出Excel，execution_type=异步）
-// 3. 由任务调度器 + ExcelExportExecutor 实际生成文件，并在任务结果中写入下载URL
+//  1. 根据筛选条件构造导出参数（module + filters，和 task-rpc 侧 ExcelExportParams 的
+//     JSON 结构对应，见 services/task/internal/domain/task/types.go）
+//  2. 调 task-rpc.SubmitTask 创建异步任务记录（task-rpc 拆分后不再直接写 admin_task 表，
+//     见 17-async-eventing.md 第 1.4 节"提交路径"）
+//  3. 由 task-rpc 的调度器 + GenericExportExecutor 实际生成文件，并在任务结果中写入下载URL
 func (l *OperationLogExportLogic) OperationLogExport(req *types.OperationLogExportReq) (*types.OperationLogExportResp, error) {
 	if req == nil {
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	// 获取当前登录用户
 	user, ok := jwthelper.FromContext(l.ctx)
 	if !ok {
 		return nil, errs.New(errs.CodeUnauthorized, "未登录或登录已过期")
 	}
 
-	// 构造导出参数（ExcelExportParams）
 	filters := make(map[string]interface{})
 	if req.UserId > 0 {
-		filters["userId"] = req.UserId
+		filters[consts.TaskFilterUserId] = req.UserId
 	}
 	if req.Username != "" {
-		filters["username"] = req.Username
+		filters[consts.TaskFilterUsername] = req.Username
 	}
 	if req.OperationType != "" {
-		filters["operationType"] = req.OperationType
+		filters[consts.TaskFilterOperationType] = req.OperationType
 	}
 	if req.OperationObject != "" {
-		filters["operationObject"] = req.OperationObject
+		filters[consts.TaskFilterOperationObj] = req.OperationObject
 	}
 	if req.Method != "" {
-		filters["method"] = req.Method
+		filters[consts.TaskFilterMethod] = req.Method
 	}
 	if req.StartTime != "" {
-		filters["startTime"] = req.StartTime
+		filters[consts.TaskFilterStartTime] = req.StartTime
 	}
 	if req.EndTime != "" {
-		filters["endTime"] = req.EndTime
+		filters[consts.TaskFilterEndTime] = req.EndTime
 	}
 
-	params := task.ExcelExportParams{
-		TaskParamsReq: task.TaskParamsReq{
-			Module: consts.TaskModuleOperationLog,
-		},
-		Filters: filters,
-	}
-
-	paramsBytes, err := json.Marshal(params)
+	paramsJSON, err := json.Marshal(map[string]interface{}{
+		"module":  consts.TaskModuleOperationLog,
+		"filters": filters,
+	})
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "构造导出参数失败", err)
 	}
 
-	// 创建任务记录
-	now := time.Now().Unix()
-	taskModel := &taskmodel.AdminTask{
+	resp, err := l.svcCtx.TaskRPC.SubmitTask(l.ctx, &taskclient.SubmitTaskRequest{
 		Name:          fmt.Sprintf("操作日志导出_%s", time.Now().Format("2006-01-02 15:04:05")),
-		Type:          consts.TaskTypeExcelExport,
+		TaskType:      consts.TaskTypeExcelExport,
 		ExecutionType: consts.TaskExecutionTypeAsync,
-		Status:        consts.TaskStatusPending,
-		Params:        sql.NullString{String: string(paramsBytes), Valid: true},
+		Params:        string(paramsJSON),
 		UserId:        user.UserID,
-		ScheduledAt:   0,
-		StartedAt:     0,
-		FinishedAt:    0,
-		CreatedAt:     now,
-		UpdatedAt:     now,
-		DeletedAt:     0,
-	}
-
-	// TODO(phase2-task-rpc): 跨域写入 Task 域（发起导出任务），Phase 2 拆分后改为调用 task-rpc.CreateTask
-	taskId, err := l.svcCtx.Domain.Task.Task.Create(l.ctx, taskModel)
+	})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "创建导出任务失败", err)
+		return nil, errs.WrapGRPCError("创建导出任务失败", err)
 	}
 
-	logx.Infof("操作日志导出任务已创建: taskId=%d, userId=%d", taskId, user.UserID)
+	logx.Infof("操作日志导出任务已创建: taskId=%d, userId=%d", resp.TaskId, user.UserID)
 
 	// 当前接口不直接返回下载URL，URL 由异步任务执行完成后写入任务结果JSON，由前端在任务列表中查看
 	return &types.OperationLogExportResp{

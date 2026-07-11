@@ -2,22 +2,22 @@ package svc
 
 import (
 	"postapocgame/admin-server/internal/config"
-	"postapocgame/admin-server/internal/domain/task"
 	"postapocgame/admin-server/internal/hub"
-	"postapocgame/admin-server/internal/interfaces"
 	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/repository/registry"
+	"postapocgame/admin-server/services/task/taskclient"
 
 	"github.com/zeromicro/go-zero/rest"
 )
 
 type ServiceContext struct {
-	Config                       config.Config
-	Repository                   *repository.Repository
-	Domain                       *registry.Domain
-	ChatHub                      *hub.ChatHub
-	TaskExecutors                map[int]interfaces.TaskExecutor
-	TaskScheduler                *task.TaskScheduler
+	Config     config.Config
+	Repository *repository.Repository
+	Domain     *registry.Domain
+	ChatHub    *hub.ChatHub
+	// TaskRPC 是 task-rpc（services/task/）的 zrpc client，取代了原来直接持有的
+	// TaskExecutors/TaskScheduler——task 域已经拆分成独立服务，gateway 侧只剩薄胶水。
+	TaskRPC                      taskclient.Task
 	AuthMiddleware               rest.Middleware
 	ApiEnabledMiddleware         rest.Middleware
 	PermissionMiddleware         rest.Middleware

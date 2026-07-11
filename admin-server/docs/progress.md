@@ -361,3 +361,100 @@ Git 提交前钩子跑了一次基于 Cursor 的自动代码审查（对照 `AGE
 **下一步**：文档 15 全部 4 项完成的定义达标，Phase 2 可以正式进入 `18-service-extraction-runbook.md` 的实际执行阶段。用户已经在 Plan 模式下写好了第一个具体执行计划（`/Users/rookie/.claude/plans/admin-server-docs-progress-md-phase-2-15-magical-steele.md`，task-rpc 完整拆分，Week 6-7），第 4 节"数据库拆分"已被本条目的全量重组覆盖并超集完成，其余 6 个步骤（通用脚手架落地 `generate-rpc.sh`→`pkg/taskcallback` 契约→`services/task/` 骨架与领域代码搬迁→跨服务调用接入→部署配置→验证）尚未开始——这是一个体量不小于本条目的独立工作量（新增 RPC 服务骨架、proto 编译、单体内嵌 TaskCallback server、领域代码整体搬迁、docker-compose 新增服务），建议作为下一次会话的独立起点，直接读该计划文件继续，不需要重新梳理服务边界。
 
 ---
+
+## 2026-07-11（续五）：task-rpc 拆分 Step 1-2 完成——通用 RPC 脚手架 + `pkg/taskcallback` 契约落地并测试通过
+
+本轮按用户确认继续执行 `/Users/rookie/.claude/plans/admin-server-docs-progress-md-phase-2-15-magical-steele.md` 的 task-rpc 拆分计划。计划共 7 步，`db/services/` 数据库拆分（对应计划第 4 节）在上一条目已超集完成；本轮完成第 1 步（通用脚手架）和第 2 步（`pkg/taskcallback` 契约），第 3/5/6/7 步（`services/task/` 骨架与领域代码搬迁、跨服务调用接入、部署配置、端到端验证）尚未开始，留给下一次会话。
+
+**探索阶段核实计划里的 5 处"发现"，全部与实际代码吻合，逐条记录判断依据（不是照抄计划，是读代码验证过的）**：
+1. `acquireLock`/`releaseLock`（`internal/domain/task/scheduler.go:327-352`）确认非原子：`Exists`+`Setex` 两步式 TOCTOU，`releaseLock` 的 `Del` 不校验锁的持有者。本轮未修复（在计划第 3 步"领域代码搬迁"时一并处理，本轮只做了脚手架和契约，还没碰 `scheduler.go`）。
+2. `ExcelExportExecutor.Execute`（`internal/domain/task/executors/excel_export_executor.go:57-68`）的 `switch params.Module` 确认缺 `sdk_call_log` 分支，命中 `default` 直接返回"不支持的导出模块"——`consts.TaskModuleSdkCallLog`、`SdkAdminRepository.ExportCallLogs` 都已就绪，只是没接上。**本轮已在新的 `TaskCallback.FetchExportData` 里补上这个分支**（见下）。
+3. `generateCSVFile`（同文件 :334-547）确认把"查询数据"和"生成文件+登记 `admin_file`"耦合在一起，且 `admin_file` 物理属于 iam（`db/services/iam/file/`），task-rpc 拆分后拿不到——**本轮设计的 `pkg/taskcallback/taskcallback.proto` 在计划要求的 `FetchExportData` 之外新增了 `RegisterExportFile`**，把 `generateCSVFile` 尾部"按 name(MD5) 查重→不存在则登记"这段逻辑原样搬进去，形成两阶段：task-rpc 生成文件后先落盘算好 MD5，再回调 `RegisterExportFile` 登记。
+4. `TaskNotifier`（`internal/domain/task/notifier.go`）确认同时耦合 `systemrepo.NewNotificationRepository`（写 `admin_notification`）和 `*hub.ChatHub.SendToUser`，两处失败都只 `logx.Errorf`——符合 `17-async-eventing.md` "失败只记日志→异步 Streams" 的判断规则。本轮未动这个文件（属于计划第 3 步的搬迁范围，`stream:task.notification` 的生产者/消费者本轮未写）。
+5. `task_recent_logic.go` 对 `system` 字典的依赖，计划第 5 节建议改成 task-rpc 自己的静态配置——本轮未动（同属第 3 步范围）。
+
+**1. 通用脚手架**：
+- 新增 `admin-server/scripts/generate-rpc.sh`（逐字对照 `16-rpc-conventions.md` 第 3 节落地），**探索阶段真实跑通时发现文档给的脚本内容有一处未覆盖的 bug 并已修复**：脚本 `cd` 进 `$SERVICE_DIR` 后直接把 `$PROTO_FILE`（默认是绝对路径）传给 `goctl rpc protoc`，但 protoc 的默认 `proto_path` 是当前目录且要求输入文件路径是这个 proto_path 的**字面前缀**——传绝对路径会被 protoc 判定为"不在任何 proto_path 下"直接报错。修复：新增一段把 `PROTO_FILE` 转换成相对 `SERVICE_DIR` 路径的逻辑，再传给 `goctl rpc protoc`。用一个临时的 `services/_smoketest/` Ping/Pong 服务实测跑通（生成的 6 个文件结构符合预期），验证完删除。
+- `tool/admin-mcp` 的 `generate_rpc` 从占位 stub（`handleGenerateRPCStub`，固定返回"尚未实现"）换成真实封装（`handleGenerateRPC`，参数 `service_name`/`proto_file`，`watchDir=services/<service_name>`），风格对齐其余 5 个真实 tool。`go build`/`go vet`（`admin-mcp` 子 module）通过。
+
+**2. `pkg/taskcallback` 契约（`17-async-eventing.md` 第 1.3 节 + 本轮对该文档的一处补充）**：
+- `pkg/taskcallback/taskcallback.proto`：`FetchExportData`（逐字用 17 文档给的 message/service 定义）+ **新增 `RegisterExportFile`**（发现 3 的处理方式，请求带 `file_name`/`original_name`/`storage_path`/`file_size`/`uploaded_by`，响应 `file_id`/`access_url`；这是对 17 文档原始设计的补充，17 文档本身还没同步这处，留给后续会话回去补记）。`protoc --go_out --go-grpc_out` 直接生成到 `pkg/taskcallback/pb/`（共享契约包，不走 `generate-rpc.sh` 的服务脚手架路径，和计划里说的一致）。
+- **单体内新增 `internal/rpcserver/taskcallback/server.go`**，实现 `TaskCallbackServer`：
+  - `FetchExportData` 的 5 个分支（`operation_log`/`audit_log`/`login_log`/`performance_log`/`sdk_call_log`）从 `ExcelExportExecutor.export{OperationLog,AuditLog,LoginLog,PerformanceLog}` 的"查询数据"部分原样迁移（表头文案、字段顺序、`sql.NullString.Valid` 判断都逐一核对过，不是重写），`sdk_call_log` 分支是新增的（发现 2 的 bug 修复，复用已存在的 `SdkAdminRepository.ExportCallLogs`）。为了保持这个通用回调接口的稳定，没有为每个 module 定义单独的 proto message，而是统一转成 `map[string]string`（表头→值）再 JSON 编码成 `rows_json`。
+  - `RegisterExportFile` 从 `generateCSVFile` 尾部"按 `name` 查重→不存在则 `fileRepo.Create`"这段逻辑原样迁移，`getStorageBaseURL`（查 `storage_base_url` 字典）也原样迁移。
+  - **补了 4 个 sqlmock 测试**（`internal/rpcserver/taskcallback/server_test.go`）：`FetchExportData` 的 operation_log 分支（验证行→JSON 转换、表头文案）、sdk_call_log 分支（专门验证发现 2 的 bug 修复真的能走通，不再命中 default）、不支持的 module 报错、`RegisterExportFile` 的新建文件路径。写测试过程中发现两处需要注意的 sqlmock 用法：① `LoginLogRepository`/`OperationLogRepository` 等 `FindPage` 内部是先查 `COUNT(*)` 再查列表（顺序敏感，sqlmock 的 `ExpectQuery` 默认按声明顺序匹配，写反会报"could not match"）；② `RegisterExportFile` 内部是先查字典（`getStorageBaseURL`）再查 `admin_file`（`FindByName`），同样是顺序敏感。4 个测试全部通过，`go test ./internal/rpcserver/... -race -count=1` 绿。
+- `admin.go` 新增 `zrpc.MustNewServer(c.TaskCallbackRPCConf, ...)` 在独立 goroutine 里和现有 REST server 并存启动，`defer taskCallbackServer.Stop()` 接入优雅关闭；`internal/config/config.go` 新增 `TaskCallbackRPCConf zrpc.RpcServerConf` 字段；`etc/admin-api.yaml` 新增 `TaskCallbackRpc` 段（`ListenOn: 127.0.0.1:9001`，只监听本地，不对外暴露）。
+- **意外的连带修复**：首次引入 `zrpc` 包后 `go build` 报 `go.sum` 缺条目（`go-zero` 的 `zrpc` 传递依赖 etcd client、k8s client-go 等，这个仓库此前从未真正 import 过 `zrpc`，只是文档里规划过），跑了一次 `go mod tidy` 补全，`go.mod`/`go.sum` 新增约 20 个间接依赖（etcd/k8s 系列），这是这次真正启用 zrpc 的必然结果，不是误操作。
+
+**验证**：`go build ./...`、`go vet ./...`、`go test ./... -race -count=1` 全绿（含新增的 4 个 `taskcallback` 测试）。本机仍无 MySQL/Docker，`TaskCallback` server 只做了单元测试级别的验证，没有真实起服务、也没有验证 `admin-api.yaml` 的 `TaskCallbackRpc` 配置真实加载成功（`conf.MustLoad` 层面没有语法错误，但没有实际跑起来过）。
+
+**遗留（本轮结束时的状态，详见下一条目）**：以上 5 项在同一会话内继续推进，全部完成，见下一条目。
+
+---
+
+## 2026-07-11（续六）：task-rpc 完整拆分收尾——计划 7 步全部完成，真实数据库端到端验证通过
+
+本轮接续上一条目，把 `/Users/rookie/.claude/plans/admin-server-docs-progress-md-phase-2-15-magical-steele.md` 剩余的第 3/5/6/7 步全部做完。`admin-server` 现在是**单 Go module、两个可独立部署的 main 二进制**（`admin.go` 是 gateway、`services/task/task.go` 是 task-rpc），这是本仓库第一次真正意义上的服务拆分，不再只是文档规划。
+
+**1. `services/task/rpc/task.proto` + `generate-rpc.sh task`**：5 个方法（`TaskList`/`TaskDetail`/`TaskCancel`/`TaskRecent`/`SubmitTask`），字段对齐 `api/admin.api` 现有的 `TaskItem`/`TaskListReq` 等类型；`TaskCancelRequest` 按计划要求多带一个 `operator_user_id`（gateway 从 JWT context 取出显式传入，task-rpc 拆分后不再能访问登录态）；`SubmitTask` 对应 `AsyncTaskBackend.Submit` 的 RPC 化，供 gateway 侧 5 个导出 logic 调用。`generate-rpc.sh` 生成产物目录形状和 `16-rpc-conventions.md` 给的示意图有出入（pb 落在 `services/task/task/` 而不是文档画的 `services/task/rpc/pb/`，client 包名 `taskclient` 不是 `iamclient` 风格的嵌套）——这是 goctl 的真实默认行为，文档画的是示意，本轮没有强行掰成文档的样子，属于合理偏差。
+
+**2. 领域代码搬迁（`internal/domain/task/` → `services/task/internal/domain/task/`），三处结构性改动**：
+- **`scheduler.go` 修复发现 1 的分布式锁原子性 bug**：原来是 `Exists` + `Setex` 两步式（TOCTOU 竞态）+ `releaseLock` 不校验持有者（`Del` 不判断锁值，会误删其他实例的锁）。改成 `SetnxExCtx`（`SET NX EX` 原子操作）+ 持锁 token（`uuid.NewString()`）+ Lua script 安全释放（`GET` 校验 token 匹配才 `DEL`，标准 Redlock 释放模式）。写测试时**又发现一个自己引入的真 bug**：`acquireLock` 在锁已被占用（`ok=false`）时仍然返回了刚生成的非空 token（虽然调用方当前不会用到，但接口契约是错的）——`TestAcquireLock_MutualExclusion` 测试直接抓到，已修复为未获取到锁时返回空 token。
+- **`notifier.go` 改造成发布 `stream:task.notification`**：原来直接持有 `systemrepo.NotificationRepository`（写 `admin_notification`，物理属于 iam）+ `*hub.ChatHub`（WebSocket 推送，物理属于 chat），这两个依赖 task-rpc 拆分后都拿不到。改成往 Redis Stream 发一条 JSON 事件，消费者搬到单体侧新增的 `internal/consumer/task_notification_consumer.go`（消费者组名 `iam-chat-task-notify`，命名体现"这是跨两个未来域的临时合并消费者"）。`17-async-eventing.md` 补记了这第三个 Stream（原文档只写了两个）。
+- **`ExcelExportExecutor` → `GenericExportExecutor`（`services/task/internal/domain/task/executors/generic_export_executor.go`）**：原来 5 个（其实是 4 个，`sdk_call_log` 缺失，见下）`export{Module}` 方法各自直连对应 repository 查数据；现在收敛成一个通用执行器，按 `params.Module` 查 `moduleRoutes`（`map[string]taskcallback.Client`）拿到该 module 数据的归属服务，调 `FetchExportData` RPC 取 `headers`/`rows_json`，本地生成 CSV 后调 `RegisterExportFile` RPC 登记文件（原来的 MD5 去重逻辑原样保留）。**顺手修复了发现 2 的 bug**：`consts.TaskModuleSdkCallLog` 常量和 `SdkAdminRepository.ExportCallLogs` 方法早就存在，但 `Execute` 的 `switch` 从来没接上这个分支，命中 `default` 直接报错"不支持的导出模块"——单体侧新增的 `internal/rpcserver/taskcallback/server.go`（承载 `FetchExportData`/`RegisterExportFile` 两个方法的实现，Phase 2 iam-rpc/sdk-rpc 真正拆分后原样搬过去）里补上了这第 5 个分支，4 个 sqlmock 测试之一专门验证这个分支能走通。
+
+**3. 仓储/模型/接口搬迁**：`internal/model/task/` 整体 `git mv` 到 `services/task/internal/model/task/`（内容不变）；`internal/repository/task/task_repository.go` 搬到 `services/task/internal/repository/`，构造函数从吃单体的 `*repository.Repository`（聚合了全部 9 个业务域 Model 的大句柄）改成只吃 `taskmodel.AdminTaskModel` + `sqlx.SqlConn`，顺手把原来绕开仓储层直连 DB 的 `scanAsyncTasks`/`scanScheduledTasks` 收进 `TaskRepository.FindPendingAsync`/`FindPendingScheduled`（搬迁时的清理，不是新范围）；`internal/interfaces/task.go` 只留 `TaskExecutor`，`AsyncTaskBackend` 确认从未被任何代码实现/消费（`grep` 全仓库只有它自己的定义），判定为死抽象，搬迁时直接删除，不留兼容层。
+
+**4. gateway 侧薄胶水化**：
+- `internal/wire/providers.go`：删除 `provideTaskExecutors`/`provideTaskScheduler`，新增 `provideTaskRPC`（`zrpc.MustNewClient` + `taskclient.NewTask`），`provideServiceContext` 签名同步收窄，`cleanup` 函数不再需要停调度器（重新跑了一次 `wire` 生成 `wire_gen.go`）。
+- `internal/repository/repository.go`、`internal/repository/registry/domain.go`：删除 `AdminTaskModel`/`TaskDomain`，`Domain` 聚合根不再有 `Task` 字段。
+- `internal/svc/servicecontext.go`：`TaskExecutors`/`TaskScheduler` 换成 `TaskRPC taskclient.Task`。
+- 4 个 `internal/logic/task/task/*.go` + `internal/logic/task/public/task_recent_logic.go` 改成薄胶水（解析 HTTP 请求 → 拼 TaskRPC 请求 → 映射响应）；`task_cancel_logic.go` 原来的"验证权限只能取消自己创建的任务、只能取消未开始/进行中的任务"这段业务逻辑下沉到 `services/task/internal/logic/taskcancellogic.go`（gateway 侧只负责从 JWT 取 `operator_user_id` 传过去）；`task_recent_logic.go` 原来"缓存优先、字典兜底"的 `getRecentTaskLimit` 按计划第 5 节建议整段删除，改成 task-rpc 自己的静态配置 `RecentTaskLimit`（`services/task/etc/task.yaml`）。
+- 5 个 `*_export_logic.go`（4 个 monitoring + 1 个 sdk）里原来 `l.svcCtx.Domain.Task.Task.Create(...)` 那句（代码里本来就留着 `// TODO(phase2-task-rpc)` 注释标记这个点）改成 `l.svcCtx.TaskRPC.SubmitTask(...)`，`task.ExcelExportParams` 这个共享 Go struct（原来在已删除的 `internal/domain/task` 包里）不再共享，gateway 侧改成直接拼 `map[string]interface{}{"module":..., "filters":...}` 再 `json.Marshal`——两边只共享 JSON 结构的隐式契约，不共享 Go 类型，这是拆分后的正常形态。
+
+**5. 部署配置**：`services/task/Dockerfile`（复用根 `Dockerfile` 的多阶段构建模式）；`docker-compose.yml` 新增 `task` 服务 + 命名卷 `uploads`（`app`/`task` 两个服务都挂载,对应 17 文档发现 3 的"共享物理文件"要求）；`db/services/init-task-db.sh`（新增，docker-compose 的 mysql 服务第二个 init 脚本，建 `admin_task` schema + 建表,不跑 `init_task.sql`——那个文件写的是 iam 的菜单/权限表,不是 `admin_task` 自己的数据）；`etc/admin-api.yaml`/`services/task/etc/task.yaml` 的三个 RPC 端点（`TaskCallbackRpc.ListenOn` 改成 `0.0.0.0` 而不是 `127.0.0.1`——docker 场景下容器间必须能互相连到；`TaskRpc.Endpoints`/`TaskCallbackRpc.Endpoints` 改成 `${TASK_RPC_ENDPOINT}`/`${TASK_CALLBACK_ENDPOINT}` 环境变量,和 `JWT_ACCESS_SECRET` 同一套 fail-fast 约定,不给静默默认值）。`14-production-deployment-checklist.md` 补了第 5 条记录这些生产环境地址配置项。
+
+**6. 真实端到端验证（不是只到编译通过）**：
+- 数据库：借用户的远程 MySQL（`oldbai`，和 Phase 1 收尾那次同一个库,该实例是共享 hosting、只有一个库,不支持另建 schema,所以 `admin_task` 表这次是建在 `oldbai` 库里做验证,不是真正独立 schema——生产环境有独立 MySQL 实例时才能建真正的 `admin_task` schema,这个差异在 `14-production-deployment-checklist.md` 里写清楚了）。用一次性 Go 脚本（未入库）跑 `create_table_task.sql` 建表。
+- 起两个真实进程：单体（`-mysql-config`/`-redis-config` 指向借用的库 + 本机 Redis,`TaskCallbackRpc` 监听 `127.0.0.1:9001`）+ task-rpc（`TASK_MYSQL_DSN` 指向同一个借用库,`TASK_CALLBACK_ENDPOINT=127.0.0.1:9001`),两边都成功连上真实 MySQL/Redis。
+- 用一次性 gRPC 测试客户端（未入库）直接调 task-rpc 的 `SubmitTask`（不经过 gateway HTTP 层,因为验证的是 task-rpc 自己的流水线,HTTP 鉴权层是 Phase 1 已经验证过的独立关注点）提交一个操作日志导出任务：**调度器 5 秒内扫描到、原子锁获取成功、`FetchExportData` RPC 查到真实 `admin_operation_log` 表 100 条数据、本地生成 CSV 文件、`RegisterExportFile` RPC 登记进真实 `admin_file` 表（`base_url` 从字典正确读到 `https://oldbai.top/oss`）、任务状态 `Pending→Running→Completed` 正确流转、`result` JSON 里的 `fileUrl`/`fileSize`/`recordCount` 全部正确**。查真实 `admin_notification` 表确认 Streams 消费者正确写入了"任务执行中"/"任务执行完成"两条记录——`stream:task.notification` 的生产者（task-rpc）→消费者（单体）全链路在真实环境里跑通。
+- 验证完整清理：删测试通知记录、删测试文件记录、`DROP TABLE admin_task`（因为是借共享库做的,不是真正独立 schema,清理更彻底）、删本地临时配置文件、停两个进程、删一次性脚本，确认 `oldbai` 库行数回到验证前基线（只有 `admin_operation_log` 因为是只读查询,行数不受影响；写入的三张表全部清空）。
+
+**7. 补测试**：`services/task/internal/domain/task/scheduler_test.go`（`TestAcquireLock_MutualExclusion`、`TestReleaseLock_OnlyOwnerCanRelease`——用 miniredis 验证锁的互斥性和"不能误删其他实例的锁"，抓到了上面提到的那个 token 返回值 bug）、`notifier_test.go`（验证 Running/Completed/Failed 发布事件、Pending 不发布）；`internal/rpcserver/taskcallback/server_test.go`（上一条目已完成,4 个 sqlmock 测试）。
+
+**验证**：`go build ./...`、`go vet ./...`、`go test ./... -race -count=1` 全绿（含新增的全部测试）。`docker compose up` 本身没有实测（本机无 Docker），配置文件语法用 `gopkg.in/yaml.v3` 做过解析校验，但容器编排层面的真实验证留给用户在有 Docker 的环境跑一遍。
+
+**已知遗留（留给用户或下次会话）**：
+1. `docker compose up` 未做容器化实测（本机无 Docker），建议用户在有 Docker 的环境验证一遍，重点看 `task` 容器能否通过服务名 `app:9001` 连到 gateway 的 `TaskCallbackRpc`、`uploads` 卷两边读写是否正常。
+2. `admin_task` 这次是借共享库验证、不是真正独立 schema，生产环境有独立 MySQL 实例时才会是真正的逻辑隔离，届时按 `14-production-deployment-checklist.md` 第 5 条的步骤建真库。
+3. `17-async-eventing.md` 第 3.2 节的"草案 disposition 表"仍然是 Phase 1 之前写的草案（本轮没有逐行核对更新），如果后续要精确核对 Phase 1 实际域服务清单和这张表的差异，需要单独一次会话处理，本轮只在文档里如实标注了这一点没做。
+4. `iam-rpc`/`sdk-rpc`/`chat-rpc`/`content-rpc` 四个服务仍未拆分（Phase 2 剩余的四次拆分，按 `18-service-extraction-runbook.md` 原定顺序是 sdk-rpc → chat-rpc → content-rpc → iam-rpc），task-rpc 这一次积累的经验（proto 设计模式、领域代码搬迁方法论、TaskCallback 式的跨服务数据借用模式、docker-compose 服务新增模式）可以直接复用。
+
+**下一步**：Phase 2 的 5 个服务拆分里，task-rpc（最简单、风险最低的那个）已经完整落地并真实验证过。下一次会话可以直接开始 sdk-rpc 拆分（`18-service-extraction-runbook.md` 原定的第二个），或者先做一次用户复核（走一遍 task-rpc 拆分的产物，确认拆分方式和验证深度符合预期）再继续，取决于用户的判断。
+
+---
+
+## 2026-07-11（续七）：提交前 Gentleman Guardian Angel 审查发现问题修复
+
+`git commit` 触发的 `gga` pre-commit hook 审查了本轮全部改动，逐项核实后处理如下。
+
+**已修复（判断为真问题）**：
+1. `internal/logic/task/task/task_cancel_logic.go`/`task_detail_logic.go`、`internal/logic/task/public/task_recent_logic.go`、5 个 `*_export_logic.go` 里调 TaskRPC 后的错误处理不一致——`task_list_logic.go` 会包一层 `errs.Wrap`，其余几处直接把原始 gRPC error 往上抛或者一律 `CodeInternalError`，前端拿不到准确的业务码。新增 `pkg/errs.WrapGRPCError`（按 `status.Code(err)` 映射 `PermissionDenied→CodeForbidden`、`FailedPrecondition/InvalidArgument→CodeBadRequest`、`NotFound→CodeNotFound` 等），全部 9 处调用点统一改用。
+2. `services/task/internal/domain/task/scheduler.go` 的 `handleTaskError` 用 `fmt.Sprintf` 手工拼 `{"success":false,"message":"%s"}`——如果错误信息本身包含双引号/反斜杠/换行，生成的不是合法 JSON，前端解析任务失败详情会出错。改用 `json.Marshal(TaskResultResp{...})`。
+3. `services/task/internal/logic/taskcancellogic.go` 的管理员判断硬编码字面量 `1`——提到 `services/task/internal/consts.SuperAdminUserID` 常量，注释说明这是延续 Phase 1 就有的种子数据约定、不是真正的 RBAC 校验，真正的修法需要额外设计（gateway 侧按权限判断，或 task-rpc 回调 iam-rpc 查角色），本轮不展开。
+4. `internal/consumer/task_notification_consumer.go` 的幂等检查 `FindPage(ctx, 1, 1, ...)` 只查最新 1 条，用户通知较多时可能查不到已存在的记录导致重复插入——改成查最近 20 条。
+5. **`db/services/iam/api/init_api.sql` 里群组详情/成员列表两条接口种子数据的 `path` 字段一直是 `/api/v1/chats/groups/:id`、`/api/v1/chats/groups/:id/members`（路径参数写法），和 `api/admin.api` 真实路由 `/chats/groups/detail`、`/chats/groups/members` 不一致——这是一处比本轮 task-rpc 拆分更早就存在的真实 bug（本轮对照原始 `db/data.sql` 核实过，这两行内容在拆分前就是这样，不是拆分引入的），后果是 `admin_api.path` 和实际路由对不上，RBAC 权限校验用这个 path 匹配会失败,群组详情/成员列表在生产环境可能因为权限校验路径不匹配而被拒绝（具体表现取决于 `PermissionMiddleware` 对未匹配到接口记录时的处理策略）。已修正种子数据（`(63,...)`/`(64,...)` 两行）并新增一次性存量迁移 `db/services/iam/api/migrations/fix_chat_group_api_paths_20260711.sql`（幂等，`UPDATE ... WHERE path = 旧值`，全新部署不需要跑，已经跑过旧版 `init_api.sql` 的库需要执行一次）。
+
+**核实后判断为超出本轮范围，未修复（保留分歧记录）**：
+1. `db/services/iam/demo/init_demo.sql`、`iam/metric/init_metric.sql`、`scripts/sqlgen/templates/init_module.sql.tpl` 里同样存在 `:id` 路径参数写法的历史残留——核实后 `admin.api` 里 demo/metric 模块已经不走这个模式（改用了 `/detail` 子路径），这些 `:id` 数据是死数据，不会被任何真实路由匹配到，不算活跃故障，且 `init_module.sql.tpl` 是脚手架模板,改动影响面更大（所有新模块的生成结果）,需要单独一次会话评估是否要改模板。本轮不顺带处理。
+
+`go build`/`go vet`/`go test -race`（SQL-only 改动，Go 测试无变化，重跑确认没有连带影响）全绿。
+
+**第二轮审查（修复后重新提交时触发）又发现几处真问题，已修复**：
+1. **task-rpc 内部错误没有转换成 gRPC status，gateway 侧的 `WrapGRPCError` 白建了**：`taskcancellogic.go` 用 `status.Error(codes.PermissionDenied/FailedPrecondition, ...)` 是对的，但 `tasklistlogic.go`/`taskdetaillogic.go`/`submittasklogic.go`/`taskrecentlogic.go` 直接把 `TaskRepo` 返回的 `*errs.Error` 原样透传——这类 error 穿过 gRPC 边界不会被 `status.Code(err)` 正确识别（不是标准 gRPC status error），gateway 侧的映射会退化成一律 `CodeInternalError`，等于第一轮修的 `WrapGRPCError` 没有真正生效。新增 `services/task/internal/logic/errconv.go` 的 `toGRPCStatus`（反向映射：`errs.CodeNotFound→codes.NotFound`、`CodeBadRequest→codes.InvalidArgument` 等），6 个错误返回点全部接上。
+2. **CI 的 `unit-test` job 没有覆盖 task-rpc**：`.github/workflows/ci.yml` 的测试范围硬编码成 `./internal/domain/... ./internal/repository/...`，task 域搬到 `services/task/` 后这条命令实际上不会跑到本轮新增的任何 task-rpc 测试（锁原子性、notifier 等）。已加上 `./internal/rpcserver/... ./services/task/...`，本地按新范围重跑过一遍确认全绿。
+3. **通知消费者的 consumer name 是硬编码字面量**：`"iam-chat-task-notify-1"` 在同一个消费者组内如果跑多副本会冲突（Redis Stream 按 consumer name 分别追踪 pending 消息）。改成 `hostname+PID` 拼出来的动态值，当前单副本部署不会有实际影响，但避免以后加副本时才发现这个坑。
+4. **`internal/consts/consts.go` 里一个死常量 `PathTaskCancel` 还写着 `:id` 路径参数写法**——核实这一组 3 个常量（`PathTaskList`/`PathTaskRecent`/`PathTaskCancel`）全部从未被引用，整组删除，不只是改掉 `:id` 那一个。
+5. **`AGENTS.md` 关键目录描述还停留在 task 域是单体内部领域服务的说法**（`internal/domain/{iam,task}/`）——更新成 task 域已拆分成独立服务 `services/task/`，`internal/domain/{iam,task}/` 只保留 `iam`。
+
+`go build`/`go vet`/`go test ./internal/domain/... ./internal/repository/... ./internal/rpcserver/... ./services/task/... -race`（和更新后的 CI 命令逐字一致）全绿。

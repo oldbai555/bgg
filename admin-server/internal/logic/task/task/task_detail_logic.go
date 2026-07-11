@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/task/taskclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -32,37 +33,25 @@ func (l *TaskDetailLogic) TaskDetail(req *types.TaskDetailReq) (resp *types.Task
 		return nil, errs.New(errs.CodeBadRequest, "任务ID不能为空")
 	}
 
-	// 查询任务详情
-	task, err := l.svcCtx.Domain.Task.Task.FindOne(l.ctx, req.Id)
+	rpcResp, err := l.svcCtx.TaskRPC.TaskDetail(l.ctx, &taskclient.TaskDetailRequest{Id: req.Id})
 	if err != nil {
-		return nil, err
+		return nil, errs.WrapGRPCError("查询任务详情失败", err)
 	}
 
-	// 转换为响应格式
-	resp = &types.TaskDetailResp{
-		Id:            task.Id,
-		Name:          task.Name,
-		TaskType:      task.Type,
-		ExecutionType: task.ExecutionType,
-		Status:        task.Status,
-		Params:        "",
-		Result:        "",
-		ErrorMessage:  task.ErrorMessage,
-		UserId:        task.UserId,
-		ScheduledAt:   task.ScheduledAt,
-		StartedAt:     task.StartedAt,
-		FinishedAt:    task.FinishedAt,
-		CreatedAt:     task.CreatedAt,
-		UpdatedAt:     task.UpdatedAt,
-	}
-
-	// 处理Params和Result（可能为NULL）
-	if task.Params.Valid {
-		resp.Params = task.Params.String
-	}
-	if task.Result.Valid {
-		resp.Result = task.Result.String
-	}
-
-	return resp, nil
+	return &types.TaskDetailResp{
+		Id:            rpcResp.Id,
+		Name:          rpcResp.Name,
+		TaskType:      rpcResp.TaskType,
+		ExecutionType: rpcResp.ExecutionType,
+		Status:        rpcResp.Status,
+		Params:        rpcResp.Params,
+		Result:        rpcResp.Result,
+		ErrorMessage:  rpcResp.ErrorMessage,
+		UserId:        rpcResp.UserId,
+		ScheduledAt:   rpcResp.ScheduledAt,
+		StartedAt:     rpcResp.StartedAt,
+		FinishedAt:    rpcResp.FinishedAt,
+		CreatedAt:     rpcResp.CreatedAt,
+		UpdatedAt:     rpcResp.UpdatedAt,
+	}, nil
 }

@@ -5,18 +5,16 @@ package sdk
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"fmt"
-	"postapocgame/admin-server/internal/domain/task"
 	"time"
 
 	"postapocgame/admin-server/internal/consts"
-	taskmodel "postapocgame/admin-server/internal/model/task"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
+	"postapocgame/admin-server/services/task/taskclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -45,57 +43,46 @@ func (l *SdkCallLogExportLogic) SdkCallLogExport(req *types.SdkCallLogExportReq)
 		return nil, errs.New(errs.CodeUnauthorized, "未登录或登录已过期")
 	}
 
-	// 构造任务参数
-	params := task.ExcelExportParams{
-		TaskParamsReq: task.TaskParamsReq{Module: consts.TaskModuleSdkCallLog},
-		Filters:       make(map[string]interface{}),
-	}
-
+	filters := make(map[string]interface{})
 	if req.SdkKeyId > 0 {
-		params.Filters[consts.TaskFilterSdkKeyId] = req.SdkKeyId
+		filters[consts.TaskFilterSdkKeyId] = req.SdkKeyId
 	}
 	if req.ApiCode != "" {
-		params.Filters[consts.TaskFilterApiCode] = req.ApiCode
+		filters[consts.TaskFilterApiCode] = req.ApiCode
 	}
 	if req.RespCode != 0 {
-		params.Filters[consts.TaskFilterRespCode] = req.RespCode
+		filters[consts.TaskFilterRespCode] = req.RespCode
 	}
 	if req.Ip != "" {
-		params.Filters[consts.TaskFilterIP] = req.Ip
+		filters[consts.TaskFilterIP] = req.Ip
 	}
 	if req.StartTime > 0 {
-		params.Filters[consts.TaskFilterStartTime] = req.StartTime
+		filters[consts.TaskFilterStartTime] = req.StartTime
 	}
 	if req.EndTime > 0 {
-		params.Filters[consts.TaskFilterEndTime] = req.EndTime
+		filters[consts.TaskFilterEndTime] = req.EndTime
 	}
 
-	paramsJSON, err := json.Marshal(params)
+	paramsJSON, err := json.Marshal(map[string]interface{}{
+		"module":  consts.TaskModuleSdkCallLog,
+		"filters": filters,
+	})
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "序列化任务参数失败", err)
 	}
 
-	now := time.Now().Unix()
-	taskModel := &taskmodel.AdminTask{
+	resp, err := l.svcCtx.TaskRPC.SubmitTask(l.ctx, &taskclient.SubmitTaskRequest{
 		Name:          fmt.Sprintf("SDK调用日志导出_%s", time.Now().Format("2006-01-02 15:04:05")),
-		Type:          consts.TaskTypeExcelExport,
+		TaskType:      consts.TaskTypeExcelExport,
 		ExecutionType: consts.TaskExecutionTypeAsync,
-		Status:        consts.TaskStatusPending,
-		Params:        sql.NullString{String: string(paramsJSON), Valid: true},
+		Params:        string(paramsJSON),
 		UserId:        user.UserID,
-		ScheduledAt:   0,
-		StartedAt:     0,
-		FinishedAt:    0,
-		CreatedAt:     now,
-		UpdatedAt:     now,
-		DeletedAt:     0,
+	})
+	if err != nil {
+		return nil, errs.WrapGRPCError("创建导出任务失败", err)
 	}
 
-	// TODO(phase2-task-rpc): 跨域写入 Task 域（发起导出任务），Phase 2 拆分后改为调用 task-rpc.CreateTask
-	_, err = l.svcCtx.Domain.Task.Task.Create(l.ctx, taskModel)
-	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "创建导出任务失败", err)
-	}
+	logx.Infof("SDK调用日志导出任务已创建: taskId=%d, userId=%d", resp.TaskId, user.UserID)
 
 	return &types.Response{
 		Code:    0,

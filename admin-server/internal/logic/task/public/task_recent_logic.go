@@ -5,13 +5,12 @@ package public
 
 import (
 	"context"
-	"strconv"
-	"time"
 
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
+	"postapocgame/admin-server/services/task/taskclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -30,87 +29,45 @@ func NewTaskRecentLogic(ctx context.Context, svcCtx *svc.ServiceContext) *TaskRe
 	}
 }
 
+// TaskRecent 薄胶水：原来"缓存优先、字典兜底、硬编码兜底"的 getRecentTaskLimit 逻辑
+// 已经按 15-service-boundaries.md 第 5 节末尾的建议下沉成 task-rpc 自己的静态配置
+// （services/task/etc/task.yaml 的 RecentTaskLimit 字段），不做 RPC 查询系统字典
+// （该值几乎不变，跨服务查一次字典表换来的收益极小，见该节原文分析）。req.Limit=0
+// 时传给 task-rpc 的也是 0，由 task-rpc 侧决定用静态配置兜底。
 func (l *TaskRecentLogic) TaskRecent(req *types.TaskRecentReq) (resp *types.TaskRecentResp, err error) {
-	// 获取当前用户（仅要求登录，不做权限校验）
 	user, ok := jwthelper.FromContext(l.ctx)
 	if !ok {
 		return nil, errs.New(errs.CodeUnauthorized, "未登录或登录已过期")
 	}
 
-	limit := l.getRecentTaskLimit(req.Limit)
-
-	// 查询最近的任务（只查询当前用户的任务）
-	tasks, err := l.svcCtx.Domain.Task.Task.FindRecent(l.ctx, limit, user.UserID)
+	rpcResp, err := l.svcCtx.TaskRPC.TaskRecent(l.ctx, &taskclient.TaskRecentRequest{
+		Limit:  req.Limit,
+		UserId: user.UserID,
+	})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "查询最近任务失败", err)
+		return nil, errs.WrapGRPCError("查询最近任务失败", err)
 	}
 
-	// 转换为响应结构
-	list := make([]types.TaskItem, 0, len(tasks))
-	for _, task := range tasks {
-		item := types.TaskItem{
-			Id:            task.Id,
-			Name:          task.Name,
-			TaskType:      task.Type,
-			ExecutionType: task.ExecutionType,
-			Status:        task.Status,
-			UserId:        task.UserId,
-			ScheduledAt:   task.ScheduledAt,
-			StartedAt:     task.StartedAt,
-			FinishedAt:    task.FinishedAt,
-			CreatedAt:     task.CreatedAt,
-			ErrorMessage:  task.ErrorMessage,
-		}
-
-		// 处理可空字段
-		if task.Params.Valid {
-			item.Params = task.Params.String
-		}
-		if task.Result.Valid {
-			item.Result = task.Result.String
-		}
-
-		list = append(list, item)
+	list := make([]types.TaskItem, 0, len(rpcResp.List))
+	for _, item := range rpcResp.List {
+		list = append(list, types.TaskItem{
+			Id:            item.Id,
+			Name:          item.Name,
+			TaskType:      item.TaskType,
+			ExecutionType: item.ExecutionType,
+			Status:        item.Status,
+			UserId:        item.UserId,
+			ScheduledAt:   item.ScheduledAt,
+			StartedAt:     item.StartedAt,
+			FinishedAt:    item.FinishedAt,
+			CreatedAt:     item.CreatedAt,
+			Params:        item.Params,
+			Result:        item.Result,
+			ErrorMessage:  item.ErrorMessage,
+		})
 	}
 
 	return &types.TaskRecentResp{
 		List: list,
 	}, nil
-}
-
-// getRecentTaskLimit 获取最近任务数量限制，优先使用业务缓存，其次字典，兜底 10
-func (l *TaskRecentLogic) getRecentTaskLimit(requestLimit int64) int64 {
-	if requestLimit > 0 {
-		return requestLimit
-	}
-
-	const (
-		cacheKey        = "task:config:recent_limit"
-		defaultLimit    = int64(10)
-		cacheExpireSecs = 600
-	)
-
-	var cached int64
-	if err := l.svcCtx.Repository.BusinessCache.Get(l.ctx, cacheKey, &cached); err == nil && cached > 0 {
-		return cached
-	}
-
-	limit := defaultLimit
-	dictType, err := l.svcCtx.Domain.System.DictType.FindByCode(l.ctx, "task_config")
-	if err == nil && dictType != nil {
-		items, err := l.svcCtx.Domain.System.DictItem.FindByTypeID(l.ctx, dictType.Id)
-		if err == nil && len(items) > 0 {
-			for _, item := range items {
-				if item.Label == "最近任务数量" {
-					if parsedLimit, parseErr := strconv.ParseInt(item.Value, 10, 64); parseErr == nil && parsedLimit > 0 {
-						limit = parsedLimit
-						break
-					}
-				}
-			}
-		}
-	}
-
-	_ = l.svcCtx.Repository.BusinessCache.Set(l.ctx, cacheKey, limit, cacheExpireSecs+int(time.Now().Unix()%60))
-	return limit
 }

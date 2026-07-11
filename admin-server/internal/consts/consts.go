@@ -115,16 +115,6 @@ const (
 	RedisTaskConfigPrefix = "task:config:"
 )
 
-// 任务相关路径常量
-const (
-	// PathTaskList 任务列表路径
-	PathTaskList = "/api/v1/tasks"
-	// PathTaskRecent 最近任务列表路径
-	PathTaskRecent = "/api/v1/tasks/recent"
-	// PathTaskCancel 任务取消路径
-	PathTaskCancel = "/api/v1/tasks/:id/cancel"
-)
-
 // 任务通知消息常量
 const (
 	// TaskNotificationTitleRunning 任务执行中通知标题

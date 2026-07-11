@@ -68,6 +68,28 @@ service TaskCallback {
 }
 ```
 
+**执行落地时的补充（`RegisterExportFile`）**：`generateCSVFile`（`internal/domain/task/executors/excel_export_executor.go:334-547`）把"查数据"和"生成文件后登记进 `admin_file`"耦合在一起，后者是本文档最初没覆盖到的一处真实缺口——`admin_file` 物理属于 iam（`db/services/iam/file/`），task-rpc 拆分后拿不到这张表，必须回调登记，不能沿用原来的直连写法。实际落地的 `pkg/taskcallback/taskcallback.proto` 因此在 `FetchExportData` 之外新增了第二个方法：
+
+```protobuf
+message RegisterExportFileRequest {
+  string file_name = 1;
+  string original_name = 2;
+  string storage_path = 3;
+  uint64 file_size = 4;
+  uint64 uploaded_by = 5;
+}
+message RegisterExportFileResponse {
+  uint64 file_id = 1;
+  string access_url = 2;
+}
+service TaskCallback {
+  rpc FetchExportData(FetchExportDataRequest) returns (FetchExportDataResponse);
+  rpc RegisterExportFile(RegisterExportFileRequest) returns (RegisterExportFileResponse);
+}
+```
+
+task-rpc 侧的执行器（`services/task/internal/domain/task/executors/generic_export_executor.go`）本地生成 CSV、算完 MD5 后回调这个方法完成登记（含按 `name` 查重复用逻辑，原样迁移自 `generateCSVFile` 尾部），单体内 `internal/rpcserver/taskcallback/server.go` 实现了这两个方法，已通过 sqlmock 测试和真实数据库端到端验证，见 `docs/progress.md` 对应条目。
+
 `task-rpc` 里的路由表（静态 map，不需要动态注册,新增导出 module 时手动加一行,这与 `16-rpc-conventions.md` 第 5 节"不引入 etcd 服务发现"的简单化取向一致）：
 
 ```go
@@ -87,7 +109,7 @@ var moduleServiceRoute = map[string]taskcallback.Client{
 
 `*_export_logic.go` 现在的行为是"创建 `admin_task` 记录，创建失败直接 `return nil, errs.Wrap(...)`（错误会一路返回给前端）"——按第 3 节的判断规则,这是同步 RPC,不是 Streams。拆分后 `iam-rpc`/`sdk-rpc` 的导出 logic 改成调 `task-rpc.SubmitTask`（对应 `AsyncTaskBackend.Submit` 的 RPC 化），task-rpc 建好 `admin_task` 记录后同步返回 `task_id`，调用方原样返回给前端（前端继续用现有的任务列表机制轮询状态,不需要改前端）。
 
-## 2. Redis Streams：两个具体的流
+## 2. Redis Streams：三个具体的流（第三个是执行阶段发现并补充的）
 
 ### 2.1 `stream:chat.user.created`
 
@@ -121,11 +143,31 @@ if _, err := l.svcCtx.Redis.XAdd(l.ctx, &redis.XAddArgs{
 
 批量写入的具体方式：消费者用 `XREADGROUP` 一次拉一批（如 `COUNT 100`），攒够一批或超时（如 200ms）后用一次事务批量 `INSERT`，减少 MySQL 往返次数——这是对现状"每次中间件调用各自 `Create` 一条记录"的一个自然优化，不是本文档强制要求的实现细节，具体 batch size/超时阈值留给实现时按实际负载调整。
 
-### 2.3 幂等性要求
+### 2.3 `stream:task.notification`（执行 task-rpc 拆分时发现并补充，本文档最初没覆盖）
+
+**背景**：`TaskNotifier`（`internal/domain/task/notifier.go`）同时直接持有 `systemrepo.NotificationRepository`（写 `admin_notification`，物理属于 iam）和 `*hub.ChatHub`（WebSocket 推送，物理属于 chat）——这是一处 `15-service-boundaries.md` 第 3 节的越界 grep 清单没扫到的耦合（它是通过构造函数注入 `*hub.ChatHub`，不是 `import internal/repository/chat`，grep 规则覆盖不到这种耦合）。两处失败原实现都只 `logx.Errorf`、不影响任务主流程，完全符合本文档第 3 节的判断规则：**异步 Streams**。
+
+**生产者**：`services/task/internal/domain/task/notifier.go` 的 `TaskNotifier.NotifyTaskStatusChange`——只在任务状态变为 Running/Completed/Failed 三种时发布，行为和原实现的过滤规则一致：
+
+```go
+event := TaskNotificationEvent{
+    TaskID: task.Id, TaskName: task.Name, UserID: task.UserId,
+    Status: task.Status, ErrorMessage: task.ErrorMessage,
+    SourceType: consts.NotificationSourceTypeTask,
+}
+payload, _ := json.Marshal(event)
+n.redis.XAddCtx(ctx, "stream:task.notification", false, "*", []string{"payload", string(payload)})
+```
+
+**消费者**：单体侧新增 `internal/consumer/task_notification_consumer.go`，消费者组名 `iam-chat-task-notify`——刻意用这个名字体现"这是一个跨两个未来域（iam 的通知表 + chat 的 WebSocket 推送）的临时合并消费者"，iam-rpc/chat-rpc 真正拆分成独立进程后要拆成两个消费者分别处理。消费到事件后做原 `notifier.go` 的两步：写 `admin_notification` 记录 + 通过 `hub.ChatHub.SendToUser` 推 WS。
+
+**已验证**：单元测试（`services/task/internal/domain/task/notifier_test.go`，验证 Running/Completed/Failed 发布、Pending 不发布）+ 真实端到端（本地起 task-rpc + 单体，对着一个借用的远程 MySQL 提交一个真实导出任务，确认 `admin_notification` 表里出现了"任务执行中"/"任务执行完成"两条记录，见 `docs/progress.md` 对应条目）。
+
+### 2.4 幂等性要求
 
 Streams 是至少一次投递（consumer 崩溃重启、`XACK` 之前进程被杀等场景都可能导致同一条消息被消费两次），消费者必须幂等。复用现有代码里已经在用的模式——`initChatForNewUser` 里"创建私聊前先查是否已存在"（`chatRepo.FindPrivateChatByUserIDs` 查到就跳过）、"加入群组前先查是否已在群里"（遍历 `chatUserRepo.FindByChatID` 结果比对 `UserId`）,这两处"插入前查是否已存在"的写法直接照搬到 Streams 消费者里,不需要引入新的幂等框架（如给每条 Stream 消息生成全局唯一 ID 再建一张去重表）——现有查询本身自带的唯一性约束（`chat_user` 表的 `uk_chat_user (chat_id, user_id)` 唯一键）已经能兜底真正的并发重复,消费者代码里的"先查后插"只是减少不必要的失败重试。
 
-### 2.4 死信处理
+### 2.5 死信处理
 
 消费者处理失败超过 N 次（建议 N=3，具体次数留给实现时按事件重要性调整,不做成可配置项，硬编码一个常量即可）后，把这条消息移到 `stream:<name>.deadletter`（如 `stream:chat.user.created.deadletter`），记一条 `logx.Errorf`，**不做更复杂的 DLQ**——不建告警、不建自动重放机制,人工发现问题时去查 deadletter 流里的内容手动处理即可。这与 `11-descoped.md` "不做日志聚合系统"的取向一致：先把最简单能工作的机制落地,复杂度按真实运维经验需要再加。
 

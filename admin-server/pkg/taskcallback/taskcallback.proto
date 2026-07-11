@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package taskcallback;
+
+option go_package = "./taskcallback";
+
+// TaskCallback 每个"承载可导出数据"的服务都实现这份接口，供 task-rpc 回调。
+// 契约设计见 admin-server/docs/17-async-eventing.md 第 1 节。
+// 当前阶段（单体尚未真正拆分成 iam-rpc/sdk-rpc 两个进程）由 admin-server 主进程
+// 内嵌一个 zrpc server 提前实现这份接口（internal/rpcserver/taskcallback/），
+// 后续 iam-rpc/sdk-rpc 真正拆分时把这个实现原样搬过去，proto 契约不变。
+
+message FetchExportDataRequest {
+  string module = 1;        // 对应 consts.TaskModule* 取值
+  uint64 task_id = 2;       // admin_task.id，用于回调方自己记录/幂等
+  uint64 requested_by = 3;  // 发起导出的用户 ID
+  string filters_json = 4;  // 原样透传 ExcelExportParams.Filters（JSON 编码后的筛选条件）
+}
+
+message FetchExportDataResponse {
+  // 每行是字段名到字段值的 map（JSON 编码字符串），避免为每个 module 单独定义一份
+  // proto message，保持这个通用回调接口的稳定。
+  repeated string rows_json = 1;
+  repeated string headers = 2; // 列名，用于 task-rpc 侧统一生成 Excel/CSV 表头
+  int64 total_count = 3;
+}
+
+// RegisterExportFile 是对 17-async-eventing.md 原始设计的一处补充（见
+// docs/progress.md 对应条目）：task-rpc 生成完导出文件后，把文件登记进
+// admin_file 表——这张表物理上属于 iam-rpc（db/services/iam/file/），
+// task-rpc 拆分后不再持有这张表，必须回调登记。
+message RegisterExportFileRequest {
+  string file_name = 1;     // 最终文件名（MD5+扩展名），对应 admin_file.name
+  string original_name = 2; // 原始文件名（供前端下载时展示）
+  string storage_path = 3;  // 代理路径，如 /api/v1/files/uploads/<name>
+  uint64 file_size = 4;     // 字节数
+  uint64 uploaded_by = 5;   // 发起导出的用户 ID（写入 admin_file 无直接字段，供审计留痕）
+}
+
+message RegisterExportFileResponse {
+  uint64 file_id = 1;
+  string access_url = 2; // 完整可访问 URL（拼接 storage_base_url 字典后的结果）
+}
+
+service TaskCallback {
+  rpc FetchExportData(FetchExportDataRequest) returns (FetchExportDataResponse);
+  rpc RegisterExportFile(RegisterExportFileRequest) returns (RegisterExportFileResponse);
+}
