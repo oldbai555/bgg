@@ -1,0 +1,20 @@
+Name: chat.rpc
+ListenOn: 0.0.0.0:8092
+Mode: pro
+
+Mysql:
+  DSN: "${CHAT_MYSQL_DSN}" # 指向 admin_chat schema，见 db/services/chat/chat/
+
+# 既用于满足 goctl 生成的 Model 内部 CachedConn 强制要求非空缓存节点，也真正用于
+# Redis Streams（stream:chat.user.created 消费者）——与 gateway 共享同一个 Redis 实例
+# （缓存/锁/队列不拆分，见 16-rpc-conventions.md 第 6 节）。
+ChatRedis:
+  Address: "${CHAT_REDIS_ADDRESS}"
+  Password: "${CHAT_REDIS_PASSWORD}"
+
+# 回调单体内嵌的 IamCallback server，取存量用户 ID / 用户展示信息。iam 域还没拆分成独立
+# 服务前的临时方案，见 pkg/iamcallback 包注释、etc/admin-api.yaml 的 IamCallbackRpc 段。
+IamCallbackRpc:
+  Endpoints:
+    - "${IAM_CALLBACK_ENDPOINT}"
+  NonBlock: true

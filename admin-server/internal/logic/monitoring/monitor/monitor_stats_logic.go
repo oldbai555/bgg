@@ -8,6 +8,7 @@ import (
 
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
+	"postapocgame/admin-server/services/chat/chatclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -55,12 +56,11 @@ func (l *MonitorStatsLogic) MonitorStats() (resp *types.MonitorStatsResp, err er
 		menuCount = 0
 	}
 
-	// 统计在线用户数（从 WebSocket Hub 获取）
-	// 注意：ChatOnlineUser 表已移除，在线用户数从 WebSocket Hub 获取
+	// 统计在线用户数（chat 域拆分成独立服务后，从 ChatRPC.GetOnlineUserCount 获取，
+	// 不再直接读 ChatHub——连接表已经搬进 chat-rpc 自己的进程）
 	onlineUserCount := int64(0)
-	if l.svcCtx.ChatHub != nil {
-		onlineUserIDs := l.svcCtx.ChatHub.GetOnlineUsers()
-		onlineUserCount = int64(len(onlineUserIDs))
+	if onlineResp, err := l.svcCtx.ChatRPC.GetOnlineUserCount(l.ctx, &chatclient.Empty{}); err == nil {
+		onlineUserCount = onlineResp.Count
 	}
 
 	// 统计操作日志数

@@ -18,7 +18,7 @@ var adminRoleColumns = []string{"id", "name", "code", "description", "status", "
 var adminPermissionColumns = []string{"id", "name", "code", "description", "created_at", "updated_at", "deleted_at"}
 
 func TestRBACService_UpdateRolePermissions_HappyPath(t *testing.T) {
-	repo, sqlMock, cleanup := newTestRepo(t)
+	repo, sqlMock, _, cleanup := newTestRepo(t)
 	defer cleanup()
 
 	sqlMock.ExpectBegin()
@@ -42,7 +42,7 @@ func TestRBACService_UpdateRolePermissions_HappyPath(t *testing.T) {
 }
 
 func TestRBACService_UpdateRolePermissions_RollbackOnInsertError(t *testing.T) {
-	repo, sqlMock, cleanup := newTestRepo(t)
+	repo, sqlMock, _, cleanup := newTestRepo(t)
 	defer cleanup()
 
 	sqlMock.ExpectBegin()
@@ -68,7 +68,7 @@ func TestRBACService_UpdateRolePermissions_RollbackOnInsertError(t *testing.T) {
 }
 
 func TestRBACService_UpdateRolePermissions_RollbackOnRoleNotFound(t *testing.T) {
-	repo, sqlMock, cleanup := newTestRepo(t)
+	repo, sqlMock, _, cleanup := newTestRepo(t)
 	defer cleanup()
 
 	sqlMock.ExpectBegin()

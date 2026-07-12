@@ -21,9 +21,11 @@ import (
 	"postapocgame/admin-server/internal/config"
 	"postapocgame/admin-server/internal/consumer"
 	"postapocgame/admin-server/internal/handler"
+	iamcallbacksrv "postapocgame/admin-server/internal/rpcserver/iamcallback"
 	taskcallbacksrv "postapocgame/admin-server/internal/rpcserver/taskcallback"
 	"postapocgame/admin-server/internal/svc"
 	appwire "postapocgame/admin-server/internal/wire"
+	iamcallbackpb "postapocgame/admin-server/pkg/iamcallback/pb"
 	taskcallbackpb "postapocgame/admin-server/pkg/taskcallback/pb"
 
 	"github.com/zeromicro/go-zero/core/conf"
@@ -68,6 +70,9 @@ func main() {
 	if len(c.SdkRPCConf.Endpoints) == 0 || c.SdkRPCConf.Endpoints[0] == "" {
 		log.Fatalf("SDK_RPC_ENDPOINT 未设置，拒绝以空 sdk-rpc 地址启动")
 	}
+	if len(c.ChatRPCConf.Endpoints) == 0 || c.ChatRPCConf.Endpoints[0] == "" {
+		log.Fatalf("CHAT_RPC_ENDPOINT 未设置，拒绝以空 chat-rpc 地址启动")
+	}
 
 	// 从外部文件加载 MySQL、Redis 和中间件配置（如果存在）
 	if err := config.MergeExternalConfig(&c, *mysqlConfigFile, *redisConfigFile, *middlewareConfigFile); err != nil {
@@ -105,9 +110,18 @@ func main() {
 	})
 	defer taskCallbackServer.Stop()
 
+	// IamCallback zrpc server：与 REST server 并存，供 services/chat/（chat-rpc）回调枚举
+	// 存量用户 / 取用户展示信息。见 pkg/iamcallback 包注释、internal/rpcserver/iamcallback/。
+	// iam 域还没拆分成独立服务前的临时方案，和 TaskCallback 同一个模式。
+	iamCallbackServer := zrpc.MustNewServer(c.IamCallbackRPCConf, func(grpcServer *grpc.Server) {
+		iamcallbackpb.RegisterIamCallbackServer(grpcServer, iamcallbacksrv.NewServer(ctx.Domain))
+	})
+	defer iamCallbackServer.Stop()
+
 	// task 通知消费者：消费 task-rpc 发布的 stream:task.notification，写 admin_notification +
-	// 推 WS。见 internal/consumer/task_notification_consumer.go 包注释、17-async-eventing.md。
-	taskNotificationConsumer := consumer.NewTaskNotificationConsumer(ctx.Repository.Redis, ctx.Repository, ctx.ChatHub)
+	// 推 WS（推 WS 现在通过 ctx.ChatRPC.PushToUser 回调 chat-rpc，见
+	// internal/consumer/task_notification_consumer.go 包注释、17-async-eventing.md）。
+	taskNotificationConsumer := consumer.NewTaskNotificationConsumer(ctx.Repository.Redis, ctx.Repository, ctx.ChatRPC)
 	taskNotificationConsumer.Start()
 	defer taskNotificationConsumer.Stop()
 
@@ -123,6 +137,10 @@ func main() {
 	go func() {
 		logx.Infof("Starting TaskCallback rpc server at %s...", c.TaskCallbackRPCConf.ListenOn)
 		taskCallbackServer.Start()
+	}()
+	go func() {
+		logx.Infof("Starting IamCallback rpc server at %s...", c.IamCallbackRPCConf.ListenOn)
+		iamCallbackServer.Start()
 	}()
 
 	// 等待关闭信号

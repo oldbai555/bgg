@@ -10,6 +10,7 @@ import (
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
+	"postapocgame/admin-server/services/chat/chatclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -28,37 +29,17 @@ func NewChatGroupDeleteLogic(ctx context.Context, svcCtx *svc.ServiceContext) *C
 	}
 }
 
+// ChatGroupDelete 薄胶水，实际业务逻辑已经搬进
+// services/chat/internal/logic/chatgroupdeletelogic.go。
 func (l *ChatGroupDeleteLogic) ChatGroupDelete(req *types.ChatGroupDeleteReq) (resp *types.Response, err error) {
-	// 获取当前用户
-	_, ok := jwthelper.FromContext(l.ctx)
-	if !ok {
+	if _, ok := jwthelper.FromContext(l.ctx); !ok {
 		return nil, errs.New(errs.CodeUnauthorized, "未登录或登录已过期")
 	}
 
-	// 查询群组
-	chat, err := l.svcCtx.Domain.Chat.Chat.FindByID(l.ctx, req.Id)
+	_, err = l.svcCtx.ChatRPC.ChatGroupDelete(l.ctx, &chatclient.ChatGroupDeleteRequest{Id: req.Id})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeNotFound, "群组不存在", err)
+		return nil, errs.WrapGRPCError("删除群组失败", err)
 	}
 
-	// 验证是否为群组
-	if chat.Type != 2 {
-		return nil, errs.New(errs.CodeBadRequest, "该聊天不是群组")
-	}
-
-	// 验证是否已删除
-	if chat.DeletedAt != 0 {
-		return nil, errs.New(errs.CodeNotFound, "群组已删除")
-	}
-
-	// 软删除群组
-	err = l.svcCtx.Domain.Chat.Chat.DeleteByID(l.ctx, req.Id)
-	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "删除群组失败", err)
-	}
-
-	return &types.Response{
-		Code:    0,
-		Message: "删除群组成功",
-	}, nil
+	return &types.Response{Code: 0, Message: "删除群组成功"}, nil
 }

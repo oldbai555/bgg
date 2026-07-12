@@ -107,6 +107,28 @@
 
 **状态**：`已就绪，待生产环境实际部署时执行`（本机无 Docker，`docker compose up` 本身未做容器化实测，只做过非容器化的直接进程验证）。
 
+### 7 · chat-rpc 拆分（Phase 2 第三个落地的服务）
+
+**触发条件**：`services/chat/` 完整拆分完成（`docs/progress.md` 对应条目），chat-rpc 成为独立部署单元。这是 5 个服务里第一个涉及 WS↔gRPC 双向流桥接、也是 `stream:chat.user.created`（Redis Streams）第一次真正投入生产路径的服务，比 task-rpc/sdk-rpc 多了两处新增复杂点：① gateway 侧 `internal/handler/chat/chatwshandler.go` 从终结 WebSocket 连接改成"终结 WS + 桥接一条到 chat-rpc 的 gRPC 双向流"；② 单体新增一个临时的 `IamCallback` zrpc server（`internal/rpcserver/iamcallback/`，和已有的 `TaskCallback` 同一个"iam-rpc 真正拆分前的过渡方案"模式），供 chat-rpc 回调枚举存量用户 / 取用户展示信息。
+
+**部署时要做什么**：
+1. 建 `admin_chat` schema：`mysql -uroot -p<pass> -e "CREATE DATABASE IF NOT EXISTS admin_chat CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"`，然后跑 `db/services/chat/chat/create_table_chat.sql`（`chat`/`chat_user`/`chat_message` 三张表；`init_chat.sql` 写的是 `admin_menu`/`admin_permission`/`admin_api`，物理属于主库 iam 部分，已经在主库初始化时跑过）。docker-compose 场景下已自动化，见 `db/services/init-chat-db.sh` + `docker-compose.yml` 的 mysql 服务第四个 init 脚本挂载。
+2. 生产环境实际地址配置（均通过环境变量，`conf.UseEnv()` 已接入，fail-fast 不给静默默认值，和 `JWT_ACCESS_SECRET`/task-rpc/sdk-rpc 那批同一套约定）：
+   - `CHAT_RPC_ENDPOINT`（gateway 侧 `etc/admin-api.yaml` 的 `ChatRpc.Endpoints`，指向 chat-rpc 实际监听地址）
+   - `CHAT_MYSQL_DSN`（chat-rpc 侧 `services/chat/etc/chat.yaml`）
+   - `CHAT_REDIS_ADDRESS`、`CHAT_REDIS_PASSWORD`（chat-rpc 侧 `services/chat/etc/chat.yaml`；这个 Redis 既满足 goctl 生成 Model 的 `CachedConn` 缓存节点要求，也真正用于消费 `stream:chat.user.created`，和 gateway 共享同一个 Redis 实例）
+   - `IAM_CALLBACK_ENDPOINT`（chat-rpc 侧 `services/chat/etc/chat.yaml` 的 `IamCallbackRpc.Endpoints`，指向单体内嵌 `IamCallback` server 的地址，对应 gateway 侧 `etc/admin-api.yaml` 新增的 `IamCallbackRpc.ListenOn`，默认 `0.0.0.0:9002`，和 `TaskCallbackRpc`（9001）同一个模式，docker-compose 场景下容器间要能互相连到所以监听 `0.0.0.0` 不是 `127.0.0.1`）
+3. 部署顺序建议：先部署 chat-rpc → 确认它监听正常且能连上 `IAM_CALLBACK_ENDPOINT` → 再重启单体 gateway（一次性完成 `IamCallback` server 上线和 gateway `ChatRPC`/WS 桥接切换）。如果先重启了 gateway、chat-rpc 还没起来，`ChatRPC` 走 `NonBlock: true` 不会阻塞 gateway 启动，但 `/api/v1/chats*` 接口和 WS 端点在 chat-rpc 真正连上之前会持续报错，不是数据丢失。
+4. 单元测试范围（`.github/workflows/ci.yml` 的 `unit-test` job）已加上 `./services/chat/...`。
+
+**如何验证生效**：`docs/progress.md` 本轮条目记录了一次真实端到端验证（借用远程 MySQL + 本地 Redis，起 gateway + chat-rpc 真实连上）：① IAM 建用户（真实调用 `UserDomainService.CreateUser`）触发 `stream:chat.user.created`，chat-rpc 消费者在秒级内完成默认群加入 + 与全部存量用户建私聊，全程真实 DB 落库验证；② 全部 11 个 unary CRUD 接口（`ChatList`/`ChatMessageList`/`ChatMessageSend`/`ChatMessageListAdmin`/`ChatMessageDelete`/`ChatGroupList`/`ChatGroupCreate`/`ChatGroupUpdate`/`ChatGroupDelete`/`ChatGroupDetail`/`ChatGroupMemberList`/`ChatGroupMemberAdd`/`ChatGroupMemberRemove`）通过真实 HTTP 请求走完整链路验证，`ChatList`/`ChatGroupDetail` 返回的部门名/角色名确认是真实回调 `IamCallback` 拿到的数据；③ 用一个最小 Go WS 客户端连 `/api/v1/chats/ws`，验证 `GetOnlineUserCount` 从 0 变 1，再发一条 `ChatMessageSend` 确认 WS 客户端实时收到广播（wire JSON 格式和拆分前逐字段一致）。验证完已清理全部测试数据（用户、群组、私聊、消息），行数复核回到基线。生产部署时可以按同样的路径（建群、发消息、开一个 WS 连接看能不能收到推送）复核一遍。
+
+**已知遗留**：
+- `docker compose up` 本身未做容器化实测（本机无 Docker，和 task-rpc/sdk-rpc 拆分时同样的限制），已用非容器化真实进程验证过完整链路（含 WS），建议用户在有 Docker 的环境跑一遍确认 `chat` 容器能通过服务名连接。
+- WS 客户端→服务端发消息（`SendMessageFrame`，对应 `chat.proto` 里 `ClientFrame` 的 `send` 分支）按文档骨架实现，但当前真实前端只用 WS 做服务端推送、发消息走 REST `ChatMessageSend`，这条路径没有真实前端联调，只做过最小 Go 客户端级别的手工验证（Join/心跳/服务端推送路径），如果后续前端真的要切到 WS 发消息，需要单独联调一次。
+
+**状态**：`已就绪，待生产环境实际部署时执行`（本机无 Docker，`docker compose up` 本身未做容器化实测，已做过非容器化的直接进程 + 真实 WS 连接验证）。
+
 ## Phase 2/3 预留条目类型（占位，届时按真实改动追加，现在不编造内容）
 
 以下只是"预计会出现哪类条目"的提示，**不是已确定的条目**，落地时按 Phase 2/3 实际改动的真实细节追加，不要现在就编内容占位：

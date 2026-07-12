@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/chat/chatclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,27 +28,17 @@ func NewChatMessageDeleteLogic(ctx context.Context, svcCtx *svc.ServiceContext) 
 	}
 }
 
+// ChatMessageDelete 薄胶水，实际业务逻辑已经搬进
+// services/chat/internal/logic/chatmessagedeletelogic.go。
 func (l *ChatMessageDeleteLogic) ChatMessageDelete(req *types.ChatMessageDeleteReq) (resp *types.Response, err error) {
 	if req == nil || req.Id == 0 {
 		return nil, errs.New(errs.CodeBadRequest, "消息ID不能为空")
 	}
 
-	// 检查消息是否存在
-	message, err := l.svcCtx.Domain.Chat.ChatMessage.FindByID(l.ctx, req.Id)
+	_, err = l.svcCtx.ChatRPC.ChatMessageDelete(l.ctx, &chatclient.ChatMessageDeleteRequest{Id: req.Id})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeNotFound, "消息不存在", err)
-	}
-	if message == nil {
-		return nil, errs.New(errs.CodeNotFound, "消息不存在")
+		return nil, errs.WrapGRPCError("删除消息失败", err)
 	}
 
-	// 删除消息（软删除）
-	if err := l.svcCtx.Domain.Chat.ChatMessage.DeleteByID(l.ctx, req.Id); err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "删除消息失败", err)
-	}
-
-	return &types.Response{
-		Code:    0,
-		Message: "删除成功",
-	}, nil
+	return &types.Response{Code: 0, Message: "删除成功"}, nil
 }

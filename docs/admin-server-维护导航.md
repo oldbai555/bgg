@@ -9,9 +9,9 @@
 | **iam** | `internal/{handler,logic,repository,model}/iam/` | 登录、用户、角色、权限、菜单、部门、接口 |
 | **blog** | `.../blog/` | 文章、标签、审核、友链、社交信息、公开博客页 API |
 | **video** | `.../video/` | 视频 CRUD、M3U8、采集、公开视频页 |
-| **chat** | `.../chat/` | 聊天、群组、消息、WebSocket（`handler/chat/chatwshandler.go`） |
-| **sdk** | `.../sdk/` | API Key、接口绑定、调用日志、公开 SDK 上传 |
-| **task** | `.../task/` + `internal/domain/task/` | 异步任务 CRUD、调度器、Excel 导出执行器 |
+| **chat** | gateway 薄胶水 `internal/{handler,logic}/chat/` + `services/chat/`（chat-rpc，2026-07-12 拆分） | 聊天、群组、消息、WebSocket↔gRPC 桥接（`internal/handler/chat/chatwshandler.go`），Hub/领域服务/消费者已搬到 `services/chat/internal/{hub,domain,consumer}/` |
+| **sdk** | gateway 薄胶水 `internal/logic/sdk/` + `services/sdk/`（sdk-rpc，2026-07-12 拆分） | API Key、接口绑定、调用日志、公开 SDK 上传，领域服务/repository 已搬到 `services/sdk/internal/{domain,repository}/` |
+| **task** | gateway 薄胶水 `internal/logic/task/` + `services/task/`（task-rpc，2026-07-11 拆分） | 异步任务 CRUD、调度器、Excel 导出执行器，领域服务/repository 已搬到 `services/task/internal/{domain,repository}/` |
 | **monitoring** | `.../monitoring/` | 监控、指标、操作/登录/审计/性能日志 |
 | **system** | `.../system/` | 配置、字典、文件、公告、通知 |
 | **misc** | `.../misc/` | ping、demo、每日一句、公共字典 |
@@ -29,13 +29,15 @@
   → video/
 
 改聊天或 WebSocket？
-  → chat/（Hub：internal/hub/chathub.go）
+  → chat 域已拆分成独立服务 services/chat/（chat-rpc）；gateway 只剩薄胶水 internal/logic/chat/ +
+    WS↔gRPC 桥接 internal/handler/chat/chatwshandler.go；Hub/领域服务在 services/chat/internal/hub/
 
 改 SDK 对外开放？
-  → sdk/
+  → sdk 域已拆分成独立服务 services/sdk/（sdk-rpc）；gateway 只剩薄胶水 internal/logic/sdk/
 
 改异步任务/定时调度？
-  → task/（领域服务：internal/domain/task/scheduler.go）
+  → task 域已拆分成独立服务 services/task/（task-rpc）；调度器在
+    services/task/internal/domain/task/scheduler.go
 
 改日志/监控/指标？
   → monitoring/
@@ -121,7 +123,7 @@ Handler/Logic 仍通过 `*svc.ServiceContext` 访问依赖；Logic 层 Repositor
 | 组合根 Wire | `internal/wire/`（改 Provider 后执行 `make wire`，提交 `wire_gen.go`） |
 | 领域 Repo 聚合 | `internal/repository/registry/domain.go` |
 | 跨域 Model 注册 | `internal/repository/repository.go` |
-| 任务调度 | `internal/domain/task/scheduler.go` |
+| 任务调度 | `services/task/internal/domain/task/scheduler.go`（task-rpc，2026-07-11 拆分） |
 | 权限解析 | `internal/domain/iam/permission_resolver.go` |
 
 ## 相关文档

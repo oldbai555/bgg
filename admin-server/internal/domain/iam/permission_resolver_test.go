@@ -16,7 +16,7 @@ import (
 var adminApiColumns = []string{"id", "name", "method", "path", "description", "status", "created_at", "updated_at", "deleted_at"}
 
 func TestPermissionResolver_CanAccess_SuperAdminBypass(t *testing.T) {
-	repo, _, cleanup := newTestRepo(t)
+	repo, _, _, cleanup := newTestRepo(t)
 	defer cleanup()
 
 	resolver := iamdomain.NewPermissionResolver(repo)
@@ -28,7 +28,7 @@ func TestPermissionResolver_CanAccess_SuperAdminBypass(t *testing.T) {
 }
 
 func TestPermissionResolver_CanAccess_ApiNotFound(t *testing.T) {
-	repo, sqlMock, cleanup := newTestRepo(t)
+	repo, sqlMock, _, cleanup := newTestRepo(t)
 	defer cleanup()
 
 	sqlMock.ExpectQuery(regexp.QuoteMeta("from `admin_api`")).
@@ -42,7 +42,7 @@ func TestPermissionResolver_CanAccess_ApiNotFound(t *testing.T) {
 }
 
 func TestPermissionResolver_CanAccess_NoRoles_Denied(t *testing.T) {
-	repo, sqlMock, cleanup := newTestRepo(t)
+	repo, sqlMock, _, cleanup := newTestRepo(t)
 	defer cleanup()
 
 	sqlMock.ExpectQuery(regexp.QuoteMeta("from `admin_api`")).
@@ -59,7 +59,7 @@ func TestPermissionResolver_CanAccess_NoRoles_Denied(t *testing.T) {
 }
 
 func TestPermissionResolver_CanAccess_MatchedApiPermission_Allowed(t *testing.T) {
-	repo, sqlMock, cleanup := newTestRepo(t)
+	repo, sqlMock, _, cleanup := newTestRepo(t)
 	defer cleanup()
 
 	sqlMock.ExpectQuery(regexp.QuoteMeta("from `admin_api`")).
@@ -80,7 +80,7 @@ func TestPermissionResolver_CanAccess_MatchedApiPermission_Allowed(t *testing.T)
 }
 
 func TestPermissionResolver_CanAccess_NoMatchedPermission_Denied(t *testing.T) {
-	repo, sqlMock, cleanup := newTestRepo(t)
+	repo, sqlMock, _, cleanup := newTestRepo(t)
 	defer cleanup()
 
 	sqlMock.ExpectQuery(regexp.QuoteMeta("from `admin_api`")).

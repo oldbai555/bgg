@@ -11,7 +11,6 @@ import (
 	"github.com/zeromicro/go-zero/core/stores/redis"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 	"postapocgame/admin-server/internal/model/blog"
-	"postapocgame/admin-server/internal/model/chat"
 	"postapocgame/admin-server/internal/model/iam"
 	"postapocgame/admin-server/internal/model/misc"
 	"postapocgame/admin-server/internal/model/monitoring"
@@ -41,9 +40,6 @@ type Repository struct {
 	AdminDictItemModel       system.AdminDictItemModel
 	AdminFileModel           system.AdminFileModel
 	DemoModel                misc.DemoModel
-	ChatModel                chat.ChatModel
-	ChatUserModel            chat.ChatUserModel
-	ChatMessageModel         chat.ChatMessageModel
 	AdminOperationLogModel   monitoring.AdminOperationLogModel
 	AdminLoginLogModel       monitoring.AdminLoginLogModel
 	AuditLogModel            monitoring.AuditLogModel
@@ -87,9 +83,6 @@ func NewRepository(conn sqlx.SqlConn, cacheConf cache.CacheConf, rdb *redis.Redi
 		AdminDictItemModel:       system.NewAdminDictItemModel(conn, cacheConf),
 		AdminFileModel:           system.NewAdminFileModel(conn, cacheConf),
 		DemoModel:                misc.NewDemoModel(conn, cacheConf),
-		ChatModel:                chat.NewChatModel(conn, cacheConf),
-		ChatUserModel:            chat.NewChatUserModel(conn, cacheConf),
-		ChatMessageModel:         chat.NewChatMessageModel(conn, cacheConf),
 		AdminOperationLogModel:   monitoring.NewAdminOperationLogModel(conn, cacheConf),
 		AdminLoginLogModel:       monitoring.NewAdminLoginLogModel(conn, cacheConf),
 		AuditLogModel:            monitoring.NewAuditLogModel(conn, cacheConf),
@@ -160,9 +153,6 @@ func (r *Repository) withSession(session sqlx.Session) *Repository {
 		AdminDictItemModel:       r.AdminDictItemModel.WithSession(session),
 		AdminFileModel:           r.AdminFileModel.WithSession(session),
 		DemoModel:                r.DemoModel.WithSession(session),
-		ChatModel:                r.ChatModel.WithSession(session),
-		ChatUserModel:            r.ChatUserModel.WithSession(session),
-		ChatMessageModel:         r.ChatMessageModel.WithSession(session),
 		AdminOperationLogModel:   r.AdminOperationLogModel.WithSession(session),
 		AdminLoginLogModel:       r.AdminLoginLogModel.WithSession(session),
 		AuditLogModel:            r.AuditLogModel.WithSession(session),

@@ -31,6 +31,16 @@ type Config struct {
 	// SDKRateLimitMiddleware/SDKCallLogMiddleware 三个中间件都通过这个 client 调用，不再
 	// 直接持有 Domain.SDK。见 18-service-extraction-runbook.md 2.2 节。
 	SdkRPCConf zrpc.RpcClientConf `json:"sdkRpc,optional" yaml:"sdkRpc" mapstructure:"sdkRpc"`
+	// ChatRPCConf 连到 chat-rpc（services/chat/）的 zrpc client 配置。chat 域已拆分成独立
+	// 服务，gateway 侧的 11 个 Chat*/ChatGroup*/ChatMessage* logic 和 WS↔gRPC 桥接 handler
+	// （internal/handler/chat/chatwshandler.go）都通过这个 client 调用，不再直接持有
+	// Domain.Chat/ChatHub。见 16-rpc-conventions.md 第 7 节、18-service-extraction-runbook.md
+	// 2.3 节。
+	ChatRPCConf zrpc.RpcClientConf `json:"chatRpc,optional" yaml:"chatRpc" mapstructure:"chatRpc"`
+	// IamCallbackRPCConf 单体内嵌的 pkg/iamcallback.IamCallback zrpc server 监听配置，供
+	// chat-rpc 回调枚举存量用户 / 取用户展示信息（用户名/昵称/头像/部门名/角色名）。iam 域
+	// 还没拆分成独立服务前的临时方案，和 TaskCallbackRPCConf 同一个模式。
+	IamCallbackRPCConf zrpc.RpcServerConf `json:"iamCallbackRpc,optional" yaml:"iamCallbackRpc" mapstructure:"iamCallbackRpc"`
 }
 
 type DatabaseConf struct {

@@ -3,28 +3,26 @@ package registry
 import (
 	"context"
 
-	"postapocgame/admin-server/internal/consts"
-	chatdomain "postapocgame/admin-server/internal/domain/chat"
-	contentdomain "postapocgame/admin-server/internal/domain/content"
-	iamdomain "postapocgame/admin-server/internal/domain/iam"
 	"postapocgame/admin-server/internal/repository"
 	blogrepo "postapocgame/admin-server/internal/repository/blog"
-	chatrepo "postapocgame/admin-server/internal/repository/chat"
 	iamrepo "postapocgame/admin-server/internal/repository/iam"
 	miscrepo "postapocgame/admin-server/internal/repository/misc"
 	monitoringrepo "postapocgame/admin-server/internal/repository/monitoring"
 	systemrepo "postapocgame/admin-server/internal/repository/system"
 	videorepo "postapocgame/admin-server/internal/repository/video"
+
+	contentdomain "postapocgame/admin-server/internal/domain/content"
+	iamdomain "postapocgame/admin-server/internal/domain/iam"
 )
 
 // Domain 聚合各领域 Repository，启动时构造一次，Logic 通过 svcCtx.Domain 访问。
-// 不再有 Task/SDK 字段：task 域已拆成独立的 task-rpc（services/task/），sdk 域已拆成
-// 独立的 sdk-rpc（services/sdk/），gateway 侧改成走 svcCtx.TaskRPC/svcCtx.SdkRPC 这两个
-// zrpc client，不通过 Domain 聚合根访问。
+// 不再有 Task/SDK/Chat 字段：task 域已拆成独立的 task-rpc（services/task/），sdk 域已拆成
+// 独立的 sdk-rpc（services/sdk/），chat 域已拆成独立的 chat-rpc（services/chat/），gateway
+// 侧改成走 svcCtx.TaskRPC/svcCtx.SdkRPC/svcCtx.ChatRPC 这三个 zrpc client，不通过 Domain
+// 聚合根访问。
 type Domain struct {
 	IAM        IAMDomain
 	Blog       BlogDomain
-	Chat       ChatDomain
 	Video      VideoDomain
 	Monitoring MonitoringDomain
 	System     SystemDomain
@@ -56,36 +54,6 @@ type BlogDomain struct {
 	SocialInfo     blogrepo.BlogSocialInfoRepository
 	Tag            blogrepo.BlogTagRepository
 	ArticleService *contentdomain.BlogArticleService
-}
-
-type ChatDomain struct {
-	Chat        chatrepo.ChatRepository
-	ChatUser    chatrepo.ChatUserRepository
-	ChatMessage chatrepo.ChatMessageRepository
-	Onboarding  chatdomain.Onboarding
-}
-
-// iamUserListerAdapter 实现 chatdomain.UserLister，是 registry 包（组合根，允许同时
-// import iam 和 chat 两个域）承担的"翻译"职责：chatdomain 包本身永远不 import
-// internal/repository/iam 或 internal/model/iam。只返回未删除、状态正常的用户，
-// 过滤逻辑放在这里而不是 chatdomain 里，因为"状态正常"是 IAM 的业务语义。
-type iamUserListerAdapter struct {
-	userRepo iamrepo.UserRepository
-}
-
-func (a *iamUserListerAdapter) FindChunk(ctx context.Context, limit int, lastID uint64) ([]chatdomain.UserRef, uint64, error) {
-	users, newLastID, err := a.userRepo.FindChunk(ctx, int64(limit), lastID)
-	if err != nil {
-		return nil, 0, err
-	}
-	refs := make([]chatdomain.UserRef, 0, len(users))
-	for _, u := range users {
-		if u.DeletedAt != 0 || u.Status != consts.UserStatusEnabled {
-			continue
-		}
-		refs = append(refs, chatdomain.UserRef{ID: u.Id})
-	}
-	return refs, newLastID, nil
 }
 
 type VideoDomain struct {
@@ -120,15 +88,9 @@ func NewDomain(repo *repository.Repository) *Domain {
 		return nil
 	}
 
-	// chatOnboarding 必须先于 IAM.UserService 构造好（UserService 依赖它）。提到局部变量
-	// 而不是在两处字面量里各构造一次，避免出现两个不同的 *ChatOnboardingService 实例
-	// （IAM 手上那个和 Domain.Chat.Onboarding 对不上，造成理解成本）。
-	userRepo := iamrepo.NewUserRepository(repo)
-	chatOnboarding := chatdomain.NewChatOnboardingService(repo, &iamUserListerAdapter{userRepo: userRepo})
-
 	return &Domain{
 		IAM: IAMDomain{
-			User:               userRepo,
+			User:               iamrepo.NewUserRepository(repo),
 			Role:               iamrepo.NewRoleRepository(repo),
 			Permission:         iamrepo.NewPermissionRepository(repo),
 			Menu:               iamrepo.NewMenuRepository(repo),
@@ -140,7 +102,7 @@ func NewDomain(repo *repository.Repository) *Domain {
 			PermissionApi:      iamrepo.NewPermissionApiRepository(repo),
 			TokenBlacklist:     iamrepo.NewTokenBlacklistRepository(repo),
 			PermissionResolver: iamdomain.NewPermissionResolver(repo),
-			UserService:        iamdomain.NewUserDomainService(repo, chatOnboarding),
+			UserService:        iamdomain.NewUserDomainService(repo, repo.Redis),
 			RBAC:               iamdomain.NewRBACService(repo),
 		},
 		Blog: BlogDomain{
@@ -151,12 +113,6 @@ func NewDomain(repo *repository.Repository) *Domain {
 			SocialInfo:     blogrepo.NewBlogSocialInfoRepository(repo),
 			Tag:            blogrepo.NewBlogTagRepository(repo),
 			ArticleService: contentdomain.NewBlogArticleService(repo),
-		},
-		Chat: ChatDomain{
-			Chat:        chatrepo.NewChatRepository(repo),
-			ChatUser:    chatrepo.NewChatUserRepository(repo),
-			ChatMessage: chatrepo.NewChatMessageRepository(repo),
-			Onboarding:  chatOnboarding,
 		},
 		Video: VideoDomain{
 			Video: videorepo.NewVideoRepository(repo),

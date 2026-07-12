@@ -10,6 +10,7 @@ import (
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
+	"postapocgame/admin-server/services/chat/chatclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -28,107 +29,38 @@ func NewChatListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ChatList
 	}
 }
 
+// ChatList 薄胶水：解析 HTTP 请求 -> 拼一次 ChatRPC 请求 -> 映射响应，chat 域的实际业务
+// 逻辑（私聊对方用户信息回调 IamCallback 展开）已经搬进
+// services/chat/internal/logic/chatlistlogic.go。
 func (l *ChatListLogic) ChatList(req *types.ChatListReq) (resp *types.ChatListResp, err error) {
-	// 获取当前用户
 	user, ok := jwthelper.FromContext(l.ctx)
 	if !ok {
 		return nil, errs.New(errs.CodeUnauthorized, "未登录或登录已过期")
 	}
 
-	// 查询用户参与的所有聊天（通过chat_user关联表）
-	chats, err := l.svcCtx.Domain.Chat.Chat.FindByUserID(l.ctx, user.UserID)
+	rpcResp, err := l.svcCtx.ChatRPC.ChatList(l.ctx, &chatclient.ChatListRequest{OperatorUserId: user.UserID})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "查询聊天列表失败", err)
+		return nil, errs.WrapGRPCError("查询聊天列表失败", err)
 	}
 
-	// 查询部门和角色信息（用于私聊显示）
-	// 构建部门ID到名称的映射
-	deptMap := make(map[uint64]string)
-	allDepts, _ := l.svcCtx.Domain.IAM.Department.ListAll(l.ctx)
-	for _, dept := range allDepts {
-		if dept.DeletedAt == 0 {
-			deptMap[dept.Id] = dept.Name
-		}
+	items := make([]types.ChatItem, 0, len(rpcResp.List))
+	for _, c := range rpcResp.List {
+		items = append(items, types.ChatItem{
+			ChatId:         c.ChatId,
+			Name:           c.Name,
+			ChatType:       c.ChatType,
+			Avatar:         c.Avatar,
+			Description:    c.Description,
+			UserId:         c.UserId,
+			Username:       c.Username,
+			Nickname:       c.Nickname,
+			DepartmentName: c.DepartmentName,
+			RoleNames:      c.RoleNames,
+			UnreadCount:    c.UnreadCount,
+			LastMessage:    c.LastMessage,
+			LastMessageAt:  c.LastMessageAt,
+		})
 	}
 
-	// 构建角色ID到名称的映射
-	roleMap := make(map[uint64]string)
-	allRoles, _, _ := l.svcCtx.Domain.IAM.Role.FindPage(l.ctx, 1, 10000, "")
-	for _, role := range allRoles {
-		if role.DeletedAt == 0 {
-			roleMap[role.Id] = role.Name
-		}
-	}
-
-	items := make([]types.ChatItem, 0, len(chats))
-	for _, chat := range chats {
-		item := types.ChatItem{
-			ChatId:      chat.Id,
-			Name:        chat.Name,
-			ChatType:    int64(chat.Type),
-			Avatar:      chat.Avatar,
-			Description: chat.Description,
-		}
-
-		// 如果是私聊（type=1），需要获取对方用户信息
-		if chat.Type == 1 {
-			// 查询私聊中的另一个用户（不是当前用户的那个）
-			chatUsers, err := l.svcCtx.Domain.Chat.ChatUser.FindByChatID(l.ctx, chat.Id)
-			if err == nil && len(chatUsers) == 2 {
-				// 找到对方用户ID
-				var otherUserID uint64
-				for _, chatUser := range chatUsers {
-					if chatUser.UserId != user.UserID {
-						otherUserID = chatUser.UserId
-						break
-					}
-				}
-
-				if otherUserID > 0 {
-					// 获取对方用户信息
-					otherUser, err := l.svcCtx.Domain.IAM.User.FindByID(l.ctx, otherUserID)
-					if err == nil && otherUser.DeletedAt == 0 && otherUser.Status == 1 {
-						item.UserId = otherUser.Id
-						item.Username = otherUser.Username
-						item.Nickname = otherUser.Nickname
-						// 显示名称：优先使用昵称，否则使用用户名
-						if otherUser.Nickname != "" {
-							item.Name = otherUser.Nickname
-						} else {
-							item.Name = otherUser.Username
-						}
-						item.Avatar = otherUser.Avatar
-
-						// 获取部门名称
-						if otherUser.DepartmentId > 0 {
-							if deptName, ok := deptMap[otherUser.DepartmentId]; ok {
-								item.DepartmentName = deptName
-							}
-						}
-
-						// 获取角色名称列表
-						roleIDs, _ := l.svcCtx.Domain.IAM.UserRole.ListRoleIDsByUserID(l.ctx, otherUser.Id)
-						roleNames := make([]string, 0, len(roleIDs))
-						for _, roleID := range roleIDs {
-							if roleName, ok := roleMap[roleID]; ok {
-								roleNames = append(roleNames, roleName)
-							}
-						}
-						item.RoleNames = roleNames
-					}
-				}
-			}
-		}
-
-		// TODO: 查询未读消息数和最后一条消息（后续实现）
-		item.UnreadCount = 0
-		item.LastMessage = ""
-		item.LastMessageAt = 0
-
-		items = append(items, item)
-	}
-
-	return &types.ChatListResp{
-		List: items,
-	}, nil
+	return &types.ChatListResp{List: items}, nil
 }

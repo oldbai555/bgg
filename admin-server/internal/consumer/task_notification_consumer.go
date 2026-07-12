@@ -21,10 +21,11 @@ import (
 	"github.com/zeromicro/go-zero/core/stores/redis"
 
 	"postapocgame/admin-server/internal/consts"
-	"postapocgame/admin-server/internal/hub"
 	systemmodel "postapocgame/admin-server/internal/model/system"
 	"postapocgame/admin-server/internal/repository"
 	systemrepo "postapocgame/admin-server/internal/repository/system"
+	"postapocgame/admin-server/services/chat/chat"
+	"postapocgame/admin-server/services/chat/chatclient"
 )
 
 const (
@@ -50,7 +51,7 @@ type taskNotificationEvent struct {
 type TaskNotificationConsumer struct {
 	redis    *redis.Redis
 	repo     *repository.Repository
-	chatHub  *hub.ChatHub
+	chatRPC  chatclient.Chat // chat 域已拆分成独立服务，推 WS 改成回调 chat-rpc.PushToUser
 	stopChan chan struct{}
 	wg       sync.WaitGroup
 
@@ -64,7 +65,7 @@ type TaskNotificationConsumer struct {
 }
 
 // NewTaskNotificationConsumer 创建消费者。
-func NewTaskNotificationConsumer(rds *redis.Redis, repo *repository.Repository, chatHub *hub.ChatHub) *TaskNotificationConsumer {
+func NewTaskNotificationConsumer(rds *redis.Redis, repo *repository.Repository, chatRPC chatclient.Chat) *TaskNotificationConsumer {
 	hostname, err := os.Hostname()
 	if err != nil || hostname == "" {
 		hostname = "unknown-host"
@@ -72,7 +73,7 @@ func NewTaskNotificationConsumer(rds *redis.Redis, repo *repository.Repository, 
 	return &TaskNotificationConsumer{
 		redis:        rds,
 		repo:         repo,
-		chatHub:      chatHub,
+		chatRPC:      chatRPC,
 		stopChan:     make(chan struct{}),
 		failures:     make(map[string]int),
 		consumerName: fmt.Sprintf("%s-%s-%d", consumerGroup, hostname, os.Getpid()),
@@ -179,7 +180,7 @@ func (c *TaskNotificationConsumer) process(ctx context.Context, event taskNotifi
 	if err == nil {
 		for _, n := range existing {
 			if n.SourceId == event.TaskID && n.Title == title {
-				return c.pushWS(event, title, content)
+				return c.pushWS(ctx, event, title, content)
 			}
 		}
 	}
@@ -201,14 +202,25 @@ func (c *TaskNotificationConsumer) process(ctx context.Context, event taskNotifi
 		return fmt.Errorf("创建任务通知记录失败: %w", err)
 	}
 
-	return c.pushWS(event, title, content)
+	return c.pushWS(ctx, event, title, content)
 }
 
-func (c *TaskNotificationConsumer) pushWS(event taskNotificationEvent, title, content string) error {
-	if c.chatHub == nil {
-		return nil
-	}
+// wsChatMessage 是 WS wire 格式（JSON）的本地副本，字段名/tag 与
+// services/chat/internal/hub.ChatMessage 逐一对齐——chat 域拆分后那个类型定义在 chat-rpc
+// 自己的 internal/ 下不能跨服务 import，按 16-rpc-conventions.md 第 6 节"直接复制不共享"
+// 的既定策略，gateway 侧这里维护一份同形状的最小拷贝，只用到推任务通知需要的字段。
+type wsChatMessage struct {
+	Type      string `json:"type"`
+	TaskID    string `json:"taskId,omitempty"`
+	TaskName  string `json:"taskName,omitempty"`
+	Status    string `json:"status,omitempty"`
+	Title     string `json:"title,omitempty"`
+	Level     string `json:"level,omitempty"`
+	Content   string `json:"content"`
+	CreatedAt int64  `json:"createdAt"`
+}
 
+func (c *TaskNotificationConsumer) pushWS(ctx context.Context, event taskNotificationEvent, title, content string) error {
 	var msgType, level string
 	switch event.Status {
 	case consts.TaskStatusRunning:
@@ -221,7 +233,7 @@ func (c *TaskNotificationConsumer) pushWS(event taskNotificationEvent, title, co
 		return nil
 	}
 
-	chatMsg := &hub.ChatMessage{
+	chatMsg := &wsChatMessage{
 		Type:      msgType,
 		TaskID:    fmt.Sprintf("%d", event.TaskID),
 		TaskName:  event.TaskName,
@@ -236,7 +248,12 @@ func (c *TaskNotificationConsumer) pushWS(event taskNotificationEvent, title, co
 		return fmt.Errorf("任务通知消息序列化失败: %w", err)
 	}
 
-	if !c.chatHub.SendToUser(event.UserID, messageBytes) {
+	resp, err := c.chatRPC.PushToUser(ctx, &chat.PushToUserRequest{UserId: event.UserID, PayloadJson: string(messageBytes)})
+	if err != nil {
+		logx.Errorf("任务通知回调 chat-rpc.PushToUser 失败: taskId=%d, userId=%d, err=%v", event.TaskID, event.UserID, err)
+		return nil // 推送失败不影响主流程（尽力而为，语义与拆分前一致）
+	}
+	if !resp.Delivered {
 		logx.Infof("任务通知WebSocket发送失败（用户可能不在线）: taskId=%d, userId=%d", event.TaskID, event.UserID)
 	}
 	return nil

@@ -15,6 +15,7 @@ services:
       - ./db/docker-init.sh:/docker-entrypoint-initdb.d/00-init.sh:ro
       - ./db/services/init-task-db.sh:/docker-entrypoint-initdb.d/01-init-task-db.sh:ro
       - ./db/services/init-sdk-db.sh:/docker-entrypoint-initdb.d/02-init-sdk-db.sh:ro
+      - ./db/services/init-chat-db.sh:/docker-entrypoint-initdb.d/03-init-chat-db.sh:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-devroot}"]
       interval: 5s
@@ -47,6 +48,8 @@ services:
       TASK_RPC_ENDPOINT: task:8090
       # sdk-rpc 的服务名:端口，见 services/sdk/。
       SDK_RPC_ENDPOINT: sdk:8091
+      # chat-rpc 的服务名:端口，见 services/chat/。
+      CHAT_RPC_ENDPOINT: chat:8092
     # admin.go 强制要求 -mysql-config/-redis-config 指向的 JSON 文件存在（MergeExternalConfig
     # 找不到文件直接报错退出），etc/dev-mysql.json/etc/dev-redis.json 是仅供本地 compose 使用的
     # 开发期配置（host 指向本 compose 内的服务名 mysql/redis，密码与上面 MYSQL_ROOT_PASSWORD
@@ -55,6 +58,7 @@ services:
     ports:
       - "20000:20000"   # 需与 etc/admin-api.yaml 的 Port 一致
       - "9001:9001"     # TaskCallback zrpc，task 容器回调用
+      - "9002:9002"     # IamCallback zrpc，chat 容器回调用
     volumes:
       - uploads:/app/uploads   # 导出文件的下载代理路径读这个卷，见 task 服务同名挂载
 
@@ -95,6 +99,24 @@ services:
       SDK_REDIS_PASSWORD: ""
     ports:
       - "8091:8091"
+
+  chat:
+    build:
+      context: .
+      dockerfile: services/chat/Dockerfile
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      CHAT_MYSQL_DSN: "root:${MYSQL_ROOT_PASSWORD:-devroot}@tcp(mysql:3306)/admin_chat?charset=utf8mb4&parseTime=true&loc=Local"
+      CHAT_REDIS_ADDRESS: redis:6379
+      CHAT_REDIS_PASSWORD: ""
+      # 单体内嵌 IamCallback server 所在的服务名:端口，见 etc/admin-api.yaml 的 IamCallbackRpc 段。
+      IAM_CALLBACK_ENDPOINT: app:9002
+    ports:
+      - "8092:8092"
 
 volumes:
   mysql_data:

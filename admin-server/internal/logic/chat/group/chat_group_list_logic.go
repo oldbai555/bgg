@@ -10,6 +10,7 @@ import (
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
+	"postapocgame/admin-server/services/chat/chatclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -28,45 +29,33 @@ func NewChatGroupListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Cha
 	}
 }
 
+// ChatGroupList 薄胶水，实际业务逻辑已经搬进
+// services/chat/internal/logic/chatgrouplistlogic.go。
 func (l *ChatGroupListLogic) ChatGroupList(req *types.ChatGroupListReq) (resp *types.ChatGroupListResp, err error) {
-	// 获取当前用户
-	_, ok := jwthelper.FromContext(l.ctx)
-	if !ok {
+	if _, ok := jwthelper.FromContext(l.ctx); !ok {
 		return nil, errs.New(errs.CodeUnauthorized, "未登录或登录已过期")
 	}
-
 	req.Page, req.PageSize = logicutil.NormalizePage(req.Page, req.PageSize, 10, 100)
 
-	// 查询群组列表
-	groups, total, err := l.svcCtx.Domain.Chat.Chat.FindGroups(l.ctx, req.Page, req.PageSize, req.Name)
+	rpcResp, err := l.svcCtx.ChatRPC.ChatGroupList(l.ctx, &chatclient.ChatGroupListRequest{
+		Page: req.Page, PageSize: req.PageSize, Name: req.Name,
+	})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "查询群组列表失败", err)
+		return nil, errs.WrapGRPCError("查询群组列表失败", err)
 	}
 
-	// 获取每个群组的成员数量
-	items := make([]types.ChatGroupItem, 0, len(groups))
-	for _, group := range groups {
-		memberCount, err := l.svcCtx.Domain.Chat.Chat.CountMembersByChatID(l.ctx, group.Id)
-		if err != nil {
-			logx.Errorf("统计群组 %d 成员数量失败: %v", group.Id, err)
-			memberCount = 0
-		}
-
+	items := make([]types.ChatGroupItem, 0, len(rpcResp.List))
+	for _, g := range rpcResp.List {
 		items = append(items, types.ChatGroupItem{
-			Id:          group.Id,
-			Name:        group.Name,
-			Avatar:      group.Avatar,
-			Description: group.Description,
-			CreatedBy:   group.CreatedBy,
-			CreatedAt:   group.CreatedAt,
-			MemberCount: memberCount,
+			Id:          g.Id,
+			Name:        g.Name,
+			Avatar:      g.Avatar,
+			Description: g.Description,
+			CreatedBy:   g.CreatedBy,
+			CreatedAt:   g.CreatedAt,
+			MemberCount: g.MemberCount,
 		})
 	}
 
-	resp = &types.ChatGroupListResp{
-		Total: total,
-		List:  items,
-	}
-
-	return resp, nil
+	return &types.ChatGroupListResp{Total: rpcResp.Total, List: items}, nil
 }

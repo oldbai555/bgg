@@ -137,6 +137,10 @@ if _, err := l.svcCtx.Redis.XAdd(l.ctx, &redis.XAddArgs{
 
 **消费者**：`chat-rpc` 起一个消费者组（`XGROUP CREATE stream:chat.user.created chat-rpc-init $ MKSTREAM`，消费者组名固定为 `<service>-<用途>` 格式，这里是 `chat-rpc-init`），消费到事件后执行"拉入默认群 + 为存量用户逐个建私聊"——这就是 `initChatForNewUser` 原来的方法体，原样搬进 chat-rpc 自己的领域服务（`services/chat/internal/domain/onboarding.go` 或类似位置），包括第 1 步查默认群、第 2 步 `FindChunk` 分批拉用户建私聊的逻辑都不变。**唯一需要补的是 Phase 1 里已经规划好的 `FindChunk` 替换全量 `FindPage(1, 10000, "")`**（`04-domain-iam-chat.md` 任务 1/2，`ChatOnboardingService.createPrivateChatsForExistingUsers` 用 `chatdomain.UserLister.FindChunk` 分批）——这个修复在 Phase 1 单体阶段就该做完，Phase 2 只是原样搬迁已经修好的版本，不是在拆分时顺带修。
 
+**执行落地时的实际偏差（chat-rpc 拆分，`docs/progress.md` 对应条目）**：本节原文写的是"iam-rpc 的用户创建事务提交后发布"，但执行这一步时 iam-rpc 还没有真正拆分（chat-rpc 是 B.6 顺序里的第三个,排在 iam-rpc 前面）,生产者实际落在**单体内** `internal/domain/iam/user_service.go` 的 `UserDomainService.CreateUser`（`publishChatUserCreated` 方法），和 task-rpc 拆分时 `TaskCallback` 的处理方式一致：先在单体里把机制跑通,等 iam-rpc 真正拆分时这段代码原样搬过去,事件格式/触发时机不用改。另外，`createPrivateChatsForExistingUsers` 分批枚举存量用户不再是本节原文设想的"chat-rpc 直接查自己的用户列表"（chat-rpc 根本不持有 `admin_user` 表），而是回调单体内新增的 `IamCallback.FindActiveUserChunk`（`pkg/iamcallback`，和 `pkg/taskcallback` 同一个"服务还没拆分,先在单体里实现一个可以被回调的最小接口"模式,见本文档第 1.3 节"执行落地时的实际偏差"记录的先例）；`ChatList`/`ChatGroupDetail`/`ChatGroupMemberList` 等 7 个原来直接读 `Domain.IAM.*` 展示用户名/昵称/部门名/角色名的 logic,同样通过 `IamCallback.GetUserProfile` 取数据，这是本节原文完全没预见到的一类新增跨服务点（原文只规划了 onboarding 这一个使用场景）。
+
+**已验证**：单元测试（`services/chat/internal/domain/chat/onboarding_test.go`，验证 `createPrivateChat` happy/rollback path + `createPrivateChatsForExistingUsers` 分页边界，用 fake `IamCallbackClient` 打桩）+ 真实端到端（本地起 gateway + chat-rpc,对着一个借用的远程 MySQL,真实调用 `UserDomainService.CreateUser` 建一个新用户，秒级内确认该用户出现在默认企业群组成员列表 + 与全部存量用户（2 个）建好私聊，`FindActiveUserChunk` 分页/过滤逻辑、`GetUserProfile` 回调链路（`ChatList` 返回的部门名"总部"、角色名"超级管理员"）均在真实数据上验证通过，见 `docs/progress.md` 对应条目）。
+
 ### 2.2 `stream:audit.request`
 
 **生产者**：gateway 的日志中间件（`OperationLogMiddleware`/`PerformanceMiddleware`）非阻塞 `XADD`，每次请求处理完成后发布一条事件,携带请求方法/路径/耗时/状态码/用户信息，等同于现在这两个中间件直接写 `admin_operation_log`/`admin_performance_log` 两张表时携带的字段。

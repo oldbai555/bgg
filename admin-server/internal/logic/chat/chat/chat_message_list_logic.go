@@ -10,6 +10,7 @@ import (
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
+	"postapocgame/admin-server/services/chat/chatclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -28,39 +29,32 @@ func NewChatMessageListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *C
 	}
 }
 
+// ChatMessageList 薄胶水：解析 HTTP 请求 -> 拼一次 ChatRPC 请求 -> 映射响应，实际业务逻辑
+// 已经搬进 services/chat/internal/logic/chatmessagelistlogic.go。
 func (l *ChatMessageListLogic) ChatMessageList(req *types.ChatMessageListReq) (resp *types.ChatMessageListResp, err error) {
 	if req == nil {
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
-
 	req.Page, req.PageSize = logicutil.NormalizePage(req.Page, req.PageSize, 20, 100)
 
-	// 获取当前用户（用于权限验证）
-	_, ok := jwthelper.FromContext(l.ctx)
-	if !ok {
+	if _, ok := jwthelper.FromContext(l.ctx); !ok {
 		return nil, errs.New(errs.CodeUnauthorized, "未登录或登录已过期")
 	}
 
-	// 根据 chatId 查询消息，如果 chatId == 0，则查询所有消息（管理页面）
-	list, total, err := l.svcCtx.Domain.Chat.ChatMessage.FindByChatID(l.ctx, req.Page, req.PageSize, req.ChatId)
+	rpcResp, err := l.svcCtx.ChatRPC.ChatMessageList(l.ctx, &chatclient.ChatMessageListRequest{
+		Page: req.Page, PageSize: req.PageSize, ChatId: req.ChatId,
+	})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "查询聊天消息列表失败", err)
+		return nil, errs.WrapGRPCError("查询聊天消息列表失败", err)
 	}
 
-	items := make([]types.ChatMessageItem, 0, len(list))
-	for _, msg := range list {
-		// 查询发送用户信息
-		fromUser, _ := l.svcCtx.Domain.IAM.User.FindByID(l.ctx, msg.FromUserId)
-		fromUserName := ""
-		if fromUser != nil {
-			fromUserName = fromUser.Username
-		}
-
+	items := make([]types.ChatMessageItem, 0, len(rpcResp.List))
+	for _, msg := range rpcResp.List {
 		items = append(items, types.ChatMessageItem{
 			Id:           msg.Id,
 			ChatId:       msg.ChatId,
 			FromUserId:   msg.FromUserId,
-			FromUserName: fromUserName,
+			FromUserName: msg.FromUserName,
 			Content:      msg.Content,
 			MessageType:  msg.MessageType,
 			Status:       msg.Status,
@@ -68,8 +62,5 @@ func (l *ChatMessageListLogic) ChatMessageList(req *types.ChatMessageListReq) (r
 		})
 	}
 
-	return &types.ChatMessageListResp{
-		Total: total,
-		List:  items,
-	}, nil
+	return &types.ChatMessageListResp{Total: rpcResp.Total, List: items}, nil
 }

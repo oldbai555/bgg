@@ -10,6 +10,7 @@ import (
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
+	"postapocgame/admin-server/services/chat/chatclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -28,55 +29,19 @@ func NewChatGroupMemberRemoveLogic(ctx context.Context, svcCtx *svc.ServiceConte
 	}
 }
 
+// ChatGroupMemberRemove 薄胶水，实际业务逻辑已经搬进
+// services/chat/internal/logic/chatgroupmemberremovelogic.go。
 func (l *ChatGroupMemberRemoveLogic) ChatGroupMemberRemove(req *types.ChatGroupMemberRemoveReq) (resp *types.Response, err error) {
-	// 获取当前用户
-	_, ok := jwthelper.FromContext(l.ctx)
-	if !ok {
+	if _, ok := jwthelper.FromContext(l.ctx); !ok {
 		return nil, errs.New(errs.CodeUnauthorized, "未登录或登录已过期")
 	}
 
-	// 查询群组
-	chat, err := l.svcCtx.Domain.Chat.Chat.FindByID(l.ctx, req.ChatId)
+	_, err = l.svcCtx.ChatRPC.ChatGroupMemberRemove(l.ctx, &chatclient.ChatGroupMemberRemoveRequest{
+		ChatId: req.ChatId, UserId: req.UserId,
+	})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeNotFound, "群组不存在", err)
+		return nil, errs.WrapGRPCError("移除成员失败", err)
 	}
 
-	// 验证是否为群组
-	if chat.Type != 2 {
-		return nil, errs.New(errs.CodeBadRequest, "该聊天不是群组")
-	}
-
-	// 验证是否已删除
-	if chat.DeletedAt != 0 {
-		return nil, errs.New(errs.CodeNotFound, "群组已删除")
-	}
-
-	// 检查用户是否在群组中
-	chatUsers, err := l.svcCtx.Domain.Chat.ChatUser.FindByChatID(l.ctx, req.ChatId)
-	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "查询群组成员失败", err)
-	}
-
-	userInGroup := false
-	for _, cu := range chatUsers {
-		if cu.UserId == req.UserId {
-			userInGroup = true
-			break
-		}
-	}
-
-	if !userInGroup {
-		return nil, errs.New(errs.CodeBadRequest, "用户不在群组中")
-	}
-
-	// 移除成员
-	err = l.svcCtx.Domain.Chat.ChatUser.DeleteByChatIDAndUserID(l.ctx, req.ChatId, req.UserId)
-	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "移除成员失败", err)
-	}
-
-	return &types.Response{
-		Code:    0,
-		Message: "移除成员成功",
-	}, nil
+	return &types.Response{Code: 0, Message: "移除成员成功"}, nil
 }

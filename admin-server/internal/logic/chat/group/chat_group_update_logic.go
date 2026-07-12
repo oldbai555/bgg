@@ -5,12 +5,12 @@ package group
 
 import (
 	"context"
-	"time"
 
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
+	"postapocgame/admin-server/services/chat/chatclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -29,59 +29,19 @@ func NewChatGroupUpdateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *C
 	}
 }
 
+// ChatGroupUpdate 薄胶水，实际业务逻辑已经搬进
+// services/chat/internal/logic/chatgroupupdatelogic.go。
 func (l *ChatGroupUpdateLogic) ChatGroupUpdate(req *types.ChatGroupUpdateReq) (resp *types.Response, err error) {
-	// 获取当前用户
-	_, ok := jwthelper.FromContext(l.ctx)
-	if !ok {
+	if _, ok := jwthelper.FromContext(l.ctx); !ok {
 		return nil, errs.New(errs.CodeUnauthorized, "未登录或登录已过期")
 	}
 
-	// 查询群组
-	chat, err := l.svcCtx.Domain.Chat.Chat.FindByID(l.ctx, req.Id)
+	_, err = l.svcCtx.ChatRPC.ChatGroupUpdate(l.ctx, &chatclient.ChatGroupUpdateRequest{
+		Id: req.Id, Name: req.Name, Avatar: req.Avatar, Description: req.Description,
+	})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeNotFound, "群组不存在", err)
+		return nil, errs.WrapGRPCError("更新群组失败", err)
 	}
 
-	// 验证是否为群组
-	if chat.Type != 2 {
-		return nil, errs.New(errs.CodeBadRequest, "该聊天不是群组")
-	}
-
-	// 验证是否已删除
-	if chat.DeletedAt != 0 {
-		return nil, errs.New(errs.CodeNotFound, "群组已删除")
-	}
-
-	// 更新字段
-	updated := false
-	if req.Name != "" && req.Name != chat.Name {
-		chat.Name = req.Name
-		updated = true
-	}
-	if req.Avatar != "" && req.Avatar != chat.Avatar {
-		chat.Avatar = req.Avatar
-		updated = true
-	}
-	if req.Description != "" && req.Description != chat.Description {
-		chat.Description = req.Description
-		updated = true
-	}
-
-	if !updated {
-		return &types.Response{
-			Code:    0,
-			Message: "无需更新",
-		}, nil
-	}
-
-	chat.UpdatedAt = time.Now().Unix()
-	err = l.svcCtx.Domain.Chat.Chat.Update(l.ctx, chat)
-	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "更新群组失败", err)
-	}
-
-	return &types.Response{
-		Code:    0,
-		Message: "更新群组成功",
-	}, nil
+	return &types.Response{Code: 0, Message: "更新群组成功"}, nil
 }

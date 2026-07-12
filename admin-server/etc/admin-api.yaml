@@ -11,6 +11,14 @@ TaskCallbackRpc:
   ListenOn: 0.0.0.0:9001
   Mode: pro
 
+# IamCallback zrpc server：与上面的 REST server 并存，供 services/chat/（chat-rpc）
+# 回调枚举存量用户 / 取用户展示信息。iam 域还没拆分成独立服务前的临时方案，和
+# TaskCallbackRpc 同一个模式，监听 0.0.0.0 让 docker-compose 场景下的 chat 容器能连进来。
+IamCallbackRpc:
+  Name: admin-api.iamcallback
+  ListenOn: 0.0.0.0:9002
+  Mode: pro
+
 # task-rpc（services/task/）的 zrpc client 配置。task 域已拆分成独立服务，见
 # 16-rpc-conventions.md 第 5 节"gateway 变薄机制"。初期用静态 Endpoints，不引入 etcd。
 # TASK_RPC_ENDPOINT 必须显式设置（和 JWT_ACCESS_SECRET 一样走 fail-fast，不给静默默认值）：
@@ -27,6 +35,15 @@ TaskRpc:
 SdkRpc:
   Endpoints:
     - "${SDK_RPC_ENDPOINT}"
+  NonBlock: true
+
+# chat-rpc（services/chat/）的 zrpc client 配置。chat 域已拆分成独立服务，11 个
+# Chat*/ChatGroup*/ChatMessage* logic 和 WS↔gRPC 桥接 handler
+# （internal/handler/chat/chatwshandler.go）都通过这个 client 调用。CHAT_RPC_ENDPOINT
+# 必须显式设置：本机同进程调试用 127.0.0.1:8092，docker-compose 用服务名 chat:8092。
+ChatRpc:
+  Endpoints:
+    - "${CHAT_RPC_ENDPOINT}"
   NonBlock: true
 
 # JWT 配置

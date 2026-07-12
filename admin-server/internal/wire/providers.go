@@ -6,11 +6,11 @@ import (
 
 	"postapocgame/admin-server/internal/config"
 	"postapocgame/admin-server/internal/consts"
-	"postapocgame/admin-server/internal/hub"
 	"postapocgame/admin-server/internal/middleware"
 	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/repository/registry"
 	"postapocgame/admin-server/internal/svc"
+	"postapocgame/admin-server/services/chat/chatclient"
 	"postapocgame/admin-server/services/sdk/sdkclient"
 	"postapocgame/admin-server/services/task/taskclient"
 
@@ -23,9 +23,9 @@ import (
 var ProviderSet = wire.NewSet(
 	provideRepository,
 	provideDomain,
-	provideChatHub,
 	provideTaskRPC,
 	provideSdkRPC,
+	provideChatRPC,
 
 	middleware.NewAuthMiddleware,
 	middleware.NewApiEnabledMiddleware,
@@ -64,12 +64,6 @@ func provideDomain(repo *repository.Repository) *registry.Domain {
 	return registry.NewDomain(repo)
 }
 
-func provideChatHub() *hub.ChatHub {
-	chatHub := hub.NewChatHub()
-	go chatHub.Run()
-	return chatHub
-}
-
 // provideTaskRPC 连到 task-rpc（services/task/）。task 域已经拆分成独立服务，gateway
 // 侧不再直接持有 TaskExecutors/TaskScheduler，改成一个 zrpc client。
 func provideTaskRPC(c config.Config) taskclient.Task {
@@ -80,6 +74,12 @@ func provideTaskRPC(c config.Config) taskclient.Task {
 // 不再直接持有 Domain.SDK，改成一个 zrpc client。
 func provideSdkRPC(c config.Config) sdkclient.Sdk {
 	return sdkclient.NewSdk(zrpc.MustNewClient(c.SdkRPCConf))
+}
+
+// provideChatRPC 连到 chat-rpc（services/chat/）。chat 域已经拆分成独立服务，gateway 侧
+// 不再直接持有 Domain.Chat/ChatHub，改成一个 zrpc client。
+func provideChatRPC(c config.Config) chatclient.Chat {
+	return chatclient.NewChat(zrpc.MustNewClient(c.ChatRPCConf))
 }
 
 // providePermissionMiddleware 是 PermissionMiddleware 的 Wire 适配函数：PermissionMiddleware
@@ -127,18 +127,18 @@ func provideServiceContext(
 	c config.Config,
 	repo *repository.Repository,
 	domain *registry.Domain,
-	chatHub *hub.ChatHub,
 	taskRPC taskclient.Task,
 	sdkRPC sdkclient.Sdk,
+	chatRPC chatclient.Chat,
 	mw *MiddlewareBundle,
 ) (*svc.ServiceContext, func()) {
 	svcCtx := &svc.ServiceContext{
 		Config:                       c,
 		Repository:                   repo,
 		Domain:                       domain,
-		ChatHub:                      chatHub,
 		TaskRPC:                      taskRPC,
 		SdkRPC:                       sdkRPC,
+		ChatRPC:                      chatRPC,
 		AuthMiddleware:               mw.Auth,
 		ApiEnabledMiddleware:         mw.ApiEnabled,
 		PermissionMiddleware:         mw.Permission,

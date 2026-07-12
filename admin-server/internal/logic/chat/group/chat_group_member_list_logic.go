@@ -10,6 +10,7 @@ import (
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
+	"postapocgame/admin-server/services/chat/chatclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -28,92 +29,30 @@ func NewChatGroupMemberListLogic(ctx context.Context, svcCtx *svc.ServiceContext
 	}
 }
 
+// ChatGroupMemberList 薄胶水，实际业务逻辑已经搬进
+// services/chat/internal/logic/chatgroupmemberlistlogic.go。
 func (l *ChatGroupMemberListLogic) ChatGroupMemberList(req *types.ChatGroupMemberListReq) (resp *types.ChatGroupMemberListResp, err error) {
-	// 获取当前用户
-	_, ok := jwthelper.FromContext(l.ctx)
-	if !ok {
+	if _, ok := jwthelper.FromContext(l.ctx); !ok {
 		return nil, errs.New(errs.CodeUnauthorized, "未登录或登录已过期")
 	}
 
-	// 查询群组
-	chat, err := l.svcCtx.Domain.Chat.Chat.FindByID(l.ctx, req.Id)
+	rpcResp, err := l.svcCtx.ChatRPC.ChatGroupMemberList(l.ctx, &chatclient.ChatGroupMemberListRequest{Id: req.Id})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeNotFound, "群组不存在", err)
+		return nil, errs.WrapGRPCError("查询群组成员失败", err)
 	}
 
-	// 验证是否为群组
-	if chat.Type != 2 {
-		return nil, errs.New(errs.CodeBadRequest, "该聊天不是群组")
+	members := make([]types.ChatGroupMemberItem, 0, len(rpcResp.List))
+	for _, m := range rpcResp.List {
+		members = append(members, types.ChatGroupMemberItem{
+			UserId:         m.UserId,
+			Username:       m.Username,
+			Nickname:       m.Nickname,
+			Avatar:         m.Avatar,
+			DepartmentName: m.DepartmentName,
+			RoleNames:      m.RoleNames,
+			JoinedAt:       m.JoinedAt,
+		})
 	}
 
-	// 验证是否已删除
-	if chat.DeletedAt != 0 {
-		return nil, errs.New(errs.CodeNotFound, "群组已删除")
-	}
-
-	// 查询成员列表
-	chatUsers, err := l.svcCtx.Domain.Chat.ChatUser.FindByChatID(l.ctx, chat.Id)
-	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "查询群组成员失败", err)
-	}
-
-	// 获取成员详细信息
-	// 构建部门ID到名称的映射
-	deptMap := make(map[uint64]string)
-	allDepts, _ := l.svcCtx.Domain.IAM.Department.ListAll(l.ctx)
-	for _, dept := range allDepts {
-		if dept.DeletedAt == 0 {
-			deptMap[dept.Id] = dept.Name
-		}
-	}
-
-	// 构建角色ID到名称的映射
-	roleMap := make(map[uint64]string)
-	allRoles, _, _ := l.svcCtx.Domain.IAM.Role.FindPage(l.ctx, 1, 10000, "")
-	for _, role := range allRoles {
-		if role.DeletedAt == 0 {
-			roleMap[role.Id] = role.Name
-		}
-	}
-
-	members := make([]types.ChatGroupMemberItem, 0, len(chatUsers))
-	for _, cu := range chatUsers {
-		user, err := l.svcCtx.Domain.IAM.User.FindByID(l.ctx, cu.UserId)
-		if err != nil || user.DeletedAt != 0 {
-			continue // 跳过已删除的用户
-		}
-
-		member := types.ChatGroupMemberItem{
-			UserId:   user.Id,
-			Username: user.Username,
-			Nickname: user.Nickname,
-			Avatar:   user.Avatar,
-			JoinedAt: cu.JoinedAt,
-		}
-
-		// 获取部门名称
-		if user.DepartmentId > 0 {
-			if deptName, ok := deptMap[user.DepartmentId]; ok {
-				member.DepartmentName = deptName
-			}
-		}
-
-		// 获取角色名称列表
-		roleIDs, _ := l.svcCtx.Domain.IAM.UserRole.ListRoleIDsByUserID(l.ctx, user.Id)
-		roleNames := make([]string, 0, len(roleIDs))
-		for _, roleID := range roleIDs {
-			if roleName, ok := roleMap[roleID]; ok {
-				roleNames = append(roleNames, roleName)
-			}
-		}
-		member.RoleNames = roleNames
-
-		members = append(members, member)
-	}
-
-	resp = &types.ChatGroupMemberListResp{
-		List: members,
-	}
-
-	return resp, nil
+	return &types.ChatGroupMemberListResp{List: members}, nil
 }
