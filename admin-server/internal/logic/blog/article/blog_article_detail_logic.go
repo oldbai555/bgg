@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/content/contentclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,26 +28,16 @@ func NewBlogArticleDetailLogic(ctx context.Context, svcCtx *svc.ServiceContext) 
 	}
 }
 
+// BlogArticleDetail 薄胶水，实际业务逻辑已经搬进
+// services/content/internal/logic/blogarticledetaillogic.go。
 func (l *BlogArticleDetailLogic) BlogArticleDetail(req *types.BlogArticleDetailReq) (resp *types.BlogArticleDetailResp, err error) {
-	if req.Id == 0 {
-		return nil, errs.New(errs.CodeBadRequest, "文章ID不能为空")
-	}
-
-	article, err := l.svcCtx.Domain.Blog.Article.FindByID(l.ctx, req.Id)
+	rpcResp, err := l.svcCtx.ContentRPC.BlogArticleDetail(l.ctx, &contentclient.BlogArticleDetailRequest{Id: req.Id})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeBadDB, "查询文章失败", err)
-	}
-	if article == nil || article.DeletedAt != 0 {
-		return nil, errs.New(errs.CodeNotFound, "文章不存在")
+		return nil, errs.WrapGRPCError("查询文章详情失败", err)
 	}
 
-	tags, err := l.svcCtx.Domain.Blog.ArticleTag.FindTagsByArticleID(l.ctx, req.Id)
-	if err != nil {
-		return nil, err
-	}
-
-	tagItems := make([]types.BlogTagItem, 0, len(tags))
-	for _, t := range tags {
+	tagItems := make([]types.BlogTagItem, 0, len(rpcResp.Tags))
+	for _, t := range rpcResp.Tags {
 		tagItems = append(tagItems, types.BlogTagItem{
 			Id:        t.Id,
 			Name:      t.Name,
@@ -58,18 +49,18 @@ func (l *BlogArticleDetailLogic) BlogArticleDetail(req *types.BlogArticleDetailR
 	}
 
 	return &types.BlogArticleDetailResp{
-		Id:          article.Id,
-		Title:       article.Title,
-		Content:     article.Content,
-		Status:      article.Status,
-		AuditStatus: article.AuditStatus,
-		Cover:       article.Cover,
-		AuthorId:    article.AuthorId,
-		AuthorName:  article.AuthorName,
-		PublishTime: article.PublishTime,
-		Summary:     article.Summary,
+		Id:          rpcResp.Id,
+		Title:       rpcResp.Title,
+		Content:     rpcResp.Content,
+		Status:      rpcResp.Status,
+		AuditStatus: rpcResp.AuditStatus,
+		Cover:       rpcResp.Cover,
+		AuthorId:    rpcResp.AuthorId,
+		AuthorName:  rpcResp.AuthorName,
+		PublishTime: rpcResp.PublishTime,
+		Summary:     rpcResp.Summary,
 		Tags:        tagItems,
-		CreatedAt:   article.CreatedAt,
-		UpdatedAt:   article.UpdatedAt,
+		CreatedAt:   rpcResp.CreatedAt,
+		UpdatedAt:   rpcResp.UpdatedAt,
 	}, nil
 }

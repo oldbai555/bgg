@@ -6,10 +6,10 @@ package public
 import (
 	"context"
 
-	"postapocgame/admin-server/internal/consts"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/content/contentclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -28,30 +28,16 @@ func NewPublicBlogArticleDetailLogic(ctx context.Context, svcCtx *svc.ServiceCon
 	}
 }
 
+// PublicBlogArticleDetail 薄胶水，实际业务逻辑已经搬进
+// services/content/internal/logic/publicblogarticledetaillogic.go。
 func (l *PublicBlogArticleDetailLogic) PublicBlogArticleDetail(req *types.PublicBlogArticleDetailReq) (resp *types.PublicBlogArticleDetailResp, err error) {
-	if req.Id == 0 {
-		return nil, errs.New(errs.CodeBadRequest, "文章ID不能为空")
-	}
-
-	article, err := l.svcCtx.Domain.Blog.Article.FindByID(l.ctx, req.Id)
+	rpcResp, err := l.svcCtx.ContentRPC.PublicBlogArticleDetail(l.ctx, &contentclient.PublicBlogArticleDetailRequest{Id: req.Id})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeBadDB, "查询文章失败", err)
-	}
-	if article == nil || article.DeletedAt != 0 {
-		return nil, errs.New(errs.CodeNotFound, "文章不存在")
+		return nil, errs.WrapGRPCError("查询文章详情失败", err)
 	}
 
-	// 仅展示已审核通过 + 上架
-	if article.AuditStatus != consts.BlogArticleAuditStatusPassed || article.Status != consts.BlogArticleStatusPublished {
-		return nil, errs.New(errs.CodeForbidden, "文章不可访问")
-	}
-
-	tags, err := l.svcCtx.Domain.Blog.ArticleTag.FindTagsByArticleID(l.ctx, req.Id)
-	if err != nil {
-		return nil, err
-	}
-	tagItems := make([]types.BlogTagItem, 0, len(tags))
-	for _, t := range tags {
+	tagItems := make([]types.BlogTagItem, 0, len(rpcResp.Tags))
+	for _, t := range rpcResp.Tags {
 		tagItems = append(tagItems, types.BlogTagItem{
 			Id:        t.Id,
 			Name:      t.Name,
@@ -63,12 +49,12 @@ func (l *PublicBlogArticleDetailLogic) PublicBlogArticleDetail(req *types.Public
 	}
 
 	return &types.PublicBlogArticleDetailResp{
-		Id:          article.Id,
-		Title:       article.Title,
-		Content:     article.Content,
-		Cover:       article.Cover,
-		AuthorName:  article.AuthorName,
-		PublishTime: article.PublishTime,
+		Id:          rpcResp.Id,
+		Title:       rpcResp.Title,
+		Content:     rpcResp.Content,
+		Cover:       rpcResp.Cover,
+		AuthorName:  rpcResp.AuthorName,
+		PublishTime: rpcResp.PublishTime,
 		Tags:        tagItems,
 	}, nil
 }

@@ -4,26 +4,22 @@ import (
 	"context"
 
 	"postapocgame/admin-server/internal/repository"
-	blogrepo "postapocgame/admin-server/internal/repository/blog"
 	iamrepo "postapocgame/admin-server/internal/repository/iam"
 	miscrepo "postapocgame/admin-server/internal/repository/misc"
 	monitoringrepo "postapocgame/admin-server/internal/repository/monitoring"
 	systemrepo "postapocgame/admin-server/internal/repository/system"
-	videorepo "postapocgame/admin-server/internal/repository/video"
 
-	contentdomain "postapocgame/admin-server/internal/domain/content"
 	iamdomain "postapocgame/admin-server/internal/domain/iam"
 )
 
 // Domain 聚合各领域 Repository，启动时构造一次，Logic 通过 svcCtx.Domain 访问。
-// 不再有 Task/SDK/Chat 字段：task 域已拆成独立的 task-rpc（services/task/），sdk 域已拆成
-// 独立的 sdk-rpc（services/sdk/），chat 域已拆成独立的 chat-rpc（services/chat/），gateway
-// 侧改成走 svcCtx.TaskRPC/svcCtx.SdkRPC/svcCtx.ChatRPC 这三个 zrpc client，不通过 Domain
-// 聚合根访问。
+// 不再有 Task/SDK/Chat/Blog/Video 字段：task 域已拆成独立的 task-rpc（services/task/），
+// sdk 域已拆成独立的 sdk-rpc（services/sdk/），chat 域已拆成独立的 chat-rpc（services/chat/），
+// blog+video 域已拆成独立的 content-rpc（services/content/），gateway 侧改成走
+// svcCtx.TaskRPC/svcCtx.SdkRPC/svcCtx.ChatRPC/svcCtx.ContentRPC 这四个 zrpc client，不通过
+// Domain 聚合根访问。
 type Domain struct {
 	IAM        IAMDomain
-	Blog       BlogDomain
-	Video      VideoDomain
 	Monitoring MonitoringDomain
 	System     SystemDomain
 	Misc       MiscDomain
@@ -44,20 +40,6 @@ type IAMDomain struct {
 	PermissionResolver *iamdomain.PermissionResolver
 	UserService        *iamdomain.UserDomainService
 	RBAC               *iamdomain.RBACService
-}
-
-type BlogDomain struct {
-	Article        blogrepo.BlogArticleRepository
-	ArticleTag     blogrepo.BlogArticleTagRepository
-	ArticleAudit   blogrepo.BlogArticleAuditRepository
-	FriendLink     blogrepo.BlogFriendLinkRepository
-	SocialInfo     blogrepo.BlogSocialInfoRepository
-	Tag            blogrepo.BlogTagRepository
-	ArticleService *contentdomain.BlogArticleService
-}
-
-type VideoDomain struct {
-	Video videorepo.VideoRepository
 }
 
 type MonitoringDomain struct {
@@ -104,18 +86,6 @@ func NewDomain(repo *repository.Repository) *Domain {
 			PermissionResolver: iamdomain.NewPermissionResolver(repo),
 			UserService:        iamdomain.NewUserDomainService(repo, repo.Redis),
 			RBAC:               iamdomain.NewRBACService(repo),
-		},
-		Blog: BlogDomain{
-			Article:        blogrepo.NewBlogArticleRepository(repo),
-			ArticleTag:     blogrepo.NewBlogArticleTagRepository(repo),
-			ArticleAudit:   blogrepo.NewBlogArticleAuditRepository(repo),
-			FriendLink:     blogrepo.NewBlogFriendLinkRepository(repo),
-			SocialInfo:     blogrepo.NewBlogSocialInfoRepository(repo),
-			Tag:            blogrepo.NewBlogTagRepository(repo),
-			ArticleService: contentdomain.NewBlogArticleService(repo),
-		},
-		Video: VideoDomain{
-			Video: videorepo.NewVideoRepository(repo),
 		},
 		Monitoring: MonitoringDomain{
 			OperationLog:   monitoringrepo.NewOperationLogRepository(repo),

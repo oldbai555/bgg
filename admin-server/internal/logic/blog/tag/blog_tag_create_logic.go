@@ -5,15 +5,11 @@ package tag
 
 import (
 	"context"
-	"postapocgame/admin-server/internal/dict"
-	"strings"
 
-	"postapocgame/admin-server/internal/consts"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
-
-	"postapocgame/admin-server/internal/model/blog"
+	"postapocgame/admin-server/services/content/contentclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -32,32 +28,15 @@ func NewBlogTagCreateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Blo
 	}
 }
 
+// BlogTagCreate 薄胶水，实际业务逻辑已经搬进 services/content/internal/logic/blogtagcreatelogic.go。
 func (l *BlogTagCreateLogic) BlogTagCreate(req *types.BlogTagCreateReq) error {
-	name := strings.TrimSpace(req.Name)
-	if name == "" {
-		return errs.New(errs.CodeBadRequest, "标签名称不能为空")
-	}
-
-	// 从字典读取标签名称最大长度限制（默认 10 个字符）
-	maxLength := dict.GetIntValue(l.ctx, l.svcCtx.Repository, consts.DictCodeBlogTagNameMaxLength, 10)
-	if err := dict.ValidateLength(name, maxLength, "标签名称"); err != nil {
-		return err
-	}
-
-	tag := &blog.BlogTag{
-		Name:   name,
+	_, err := l.svcCtx.ContentRPC.BlogTagCreate(l.ctx, &contentclient.BlogTagCreateRequest{
+		Name:   req.Name,
 		Status: req.Status,
-		Remark: strings.TrimSpace(req.Remark),
+		Remark: req.Remark,
+	})
+	if err != nil {
+		return errs.WrapGRPCError("创建标签失败", err)
 	}
-
-	if tag.Status == 0 {
-		// 默认启用
-		tag.Status = 1
-	}
-
-	if err := l.svcCtx.Domain.Blog.Tag.Create(l.ctx, tag); err != nil {
-		return err
-	}
-
 	return nil
 }

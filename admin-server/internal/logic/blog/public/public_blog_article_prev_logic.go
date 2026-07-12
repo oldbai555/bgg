@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/content/contentclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,34 +28,12 @@ func NewPublicBlogArticlePrevLogic(ctx context.Context, svcCtx *svc.ServiceConte
 	}
 }
 
+// PublicBlogArticlePrev 薄胶水，实际业务逻辑已经搬进
+// services/content/internal/logic/publicblogarticleprevlogic.go。
 func (l *PublicBlogArticlePrevLogic) PublicBlogArticlePrev(req *types.PublicBlogArticlePrevReq) (resp *types.PublicBlogArticlePrevResp, err error) {
-	if req.Id == 0 {
-		return nil, errs.New(errs.CodeBadRequest, "文章ID不能为空")
-	}
-
-	// 查询当前文章信息
-	currentArticle, err := l.svcCtx.Domain.Blog.Article.FindByID(l.ctx, req.Id)
+	rpcResp, err := l.svcCtx.ContentRPC.PublicBlogArticlePrev(l.ctx, &contentclient.PublicBlogArticlePrevNextRequest{Id: req.Id})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeBadDB, "查询当前文章失败", err)
+		return nil, errs.WrapGRPCError("查询上一篇文章失败", err)
 	}
-	if currentArticle == nil {
-		return nil, errs.New(errs.CodeNotFound, "文章不存在")
-	}
-
-	// 查询上一篇文章
-	prevArticle, err := l.svcCtx.Domain.Blog.Article.FindPrevArticle(l.ctx, currentArticle.PublishTime)
-	if err != nil {
-		return nil, errs.Wrap(errs.CodeBadDB, "查询上一篇文章失败", err)
-	}
-
-	// 如果没有上一篇文章，返回空值
-	if prevArticle == nil {
-		return &types.PublicBlogArticlePrevResp{}, nil
-	}
-
-	return &types.PublicBlogArticlePrevResp{
-		Id:          prevArticle.Id,
-		Title:       prevArticle.Title,
-		PublishTime: prevArticle.PublishTime,
-	}, nil
+	return &types.PublicBlogArticlePrevResp{Id: rpcResp.Id, Title: rpcResp.Title, PublishTime: rpcResp.PublishTime}, nil
 }

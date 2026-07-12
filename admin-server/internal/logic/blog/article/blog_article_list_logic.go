@@ -5,10 +5,11 @@ package article
 
 import (
 	"context"
-	"strings"
 
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
+	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/content/contentclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,50 +28,25 @@ func NewBlogArticleListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *B
 	}
 }
 
+// BlogArticleList 薄胶水，实际业务逻辑已经搬进
+// services/content/internal/logic/blogarticlelistlogic.go。
 func (l *BlogArticleListLogic) BlogArticleList(req *types.BlogArticleListReq) (resp *types.BlogArticleListResp, err error) {
-	page := req.Page
-	if page < 1 {
-		page = 1
-	}
-	pageSize := req.PageSize
-	if pageSize <= 0 {
-		pageSize = 20
-	}
-
-	list, total, err := l.svcCtx.Domain.Blog.Article.FindPage(
-		l.ctx,
-		page,
-		pageSize,
-		strings.TrimSpace(req.Title),
-		req.Status,
-		req.AuditStatus,
-		req.TagId,
-		req.StartTime,
-		req.EndTime,
-	)
+	rpcResp, err := l.svcCtx.ContentRPC.BlogArticleList(l.ctx, &contentclient.BlogArticleListRequest{
+		Page:        req.Page,
+		PageSize:    req.PageSize,
+		Title:       req.Title,
+		Status:      req.Status,
+		AuditStatus: req.AuditStatus,
+		TagId:       req.TagId,
+		StartTime:   req.StartTime,
+		EndTime:     req.EndTime,
+	})
 	if err != nil {
-		return nil, err
+		return nil, errs.WrapGRPCError("查询文章列表失败", err)
 	}
 
-	ids := make([]uint64, 0, len(list))
-	for _, a := range list {
-		ids = append(ids, a.Id)
-	}
-
-	tagMap, err := l.svcCtx.Domain.Blog.ArticleTag.FindTagsByArticleIDs(l.ctx, ids)
-	if err != nil {
-		return nil, err
-	}
-
-	items := make([]types.BlogArticleItem, 0, len(list))
-	for _, a := range list {
-		tags := tagMap[a.Id]
-		tagIDs := make([]uint64, 0, len(tags))
-		tagNames := make([]string, 0, len(tags))
-		for _, t := range tags {
-			tagIDs = append(tagIDs, t.Id)
-			tagNames = append(tagNames, t.Name)
-		}
+	items := make([]types.BlogArticleItem, 0, len(rpcResp.List))
+	for _, a := range rpcResp.List {
 		items = append(items, types.BlogArticleItem{
 			Id:          a.Id,
 			Title:       a.Title,
@@ -79,8 +55,8 @@ func (l *BlogArticleListLogic) BlogArticleList(req *types.BlogArticleListReq) (r
 			Cover:       a.Cover,
 			AuthorId:    a.AuthorId,
 			AuthorName:  a.AuthorName,
-			TagIds:      tagIDs,
-			TagNames:    tagNames,
+			TagIds:      a.TagIds,
+			TagNames:    a.TagNames,
 			PublishTime: a.PublishTime,
 			IsTop:       a.IsTop,
 			CreatedAt:   a.CreatedAt,
@@ -88,8 +64,5 @@ func (l *BlogArticleListLogic) BlogArticleList(req *types.BlogArticleListReq) (r
 		})
 	}
 
-	return &types.BlogArticleListResp{
-		Total: total,
-		List:  items,
-	}, nil
+	return &types.BlogArticleListResp{Total: rpcResp.Total, List: items}, nil
 }

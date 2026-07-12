@@ -11,6 +11,7 @@ import (
 	"postapocgame/admin-server/internal/repository/registry"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/services/chat/chatclient"
+	"postapocgame/admin-server/services/content/contentclient"
 	"postapocgame/admin-server/services/sdk/sdkclient"
 	"postapocgame/admin-server/services/task/taskclient"
 
@@ -26,6 +27,7 @@ var ProviderSet = wire.NewSet(
 	provideTaskRPC,
 	provideSdkRPC,
 	provideChatRPC,
+	provideContentRPC,
 
 	middleware.NewAuthMiddleware,
 	middleware.NewApiEnabledMiddleware,
@@ -82,6 +84,12 @@ func provideChatRPC(c config.Config) chatclient.Chat {
 	return chatclient.NewChat(zrpc.MustNewClient(c.ChatRPCConf))
 }
 
+// provideContentRPC 连到 content-rpc（services/content/）。blog+video 域已经拆分成独立
+// 服务，gateway 侧不再直接持有 Domain.Blog/Domain.Video，改成一个 zrpc client。
+func provideContentRPC(c config.Config) contentclient.Content {
+	return contentclient.NewContent(zrpc.MustNewClient(c.ContentRPCConf))
+}
+
 // providePermissionMiddleware 是 PermissionMiddleware 的 Wire 适配函数：PermissionMiddleware
 // 构造函数吃的是 *iamdomain.PermissionResolver，但那不是一个独立的 Wire 节点，只是
 // *registry.Domain 结构体里的一个字段（domain.IAM.PermissionResolver）。Wire 没法凭空
@@ -130,6 +138,7 @@ func provideServiceContext(
 	taskRPC taskclient.Task,
 	sdkRPC sdkclient.Sdk,
 	chatRPC chatclient.Chat,
+	contentRPC contentclient.Content,
 	mw *MiddlewareBundle,
 ) (*svc.ServiceContext, func()) {
 	svcCtx := &svc.ServiceContext{
@@ -139,6 +148,7 @@ func provideServiceContext(
 		TaskRPC:                      taskRPC,
 		SdkRPC:                       sdkRPC,
 		ChatRPC:                      chatRPC,
+		ContentRPC:                   contentRPC,
 		AuthMiddleware:               mw.Auth,
 		ApiEnabledMiddleware:         mw.ApiEnabled,
 		PermissionMiddleware:         mw.Permission,

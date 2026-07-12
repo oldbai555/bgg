@@ -1,0 +1,34 @@
+Name: content.rpc
+ListenOn: 0.0.0.0:8093
+Mode: pro
+
+Mysql:
+  DSN: "${CONTENT_MYSQL_DSN}" # 指向 admin_content schema，见 db/services/content/
+
+# 业务本身不用 Redis，纯粹是满足 goctl 生成的 Model 内部 CachedConn 强制要求非空缓存节点，
+# 与 gateway 共享同一个 Redis 实例（缓存/锁/队列不拆分）。
+ContentRedis:
+  Address: "${CONTENT_REDIS_ADDRESS}"
+  Password: "${CONTENT_REDIS_PASSWORD}"
+
+# 回调单体内嵌的 IamCallback server：PublicBlogAuthorInfo 需要的用户信息 + 审计日志写入。
+# iam 域还没拆分成独立服务前的临时方案，见 pkg/iamcallback 包注释、
+# etc/admin-api.yaml 的 IamCallbackRpc 段。
+IamCallbackRpc:
+  Endpoints:
+    - "${IAM_CALLBACK_ENDPOINT}"
+  NonBlock: true
+
+# 取代原来读字典 blog_*_max_length / blog_article_top_max_count（物理属于 iam 域）的做法，
+# 默认值全部对齐现有字典种子数据。
+Limits:
+  BlogTagNameMaxLength: 10
+  BlogArticleTitleMaxLength: 100
+  BlogArticleSummaryLength: 120
+  BlogArticleTopMaxCount: 1
+  BlogFriendLinkNameMaxLength: 15
+  BlogFriendLinkUrlMaxLength: 255
+  BlogFriendLinkRemarkMaxLength: 127
+  BlogSocialInfoNameMaxLength: 15
+  BlogSocialInfoUrlMaxLength: 255
+  BlogSocialInfoRemarkMaxLength: 127

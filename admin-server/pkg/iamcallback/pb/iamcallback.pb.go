@@ -221,6 +221,7 @@ type GetUserProfileResponse struct {
 	Avatar         string                 `protobuf:"bytes,4,opt,name=avatar,proto3" json:"avatar,omitempty"`
 	DepartmentName string                 `protobuf:"bytes,5,opt,name=department_name,json=departmentName,proto3" json:"department_name,omitempty"`
 	RoleNames      []string               `protobuf:"bytes,6,rep,name=role_names,json=roleNames,proto3" json:"role_names,omitempty"`
+	Signature      string                 `protobuf:"bytes,7,opt,name=signature,proto3" json:"signature,omitempty"` // 个性签名，目前只有 content-rpc（public_blog_author_info_logic.go）用
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -297,6 +298,125 @@ func (x *GetUserProfileResponse) GetRoleNames() []string {
 	return nil
 }
 
+func (x *GetUserProfileResponse) GetSignature() string {
+	if x != nil {
+		return x.Signature
+	}
+	return ""
+}
+
+type RecordAuditLogRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Username      string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+	AuditType     string                 `protobuf:"bytes,3,opt,name=audit_type,json=auditType,proto3" json:"audit_type,omitempty"`
+	AuditObject   string                 `protobuf:"bytes,4,opt,name=audit_object,json=auditObject,proto3" json:"audit_object,omitempty"`
+	DetailJson    string                 `protobuf:"bytes,5,opt,name=detail_json,json=detailJson,proto3" json:"detail_json,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RecordAuditLogRequest) Reset() {
+	*x = RecordAuditLogRequest{}
+	mi := &file_iamcallback_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RecordAuditLogRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RecordAuditLogRequest) ProtoMessage() {}
+
+func (x *RecordAuditLogRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_iamcallback_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RecordAuditLogRequest.ProtoReflect.Descriptor instead.
+func (*RecordAuditLogRequest) Descriptor() ([]byte, []int) {
+	return file_iamcallback_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *RecordAuditLogRequest) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *RecordAuditLogRequest) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *RecordAuditLogRequest) GetAuditType() string {
+	if x != nil {
+		return x.AuditType
+	}
+	return ""
+}
+
+func (x *RecordAuditLogRequest) GetAuditObject() string {
+	if x != nil {
+		return x.AuditObject
+	}
+	return ""
+}
+
+func (x *RecordAuditLogRequest) GetDetailJson() string {
+	if x != nil {
+		return x.DetailJson
+	}
+	return ""
+}
+
+type RecordAuditLogResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RecordAuditLogResponse) Reset() {
+	*x = RecordAuditLogResponse{}
+	mi := &file_iamcallback_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RecordAuditLogResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RecordAuditLogResponse) ProtoMessage() {}
+
+func (x *RecordAuditLogResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_iamcallback_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RecordAuditLogResponse.ProtoReflect.Descriptor instead.
+func (*RecordAuditLogResponse) Descriptor() ([]byte, []int) {
+	return file_iamcallback_proto_rawDescGZIP(), []int{6}
+}
+
 var File_iamcallback_proto protoreflect.FileDescriptor
 
 const file_iamcallback_proto_rawDesc = "" +
@@ -312,7 +432,7 @@ const file_iamcallback_proto_rawDesc = "" +
 	"\fnext_last_id\x18\x02 \x01(\x04R\n" +
 	"nextLastId\"0\n" +
 	"\x15GetUserProfileRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\x04R\x06userId\"\xc8\x01\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\"\xe6\x01\n" +
 	"\x16GetUserProfileResponse\x12\x16\n" +
 	"\x06exists\x18\x01 \x01(\bR\x06exists\x12\x1a\n" +
 	"\busername\x18\x02 \x01(\tR\busername\x12\x1a\n" +
@@ -320,10 +440,21 @@ const file_iamcallback_proto_rawDesc = "" +
 	"\x06avatar\x18\x04 \x01(\tR\x06avatar\x12'\n" +
 	"\x0fdepartment_name\x18\x05 \x01(\tR\x0edepartmentName\x12\x1d\n" +
 	"\n" +
-	"role_names\x18\x06 \x03(\tR\troleNames2\xd2\x01\n" +
+	"role_names\x18\x06 \x03(\tR\troleNames\x12\x1c\n" +
+	"\tsignature\x18\a \x01(\tR\tsignature\"\xaf\x01\n" +
+	"\x15RecordAuditLogRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x1a\n" +
+	"\busername\x18\x02 \x01(\tR\busername\x12\x1d\n" +
+	"\n" +
+	"audit_type\x18\x03 \x01(\tR\tauditType\x12!\n" +
+	"\faudit_object\x18\x04 \x01(\tR\vauditObject\x12\x1f\n" +
+	"\vdetail_json\x18\x05 \x01(\tR\n" +
+	"detailJson\"\x18\n" +
+	"\x16RecordAuditLogResponse2\xad\x02\n" +
 	"\vIamCallback\x12h\n" +
 	"\x13FindActiveUserChunk\x12'.iamcallback.FindActiveUserChunkRequest\x1a(.iamcallback.FindActiveUserChunkResponse\x12Y\n" +
-	"\x0eGetUserProfile\x12\".iamcallback.GetUserProfileRequest\x1a#.iamcallback.GetUserProfileResponseB\x0fZ\r./iamcallbackb\x06proto3"
+	"\x0eGetUserProfile\x12\".iamcallback.GetUserProfileRequest\x1a#.iamcallback.GetUserProfileResponse\x12Y\n" +
+	"\x0eRecordAuditLog\x12\".iamcallback.RecordAuditLogRequest\x1a#.iamcallback.RecordAuditLogResponseB\x0fZ\r./iamcallbackb\x06proto3"
 
 var (
 	file_iamcallback_proto_rawDescOnce sync.Once
@@ -337,22 +468,26 @@ func file_iamcallback_proto_rawDescGZIP() []byte {
 	return file_iamcallback_proto_rawDescData
 }
 
-var file_iamcallback_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_iamcallback_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_iamcallback_proto_goTypes = []any{
 	(*FindActiveUserChunkRequest)(nil),  // 0: iamcallback.FindActiveUserChunkRequest
 	(*ActiveUserRef)(nil),               // 1: iamcallback.ActiveUserRef
 	(*FindActiveUserChunkResponse)(nil), // 2: iamcallback.FindActiveUserChunkResponse
 	(*GetUserProfileRequest)(nil),       // 3: iamcallback.GetUserProfileRequest
 	(*GetUserProfileResponse)(nil),      // 4: iamcallback.GetUserProfileResponse
+	(*RecordAuditLogRequest)(nil),       // 5: iamcallback.RecordAuditLogRequest
+	(*RecordAuditLogResponse)(nil),      // 6: iamcallback.RecordAuditLogResponse
 }
 var file_iamcallback_proto_depIdxs = []int32{
 	1, // 0: iamcallback.FindActiveUserChunkResponse.users:type_name -> iamcallback.ActiveUserRef
 	0, // 1: iamcallback.IamCallback.FindActiveUserChunk:input_type -> iamcallback.FindActiveUserChunkRequest
 	3, // 2: iamcallback.IamCallback.GetUserProfile:input_type -> iamcallback.GetUserProfileRequest
-	2, // 3: iamcallback.IamCallback.FindActiveUserChunk:output_type -> iamcallback.FindActiveUserChunkResponse
-	4, // 4: iamcallback.IamCallback.GetUserProfile:output_type -> iamcallback.GetUserProfileResponse
-	3, // [3:5] is the sub-list for method output_type
-	1, // [1:3] is the sub-list for method input_type
+	5, // 3: iamcallback.IamCallback.RecordAuditLog:input_type -> iamcallback.RecordAuditLogRequest
+	2, // 4: iamcallback.IamCallback.FindActiveUserChunk:output_type -> iamcallback.FindActiveUserChunkResponse
+	4, // 5: iamcallback.IamCallback.GetUserProfile:output_type -> iamcallback.GetUserProfileResponse
+	6, // 6: iamcallback.IamCallback.RecordAuditLog:output_type -> iamcallback.RecordAuditLogResponse
+	4, // [4:7] is the sub-list for method output_type
+	1, // [1:4] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
 	1, // [1:1] is the sub-list for extension extendee
 	0, // [0:1] is the sub-list for field type_name
@@ -369,7 +504,7 @@ func file_iamcallback_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_iamcallback_proto_rawDesc), len(file_iamcallback_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -5,13 +5,11 @@ package tag
 
 import (
 	"context"
-	"postapocgame/admin-server/internal/dict"
-	"strings"
 
-	"postapocgame/admin-server/internal/consts"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/content/contentclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -30,35 +28,16 @@ func NewBlogTagUpdateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Blo
 	}
 }
 
+// BlogTagUpdate 薄胶水，实际业务逻辑已经搬进 services/content/internal/logic/blogtagupdatelogic.go。
 func (l *BlogTagUpdateLogic) BlogTagUpdate(req *types.BlogTagUpdateReq) error {
-	if req.Id == 0 {
-		return errs.New(errs.CodeBadRequest, "标签ID不能为空")
-	}
-
-	tag, err := l.svcCtx.Domain.Blog.Tag.FindByID(l.ctx, req.Id)
+	_, err := l.svcCtx.ContentRPC.BlogTagUpdate(l.ctx, &contentclient.BlogTagUpdateRequest{
+		Id:     req.Id,
+		Name:   req.Name,
+		Status: req.Status,
+		Remark: req.Remark,
+	})
 	if err != nil {
-		return errs.Wrap(errs.CodeBadDB, "查询标签失败", err)
+		return errs.WrapGRPCError("更新标签失败", err)
 	}
-
-	if req.Name != "" {
-		name := strings.TrimSpace(req.Name)
-		// 从字典读取标签名称最大长度限制（默认 10 个字符）
-		maxLength := dict.GetIntValue(l.ctx, l.svcCtx.Repository, consts.DictCodeBlogTagNameMaxLength, 10)
-		if err := dict.ValidateLength(name, maxLength, "标签名称"); err != nil {
-			return err
-		}
-		tag.Name = name
-	}
-	if req.Status != 0 {
-		tag.Status = req.Status
-	}
-	if req.Remark != "" {
-		tag.Remark = strings.TrimSpace(req.Remark)
-	}
-
-	if err = l.svcCtx.Domain.Blog.Tag.Update(l.ctx, tag); err != nil {
-		return err
-	}
-
 	return nil
 }

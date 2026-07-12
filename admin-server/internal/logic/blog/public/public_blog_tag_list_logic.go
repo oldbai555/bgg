@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/content/contentclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,15 +28,15 @@ func NewPublicBlogTagListLogic(ctx context.Context, svcCtx *svc.ServiceContext) 
 	}
 }
 
+// PublicBlogTagList 薄胶水，实际业务逻辑已经搬进
+// services/content/internal/logic/publicblogtaglistlogic.go。
 func (l *PublicBlogTagListLogic) PublicBlogTagList() (resp *types.PublicBlogTagListResp, err error) {
-	// 查询启用的标签列表（使用较大的limit，实际业务中可根据需要调整）
-	tagList, err := l.svcCtx.Domain.Blog.Tag.FindEnabledList(l.ctx, 1000)
+	rpcResp, err := l.svcCtx.ContentRPC.PublicBlogTagList(l.ctx, &contentclient.PublicBlogGlobalRequest{})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeBadDB, "查询标签列表失败", err)
+		return nil, errs.WrapGRPCError("查询标签列表失败", err)
 	}
-
-	items := make([]types.BlogTagItem, 0, len(tagList))
-	for _, tag := range tagList {
+	items := make([]types.BlogTagItem, 0, len(rpcResp.List))
+	for _, tag := range rpcResp.List {
 		items = append(items, types.BlogTagItem{
 			Id:        tag.Id,
 			Name:      tag.Name,
@@ -45,8 +46,5 @@ func (l *PublicBlogTagListLogic) PublicBlogTagList() (resp *types.PublicBlogTagL
 			UpdatedAt: tag.UpdatedAt,
 		})
 	}
-
-	return &types.PublicBlogTagListResp{
-		List: items,
-	}, nil
+	return &types.PublicBlogTagListResp{List: items}, nil
 }

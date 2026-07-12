@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	IamCallback_FindActiveUserChunk_FullMethodName = "/iamcallback.IamCallback/FindActiveUserChunk"
 	IamCallback_GetUserProfile_FullMethodName      = "/iamcallback.IamCallback/GetUserProfile"
+	IamCallback_RecordAuditLog_FullMethodName      = "/iamcallback.IamCallback/RecordAuditLog"
 )
 
 // IamCallbackClient is the client API for IamCallback service.
@@ -29,6 +30,7 @@ const (
 type IamCallbackClient interface {
 	FindActiveUserChunk(ctx context.Context, in *FindActiveUserChunkRequest, opts ...grpc.CallOption) (*FindActiveUserChunkResponse, error)
 	GetUserProfile(ctx context.Context, in *GetUserProfileRequest, opts ...grpc.CallOption) (*GetUserProfileResponse, error)
+	RecordAuditLog(ctx context.Context, in *RecordAuditLogRequest, opts ...grpc.CallOption) (*RecordAuditLogResponse, error)
 }
 
 type iamCallbackClient struct {
@@ -59,12 +61,23 @@ func (c *iamCallbackClient) GetUserProfile(ctx context.Context, in *GetUserProfi
 	return out, nil
 }
 
+func (c *iamCallbackClient) RecordAuditLog(ctx context.Context, in *RecordAuditLogRequest, opts ...grpc.CallOption) (*RecordAuditLogResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RecordAuditLogResponse)
+	err := c.cc.Invoke(ctx, IamCallback_RecordAuditLog_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // IamCallbackServer is the server API for IamCallback service.
 // All implementations must embed UnimplementedIamCallbackServer
 // for forward compatibility.
 type IamCallbackServer interface {
 	FindActiveUserChunk(context.Context, *FindActiveUserChunkRequest) (*FindActiveUserChunkResponse, error)
 	GetUserProfile(context.Context, *GetUserProfileRequest) (*GetUserProfileResponse, error)
+	RecordAuditLog(context.Context, *RecordAuditLogRequest) (*RecordAuditLogResponse, error)
 	mustEmbedUnimplementedIamCallbackServer()
 }
 
@@ -80,6 +93,9 @@ func (UnimplementedIamCallbackServer) FindActiveUserChunk(context.Context, *Find
 }
 func (UnimplementedIamCallbackServer) GetUserProfile(context.Context, *GetUserProfileRequest) (*GetUserProfileResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetUserProfile not implemented")
+}
+func (UnimplementedIamCallbackServer) RecordAuditLog(context.Context, *RecordAuditLogRequest) (*RecordAuditLogResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RecordAuditLog not implemented")
 }
 func (UnimplementedIamCallbackServer) mustEmbedUnimplementedIamCallbackServer() {}
 func (UnimplementedIamCallbackServer) testEmbeddedByValue()                     {}
@@ -138,6 +154,24 @@ func _IamCallback_GetUserProfile_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _IamCallback_RecordAuditLog_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RecordAuditLogRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamCallbackServer).RecordAuditLog(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IamCallback_RecordAuditLog_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamCallbackServer).RecordAuditLog(ctx, req.(*RecordAuditLogRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // IamCallback_ServiceDesc is the grpc.ServiceDesc for IamCallback service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -152,6 +186,10 @@ var IamCallback_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUserProfile",
 			Handler:    _IamCallback_GetUserProfile_Handler,
+		},
+		{
+			MethodName: "RecordAuditLog",
+			Handler:    _IamCallback_RecordAuditLog_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

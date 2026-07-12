@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/content/contentclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,15 +28,15 @@ func NewPublicBlogSocialInfoListLogic(ctx context.Context, svcCtx *svc.ServiceCo
 	}
 }
 
+// PublicBlogSocialInfoList 薄胶水，实际业务逻辑已经搬进
+// services/content/internal/logic/publicblogsocialinfolistlogic.go。
 func (l *PublicBlogSocialInfoListLogic) PublicBlogSocialInfoList() (resp *types.PublicBlogSocialInfoListResp, err error) {
-	// 查询启用的社交信息列表
-	list, err := l.svcCtx.Domain.Blog.SocialInfo.FindEnabledList(l.ctx)
+	rpcResp, err := l.svcCtx.ContentRPC.PublicBlogSocialInfoList(l.ctx, &contentclient.PublicBlogGlobalRequest{})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeBadDB, "查询社交信息列表失败", err)
+		return nil, errs.WrapGRPCError("查询社交信息列表失败", err)
 	}
-
-	items := make([]types.PublicBlogSocialInfoItem, 0, len(list))
-	for _, info := range list {
+	items := make([]types.PublicBlogSocialInfoItem, 0, len(rpcResp.List))
+	for _, info := range rpcResp.List {
 		items = append(items, types.PublicBlogSocialInfoItem{
 			Id:       info.Id,
 			Name:     info.Name,
@@ -44,8 +45,5 @@ func (l *PublicBlogSocialInfoListLogic) PublicBlogSocialInfoList() (resp *types.
 			OrderNum: info.OrderNum,
 		})
 	}
-
-	return &types.PublicBlogSocialInfoListResp{
-		List: items,
-	}, nil
+	return &types.PublicBlogSocialInfoListResp{List: items}, nil
 }

@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/content/contentclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,15 +28,15 @@ func NewPublicBlogFriendLinkListLogic(ctx context.Context, svcCtx *svc.ServiceCo
 	}
 }
 
+// PublicBlogFriendLinkList 薄胶水，实际业务逻辑已经搬进
+// services/content/internal/logic/publicblogfriendlinklistlogic.go。
 func (l *PublicBlogFriendLinkListLogic) PublicBlogFriendLinkList() (resp *types.PublicBlogFriendLinkListResp, err error) {
-	// 查询启用的友情链接列表
-	list, err := l.svcCtx.Domain.Blog.FriendLink.FindEnabledList(l.ctx)
+	rpcResp, err := l.svcCtx.ContentRPC.PublicBlogFriendLinkList(l.ctx, &contentclient.PublicBlogGlobalRequest{})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeBadDB, "查询友情链接列表失败", err)
+		return nil, errs.WrapGRPCError("查询友情链接列表失败", err)
 	}
-
-	items := make([]types.PublicBlogFriendLinkItem, 0, len(list))
-	for _, link := range list {
+	items := make([]types.PublicBlogFriendLinkItem, 0, len(rpcResp.List))
+	for _, link := range rpcResp.List {
 		items = append(items, types.PublicBlogFriendLinkItem{
 			Id:       link.Id,
 			Name:     link.Name,
@@ -44,8 +45,5 @@ func (l *PublicBlogFriendLinkListLogic) PublicBlogFriendLinkList() (resp *types.
 			OrderNum: link.OrderNum,
 		})
 	}
-
-	return &types.PublicBlogFriendLinkListResp{
-		List: items,
-	}, nil
+	return &types.PublicBlogFriendLinkListResp{List: items}, nil
 }

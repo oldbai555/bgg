@@ -5,11 +5,11 @@ package video
 
 import (
 	"context"
-	"encoding/json"
-	"postapocgame/admin-server/internal/logic/logicutil"
+
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/content/contentclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -28,58 +28,36 @@ func NewVideoListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *VideoLi
 	}
 }
 
+// VideoList 薄胶水：统一分页参数（原 logicutil.NormalizePage）的默认值/上限处理已经下沉到
+// content-rpc 侧内联实现，实际业务逻辑搬进 services/content/internal/logic/videolistlogic.go。
 func (l *VideoListLogic) VideoList(req *types.VideoListReq) (resp *types.VideoListResp, err error) {
-	if req == nil {
-		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
-	}
-
-	// 统一分页参数
-	req.Page, req.PageSize = logicutil.NormalizePage(req.Page, req.PageSize, 20, 100)
-
-	// 支持sourceType筛选（0=全部，1=手动添加，2=采集）
-	sourceType := req.SourceType
-	list, total, err := l.svcCtx.Domain.Video.Video.FindPage(l.ctx, req.Page, req.PageSize, req.Keyword, sourceType)
+	rpcResp, err := l.svcCtx.ContentRPC.VideoList(l.ctx, &contentclient.VideoListRequest{
+		Page:       req.Page,
+		PageSize:   req.PageSize,
+		Keyword:    req.Keyword,
+		SourceType: req.SourceType,
+	})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "查询视频列表失败", err)
+		return nil, errs.WrapGRPCError("查询视频列表失败", err)
 	}
 
-	items := make([]types.VideoItem, 0, len(list))
-	for _, v := range list {
-		item := types.VideoItem{
-			Id:         v.Id,
-			Name:       v.Name,
-			Duration:   v.Duration,
-			PlayUrl:    v.PlayUrl,
-			SourceType: v.Type,
-			CreatedAt:  v.CreatedAt,
-			UpdatedAt:  v.UpdatedAt,
-		}
-
-		// 处理可选字段
-		if v.Uuid.Valid {
-			item.Uuid = v.Uuid.String
-		}
-		if v.Cover.Valid {
-			item.Cover = v.Cover.String
-		}
-		if v.GodNum.Valid {
-			item.GodNum = v.GodNum.String
-		}
-		if v.Description.Valid {
-			item.Description = v.Description.String
-		}
-		if v.XlzzUrls.Valid {
-			var xlzzUrls []string
-			if err := json.Unmarshal([]byte(v.XlzzUrls.String), &xlzzUrls); err == nil {
-				item.XlzzUrls = xlzzUrls
-			}
-		}
-
-		items = append(items, item)
+	items := make([]types.VideoItem, 0, len(rpcResp.List))
+	for _, v := range rpcResp.List {
+		items = append(items, types.VideoItem{
+			Id:          v.Id,
+			Uuid:        v.Uuid,
+			Name:        v.Name,
+			Cover:       v.Cover,
+			GodNum:      v.GodNum,
+			Duration:    v.Duration,
+			PlayUrl:     v.PlayUrl,
+			XlzzUrls:    v.XlzzUrls,
+			Description: v.Description,
+			SourceType:  v.SourceType,
+			CreatedAt:   v.CreatedAt,
+			UpdatedAt:   v.UpdatedAt,
+		})
 	}
 
-	return &types.VideoListResp{
-		Total: total,
-		List:  items,
-	}, nil
+	return &types.VideoListResp{Total: rpcResp.Total, List: items}, nil
 }

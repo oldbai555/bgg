@@ -73,6 +73,9 @@ func main() {
 	if len(c.ChatRPCConf.Endpoints) == 0 || c.ChatRPCConf.Endpoints[0] == "" {
 		log.Fatalf("CHAT_RPC_ENDPOINT 未设置，拒绝以空 chat-rpc 地址启动")
 	}
+	if len(c.ContentRPCConf.Endpoints) == 0 || c.ContentRPCConf.Endpoints[0] == "" {
+		log.Fatalf("CONTENT_RPC_ENDPOINT 未设置，拒绝以空 content-rpc 地址启动")
+	}
 
 	// 从外部文件加载 MySQL、Redis 和中间件配置（如果存在）
 	if err := config.MergeExternalConfig(&c, *mysqlConfigFile, *redisConfigFile, *middlewareConfigFile); err != nil {

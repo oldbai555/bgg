@@ -7,8 +7,11 @@ package iamcallback
 
 import (
 	"context"
+	"database/sql"
+	"time"
 
 	"postapocgame/admin-server/internal/consts"
+	monitoringmodel "postapocgame/admin-server/internal/model/monitoring"
 	"postapocgame/admin-server/internal/repository/registry"
 	pb "postapocgame/admin-server/pkg/iamcallback/pb"
 )
@@ -51,10 +54,11 @@ func (s *Server) GetUserProfile(ctx context.Context, req *pb.GetUserProfileReque
 	}
 
 	resp := &pb.GetUserProfileResponse{
-		Exists:   true,
-		Username: user.Username,
-		Nickname: user.Nickname,
-		Avatar:   user.Avatar,
+		Exists:    true,
+		Username:  user.Username,
+		Nickname:  user.Nickname,
+		Avatar:    user.Avatar,
+		Signature: user.Signature,
 	}
 
 	if user.DepartmentId > 0 {
@@ -67,6 +71,31 @@ func (s *Server) GetUserProfile(ctx context.Context, req *pb.GetUserProfileReque
 	}
 
 	return resp, nil
+}
+
+// RecordAuditLog 写一条审计日志，逻辑迁移自 pkg/audit.RecordAuditLog（该函数原本直接持有
+// gateway 的 *svc.ServiceContext，content-rpc 拆分后拿不到，改成回调这个方法）。IP/UA
+// 字段不在这个 RPC 契约里：content-rpc 唯一的两处调用点（blog_article_audit_logic.go/
+// blog_article_audit_unpublish_logic.go）原来就是传一个空的 *http.Request，IP/UA 本来就
+// 恒为空，去掉这两个字段不改变现有行为。
+func (s *Server) RecordAuditLog(ctx context.Context, req *pb.RecordAuditLogRequest) (*pb.RecordAuditLogResponse, error) {
+	now := time.Now().Unix()
+	auditLog := &monitoringmodel.AuditLog{
+		UserId:      req.UserId,
+		Username:    req.Username,
+		AuditType:   req.AuditType,
+		AuditObject: req.AuditObject,
+		CreatedAt:   now,
+		UpdatedAt:   now,
+		DeletedAt:   0,
+	}
+	if req.DetailJson != "" {
+		auditLog.AuditDetail = sql.NullString{String: req.DetailJson, Valid: true}
+	}
+	if err := s.domain.Monitoring.AuditLog.Create(ctx, auditLog); err != nil {
+		return nil, err
+	}
+	return &pb.RecordAuditLogResponse{}, nil
 }
 
 func (s *Server) resolveDepartmentName(ctx context.Context, id uint64) string {

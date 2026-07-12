@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/content/contentclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,28 +28,18 @@ func NewPublicBlogAuthorInfoLogic(ctx context.Context, svcCtx *svc.ServiceContex
 	}
 }
 
+// PublicBlogAuthorInfo 薄胶水：原来的跨域读取 IAM 用户信息（TODO(phase2-content-rpc)）
+// 已经在 content-rpc 侧改成回调 IamCallback.GetUserProfile，实际业务逻辑搬进
+// services/content/internal/logic/publicblogauthorinfologic.go。
 func (l *PublicBlogAuthorInfoLogic) PublicBlogAuthorInfo() (resp *types.PublicBlogAuthorInfoResp, err error) {
-	// 查询超级管理员（id=1）的信息
-	// TODO(phase2-content-rpc): 跨域读取 IAM 用户信息，Phase 2 拆分后改为调用 iam-rpc.GetUserProfile
-	user, err := l.svcCtx.Domain.IAM.User.FindByID(l.ctx, 1)
+	rpcResp, err := l.svcCtx.ContentRPC.PublicBlogAuthorInfo(l.ctx, &contentclient.PublicBlogGlobalRequest{})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeBadDB, "查询作者信息失败", err)
+		return nil, errs.WrapGRPCError("查询作者信息失败", err)
 	}
-
-	// 如果用户不存在或已删除，返回默认值
-	if user == nil || user.DeletedAt > 0 {
-		return &types.PublicBlogAuthorInfoResp{
-			Id:        1,
-			Nickname:  "管理员",
-			Avatar:    "",
-			Signature: "",
-		}, nil
-	}
-
 	return &types.PublicBlogAuthorInfoResp{
-		Id:        user.Id,
-		Nickname:  user.Nickname,
-		Avatar:    user.Avatar,
-		Signature: user.Signature,
+		Id:        rpcResp.Id,
+		Nickname:  rpcResp.Nickname,
+		Avatar:    rpcResp.Avatar,
+		Signature: rpcResp.Signature,
 	}, nil
 }

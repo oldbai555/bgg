@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/content/contentclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,14 +28,12 @@ func NewBlogArticleDeleteLogic(ctx context.Context, svcCtx *svc.ServiceContext) 
 	}
 }
 
+// BlogArticleDelete 薄胶水，实际业务逻辑已经搬进
+// services/content/internal/logic/blogarticledeletelogic.go。
 func (l *BlogArticleDeleteLogic) BlogArticleDelete(req *types.BlogArticleDeleteReq) (resp *types.Response, err error) {
-	if req.Id == 0 {
-		return nil, errs.New(errs.CodeBadRequest, "文章ID不能为空")
+	_, err = l.svcCtx.ContentRPC.BlogArticleDelete(l.ctx, &contentclient.BlogArticleDeleteRequest{Id: req.Id})
+	if err != nil {
+		return nil, errs.WrapGRPCError("删除文章失败", err)
 	}
-
-	if err := l.svcCtx.Domain.Blog.Article.Delete(l.ctx, req.Id); err != nil {
-		return nil, err
-	}
-
 	return &types.Response{Code: int(errs.CodeOK), Message: "删除成功"}, nil
 }

@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/content/contentclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,27 +28,12 @@ func NewBlogSocialInfoDeleteLogic(ctx context.Context, svcCtx *svc.ServiceContex
 	}
 }
 
+// BlogSocialInfoDelete 薄胶水，实际业务逻辑已经搬进
+// services/content/internal/logic/blogsocialinfodeletelogic.go。
 func (l *BlogSocialInfoDeleteLogic) BlogSocialInfoDelete(req *types.BlogSocialInfoDeleteReq) (resp *types.Response, err error) {
-	if req.Id == 0 {
-		return nil, errs.New(errs.CodeBadRequest, "社交信息ID不能为空")
-	}
-
-	// 检查记录是否存在
-	info, err := l.svcCtx.Domain.Blog.SocialInfo.FindByID(l.ctx, req.Id)
+	_, err = l.svcCtx.ContentRPC.BlogSocialInfoDelete(l.ctx, &contentclient.BlogSocialInfoDeleteRequest{Id: req.Id})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeBadDB, "查询社交信息失败", err)
+		return nil, errs.WrapGRPCError("删除社交信息失败", err)
 	}
-	if info == nil {
-		return nil, errs.New(errs.CodeNotFound, "社交信息不存在")
-	}
-
-	// 执行软删除
-	if err := l.svcCtx.Domain.Blog.SocialInfo.Delete(l.ctx, req.Id); err != nil {
-		return nil, err
-	}
-
-	return &types.Response{
-		Code:    0,
-		Message: "删除成功",
-	}, nil
+	return &types.Response{Code: 0, Message: "删除成功"}, nil
 }

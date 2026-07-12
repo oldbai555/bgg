@@ -10,12 +10,10 @@ import (
 	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/core/stores/redis"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
-	"postapocgame/admin-server/internal/model/blog"
 	"postapocgame/admin-server/internal/model/iam"
 	"postapocgame/admin-server/internal/model/misc"
 	"postapocgame/admin-server/internal/model/monitoring"
 	"postapocgame/admin-server/internal/model/system"
-	"postapocgame/admin-server/internal/model/video"
 )
 
 // Repository 聚合 goctl 生成的 Model，统一数据访问入口。
@@ -47,13 +45,6 @@ type Repository struct {
 	AdminNoticeModel         system.AdminNoticeModel
 	AdminNotificationModel   system.AdminNotificationModel
 	DailyShortSentenceModel  misc.DailyShortSentenceModel
-	VideoModel               video.VideoModel
-	BlogTagModel             blog.BlogTagModel
-	BlogArticleModel         blog.BlogArticleModel
-	BlogArticleTagModel      blog.BlogArticleTagModel
-	BlogArticleAuditModel    blog.BlogArticleAuditModel
-	BlogFriendLinkModel      blog.BlogFriendLinkModel
-	BlogSocialInfoModel      blog.BlogSocialInfoModel
 }
 
 func NewRepository(conn sqlx.SqlConn, cacheConf cache.CacheConf, rdb *redis.Redis) (*Repository, error) {
@@ -90,13 +81,6 @@ func NewRepository(conn sqlx.SqlConn, cacheConf cache.CacheConf, rdb *redis.Redi
 		AdminNoticeModel:         system.NewAdminNoticeModel(conn, cacheConf),
 		AdminNotificationModel:   system.NewAdminNotificationModel(conn, cacheConf),
 		DailyShortSentenceModel:  misc.NewDailyShortSentenceModel(conn, cacheConf),
-		VideoModel:               video.NewVideoModel(conn, cacheConf),
-		BlogTagModel:             blog.NewBlogTagModel(conn, cacheConf),
-		BlogArticleModel:         blog.NewBlogArticleModel(conn, cacheConf),
-		BlogArticleTagModel:      blog.NewBlogArticleTagModel(conn, cacheConf),
-		BlogArticleAuditModel:    blog.NewBlogArticleAuditModel(conn, cacheConf),
-		BlogFriendLinkModel:      blog.NewBlogFriendLinkModel(conn, cacheConf),
-		BlogSocialInfoModel:      blog.NewBlogSocialInfoModel(conn, cacheConf),
 	}, nil
 }
 
@@ -160,12 +144,5 @@ func (r *Repository) withSession(session sqlx.Session) *Repository {
 		AdminNoticeModel:         r.AdminNoticeModel.WithSession(session),
 		AdminNotificationModel:   r.AdminNotificationModel.WithSession(session),
 		DailyShortSentenceModel:  r.DailyShortSentenceModel.WithSession(session),
-		VideoModel:               r.VideoModel.WithSession(session),
-		BlogTagModel:             r.BlogTagModel.WithSession(session),
-		BlogArticleModel:         r.BlogArticleModel.WithSession(session),
-		BlogArticleTagModel:      r.BlogArticleTagModel.WithSession(session),
-		BlogArticleAuditModel:    r.BlogArticleAuditModel.WithSession(session),
-		BlogFriendLinkModel:      r.BlogFriendLinkModel.WithSession(session),
-		BlogSocialInfoModel:      r.BlogSocialInfoModel.WithSession(session),
 	}
 }

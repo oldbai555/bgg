@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/content/contentclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,53 +28,22 @@ func NewPublicVideoListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *P
 	}
 }
 
+// PublicVideoList 薄胶水，实际业务逻辑已经搬进
+// services/content/internal/logic/publicvideolistlogic.go。
 func (l *PublicVideoListLogic) PublicVideoList(req *types.PublicVideoListReq) (resp *types.PublicVideoListResp, err error) {
-	if req == nil {
-		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
-	}
-
-	// 设置默认值
-	page := req.Page
-	if page < 1 {
-		page = 1
-	}
-	size := req.Size
-	if size < 1 {
-		size = 10
-	}
-	if size > 100 {
-		size = 100
-	}
-
-	// 查询视频列表（只查询采集视频，type=2）
-	keyword := req.Content
-	list, total, err := l.svcCtx.Domain.Video.Video.FindPage(l.ctx, page, size, keyword, 2)
+	rpcResp, err := l.svcCtx.ContentRPC.PublicVideoList(l.ctx, &contentclient.PublicVideoListRequest{
+		Page:    req.Page,
+		Size:    req.Size,
+		Content: req.Content,
+	})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "查询视频列表失败", err)
+		return nil, errs.WrapGRPCError("查询视频列表失败", err)
 	}
 
-	// 转换为公开视频项（字段较少）
-	items := make([]types.PublicVideoItem, 0, len(list))
-	for _, v := range list {
-		item := types.PublicVideoItem{
-			Id:   v.Id,
-			Name: v.Name,
-		}
-
-		if v.Uuid.Valid {
-			item.Uuid = v.Uuid.String
-		}
-		if v.GodNum.Valid {
-			item.GodNum = v.GodNum.String
-		}
-
-		items = append(items, item)
+	items := make([]types.PublicVideoItem, 0, len(rpcResp.List))
+	for _, v := range rpcResp.List {
+		items = append(items, types.PublicVideoItem{Id: v.Id, Uuid: v.Uuid, Name: v.Name, GodNum: v.GodNum})
 	}
 
-	return &types.PublicVideoListResp{
-		List:  items,
-		Page:  page,
-		Size:  size,
-		Total: total,
-	}, nil
+	return &types.PublicVideoListResp{List: items, Page: rpcResp.Page, Size: rpcResp.Size, Total: rpcResp.Total}, nil
 }

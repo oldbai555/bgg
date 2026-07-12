@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/content/contentclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,19 +28,12 @@ func NewBlogArticleUntopLogic(ctx context.Context, svcCtx *svc.ServiceContext) *
 	}
 }
 
+// BlogArticleUntop 薄胶水，实际业务逻辑已经搬进
+// services/content/internal/logic/blogarticleuntoplogic.go。
 func (l *BlogArticleUntopLogic) BlogArticleUntop(req *types.BlogArticleUntopReq) (resp *types.Response, err error) {
-	if req.Id == 0 {
-		return nil, errs.New(errs.CodeBadRequest, "文章ID不能为空")
+	_, err = l.svcCtx.ContentRPC.BlogArticleUntop(l.ctx, &contentclient.BlogArticleUntopRequest{Id: req.Id})
+	if err != nil {
+		return nil, errs.WrapGRPCError("取消置顶失败", err)
 	}
-
-	// 直接执行更新，UpdateTopStatus 内部会检查文章是否存在
-	// 这样可以避免缓存问题，直接从数据库查询最新状态
-	if err := l.svcCtx.Domain.Blog.Article.UpdateTopStatus(l.ctx, req.Id, 0); err != nil {
-		return nil, err
-	}
-
-	return &types.Response{
-		Code:    0,
-		Message: "取消置顶成功",
-	}, nil
+	return &types.Response{Code: 0, Message: "取消置顶成功"}, nil
 }

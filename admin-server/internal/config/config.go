@@ -38,9 +38,14 @@ type Config struct {
 	// 2.3 节。
 	ChatRPCConf zrpc.RpcClientConf `json:"chatRpc,optional" yaml:"chatRpc" mapstructure:"chatRpc"`
 	// IamCallbackRPCConf 单体内嵌的 pkg/iamcallback.IamCallback zrpc server 监听配置，供
-	// chat-rpc 回调枚举存量用户 / 取用户展示信息（用户名/昵称/头像/部门名/角色名）。iam 域
-	// 还没拆分成独立服务前的临时方案，和 TaskCallbackRPCConf 同一个模式。
+	// chat-rpc/content-rpc 回调枚举存量用户 / 取用户展示信息（用户名/昵称/头像/部门名/角色名）
+	// / 写审计日志。iam 域还没拆分成独立服务前的临时方案，和 TaskCallbackRPCConf 同一个模式。
 	IamCallbackRPCConf zrpc.RpcServerConf `json:"iamCallbackRpc,optional" yaml:"iamCallbackRpc" mapstructure:"iamCallbackRpc"`
+	// ContentRPCConf 连到 content-rpc（services/content/）的 zrpc client 配置。blog+video 域
+	// 已拆分成独立服务，gateway 侧的 34 个 Blog*/PublicBlog* logic + 6 个 Video*/PublicVideo*
+	// logic 都通过这个 client 调用，不再直接持有 Domain.Blog/Domain.Video。见
+	// 18-service-extraction-runbook.md 2.4 节。
+	ContentRPCConf zrpc.RpcClientConf `json:"contentRpc,optional" yaml:"contentRpc" mapstructure:"contentRpc"`
 }
 
 type DatabaseConf struct {

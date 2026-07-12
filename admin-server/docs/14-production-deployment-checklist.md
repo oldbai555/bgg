@@ -129,6 +129,29 @@
 
 **状态**：`已就绪，待生产环境实际部署时执行`（本机无 Docker，`docker compose up` 本身未做容器化实测，已做过非容器化的直接进程 + 真实 WS 连接验证）。
 
+### 8 · content-rpc 拆分（Phase 2 第四个落地的服务）
+
+**触发条件**：`services/content/` 完整拆分完成（`docs/progress.md` 对应条目），content-rpc 成为独立部署单元。这是 blog（标签/文章/审核/友情链接/社交信息/公共展示）+ video（管理/采集/公共展示）合并拆出的服务，`18-service-extraction-runbook.md` 2.4 节定性为"文件数最多但架构最简单"，没有新增跨服务机制（`M3u8Proxy`/`VideoCollectOptions` 不涉及域数据，继续留在 gateway；`PublicBlogAuthorInfo`/`BlogArticleAudit`/`BlogArticleAuditUnpublish` 复用已有的 `IamCallback` 回调模式，只是新增了 `signature` 字段和 `RecordAuditLog` 方法）。
+
+**部署时要做什么**：
+1. 建 `admin_content` schema：`mysql -uroot -p<pass> -e "CREATE DATABASE IF NOT EXISTS admin_content CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"`，然后依次跑 `db/services/content/blog/create_table_blog.sql`、`db/services/content/blog_extension/create_table_blog_extension.sql`、`db/services/content/video/create_table_video.sql`（共 7 张表；三个模块各自的 `init_*.sql` 写的是 `admin_menu`/`admin_permission`/`admin_api`，物理属于主库 iam 部分，已经在主库初始化时跑过）。docker-compose 场景下已自动化，见 `db/services/init-content-db.sh` + `docker-compose.yml` 的 mysql 服务第五个 init 脚本挂载。
+2. 生产环境实际地址配置（均通过环境变量，`conf.UseEnv()` 已接入，fail-fast 不给静默默认值，和 `JWT_ACCESS_SECRET`/task-rpc/sdk-rpc/chat-rpc 那批同一套约定）：
+   - `CONTENT_RPC_ENDPOINT`（gateway 侧 `etc/admin-api.yaml` 的 `ContentRpc.Endpoints`，指向 content-rpc 实际监听地址）
+   - `CONTENT_MYSQL_DSN`（content-rpc 侧 `services/content/etc/content.yaml`）
+   - `CONTENT_REDIS_ADDRESS`、`CONTENT_REDIS_PASSWORD`（content-rpc 侧 `services/content/etc/content.yaml`；纯粹满足 goctl 生成 Model 的 `CachedConn` 缓存节点要求，业务本身不用 Redis，和 gateway 共享同一个 Redis 实例）
+   - `IAM_CALLBACK_ENDPOINT`（content-rpc 侧 `services/content/etc/content.yaml` 的 `IamCallbackRpc.Endpoints`，指向单体内嵌 `IamCallback` server 的地址，和 task-rpc/chat-rpc 用的是同一个 `0.0.0.0:9002`）
+3. **`services/content/etc/content.yaml` 的 `Limits` 段需要人工核对一次**：原来读字典（`blog_article_title_max_length`/`blog_article_summary_length`/`blog_article_top_max_count`/`blog_tag_name_max_length`/`blog_friend_link_*_max_length`/`blog_social_info_*_max_length`，共 10 个）决定的长度/数量上限，改成了这个静态配置段，默认值已对齐字典种子数据；如果生产环境之前通过后台字典管理改过这些值，需要手动同步改这个配置项，否则会变回默认值。
+4. 部署顺序建议：先部署 content-rpc → 确认它监听正常且能连上 `IAM_CALLBACK_ENDPOINT` → 再重启单体 gateway。`ContentRPC` 走 `NonBlock: true` 不会阻塞 gateway 启动，但 `/api/v1/blog/*`、`/api/v1/videos*` 系列接口在 content-rpc 真正连上之前会持续报错。
+5. 单元测试范围（`.github/workflows/ci.yml` 的 `unit-test` job）已加上 `./services/content/...`。
+
+**如何验证生效**：`docs/progress.md` 本轮条目记录了一次真实端到端验证（借用远程 MySQL + 本地 Redis，起 gateway + content-rpc 真实连上，对着真实存量数据——27 篇已发布文章、5 个标签等——做只读验证，写操作全部用新建的测试数据并在验证后精确物理清理）：① 全部公共只读接口（文章列表/详情/上一篇/下一篇/统计、标签/友情链接/社交信息列表、作者信息）对着真实数据验证通过；② 用临时管理员账号 + 临时角色（绑定"全部权限"）验证了标签/文章/友情链接/社交信息的完整 CRUD，文章的提交→审核→上架→置顶→取消置顶→审核下架全流程状态流转正确，审核/下架的审计日志确认真实写入了 `audit_log` 表（回调 `IamCallback.RecordAuditLog` 全链路打通）；③ 视频采集（`VideoCollect`）、管理端视频新增/列表/删除验证通过。
+
+**已知遗留**：
+- `docker compose up` 本身未做容器化实测（本机无 Docker，和前三次服务拆分同样的限制），已用非容器化真实进程验证过完整链路，建议用户在有 Docker 的环境跑一遍确认 `content` 容器能通过服务名连接。
+- **发现一个预先存在、和本轮拆分无关的真实 bug，未修复**：`services/content/internal/model/video/videomodel_gen.go` 的自定义 `Update` 方法（`git log -S` 定位到引入提交 `9580866`，远早于 Phase 1-2 重构）只给 SQL 绑定了 `Name/Cover/Duration/PlayUrl/Description/DeletedAt` 六个字段的值，但 SET 子句是按 `Video` 结构体全部字段（含 `Uuid`/`GodNum`/`XlzzUrls`/`Type`）动态生成的，参数个数和占位符数量对不上——`PUT /api/v1/videos`（视频编辑）从引入那一刻起就没有真正生效过，真实环境验证时用测试数据触发确认（报错而非静默失败，不会误导为"改成功了"）。这是一个标了"goctl 生成/DO NOT EDIT"的文件，按项目规则正确修法是"改模板 → 重新生成"而不是手改生成文件，不在本轮 content-rpc 拆分范围内展开，建议单独排期：核实 `.template/model/` 里对应模板的参数绑定逻辑，或者确认这是否是一次性的手工生成产物（未走标准模板流程），再决定修复路径。
+
+**状态**：`已就绪，待生产环境实际部署时执行`（本机无 Docker，`docker compose up` 本身未做容器化实测，已做过非容器化的直接进程 + 真实数据验证；`VideoUpdate` 已知 bug 需要用户决定是否在此次部署前一并修复）。
+
 ## Phase 2/3 预留条目类型（占位，届时按真实改动追加，现在不编造内容）
 
 以下只是"预计会出现哪类条目"的提示，**不是已确定的条目**，落地时按 Phase 2/3 实际改动的真实细节追加，不要现在就编内容占位：

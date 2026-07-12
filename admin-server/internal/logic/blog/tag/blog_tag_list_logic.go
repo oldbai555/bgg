@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/content/contentclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,25 +28,21 @@ func NewBlogTagListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *BlogT
 	}
 }
 
+// BlogTagList 薄胶水：解析 HTTP 请求 -> 调 ContentRPC -> 映射响应，实际业务逻辑已经搬进
+// services/content/internal/logic/blogtaglistlogic.go。
 func (l *BlogTagListLogic) BlogTagList(req *types.BlogTagListReq) (resp *types.BlogTagListResp, err error) {
-	// 参数预处理与默认值
-	page := req.Page
-	if page < 1 {
-		page = 1
-	}
-	pageSize := req.PageSize
-	if pageSize <= 0 {
-		pageSize = 20
-	}
-
-	// 调用仓储层分页查询
-	list, total, err := l.svcCtx.Domain.Blog.Tag.FindPage(l.ctx, page, pageSize, req.Name, req.Status)
+	rpcResp, err := l.svcCtx.ContentRPC.BlogTagList(l.ctx, &contentclient.BlogTagListRequest{
+		Page:     req.Page,
+		PageSize: req.PageSize,
+		Name:     req.Name,
+		Status:   req.Status,
+	})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeBadDB, "查询标签列表失败", err)
+		return nil, errs.WrapGRPCError("查询标签列表失败", err)
 	}
 
-	items := make([]types.BlogTagItem, 0, len(list))
-	for _, t := range list {
+	items := make([]types.BlogTagItem, 0, len(rpcResp.List))
+	for _, t := range rpcResp.List {
 		items = append(items, types.BlogTagItem{
 			Id:        t.Id,
 			Name:      t.Name,
@@ -56,8 +53,5 @@ func (l *BlogTagListLogic) BlogTagList(req *types.BlogTagListReq) (resp *types.B
 		})
 	}
 
-	return &types.BlogTagListResp{
-		Total: total,
-		List:  items,
-	}, nil
+	return &types.BlogTagListResp{Total: rpcResp.Total, List: items}, nil
 }

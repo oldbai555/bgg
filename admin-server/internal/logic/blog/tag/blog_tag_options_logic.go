@@ -6,6 +6,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/content/contentclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -25,21 +26,20 @@ func NewBlogTagOptionsLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Bl
 	}
 }
 
+// BlogTagOptions 薄胶水，实际业务逻辑已经搬进
+// services/content/internal/logic/blogtagoptionslogic.go。
 func (l *BlogTagOptionsLogic) BlogTagOptions(req *types.BlogTagOptionsReq) (resp *types.BlogTagOptionsResp, err error) {
-	limit := int64(1000)
-	if req != nil && req.Limit > 0 {
+	limit := int64(0)
+	if req != nil {
 		limit = req.Limit
 	}
-	list, err := l.svcCtx.Domain.Blog.Tag.FindEnabledList(l.ctx, limit)
+	rpcResp, err := l.svcCtx.ContentRPC.BlogTagOptions(l.ctx, &contentclient.BlogTagOptionsRequest{Limit: limit})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeBadDB, "查询标签选项失败", err)
+		return nil, errs.WrapGRPCError("查询标签选项失败", err)
 	}
-	items := make([]types.BlogTagOptionItem, 0, len(list))
-	for _, t := range list {
-		items = append(items, types.BlogTagOptionItem{
-			Id:   t.Id,
-			Name: t.Name,
-		})
+	items := make([]types.BlogTagOptionItem, 0, len(rpcResp.List))
+	for _, t := range rpcResp.List {
+		items = append(items, types.BlogTagOptionItem{Id: t.Id, Name: t.Name})
 	}
 	return &types.BlogTagOptionsResp{List: items}, nil
 }

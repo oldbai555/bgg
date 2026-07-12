@@ -46,6 +46,15 @@ ChatRpc:
     - "${CHAT_RPC_ENDPOINT}"
   NonBlock: true
 
+# content-rpc（services/content/）的 zrpc client 配置。blog+video 域已拆分成独立服务，
+# 34 个 Blog*/PublicBlog* logic + 6 个 Video*/PublicVideo* logic 都通过这个 client 调用
+# （M3u8Proxy/VideoCollectOptions 不访问域数据，继续留在 gateway）。CONTENT_RPC_ENDPOINT
+# 必须显式设置：本机同进程调试用 127.0.0.1:8093，docker-compose 用服务名 content:8093。
+ContentRpc:
+  Endpoints:
+    - "${CONTENT_RPC_ENDPOINT}"
+  NonBlock: true
+
 # JWT 配置
 JWT:
   AccessSecret: "${JWT_ACCESS_SECRET}"

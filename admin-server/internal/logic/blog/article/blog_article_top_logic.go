@@ -6,11 +6,10 @@ package article
 import (
 	"context"
 
-	"postapocgame/admin-server/internal/consts"
-	"postapocgame/admin-server/internal/dict"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/content/contentclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -29,20 +28,12 @@ func NewBlogArticleTopLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Bl
 	}
 }
 
+// BlogArticleTop 薄胶水，置顶数量上限的静态配置已经下沉到 content-rpc，实际业务逻辑
+// 搬进 services/content/internal/logic/blogarticletoplogic.go。
 func (l *BlogArticleTopLogic) BlogArticleTop(req *types.BlogArticleTopReq) (resp *types.Response, err error) {
-	if req.Id == 0 {
-		return nil, errs.New(errs.CodeBadRequest, "文章ID不能为空")
+	_, err = l.svcCtx.ContentRPC.BlogArticleTop(l.ctx, &contentclient.BlogArticleTopRequest{Id: req.Id})
+	if err != nil {
+		return nil, errs.WrapGRPCError("置顶失败", err)
 	}
-
-	// 从字典读取置顶最大数量限制（默认1篇）
-	maxCount := int64(dict.GetIntValue(l.ctx, l.svcCtx.Repository, consts.DictCodeBlogArticleTopMaxCount, 1))
-
-	if err := l.svcCtx.Domain.Blog.ArticleService.SetArticleTop(l.ctx, req.Id, maxCount); err != nil {
-		return nil, err
-	}
-
-	return &types.Response{
-		Code:    0,
-		Message: "置顶成功",
-	}, nil
+	return &types.Response{Code: 0, Message: "置顶成功"}, nil
 }

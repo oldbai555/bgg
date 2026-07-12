@@ -5,14 +5,11 @@ package video
 
 import (
 	"context"
-	"database/sql"
-	"time"
 
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
-
-	"postapocgame/admin-server/internal/model/video"
+	"postapocgame/admin-server/services/content/contentclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -31,32 +28,20 @@ func NewVideoCreateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Video
 	}
 }
 
+// VideoCreate 薄胶水，实际业务逻辑已经搬进 services/content/internal/logic/videocreatelogic.go。
 func (l *VideoCreateLogic) VideoCreate(req *types.VideoCreateReq) error {
-	if req == nil || req.Name == "" || req.PlayUrl == "" {
-		return errs.New(errs.CodeBadRequest, "视频名称和播放链接不能为空")
+	_, err := l.svcCtx.ContentRPC.VideoCreate(l.ctx, &contentclient.VideoCreateRequest{
+		Name:        req.Name,
+		Cover:       req.Cover,
+		GodNum:      req.GodNum,
+		Duration:    req.Duration,
+		PlayUrl:     req.PlayUrl,
+		XlzzUrls:    req.XlzzUrls,
+		Description: req.Description,
+		SourceType:  req.SourceType,
+	})
+	if err != nil {
+		return errs.WrapGRPCError("创建视频失败", err)
 	}
-
-	now := time.Now().Unix()
-	video := video.Video{
-		Name:      req.Name,
-		Duration:  req.Duration,
-		PlayUrl:   req.PlayUrl,
-		CreatedAt: now,
-		UpdatedAt: now,
-		DeletedAt: 0,
-	}
-
-	// 处理可选字段
-	if req.Cover != "" {
-		video.Cover = sql.NullString{String: req.Cover, Valid: true}
-	}
-	if req.Description != "" {
-		video.Description = sql.NullString{String: req.Description, Valid: true}
-	}
-
-	if err := l.svcCtx.Domain.Video.Video.Create(l.ctx, &video); err != nil {
-		return errs.Wrap(errs.CodeInternalError, "创建视频失败", err)
-	}
-
 	return nil
 }

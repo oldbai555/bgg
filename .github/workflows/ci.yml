@@ -35,11 +35,11 @@ jobs:
       - name: go test (unit)
         # 范围严格对齐 08-testing-strategy.md 的口径：只跑领域服务 + repository 层，
         # 不是 go test ./...；集成测试（//go:build integration）默认不会被这条命令带上。
-        # services/task/...、services/sdk/...、services/chat/... 是 Phase 2 拆出的
-        # task-rpc/sdk-rpc/chat-rpc（对应域的领域服务/repository 已经搬到这里，不再在
-        # internal/domain/...、internal/repository/... 下），一并跑。internal/rpcserver/...
-        # 是单体内嵌的 TaskCallback/IamCallback server 实现，同理需要跑。
-        run: cd admin-server && go test ./internal/domain/... ./internal/repository/... ./internal/rpcserver/... ./services/task/... ./services/sdk/... ./services/chat/... -race -count=1
+        # services/task/...、services/sdk/...、services/chat/...、services/content/... 是
+        # Phase 2 拆出的 task-rpc/sdk-rpc/chat-rpc/content-rpc（对应域的领域服务/repository
+        # 已经搬到这里，不再在 internal/domain/...、internal/repository/... 下），一并跑。
+        # internal/rpcserver/... 是单体内嵌的 TaskCallback/IamCallback server 实现，同理需要跑。
+        run: cd admin-server && go test ./internal/domain/... ./internal/repository/... ./internal/rpcserver/... ./services/task/... ./services/sdk/... ./services/chat/... ./services/content/... -race -count=1
 
   integration-test:
     runs-on: ubuntu-latest

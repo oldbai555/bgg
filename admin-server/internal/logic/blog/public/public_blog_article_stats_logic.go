@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/content/contentclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,14 +28,12 @@ func NewPublicBlogArticleStatsLogic(ctx context.Context, svcCtx *svc.ServiceCont
 	}
 }
 
+// PublicBlogArticleStats 薄胶水，实际业务逻辑已经搬进
+// services/content/internal/logic/publicblogarticlestatslogic.go。
 func (l *PublicBlogArticleStatsLogic) PublicBlogArticleStats() (resp *types.PublicBlogArticleStatsResp, err error) {
-	// 统计已发布文章总数
-	total, err := l.svcCtx.Domain.Blog.Article.CountPublishedArticles(l.ctx)
+	rpcResp, err := l.svcCtx.ContentRPC.PublicBlogArticleStats(l.ctx, &contentclient.PublicBlogGlobalRequest{})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeBadDB, "统计文章总数失败", err)
+		return nil, errs.WrapGRPCError("统计文章总数失败", err)
 	}
-
-	return &types.PublicBlogArticleStatsResp{
-		TotalArticles: total,
-	}, nil
+	return &types.PublicBlogArticleStatsResp{TotalArticles: rpcResp.TotalArticles}, nil
 }

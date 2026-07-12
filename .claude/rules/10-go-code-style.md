@@ -24,7 +24,7 @@ admin-server/
 │   ├── middleware/        # 手写中间件
 │   ├── consts/ config/ types/ svc/
 ├── pkg/ scripts/ .template/ db/
-└── services/task/, services/sdk/, services/chat/  # Phase 2 拆出的 task-rpc/sdk-rpc/chat-rpc 独立服务（领域代码/repository 已搬出单体）
+└── services/task/, services/sdk/, services/chat/, services/content/  # Phase 2 拆出的 task-rpc/sdk-rpc/chat-rpc/content-rpc 独立服务（领域代码/repository 已搬出单体）
 ```
 
 维护导航见 `docs/admin-server-维护导航.md`。

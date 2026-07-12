@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/content/contentclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,16 +28,11 @@ func NewBlogTagDeleteLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Blo
 	}
 }
 
+// BlogTagDelete 薄胶水，实际业务逻辑已经搬进 services/content/internal/logic/blogtagdeletelogic.go。
 func (l *BlogTagDeleteLogic) BlogTagDelete(req *types.BlogTagDeleteReq) error {
-	if req.Id == 0 {
-		return errs.New(errs.CodeBadRequest, "标签ID不能为空")
+	_, err := l.svcCtx.ContentRPC.BlogTagDelete(l.ctx, &contentclient.BlogTagDeleteRequest{Id: req.Id})
+	if err != nil {
+		return errs.WrapGRPCError("删除标签失败", err)
 	}
-
-	// TODO: 如需限制有文章关联的标签删除，可以在后续通过文章标签关联表进行检查
-
-	if err := l.svcCtx.Domain.Blog.Tag.Delete(l.ctx, req.Id); err != nil {
-		return err
-	}
-
 	return nil
 }
