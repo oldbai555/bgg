@@ -13,12 +13,15 @@ import (
 	"github.com/zeromicro/go-zero/core/stores/redis"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 
-	sdkdomain "postapocgame/admin-server/internal/domain/sdk"
-	sdkmodel "postapocgame/admin-server/internal/model/sdk"
-	"postapocgame/admin-server/internal/repository"
+	sdkdomain "postapocgame/admin-server/services/sdk/internal/domain/sdk"
+	sdkmodel "postapocgame/admin-server/services/sdk/internal/model/sdk"
+	"postapocgame/admin-server/services/sdk/internal/repository"
 )
 
-func newTestRepo(t *testing.T) (*repository.Repository, sqlmock.Sqlmock, func()) {
+// newTestStore 和 internal/repository/repository_test.go 用的是同一套组合：miniredis +
+// 单节点 CacheConf——goctl 生成的 Model 内部走 sqlc.CachedConn，cache.New 对空 CacheConf
+// 会 log.Fatal，必须喂一个真实（哪怕是内存模拟的）Redis 节点。
+func newTestStore(t *testing.T) (*repository.Store, sqlmock.Sqlmock, func()) {
 	t.Helper()
 
 	db, sqlMock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherRegexp))
@@ -30,20 +33,17 @@ func newTestRepo(t *testing.T) (*repository.Repository, sqlmock.Sqlmock, func())
 
 	redisConf := redis.RedisConf{Host: mr.Addr(), Type: "node"}
 	cacheConf := cache.CacheConf{{RedisConf: redisConf, Weight: 100}}
-	rdb, err := redis.NewRedis(redisConf)
-	require.NoError(t, err)
 
-	repo, err := repository.NewRepository(conn, cacheConf, rdb)
-	require.NoError(t, err)
+	store := repository.NewStore(conn, cacheConf)
 
-	return repo, sqlMock, func() {
+	return store, sqlMock, func() {
 		_ = db.Close()
 		mr.Close()
 	}
 }
 
 func TestSDKService_SaveApiKeyBindings_HappyPath(t *testing.T) {
-	repo, sqlMock, cleanup := newTestRepo(t)
+	store, sqlMock, cleanup := newTestStore(t)
 	defer cleanup()
 
 	sqlMock.ExpectBegin()
@@ -55,7 +55,7 @@ func TestSDKService_SaveApiKeyBindings_HappyPath(t *testing.T) {
 		WillReturnResult(sqlmock.NewResult(2, 1))
 	sqlMock.ExpectCommit()
 
-	svc := sdkdomain.NewSDKService(repo)
+	svc := sdkdomain.NewSDKService(store)
 	bindings := []sdkmodel.SdkKeyApi{
 		{SdkKeyId: 1, SdkInterfaceId: 10},
 		{SdkKeyId: 1, SdkInterfaceId: 11},
@@ -67,7 +67,7 @@ func TestSDKService_SaveApiKeyBindings_HappyPath(t *testing.T) {
 }
 
 func TestSDKService_SaveApiKeyBindings_RollbackOnInsertError(t *testing.T) {
-	repo, sqlMock, cleanup := newTestRepo(t)
+	store, sqlMock, cleanup := newTestStore(t)
 	defer cleanup()
 
 	sqlMock.ExpectBegin()
@@ -79,7 +79,7 @@ func TestSDKService_SaveApiKeyBindings_RollbackOnInsertError(t *testing.T) {
 		WillReturnError(assert.AnError)
 	sqlMock.ExpectRollback()
 
-	svc := sdkdomain.NewSDKService(repo)
+	svc := sdkdomain.NewSDKService(store)
 	bindings := []sdkmodel.SdkKeyApi{
 		{SdkKeyId: 1, SdkInterfaceId: 10},
 		{SdkKeyId: 1, SdkInterfaceId: 11},

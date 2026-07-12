@@ -23,6 +23,7 @@ func InitializeApp(c config.Config) (*svc.ServiceContext, func(), error) {
 	domain := provideDomain(repository)
 	chatHub := provideChatHub()
 	task := provideTaskRPC(c)
+	sdk := provideSdkRPC(c)
 	authMiddleware := middleware.NewAuthMiddleware(c, repository)
 	apiEnabledMiddleware := middleware.NewApiEnabledMiddleware(repository)
 	permissionMiddleware := providePermissionMiddleware(domain)
@@ -31,11 +32,11 @@ func InitializeApp(c config.Config) (*svc.ServiceContext, func(), error) {
 	rateLimitMiddleware := middleware.NewRateLimitMiddleware(c, repository)
 	performanceMiddleware := middleware.NewPerformanceMiddleware(c, repository)
 	corsMiddleware := middleware.NewCorsMiddleware()
-	sdkAuthMiddleware := middleware.NewSDKAuthMiddleware(repository)
-	sdkRateLimitMiddleware := middleware.NewSDKRateLimitMiddleware(repository)
-	sdkCallLogMiddleware := middleware.NewSDKCallLogMiddleware(repository)
+	sdkAuthMiddleware := middleware.NewSDKAuthMiddleware(sdk)
+	sdkRateLimitMiddleware := middleware.NewSDKRateLimitMiddleware(repository, sdk)
+	sdkCallLogMiddleware := middleware.NewSDKCallLogMiddleware(sdk)
 	middlewareBundle := provideMiddlewareBundle(authMiddleware, apiEnabledMiddleware, permissionMiddleware, operationLogMiddleware, publicOperationLogMiddleware, rateLimitMiddleware, performanceMiddleware, corsMiddleware, sdkAuthMiddleware, sdkRateLimitMiddleware, sdkCallLogMiddleware)
-	serviceContext, cleanup := provideServiceContext(c, repository, domain, chatHub, task, middlewareBundle)
+	serviceContext, cleanup := provideServiceContext(c, repository, domain, chatHub, task, sdk, middlewareBundle)
 	return serviceContext, func() {
 		cleanup()
 	}, nil

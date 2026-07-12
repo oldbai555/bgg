@@ -1,38 +1,36 @@
 package sdk
 
 import (
-	"postapocgame/admin-server/internal/repository"
 	"context"
-	"database/sql"
 	"fmt"
-	"strconv"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
 	"postapocgame/admin-server/pkg/errs"
-	sdkmodel "postapocgame/admin-server/internal/model/sdk"
+	sdkmodel "postapocgame/admin-server/services/sdk/internal/model/sdk"
+	"postapocgame/admin-server/services/sdk/internal/repository"
 )
 
 type SdkAdminRepository struct {
-	repo *repository.Repository
+	store *repository.Store
 }
 
-func NewSdkAdminRepository(repo *repository.Repository) *SdkAdminRepository {
-	return &SdkAdminRepository{repo: repo}
+func NewSdkAdminRepository(store *repository.Store) *SdkAdminRepository {
+	return &SdkAdminRepository{store: store}
 }
 
 // -------- API Key --------
 
 func (r *SdkAdminRepository) FindSdkKey(ctx context.Context, id uint64) (*sdkmodel.SdkKey, error) {
-	return r.repo.SdkKeyModel.FindOne(ctx, id)
+	return r.store.SdkKeyModel.FindOne(ctx, id)
 }
 
 func (r *SdkAdminRepository) FindSdkKeyByApiKey(ctx context.Context, apiKey string) (*sdkmodel.SdkKey, error) {
-	return r.repo.SdkKeyModel.FindOneByApiKey(ctx, apiKey)
+	return r.store.SdkKeyModel.FindOneByApiKey(ctx, apiKey)
 }
 
 func (r *SdkAdminRepository) FindSdkKeyByApiSecret(ctx context.Context, apiSecret string) (*sdkmodel.SdkKey, error) {
-	return r.repo.SdkKeyModel.FindOneByApiSecret(ctx, apiSecret)
+	return r.store.SdkKeyModel.FindOneByApiSecret(ctx, apiSecret)
 }
 
 func (r *SdkAdminRepository) ListSdkKeys(ctx context.Context, page, pageSize int64, name string, status int64) ([]sdkmodel.SdkKey, int64, error) {
@@ -61,7 +59,7 @@ func (r *SdkAdminRepository) ListSdkKeys(ctx context.Context, page, pageSize int
 	if err != nil {
 		return nil, 0, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
 	}
-	if err := r.repo.DB.QueryRowCtx(ctx, &total, countSQL, countArgs...); err != nil {
+	if err := r.store.DB.QueryRowCtx(ctx, &total, countSQL, countArgs...); err != nil {
 		return nil, 0, err
 	}
 
@@ -76,7 +74,7 @@ func (r *SdkAdminRepository) ListSdkKeys(ctx context.Context, page, pageSize int
 		return nil, 0, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
 	}
 	var list []sdkmodel.SdkKey
-	if err := r.repo.DB.QueryRowsCtx(ctx, &list, listSQL, listArgs...); err != nil {
+	if err := r.store.DB.QueryRowsCtx(ctx, &list, listSQL, listArgs...); err != nil {
 		return nil, 0, err
 	}
 
@@ -84,7 +82,7 @@ func (r *SdkAdminRepository) ListSdkKeys(ctx context.Context, page, pageSize int
 }
 
 func (r *SdkAdminRepository) CreateSdkKey(ctx context.Context, key *sdkmodel.SdkKey) (uint64, error) {
-	res, err := r.repo.SdkKeyModel.Insert(ctx, key)
+	res, err := r.store.SdkKeyModel.Insert(ctx, key)
 	if err != nil {
 		return 0, err
 	}
@@ -99,21 +97,21 @@ func (r *SdkAdminRepository) CreateSdkKey(ctx context.Context, key *sdkmodel.Sdk
 }
 
 func (r *SdkAdminRepository) UpdateSdkKey(ctx context.Context, key *sdkmodel.SdkKey) error {
-	return r.repo.SdkKeyModel.Update(ctx, key)
+	return r.store.SdkKeyModel.Update(ctx, key)
 }
 
 func (r *SdkAdminRepository) DeleteSdkKey(ctx context.Context, id uint64) error {
-	return r.repo.SdkKeyModel.Delete(ctx, id)
+	return r.store.SdkKeyModel.Delete(ctx, id)
 }
 
 // -------- SDK Interface --------
 
 func (r *SdkAdminRepository) FindInterface(ctx context.Context, id uint64) (*sdkmodel.SdkInterface, error) {
-	return r.repo.SdkInterfaceModel.FindOne(ctx, id)
+	return r.store.SdkInterfaceModel.FindOne(ctx, id)
 }
 
 func (r *SdkAdminRepository) FindInterfaceByCode(ctx context.Context, apiCode string) (*sdkmodel.SdkInterface, error) {
-	return r.repo.SdkInterfaceModel.FindOneByApiCode(ctx, apiCode)
+	return r.store.SdkInterfaceModel.FindOneByApiCode(ctx, apiCode)
 }
 
 func (r *SdkAdminRepository) ListInterfaces(ctx context.Context, page, pageSize int64, name, apiCode string, status int64) ([]sdkmodel.SdkInterface, int64, error) {
@@ -145,7 +143,7 @@ func (r *SdkAdminRepository) ListInterfaces(ctx context.Context, page, pageSize 
 	if err != nil {
 		return nil, 0, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
 	}
-	if err := r.repo.DB.QueryRowCtx(ctx, &total, countSQL, countArgs...); err != nil {
+	if err := r.store.DB.QueryRowCtx(ctx, &total, countSQL, countArgs...); err != nil {
 		return nil, 0, err
 	}
 
@@ -160,7 +158,7 @@ func (r *SdkAdminRepository) ListInterfaces(ctx context.Context, page, pageSize 
 		return nil, 0, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
 	}
 	var list []sdkmodel.SdkInterface
-	if err := r.repo.DB.QueryRowsCtx(ctx, &list, listSQL, listArgs...); err != nil {
+	if err := r.store.DB.QueryRowsCtx(ctx, &list, listSQL, listArgs...); err != nil {
 		return nil, 0, err
 	}
 
@@ -168,7 +166,7 @@ func (r *SdkAdminRepository) ListInterfaces(ctx context.Context, page, pageSize 
 }
 
 func (r *SdkAdminRepository) CreateInterface(ctx context.Context, iface *sdkmodel.SdkInterface) (uint64, error) {
-	res, err := r.repo.SdkInterfaceModel.Insert(ctx, iface)
+	res, err := r.store.SdkInterfaceModel.Insert(ctx, iface)
 	if err != nil {
 		return 0, err
 	}
@@ -183,11 +181,11 @@ func (r *SdkAdminRepository) CreateInterface(ctx context.Context, iface *sdkmode
 }
 
 func (r *SdkAdminRepository) UpdateInterface(ctx context.Context, iface *sdkmodel.SdkInterface) error {
-	return r.repo.SdkInterfaceModel.Update(ctx, iface)
+	return r.store.SdkInterfaceModel.Update(ctx, iface)
 }
 
 func (r *SdkAdminRepository) DeleteInterface(ctx context.Context, id uint64) error {
-	return r.repo.SdkInterfaceModel.Delete(ctx, id)
+	return r.store.SdkInterfaceModel.Delete(ctx, id)
 }
 
 // -------- 绑定关系 --------
@@ -210,7 +208,7 @@ LEFT JOIN sdk_key_api k ON k.sdk_interface_id = i.id AND k.sdk_key_id = ? AND k.
 WHERE i.deleted_at = 0
 ORDER BY i.id DESC`
 	var list []SdkBindingView
-	if err := r.repo.DB.QueryRowsCtx(ctx, &list, query, args...); err != nil {
+	if err := r.store.DB.QueryRowsCtx(ctx, &list, query, args...); err != nil {
 		return nil, err
 	}
 	return list, nil
@@ -239,7 +237,7 @@ func (r *SdkAdminRepository) SaveBindings(ctx context.Context, sdkKeyId uint64, 
 	if err != nil {
 		return errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
 	}
-	if _, err := r.repo.DB.ExecCtx(ctx, delSQL, delArgs...); err != nil {
+	if _, err := r.store.DB.ExecCtx(ctx, delSQL, delArgs...); err != nil {
 		return err
 	}
 
@@ -254,7 +252,7 @@ func (r *SdkAdminRepository) SaveBindings(ctx context.Context, sdkKeyId uint64, 
 		if b.DeletedAt != 0 {
 			b.DeletedAt = 0
 		}
-		_, err := r.repo.SdkKeyApiModel.Insert(ctx, &b)
+		_, err := r.store.SdkKeyApiModel.Insert(ctx, &b)
 		if err != nil {
 			return err
 		}
@@ -302,7 +300,7 @@ func (r *SdkAdminRepository) ListCallLogs(ctx context.Context, page, pageSize in
 	if err != nil {
 		return nil, 0, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
 	}
-	if err := r.repo.DB.QueryRowCtx(ctx, &total, countSQL, countArgs...); err != nil {
+	if err := r.store.DB.QueryRowCtx(ctx, &total, countSQL, countArgs...); err != nil {
 		return nil, 0, err
 	}
 
@@ -317,7 +315,7 @@ func (r *SdkAdminRepository) ListCallLogs(ctx context.Context, page, pageSize in
 		return nil, 0, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
 	}
 	var list []sdkmodel.SdkCallLog
-	if err := r.repo.DB.QueryRowsCtx(ctx, &list, listSQL, listArgs...); err != nil {
+	if err := r.store.DB.QueryRowsCtx(ctx, &list, listSQL, listArgs...); err != nil {
 		return nil, 0, err
 	}
 
@@ -361,33 +359,8 @@ func (r *SdkAdminRepository) ExportCallLogs(ctx context.Context, maxRows int64, 
 	}
 
 	var list []sdkmodel.SdkCallLog
-	if err := r.repo.DB.QueryRowsCtx(ctx, &list, sql, args...); err != nil {
+	if err := r.store.DB.QueryRowsCtx(ctx, &list, sql, args...); err != nil {
 		return nil, err
 	}
 	return list, nil
-}
-
-// -------- 字典 --------
-
-func (r *SdkAdminRepository) GetRateLimitDefault(ctx context.Context) (int64, error) {
-	// 从字典 sdk_rate_limit_default 读取第一条值
-	typeId, err := r.repo.AdminDictTypeModel.FindIdByCode(ctx, "sdk_rate_limit_default")
-	if err != nil {
-		return 0, err
-	}
-	if typeId == 0 {
-		return 0, sql.ErrNoRows
-	}
-	items, _, err := r.repo.AdminDictItemModel.FindPageByTypeId(ctx, typeId, 1, 1)
-	if err != nil {
-		return 0, err
-	}
-	if len(items) == 0 {
-		return 0, sql.ErrNoRows
-	}
-	v, err := strconv.ParseInt(items[0].Value, 10, 64)
-	if err != nil {
-		return 0, err
-	}
-	return v, nil
 }

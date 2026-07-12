@@ -65,6 +65,9 @@ func main() {
 	if len(c.TaskRPCConf.Endpoints) == 0 || c.TaskRPCConf.Endpoints[0] == "" {
 		log.Fatalf("TASK_RPC_ENDPOINT 未设置，拒绝以空 task-rpc 地址启动")
 	}
+	if len(c.SdkRPCConf.Endpoints) == 0 || c.SdkRPCConf.Endpoints[0] == "" {
+		log.Fatalf("SDK_RPC_ENDPOINT 未设置，拒绝以空 sdk-rpc 地址启动")
+	}
 
 	// 从外部文件加载 MySQL、Redis 和中间件配置（如果存在）
 	if err := config.MergeExternalConfig(&c, *mysqlConfigFile, *redisConfigFile, *middlewareConfigFile); err != nil {
@@ -94,10 +97,11 @@ func main() {
 	syncRoutesToAdminAPI(ctx, server)
 
 	// TaskCallback zrpc server：与 REST server 并存，供 services/task/（task-rpc）回调取导出
-	// 数据/登记导出文件。见 16-rpc-conventions.md、17-async-eventing.md 第 1 节；Phase 2
-	// iam-rpc/sdk-rpc 真正拆分后原样搬过去。
+	// 数据/登记导出文件。见 16-rpc-conventions.md、17-async-eventing.md 第 1 节；sdk_call_log
+	// 分支已经改成回调 ctx.SdkRPC（sdk-rpc 拆分完成），admin_file 登记（iam 域）仍在这里；
+	// Phase 2 iam-rpc 真正拆分后这部分原样搬过去。
 	taskCallbackServer := zrpc.MustNewServer(c.TaskCallbackRPCConf, func(grpcServer *grpc.Server) {
-		taskcallbackpb.RegisterTaskCallbackServer(grpcServer, taskcallbacksrv.NewServer(ctx.Repository))
+		taskcallbackpb.RegisterTaskCallbackServer(grpcServer, taskcallbacksrv.NewServer(ctx.Repository, ctx.SdkRPC))
 	})
 	defer taskCallbackServer.Stop()
 

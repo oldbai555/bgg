@@ -8,13 +8,10 @@ import (
 	"net"
 	"net/http"
 	"strings"
-	"time"
 
-	"postapocgame/admin-server/internal/consts"
-	"postapocgame/admin-server/internal/repository"
-	sdkrepo "postapocgame/admin-server/internal/repository/sdk"
 	"postapocgame/admin-server/pkg/errs"
 	"postapocgame/admin-server/pkg/response"
+	"postapocgame/admin-server/services/sdk/sdkclient"
 )
 
 type sdkCtxKey string
@@ -26,59 +23,43 @@ const (
 	ctxKeySdkApiCode     sdkCtxKey = "sdkApiCode"
 )
 
+// SDKAuthMiddleware 继续留在 gateway（HTTP 请求最早触达的地方），内部实现从直连
+// Repository 改成调 sdk-rpc 的 VerifyApiKey，sdk 域的鉴权判断逻辑本身已经原样搬进
+// services/sdk/internal/logic/verifyapikeylogic.go，见 18-service-extraction-runbook.md
+// 2.2 节。
 type SDKAuthMiddleware struct {
-	repo *repository.Repository
+	sdkRPC sdkclient.Sdk
 }
 
-func NewSDKAuthMiddleware(repo *repository.Repository) *SDKAuthMiddleware {
-	return &SDKAuthMiddleware{repo: repo}
+func NewSDKAuthMiddleware(sdkRPC sdkclient.Sdk) *SDKAuthMiddleware {
+	return &SDKAuthMiddleware{sdkRPC: sdkRPC}
 }
 
 func (m *SDKAuthMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		apiKey := r.Header.Get("X-API-Key")
 		apiSecret := r.Header.Get("X-API-Secret")
-		if strings.TrimSpace(apiKey) == "" || strings.TrimSpace(apiSecret) == "" {
-			response.ErrorCtx(r.Context(), w, errs.New(errs.CodeUnauthorized, "缺少 API Key 或 Secret"))
-			return
-		}
 
-		sdkRepo := sdkrepo.NewSdkRepository(m.repo)
-		sdkKey, err := sdkRepo.FindKeyByApiKey(r.Context(), apiKey)
+		resp, err := m.sdkRPC.VerifyApiKey(r.Context(), &sdkclient.VerifyApiKeyRequest{
+			ApiKey:    apiKey,
+			ApiSecret: apiSecret,
+			Method:    r.Method,
+			Path:      r.URL.Path,
+			ClientIp:  clientIPFromRequest(r),
+		})
 		if err != nil {
-			response.ErrorCtx(r.Context(), w, errs.New(errs.CodeUnauthorized, "无效的 API Key"))
+			response.ErrorCtx(r.Context(), w, errs.WrapGRPCError("SDK 鉴权失败", err))
 			return
 		}
-		if sdkKey.ApiSecret != apiSecret {
-			response.ErrorCtx(r.Context(), w, errs.New(errs.CodeUnauthorized, "Secret 不匹配"))
-			return
-		}
-		if sdkKey.Status != consts.Open {
-			response.ErrorCtx(r.Context(), w, errs.New(errs.CodeUnauthorized, "API Key 已被禁用"))
-			return
-		}
-		if sdkKey.ExpireAt > 0 && time.Now().Unix() > sdkKey.ExpireAt {
-			response.ErrorCtx(r.Context(), w, errs.New(errs.CodeUnauthorized, "API Key 已过期"))
+		if !resp.Valid {
+			response.ErrorCtx(r.Context(), w, errs.New(int(resp.Code), resp.Message))
 			return
 		}
 
-		clientIP := clientIPFromRequest(r)
-		if !sdkRepo.IsIPAllowed(sdkKey.IpWhitelist, clientIP) {
-			response.ErrorCtx(r.Context(), w, errs.New(errs.CodeForbidden, "IP 不在白名单"))
-			return
-		}
-
-		apiCode := sdkRepo.BuildInterfaceCode(r.Method, r.URL.Path)
-		sdkInterface, err := sdkRepo.FindInterfaceByCode(r.Context(), apiCode)
-		if err != nil || sdkInterface == nil || sdkInterface.Status != consts.Open {
-			response.ErrorCtx(r.Context(), w, errs.New(errs.CodeForbidden, "接口未开通或已禁用"))
-			return
-		}
-
-		ctx := context.WithValue(r.Context(), ctxKeySdkKeyID, sdkKey.Id)
-		ctx = context.WithValue(ctx, ctxKeySdkApiKey, sdkKey.ApiKey)
-		ctx = context.WithValue(ctx, ctxKeySdkInterfaceID, sdkInterface.Id)
-		ctx = context.WithValue(ctx, ctxKeySdkApiCode, sdkInterface.ApiCode)
+		ctx := context.WithValue(r.Context(), ctxKeySdkKeyID, resp.SdkKeyId)
+		ctx = context.WithValue(ctx, ctxKeySdkApiKey, resp.ApiKey)
+		ctx = context.WithValue(ctx, ctxKeySdkInterfaceID, resp.SdkInterfaceId)
+		ctx = context.WithValue(ctx, ctxKeySdkApiCode, resp.ApiCode)
 		next(w, r.WithContext(ctx))
 	}
 }

@@ -88,6 +88,25 @@
 
 **状态**：`已就绪，待生产环境实际部署时执行`（本机无 Docker，`docker compose up` 本身未做容器化实测,只做过非容器化的直接进程验证）。
 
+### 6 · sdk-rpc 拆分（Phase 2 第二个落地的服务）
+
+**触发条件**：`services/sdk/` 完整拆分完成（`docs/progress.md` 对应条目），sdk-rpc 成为独立部署单元。sdk 域没有调度器/Redis 锁，比 task-rpc 更简单，但多了两处 task-rpc 没有的复杂点：① `SDKAuthMiddleware`/`SDKRateLimitMiddleware`/`SDKCallLogMiddleware` 三个中间件仍在 gateway，内部实现改成调 sdk-rpc；② 单体内嵌的 `pkg/taskcallback` server（`internal/rpcserver/taskcallback/server.go`）的 `sdk_call_log` 导出分支改成回调 sdk-rpc 新增的 `SdkCallLogExport` 方法。
+
+**部署时要做什么**：
+1. 建 `admin_sdk` schema（逻辑隔离，物理上和主库同一个 MySQL 实例）：`mysql -uroot -p<pass> -e "CREATE DATABASE IF NOT EXISTS admin_sdk CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"`，然后跑 `db/services/sdk/sdk/create_table_sdk.sql`（**只需要这一个文件**——`init_sdk.sql` 写的是 `admin_menu`/`admin_permission`/`admin_api`，物理属于主库 iam 部分，已经在主库初始化时跑过，不属于 `admin_sdk` schema）。docker-compose 场景下这一步已经自动化，见 `db/services/init-sdk-db.sh` + `docker-compose.yml` 的 mysql 服务第三个 init 脚本挂载。
+2. 生产环境实际地址配置（均通过环境变量，`conf.UseEnv()` 已接入，fail-fast 不给静默默认值，和 `JWT_ACCESS_SECRET`/task-rpc 那批同一套约定）：
+   - `SDK_RPC_ENDPOINT`（gateway 侧 `etc/admin-api.yaml` 的 `SdkRpc.Endpoints`，指向 sdk-rpc 实际监听地址）
+   - `SDK_MYSQL_DSN`（sdk-rpc 侧 `services/sdk/etc/sdk.yaml`）
+   - `SDK_REDIS_ADDRESS`、`SDK_REDIS_PASSWORD`（sdk-rpc 侧 `services/sdk/etc/sdk.yaml`；sdk-rpc 业务本身不用 Redis，纯粹是满足 goctl 生成 Model 的 `CachedConn` 强制要求非空缓存节点，和 gateway 共享同一个 Redis 实例即可，不需要单独的 Redis 部署）
+   - `RateLimitDefault`（`services/sdk/etc/sdk.yaml` 里的静态配置项，不是环境变量，默认 60——取代原来读字典 `sdk_rate_limit_default` 的做法，字典数据本身仍留在 `admin_menu` 所在的主库，但已经不再被任何代码读取，生产环境如果要调整这个默认值，改这个配置项然后重启 sdk-rpc，不要指望改字典生效）。
+3. `SdkCallLogExport` 是本次拆分新增、17-async-eventing.md 原文档没有的一个 `pkg/taskcallback`-类似回调（但不是复用 `pkg/taskcallback` 契约本身，是 sdk.proto 里单独定义的方法），单体内嵌的 TaskCallback server 需要重启才能加载新代码；如果部署时先重启了 sdk-rpc、还没重启单体，SDK 调用日志导出任务会失败（`fetchSdkCallLog` 报错），不是数据丢失，任务失败后可以重新提交导出任务，但建议按顺序：先部署 sdk-rpc → 确认它监听正常 → 再重启单体 gateway（一次性完成 TaskCallback server 和其余 SdkRPC 调用点的切换）。
+
+**如何验证生效**：`docs/progress.md` 本轮条目记录了一次真实端到端验证（借用远程 MySQL + 本地 Redis，起 sdk-rpc + 单体真实连上）：直接调 sdk-rpc 的全部 14 个 RPC 方法（API Key/接口 CRUD、绑定、调用记录列表/导出、VerifyApiKey/GetEffectiveRateLimit/RecordCallLog）+ 通过真实 HTTP 请求走完整 `SDKAuthMiddleware→SDKRateLimitMiddleware→handler→SDKCallLogMiddleware` 链路（含限流生效、调用日志真实落库），验证完已清理测试数据。生产部署时按同样的路径（建一个真实 API Key、绑定一个接口、发几次请求确认鉴权/限流/调用记录都符合预期）复核一遍即可。
+
+**已知遗留（本次验证中发现，不属于本轮拆分引入，但值得部署前留意）**：`sdk_key_api` 表的唯一索引 `uk_sdk_key_api (sdk_key_id, sdk_interface_id)` 不包含 `deleted_at`，`SaveApiKeyBindings` 的"软删旧绑定 + 插入新绑定"模式在给同一个 Key 重复绑定同一个接口时会触发 `Duplicate entry` 报错（软删除的旧行仍然占用唯一索引位）。这是拆分前就存在的原始代码行为（本轮只是原样搬迁，未修改这段逻辑），真实生产使用中大概率只在管理员反复调整同一个 Key 的接口授权时才会撞到，建议后续单独排期修复（唯一索引加上 `deleted_at` 或改成物理删除旧绑定），不在本轮 sdk-rpc 拆分范围内处理。
+
+**状态**：`已就绪，待生产环境实际部署时执行`（本机无 Docker，`docker compose up` 本身未做容器化实测，只做过非容器化的直接进程验证）。
+
 ## Phase 2/3 预留条目类型（占位，届时按真实改动追加，现在不编造内容）
 
 以下只是"预计会出现哪类条目"的提示，**不是已确定的条目**，落地时按 Phase 2/3 实际改动的真实细节追加，不要现在就编内容占位：

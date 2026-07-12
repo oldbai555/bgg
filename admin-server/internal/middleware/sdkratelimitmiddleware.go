@@ -9,17 +9,23 @@ import (
 	"time"
 
 	"postapocgame/admin-server/internal/repository"
-	sdkrepo "postapocgame/admin-server/internal/repository/sdk"
 	"postapocgame/admin-server/pkg/errs"
 	"postapocgame/admin-server/pkg/response"
+	"postapocgame/admin-server/services/sdk/sdkclient"
 )
 
+// SDKRateLimitMiddleware 继续留在 gateway：限流计数用的 Redis 滑动窗口是全服务共享的
+// 基础设施，不属于 sdk 域数据，留在这里；只有"这个 Key/接口组合的有效限流上限是多少"这一
+// 步查询改成调 sdk-rpc 的 GetEffectiveRateLimit（sdk_interface.rate_limit_default +
+// sdk_key_api.custom_rate_limit 覆盖，都是 sdk 域自己的表）。见 18-service-extraction-
+// runbook.md 2.2 节。
 type SDKRateLimitMiddleware struct {
-	repo *repository.Repository
+	repo   *repository.Repository
+	sdkRPC sdkclient.Sdk
 }
 
-func NewSDKRateLimitMiddleware(repo *repository.Repository) *SDKRateLimitMiddleware {
-	return &SDKRateLimitMiddleware{repo: repo}
+func NewSDKRateLimitMiddleware(repo *repository.Repository, sdkRPC sdkclient.Sdk) *SDKRateLimitMiddleware {
+	return &SDKRateLimitMiddleware{repo: repo, sdkRPC: sdkRPC}
 }
 
 func (m *SDKRateLimitMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
@@ -34,18 +40,15 @@ func (m *SDKRateLimitMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc 
 			return
 		}
 
-		sdkRepo := sdkrepo.NewSdkRepository(m.repo)
-		iface, err := sdkRepo.FindInterfaceByCode(ctx, apiCode)
-		if err != nil || iface == nil {
-			response.ErrorCtx(ctx, w, errs.New(errs.CodeForbidden, "接口不存在"))
+		rpcResp, err := m.sdkRPC.GetEffectiveRateLimit(ctx, &sdkclient.GetEffectiveRateLimitRequest{
+			SdkKeyId:       sdkKeyId,
+			SdkInterfaceId: sdkInterfaceId,
+		})
+		if err != nil {
+			response.ErrorCtx(ctx, w, errs.WrapGRPCError("获取限流配置失败", err))
 			return
 		}
-		binding, _ := sdkRepo.FindKeyApiBinding(ctx, sdkKeyId, sdkInterfaceId)
-
-		limit := sdkRepo.GetDefaultRateLimit(ctx, iface.RateLimitDefault)
-		if binding != nil && binding.CustomRateLimit > 0 {
-			limit = binding.CustomRateLimit
-		}
+		limit := rpcResp.Limit
 		if limit <= 0 {
 			limit = 60
 		}

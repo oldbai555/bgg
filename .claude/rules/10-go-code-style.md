@@ -24,7 +24,7 @@ admin-server/
 │   ├── middleware/        # 手写中间件
 │   ├── consts/ config/ types/ svc/
 ├── pkg/ scripts/ .template/ db/
-└── services/task/          # Phase 2 拆出的 task-rpc 独立服务（领域代码/repository 已搬出单体）
+└── services/task/, services/sdk/  # Phase 2 拆出的 task-rpc/sdk-rpc 独立服务（领域代码/repository 已搬出单体）
 ```
 
 维护导航见 `docs/admin-server-维护导航.md`。
@@ -84,7 +84,7 @@ query := fmt.Sprintf("SELECT * FROM `admin_user` WHERE %s", whereClause)
 query := "SELECT * FROM `admin_user` WHERE username LIKE '%" + name + "%'"
 ```
 
-**已知例外（待办，不是可以效仿的先例）**：`internal/repository/performance_log_repository.go`、`internal/repository/chat_repository.go` 目前仍未迁移到 squirrel。新增/修改这两个文件时应顺手迁移，而不是继续用旧写法。
+**已知例外（待办，不是可以效仿的先例）**：`internal/repository/chat/chat_repository.go` 目前仍有部分方法用静态多行 SQL（参数化、无拼接风险，但不是 squirrel）。新增/修改这个文件时应顺手迁移，而不是继续用旧写法。`internal/repository/monitoring/performance_log_repository.go` 已经迁移到 squirrel，不再是例外。
 
 # 错误处理
 

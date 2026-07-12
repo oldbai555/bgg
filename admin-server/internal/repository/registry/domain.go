@@ -7,26 +7,24 @@ import (
 	chatdomain "postapocgame/admin-server/internal/domain/chat"
 	contentdomain "postapocgame/admin-server/internal/domain/content"
 	iamdomain "postapocgame/admin-server/internal/domain/iam"
-	sdkdomain "postapocgame/admin-server/internal/domain/sdk"
 	"postapocgame/admin-server/internal/repository"
 	blogrepo "postapocgame/admin-server/internal/repository/blog"
 	chatrepo "postapocgame/admin-server/internal/repository/chat"
 	iamrepo "postapocgame/admin-server/internal/repository/iam"
 	miscrepo "postapocgame/admin-server/internal/repository/misc"
 	monitoringrepo "postapocgame/admin-server/internal/repository/monitoring"
-	sdkrepo "postapocgame/admin-server/internal/repository/sdk"
 	systemrepo "postapocgame/admin-server/internal/repository/system"
 	videorepo "postapocgame/admin-server/internal/repository/video"
 )
 
 // Domain 聚合各领域 Repository，启动时构造一次，Logic 通过 svcCtx.Domain 访问。
-// 不再有 Task 字段：task 域已拆成独立的 task-rpc（services/task/），gateway 侧改成走
-// svcCtx.TaskRPC 这个 zrpc client，不通过 Domain 聚合根访问。
+// 不再有 Task/SDK 字段：task 域已拆成独立的 task-rpc（services/task/），sdk 域已拆成
+// 独立的 sdk-rpc（services/sdk/），gateway 侧改成走 svcCtx.TaskRPC/svcCtx.SdkRPC 这两个
+// zrpc client，不通过 Domain 聚合根访问。
 type Domain struct {
 	IAM        IAMDomain
 	Blog       BlogDomain
 	Chat       ChatDomain
-	SDK        SDKDomain
 	Video      VideoDomain
 	Monitoring MonitoringDomain
 	System     SystemDomain
@@ -88,12 +86,6 @@ func (a *iamUserListerAdapter) FindChunk(ctx context.Context, limit int, lastID 
 		refs = append(refs, chatdomain.UserRef{ID: u.Id})
 	}
 	return refs, newLastID, nil
-}
-
-type SDKDomain struct {
-	Admin   *sdkrepo.SdkAdminRepository
-	Public  *sdkrepo.SdkRepository
-	Service *sdkdomain.SDKService
 }
 
 type VideoDomain struct {
@@ -165,11 +157,6 @@ func NewDomain(repo *repository.Repository) *Domain {
 			ChatUser:    chatrepo.NewChatUserRepository(repo),
 			ChatMessage: chatrepo.NewChatMessageRepository(repo),
 			Onboarding:  chatOnboarding,
-		},
-		SDK: SDKDomain{
-			Admin:   sdkrepo.NewSdkAdminRepository(repo),
-			Public:  sdkrepo.NewSdkRepository(repo),
-			Service: sdkdomain.NewSDKService(repo),
 		},
 		Video: VideoDomain{
 			Video: videorepo.NewVideoRepository(repo),

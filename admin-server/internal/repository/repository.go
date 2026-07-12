@@ -15,7 +15,6 @@ import (
 	"postapocgame/admin-server/internal/model/iam"
 	"postapocgame/admin-server/internal/model/misc"
 	"postapocgame/admin-server/internal/model/monitoring"
-	"postapocgame/admin-server/internal/model/sdk"
 	"postapocgame/admin-server/internal/model/system"
 	"postapocgame/admin-server/internal/model/video"
 )
@@ -53,10 +52,6 @@ type Repository struct {
 	AdminNotificationModel   system.AdminNotificationModel
 	DailyShortSentenceModel  misc.DailyShortSentenceModel
 	VideoModel               video.VideoModel
-	SdkKeyModel              sdk.SdkKeyModel
-	SdkInterfaceModel        sdk.SdkInterfaceModel
-	SdkKeyApiModel           sdk.SdkKeyApiModel
-	SdkCallLogModel          sdk.SdkCallLogModel
 	BlogTagModel             blog.BlogTagModel
 	BlogArticleModel         blog.BlogArticleModel
 	BlogArticleTagModel      blog.BlogArticleTagModel
@@ -103,10 +98,6 @@ func NewRepository(conn sqlx.SqlConn, cacheConf cache.CacheConf, rdb *redis.Redi
 		AdminNotificationModel:   system.NewAdminNotificationModel(conn, cacheConf),
 		DailyShortSentenceModel:  misc.NewDailyShortSentenceModel(conn, cacheConf),
 		VideoModel:               video.NewVideoModel(conn, cacheConf),
-		SdkKeyModel:              sdk.NewSdkKeyModel(conn, cacheConf),
-		SdkInterfaceModel:        sdk.NewSdkInterfaceModel(conn, cacheConf),
-		SdkKeyApiModel:           sdk.NewSdkKeyApiModel(conn, cacheConf),
-		SdkCallLogModel:          sdk.NewSdkCallLogModel(conn, cacheConf),
 		BlogTagModel:             blog.NewBlogTagModel(conn, cacheConf),
 		BlogArticleModel:         blog.NewBlogArticleModel(conn, cacheConf),
 		BlogArticleTagModel:      blog.NewBlogArticleTagModel(conn, cacheConf),
@@ -180,10 +171,6 @@ func (r *Repository) withSession(session sqlx.Session) *Repository {
 		AdminNotificationModel:   r.AdminNotificationModel.WithSession(session),
 		DailyShortSentenceModel:  r.DailyShortSentenceModel.WithSession(session),
 		VideoModel:               r.VideoModel.WithSession(session),
-		SdkKeyModel:              r.SdkKeyModel.WithSession(session),
-		SdkInterfaceModel:        r.SdkInterfaceModel.WithSession(session),
-		SdkKeyApiModel:           r.SdkKeyApiModel.WithSession(session),
-		SdkCallLogModel:          r.SdkCallLogModel.WithSession(session),
 		BlogTagModel:             r.BlogTagModel.WithSession(session),
 		BlogArticleModel:         r.BlogArticleModel.WithSession(session),
 		BlogArticleTagModel:      r.BlogArticleTagModel.WithSession(session),

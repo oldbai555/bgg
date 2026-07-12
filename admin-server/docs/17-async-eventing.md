@@ -105,6 +105,8 @@ var moduleServiceRoute = map[string]taskcallback.Client{
 
 `ExcelExportExecutor.Execute` 的新形态：不再直连 repository，而是查路由表拿到对应服务的 `taskcallback.Client`，调 `FetchExportData`，拿到 `rows_json`/`headers` 后按现有逻辑生成 Excel/CSV 文件——生成文件、写 `admin_task.result` 这部分逻辑完全不变，只是"怎么拿到要导出的数据"从直连 repository 换成一次 RPC。`iam-rpc`/`sdk-rpc` 侧新增一个 `TaskCallback` 的 server 实现，内部就是把原来 4 个 `*_export_logic.go`（现在只负责"创建任务记录"）里散落的查询逻辑集中实现一遍。
 
+**执行落地时的实际偏差（sdk-rpc 拆分，`docs/progress.md` 对应条目）**：本节原文预期 sdk-rpc 会新增一个完整的 `TaskCallback` server 实现（和上一段"iam-rpc/sdk-rpc 侧新增一个 TaskCallback 的 server 实现"字面一致）。实际执行时改了主意：单体内嵌的 `pkg/taskcallback` server（`internal/rpcserver/taskcallback/server.go`）继续保留、继续实现完整的 `TaskCallback`（`FetchExportData`/`RegisterExportFile`），因为 `RegisterExportFile` 依赖的 `admin_file` 表物理上仍属于还没拆分的 iam；只是 `FetchExportData` 内部 `sdk_call_log` 这一个分支的实现从"直连 `SdkAdminRepository.ExportCallLogs`"改成"回调 sdk-rpc 新增的一个专用方法 `SdkCallLogExport`"（定义在 `services/sdk/rpc/sdk.proto`，**不是** `pkg/taskcallback.TaskCallback` 契约的一部分，是 sdk-rpc 自己 proto 里的方法）。原因：让 sdk-rpc 现在就完整实现 `TaskCallback` 契约（含它永远不会真正被调用到的 `RegisterExportFile`）纯属为了"提前满足 Go interface"而增加的一个不必要的服务面，不如直接加一个专用方法更直白；等 iam-rpc 真正拆分、`admin_file` 也搬走时，`TaskCallback` 的两个方法才会真正统一挪到各自域，`task-rpc` 侧 `moduleRoutes`/`fileRegistryClient` 的路由表机制本身完全不用改，只改路由表指向的值。
+
 ### 1.4 提交路径（`monitoring/sdk → task` 的同步 RPC 部分）
 
 `*_export_logic.go` 现在的行为是"创建 `admin_task` 记录，创建失败直接 `return nil, errs.Wrap(...)`（错误会一路返回给前端）"——按第 3 节的判断规则,这是同步 RPC,不是 Streams。拆分后 `iam-rpc`/`sdk-rpc` 的导出 logic 改成调 `task-rpc.SubmitTask`（对应 `AsyncTaskBackend.Submit` 的 RPC 化），task-rpc 建好 `admin_task` 记录后同步返回 `task_id`，调用方原样返回给前端（前端继续用现有的任务列表机制轮询状态,不需要改前端）。

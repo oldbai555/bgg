@@ -20,6 +20,15 @@ TaskRpc:
     - "${TASK_RPC_ENDPOINT}"
   NonBlock: true
 
+# sdk-rpc（services/sdk/）的 zrpc client 配置。sdk 域已拆分成独立服务，11 个
+# SdkApiKey/SdkInterface/SdkCallLog logic 和 SDKAuthMiddleware/SDKRateLimitMiddleware/
+# SDKCallLogMiddleware 三个中间件都通过这个 client 调用。SDK_RPC_ENDPOINT 必须显式设置：
+# 本机同进程调试用 127.0.0.1:8091，docker-compose 用服务名 sdk:8091。
+SdkRpc:
+  Endpoints:
+    - "${SDK_RPC_ENDPOINT}"
+  NonBlock: true
+
 # JWT 配置
 JWT:
   AccessSecret: "${JWT_ACCESS_SECRET}"

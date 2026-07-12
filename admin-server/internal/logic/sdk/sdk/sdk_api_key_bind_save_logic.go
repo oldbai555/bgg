@@ -9,8 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
-
-	"postapocgame/admin-server/internal/model/sdk"
+	"postapocgame/admin-server/services/sdk/sdkclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -29,25 +28,27 @@ func NewSdkApiKeyBindSaveLogic(ctx context.Context, svcCtx *svc.ServiceContext) 
 	}
 }
 
+// SdkApiKeyBindSave 薄胶水：sdkInterfaceId==0 过滤、事务包裹的"软删旧绑定+插入新绑定"
+// 已经搬进 services/sdk/internal/logic/sdkapikeybindsavelogic.go（调
+// SDKService.SaveApiKeyBindings），这里原样透传全部绑定，由 sdk-rpc 侧过滤。
 func (l *SdkApiKeyBindSaveLogic) SdkApiKeyBindSave(req *types.SdkApiKeyBindSaveReq) error {
 	if req == nil || req.SdkKeyId == 0 {
 		return errs.New(errs.CodeBadRequest, "sdkKeyId 不能为空")
 	}
-	bindings := make([]sdk.SdkKeyApi, 0, len(req.Bindings))
+
+	bindings := make([]*sdkclient.SdkApiKeyBinding, 0, len(req.Bindings))
 	for _, b := range req.Bindings {
-		if b.SdkInterfaceId == 0 {
-			continue
-		}
-		bindings = append(bindings, sdk.SdkKeyApi{
-			SdkKeyId:        req.SdkKeyId,
+		bindings = append(bindings, &sdkclient.SdkApiKeyBinding{
 			SdkInterfaceId:  b.SdkInterfaceId,
 			CustomRateLimit: b.CustomRateLimit,
-			DeletedAt:       0,
 		})
 	}
 
-	if err := l.svcCtx.Domain.SDK.Service.SaveApiKeyBindings(l.ctx, req.SdkKeyId, bindings); err != nil {
-		return errs.Wrap(errs.CodeInternalError, "保存授权失败", err)
+	if _, err := l.svcCtx.SdkRPC.SdkApiKeyBindSave(l.ctx, &sdkclient.SdkApiKeyBindSaveRequest{
+		SdkKeyId: req.SdkKeyId,
+		Bindings: bindings,
+	}); err != nil {
+		return errs.WrapGRPCError("保存授权失败", err)
 	}
 
 	return nil

@@ -1,15 +1,16 @@
 // Package taskcallback 实现 pkg/taskcallback.TaskCallbackServer，供 task-rpc 回调取导出数据 /
 // 登记导出文件。当前阶段单体内嵌一个 zrpc server 提前实现这份接口（admin.go 里和 REST server
-// 并存），后续 iam-rpc/sdk-rpc 真正拆分时把这个实现原样搬过去，不改契约。
+// 并存），后续 iam-rpc 真正拆分时把这个实现原样搬过去，不改契约。
 //
-// FetchExportData 的 5 个分支是从 internal/domain/task/executors/excel_export_executor.go 的
-// export{OperationLog,AuditLog,LoginLog,PerformanceLog}（查询部分）原样迁移过来的，新增了此前
-// 缺失的 sdk_call_log 分支（复用已存在的 SdkAdminRepository.ExportCallLogs，修复了一个真实
-// bug：consts.TaskModuleSdkCallLog 常量和导出方法都已就绪，只是 Execute 的 switch 一直没接上，
-// 命中 default 直接报错"不支持的导出模块"，见 docs/progress.md 对应条目）。
+// FetchExportData 的 4 个分支（operation_log/audit_log/login_log/performance_log）是从
+// internal/domain/task/executors/excel_export_executor.go 的
+// export{OperationLog,AuditLog,LoginLog,PerformanceLog}（查询部分）原样迁移过来的。
+// sdk_call_log 分支原来直连 SdkAdminRepository.ExportCallLogs，sdk-rpc 拆分后 sdk_call_log
+// 表物理上已经不在这个进程里，改成回调 sdk-rpc 的 SdkCallLogExport（见
+// services/sdk/rpc/sdk.proto、services/sdk/internal/logic/sdkcallLogexportlogic.go）。
 //
 // RegisterExportFile 是从 generateCSVFile 的"文件已存在则复用记录，否则登记 admin_file"这段
-// 尾部逻辑原样迁移过来的。
+// 尾部逻辑原样迁移过来的，admin_file 物理上属于 iam，继续留在这里。
 package taskcallback
 
 import (
@@ -25,18 +26,19 @@ import (
 	systemmodel "postapocgame/admin-server/internal/model/system"
 	"postapocgame/admin-server/internal/repository"
 	monitoringrepo "postapocgame/admin-server/internal/repository/monitoring"
-	sdkrepo "postapocgame/admin-server/internal/repository/sdk"
 	systemrepo "postapocgame/admin-server/internal/repository/system"
 	pb "postapocgame/admin-server/pkg/taskcallback/pb"
+	"postapocgame/admin-server/services/sdk/sdkclient"
 )
 
 type Server struct {
 	pb.UnimplementedTaskCallbackServer
-	repo *repository.Repository
+	repo   *repository.Repository
+	sdkRPC sdkclient.Sdk
 }
 
-func NewServer(repo *repository.Repository) *Server {
-	return &Server{repo: repo}
+func NewServer(repo *repository.Repository, sdkRPC sdkclient.Sdk) *Server {
+	return &Server{repo: repo, sdkRPC: sdkRPC}
 }
 
 // FetchExportData 按 module 分支查询要导出的数据，返回通用的 headers/rows_json 结构。
@@ -272,26 +274,25 @@ func (s *Server) fetchPerformanceLog(ctx context.Context, filters map[string]int
 	return headers, rows, nil
 }
 
-// fetchSdkCallLog 是此前缺失的分支（发现 2 的 bug 修复）：consts.TaskModuleSdkCallLog 常量、
-// SdkAdminRepository.ExportCallLogs 方法都已经存在，只是从未被 Execute 的 switch 接上过。
+// fetchSdkCallLog 回调 sdk-rpc 的 SdkCallLogExport——sdk_call_log 表物理上属于 sdk-rpc，
+// 这个进程拿不到直连数据的能力了。
 func (s *Server) fetchSdkCallLog(ctx context.Context, filters map[string]interface{}) ([]string, [][]string, error) {
-	repo := sdkrepo.NewSdkAdminRepository(s.repo)
-	list, err := repo.ExportCallLogs(ctx, 2000,
-		filterUint64(filters, consts.TaskFilterSdkKeyId),
-		filterString(filters, consts.TaskFilterApiCode),
-		filterInt64(filters, consts.TaskFilterRespCode),
-		filterString(filters, consts.TaskFilterIP),
-		filterInt64(filters, consts.TaskFilterStartTime),
-		filterInt64(filters, consts.TaskFilterEndTime),
-	)
+	resp, err := s.sdkRPC.SdkCallLogExport(ctx, &sdkclient.SdkCallLogExportRequest{
+		MaxRows:   2000,
+		SdkKeyId:  filterUint64(filters, consts.TaskFilterSdkKeyId),
+		ApiCode:   filterString(filters, consts.TaskFilterApiCode),
+		RespCode:  filterInt64(filters, consts.TaskFilterRespCode),
+		Ip:        filterString(filters, consts.TaskFilterIP),
+		StartTime: filterInt64(filters, consts.TaskFilterStartTime),
+		EndTime:   filterInt64(filters, consts.TaskFilterEndTime),
+	})
 	if err != nil {
 		return nil, nil, fmt.Errorf("查询SDK调用日志失败: %w", err)
 	}
 
 	headers := []string{"ID", "SDK Key ID", "接口编码", "响应状态码", "IP地址", "耗时(ms)", "创建时间"}
-	rows := make([][]string, 0, len(list))
-	for i := range list {
-		row := &list[i]
+	rows := make([][]string, 0, len(resp.List))
+	for _, row := range resp.List {
 		rows = append(rows, []string{
 			fmt.Sprintf("%d", row.Id),
 			fmt.Sprintf("%d", row.SdkKeyId),
@@ -333,7 +334,7 @@ func (s *Server) RegisterExportFile(ctx context.Context, req *pb.RegisterExportF
 		BaseUrl:      baseURL,
 		Size:         req.FileSize,
 		StorageType:  "local",
-		Status:       1,
+		Status:       consts.Open,
 		CreatedAt:    now,
 		UpdatedAt:    now,
 		DeletedAt:    0,

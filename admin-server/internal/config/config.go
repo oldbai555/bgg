@@ -26,6 +26,11 @@ type Config struct {
 	// 服务，gateway 侧的 TaskList/TaskDetail/TaskCancel/TaskRecent 和 5 个导出 logic 都通过
 	// 这个 client 调用，不再直接持有 Domain.Task。见 16-rpc-conventions.md 第 5 节。
 	TaskRPCConf zrpc.RpcClientConf `json:"taskRpc,optional" yaml:"taskRpc" mapstructure:"taskRpc"`
+	// SdkRPCConf 连到 sdk-rpc（services/sdk/）的 zrpc client 配置。sdk 域已拆分成独立服务，
+	// gateway 侧的 11 个 SdkApiKey/SdkInterface/SdkCallLog logic 和 SDKAuthMiddleware/
+	// SDKRateLimitMiddleware/SDKCallLogMiddleware 三个中间件都通过这个 client 调用，不再
+	// 直接持有 Domain.SDK。见 18-service-extraction-runbook.md 2.2 节。
+	SdkRPCConf zrpc.RpcClientConf `json:"sdkRpc,optional" yaml:"sdkRpc" mapstructure:"sdkRpc"`
 }
 
 type DatabaseConf struct {

@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/sdk/sdkclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,21 +28,26 @@ func NewSdkApiKeyListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Sdk
 	}
 }
 
+// SdkApiKeyList 薄胶水：解析 HTTP 请求 -> 拼一次 SdkRPC 请求 -> 映射响应，sdk 域的实际
+// 业务逻辑已经搬进 services/sdk/internal/logic/sdkapikeylistlogic.go。
 func (l *SdkApiKeyListLogic) SdkApiKeyList(req *types.SdkApiKeyListReq) (resp *types.SdkApiKeyListResp, err error) {
 	if req == nil {
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 	req.Page, req.PageSize = logicutil.NormalizePage(req.Page, req.PageSize, 20, 100)
 
-	// status == 0 表示不按状态过滤，非0才过滤
-	statusFilter := req.Status
-	list, total, err := l.svcCtx.Domain.SDK.Admin.ListSdkKeys(l.ctx, req.Page, req.PageSize, req.Name, statusFilter)
+	rpcResp, err := l.svcCtx.SdkRPC.SdkApiKeyList(l.ctx, &sdkclient.SdkApiKeyListRequest{
+		Page:     req.Page,
+		PageSize: req.PageSize,
+		Name:     req.Name,
+		Status:   req.Status,
+	})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "查询 API Key 列表失败", err)
+		return nil, errs.WrapGRPCError("查询 API Key 列表失败", err)
 	}
 
-	items := make([]types.SdkApiKeyItem, 0, len(list))
-	for _, k := range list {
+	items := make([]types.SdkApiKeyItem, 0, len(rpcResp.List))
+	for _, k := range rpcResp.List {
 		items = append(items, types.SdkApiKeyItem{
 			Id:          k.Id,
 			Name:        k.Name,
@@ -56,7 +62,7 @@ func (l *SdkApiKeyListLogic) SdkApiKeyList(req *types.SdkApiKeyListReq) (resp *t
 	}
 
 	return &types.SdkApiKeyListResp{
-		Total: total,
+		Total: rpcResp.Total,
 		List:  items,
 	}, nil
 }

@@ -1,32 +1,30 @@
 package sdk
 
 import (
-	"postapocgame/admin-server/internal/repository"
 	"context"
 	"fmt"
-	"strconv"
 	"strings"
 
-
 	"github.com/pkg/errors"
-	sdkmodel "postapocgame/admin-server/internal/model/sdk"
+	sdkmodel "postapocgame/admin-server/services/sdk/internal/model/sdk"
+	"postapocgame/admin-server/services/sdk/internal/repository"
 )
 
 // SdkRepository 封装 SDK 相关数据访问。
 type SdkRepository struct {
-	repo *repository.Repository
+	store *repository.Store
 }
 
-func NewSdkRepository(repo *repository.Repository) *SdkRepository {
-	return &SdkRepository{repo: repo}
+func NewSdkRepository(store *repository.Store) *SdkRepository {
+	return &SdkRepository{store: store}
 }
 
 func (r *SdkRepository) FindKeyByApiKey(ctx context.Context, apiKey string) (*sdkmodel.SdkKey, error) {
-	return r.repo.SdkKeyModel.FindOneByApiKey(ctx, apiKey)
+	return r.store.SdkKeyModel.FindOneByApiKey(ctx, apiKey)
 }
 
 func (r *SdkRepository) FindInterfaceByCode(ctx context.Context, apiCode string) (*sdkmodel.SdkInterface, error) {
-	return r.repo.SdkInterfaceModel.FindOneByApiCode(ctx, apiCode)
+	return r.store.SdkInterfaceModel.FindOneByApiCode(ctx, apiCode)
 }
 
 func (r *SdkRepository) FindInterfaceByPathMethod(ctx context.Context, path, method string) (*sdkmodel.SdkInterface, error) {
@@ -40,34 +38,22 @@ func (r *SdkRepository) BuildInterfaceCode(method, path string) string {
 }
 
 func (r *SdkRepository) FindKeyApiBinding(ctx context.Context, sdkKeyId, sdkInterfaceId uint64) (*sdkmodel.SdkKeyApi, error) {
-	return r.repo.SdkKeyApiModel.FindOneBySdkKeyIdSdkInterfaceId(ctx, sdkKeyId, sdkInterfaceId)
+	return r.store.SdkKeyApiModel.FindOneBySdkKeyIdSdkInterfaceId(ctx, sdkKeyId, sdkInterfaceId)
 }
 
-// GetDefaultRateLimit 返回接口默认值或字典默认值（sdk_rate_limit_default）；若均无则 60。
-func (r *SdkRepository) GetDefaultRateLimit(ctx context.Context, interfaceDefault int64) int64 {
+// GetDefaultRateLimit 返回接口自身默认值；若接口未设置（<=0），退回 staticDefault。
+// staticDefault 原来读字典 sdk_rate_limit_default（物理属于 iam 域），拆分后 sdk-rpc
+// 拿不到那张表，改成 services/sdk/etc/sdk.yaml 里的静态配置 RateLimitDefault，和
+// task-rpc 的 task_recent_logic.go 处理 system 域字典依赖是同一个模式（18-service-
+// extraction-runbook.md 2.1 节）。字典种子数据里的默认值是 60，静态配置沿用同一个值。
+func (r *SdkRepository) GetDefaultRateLimit(interfaceDefault, staticDefault int64) int64 {
 	if interfaceDefault > 0 {
 		return interfaceDefault
 	}
-	typeId, err := r.repo.AdminDictTypeModel.FindIdByCode(ctx, "sdk_rate_limit_default")
-	if err == nil && typeId > 0 {
-		items, _, _ := r.repo.AdminDictItemModel.FindPageByTypeId(ctx, typeId, 1, 1)
-		if len(items) > 0 {
-			if v := parseInt64(items[0].Value); v > 0 {
-				return v
-			}
-		}
+	if staticDefault > 0 {
+		return staticDefault
 	}
 	return 60
-}
-
-func parseInt64(s string) int64 {
-	if s == "" {
-		return 0
-	}
-	if v, err := strconv.ParseInt(s, 10, 64); err == nil {
-		return v
-	}
-	return 0
 }
 
 // IsIPAllowed 校验 IP 白名单（空表示不限制）
@@ -89,6 +75,6 @@ func (r *SdkRepository) IsIPAllowed(ipWhitelist string, clientIP string) bool {
 
 // SaveCallLog 保存调用日志（已截断/脱敏的 req/resp 由调用方处理）
 func (r *SdkRepository) SaveCallLog(ctx context.Context, log *sdkmodel.SdkCallLog) error {
-	_, err := r.repo.SdkCallLogModel.Insert(ctx, log)
+	_, err := r.store.SdkCallLogModel.Insert(ctx, log)
 	return errors.WithStack(err)
 }

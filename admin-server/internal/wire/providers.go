@@ -11,6 +11,7 @@ import (
 	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/internal/repository/registry"
 	"postapocgame/admin-server/internal/svc"
+	"postapocgame/admin-server/services/sdk/sdkclient"
 	"postapocgame/admin-server/services/task/taskclient"
 
 	"github.com/google/wire"
@@ -24,6 +25,7 @@ var ProviderSet = wire.NewSet(
 	provideDomain,
 	provideChatHub,
 	provideTaskRPC,
+	provideSdkRPC,
 
 	middleware.NewAuthMiddleware,
 	middleware.NewApiEnabledMiddleware,
@@ -74,6 +76,12 @@ func provideTaskRPC(c config.Config) taskclient.Task {
 	return taskclient.NewTask(zrpc.MustNewClient(c.TaskRPCConf))
 }
 
+// provideSdkRPC 连到 sdk-rpc（services/sdk/）。sdk 域已经拆分成独立服务，gateway 侧
+// 不再直接持有 Domain.SDK，改成一个 zrpc client。
+func provideSdkRPC(c config.Config) sdkclient.Sdk {
+	return sdkclient.NewSdk(zrpc.MustNewClient(c.SdkRPCConf))
+}
+
 // providePermissionMiddleware 是 PermissionMiddleware 的 Wire 适配函数：PermissionMiddleware
 // 构造函数吃的是 *iamdomain.PermissionResolver，但那不是一个独立的 Wire 节点，只是
 // *registry.Domain 结构体里的一个字段（domain.IAM.PermissionResolver）。Wire 没法凭空
@@ -121,6 +129,7 @@ func provideServiceContext(
 	domain *registry.Domain,
 	chatHub *hub.ChatHub,
 	taskRPC taskclient.Task,
+	sdkRPC sdkclient.Sdk,
 	mw *MiddlewareBundle,
 ) (*svc.ServiceContext, func()) {
 	svcCtx := &svc.ServiceContext{
@@ -129,6 +138,7 @@ func provideServiceContext(
 		Domain:                       domain,
 		ChatHub:                      chatHub,
 		TaskRPC:                      taskRPC,
+		SdkRPC:                       sdkRPC,
 		AuthMiddleware:               mw.Auth,
 		ApiEnabledMiddleware:         mw.ApiEnabled,
 		PermissionMiddleware:         mw.Permission,

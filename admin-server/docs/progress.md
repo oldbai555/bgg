@@ -458,3 +458,93 @@ Git 提交前钩子跑了一次基于 Cursor 的自动代码审查（对照 `AGE
 5. **`AGENTS.md` 关键目录描述还停留在 task 域是单体内部领域服务的说法**（`internal/domain/{iam,task}/`）——更新成 task 域已拆分成独立服务 `services/task/`，`internal/domain/{iam,task}/` 只保留 `iam`。
 
 `go build`/`go vet`/`go test ./internal/domain/... ./internal/repository/... ./internal/rpcserver/... ./services/task/... -race`（和更新后的 CI 命令逐字一致）全绿。
+
+---
+
+## 2026-07-12：sdk-rpc 拆分——Phase 2 第二个服务，`18-service-extraction-runbook.md` checklist 全部完成，真实数据库+HTTP 端到端验证通过
+
+本轮按 `18-service-extraction-runbook.md` 第 1 节通用 checklist + 2.2 节 sdk-rpc 差异附录，把 sdk 域从单体拆成独立的 `services/sdk/`。sdk 域比 task-rpc 更小（13 个原始文件、无调度器/无 Redis 业务依赖），但比 task-rpc 多了两处需要现场设计的点：gateway 侧 3 个 SDK 中间件怎么改造、以及一个此前完全没预料到的 TaskCallback 交叉依赖，记录见下。
+
+**1. `services/sdk/rpc/sdk.proto` 设计（14 个方法，不是 11 个）**：
+- 11 个后台管理面 CRUD 方法（API Key 增删改查、接口增删改查、绑定查/存、调用记录列表）直接对应 `.api` 里 `sdk/sdk` group 现有的 11 个接口，字段名逐一核对原 `types.Sdk*` 结构体。
+- **`SdkCallLogExport`（会话过程中发现并新增,不在最初设计里）**：探索阶段发现 `internal/rpcserver/taskcallback/server.go`（单体内嵌的 TaskCallback server,供 task-rpc 异步导出任务回调）的 `fetchSdkCallLog` 分支直连 `SdkAdminRepository.ExportCallLogs`——sdk-rpc 拆分后这个 repository 已经不在这个进程里了。没有让 sdk-rpc 新增一整个 `TaskCallback` server 实现去接这个缺口（`RegisterExportFile` 依赖的 `admin_file` 表物理上还在没拆分的 iam,让 sdk-rpc 提前实现一个自己永远不会被真正调用的方法只是为了满足 Go interface,没有实际意义），改成给 sdk.proto 单独加一个 `SdkCallLogExport` 方法（maxRows 上限 2000,和管理页 `SdkCallLogList` 的 200 上限语义不同不能合并复用），`internal/rpcserver/taskcallback/server.go` 的 `fetchSdkCallLog` 从直连 repository 改成回调这个新方法。`17-async-eventing.md` 补记了这处和原文档预期不一致的地方。
+- **3 个"对外 SDK 调用面"方法（`VerifyApiKey`/`GetEffectiveRateLimit`/`RecordCallLog`）供 gateway 中间件调用**，不是常规业务 RPC：`SDKAuthMiddleware`/`SDKRateLimitMiddleware`/`SDKCallLogMiddleware` 三个中间件按 runbook 2.2 节推荐方案继续留在 gateway（HTTP 请求最早触达的地方，限流用的 Redis 滑动窗口也留在 gateway，全服务共享不属于 sdk 域数据），内部实现从直连 Repository 改成调这三个 RPC。
+- **`VerifyApiKeyResponse` 的设计偏离了 task-rpc 建立的惯例，是有意为之**：task-rpc 的 `errconv.go`/`WrapGRPCError` 惯例是"每个调用点一个通用 msg"（如"查询任务列表失败"），把服务端具体错误原因压缩成一句话——这对内部管理后台可接受，但 `SDKAuthMiddleware` 原本有 7 种具体失败文案（缺少凭证/无效 Key/Secret 不匹配/已禁用/已过期/IP 不在白名单/接口未开通），是外部第三方 SDK 调用方依赖的公开契约，压缩成一句话是真实的体验倒退。所以 `VerifyApiKey` 不用 gRPC status error 表达失败，改成显式的 `valid`/`code`/`message` 字段，gateway 侧直接用 `errs.New(int(resp.Code), resp.Message)` 透传，7 种文案原样保留。
+
+**2. 领域代码搬迁（`internal/{model,repository,domain}/sdk/` → `services/sdk/internal/`）**：
+- `SdkKeyModel`/`SdkInterfaceModel`/`SdkKeyApiModel`/`SdkCallLogModel` 四个 goctl 生成的 Model 整体 `git mv`，包名不变。
+- **`SdkAdminRepository`/`SdkRepository`/`SDKService` 的依赖从单体的 `*repository.Repository`（聚合全部业务域 Model 的大句柄）换成 sdk-rpc 自己的 `*repository.Store`**（新增 `services/sdk/internal/repository/store.go`，只聚合这四个 Model + `Transact`/`withSession`，和单体 `Repository.Transact` 同构的小号版本）——这是和 task-rpc 的 `TaskRepository` 收窄模式一致的处理方式。
+- **顺手删除一处确认过的死代码**：`SdkAdminRepository.GetRateLimitDefault`（读字典 `sdk_rate_limit_default`）搬迁前先 grep 确认全仓库零调用点，直接删除，不带过去。
+- **`sdk_rate_limit_default` 字典依赖（物理属于 iam）按 task-rpc 附录 2.1 节同一模式处理**：`SdkRepository.GetDefaultRateLimit` 从"接口自身默认值 → 查字典 → 兜底 60"三级改成"接口自身默认值 → 传入的 `staticDefault` 参数 → 兜底 60"，`staticDefault` 来自 `services/sdk/etc/sdk.yaml` 的静态配置项 `RateLimitDefault`（默认 60，和字典种子数据的原值一致）。字典数据本身不删除（历史包袱，留着无害，但生产环境如果指望改字典调整这个默认值不会再生效，需要改配置重启，已在 `14-production-deployment-checklist.md` 写清楚）。
+- **sdk-rpc 业务本身不用 Redis，但仍然需要配一个 `SdkRedis`**（不叫 `Redis`，避免和 `zrpc.RpcServerConf` 内嵌字段撞名，和 task-rpc 的 `TaskRedis` 同一个坑）：goctl 生成的 Model 内部走 `sqlc.CachedConn`，`cache.New` 对空 `CacheConf` 会 `log.Fatal`（这是 Week1 事务测试踩过的坑，这次在搭 sdk-rpc 单元测试时又踩了一次——最初写的 `newTestStore` 直接传 `cache.CacheConf{}`，跑起来才发现，改成和其余测试一致的 miniredis + 单节点 `CacheConf` 组合）。
+
+**3. gateway 侧薄胶水化**：11 个 `internal/logic/sdk/sdk/*.go` 改成"解析请求 → 拼 SdkRPC 请求 → 映射响应"，业务逻辑（Key/Secret 生成唯一性校验、apiCode 自动生成与查重、绑定过滤）整段搬进 `services/sdk/internal/logic/`；`sdk_call_log_export_logic.go`（走 TaskRPC.SubmitTask 创建异步任务）和 `sdk_file_upload_logic.go`（委托给 iam 域的 `file` logic）确认从未访问 SDK 领域数据，原样留在 gateway 不动。`internal/repository/registry/domain.go` 删除 `SDKDomain`/`SDK` 字段（同 task-rpc 拆分时删 `TaskDomain` 的处理方式），`internal/repository/repository.go` 删除 4 个 `Sdk*Model` 字段。
+
+**4. wire 装配**：`internal/wire/providers.go` 新增 `provideSdkRPC`，`config.Config` 新增 `SdkRPCConf`，`svc.ServiceContext` 新增 `SdkRPC sdkclient.Sdk`；3 个 SDK 中间件构造函数从吃 `*repository.Repository` 改成吃 `sdkclient.Sdk`（`SDKRateLimitMiddleware` 仍保留 `*repository.Repository` 用于访问共享 Redis 做滑动窗口计数，双依赖）；`internal/rpcserver/taskcallback/server.go` 的 `NewServer` 新增 `sdkRPC sdkclient.Sdk` 参数，`admin.go` 调用点同步更新。`wire ./internal/wire` 重新生成 `wire_gen.go`。
+
+**5. 部署配置**：`db/services/init-sdk-db.sh`（新增，和 `init-task-db.sh` 同一个模式，建 `admin_sdk` schema + 建表，不跑 `init_sdk.sql`）；`docker-compose.yml` 新增 `sdk` 服务（`SDK_MYSQL_DSN`/`SDK_REDIS_ADDRESS`/`SDK_REDIS_PASSWORD`）+ mysql 服务第三个 init 脚本挂载；`etc/admin-api.yaml` 新增 `SdkRpc.Endpoints: ["${SDK_RPC_ENDPOINT}"]`；`.github/workflows/ci.yml` 的 `unit-test` job 范围加上 `./services/sdk/...`。`services/sdk/Dockerfile` 复用 task-rpc 的多阶段构建模式。
+
+**6. 测试**：`services/sdk/internal/domain/sdk/sdk_service_test.go`（`SDKService.SaveApiKeyBindings` happy/rollback，从单体原样迁移，`newTestStore` 改用 `*repository.Store`）；新增 `services/sdk/internal/logic/logic_test.go`（12 个测试，覆盖 `VerifyApiKey` 全部 7 种失败分支 + 成功路径、`GetEffectiveRateLimit` 的接口不存在/静态兜底/自定义绑定覆盖三种情形、`RecordCallLog` happy path）；`internal/rpcserver/taskcallback/server_test.go` 修复（`NewServer` 新签名，`TestFetchExportData_SdkCallLog` 从 sqlmock 直接命中 `sdk_call_log` 表改成对 `fakeSdkClient`（内嵌 nil `sdkclient.Sdk` 接口只覆盖 `SdkCallLogExport` 的最小 fake）打桩）。`go build`/`go vet`/`go test ./... -race`/`golangci-lint run ./...` 全绿。
+
+**7. 真实环境端到端验证（借用户远程库 `oldbai` + 本机 Redis，和 Phase 1 收尾/task-rpc 拆分同一个库）**：
+- 起两个真实进程：sdk-rpc（`SDK_MYSQL_DSN` 指向 oldbai，`SDK_REDIS_ADDRESS` 指向本机 Redis）+ 单体 gateway（`-mysql-config`/`-redis-config` 指向临时生成的 `etc/local-{mysql,redis}.json`，`SDK_RPC_ENDPOINT=127.0.0.1:8091`），均成功连上真实 MySQL/Redis。`etc/local-mysql.json`/`etc/local-redis.json` 补进 `.gitignore`（此前 Phase 1 收尾那次加过、后来文件删除时连带把 gitignore 条目也丢了，这次重新加上）。
+- 一次性 Go 客户端（未入库）直连 sdk-rpc 跑通全部 14 个 RPC 方法：创建/列表/更新 API Key，创建/列表接口，绑定保存/查询（真实验证 `bound`/`custom_rate_limit` 字段），`VerifyApiKey` 成功路径 + Secret 错误的拒绝路径（`code=10003` 对应 `errs.CodeUnauthorized`），`GetEffectiveRateLimit`（真实读到绑定的 `custom_rate_limit=99` 覆盖接口默认值），`RecordCallLog` + `SdkCallLogList`/`SdkCallLogExport` 读到刚写入的记录。
+- 真实 HTTP 端到端：给测试 Key 绑定 `POST /sdk/file/upload`（`RateLimitDefault=5`），用 `curl` 走真实 gateway：无凭证 400、错误凭证返回`"无效的 API Key"`、正确凭证真实上传文件成功（返回真实 `admin_file` 记录和可访问 URL）、连续 7 次请求验证限流在第 5 次后正确触发 429（`SDKAuthMiddleware → SDKRateLimitMiddleware → handler → SDKCallLogMiddleware` 全链路，含 Redis 滑动窗口计数和调用日志真实落库，`sdk_call_log` 表最终 6 条记录和"1 次直连 RPC + 5 次成功 HTTP 请求"精确对应，3 次被限流拒绝的请求因为 `SDKCallLogMiddleware` 在 `RateLimit` 之后执行,正确地没有留下日志——验证了中间件声明顺序`PerformanceMiddleware,SDKAuthMiddleware,SDKRateLimitMiddleware,SDKCallLogMiddleware`本身也是对的）。文件去重逻辑（按 MD5 查重复用记录）在重复上传同一份文件内容时也顺带验证生效（6 次上传只产生 1 条 `admin_file` 记录）。
+- **验证过程中发现一个预置在原代码里、和本轮拆分无关的真实 bug（不修复，记录留档）**：`sdk_key_api` 表的唯一索引 `uk_sdk_key_api (sdk_key_id, sdk_interface_id)` 不包含 `deleted_at`，`SaveApiKeyBindings`（`SaveBindings`）的"软删旧绑定 + 插入新绑定"模式在给同一个 Key 重复绑定同一个接口时会撞 `Duplicate entry`——软删除的旧行仍然占着唯一索引位。这段 SQL 逻辑是从单体原样搬过来的，字节级未改动，是历史遗留问题，不在本轮拆分范围内修，已写入 `14-production-deployment-checklist.md` 条目 6 的"已知遗留"。
+- 验证完整清理：`DELETE` 全部测试用 `sdk_key`/`sdk_interface`/`sdk_key_api`/`sdk_call_log`/`admin_file` 记录（按精确 ID，不是按前缀模糊删），删除本地上传的测试文件，停两个进程，删 `etc/local-{mysql,redis}.json`、一次性验证脚本，复核 4 张 sdk 表 + `admin_file` 测试记录行数精确回到验证前基线（0/0/0/0，`admin_file` 无残留）。
+
+**8. 文档同步**：`17-async-eventing.md` 补记 `SdkCallLogExport` 和原文档预期（sdk-rpc 新增完整 `TaskCallback` server）的实际偏差；`14-production-deployment-checklist.md` 新增条目 6（sdk-rpc 拆分的部署步骤、环境变量清单、已知遗留的唯一索引问题）；`AGENTS.md` + `.cursor/rules/10-go-code-style.mdc` + `.claude/rules/10-go-code-style.md`（三处同步）更新目录结构描述，`internal/domain/` 不再有 `sdk/` 子目录。
+
+**遗留/需要用户关注的点**：
+1. `sdk_key_api` 唯一索引不含 `deleted_at` 导致重复绑定报错的 bug（见上），建议后续单独排期：唯一索引加 `deleted_at` 或 `SaveBindings` 改成物理删除旧绑定,两种都需要评估对现有数据的影响,本轮不擅自选择。
+2. `docker compose up` 本身未做容器化实测（本机无 Docker，和 task-rpc 拆分时同样的限制），已用非容器化真实进程验证过完整链路，建议用户在有 Docker 的环境跑一遍确认 `sdk` 容器能通过服务名连接。
+3. Phase 2 剩余 3 个服务（chat-rpc → content-rpc → iam-rpc，按 `18-service-extraction-runbook.md` 原定顺序）尚未开始；chat-rpc 是第一个真正用到 Redis Streams（`stream:chat.user.created`）和 WS↔gRPC 双向流桥接的服务，复杂度明显高于前两个，建议下一次会话开始前先过一遍 `16-rpc-conventions.md` 第 7 节的桥接代码骨架。
+4. 本次改动尚未 `git commit`。
+
+**下一步**：sdk-rpc 拆分完整落地并通过真实环境验证。下一次会话可以直接开始 chat-rpc 拆分（`18-service-extraction-runbook.md` 2.3 节附录），或先做一次用户复核，取决于用户判断。
+
+---
+
+## 2026-07-12（续）：提交前 Cursor 自动代码审查（Gentleman Guardian Angel）发现问题修复
+
+Git 提交前钩子跑了一次审查，第一次提交被拦截。逐项核实后处理如下：
+
+**已修复（判断为真问题）**：
+1. `admin.go` 只对 `TASK_RPC_ENDPOINT` 做了空值 fail-fast 检查，没有对称地检查 `SDK_RPC_ENDPOINT`——sdk-rpc 拆分完成后，gateway 若漏配这个环境变量会等到第一次真实 SDK 调用才报错，而不是启动即拒绝，和 `JWT_ACCESS_SECRET`/`TASK_RPC_ENDPOINT` 的既有 fail-fast 约定不一致。已补上对称检查。
+2. **`docs/后端开发进度.md` 本轮最初判断不需要更新（推理是"纯架构迁移、外部行为不变、和 Week1 的判断先例一样"），复核 task-rpc 拆分那次的真实先例后发现判断有误**：task-rpc 拆分虽然大部分是纯架构迁移，但仍然新增了一节（第 17 节），哪怕内容只是"架构变化本身"加"顺带修的几个真 bug"，也确实按 `AGENTS.md` 第 7 节"完成的定义"的口径开了一节。本轮虽然没有顺带修复任何真实 bug（纯迁移，`sdk_key_api` 唯一索引问题是发现但未修），仍然对齐先例补了一节（第 18 节，只有架构变化说明 + 已知遗留，没有"行为变化"条目，如实反映本轮的真实情况）。
+
+**核实后判断为超出本轮范围、不修复（保留分歧记录，和历次 gga 审查回合同样的处理方式）**：
+1. 审查指出多处 SDK CRUD logic（`sdkapikeycreatelogic.go`/`sdkapikeyupdatelogic.go`/`sdkinterfacecreatelogic.go`/`sdkinterfaceupdatelogic.go`）用字面量 `1`/`2` 表示启用/禁用状态，建议改用 `consts` 常量。核实：这几处的 `status != 1 && status != 2`/`req.Status == 1 || req.Status == 2` 写法在 `git show d7667d1`（本轮拆分前的基线提交）就已经是这样，本轮是原样搬迁业务逻辑（从 gateway 搬进 `services/sdk/internal/logic/`），字节级未改动这部分判断逻辑，不是本轮新引入的代码。且核实主库 `internal/consts` 本身也只有 `Open = 1`、没有对应的 `Disabled` 常量，这是全仓库既有风格（历次审查已经反复记录过"硬编码业务常量...本轮没有引入新的此类代码,清理是独立的、范围大得多的任务,不顺带做"），本轮不顺带清理。
+2. 审查指出 `internal/rpcserver/taskcallback/server.go` 的 `RegisterExportFile` 硬编码 `Status: 1`，建议改成 `consts.Open`。核实：`git show d7667d1` 确认这行代码本轮拆分前就是这样，本轮只改了同一个文件里的 `fetchSdkCallLog` 分支（sdk_call_log 回调改造），未触碰 `RegisterExportFile`，同上，不属于本轮引入的代码，不顺带清理。
+
+`go build`/`go vet`/`go test ./... -race`/`golangci-lint run ./...` 修复后重新跑绿。
+
+**第二轮审查（修复后重新提交时触发）又发现一处真问题，已修复；其余判断为不修复**：
+1. **`docs/后端开发进度.md` 第 0 节目录树、第 8 节"关键代码位置"的 SDK 条目还停留在拆分前的样子**（第 0 节目录树只列了 `services/task/`，第 8 节 SDK 条目还写着 `internal/{handler,logic}/sdk/` 直连中间件，没有反映 sdk 域已经拆到 `services/sdk/`、gateway 侧只剩薄胶水）——第一轮修复时新增了第 18 节记录本轮变化，但没有回头核对文档前面本来就有的目录索引小节是不是也需要同步，这是真的漏项。已修复：第 0 节目录树加上 `services/sdk/`，第 8 节 SDK 条目按第 17 节 task-rpc 条目的写法重写（gateway 侧薄胶水 + sdk-rpc 本体 + 跨服务契约三段式）。
+2. 审查再次提到状态字面量 `1`/`2` 硬编码、`RegisterExportFile` 的 `Status: 1`——核实结论不变（见上一轮记录），本轮不修。
+3. 审查提到 `.cursor/rules/10-go-code-style.mdc`/`.claude/rules/10-go-code-style.md` 的 `internal/domain/` 目录树只写了 `iam/`，没体现 Phase 1 已经存在的 `content/`/`chat/`——核实这处遗漏在本轮拆分之前就存在（`git show d7667d1` 确认），和本轮 sdk-rpc 拆分无关，本轮已经改了这两个文件里 `services/task/` → `services/task/, services/sdk/` 那一行（本轮改动直接相关的部分），不顺带修复域列表这个更早的遗漏，留给后续统一梳理 `internal/domain/` 全部子目录时一起处理。
+4. **审查建议 `services/sdk/internal/logic/` 的分页逻辑复用 gateway 的 `logicutil.NormalizePage`，核实后判断这个建议本身是错的，不采纳**：`services/task/internal/logic/tasklistlogic.go`（task-rpc，Week 6-7 落地，已经跑通真实环境验证）用的同样是内联 `if page <= 0 { page = 1 }`，不 import `internal/logicutil`——这是有意为之的既有先例：RPC 服务的 `services/<name>/internal/` 应该完全自包含，不应该反向依赖 gateway 的 `internal/` 包（`16-rpc-conventions.md` "services/<name>/internal/ 内部的分层完全复刻现在单体的结构"，隐含的边界是不共享 gateway 侧的工具函数）。sdk-rpc 的写法和 task-rpc 保持一致，是正确的，审查这条建议如果采纳反而会引入服务间不该有的反向依赖，不修改。
+
+`go build`/`go vet`/`go test ./... -race`/`golangci-lint run ./...` 第二轮修复后重新跑绿。
+
+**第三轮审查：全部核实为重复项或已确认的历史遗留，不修复，记录后直接提交**：
+1. 重复第一/二轮已裁定的状态字面量硬编码、`RegisterExportFile Status:1`、`sdk_key_api` 唯一索引问题——结论不变。**新增一处同类字面量**（`internal/middleware/sdkratelimitmiddleware.go` 的 `limit = 60` 兜底值）：`git show d7667d1` 确认这行代码本轮拆分前就是这样、字节级未改动，同一类不属于本轮引入的既有代码风格，不修。
+2. **新增指出 `sdkapikeylistlogic.go`/`sdkinterfacelistlogic.go` 用 `toGRPCStatus(err)` 直接传原始 error，和其余大多数文件先 `errs.Wrap(...)` 再传的写法不一致**——核实这条本身站得住（两个文件确实和同目录其余文件手法不同），但核实后判断不算缺陷：① `services/task/internal/logic/tasklistlogic.go`（已验证过的 task-rpc 先例）用的正是同一种"直接 `toGRPCStatus(err)`"写法，是列表类只读查询的既定简写模式，不是本轮独创；② 从实际效果看两种写法等价——`toGRPCStatus` 的 switch 没有显式处理 `CodeInternalError`，无论走 `errs.Wrap(errs.CodeInternalError,...)` 还是原始 error 直传，都会落到 `codes.Internal` 分支；而 gateway 侧调用点（`internal/logic/sdk/sdk/sdk_api_key_list_logic.go` 等）本来就会用 `errs.WrapGRPCError("查询 API Key 列表失败", err)` 套一层自己的提示文案，sdk-rpc 侧 `errs.Wrap` 加的内部 message 从未穿透到最终用户，只在 sdk-rpc 自己的日志里有意义。两种写法在当前代码路径下用户可观察行为完全相同，不是真实 bug，不修改（如果未来某个仓储方法开始返回更精确的 `*errs.Error` code，`toGRPCStatus(err)` 直传反而能正确传播那个更精确的 code，比强制套 `CodeInternalError` 更准确，是技术上更优的写法）。
+3. 审查提到规则文件的 squirrel"已知例外"清单提到 `performance_log_repository.go` 已经迁移、文档未跟进——核实是更早会话（Week4-5）遗留的文档滞后，和本轮 sdk-rpc 拆分无关，不顺带修。
+4. 审查提到 `docs/后端开发进度.md` 第 9 节仍引用已删除的 `db/tables.sql`/`db/migrations/` 路径——核实第 9 节是**带日期的历史变更日志**（2025-12-24 ~ 2026-01-16 各条目），记录的是当时那次改动使用的真实路径，`progress.md`/`docs/后端开发进度.md` 两份文档都明确"只追加、不重写历史"的维护约定——回头把历史日志条目的路径改写成 Phase 2 重组后的新路径，会让"某条记录当时到底改了什么"这件事失真，属于历史记录的正常特征（路径会随时间演进）而不是需要修的错误，不修改。
+
+`go build`/`go vet`/`go test ./... -race`/`golangci-lint run ./...` 全绿，未发现需要变更代码/文档的新增真实问题。
+
+**第四轮审查：审查自己在结论里把要求收窄到两条低风险单行改动，采纳这两条，其余维持前三轮的核实结论**：
+1. **采纳并修复**：`.cursor/rules/10-go-code-style.mdc`/`.claude/rules/10-go-code-style.md` 的 squirrel"已知例外"清单核实后确认过时——`internal/repository/monitoring/performance_log_repository.go`（清单里的旧路径 `internal/repository/performance_log_repository.go` 本身也没跟上 DDD-lite 域重组后的真实路径）已经完整迁移到 squirrel（`grep` 确认全文件零 `fmt.Sprintf`/字符串拼接 SQL），不再是例外；`internal/repository/chat/chat_repository.go` 仍有几处参数化的静态多行 SQL（无拼接风险，但不是 squirrel），继续保留为例外，路径同步更正。两处文件改成一致表述。
+2. **采纳并修复**：`internal/rpcserver/taskcallback/server.go` 的 `RegisterExportFile` 硬编码 `Status: 1` 改成 `consts.Open`（文件顶部已经 import 了 `internal/consts`，纯替换,零风险）。
+3. 其余项（状态字面量硬编码、`sdkratelimitmiddleware.go` 的 `limit = 60`、`sdk_key_api` 唯一索引、`sdkapikeylistlogic.go`/`sdkinterfacelistlogic.go` 的 `toGRPCStatus(err)` 直传写法、`internal/domain/` 目录树未列全域、`docs/后端开发进度.md` 第 9 节历史日志路径）维持前几轮"核实为超出本轮范围或已确认无实际行为差异"的结论，不重复展开。
+
+`go build`/`go vet`/`go test ./... -race`/`golangci-lint run ./...` 第四轮修复后重新跑绿。
+
+**第五轮审查：一条真问题（根目录 `docs/后端开发进度.md` 的 squirrel 状态描述没跟上第四轮的代码结论），已修复；其余核实为误报或前几轮已裁定的重复项**：
+1. **采纳并修复**：`docs/后端开发进度.md` 第 5 节"待实现/待完善功能"的 2026-01-19 遗留待办、第 8 节"聊天模块"/"性能日志"两处关键代码位置索引，仍写着 `performance_log_repository.go`/`chat_repository.go` 两个都"未使用 squirrel"，且路径是域重组前的旧扁平路径——这是本会话第四轮刚确认过 `performance_log_repository.go` 已完成 squirrel 迁移之后,没有回头检查根目录这份文档是不是也需要同步更正,是真的漏项。已修复：第 5 节待办项标记为已订正（不是静默删除,按文档"订正需注明"的既有约定加了订正说明）,第 8 节两处路径更正为域重组后的真实路径（`internal/repository/chat/chat_repository.go`、`internal/repository/monitoring/performance_log_repository.go`），squirrel 状态描述同步更正。
+2. 审查指出 `.claude/rules/10-go-code-style.md`/`.cursor/rules/10-go-code-style.mdc` 引用 `00-workflow.md` vs `00-workflow.mdc` 扩展名不一致——核实这是**设计如此**，不是 bug：两份规则文件分别活在 `.claude/rules/`（Claude 生态,文件都是 `.md`）和 `.cursor/rules/`（Cursor 生态,文件都是 `.mdc`）两个独立目录里,各自引用同目录下的兄弟文件,扩展名分别匹配各自生态是正确的交叉引用,不是"不一致"，不修改。
+3. 其余项（状态字面量硬编码、`sdk_key_api` 唯一索引、`internal/domain/` 目录树未列全域、"完成的定义"里提到的"尚未 commit"/"docker compose 未实测"）——前者维持前几轮结论；"尚未 commit" 本身是提交前的必然状态描述,不是需要修复的缺陷,commit 成功后这句话自然对应"已提交";docker compose 未实测是本机环境限制,已在文档里如实标注,不是隐瞒。
+
+`go build`/`go vet`/`go test ./... -race`/`golangci-lint run ./...` 第五轮修复后重新跑绿。

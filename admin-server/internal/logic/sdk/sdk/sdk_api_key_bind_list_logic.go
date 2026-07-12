@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/sdk/sdkclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -32,13 +33,13 @@ func (l *SdkApiKeyBindListLogic) SdkApiKeyBindList(req *types.SdkApiKeyBindListR
 		return nil, errs.New(errs.CodeBadRequest, "sdkKeyId 不能为空")
 	}
 
-	list, err := l.svcCtx.Domain.SDK.Admin.ListBindings(l.ctx, req.SdkKeyId)
+	rpcResp, err := l.svcCtx.SdkRPC.SdkApiKeyBindList(l.ctx, &sdkclient.SdkApiKeyBindListRequest{SdkKeyId: req.SdkKeyId})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "查询绑定列表失败", err)
+		return nil, errs.WrapGRPCError("查询绑定列表失败", err)
 	}
 
-	items := make([]types.SdkApiKeyBindItem, 0, len(list))
-	for _, v := range list {
+	items := make([]types.SdkApiKeyBindItem, 0, len(rpcResp.List))
+	for _, v := range rpcResp.List {
 		items = append(items, types.SdkApiKeyBindItem{
 			SdkInterfaceId:  v.SdkInterfaceId,
 			ApiCode:         v.ApiCode,

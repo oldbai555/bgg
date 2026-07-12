@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/sdk/sdkclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -33,15 +34,19 @@ func (l *SdkInterfaceListLogic) SdkInterfaceList(req *types.SdkInterfaceListReq)
 	}
 	req.Page, req.PageSize = logicutil.NormalizePage(req.Page, req.PageSize, 20, 100)
 
-	// status == 0 表示不按状态过滤，非0才过滤
-	statusFilter := req.Status
-	list, total, err := l.svcCtx.Domain.SDK.Admin.ListInterfaces(l.ctx, req.Page, req.PageSize, req.Name, req.ApiCode, statusFilter)
+	rpcResp, err := l.svcCtx.SdkRPC.SdkInterfaceList(l.ctx, &sdkclient.SdkInterfaceListRequest{
+		Page:     req.Page,
+		PageSize: req.PageSize,
+		Name:     req.Name,
+		ApiCode:  req.ApiCode,
+		Status:   req.Status,
+	})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "查询接口列表失败", err)
+		return nil, errs.WrapGRPCError("查询接口列表失败", err)
 	}
 
-	items := make([]types.SdkInterfaceItem, 0, len(list))
-	for _, v := range list {
+	items := make([]types.SdkInterfaceItem, 0, len(rpcResp.List))
+	for _, v := range rpcResp.List {
 		items = append(items, types.SdkInterfaceItem{
 			Id:               v.Id,
 			Name:             v.Name,
@@ -56,7 +61,7 @@ func (l *SdkInterfaceListLogic) SdkInterfaceList(req *types.SdkInterfaceListReq)
 	}
 
 	return &types.SdkInterfaceListResp{
-		Total: total,
+		Total: rpcResp.Total,
 		List:  items,
 	}, nil
 }

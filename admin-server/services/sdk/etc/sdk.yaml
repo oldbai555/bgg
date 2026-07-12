@@ -1,0 +1,15 @@
+Name: sdk.rpc
+ListenOn: 0.0.0.0:8091
+Mode: pro
+
+Mysql:
+  DSN: "${SDK_MYSQL_DSN}" # 指向 admin_sdk schema，见 db/services/sdk/sdk/
+
+# 业务本身不用 Redis，纯粹是满足 goctl 生成的 Model 内部 CachedConn 强制要求非空缓存节点，
+# 与 gateway 共享同一个 Redis 实例（缓存/锁/队列不拆分）。
+SdkRedis:
+  Address: "${SDK_REDIS_ADDRESS}"
+  Password: "${SDK_REDIS_PASSWORD}"
+
+# 取代原来读字典 sdk_rate_limit_default（物理属于 iam 域）的做法，字典种子数据默认值是 60。
+RateLimitDefault: 60

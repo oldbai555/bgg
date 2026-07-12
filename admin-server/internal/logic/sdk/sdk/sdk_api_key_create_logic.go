@@ -5,16 +5,11 @@ package sdk
 
 import (
 	"context"
-	"crypto/rand"
-	"encoding/hex"
-	"strings"
 
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
-
-	"postapocgame/admin-server/internal/model/sdk"
-	sdkrepo "postapocgame/admin-server/internal/repository/sdk"
+	"postapocgame/admin-server/services/sdk/sdkclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -33,65 +28,27 @@ func NewSdkApiKeyCreateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *S
 	}
 }
 
+// SdkApiKeyCreate 薄胶水：Key/Secret 生成与唯一性校验已经搬进
+// services/sdk/internal/logic/sdkapikeycreatelogic.go。
 func (l *SdkApiKeyCreateLogic) SdkApiKeyCreate(req *types.SdkApiKeyCreateReq) (resp *types.SdkApiKeyCreateResp, err error) {
 	if req == nil {
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
-	if strings.TrimSpace(req.Name) == "" {
-		return nil, errs.New(errs.CodeBadRequest, "名称不能为空")
-	}
 
-	apiKey, apiSecret, err := l.generateUniqueKeyPair(l.svcCtx.Domain.SDK.Admin)
-	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "生成 API Key 失败", err)
-	}
-
-	status := req.Status
-	if status != 1 && status != 2 {
-		status = 1 // 默认启用
-	}
-
-	data := &sdk.SdkKey{
+	rpcResp, err := l.svcCtx.SdkRPC.SdkApiKeyCreate(l.ctx, &sdkclient.SdkApiKeyCreateRequest{
 		Name:        req.Name,
-		ApiKey:      apiKey,
-		ApiSecret:   apiSecret,
-		Status:      status,
+		Status:      req.Status,
 		ExpireAt:    req.ExpireAt,
 		IpWhitelist: req.IpWhitelist,
 		Remark:      req.Remark,
-	}
-
-	id, err := l.svcCtx.Domain.SDK.Admin.CreateSdkKey(l.ctx, data)
+	})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "创建 API Key 失败", err)
+		return nil, errs.WrapGRPCError("创建 API Key 失败", err)
 	}
 
 	return &types.SdkApiKeyCreateResp{
-		Id:        id,
-		ApiKey:    apiKey,
-		ApiSecret: apiSecret,
+		Id:        rpcResp.Id,
+		ApiKey:    rpcResp.ApiKey,
+		ApiSecret: rpcResp.ApiSecret,
 	}, nil
-}
-
-func (l *SdkApiKeyCreateLogic) generateUniqueKeyPair(repo *sdkrepo.SdkAdminRepository) (string, string, error) {
-	for i := 0; i < 5; i++ {
-		key := randomHex(24)
-		secret := randomHex(32)
-		_, err := repo.FindSdkKeyByApiKey(l.ctx, key)
-		if err == nil {
-			continue
-		}
-		// allow not found
-		if _, err := repo.FindSdkKeyByApiSecret(l.ctx, secret); err == nil {
-			continue
-		}
-		return key, secret, nil
-	}
-	return "", "", errs.New(errs.CodeInternalError, "生成唯一 API Key 失败")
-}
-
-func randomHex(n int) string {
-	b := make([]byte, n)
-	_, _ = rand.Read(b)
-	return strings.ToLower(hex.EncodeToString(b))
 }

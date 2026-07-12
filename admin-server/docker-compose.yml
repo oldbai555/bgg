@@ -14,6 +14,7 @@ services:
       - ./db:/db:ro
       - ./db/docker-init.sh:/docker-entrypoint-initdb.d/00-init.sh:ro
       - ./db/services/init-task-db.sh:/docker-entrypoint-initdb.d/01-init-task-db.sh:ro
+      - ./db/services/init-sdk-db.sh:/docker-entrypoint-initdb.d/02-init-sdk-db.sh:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-devroot}"]
       interval: 5s
@@ -44,6 +45,8 @@ services:
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-local-dev-refresh-secret-not-for-prod}
       # task-rpc 的服务名:端口，见 services/task/ 和 16-rpc-conventions.md 第 5 节。
       TASK_RPC_ENDPOINT: task:8090
+      # sdk-rpc 的服务名:端口，见 services/sdk/。
+      SDK_RPC_ENDPOINT: sdk:8091
     # admin.go 强制要求 -mysql-config/-redis-config 指向的 JSON 文件存在（MergeExternalConfig
     # 找不到文件直接报错退出），etc/dev-mysql.json/etc/dev-redis.json 是仅供本地 compose 使用的
     # 开发期配置（host 指向本 compose 内的服务名 mysql/redis，密码与上面 MYSQL_ROOT_PASSWORD
@@ -76,6 +79,22 @@ services:
       # 和 app 共享同一份物理导出文件——task-rpc 生成 CSV，gateway 的
       # /api/v1/files/uploads/* 路由负责对外提供下载，见 17-async-eventing.md 发现 3。
       - uploads:/app/uploads
+
+  sdk:
+    build:
+      context: .
+      dockerfile: services/sdk/Dockerfile
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      SDK_MYSQL_DSN: "root:${MYSQL_ROOT_PASSWORD:-devroot}@tcp(mysql:3306)/admin_sdk?charset=utf8mb4&parseTime=true&loc=Local"
+      SDK_REDIS_ADDRESS: redis:6379
+      SDK_REDIS_PASSWORD: ""
+    ports:
+      - "8091:8091"
 
 volumes:
   mysql_data:

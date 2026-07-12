@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/sdk/sdkclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -33,13 +34,22 @@ func (l *SdkCallLogListLogic) SdkCallLogList(req *types.SdkCallLogListReq) (resp
 	}
 	req.Page, req.PageSize = logicutil.NormalizePage(req.Page, req.PageSize, 20, 200)
 
-	list, total, err := l.svcCtx.Domain.SDK.Admin.ListCallLogs(l.ctx, req.Page, req.PageSize, req.SdkKeyId, req.ApiCode, req.RespCode, req.Ip, req.StartTime, req.EndTime)
+	rpcResp, err := l.svcCtx.SdkRPC.SdkCallLogList(l.ctx, &sdkclient.SdkCallLogListRequest{
+		Page:      req.Page,
+		PageSize:  req.PageSize,
+		SdkKeyId:  req.SdkKeyId,
+		ApiCode:   req.ApiCode,
+		RespCode:  req.RespCode,
+		Ip:        req.Ip,
+		StartTime: req.StartTime,
+		EndTime:   req.EndTime,
+	})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "查询调用记录失败", err)
+		return nil, errs.WrapGRPCError("查询调用记录失败", err)
 	}
 
-	items := make([]types.SdkCallLogItem, 0, len(list))
-	for _, v := range list {
+	items := make([]types.SdkCallLogItem, 0, len(rpcResp.List))
+	for _, v := range rpcResp.List {
 		items = append(items, types.SdkCallLogItem{
 			Id:             v.Id,
 			SdkKeyId:       v.SdkKeyId,
@@ -55,7 +65,7 @@ func (l *SdkCallLogListLogic) SdkCallLogList(req *types.SdkCallLogListReq) (resp
 	}
 
 	return &types.SdkCallLogListResp{
-		Total: total,
+		Total: rpcResp.Total,
 		List:  items,
 	}, nil
 }

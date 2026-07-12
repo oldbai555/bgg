@@ -12,12 +12,26 @@ import (
 	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/core/stores/redis"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
+	"google.golang.org/grpc"
 
 	"postapocgame/admin-server/internal/consts"
 	"postapocgame/admin-server/internal/repository"
 	taskcallbacksrv "postapocgame/admin-server/internal/rpcserver/taskcallback"
 	pb "postapocgame/admin-server/pkg/taskcallback/pb"
+	"postapocgame/admin-server/services/sdk/sdkclient"
 )
+
+// fakeSdkClient 是 sdkclient.Sdk 的最小 fake：内嵌 nil 接口满足全部方法签名，只覆盖测试
+// 用到的 SdkCallLogExport——sdk-rpc 已经拆成独立进程，这里不再能用 sqlmock 直接命中
+// sdk_call_log 表，改成对着这个 RPC 边界打桩。
+type fakeSdkClient struct {
+	sdkclient.Sdk
+	exportFn func(ctx context.Context, in *sdkclient.SdkCallLogExportRequest) (*sdkclient.SdkCallLogExportResponse, error)
+}
+
+func (f *fakeSdkClient) SdkCallLogExport(ctx context.Context, in *sdkclient.SdkCallLogExportRequest, _ ...grpc.CallOption) (*sdkclient.SdkCallLogExportResponse, error) {
+	return f.exportFn(ctx, in)
+}
 
 func newTestRepo(t *testing.T) (*repository.Repository, sqlmock.Sqlmock, func()) {
 	t.Helper()
@@ -56,7 +70,7 @@ func TestFetchExportData_OperationLog(t *testing.T) {
 		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(1))
 	mock.ExpectQuery(`(?i)select \* from .*admin_operation_log`).WillReturnRows(rows)
 
-	srv := taskcallbacksrv.NewServer(repo)
+	srv := taskcallbacksrv.NewServer(repo, nil)
 	resp, err := srv.FetchExportData(context.Background(), &pb.FetchExportDataRequest{
 		Module:      consts.TaskModuleOperationLog,
 		FiltersJson: `{}`,
@@ -71,19 +85,24 @@ func TestFetchExportData_OperationLog(t *testing.T) {
 	assert.Equal(t, "POST", row["请求方法"])
 }
 
-// TestFetchExportData_SdkCallLog 验证发现 2 的 bug 修复：sdk_call_log 此前命中 default 分支
-// 直接报错"不支持的导出模块"，现在应该走通 SdkAdminRepository.ExportCallLogs。
+// TestFetchExportData_SdkCallLog 验证 sdk_call_log 分支正确回调 sdk-rpc 的
+// SdkCallLogExport（sdk 域拆分后 sdk_call_log 表不再在这个进程里，见发现 2 的 bug 修复历史：
+// 曾经命中 default 分支直接报错"不支持的导出模块"）。
 func TestFetchExportData_SdkCallLog(t *testing.T) {
-	repo, mock, cleanup := newTestRepo(t)
+	repo, _, cleanup := newTestRepo(t)
 	defer cleanup()
 
-	rows := sqlmock.NewRows([]string{
-		"id", "sdk_key_id", "sdk_interface_id", "api_code", "path", "method", "ip", "user_agent",
-		"req_body", "resp_body", "resp_code", "duration_ms", "deleted_at", "created_at", "updated_at",
-	}).AddRow(1, 5, 1, "video.list", "/sdk/video/list", "GET", "1.2.3.4", "sdk-client", nil, nil, 200, 30, 0, 1700000000, 1700000000)
-	mock.ExpectQuery(`(?i)select \* from .*sdk_call_log`).WillReturnRows(rows)
+	fakeSdk := &fakeSdkClient{
+		exportFn: func(ctx context.Context, in *sdkclient.SdkCallLogExportRequest) (*sdkclient.SdkCallLogExportResponse, error) {
+			return &sdkclient.SdkCallLogExportResponse{
+				List: []*sdkclient.SdkCallLogItem{
+					{Id: 1, SdkKeyId: 5, ApiCode: "video.list", Path: "/sdk/video/list", Method: "GET", Ip: "1.2.3.4", RespCode: 200, DurationMs: 30, CreatedAt: 1700000000},
+				},
+			}, nil
+		},
+	}
 
-	srv := taskcallbacksrv.NewServer(repo)
+	srv := taskcallbacksrv.NewServer(repo, fakeSdk)
 	resp, err := srv.FetchExportData(context.Background(), &pb.FetchExportDataRequest{
 		Module:      consts.TaskModuleSdkCallLog,
 		FiltersJson: `{}`,
@@ -101,7 +120,7 @@ func TestFetchExportData_UnsupportedModule(t *testing.T) {
 	repo, _, cleanup := newTestRepo(t)
 	defer cleanup()
 
-	srv := taskcallbacksrv.NewServer(repo)
+	srv := taskcallbacksrv.NewServer(repo, nil)
 	_, err := srv.FetchExportData(context.Background(), &pb.FetchExportDataRequest{
 		Module:      "not_a_real_module",
 		FiltersJson: `{}`,
@@ -126,7 +145,7 @@ func TestRegisterExportFile_CreatesNewRecord(t *testing.T) {
 	mock.ExpectExec(`(?i)insert into .*admin_file`).
 		WillReturnResult(sqlmock.NewResult(42, 1))
 
-	srv := taskcallbacksrv.NewServer(repo)
+	srv := taskcallbacksrv.NewServer(repo, nil)
 	resp, err := srv.RegisterExportFile(context.Background(), &pb.RegisterExportFileRequest{
 		FileName:     "abc123.csv",
 		OriginalName: "操作日志_20260711.csv",
