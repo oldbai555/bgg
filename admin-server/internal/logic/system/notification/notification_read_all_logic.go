@@ -10,6 +10,7 @@ import (
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -29,14 +30,14 @@ func NewNotificationReadAllLogic(ctx context.Context, svcCtx *svc.ServiceContext
 }
 
 func (l *NotificationReadAllLogic) NotificationReadAll() (resp *types.Response, err error) {
-	// 获取当前用户
 	user, ok := jwthelper.FromContext(l.ctx)
 	if !ok {
 		return nil, errs.New(errs.CodeUnauthorized, "未登录或登录已过期")
 	}
 
-	if err := l.svcCtx.Domain.System.Notification.MarkAllAsRead(l.ctx, user.UserID); err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "标记全部已读失败", err)
+	_, err = l.svcCtx.IamRPC.NotificationReadAll(l.ctx, &iamclient.NotificationReadAllRequest{UserId: user.UserID})
+	if err != nil {
+		return nil, errs.WrapGRPCError("标记全部已读失败", err)
 	}
 
 	return &types.Response{

@@ -5,10 +5,12 @@ package notice
 
 import (
 	"context"
+
 	"postapocgame/admin-server/internal/logic/logicutil"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -34,29 +36,33 @@ func (l *NoticeListLogic) NoticeList(req *types.NoticeListReq) (resp *types.Noti
 
 	req.Page, req.PageSize = logicutil.NormalizePage(req.Page, req.PageSize, 10, 100)
 
-	// 处理筛选条件：如果未传入，使用 -1 作为标记
 	noticeType := req.NoticeType
 	if noticeType < 0 {
-		noticeType = 0 // 未传入时设为0，表示不筛选类型
+		noticeType = 0
 	}
 	status := req.Status
 	if status < 0 {
-		status = -1 // 未传入时设为-1，表示不筛选状态
+		status = -1
 	}
-	// 状态：1=草稿，2=已发布，0=未定义（不使用）
 
-	list, total, err := l.svcCtx.Domain.System.Notice.FindPage(l.ctx, req.Page, req.PageSize, req.Title, noticeType, status)
+	rpcResp, err := l.svcCtx.IamRPC.NoticeList(l.ctx, &iamclient.NoticeListRequest{
+		Page:       req.Page,
+		PageSize:   req.PageSize,
+		Title:      req.Title,
+		NoticeType: noticeType,
+		Status:     status,
+	})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "查询公告列表失败", err)
+		return nil, errs.WrapGRPCError("查询公告列表失败", err)
 	}
 
-	items := make([]types.NoticeItem, 0, len(list))
-	for _, n := range list {
+	items := make([]types.NoticeItem, 0, len(rpcResp.List))
+	for _, n := range rpcResp.List {
 		items = append(items, types.NoticeItem{
 			Id:          n.Id,
 			Title:       n.Title,
 			Content:     n.Content,
-			NoticeType:  n.Type,
+			NoticeType:  n.NoticeType,
 			Status:      n.Status,
 			PublishTime: n.PublishTime,
 			CreatedBy:   n.CreatedBy,
@@ -66,7 +72,7 @@ func (l *NoticeListLogic) NoticeList(req *types.NoticeListReq) (resp *types.Noti
 	}
 
 	return &types.NoticeListResp{
-		Total: total,
+		Total: rpcResp.Total,
 		List:  items,
 	}, nil
 }

@@ -5,12 +5,12 @@ package notification
 
 import (
 	"context"
-	"time"
 
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -34,29 +34,17 @@ func (l *NotificationReadLogic) NotificationRead(req *types.NotificationReadReq)
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	// 获取当前用户
 	user, ok := jwthelper.FromContext(l.ctx)
 	if !ok {
 		return nil, errs.New(errs.CodeUnauthorized, "未登录或登录已过期")
 	}
 
-	// 验证消息通知是否属于当前用户
-	notification, err := l.svcCtx.Domain.System.Notification.FindByID(l.ctx, req.Id)
+	_, err = l.svcCtx.IamRPC.NotificationRead(l.ctx, &iamclient.NotificationReadRequest{
+		Id:     req.Id,
+		UserId: user.UserID,
+	})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeNotFound, "消息通知不存在", err)
-	}
-	if notification.UserId != user.UserID {
-		return nil, errs.New(errs.CodeForbidden, "无权操作该消息通知")
-	}
-
-	// 标记为已读（字典值：1=未读，2=已读）
-	now := time.Now().Unix()
-	notification.ReadStatus = 2
-	notification.ReadAt = now
-	notification.UpdatedAt = now
-
-	if err := l.svcCtx.Domain.System.Notification.Update(l.ctx, notification); err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "标记已读失败", err)
+		return nil, errs.WrapGRPCError("标记已读失败", err)
 	}
 
 	return &types.Response{

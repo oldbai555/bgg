@@ -5,10 +5,12 @@ package daily_short_sentence
 
 import (
 	"context"
+
 	"postapocgame/admin-server/internal/logic/logicutil"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -34,37 +36,32 @@ func (l *DailyShortSentenceListLogic) DailyShortSentenceList(req *types.DailySho
 
 	req.Page, req.PageSize = logicutil.NormalizePage(req.Page, req.PageSize, 20, 100)
 
-	list, total, err := l.svcCtx.Domain.Misc.DailyShortSentence.FindPage(l.ctx, req.Page, req.PageSize, req.Keyword, req.SentenceType)
+	rpcResp, err := l.svcCtx.IamRPC.DailyShortSentenceList(l.ctx, &iamclient.DailyShortSentenceListRequest{
+		Page:         req.Page,
+		PageSize:     req.PageSize,
+		Keyword:      req.Keyword,
+		SentenceType: req.SentenceType,
+	})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "查询每日短句列表失败", err)
+		return nil, errs.WrapGRPCError("查询每日短句列表失败", err)
 	}
 
-	items := make([]types.DailyShortSentenceItem, 0, len(list))
-	for _, s := range list {
-		item := types.DailyShortSentenceItem{
-			Id:           s.Id,
-			SentenceType: s.Type,
-			Content:      s.Content,
-			CreatedAt:    s.CreatedAt,
-			UpdatedAt:    s.UpdatedAt,
-		}
-
-		// 处理可选字段
-		if s.Img.Valid {
-			item.Img = s.Img.String
-		}
-		if s.LiteratureAuthor.Valid {
-			item.LiteratureAuthor = s.LiteratureAuthor.String
-		}
-		if s.ConvertImg.Valid {
-			item.ConvertImg = s.ConvertImg.String
-		}
-
-		items = append(items, item)
+	items := make([]types.DailyShortSentenceItem, 0, len(rpcResp.List))
+	for _, s := range rpcResp.List {
+		items = append(items, types.DailyShortSentenceItem{
+			Id:               s.Id,
+			SentenceType:     s.SentenceType,
+			Content:          s.Content,
+			Img:              s.Img,
+			LiteratureAuthor: s.LiteratureAuthor,
+			ConvertImg:       s.ConvertImg,
+			CreatedAt:        s.CreatedAt,
+			UpdatedAt:        s.UpdatedAt,
+		})
 	}
 
 	return &types.DailyShortSentenceListResp{
-		Total: total,
+		Total: rpcResp.Total,
 		List:  items,
 	}, nil
 }

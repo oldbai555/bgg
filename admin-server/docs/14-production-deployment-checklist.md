@@ -152,6 +152,29 @@
 
 **状态**：`已就绪，待生产环境实际部署时执行`（本机无 Docker，`docker compose up` 本身未做容器化实测，已做过非容器化的直接进程 + 真实数据验证；`VideoUpdate` 已知 bug 需要用户决定是否在此次部署前一并修复）。
 
+### 9 · iam-rpc 拆分（Phase 2 第五个、也是最后一个落地的服务）
+
+**触发条件**：`services/iam/` 完整拆分完成（`docs/progress.md` 对应条目），iam-rpc 成为独立部署单元，Phase 2 五个服务拆分至此全部落地。这是体量最大、安全敏感度最高的一次拆分：iam+system+monitoring+misc 四个域（约 94 个 RPC 方法）整体搬出单体，`AuthMiddleware`/`PermissionMiddleware`/`ApiEnabledMiddleware`/`OperationLogMiddleware`/`PerformanceMiddleware` 五个中间件第一次真正从直连数据库切换成调 zrpc client，`pkg/taskcallback`/`pkg/iamcallback` 两个"iam 域还没拆分前的临时回调契约"服务端实现也整体搬到这里，成为它们的永久归宿。
+
+**部署时要做什么**：
+1. **不需要新建 schema**：iam-rpc 复用现有的 `"admin"` schema（用户明确选择，见 `docs/progress.md` 本轮条目"MySQL schema 决策"）——iam+system+monitoring+misc 从单体拆分前就一直存在这个库里，task/sdk/chat/content 早已各自独立成 `admin_task`/`admin_sdk`/`admin_chat`/`admin_content`，`"admin"` 库现在事实上就是 iam 专属库，零数据迁移、零改名操作。`db/services/init-dev-db.sh` 第一步（`[1/4] iam 建表+初始化数据`）本来就在维护这部分表，不需要新增 `init-iam-db.sh`。
+2. 生产环境实际地址配置（均通过环境变量，`conf.UseEnv()` 已接入，fail-fast 不给静默默认值）：
+   - `IAM_RPC_ENDPOINT`、`IAM_CALLBACK_RPC_ENDPOINT`（gateway 侧 `etc/admin-api.yaml` 的 `IamRpc.Endpoints`/`IamCallbackRpc.Endpoints`，两者指向同一个 iam-rpc 地址，只是调用不同的 gRPC service）
+   - `IAM_MYSQL_DSN`（iam-rpc 侧 `services/iam/etc/iam.yaml`，**必须指向现有 `"admin"` schema，不是新库**）
+   - `IAM_REDIS_ADDRESS`、`IAM_REDIS_PASSWORD`（iam-rpc 侧，和 gateway/其余四个服务共享同一个物理 Redis 实例——JWT 黑名单、限流滑动窗口、业务缓存都在这个实例上，不能指错）
+   - `SDK_RPC_ENDPOINT`、`CHAT_RPC_ENDPOINT`（iam-rpc 侧，前者供原 `TaskCallback.FetchExportData` 的 `fetchSdkCallLog` 分支回调 sdk-rpc 用，后者供 task 通知消费者推送 WS 通知时回调 chat-rpc 用）
+   - `TASK_CALLBACK_ENDPOINT`（task-rpc 侧 `services/task/etc/task.yaml`）、`IAM_CALLBACK_ENDPOINT`（chat-rpc/content-rpc 侧对应 yaml）三者**全部从原来的 `app:9001`/`app:9002`（gateway 容器）改指向 iam-rpc 地址**——这是本轮和前四次拆分的关键差异：TaskCallback/IamCallback 两个 server 不再由 gateway 内嵌承载。
+3. 部署顺序建议：先部署 iam-rpc → 确认它监听正常且能连上 `"admin"` schema → 再依次重启/部署 task-rpc、chat-rpc、content-rpc（它们的回调 endpoint 都改指向了 iam-rpc）→ 最后重启 gateway。gateway 的 `IamRpc`/`IamCallbackRpc` 走 `NonBlock: true` 不会阻塞启动，但在 iam-rpc 真正连上之前，几乎全部接口（除了少数不依赖 iam-rpc 的纯代理接口）都会报错——这和前四次拆分"只影响对应域接口"的影响面完全不同，iam-rpc 是唯一一个"挂了就全站不可用"的服务，上线/回滚窗口需要格外谨慎。
+4. 单元测试范围（`.github/workflows/ci.yml` 的 `unit-test` job）已加上 `./services/iam/...`，同时移除了已删除的 `./internal/domain/... ./internal/repository/... ./internal/rpcserver/...` 三个路径。
+
+**如何验证生效**：`docs/progress.md` 本轮条目记录了一次真实端到端验证（借用远程 MySQL + 本地 Redis，起 iam-rpc + gateway 真实连上，对着真实存量数据验证）：① `GET /api/v1/ping` 返回 `database:ok,redis:ok`；② 超级管理员（`user_id=1`）请求 `GET /api/v1/users` 返回真实数据且和直接查库结果一致，验证了 `PermissionMiddleware` 超级管理员 bypass 分支 + `UserList` RPC；③ `GET /api/v1/monitor/stats` 返回真实聚合统计（用户/角色/权限/菜单/操作日志/登录日志计数），验证了 `MonitorStats` 多表聚合查询；④ `GET /api/v1/public/dict`（无需登录）返回真实字典值，验证了 `ApiEnabledMiddleware.CheckApiEnabled` + `DictGet`；⑤ 用无任何角色的真实用户 id 签发 JWT 请求受保护接口，正确返回 `403`，验证了 `CheckPermission` 拒绝分支。全程只做只读+权限判定验证，未触发任何写操作，验证后核对 `admin_operation_log` 表行数与验证前完全一致。
+
+**已知遗留**：
+- `docker compose up` 本身未做容器化实测（本机无 Docker，和前四次服务拆分同样的限制），建议用户在有 Docker 的环境跑一遍确认新增的 `iam` 容器能通过服务名被 `app`/`task`/`chat`/`content` 四个容器连接。
+- 本轮真实环境验证**没有覆盖** `Login`/`Refresh`（需要真实管理员密码）、`FileUpload`/`FileDownload`（涉及本地磁盘写入）、`Notice`/`Notification` 批量通知创建（涉及真实批量写入）这几类路径，建议部署前后找一个安全窗口补一轮验证，尤其是 `Login`——这是唯一一个 token 签发逻辑发生迁移（从单体搬进 iam-rpc）的路径，理论上行为应该完全一致（近乎逐字迁移），但生产环境实际验证过和"理论上应该一致"是两回事。
+
+**状态**：`已就绪，待生产环境实际部署时执行`（本机无 Docker，`docker compose up` 本身未做容器化实测，已做过非容器化的直接进程 + 真实数据只读验证；`Login`/`Refresh`/`FileUpload`/`FileDownload`/`Notice`/`Notification` 几类写路径建议部署前后补验证）。
+
 ## Phase 2/3 预留条目类型（占位，届时按真实改动追加，现在不编造内容）
 
 以下只是"预计会出现哪类条目"的提示，**不是已确定的条目**，落地时按 Phase 2/3 实际改动的真实细节追加，不要现在就编内容占位：

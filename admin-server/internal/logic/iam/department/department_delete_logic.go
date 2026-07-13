@@ -9,7 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
-	"postapocgame/admin-server/pkg/initdata"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -32,13 +32,10 @@ func (l *DepartmentDeleteLogic) DepartmentDelete(req *types.DepartmentDeleteReq)
 	if req.Id == 0 {
 		return errs.New(errs.CodeBadRequest, "部门ID不能为空")
 	}
-	// 保护初始化数据：不允许删除根部门（id=1）
-	if initdata.IsInitDepartmentID(req.Id) {
-		return errs.New(errs.CodeBadRequest, "初始化数据不可删除")
-	}
 
-	if err := l.svcCtx.Domain.IAM.Department.DeleteByID(l.ctx, req.Id); err != nil {
-		return errs.Wrap(errs.CodeInternalError, "删除部门失败", err)
+	_, err := l.svcCtx.IamRPC.DepartmentDelete(l.ctx, &iamclient.DepartmentDeleteRequest{Id: req.Id})
+	if err != nil {
+		return errs.WrapGRPCError("删除部门失败", err)
 	}
 	return nil
 }

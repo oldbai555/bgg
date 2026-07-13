@@ -10,6 +10,7 @@ import (
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -29,14 +30,14 @@ func NewNotificationClearReadLogic(ctx context.Context, svcCtx *svc.ServiceConte
 }
 
 func (l *NotificationClearReadLogic) NotificationClearRead() (resp *types.Response, err error) {
-	// 获取当前用户
 	user, ok := jwthelper.FromContext(l.ctx)
 	if !ok {
 		return nil, errs.New(errs.CodeUnauthorized, "未登录或登录已过期")
 	}
 
-	if err := l.svcCtx.Domain.System.Notification.ClearRead(l.ctx, user.UserID); err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "清除已读消息失败", err)
+	_, err = l.svcCtx.IamRPC.NotificationClearRead(l.ctx, &iamclient.NotificationClearReadRequest{UserId: user.UserID})
+	if err != nil {
+		return nil, errs.WrapGRPCError("清除已读消息失败", err)
 	}
 
 	return &types.Response{

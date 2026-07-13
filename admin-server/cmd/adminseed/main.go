@@ -5,61 +5,44 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"strings"
 
-	"golang.org/x/crypto/bcrypt"
-	"postapocgame/admin-server/internal/config"
-	"postapocgame/admin-server/internal/repository"
+	"github.com/zeromicro/go-zero/zrpc"
 
-	"github.com/zeromicro/go-zero/core/conf"
-	"github.com/zeromicro/go-zero/core/stores/sqlc"
-	"postapocgame/admin-server/internal/model/iam"
+	"postapocgame/admin-server/services/iam/iamclient"
 )
 
-// 一个简单的种子工具：根据配置连接数据库，创建默认管理员账号和基础角色/权限。
-// 使用方式（在 admin-server 目录）：go run ./cmd/adminseed -f etc/admin-api.yaml -username admin -password 123456
+// 一个简单的种子工具：通过 iam-rpc 的 UserCreate 接口创建默认管理员账号。
+// admin_user 表物理属于 iam-rpc，本工具不再直连数据库，而是作为一个普通 gRPC 客户端调用
+// iam-rpc（密码 bcrypt 哈希、用户名去重都在 UserService.CreateUser 里完成）。
+// 使用方式（在 admin-server 目录）：go run ./cmd/adminseed -endpoint 127.0.0.1:8081 -username admin -password 123456
 
 var (
-	configFile = flag.String("f", "etc/admin-api.yaml", "the config file")
-	username   = flag.String("username", "oldbai", "admin username")
-	password   = flag.String("password", "oldbai", "admin password (will be bcrypt hashed)")
+	endpoint = flag.String("endpoint", "127.0.0.1:8081", "iam-rpc listen address")
+	username = flag.String("username", "oldbai", "admin username")
+	password = flag.String("password", "oldbai", "admin password (will be bcrypt hashed)")
 )
 
 func main() {
 	flag.Parse()
 
-	var c config.Config
-	conf.MustLoad(*configFile, &c)
-
-	repo, err := repository.BuildSources(c)
+	client, err := zrpc.NewClient(zrpc.RpcClientConf{Endpoints: []string{*endpoint}})
 	if err != nil {
-		log.Fatalf("init repository failed: %v", err)
+		log.Fatalf("dial iam-rpc failed: %v", err)
 	}
+	iamRPC := iamclient.NewIam(client)
 
 	ctx := context.Background()
-	userModel := repo.AdminUserModel
-
-	// 生成密码哈希
-	hash, err := bcrypt.GenerateFromPassword([]byte(*password), c.Bcrypt.Cost)
-	if err != nil {
-		log.Fatalf("generate password hash failed: %v", err)
-	}
-
-	// 创建管理员用户（若不存在）
-	user, err := userModel.FindOneByUsername(ctx, *username)
-	if err == nil && user != nil {
-		fmt.Printf("Admin user already exists: username=%s\n", *username)
-		return
-	}
-	if err != nil && err != sqlc.ErrNotFound {
-		log.Fatalf("query admin user failed: %v", err)
-	}
-
-	_, err = userModel.Insert(ctx, &iam.AdminUser{
-		Username:     *username,
-		PasswordHash: string(hash),
-		Status:       1,
+	_, err = iamRPC.UserCreate(ctx, &iamclient.UserCreateRequest{
+		Username: *username,
+		Password: *password,
+		Status:   1,
 	})
 	if err != nil {
+		if strings.Contains(err.Error(), "已存在") {
+			fmt.Printf("Admin user already exists: username=%s\n", *username)
+			return
+		}
 		log.Fatalf("create admin user failed: %v", err)
 	}
 	fmt.Printf("Admin user created: username=%s\n", *username)

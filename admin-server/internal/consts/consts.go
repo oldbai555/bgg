@@ -13,6 +13,21 @@ const (
 	PingMessagePong = "pong"
 )
 
+// 字典 code 常量（物理属于 iam-rpc 的 admin_dict_type/admin_dict_item 表，
+// gateway 侧通过 IamRPC.DictGet 读取，这里只是本地引用用的 code 常量）
+const (
+	DictCodeVideoProxyURL  = "video_proxy_url"
+	DictCodeStorageBaseURL = "storage_base_url"
+)
+
+// 需要 CORS 的公共接口路径片段（ApiEnabledMiddleware.setCORSIfNeeded 用，用
+// strings.Contains 匹配；和下面已存在、构造完整代理 URL 用的 PathM3U8Proxy 是不同用途，
+// 不合并）
+const (
+	CORSPathM3U8Proxy    = "/m3u8/proxy"
+	CORSPathVideoCollect = "/videos/collect"
+)
+
 // Redis 相关常量
 const (
 	RedisPingFailedMessage = "redis ping failed"

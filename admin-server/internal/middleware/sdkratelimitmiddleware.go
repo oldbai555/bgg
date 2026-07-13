@@ -8,10 +8,11 @@ import (
 	"net/http"
 	"time"
 
-	"postapocgame/admin-server/internal/repository"
 	"postapocgame/admin-server/pkg/errs"
 	"postapocgame/admin-server/pkg/response"
 	"postapocgame/admin-server/services/sdk/sdkclient"
+
+	"github.com/zeromicro/go-zero/core/stores/redis"
 )
 
 // SDKRateLimitMiddleware 继续留在 gateway：限流计数用的 Redis 滑动窗口是全服务共享的
@@ -20,12 +21,12 @@ import (
 // sdk_key_api.custom_rate_limit 覆盖，都是 sdk 域自己的表）。见 18-service-extraction-
 // runbook.md 2.2 节。
 type SDKRateLimitMiddleware struct {
-	repo   *repository.Repository
+	redis  *redis.Redis
 	sdkRPC sdkclient.Sdk
 }
 
-func NewSDKRateLimitMiddleware(repo *repository.Repository, sdkRPC sdkclient.Sdk) *SDKRateLimitMiddleware {
-	return &SDKRateLimitMiddleware{repo: repo, sdkRPC: sdkRPC}
+func NewSDKRateLimitMiddleware(rdb *redis.Redis, sdkRPC sdkclient.Sdk) *SDKRateLimitMiddleware {
+	return &SDKRateLimitMiddleware{redis: rdb, sdkRPC: sdkRPC}
 }
 
 func (m *SDKRateLimitMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
@@ -55,19 +56,18 @@ func (m *SDKRateLimitMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc 
 
 		clientIP := clientIPFromRequest(r)
 		now := time.Now()
-		redis := m.repo.Redis
 
 		keys := []string{
 			fmt.Sprintf("sdk:rl:key:%s:%s:%d", apiKey, apiCode, now.Unix()/60),
 			fmt.Sprintf("sdk:rl:ip:%s:%s:%d", clientIP, apiCode, now.Unix()/60),
 		}
 		for _, k := range keys {
-			cnt, err := redis.IncrCtx(ctx, k)
+			cnt, err := m.redis.IncrCtx(ctx, k)
 			if err != nil {
 				continue
 			}
 			if cnt == 1 {
-				_ = redis.ExpireCtx(ctx, k, 65)
+				_ = m.redis.ExpireCtx(ctx, k, 65)
 			}
 			if cnt > int64(limit) {
 				// 与 Admin 侧 RateLimitMiddleware 保持一致：先手动写 429（response.ErrorCtx

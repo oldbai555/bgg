@@ -3,30 +3,28 @@ package middleware
 import (
 	"bytes"
 	"context"
-	"database/sql"
 	"encoding/json"
 	"io"
 	"net/http"
 	"strings"
 	"time"
 
-	"postapocgame/admin-server/internal/repository"
+	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	"postapocgame/admin-server/internal/model/monitoring"
-	monitoringrepo "postapocgame/admin-server/internal/repository/monitoring"
 )
 
 // PublicOperationLogMiddleware 公共接口操作日志中间件，记录所有公共接口的调用日志（包括 GET 请求）
 type PublicOperationLogMiddleware struct {
-	repo  *repository.Repository
-	logCh chan *monitoring.AdminOperationLog // 异步日志通道
+	iamRPC iamclient.Iam
+	logCh  chan *iamclient.OperationLogEntry // 异步日志通道
 }
 
-func NewPublicOperationLogMiddleware(repo *repository.Repository) *PublicOperationLogMiddleware {
+func NewPublicOperationLogMiddleware(iamRPC iamclient.Iam) *PublicOperationLogMiddleware {
 	m := &PublicOperationLogMiddleware{
-		repo:  repo,
-		logCh: make(chan *monitoring.AdminOperationLog, 1000), // 缓冲1000条日志
+		iamRPC: iamRPC,
+		logCh:  make(chan *iamclient.OperationLogEntry, 1000), // 缓冲1000条日志
 	}
 
 	// 启动异步日志写入 goroutine
@@ -79,14 +77,13 @@ func (m *PublicOperationLogMiddleware) Handle(next http.HandlerFunc) http.Handle
 		operationType, operationObject := m.parseOperation(method, path)
 
 		// 构建操作日志
-		requestParams := sql.NullString{}
+		requestParams := ""
 		if len(requestBody) > 0 {
-			// 限制请求参数长度，避免过长
 			paramsStr := string(requestBody)
 			if len(paramsStr) > 10000 {
 				paramsStr = paramsStr[:10000] + "..."
 			}
-			requestParams = sql.NullString{String: paramsStr, Valid: true}
+			requestParams = paramsStr
 		}
 
 		// 对于 GET 请求，记录查询参数
@@ -95,14 +92,14 @@ func (m *PublicOperationLogMiddleware) Handle(next http.HandlerFunc) http.Handle
 			if len(queryStr) > 10000 {
 				queryStr = queryStr[:10000] + "..."
 			}
-			if requestParams.Valid {
-				requestParams.String = requestParams.String + "&" + queryStr
+			if requestParams != "" {
+				requestParams = requestParams + "&" + queryStr
 			} else {
-				requestParams = sql.NullString{String: queryStr, Valid: true}
+				requestParams = queryStr
 			}
 		}
 
-		operationLog := &monitoring.AdminOperationLog{
+		operationLog := &iamclient.OperationLogEntry{
 			UserId:          userId,
 			Username:        username,
 			OperationType:   operationType,
@@ -115,13 +112,11 @@ func (m *PublicOperationLogMiddleware) Handle(next http.HandlerFunc) http.Handle
 			IpAddress:       m.getClientIP(r),
 			UserAgent:       r.UserAgent(),
 			Duration:        int64(duration),
-			DeletedAt:       0, // 软删除字段，0 表示未删除
 		}
 
 		// 异步写入日志（非阻塞）
 		select {
 		case m.logCh <- operationLog:
-			logx.Infof("公共接口操作日志已加入队列: method=%s, path=%s", method, path)
 		default:
 			// 通道满了，记录警告但不阻塞请求
 			logx.Errorf("公共接口操作日志通道已满，丢弃日志: %+v", operationLog)
@@ -145,7 +140,6 @@ func (m *PublicOperationLogMiddleware) shouldSkip(path string) bool {
 
 // parseOperation 解析操作类型和操作对象
 func (m *PublicOperationLogMiddleware) parseOperation(method, path string) (operationType, operationObject string) {
-	// 根据 HTTP 方法确定操作类型
 	switch method {
 	case http.MethodGet:
 		operationType = "query" // 公共接口的 GET 请求标记为 query
@@ -189,7 +183,6 @@ func (m *PublicOperationLogMiddleware) extractResponseMsg(responseBody string) s
 		return ""
 	}
 
-	// 尝试解析 JSON 响应
 	var resp map[string]interface{}
 	if err := json.Unmarshal([]byte(responseBody), &resp); err == nil {
 		if msg, ok := resp["msg"].(string); ok {
@@ -197,7 +190,6 @@ func (m *PublicOperationLogMiddleware) extractResponseMsg(responseBody string) s
 		}
 	}
 
-	// 如果解析失败，返回前255个字符
 	if len(responseBody) > 255 {
 		return responseBody[:255]
 	}
@@ -206,7 +198,6 @@ func (m *PublicOperationLogMiddleware) extractResponseMsg(responseBody string) s
 
 // getClientIP 获取客户端 IP 地址
 func (m *PublicOperationLogMiddleware) getClientIP(r *http.Request) string {
-	// 优先从 X-Forwarded-For 获取（代理场景）
 	ip := r.Header.Get("X-Forwarded-For")
 	if ip != "" {
 		ips := strings.Split(ip, ",")
@@ -215,13 +206,11 @@ func (m *PublicOperationLogMiddleware) getClientIP(r *http.Request) string {
 		}
 	}
 
-	// 其次从 X-Real-IP 获取
 	ip = r.Header.Get("X-Real-IP")
 	if ip != "" {
 		return ip
 	}
 
-	// 最后从 RemoteAddr 获取
 	ip = r.RemoteAddr
 	if idx := strings.LastIndex(ip, ":"); idx != -1 {
 		ip = ip[:idx]
@@ -231,24 +220,21 @@ func (m *PublicOperationLogMiddleware) getClientIP(r *http.Request) string {
 
 // logWriter 异步日志写入器
 func (m *PublicOperationLogMiddleware) logWriter() {
-	operationLogRepo := monitoringrepo.NewOperationLogRepository(m.repo)
-	batch := make([]*monitoring.AdminOperationLog, 0, 100) // 批量写入，每批100条
-	ticker := time.NewTicker(5 * time.Second)              // 每5秒写入一次
+	batch := make([]*iamclient.OperationLogEntry, 0, 100)
+	ticker := time.NewTicker(5 * time.Second)
 	defer ticker.Stop()
 
 	for {
 		select {
 		case log := <-m.logCh:
 			batch = append(batch, log)
-			// 如果批次达到100条，立即写入
 			if len(batch) >= 100 {
-				m.writeBatch(operationLogRepo, batch)
+				m.writeBatch(batch)
 				batch = batch[:0]
 			}
 		case <-ticker.C:
-			// 定时写入批次中的日志
 			if len(batch) > 0 {
-				m.writeBatch(operationLogRepo, batch)
+				m.writeBatch(batch)
 				batch = batch[:0]
 			}
 		}
@@ -256,22 +242,14 @@ func (m *PublicOperationLogMiddleware) logWriter() {
 }
 
 // writeBatch 批量写入日志
-func (m *PublicOperationLogMiddleware) writeBatch(repo monitoringrepo.OperationLogRepository, logs []*monitoring.AdminOperationLog) {
-	ctx := context.Background()
+func (m *PublicOperationLogMiddleware) writeBatch(logs []*iamclient.OperationLogEntry) {
 	if len(logs) == 0 {
 		return
 	}
 
-	// 使用批量创建方法
-	if err := repo.BatchCreate(ctx, logs); err != nil {
-		logx.Errorf("批量写入公共接口操作日志失败: count=%d, error: %v", len(logs), err)
-		// 如果批量写入失败，尝试逐条写入
-		for _, log := range logs {
-			if err := repo.Create(ctx, log); err != nil {
-				logx.Errorf("写入公共接口操作日志失败: %+v, error: %v", log, err)
-			}
-		}
-	} else {
-		logx.Infof("成功批量写入公共接口操作日志: count=%d", len(logs))
+	ctx := context.Background()
+	if _, err := m.iamRPC.BatchRecordOperationLog(ctx, &iamclient.BatchRecordOperationLogRequest{Logs: logs}); err != nil {
+		logx.Errorf("批量写入公共接口操作日志失败: count=%d, error: %v",
+			len(logs), errs.WrapGRPCError("批量写入公共接口操作日志失败", err))
 	}
 }

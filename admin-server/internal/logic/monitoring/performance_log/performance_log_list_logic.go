@@ -5,9 +5,12 @@ package performance_log
 
 import (
 	"context"
+
 	"postapocgame/admin-server/internal/logic/logicutil"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
+	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,28 +30,24 @@ func NewPerformanceLogListLogic(ctx context.Context, svcCtx *svc.ServiceContext)
 }
 
 func (l *PerformanceLogListLogic) PerformanceLogList(req *types.PerformanceLogListReq) (resp *types.PerformanceLogListResp, err error) {
-	// 参数兜底处理
 	page, pageSize := logicutil.NormalizePage(req.Page, req.PageSize, 20, 100)
 
-	// 仓库查询
-	logs, total, err := l.svcCtx.Domain.Monitoring.PerformanceLog.FindPage(
-		l.ctx,
-		page,
-		pageSize,
-		req.Method,
-		req.Path,
-		req.IsSlow,
-		req.StatusCode,
-		req.StartTime,
-		req.EndTime,
-	)
+	rpcResp, err := l.svcCtx.IamRPC.PerformanceLogList(l.ctx, &iamclient.PerformanceLogListRequest{
+		Page:       page,
+		PageSize:   pageSize,
+		Method:     req.Method,
+		Path:       req.Path,
+		IsSlow:     req.IsSlow,
+		StatusCode: req.StatusCode,
+		StartTime:  req.StartTime,
+		EndTime:    req.EndTime,
+	})
 	if err != nil {
-		return nil, err
+		return nil, errs.WrapGRPCError("查询性能日志列表失败", err)
 	}
 
-	// 转为响应结构
-	items := make([]types.PerformanceLogItem, 0, len(logs))
-	for _, lg := range logs {
+	items := make([]types.PerformanceLogItem, 0, len(rpcResp.List))
+	for _, lg := range rpcResp.List {
 		items = append(items, types.PerformanceLogItem{
 			Id:            lg.Id,
 			UserId:        lg.UserId,
@@ -67,7 +66,7 @@ func (l *PerformanceLogListLogic) PerformanceLogList(req *types.PerformanceLogLi
 	}
 
 	return &types.PerformanceLogListResp{
-		Total: total,
+		Total: rpcResp.Total,
 		List:  items,
 	}, nil
 }

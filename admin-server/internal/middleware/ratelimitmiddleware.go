@@ -8,7 +8,7 @@ import (
 
 	"postapocgame/admin-server/internal/config"
 	"postapocgame/admin-server/internal/consts"
-	"postapocgame/admin-server/internal/repository"
+	"github.com/zeromicro/go-zero/core/stores/redis"
 	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 	"postapocgame/admin-server/pkg/response"
@@ -19,7 +19,7 @@ import (
 
 // RateLimitMiddleware 限流中间件，支持按IP、按用户、按接口限流
 type RateLimitMiddleware struct {
-	repo   *repository.Repository
+	redis  *redis.Redis
 	config config.RateLimitConf
 	// 按IP限流器映射
 	ipLimiters map[string]*limit.PeriodLimit
@@ -63,9 +63,9 @@ type RateLimitConfig struct {
 	} `json:"globalLimit" yaml:"globalLimit"`
 }
 
-func NewRateLimitMiddleware(cfg config.Config, repo *repository.Repository) *RateLimitMiddleware {
+func NewRateLimitMiddleware(cfg config.Config, rdb *redis.Redis) *RateLimitMiddleware {
 	m := &RateLimitMiddleware{
-		repo:         repo,
+		redis:        rdb,
 		config:       cfg.RateLimit,
 		ipLimiters:   make(map[string]*limit.PeriodLimit),
 		userLimiters: make(map[uint64]*limit.PeriodLimit),
@@ -80,7 +80,7 @@ func NewRateLimitMiddleware(cfg config.Config, repo *repository.Repository) *Rat
 		m.globalLimiter = limit.NewPeriodLimit(
 			rlConfig.GlobalLimit.Period,
 			rlConfig.GlobalLimit.Quota,
-			repo.Redis,
+			rdb,
 			consts.RedisRateLimitGlobalPrefix,
 		)
 	}
@@ -176,7 +176,7 @@ func (m *RateLimitMiddleware) getIPLimiter(ip string, quota, period int) *limit.
 			limiter = limit.NewPeriodLimit(
 				period,
 				quota,
-				m.repo.Redis,
+				m.redis,
 				consts.RedisRateLimitIPPrefix+ip,
 			)
 			m.ipLimiters[ip] = limiter
@@ -200,7 +200,7 @@ func (m *RateLimitMiddleware) getUserLimiter(userID uint64, quota, period int) *
 			limiter = limit.NewPeriodLimit(
 				period,
 				quota,
-				m.repo.Redis,
+				m.redis,
 				consts.RedisRateLimitUserPrefix+strconv.FormatUint(userID, 10),
 			)
 			m.userLimiters[userID] = limiter
@@ -224,7 +224,7 @@ func (m *RateLimitMiddleware) getAPILimiter(apiKey string, quota, period int) *l
 			limiter = limit.NewPeriodLimit(
 				period,
 				quota,
-				m.repo.Redis,
+				m.redis,
 				consts.RedisRateLimitAPIPrefix+apiKey,
 			)
 			m.apiLimiters[apiKey] = limiter
@@ -281,7 +281,7 @@ func (m *RateLimitMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 		if config.GlobalLimit.Enabled && m.globalLimiter != nil {
 			code, err := m.globalLimiter.Take(consts.RedisRateLimitGlobalPrefix)
 			if err != nil {
-				logx.Errorf("全局限流检查失败: %v", err)
+				logx.Errorf("全局限流检查失败: %v", errs.Wrap(errs.CodeInternalError, "全局限流检查失败", err))
 			} else if code == limit.OverQuota {
 				m.rateLimitResponse(w, r, consts.RateLimitMessageGlobal)
 				return
@@ -294,7 +294,7 @@ func (m *RateLimitMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 			limiter := m.getIPLimiter(ip, config.IPLimit.Quota, config.IPLimit.Period)
 			code, err := limiter.Take(ip)
 			if err != nil {
-				logx.Errorf("IP限流检查失败: %v", err)
+				logx.Errorf("IP限流检查失败: %v", errs.Wrap(errs.CodeInternalError, "IP限流检查失败", err))
 			} else if code == limit.OverQuota {
 				logx.Infof("IP限流触发: IP=%s, Path=%s", ip, path)
 				m.rateLimitResponse(w, r, consts.RateLimitMessageIP)
@@ -309,7 +309,7 @@ func (m *RateLimitMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 				limiter := m.getUserLimiter(user.UserID, config.UserLimit.Quota, config.UserLimit.Period)
 				code, err := limiter.Take(strconv.FormatUint(user.UserID, 10))
 				if err != nil {
-					logx.Errorf("用户限流检查失败: %v", err)
+					logx.Errorf("用户限流检查失败: %v", errs.Wrap(errs.CodeInternalError, "用户限流检查失败", err))
 				} else if code == limit.OverQuota {
 					logx.Infof("用户限流触发: UserID=%d, Username=%s, Path=%s", user.UserID, user.Username, path)
 					m.rateLimitResponse(w, r, consts.RateLimitMessageUser)
@@ -324,7 +324,7 @@ func (m *RateLimitMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 			limiter := m.getAPILimiter(apiKey, config.APILimit.Quota, config.APILimit.Period)
 			code, err := limiter.Take(apiKey)
 			if err != nil {
-				logx.Errorf("接口限流检查失败: %v", err)
+				logx.Errorf("接口限流检查失败: %v", errs.Wrap(errs.CodeInternalError, "接口限流检查失败", err))
 			} else if code == limit.OverQuota {
 				logx.Infof("接口限流触发: API=%s", apiKey)
 				m.rateLimitResponse(w, r, consts.RateLimitMessageAPI)

@@ -9,8 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
-
-	iamdomain "postapocgame/admin-server/internal/domain/iam"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -34,7 +33,7 @@ func (l *UserCreateLogic) UserCreate(req *types.UserCreateReq) error {
 		return errs.New(errs.CodeBadRequest, "用户名和密码不能为空")
 	}
 
-	_, err := l.svcCtx.Domain.IAM.UserService.CreateUser(l.ctx, iamdomain.CreateUserInput{
+	_, err := l.svcCtx.IamRPC.UserCreate(l.ctx, &iamclient.UserCreateRequest{
 		Username:     req.Username,
 		Nickname:     req.Nickname,
 		Password:     req.Password,
@@ -43,5 +42,8 @@ func (l *UserCreateLogic) UserCreate(req *types.UserCreateReq) error {
 		DepartmentId: req.DepartmentId,
 		Status:       req.Status,
 	})
-	return err
+	if err != nil {
+		return errs.WrapGRPCError("创建用户失败", err)
+	}
+	return nil
 }

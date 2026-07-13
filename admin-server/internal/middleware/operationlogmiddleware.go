@@ -3,7 +3,6 @@ package middleware
 import (
 	"bytes"
 	"context"
-	"database/sql"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -11,24 +10,23 @@ import (
 	"time"
 
 	"postapocgame/admin-server/internal/consts"
-	"postapocgame/admin-server/internal/repository"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	"postapocgame/admin-server/internal/model/monitoring"
-	monitoringrepo "postapocgame/admin-server/internal/repository/monitoring"
 )
 
-// OperationLogMiddleware 操作日志中间件，自动记录所有增删改操作的日志
+// OperationLogMiddleware 操作日志中间件，自动记录所有增删改操作的日志。iam-rpc 拆分后，
+// 批量落库改成调 iam-rpc.BatchRecordOperationLog，进程内缓冲/批量策略不变。
 type OperationLogMiddleware struct {
-	repo  *repository.Repository
-	logCh chan *monitoring.AdminOperationLog // 异步日志通道
+	iamRPC iamclient.Iam
+	logCh  chan *iamclient.OperationLogEntry // 异步日志通道
 }
 
-func NewOperationLogMiddleware(repo *repository.Repository) *OperationLogMiddleware {
+func NewOperationLogMiddleware(iamRPC iamclient.Iam) *OperationLogMiddleware {
 	m := &OperationLogMiddleware{
-		repo:  repo,
-		logCh: make(chan *monitoring.AdminOperationLog, 1000), // 缓冲1000条日志
+		iamRPC: iamRPC,
+		logCh:  make(chan *iamclient.OperationLogEntry, 1000), // 缓冲1000条日志
 	}
 
 	// 启动异步日志写入 goroutine
@@ -90,17 +88,17 @@ func (m *OperationLogMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc 
 		operationType, operationObject := m.parseOperation(method, path)
 
 		// 构建操作日志
-		requestParams := sql.NullString{}
+		requestParams := ""
 		if len(requestBody) > 0 {
 			// 限制请求参数长度，避免过长
 			paramsStr := string(requestBody)
 			if len(paramsStr) > 10000 {
 				paramsStr = paramsStr[:10000] + "..."
 			}
-			requestParams = sql.NullString{String: paramsStr, Valid: true}
+			requestParams = paramsStr
 		}
 
-		operationLog := &monitoring.AdminOperationLog{
+		operationLog := &iamclient.OperationLogEntry{
 			UserId:          userId,
 			Username:        username,
 			OperationType:   operationType,
@@ -113,13 +111,11 @@ func (m *OperationLogMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc 
 			IpAddress:       m.getClientIP(r),
 			UserAgent:       r.UserAgent(),
 			Duration:        int64(duration),
-			DeletedAt:       0, // 软删除字段，0 表示未删除
 		}
 
 		// 异步写入日志（非阻塞）
 		select {
 		case m.logCh <- operationLog:
-			logx.Infof("操作日志已加入队列: method=%s, path=%s, userId=%d", method, path, userId)
 		default:
 			// 通道满了，记录警告但不阻塞请求
 			logx.Errorf("操作日志通道已满，丢弃日志: %+v", operationLog)
@@ -222,8 +218,7 @@ func (m *OperationLogMiddleware) getClientIP(r *http.Request) string {
 
 // logWriter 异步日志写入器
 func (m *OperationLogMiddleware) logWriter() {
-	operationLogRepo := monitoringrepo.NewOperationLogRepository(m.repo)
-	batch := make([]*monitoring.AdminOperationLog, 0, 100) // 批量写入，每批100条
+	batch := make([]*iamclient.OperationLogEntry, 0, 100) // 批量写入，每批100条
 	ticker := time.NewTicker(5 * time.Second)              // 每5秒写入一次
 	defer ticker.Stop()
 
@@ -233,13 +228,13 @@ func (m *OperationLogMiddleware) logWriter() {
 			batch = append(batch, log)
 			// 如果批次达到100条，立即写入
 			if len(batch) >= 100 {
-				m.writeBatch(operationLogRepo, batch)
+				m.writeBatch(batch)
 				batch = batch[:0]
 			}
 		case <-ticker.C:
 			// 定时写入批次中的日志
 			if len(batch) > 0 {
-				m.writeBatch(operationLogRepo, batch)
+				m.writeBatch(batch)
 				batch = batch[:0]
 			}
 		}
@@ -247,23 +242,14 @@ func (m *OperationLogMiddleware) logWriter() {
 }
 
 // writeBatch 批量写入日志
-func (m *OperationLogMiddleware) writeBatch(repo monitoringrepo.OperationLogRepository, logs []*monitoring.AdminOperationLog) {
-	ctx := context.Background()
+func (m *OperationLogMiddleware) writeBatch(logs []*iamclient.OperationLogEntry) {
 	if len(logs) == 0 {
 		return
 	}
 
-	// 使用批量创建方法
-	if err := repo.BatchCreate(ctx, logs); err != nil {
+	ctx := context.Background()
+	if _, err := m.iamRPC.BatchRecordOperationLog(ctx, &iamclient.BatchRecordOperationLogRequest{Logs: logs}); err != nil {
 		logx.Errorf("批量写入操作日志失败: count=%d, error: %v", len(logs), err)
-		// 如果批量写入失败，尝试逐条写入
-		for _, log := range logs {
-			if err := repo.Create(ctx, log); err != nil {
-				logx.Errorf("写入操作日志失败: %+v, error: %v", log, err)
-			}
-		}
-	} else {
-		logx.Infof("成功批量写入操作日志: count=%d", len(logs))
 	}
 }
 

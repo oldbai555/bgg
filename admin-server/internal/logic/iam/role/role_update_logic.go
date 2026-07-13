@@ -5,11 +5,11 @@ package role
 
 import (
 	"context"
-	"database/sql"
 
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -33,22 +33,14 @@ func (l *RoleUpdateLogic) RoleUpdate(req *types.RoleUpdateReq) error {
 		return errs.New(errs.CodeBadRequest, "角色ID不能为空")
 	}
 
-	role, err := l.svcCtx.Domain.IAM.Role.FindByID(l.ctx, req.Id)
+	_, err := l.svcCtx.IamRPC.RoleUpdate(l.ctx, &iamclient.RoleUpdateRequest{
+		Id:          req.Id,
+		Name:        req.Name,
+		Description: req.Description,
+		Status:      req.Status,
+	})
 	if err != nil {
-		return errs.Wrap(errs.CodeInternalError, "查询角色失败", err)
-	}
-
-	role.Name = req.Name
-	if req.Description != "" {
-		role.Description = sql.NullString{String: req.Description, Valid: true}
-	}
-	// Status 字段：0 是有效值（禁用），需要特殊处理
-	if req.Status == 0 || req.Status == 1 {
-		role.Status = req.Status
-	}
-
-	if err := l.svcCtx.Domain.IAM.Role.Update(l.ctx, role); err != nil {
-		return errs.Wrap(errs.CodeInternalError, "更新角色失败", err)
+		return errs.WrapGRPCError("更新角色失败", err)
 	}
 	return nil
 }

@@ -5,13 +5,11 @@ package dict_type
 
 import (
 	"context"
-	"database/sql"
 
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
-
-	"postapocgame/admin-server/internal/model/system"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -35,26 +33,14 @@ func (l *DictTypeCreateLogic) DictTypeCreate(req *types.DictTypeCreateReq) error
 		return errs.New(errs.CodeBadRequest, "字典类型名称和编码不能为空")
 	}
 
-	// 检查编码是否已存在
-	_, err := l.svcCtx.Domain.System.DictType.FindByCode(l.ctx, req.Code)
-	if err == nil {
-		return errs.New(errs.CodeBadRequest, "字典类型编码已存在")
-	}
-
-	status := req.Status
-	if status == 0 {
-		status = 1
-	}
-
-	dictType := system.AdminDictType{
+	_, err := l.svcCtx.IamRPC.DictTypeCreate(l.ctx, &iamclient.DictTypeCreateRequest{
 		Name:        req.Name,
 		Code:        req.Code,
-		Description: sql.NullString{String: req.Description, Valid: req.Description != ""},
-		Status:      status,
-	}
-
-	if err := l.svcCtx.Domain.System.DictType.Create(l.ctx, &dictType); err != nil {
-		return errs.Wrap(errs.CodeInternalError, "创建字典类型失败", err)
+		Description: req.Description,
+		Status:      req.Status,
+	})
+	if err != nil {
+		return errs.WrapGRPCError("创建字典类型失败", err)
 	}
 	return nil
 }

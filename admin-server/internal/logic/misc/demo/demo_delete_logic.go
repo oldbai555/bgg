@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -32,8 +33,9 @@ func (l *DemoDeleteLogic) DemoDelete(req *types.DemoDeleteReq) error {
 		return errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	if err := l.svcCtx.Domain.Misc.Demo.DeleteByID(l.ctx, req.Id); err != nil {
-		return errs.Wrap(errs.CodeInternalError, "删除演示功能失败", err)
+	_, err := l.svcCtx.IamRPC.DemoDelete(l.ctx, &iamclient.DemoDeleteRequest{Id: req.Id})
+	if err != nil {
+		return errs.WrapGRPCError("删除演示功能失败", err)
 	}
 	return nil
 }

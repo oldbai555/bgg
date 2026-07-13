@@ -8,7 +8,8 @@ import (
 
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
-	"postapocgame/admin-server/services/chat/chatclient"
+	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -28,104 +29,18 @@ func NewMonitorStatsLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Moni
 }
 
 func (l *MonitorStatsLogic) MonitorStats() (resp *types.MonitorStatsResp, err error) {
-	// 统计用户数
-	userCount, err := l.countUsers()
+	rpcResp, err := l.svcCtx.IamRPC.MonitorStats(l.ctx, &iamclient.Empty{})
 	if err != nil {
-		l.Errorf("统计用户数失败: %v", err)
-		userCount = 0
-	}
-
-	// 统计角色数
-	roleCount, err := l.countRoles()
-	if err != nil {
-		l.Errorf("统计角色数失败: %v", err)
-		roleCount = 0
-	}
-
-	// 统计权限数
-	permissionCount, err := l.countPermissions()
-	if err != nil {
-		l.Errorf("统计权限数失败: %v", err)
-		permissionCount = 0
-	}
-
-	// 统计菜单数
-	menuCount, err := l.countMenus()
-	if err != nil {
-		l.Errorf("统计菜单数失败: %v", err)
-		menuCount = 0
-	}
-
-	// 统计在线用户数（chat 域拆分成独立服务后，从 ChatRPC.GetOnlineUserCount 获取，
-	// 不再直接读 ChatHub——连接表已经搬进 chat-rpc 自己的进程）
-	onlineUserCount := int64(0)
-	if onlineResp, err := l.svcCtx.ChatRPC.GetOnlineUserCount(l.ctx, &chatclient.Empty{}); err == nil {
-		onlineUserCount = onlineResp.Count
-	}
-
-	// 统计操作日志数
-	operationLogCount, err := l.countOperationLogs()
-	if err != nil {
-		l.Errorf("统计操作日志数失败: %v", err)
-		operationLogCount = 0
-	}
-
-	// 统计登录日志数
-	loginLogCount, err := l.countLoginLogs()
-	if err != nil {
-		l.Errorf("统计登录日志数失败: %v", err)
-		loginLogCount = 0
+		return nil, errs.WrapGRPCError("查询监控统计失败", err)
 	}
 
 	return &types.MonitorStatsResp{
-		UserCount:         userCount,
-		RoleCount:         roleCount,
-		PermissionCount:   permissionCount,
-		MenuCount:         menuCount,
-		OnlineUserCount:   onlineUserCount,
-		OperationLogCount: operationLogCount,
-		LoginLogCount:     loginLogCount,
+		UserCount:         rpcResp.UserCount,
+		RoleCount:         rpcResp.RoleCount,
+		PermissionCount:   rpcResp.PermissionCount,
+		MenuCount:         rpcResp.MenuCount,
+		OnlineUserCount:   rpcResp.OnlineUserCount,
+		OperationLogCount: rpcResp.OperationLogCount,
+		LoginLogCount:     rpcResp.LoginLogCount,
 	}, nil
-}
-
-// countUsers 统计用户数
-func (l *MonitorStatsLogic) countUsers() (int64, error) {
-	var count int64
-	err := l.svcCtx.Repository.DB.QueryRowCtx(l.ctx, &count, "SELECT COUNT(*) FROM `admin_user` WHERE deleted_at = 0")
-	return count, err
-}
-
-// countRoles 统计角色数
-func (l *MonitorStatsLogic) countRoles() (int64, error) {
-	var count int64
-	err := l.svcCtx.Repository.DB.QueryRowCtx(l.ctx, &count, "SELECT COUNT(*) FROM `admin_role` WHERE deleted_at = 0")
-	return count, err
-}
-
-// countPermissions 统计权限数
-func (l *MonitorStatsLogic) countPermissions() (int64, error) {
-	var count int64
-	err := l.svcCtx.Repository.DB.QueryRowCtx(l.ctx, &count, "SELECT COUNT(*) FROM `admin_permission` WHERE deleted_at = 0")
-	return count, err
-}
-
-// countMenus 统计菜单数
-func (l *MonitorStatsLogic) countMenus() (int64, error) {
-	var count int64
-	err := l.svcCtx.Repository.DB.QueryRowCtx(l.ctx, &count, "SELECT COUNT(*) FROM `admin_menu` WHERE deleted_at = 0")
-	return count, err
-}
-
-// countOperationLogs 统计操作日志数
-func (l *MonitorStatsLogic) countOperationLogs() (int64, error) {
-	var count int64
-	err := l.svcCtx.Repository.DB.QueryRowCtx(l.ctx, &count, "SELECT COUNT(*) FROM `admin_operation_log` WHERE deleted_at = 0")
-	return count, err
-}
-
-// countLoginLogs 统计登录日志数
-func (l *MonitorStatsLogic) countLoginLogs() (int64, error) {
-	var count int64
-	err := l.svcCtx.Repository.DB.QueryRowCtx(l.ctx, &count, "SELECT COUNT(*) FROM `admin_login_log` WHERE deleted_at = 0")
-	return count, err
 }

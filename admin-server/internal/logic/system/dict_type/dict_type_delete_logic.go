@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -32,14 +33,9 @@ func (l *DictTypeDeleteLogic) DictTypeDelete(req *types.DictTypeDeleteReq) error
 		return errs.New(errs.CodeBadRequest, "字典类型ID不能为空")
 	}
 
-	// 检查是否有字典项关联
-	items, err := l.svcCtx.Domain.System.DictItem.FindByTypeID(l.ctx, req.Id)
-	if err == nil && len(items) > 0 {
-		return errs.New(errs.CodeBadRequest, "该字典类型下存在字典项，无法删除")
-	}
-
-	if err := l.svcCtx.Domain.System.DictType.DeleteByID(l.ctx, req.Id); err != nil {
-		return errs.Wrap(errs.CodeInternalError, "删除字典类型失败", err)
+	_, err := l.svcCtx.IamRPC.DictTypeDelete(l.ctx, &iamclient.DictTypeDeleteRequest{Id: req.Id})
+	if err != nil {
+		return errs.WrapGRPCError("删除字典类型失败", err)
 	}
 	return nil
 }

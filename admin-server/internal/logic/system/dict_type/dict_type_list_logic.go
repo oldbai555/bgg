@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -32,29 +33,30 @@ func (l *DictTypeListLogic) DictTypeList(req *types.DictTypeListReq) (resp *type
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	list, total, err := l.svcCtx.Domain.System.DictType.FindPage(l.ctx, req.Page, req.PageSize, req.Name, req.Code)
+	rpcResp, err := l.svcCtx.IamRPC.DictTypeList(l.ctx, &iamclient.DictTypeListRequest{
+		Page:     req.Page,
+		PageSize: req.PageSize,
+		Name:     req.Name,
+		Code:     req.Code,
+	})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "查询字典类型列表失败", err)
+		return nil, errs.WrapGRPCError("查询字典类型列表失败", err)
 	}
 
-	items := make([]types.DictTypeItem, 0, len(list))
-	for _, dt := range list {
-		description := ""
-		if dt.Description.Valid {
-			description = dt.Description.String
-		}
+	items := make([]types.DictTypeItem, 0, len(rpcResp.List))
+	for _, dt := range rpcResp.List {
 		items = append(items, types.DictTypeItem{
 			Id:          dt.Id,
 			Name:        dt.Name,
 			Code:        dt.Code,
-			Description: description,
+			Description: dt.Description,
 			Status:      dt.Status,
 			CreatedAt:   dt.CreatedAt,
 		})
 	}
 
 	return &types.DictTypeListResp{
-		Total: total,
+		Total: rpcResp.Total,
 		List:  items,
 	}, nil
 }

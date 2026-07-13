@@ -306,12 +306,17 @@ func (x *GetUserProfileResponse) GetSignature() string {
 }
 
 type RecordAuditLogRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	Username      string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
-	AuditType     string                 `protobuf:"bytes,3,opt,name=audit_type,json=auditType,proto3" json:"audit_type,omitempty"`
-	AuditObject   string                 `protobuf:"bytes,4,opt,name=audit_object,json=auditObject,proto3" json:"audit_object,omitempty"`
-	DetailJson    string                 `protobuf:"bytes,5,opt,name=detail_json,json=detailJson,proto3" json:"detail_json,omitempty"`
+	state       protoimpl.MessageState `protogen:"open.v1"`
+	UserId      uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Username    string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+	AuditType   string                 `protobuf:"bytes,3,opt,name=audit_type,json=auditType,proto3" json:"audit_type,omitempty"`
+	AuditObject string                 `protobuf:"bytes,4,opt,name=audit_object,json=auditObject,proto3" json:"audit_object,omitempty"`
+	DetailJson  string                 `protobuf:"bytes,5,opt,name=detail_json,json=detailJson,proto3" json:"detail_json,omitempty"`
+	// ip_address/user_agent 是 iam-rpc 拆分时补的字段：content-rpc 的两处调用点原来就传
+	// 空 *http.Request，这两个字段留空；gateway 侧自己的 6 个 RBAC 审计调用点（原
+	// pkg/audit.RecordAuditLog）有真实的 *http.Request，用这两个字段填充，不再是恒为空。
+	IpAddress     string `protobuf:"bytes,6,opt,name=ip_address,json=ipAddress,proto3" json:"ip_address,omitempty"`
+	UserAgent     string `protobuf:"bytes,7,opt,name=user_agent,json=userAgent,proto3" json:"user_agent,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -381,6 +386,20 @@ func (x *RecordAuditLogRequest) GetDetailJson() string {
 	return ""
 }
 
+func (x *RecordAuditLogRequest) GetIpAddress() string {
+	if x != nil {
+		return x.IpAddress
+	}
+	return ""
+}
+
+func (x *RecordAuditLogRequest) GetUserAgent() string {
+	if x != nil {
+		return x.UserAgent
+	}
+	return ""
+}
+
 type RecordAuditLogResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -441,7 +460,7 @@ const file_iamcallback_proto_rawDesc = "" +
 	"\x0fdepartment_name\x18\x05 \x01(\tR\x0edepartmentName\x12\x1d\n" +
 	"\n" +
 	"role_names\x18\x06 \x03(\tR\troleNames\x12\x1c\n" +
-	"\tsignature\x18\a \x01(\tR\tsignature\"\xaf\x01\n" +
+	"\tsignature\x18\a \x01(\tR\tsignature\"\xed\x01\n" +
 	"\x15RecordAuditLogRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x1a\n" +
 	"\busername\x18\x02 \x01(\tR\busername\x12\x1d\n" +
@@ -449,7 +468,11 @@ const file_iamcallback_proto_rawDesc = "" +
 	"audit_type\x18\x03 \x01(\tR\tauditType\x12!\n" +
 	"\faudit_object\x18\x04 \x01(\tR\vauditObject\x12\x1f\n" +
 	"\vdetail_json\x18\x05 \x01(\tR\n" +
-	"detailJson\"\x18\n" +
+	"detailJson\x12\x1d\n" +
+	"\n" +
+	"ip_address\x18\x06 \x01(\tR\tipAddress\x12\x1d\n" +
+	"\n" +
+	"user_agent\x18\a \x01(\tR\tuserAgent\"\x18\n" +
 	"\x16RecordAuditLogResponse2\xad\x02\n" +
 	"\vIamCallback\x12h\n" +
 	"\x13FindActiveUserChunk\x12'.iamcallback.FindActiveUserChunkRequest\x1a(.iamcallback.FindActiveUserChunkResponse\x12Y\n" +

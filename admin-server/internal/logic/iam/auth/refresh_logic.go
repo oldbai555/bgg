@@ -9,7 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
-	jwthelper "postapocgame/admin-server/pkg/jwt"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -29,51 +29,17 @@ func NewRefreshLogic(ctx context.Context, svcCtx *svc.ServiceContext) *RefreshLo
 }
 
 func (l *RefreshLogic) Refresh(req *types.RefreshReq) (resp *types.TokenPair, err error) {
-	if req == nil || req.RefreshToken == "" {
-		return nil, errs.New(errs.CodeBadRequest, "刷新令牌不能为空")
+	if req == nil {
+		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	claims, err := jwthelper.ParseToken(req.RefreshToken, l.svcCtx.Config.JWT.RefreshSecret)
-	if err != nil || !claims.IsRefresh {
-		return nil, errs.New(errs.CodeUnauthorized, "刷新令牌无效或已过期")
-	}
-
-	// 黑名单校验：与 authmiddleware.go 对访问令牌的校验对齐，避免 Logout 之后刷新令牌
-	// 在自然过期前仍能继续换发新的访问令牌。
-	blacklisted, err := l.svcCtx.Domain.IAM.TokenBlacklist.IsBlacklisted(l.ctx, req.RefreshToken)
+	rpcResp, err := l.svcCtx.IamRPC.Refresh(l.ctx, &iamclient.RefreshRequest{RefreshToken: req.RefreshToken})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "检查令牌黑名单失败", err)
-	}
-	if blacklisted {
-		return nil, errs.New(errs.CodeUnauthorized, "刷新令牌无效或已过期")
-	}
-
-	accessToken, err := jwthelper.GenerateToken(
-		l.svcCtx.Config.JWT.AccessSecret,
-		l.svcCtx.Config.JWT.Issuer,
-		l.svcCtx.Config.JWT.AccessExpire,
-		claims.UserID,
-		claims.Username,
-		false,
-	)
-	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "生成访问令牌失败", err)
-	}
-
-	refreshToken, err := jwthelper.GenerateToken(
-		l.svcCtx.Config.JWT.RefreshSecret,
-		l.svcCtx.Config.JWT.Issuer,
-		l.svcCtx.Config.JWT.RefreshExpire,
-		claims.UserID,
-		claims.Username,
-		true,
-	)
-	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "生成刷新令牌失败", err)
+		return nil, errs.WrapGRPCError("刷新令牌失败", err)
 	}
 
 	return &types.TokenPair{
-		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
+		AccessToken:  rpcResp.AccessToken,
+		RefreshToken: rpcResp.RefreshToken,
 	}, nil
 }

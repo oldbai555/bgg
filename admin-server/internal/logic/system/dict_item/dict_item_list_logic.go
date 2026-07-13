@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -32,17 +33,18 @@ func (l *DictItemListLogic) DictItemList(req *types.DictItemListReq) (resp *type
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	list, total, err := l.svcCtx.Domain.System.DictItem.FindPage(l.ctx, req.Page, req.PageSize, req.TypeId, req.Label)
+	rpcResp, err := l.svcCtx.IamRPC.DictItemList(l.ctx, &iamclient.DictItemListRequest{
+		Page:     req.Page,
+		PageSize: req.PageSize,
+		TypeId:   req.TypeId,
+		Label:    req.Label,
+	})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "查询字典项列表失败", err)
+		return nil, errs.WrapGRPCError("查询字典项列表失败", err)
 	}
 
-	items := make([]types.DictItemItem, 0, len(list))
-	for _, di := range list {
-		remark := ""
-		if di.Remark.Valid {
-			remark = di.Remark.String
-		}
+	items := make([]types.DictItemItem, 0, len(rpcResp.List))
+	for _, di := range rpcResp.List {
 		items = append(items, types.DictItemItem{
 			Id:        di.Id,
 			TypeId:    di.TypeId,
@@ -50,13 +52,13 @@ func (l *DictItemListLogic) DictItemList(req *types.DictItemListReq) (resp *type
 			Value:     di.Value,
 			Sort:      di.Sort,
 			Status:    di.Status,
-			Remark:    remark,
+			Remark:    di.Remark,
 			CreatedAt: di.CreatedAt,
 		})
 	}
 
 	return &types.DictItemListResp{
-		Total: total,
+		Total: rpcResp.Total,
 		List:  items,
 	}, nil
 }

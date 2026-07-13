@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -32,34 +33,31 @@ func (l *ConfigListLogic) ConfigList(req *types.ConfigListReq) (resp *types.Conf
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	list, total, err := l.svcCtx.Domain.System.Config.FindPage(l.ctx, req.Page, req.PageSize, req.Group, req.Key)
+	rpcResp, err := l.svcCtx.IamRPC.ConfigList(l.ctx, &iamclient.ConfigListRequest{
+		Page:     req.Page,
+		PageSize: req.PageSize,
+		Group:    req.Group,
+		Key:      req.Key,
+	})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "查询配置列表失败", err)
+		return nil, errs.WrapGRPCError("查询配置列表失败", err)
 	}
 
-	items := make([]types.ConfigItem, 0, len(list))
-	for _, c := range list {
-		value := ""
-		if c.Value.Valid {
-			value = c.Value.String
-		}
-		description := ""
-		if c.Description.Valid {
-			description = c.Description.String
-		}
+	items := make([]types.ConfigItem, 0, len(rpcResp.List))
+	for _, c := range rpcResp.List {
 		items = append(items, types.ConfigItem{
 			Id:          c.Id,
 			Group:       c.Group,
 			Key:         c.Key,
-			Value:       value,
-			ConfigType:  c.Type,
-			Description: description,
+			Value:       c.Value,
+			ConfigType:  c.ConfigType,
+			Description: c.Description,
 			CreatedAt:   c.CreatedAt,
 		})
 	}
 
 	return &types.ConfigListResp{
-		Total: total,
+		Total: rpcResp.Total,
 		List:  items,
 	}, nil
 }

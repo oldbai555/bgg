@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -32,9 +33,9 @@ func (l *DailyShortSentenceDeleteLogic) DailyShortSentenceDelete(req *types.Dail
 		return errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	if err := l.svcCtx.Domain.Misc.DailyShortSentence.DeleteByID(l.ctx, req.Id); err != nil {
-		return errs.Wrap(errs.CodeInternalError, "删除每日短句失败", err)
+	_, err := l.svcCtx.IamRPC.DailyShortSentenceDelete(l.ctx, &iamclient.DailyShortSentenceDeleteRequest{Id: req.Id})
+	if err != nil {
+		return errs.WrapGRPCError("删除每日短句失败", err)
 	}
-
 	return nil
 }

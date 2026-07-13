@@ -5,13 +5,11 @@ package permission
 
 import (
 	"context"
-	"database/sql"
 
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
-
-	"postapocgame/admin-server/internal/model/iam"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -35,13 +33,13 @@ func (l *PermissionCreateLogic) PermissionCreate(req *types.PermissionCreateReq)
 		return errs.New(errs.CodeBadRequest, "权限名称和编码不能为空")
 	}
 
-	p := iam.AdminPermission{
+	_, err := l.svcCtx.IamRPC.PermissionCreate(l.ctx, &iamclient.PermissionCreateRequest{
 		Name:        req.Name,
 		Code:        req.Code,
-		Description: sql.NullString{String: req.Description, Valid: req.Description != ""},
-	}
-	if err := l.svcCtx.Domain.IAM.Permission.Create(l.ctx, &p); err != nil {
-		return errs.Wrap(errs.CodeInternalError, "创建权限失败", err)
+		Description: req.Description,
+	})
+	if err != nil {
+		return errs.WrapGRPCError("创建权限失败", err)
 	}
 	return nil
 }

@@ -11,17 +11,22 @@ import (
 )
 
 // Config 聚合服务配置，RestConf 内嵌以支持 go-zero HTTP 配置。
+// iam 域拆分成独立服务后，gateway 不再直连任何 MySQL（DatabaseConf 整个类型已删除），
+// 只保留共享 Redis（token 黑名单、限流滑动窗口）+ 5 个 zrpc client。
 type Config struct {
 	rest.RestConf `json:",inline" yaml:",inline" mapstructure:",squash"`
-	Database      DatabaseConf  `json:"database,optional" yaml:"database" mapstructure:"database"`
 	Redis         RedisConf     `json:"redis,optional" yaml:"redis" mapstructure:"redis"`
 	JWT           JWTConf       `json:"jwt,optional" yaml:"jwt" mapstructure:"jwt"`
 	Bcrypt        BcryptConf    `json:"bcrypt,optional" yaml:"bcrypt" mapstructure:"bcrypt"`
 	RateLimit     RateLimitConf `json:"rateLimit,optional" yaml:"rateLimit" mapstructure:"rateLimit"`
-	// TaskCallbackRPCConf 单体内嵌的 pkg/taskcallback.TaskCallback zrpc server 监听配置，
-	// 供 services/task/（task-rpc）回调取导出数据/登记导出文件。见 16-rpc-conventions.md、
-	// 17-async-eventing.md 第 1 节。Phase 2 iam-rpc/sdk-rpc 真正拆分后这个 server 原样搬过去。
-	TaskCallbackRPCConf zrpc.RpcServerConf `json:"taskCallbackRpc,optional" yaml:"taskCallbackRpc" mapstructure:"taskCallbackRpc"`
+	// IamRpc 连到 iam-rpc（services/iam/）的 zrpc client 配置。iam+system+monitoring+misc
+	// 四个域已拆分成独立服务，gateway 侧全部相关 logic、5 个中间件（Auth/Permission/
+	// ApiEnabled/OperationLog/Performance）都通过这个 client 调用。
+	IamRpc zrpc.RpcClientConf `json:"iamRpc,optional" yaml:"iamRpc" mapstructure:"iamRpc"`
+	// IamCallbackRpc 连到 iam-rpc 同一进程内注册的 pkg/iamcallback.IamCallback 服务
+	// （RBAC 变更审计日志写入，pkg/audit.RecordAuditLog 用它）。和 IamRpc 指向同一个
+	// iam-rpc 地址，只是调用不同的 gRPC service。
+	IamCallbackRpc zrpc.RpcClientConf `json:"iamCallbackRpc,optional" yaml:"iamCallbackRpc" mapstructure:"iamCallbackRpc"`
 	// TaskRPCConf 连到 task-rpc（services/task/）的 zrpc client 配置。task 域已拆分成独立
 	// 服务，gateway 侧的 TaskList/TaskDetail/TaskCancel/TaskRecent 和 5 个导出 logic 都通过
 	// 这个 client 调用，不再直接持有 Domain.Task。见 16-rpc-conventions.md 第 5 节。
@@ -37,24 +42,11 @@ type Config struct {
 	// Domain.Chat/ChatHub。见 16-rpc-conventions.md 第 7 节、18-service-extraction-runbook.md
 	// 2.3 节。
 	ChatRPCConf zrpc.RpcClientConf `json:"chatRpc,optional" yaml:"chatRpc" mapstructure:"chatRpc"`
-	// IamCallbackRPCConf 单体内嵌的 pkg/iamcallback.IamCallback zrpc server 监听配置，供
-	// chat-rpc/content-rpc 回调枚举存量用户 / 取用户展示信息（用户名/昵称/头像/部门名/角色名）
-	// / 写审计日志。iam 域还没拆分成独立服务前的临时方案，和 TaskCallbackRPCConf 同一个模式。
-	IamCallbackRPCConf zrpc.RpcServerConf `json:"iamCallbackRpc,optional" yaml:"iamCallbackRpc" mapstructure:"iamCallbackRpc"`
 	// ContentRPCConf 连到 content-rpc（services/content/）的 zrpc client 配置。blog+video 域
 	// 已拆分成独立服务，gateway 侧的 34 个 Blog*/PublicBlog* logic + 6 个 Video*/PublicVideo*
 	// logic 都通过这个 client 调用，不再直接持有 Domain.Blog/Domain.Video。见
 	// 18-service-extraction-runbook.md 2.4 节。
 	ContentRPCConf zrpc.RpcClientConf `json:"contentRpc,optional" yaml:"contentRpc" mapstructure:"contentRpc"`
-}
-
-type DatabaseConf struct {
-	DSN                string `json:"dsn" yaml:"dsn" mapstructure:"dsn"`
-	MaxOpen            int    `json:"maxOpen" yaml:"maxOpen" mapstructure:"maxOpen"`                                  // 最大打开连接数
-	MaxIdle            int    `json:"maxIdle" yaml:"maxIdle" mapstructure:"maxIdle"`                                  // 最大空闲连接数
-	ConnMaxLifetime    int    `json:"connMaxLifetime" yaml:"connMaxLifetime" mapstructure:"connMaxLifetime"`          // 连接最大生存时间（秒），默认 300
-	ConnMaxIdleTime    int    `json:"connMaxIdleTime" yaml:"connMaxIdleTime" mapstructure:"connMaxIdleTime"`          // 连接最大空闲时间（秒），默认 600
-	SlowQueryThreshold int    `json:"slowQueryThreshold" yaml:"slowQueryThreshold" mapstructure:"slowQueryThreshold"` // 慢查询阈值（毫秒），默认 1000
 }
 
 type RedisConf struct {

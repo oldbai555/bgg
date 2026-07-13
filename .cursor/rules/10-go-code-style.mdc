@@ -15,18 +15,21 @@ admin-server/
 ├── api/admin.api          # 唯一 .api 定义文件（group 格式：<domain>/<module>）
 ├── internal/
 │   ├── handler/<domain>/<module>/  # goctl 生成，禁止手改（custom_routes.go 除外）
-│   ├── logic/<domain>/<module>/    # goctl 生成骨架 + 手写业务逻辑
-│   ├── repository/
-│   │   ├── repository.go           # 跨域基础设施（BuildSources、Model 注册）
-│   │   └── <domain>/*.go           # package <domain>，强制 squirrel
-│   ├── model/<domain>/*.go         # goctl 生成，package <domain>
-│   ├── domain/
-│   │   └── iam/permission_resolver.go  # RBAC 领域服务
-│   ├── middleware/        # 手写中间件
+│   ├── logic/<domain>/<module>/    # goctl 生成骨架 + 薄胶水（解析请求 -> 调对应 *RPC -> 映射响应）
+│   ├── middleware/        # 手写中间件，全部通过 zrpc client 调用各服务，不再直连数据库
+│   ├── redisconn/         # gateway 唯一保留的存储直连：共享 Redis（token 黑名单、限流滑动窗口）
 │   ├── consts/ config/ types/ svc/
 ├── pkg/ scripts/ .template/ db/
-└── services/task/, services/sdk/, services/chat/, services/content/  # Phase 2 拆出的 task-rpc/sdk-rpc/chat-rpc/content-rpc 独立服务（领域代码/repository 已搬出单体）
+└── services/iam/, services/task/, services/sdk/, services/chat/, services/content/
+    # Phase 2 拆出的 iam-rpc/task-rpc/sdk-rpc/chat-rpc/content-rpc 五个独立服务，
+    # 全部领域代码/repository/model/domain 都已经搬出单体：
+    # gateway 的 internal/repository/、internal/model/、internal/domain/ 三个目录已整体删除，
+    # 不再直连任何 MySQL。iam-rpc（services/iam/）额外承载 RBAC 权限校验（供
+    # PermissionMiddleware/ApiEnabledMiddleware 调用）+ pkg/taskcallback、pkg/iamcallback
+    # 两个跨服务回调契约的服务端实现。
 ```
+
+各服务内部分层一致：`services/<name>/internal/{handler,logic,repository,model,domain,svc}/`，参考实现见 `services/iam/internal/repository/iam/role_permission_repository.go`（squirrel 用法）。
 
 维护导航见 `docs/admin-server-维护导航.md`。
 
@@ -43,7 +46,7 @@ admin-server/
 - 所有类型定义在同一个 `type (...)` 块内，按业务模块用中文注释分节
 - 每个功能组有独立的 `@server(group: xxx, prefix: /api/v1, middleware: A,B,C)` + `service admin-api {...}` 块
 - Group 格式 `<domain>/<module>`（如 `iam/user`、`blog/article`、`system/dict_type`），goctl 生成 `handler/<domain>/<module>/` 嵌套目录
-- **禁止**往 `ServiceContext` 添加多个具名 repository 字段；允许唯一的 `Domain *registry.Domain` 聚合（`internal/repository/registry/`）。Logic 优先 `l.svcCtx.Domain.IAM.User`，旧代码可继续内联 `xxxrepo.NewXxxRepository(svcCtx.Repository)` 直至按域迁移
+- **gateway 的 `ServiceContext` 不持有任何 repository/Domain 字段**：Phase 2 五个服务（iam/task/sdk/chat/content）全部拆分完成后，gateway 只剩 `Redis *redis.Redis`（共享 Redis 直连）+ 每个服务对应的 `XxxRPC xxxclient.Xxx` zrpc client 字段，`internal/logic/<domain>/<module>/` 下的 Logic 一律调 `l.svcCtx.XxxRPC.Method(...)`，不直连任何数据库。各服务自己内部的 `services/<name>/internal/svc/servicecontext.go` 才持有该服务自己的 `Repository`/`Domain *registry.Domain` 聚合（`services/<name>/internal/repository/registry/`），Logic 优先 `l.svcCtx.Domain.IAM.User` 这种调用方式
 - 禁止路径参数 `:id`，一律 Query/Body 参数，或 `/xxx/detail`、`/xxx/get` 子路径
 - `optional` 标签规则：
   - Query 参数：`form:"paramName,optional"`（即使业务上必填，也要加，必填校验放 Logic 层）
@@ -55,7 +58,7 @@ admin-server/
 
 所有需要动态构建 SQL 的地方必须使用 `github.com/Masterminds/squirrel`（别名 `sq`），禁止 `fmt.Sprintf` 或字符串拼接。适用范围：Repository 层所有自定义查询方法、动态 WHERE/ORDER BY/LIMIT/OFFSET、UPDATE/DELETE 的动态条件。
 
-参考实现：`internal/repository/iam/role_permission_repository.go`
+参考实现：`services/iam/internal/repository/iam/role_permission_repository.go`
 
 ```go
 import (
@@ -85,7 +88,7 @@ query := fmt.Sprintf("SELECT * FROM `admin_user` WHERE %s", whereClause)
 query := "SELECT * FROM `admin_user` WHERE username LIKE '%" + name + "%'"
 ```
 
-**已知例外（待办，不是可以效仿的先例）**：`services/chat/internal/repository/chat/chat_repository.go`（chat 域 Phase 2 已拆分成独立的 chat-rpc，路径不再在 `internal/repository/chat/` 下）目前仍有部分方法用静态多行 SQL（参数化、无拼接风险，但不是 squirrel）。新增/修改这个文件时应顺手迁移，而不是继续用旧写法。`internal/repository/monitoring/performance_log_repository.go` 已经迁移到 squirrel，不再是例外。
+**已知例外（待办，不是可以效仿的先例）**：`services/chat/internal/repository/chat/chat_repository.go` 目前仍有部分方法用静态多行 SQL（参数化、无拼接风险，但不是 squirrel）。新增/修改这个文件时应顺手迁移，而不是继续用旧写法。`services/iam/internal/repository/monitoring/performance_log_repository.go` 已经迁移到 squirrel，不再是例外。
 
 # 错误处理
 
@@ -121,7 +124,7 @@ Performance → RateLimit → Auth → Permission → OperationLog
 - Handler：`<module><action>handler.go`（如 `userlisthandler.go`），函数 `<Module><Action>Handler(svcCtx) http.HandlerFunc`
 - Logic：`<module><action>logic.go`（如 `userlistlogic.go`），类型 `<Module><Action>Logic`，构造函数 `New<Module><Action>Logic`，方法名同 action，如 `func (l *UserListLogic) UserList(req *types.UserListReq) (*types.UserListResp, error)`
 - Types：`<Module>Item`、`<Module>ListReq/Resp`、`<Module>CreateReq`、`<Module>UpdateReq`、`<Module>DeleteReq`，CRUD 后缀保持一致
-- 构造函数 `New<Module>Repository(repo *repository.Repository)`，定义在 `internal/repository/<domain>/`
+- 构造函数 `New<Module>Repository(repo *repository.Repository)`，定义在各服务自己的 `services/<name>/internal/repository/<domain>/`（gateway 已不持有任何 repository）
 - Model：goctl 标准 `Admin<Table>Model` 接口 + `defaultAdmin<Table>Model`，业务定制写在 `xxxmodel.go`（手改），生成部分在 `xxxmodel_gen.go`（禁止手改）
 
 # 静态检查

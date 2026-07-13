@@ -5,11 +5,13 @@ package notification
 
 import (
 	"context"
+
 	"postapocgame/admin-server/internal/logic/logicutil"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -33,7 +35,6 @@ func (l *NotificationListLogic) NotificationList(req *types.NotificationListReq)
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	// 获取当前用户
 	user, ok := jwthelper.FromContext(l.ctx)
 	if !ok {
 		return nil, errs.New(errs.CodeUnauthorized, "未登录或登录已过期")
@@ -41,16 +42,19 @@ func (l *NotificationListLogic) NotificationList(req *types.NotificationListReq)
 
 	req.Page, req.PageSize = logicutil.NormalizePage(req.Page, req.PageSize, 10, 100)
 
-	// 只查询当前用户的消息通知
-	// ReadStatus 枚举（字典 read_status）：0 = 全部（不筛选）；1 = 未读；2 = 已读
-	// DB 中 admin_notification.read_status 与枚举值保持一致：1 = 未读，2 = 已读
-	list, total, err := l.svcCtx.Domain.System.Notification.FindPage(l.ctx, req.Page, req.PageSize, user.UserID, req.SourceType, req.ReadStatus)
+	rpcResp, err := l.svcCtx.IamRPC.NotificationList(l.ctx, &iamclient.NotificationListRequest{
+		Page:       req.Page,
+		PageSize:   req.PageSize,
+		UserId:     user.UserID,
+		SourceType: req.SourceType,
+		ReadStatus: req.ReadStatus,
+	})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "查询消息通知列表失败", err)
+		return nil, errs.WrapGRPCError("查询消息通知列表失败", err)
 	}
 
-	items := make([]types.NotificationItem, 0, len(list))
-	for _, n := range list {
+	items := make([]types.NotificationItem, 0, len(rpcResp.List))
+	for _, n := range rpcResp.List {
 		items = append(items, types.NotificationItem{
 			Id:         n.Id,
 			UserId:     n.UserId,
@@ -66,7 +70,7 @@ func (l *NotificationListLogic) NotificationList(req *types.NotificationListReq)
 	}
 
 	return &types.NotificationListResp{
-		Total: total,
+		Total: rpcResp.Total,
 		List:  items,
 	}, nil
 }

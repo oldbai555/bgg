@@ -2,18 +2,15 @@ package audit
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"net/http"
 	"strings"
-	"time"
 
 	"postapocgame/admin-server/internal/svc"
+	pb "postapocgame/admin-server/pkg/iamcallback/pb"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	"postapocgame/admin-server/internal/model/monitoring"
-	monitoringrepo "postapocgame/admin-server/internal/repository/monitoring"
 )
 
 // AuditType 审计类型常量
@@ -34,8 +31,10 @@ const (
 	AuditObjectConfig         = "config"          // 配置
 )
 
-// RecordAuditLog 记录审计日志（异步）
-// httpReq 可以为 nil，如果为 nil 则 IP 和 User-Agent 为空
+// RecordAuditLog 记录审计日志（异步）。iam 域拆分成独立服务后，admin_audit_log 表物理上
+// 属于 iam-rpc，这里改成回调 iam-rpc 同一进程内注册的 pkg/iamcallback.IamCallback 服务
+// （和 content-rpc 的两处调用点走同一个契约），"异步、失败只记日志"的既有语义不变。
+// httpReq 可以为 nil，如果为 nil 则 IP 和 User-Agent 为空。
 func RecordAuditLog(svcCtx *svc.ServiceContext, ctx context.Context, httpReq *http.Request, auditType, auditObject string, detail interface{}) {
 	if svcCtx == nil || ctx == nil {
 		logx.Errorf("记录审计日志失败: svcCtx 或 ctx 为 nil")
@@ -67,23 +66,6 @@ func RecordAuditLog(svcCtx *svc.ServiceContext, ctx context.Context, httpReq *ht
 		}
 	}
 
-	// 构建审计日志
-	now := time.Now().Unix()
-	auditLog := &monitoring.AuditLog{
-		UserId:      userId,
-		Username:    username,
-		AuditType:   auditType,
-		AuditObject: auditObject,
-		IpAddress:   ip,
-		UserAgent:   userAgent,
-		CreatedAt:   now,
-		UpdatedAt:   now,
-		DeletedAt:   0,
-	}
-	if detailJSON != "" {
-		auditLog.AuditDetail = sql.NullString{String: detailJSON, Valid: true}
-	}
-
 	// 异步写入日志（使用 goroutine，避免阻塞主流程）
 	go func() {
 		defer func() {
@@ -92,8 +74,16 @@ func RecordAuditLog(svcCtx *svc.ServiceContext, ctx context.Context, httpReq *ht
 			}
 		}()
 
-		auditLogRepo := monitoringrepo.NewAuditLogRepository(svcCtx.Repository)
-		if err := auditLogRepo.Create(context.Background(), auditLog); err != nil {
+		_, err := svcCtx.IamCallbackRPC.RecordAuditLog(context.Background(), &pb.RecordAuditLogRequest{
+			UserId:      userId,
+			Username:    username,
+			AuditType:   auditType,
+			AuditObject: auditObject,
+			DetailJson:  detailJSON,
+			IpAddress:   ip,
+			UserAgent:   userAgent,
+		})
+		if err != nil {
 			logx.Errorf("记录审计日志失败: userId=%d, username=%s, auditType=%s, auditObject=%s, error: %v",
 				userId, username, auditType, auditObject, err)
 		} else {

@@ -5,11 +5,11 @@ package auth
 
 import (
 	"context"
-	"time"
 
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -33,19 +33,12 @@ func (l *LogoutLogic) Logout(req *types.LogoutReq) error {
 		return errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	// 访问令牌加入黑名单
-	if req.AccessToken != "" {
-		if err := l.svcCtx.Domain.IAM.TokenBlacklist.Blacklist(l.ctx, req.AccessToken, time.Duration(l.svcCtx.Config.JWT.AccessExpire)*time.Second); err != nil {
-			return errs.Wrap(errs.CodeInternalError, "加入访问令牌黑名单失败", err)
-		}
+	_, err := l.svcCtx.IamRPC.Logout(l.ctx, &iamclient.LogoutRequest{
+		AccessToken:  req.AccessToken,
+		RefreshToken: req.RefreshToken,
+	})
+	if err != nil {
+		return errs.WrapGRPCError("登出失败", err)
 	}
-
-	// 刷新令牌加入黑名单
-	if req.RefreshToken != "" {
-		if err := l.svcCtx.Domain.IAM.TokenBlacklist.Blacklist(l.ctx, req.RefreshToken, time.Duration(l.svcCtx.Config.JWT.RefreshExpire)*time.Second); err != nil {
-			return errs.Wrap(errs.CodeInternalError, "加入刷新令牌黑名单失败", err)
-		}
-	}
-
 	return nil
 }

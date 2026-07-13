@@ -5,15 +5,14 @@ package auth
 
 import (
 	"context"
-	"time"
 
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type PasswordChangeLogic struct {
@@ -35,49 +34,18 @@ func (l *PasswordChangeLogic) PasswordChange(req *types.PasswordChangeReq) error
 		return errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	// 验证参数
-	if req.OldPassword == "" {
-		return errs.New(errs.CodeBadRequest, "原密码不能为空")
-	}
-	if req.NewPassword == "" {
-		return errs.New(errs.CodeBadRequest, "新密码不能为空")
-	}
-	if len(req.NewPassword) < 6 {
-		return errs.New(errs.CodeBadRequest, "新密码长度不能少于6位")
-	}
-
-	// 获取当前用户
 	user, ok := jwthelper.FromContext(l.ctx)
 	if !ok {
 		return errs.New(errs.CodeUnauthorized, "未登录或登录已过期")
 	}
 
-	// 获取用户信息
-	userInfo, err := l.svcCtx.Domain.IAM.User.FindByID(l.ctx, user.UserID)
+	_, err := l.svcCtx.IamRPC.PasswordChange(l.ctx, &iamclient.PasswordChangeRequest{
+		UserId:      user.UserID,
+		OldPassword: req.OldPassword,
+		NewPassword: req.NewPassword,
+	})
 	if err != nil {
-		return errs.Wrap(errs.CodeInternalError, "获取用户信息失败", err)
+		return errs.WrapGRPCError("修改密码失败", err)
 	}
-
-	// 验证原密码
-	err = bcrypt.CompareHashAndPassword([]byte(userInfo.PasswordHash), []byte(req.OldPassword))
-	if err != nil {
-		return errs.New(errs.CodeBadRequest, "原密码错误")
-	}
-
-	// 加密新密码
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
-	if err != nil {
-		return errs.Wrap(errs.CodeInternalError, "加密密码失败", err)
-	}
-
-	// 更新密码
-	userInfo.PasswordHash = string(hashedPassword)
-	userInfo.UpdatedAt = time.Now().Unix()
-
-	err = l.svcCtx.Domain.IAM.User.Update(l.ctx, userInfo)
-	if err != nil {
-		return errs.Wrap(errs.CodeInternalError, "更新密码失败", err)
-	}
-
 	return nil
 }

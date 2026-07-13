@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -32,21 +33,13 @@ func (l *FileUpdateLogic) FileUpdate(req *types.FileUpdateReq) error {
 		return errs.New(errs.CodeBadRequest, "文件ID不能为空")
 	}
 
-	file, err := l.svcCtx.Domain.System.File.FindByID(l.ctx, req.Id)
+	_, err := l.svcCtx.IamRPC.FileUpdate(l.ctx, &iamclient.FileUpdateRequest{
+		Id:     req.Id,
+		Name:   req.Name,
+		Status: req.Status,
+	})
 	if err != nil {
-		return errs.Wrap(errs.CodeInternalError, "查询文件失败", err)
-	}
-
-	if req.Name != "" {
-		file.Name = req.Name
-	}
-	// Status 字段：0 是有效值（禁用），需要特殊处理
-	if req.Status == 0 || req.Status == 1 {
-		file.Status = req.Status
-	}
-
-	if err := l.svcCtx.Domain.System.File.Update(l.ctx, file); err != nil {
-		return errs.Wrap(errs.CodeInternalError, "更新文件记录失败", err)
+		return errs.WrapGRPCError("更新文件记录失败", err)
 	}
 	return nil
 }

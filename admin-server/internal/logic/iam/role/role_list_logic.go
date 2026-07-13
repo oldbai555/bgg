@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -32,28 +33,28 @@ func (l *RoleListLogic) RoleList(req *types.RoleListReq) (resp *types.RoleListRe
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	list, total, err := l.svcCtx.Domain.IAM.Role.FindPage(l.ctx, req.Page, req.PageSize, req.Name)
+	rpcResp, err := l.svcCtx.IamRPC.RoleList(l.ctx, &iamclient.RoleListRequest{
+		Page:     req.Page,
+		PageSize: req.PageSize,
+		Name:     req.Name,
+	})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "查询角色列表失败", err)
+		return nil, errs.WrapGRPCError("查询角色列表失败", err)
 	}
 
-	items := make([]types.RoleItem, 0, len(list))
-	for _, r := range list {
-		description := ""
-		if r.Description.Valid {
-			description = r.Description.String
-		}
+	items := make([]types.RoleItem, 0, len(rpcResp.List))
+	for _, r := range rpcResp.List {
 		items = append(items, types.RoleItem{
 			Id:          r.Id,
 			Name:        r.Name,
 			Code:        r.Code,
-			Description: description,
+			Description: r.Description,
 			Status:      r.Status,
 		})
 	}
 
 	return &types.RoleListResp{
-		Total: total,
+		Total: rpcResp.Total,
 		List:  items,
 	}, nil
 }

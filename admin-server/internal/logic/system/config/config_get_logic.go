@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -32,38 +33,10 @@ func (l *ConfigGetLogic) ConfigGet(req *types.ConfigGetReq) (resp *types.ConfigG
 		return nil, errs.New(errs.CodeBadRequest, "配置键不能为空")
 	}
 
-	// 尝试从缓存获取配置
-	cache := l.svcCtx.Repository.BusinessCache
-	var cachedValue string
-	err = cache.GetConfigKey(l.ctx, req.Key, &cachedValue)
-	if err == nil {
-		// 缓存命中，直接返回
-		return &types.ConfigGetResp{
-			Value: cachedValue,
-		}, nil
-	}
-
-	// 缓存未命中，从数据库查询
-	config, err := l.svcCtx.Domain.System.Config.FindByKey(l.ctx, req.Key)
+	rpcResp, err := l.svcCtx.IamRPC.ConfigGet(l.ctx, &iamclient.ConfigGetRequest{Key: req.Key})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "查询配置失败", err)
+		return nil, errs.WrapGRPCError("查询配置失败", err)
 	}
 
-	value := ""
-	if config.Value.Valid {
-		value = config.Value.String
-	}
-
-	resp = &types.ConfigGetResp{
-		Value: value,
-	}
-
-	// 写入缓存（异步，不阻塞返回）
-	go func() {
-		if err := cache.SetConfigKey(context.Background(), req.Key, value); err != nil {
-			l.Errorf("设置配置缓存失败: key=%s, error=%v", req.Key, err)
-		}
-	}()
-
-	return resp, nil
+	return &types.ConfigGetResp{Value: rpcResp.Value}, nil
 }

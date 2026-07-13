@@ -13,7 +13,6 @@ import (
 
 var (
 	// 默认配置文件路径（根据操作系统动态设置）
-	DefaultMySQLConfigPath      string
 	DefaultRedisConfigPath      string
 	DefaultMiddlewareConfigPath string
 )
@@ -21,89 +20,13 @@ var (
 func init() {
 	// 根据操作系统设置默认路径
 	if runtime.GOOS == "windows" {
-		DefaultMySQLConfigPath = "C:\\work\\mysql.json"
 		DefaultRedisConfigPath = "C:\\work\\redis.json"
 		DefaultMiddlewareConfigPath = "C:\\work\\middleware.yaml"
 	} else {
 		// Linux 或其他 Unix 系统
-		DefaultMySQLConfigPath = "/etc/work/mysql.json"
 		DefaultRedisConfigPath = "/etc/work/redis.json"
 		DefaultMiddlewareConfigPath = "/etc/work/middleware.yaml"
 	}
-}
-
-// LoadMySQLConfig 从文件加载 MySQL 配置
-func LoadMySQLConfig(configPath string) (*DatabaseConf, error) {
-	if configPath == "" {
-		configPath = DefaultMySQLConfigPath
-	}
-
-	// 检查文件是否存在（必须存在）
-	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		return nil, errors.Errorf("MySQL配置文件不存在: %s，请确保文件存在", configPath)
-	}
-
-	data, err := os.ReadFile(configPath)
-	if err != nil {
-		return nil, errors.Wrapf(err, "读取MySQL配置文件失败: %s", configPath)
-	}
-
-	var mysqlConfig struct {
-		Addr               string `json:"addr"`
-		Port               int    `json:"port"`
-		Username           string `json:"username"`
-		Password           string `json:"password"`
-		Database           string `json:"database"`
-		MaxOpen            int    `json:"maxOpen"`
-		MaxIdle            int    `json:"maxIdle"`
-		ConnMaxLifetime    int    `json:"connMaxLifetime"`
-		ConnMaxIdleTime    int    `json:"connMaxIdleTime"`
-		SlowQueryThreshold int    `json:"slowQueryThreshold"`
-	}
-
-	if err := json.Unmarshal(data, &mysqlConfig); err != nil {
-		return nil, errors.Wrapf(err, "解析MySQL配置文件失败: %s", configPath)
-	}
-
-	// 构建 DSN（添加 charset=utf8mb4 以支持中文）
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true&loc=Local&charset=utf8mb4&collation=utf8mb4_unicode_ci",
-		mysqlConfig.Username,
-		mysqlConfig.Password,
-		mysqlConfig.Addr,
-		mysqlConfig.Port,
-		mysqlConfig.Database,
-	)
-
-	// 设置默认值
-	maxOpen := mysqlConfig.MaxOpen
-	if maxOpen == 0 {
-		maxOpen = 20
-	}
-	maxIdle := mysqlConfig.MaxIdle
-	if maxIdle == 0 {
-		maxIdle = 10
-	}
-	connMaxLifetime := mysqlConfig.ConnMaxLifetime
-	if connMaxLifetime == 0 {
-		connMaxLifetime = 300
-	}
-	connMaxIdleTime := mysqlConfig.ConnMaxIdleTime
-	if connMaxIdleTime == 0 {
-		connMaxIdleTime = 600
-	}
-	slowQueryThreshold := mysqlConfig.SlowQueryThreshold
-	if slowQueryThreshold == 0 {
-		slowQueryThreshold = 1000
-	}
-
-	return &DatabaseConf{
-		DSN:                dsn,
-		MaxOpen:            maxOpen,
-		MaxIdle:            maxIdle,
-		ConnMaxLifetime:    connMaxLifetime,
-		ConnMaxIdleTime:    connMaxIdleTime,
-		SlowQueryThreshold: slowQueryThreshold,
-	}, nil
 }
 
 // LoadRedisConfig 从文件加载 Redis 配置
@@ -190,21 +113,9 @@ func LoadMiddlewareConfig(configPath string) (*RateLimitConf, error) {
 	return &middlewareConfig.RateLimit, nil
 }
 
-// MergeExternalConfig 合并外部配置到主配置
-// 要求外部配置文件必须存在，不存在则报错
-func MergeExternalConfig(c *Config, mysqlConfigPath, redisConfigPath, middlewareConfigPath string) error {
-	// 从外部文件加载 MySQL 配置（必须存在）
-	if mysqlConfigPath == "" {
-		mysqlConfigPath = DefaultMySQLConfigPath
-	}
-	mysqlConf, err := LoadMySQLConfig(mysqlConfigPath)
-	if err != nil {
-		return errors.Wrap(err, "加载MySQL配置失败，配置文件必须存在")
-	}
-
-	// 直接使用外部文件的配置（包含所有MySQL相关参数）
-	c.Database = *mysqlConf
-
+// MergeExternalConfig 合并外部配置到主配置。gateway 拆分后不再直连任何 MySQL，只需要
+// 合并 Redis（必须存在）+ 中间件配置（可选）。
+func MergeExternalConfig(c *Config, redisConfigPath, middlewareConfigPath string) error {
 	// 从外部文件加载 Redis 配置（必须存在）
 	if redisConfigPath == "" {
 		redisConfigPath = DefaultRedisConfigPath

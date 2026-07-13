@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -32,8 +33,9 @@ func (l *NoticeDeleteLogic) NoticeDelete(req *types.NoticeDeleteReq) (resp *type
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	if err := l.svcCtx.Domain.System.Notice.DeleteByID(l.ctx, req.Id); err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "删除公告失败", err)
+	_, err = l.svcCtx.IamRPC.NoticeDelete(l.ctx, &iamclient.NoticeDeleteRequest{Id: req.Id})
+	if err != nil {
+		return nil, errs.WrapGRPCError("删除公告失败", err)
 	}
 
 	return &types.Response{

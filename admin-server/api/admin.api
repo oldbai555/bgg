@@ -1523,7 +1523,7 @@ service admin-api {
 @server (
 	group:      video/video_collect
 	prefix:     /api/v1
-	middleware: PerformanceMiddleware,CorsMiddleware,ApiEnabledMiddleware,OperationLogMiddleware
+	middleware: PerformanceMiddleware,CorsMiddleware,ApiEnabledMiddleware,PublicOperationLogMiddleware
 )
 service admin-api {
 	@handler VideoCollect

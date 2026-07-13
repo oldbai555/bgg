@@ -5,11 +5,11 @@ package api
 
 import (
 	"context"
-	"database/sql"
 
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -33,30 +33,16 @@ func (l *ApiUpdateLogic) ApiUpdate(req *types.ApiUpdateReq) error {
 		return errs.New(errs.CodeBadRequest, "接口ID不能为空")
 	}
 
-	api, err := l.svcCtx.Domain.IAM.Api.FindByID(l.ctx, req.Id)
+	_, err := l.svcCtx.IamRPC.ApiUpdate(l.ctx, &iamclient.ApiUpdateRequest{
+		Id:          req.Id,
+		Name:        req.Name,
+		Method:      req.Method,
+		Path:        req.Path,
+		Description: req.Description,
+		Status:      req.Status,
+	})
 	if err != nil {
-		return errs.Wrap(errs.CodeInternalError, "查询接口失败", err)
-	}
-
-	if req.Name != "" {
-		api.Name = req.Name
-	}
-	if req.Method != "" {
-		api.Method = req.Method
-	}
-	if req.Path != "" {
-		api.Path = req.Path
-	}
-	if req.Description != "" {
-		api.Description = sql.NullString{String: req.Description, Valid: true}
-	}
-	// Status 字段：0 是有效值（禁用），需要特殊处理
-	if req.Status == 0 || req.Status == 1 {
-		api.Status = req.Status
-	}
-
-	if err := l.svcCtx.Domain.IAM.Api.Update(l.ctx, api); err != nil {
-		return errs.Wrap(errs.CodeInternalError, "更新接口失败", err)
+		return errs.WrapGRPCError("更新接口失败", err)
 	}
 	return nil
 }

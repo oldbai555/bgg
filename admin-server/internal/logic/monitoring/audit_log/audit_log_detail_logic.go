@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -32,17 +33,9 @@ func (l *AuditLogDetailLogic) AuditLogDetail(req *types.AuditLogDetailReq) (resp
 		return nil, errs.New(errs.CodeBadRequest, "审计日志ID不能为空")
 	}
 
-	log, err := l.svcCtx.Domain.Monitoring.AuditLog.FindByID(l.ctx, req.Id)
+	log, err := l.svcCtx.IamRPC.AuditLogDetail(l.ctx, &iamclient.AuditLogDetailRequest{Id: req.Id})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "查询审计日志详情失败", err)
-	}
-	if log == nil {
-		return nil, errs.New(errs.CodeNotFound, "审计日志不存在")
-	}
-
-	auditDetail := ""
-	if log.AuditDetail.Valid {
-		auditDetail = log.AuditDetail.String
+		return nil, errs.WrapGRPCError("查询审计日志详情失败", err)
 	}
 
 	return &types.AuditLogDetailResp{
@@ -52,7 +45,7 @@ func (l *AuditLogDetailLogic) AuditLogDetail(req *types.AuditLogDetailReq) (resp
 			Username:    log.Username,
 			AuditType:   log.AuditType,
 			AuditObject: log.AuditObject,
-			AuditDetail: auditDetail,
+			AuditDetail: log.AuditDetail,
 			IpAddress:   log.IpAddress,
 			UserAgent:   log.UserAgent,
 			CreatedAt:   log.CreatedAt,

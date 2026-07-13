@@ -5,14 +5,11 @@ package daily_short_sentence
 
 import (
 	"context"
-	"database/sql"
-	"time"
 
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
-
-	"postapocgame/admin-server/internal/model/misc"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -36,34 +33,15 @@ func (l *DailyShortSentenceCreateLogic) DailyShortSentenceCreate(req *types.Dail
 		return errs.New(errs.CodeBadRequest, "短句内容不能为空")
 	}
 
-	sentenceType := req.SentenceType
-	if sentenceType == 0 {
-		sentenceType = 1 // 默认为普通类型
+	_, err := l.svcCtx.IamRPC.DailyShortSentenceCreate(l.ctx, &iamclient.DailyShortSentenceCreateRequest{
+		SentenceType:     req.SentenceType,
+		Content:          req.Content,
+		Img:              req.Img,
+		LiteratureAuthor: req.LiteratureAuthor,
+		ConvertImg:       req.ConvertImg,
+	})
+	if err != nil {
+		return errs.WrapGRPCError("创建每日短句失败", err)
 	}
-
-	now := time.Now().Unix()
-	sentence := misc.DailyShortSentence{
-		Type:      sentenceType,
-		Content:   req.Content,
-		CreatedAt: now,
-		UpdatedAt: now,
-		DeletedAt: 0,
-	}
-
-	// 处理可选字段
-	if req.Img != "" {
-		sentence.Img = sql.NullString{String: req.Img, Valid: true}
-	}
-	if req.LiteratureAuthor != "" {
-		sentence.LiteratureAuthor = sql.NullString{String: req.LiteratureAuthor, Valid: true}
-	}
-	if req.ConvertImg != "" {
-		sentence.ConvertImg = sql.NullString{String: req.ConvertImg, Valid: true}
-	}
-
-	if err := l.svcCtx.Domain.Misc.DailyShortSentence.Create(l.ctx, &sentence); err != nil {
-		return errs.Wrap(errs.CodeInternalError, "创建每日短句失败", err)
-	}
-
 	return nil
 }

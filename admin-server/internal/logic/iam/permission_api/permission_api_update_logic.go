@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -32,5 +33,12 @@ func (l *PermissionApiUpdateLogic) PermissionApiUpdate(req *types.PermissionApiU
 		return errs.New(errs.CodeBadRequest, "权限ID不能为空")
 	}
 
-	return l.svcCtx.Domain.IAM.RBAC.UpdatePermissionApis(l.ctx, req.PermissionId, req.ApiIds)
+	_, err := l.svcCtx.IamRPC.PermissionApiUpdate(l.ctx, &iamclient.PermissionApiUpdateRequest{
+		PermissionId: req.PermissionId,
+		ApiIds:       req.ApiIds,
+	})
+	if err != nil {
+		return errs.WrapGRPCError("更新权限接口失败", err)
+	}
+	return nil
 }

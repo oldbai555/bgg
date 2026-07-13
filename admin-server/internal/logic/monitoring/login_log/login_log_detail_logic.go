@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -32,9 +33,9 @@ func (l *LoginLogDetailLogic) LoginLogDetail(req *types.LoginLogDetailReq) (resp
 		return nil, errs.New(errs.CodeBadRequest, "登录日志ID不能为空")
 	}
 
-	log, err := l.svcCtx.Domain.Monitoring.LoginLog.FindByID(l.ctx, req.Id)
+	log, err := l.svcCtx.IamRPC.LoginLogDetail(l.ctx, &iamclient.LoginLogDetailRequest{Id: req.Id})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "查询登录日志详情失败", err)
+		return nil, errs.WrapGRPCError("查询登录日志详情失败", err)
 	}
 
 	return &types.LoginLogDetailResp{

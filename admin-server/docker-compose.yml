@@ -12,6 +12,8 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
       - ./db:/db:ro
+      # 00-init.sh 内部跑 db/services/init-dev-db.sh，第一步就建 iam+system+monitoring+misc
+      # 的表——iam-rpc 复用这个已经存在的 "admin" schema，不需要单独的 init-iam-db.sh。
       - ./db/docker-init.sh:/docker-entrypoint-initdb.d/00-init.sh:ro
       - ./db/services/init-task-db.sh:/docker-entrypoint-initdb.d/01-init-task-db.sh:ro
       - ./db/services/init-sdk-db.sh:/docker-entrypoint-initdb.d/02-init-sdk-db.sh:ro
@@ -38,13 +40,19 @@ services:
       context: .
       dockerfile: Dockerfile
     depends_on:
-      mysql:
-        condition: service_healthy
       redis:
         condition: service_healthy
+      iam:
+        condition: service_started
     environment:
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-local-dev-access-secret-not-for-prod}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-local-dev-refresh-secret-not-for-prod}
+      # iam-rpc 的服务名:端口，见 services/iam/ 和 18-service-extraction-runbook.md。
+      # gateway 不再直连任何 MySQL，Auth/Permission/ApiEnabled/OperationLog/Performance
+      # 5 个中间件和全部 iam/system/monitoring/misc logic 都通过这个 client 调用。
+      IAM_RPC_ENDPOINT: iam:8081
+      # IamCallback（RBAC 审计日志写入）走同一个 iam-rpc 地址，只是调用不同的 gRPC service。
+      IAM_CALLBACK_RPC_ENDPOINT: iam:8081
       # task-rpc 的服务名:端口，见 services/task/ 和 16-rpc-conventions.md 第 5 节。
       TASK_RPC_ENDPOINT: task:8090
       # sdk-rpc 的服务名:端口，见 services/sdk/。
@@ -53,17 +61,40 @@ services:
       CHAT_RPC_ENDPOINT: chat:8092
       # content-rpc 的服务名:端口，见 services/content/。
       CONTENT_RPC_ENDPOINT: content:8093
-    # admin.go 强制要求 -mysql-config/-redis-config 指向的 JSON 文件存在（MergeExternalConfig
-    # 找不到文件直接报错退出），etc/dev-mysql.json/etc/dev-redis.json 是仅供本地 compose 使用的
-    # 开发期配置（host 指向本 compose 内的服务名 mysql/redis，密码与上面 MYSQL_ROOT_PASSWORD
-    # 默认值一致），生产环境必须换成 /etc/work/ 下的真实文件，不能沿用这两个文件。
-    command: ["./admin", "-f", "etc/admin-api.yaml", "-mysql-config", "etc/dev-mysql.json", "-redis-config", "etc/dev-redis.json"]
+    # admin.go 强制要求 -redis-config 指向的 JSON 文件存在（MergeExternalConfig 找不到文件
+    # 直接报错退出），etc/dev-redis.json 是仅供本地 compose 使用的开发期配置（host 指向本
+    # compose 内的服务名 redis），生产环境必须换成 /etc/work/ 下的真实文件。iam+system+
+    # monitoring+misc 域拆分成 iam-rpc 后，gateway 不再直连 MySQL，不再需要 -mysql-config。
+    command: ["./admin", "-f", "etc/admin-api.yaml", "-redis-config", "etc/dev-redis.json"]
     ports:
       - "20000:20000"   # 需与 etc/admin-api.yaml 的 Port 一致
-      - "9001:9001"     # TaskCallback zrpc，task 容器回调用
-      - "9002:9002"     # IamCallback zrpc，chat 容器回调用
     volumes:
       - uploads:/app/uploads   # 导出文件的下载代理路径读这个卷，见 task 服务同名挂载
+
+  iam:
+    build:
+      context: .
+      dockerfile: services/iam/Dockerfile
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-local-dev-access-secret-not-for-prod}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-local-dev-refresh-secret-not-for-prod}
+      # 复用 "admin" schema（iam+system+monitoring+misc 从单体拆分前就一直在这个库里），
+      # 不是新建的 admin_iam，零数据迁移风险，见 services/iam/etc/iam.yaml 顶部注释。
+      IAM_MYSQL_DSN: "root:${MYSQL_ROOT_PASSWORD:-devroot}@tcp(mysql:3306)/${MYSQL_DATABASE:-admin}?charset=utf8mb4&parseTime=true&loc=Local"
+      IAM_REDIS_ADDRESS: redis:6379
+      IAM_REDIS_PASSWORD: ""
+      # sdk-rpc 的服务名:端口——原单体内嵌 TaskCallback server 的 fetchSdkCallLog 分支
+      # 回调用，见 services/iam/etc/iam.yaml。
+      SDK_RPC_ENDPOINT: sdk:8091
+      # chat-rpc 的服务名:端口——task 通知消费者推送 WS 通知时回调用。
+      CHAT_RPC_ENDPOINT: chat:8092
+    ports:
+      - "8081:8081"   # Iam + TaskCallback + IamCallback 三个 gRPC service 同一个端口
 
   task:
     build:
@@ -74,12 +105,15 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      iam:
+        condition: service_started
     environment:
       TASK_MYSQL_DSN: "root:${MYSQL_ROOT_PASSWORD:-devroot}@tcp(mysql:3306)/admin_task?charset=utf8mb4&parseTime=true&loc=Local"
       TASK_REDIS_ADDRESS: redis:6379
       TASK_REDIS_PASSWORD: ""
-      # 单体内嵌 TaskCallback server 所在的服务名:端口，见 etc/admin-api.yaml 的 TaskCallbackRpc 段。
-      TASK_CALLBACK_ENDPOINT: app:9001
+      # TaskCallback server 现在整体搬进了 iam-rpc 进程，见 etc/iam.yaml 顶部注释；
+      # 不再指向 gateway（app 容器）。
+      TASK_CALLBACK_ENDPOINT: iam:8081
     ports:
       - "8090:8090"
     volumes:
@@ -112,12 +146,15 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      iam:
+        condition: service_started
     environment:
       CHAT_MYSQL_DSN: "root:${MYSQL_ROOT_PASSWORD:-devroot}@tcp(mysql:3306)/admin_chat?charset=utf8mb4&parseTime=true&loc=Local"
       CHAT_REDIS_ADDRESS: redis:6379
       CHAT_REDIS_PASSWORD: ""
-      # 单体内嵌 IamCallback server 所在的服务名:端口，见 etc/admin-api.yaml 的 IamCallbackRpc 段。
-      IAM_CALLBACK_ENDPOINT: app:9002
+      # IamCallback server 现在整体搬进了 iam-rpc 进程，见 etc/iam.yaml 顶部注释；
+      # 不再指向 gateway（app 容器）。
+      IAM_CALLBACK_ENDPOINT: iam:8081
     ports:
       - "8092:8092"
 
@@ -130,14 +167,16 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      iam:
+        condition: service_started
     environment:
       CONTENT_MYSQL_DSN: "root:${MYSQL_ROOT_PASSWORD:-devroot}@tcp(mysql:3306)/admin_content?charset=utf8mb4&parseTime=true&loc=Local"
       CONTENT_REDIS_ADDRESS: redis:6379
       CONTENT_REDIS_PASSWORD: ""
-      # 单体内嵌 IamCallback server 所在的服务名:端口，供 PublicBlogAuthorInfo/
-      # BlogArticleAudit/BlogArticleAuditUnpublish 回调，见 etc/admin-api.yaml 的
-      # IamCallbackRpc 段。
-      IAM_CALLBACK_ENDPOINT: app:9002
+      # IamCallback server 现在整体搬进了 iam-rpc 进程，供 PublicBlogAuthorInfo/
+      # BlogArticleAudit/BlogArticleAuditUnpublish 回调，见 etc/iam.yaml 顶部注释；
+      # 不再指向 gateway（app 容器）。
+      IAM_CALLBACK_ENDPOINT: iam:8081
     ports:
       - "8093:8093"
 

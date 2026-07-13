@@ -9,9 +9,9 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type UserUpdateLogic struct {
@@ -33,50 +33,18 @@ func (l *UserUpdateLogic) UserUpdate(req *types.UserUpdateReq) error {
 		return errs.New(errs.CodeBadRequest, "用户ID不能为空")
 	}
 
-	user, err := l.svcCtx.Domain.IAM.User.FindByID(l.ctx, req.Id)
+	_, err := l.svcCtx.IamRPC.UserUpdate(l.ctx, &iamclient.UserUpdateRequest{
+		Id:           req.Id,
+		Username:     req.Username,
+		Nickname:     req.Nickname,
+		Password:     req.Password,
+		Avatar:       req.Avatar,
+		Signature:    req.Signature,
+		DepartmentId: req.DepartmentId,
+		Status:       req.Status,
+	})
 	if err != nil {
-		return errs.Wrap(errs.CodeInternalError, "查询用户失败", err)
-	}
-
-	if req.Username != "" {
-		// 检查新用户名是否已被其他用户使用
-		existing, err := l.svcCtx.Domain.IAM.User.FindByUsername(l.ctx, req.Username)
-		if err == nil && existing.Id != req.Id {
-			return errs.New(errs.CodeBadRequest, "用户名已被使用")
-		}
-		user.Username = req.Username
-	}
-
-	if req.Password != "" {
-		hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
-		if err != nil {
-			return errs.Wrap(errs.CodeInternalError, "密码加密失败", err)
-		}
-		user.PasswordHash = string(hash)
-	}
-
-	if req.DepartmentId != 0 {
-		user.DepartmentId = req.DepartmentId
-	}
-
-	// 更新昵称、头像和个性签名
-	if req.Nickname != "" {
-		user.Nickname = req.Nickname
-	}
-	if req.Avatar != "" {
-		user.Avatar = req.Avatar
-	}
-	if req.Signature != "" {
-		user.Signature = req.Signature
-	}
-
-	// Status 字段：0 是有效值（禁用），需要特殊处理
-	if req.Status == 0 || req.Status == 1 {
-		user.Status = req.Status
-	}
-
-	if err := l.svcCtx.Domain.IAM.User.Update(l.ctx, user); err != nil {
-		return errs.Wrap(errs.CodeInternalError, "更新用户失败", err)
+		return errs.WrapGRPCError("更新用户失败", err)
 	}
 	return nil
 }

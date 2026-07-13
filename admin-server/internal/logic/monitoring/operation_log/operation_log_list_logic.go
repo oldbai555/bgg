@@ -5,10 +5,12 @@ package operation_log
 
 import (
 	"context"
+
 	"postapocgame/admin-server/internal/logic/logicutil"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -32,32 +34,25 @@ func (l *OperationLogListLogic) OperationLogList(req *types.OperationLogListReq)
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	// 统一分页参数
 	req.Page, req.PageSize = logicutil.NormalizePage(req.Page, req.PageSize, 20, 100)
 
-	list, total, err := l.svcCtx.Domain.Monitoring.OperationLog.FindPage(
-		l.ctx,
-		req.Page,
-		req.PageSize,
-		req.UserId,
-		req.Username,
-		req.OperationType,
-		req.OperationObject,
-		req.Method,
-		req.StartTime,
-		req.EndTime,
-	)
+	rpcResp, err := l.svcCtx.IamRPC.OperationLogList(l.ctx, &iamclient.OperationLogListRequest{
+		Page:            req.Page,
+		PageSize:        req.PageSize,
+		UserId:          req.UserId,
+		Username:        req.Username,
+		OperationType:   req.OperationType,
+		OperationObject: req.OperationObject,
+		Method:          req.Method,
+		StartTime:       req.StartTime,
+		EndTime:         req.EndTime,
+	})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "查询操作日志列表失败", err)
+		return nil, errs.WrapGRPCError("查询操作日志列表失败", err)
 	}
 
-	items := make([]types.OperationLogItem, 0, len(list))
-	for _, log := range list {
-		requestParams := ""
-		if log.RequestParams.Valid {
-			requestParams = log.RequestParams.String
-		}
-
+	items := make([]types.OperationLogItem, 0, len(rpcResp.List))
+	for _, log := range rpcResp.List {
 		items = append(items, types.OperationLogItem{
 			Id:              log.Id,
 			UserId:          log.UserId,
@@ -66,7 +61,7 @@ func (l *OperationLogListLogic) OperationLogList(req *types.OperationLogListReq)
 			OperationObject: log.OperationObject,
 			Method:          log.Method,
 			Path:            log.Path,
-			RequestParams:   requestParams,
+			RequestParams:   log.RequestParams,
 			ResponseCode:    int(log.ResponseCode),
 			ResponseMsg:     log.ResponseMsg,
 			IpAddress:       log.IpAddress,
@@ -77,7 +72,7 @@ func (l *OperationLogListLogic) OperationLogList(req *types.OperationLogListReq)
 	}
 
 	return &types.OperationLogListResp{
-		Total: total,
+		Total: rpcResp.Total,
 		List:  items,
 	}, nil
 }

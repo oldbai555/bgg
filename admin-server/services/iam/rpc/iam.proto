@@ -1,0 +1,1219 @@
+syntax = "proto3";
+
+package iam;
+
+option go_package = "./iam";
+
+// iam-rpc 承载 Phase 1 分组约定里的 iam + system + monitoring + misc 四个子域
+// （db/services/iam/ 下的全部模块），是 Phase 2 五个服务里最后拆分、也是唯一被其余
+// 四个服务（task/sdk/chat/content）依赖做权限校验/用户资料查询的服务。
+//
+// 本 proto 只承担"新增的 Iam 服务"本身。pkg/taskcallback.TaskCallback、
+// pkg/iamcallback.IamCallback 两个已经在 task-rpc/chat-rpc/content-rpc 拆分时
+// 定型的独立 proto 契约保持不变（其余服务的 client 代码不用动），服务端实现原样
+// 从单体的 internal/rpcserver/{taskcallback,iamcallback}/ 搬进本服务的
+// internal/server/，和 Iam 服务一起注册在同一个 zrpc.Server 上（见 iam.go）。
+
+message Empty {}
+
+// ---------- 权限校验 / 用户资料（16-rpc-conventions.md 第 4 节基础契约） ----------
+
+message CheckPermissionRequest {
+  uint64 user_id = 1;
+  string method = 2;
+  string path = 3;
+}
+
+message CheckPermissionResponse {
+  bool allowed = 1;
+  string reason = 2;
+}
+
+// GetUserProfile/BatchGetUserProfiles/FindActiveUserChunk/RecordAuditLog/
+// IsTokenBlacklisted 不在这个 proto 里：chat-rpc/content-rpc 已经在各自拆分时通过
+// pkg/iamcallback.IamCallback 这个独立契约实现了等价能力（且是真实在用的，
+// BatchGetUserProfiles 反而从未被任何服务调用过——只是 16-rpc-conventions.md 第 4 节
+// 早期草稿设想的方法，实际落地走的是 IamCallback 这条路）。iam-rpc 拆分时把
+// internal/rpcserver/iamcallback/ 的服务端实现原样搬进 services/iam/internal/server/，
+// 和 pkg/taskcallback 的服务端实现一起注册在本服务同一个 zrpc.Server 上（见 iam.go），
+// 两个 proto 契约本身不变，chat-rpc/content-rpc/task-rpc 侧代码零改动，只改配置里的
+// 回调地址指向 iam-rpc。IsTokenBlacklisted 同理不需要：黑名单检查直连共享 Redis，
+// 见 16-rpc-conventions.md 第 6 节。
+
+// ---------- Gateway 基础设施回调（中间件切换成 RPC 后新增，16/18 文档草稿未覆盖） ----------
+
+// CheckApiEnabled 供 gateway ApiEnabledMiddleware：判断某个 method+path 对应的
+// admin_api 记录是否存在且已启用。
+message CheckApiEnabledRequest {
+  string method = 1;
+  string path = 2;
+}
+
+message CheckApiEnabledResponse {
+  bool exists = 1;
+  bool enabled = 2;
+}
+
+// SyncApiRoutes 供 gateway 启动时把 rest.Server 已注册的路由同步进 admin_api 表
+// （原 admin.go 的 syncRoutesToAdminAPI，直连 AdminApiModel；拆分后 gateway 没有
+// 直连数据库的能力，改成一次性批量 RPC，逻辑原样保留在 iam-rpc 侧）。
+message ApiRouteRef {
+  string method = 1;
+  string path = 2;
+}
+
+message SyncApiRoutesRequest {
+  repeated ApiRouteRef routes = 1;
+}
+
+// BatchRecordOperationLog 供 gateway 的 OperationLogMiddleware/
+// PublicOperationLogMiddleware：两个中间件各自在进程内缓冲批量后调用一次。
+message OperationLogEntry {
+  uint64 user_id = 1;
+  string username = 2;
+  string operation_type = 3;
+  string operation_object = 4;
+  string method = 5;
+  string path = 6;
+  string request_params = 7;
+  int64 response_code = 8;
+  string response_msg = 9;
+  string ip_address = 10;
+  string user_agent = 11;
+  int64 duration = 12;
+}
+
+message BatchRecordOperationLogRequest {
+  repeated OperationLogEntry logs = 1;
+}
+
+// RecordPerformanceLog 供 gateway 的 PerformanceMiddleware（仅慢接口/错误请求才调用，
+// 原语义不变，见 internal/middleware/performancemiddleware.go）。
+message RecordPerformanceLogRequest {
+  uint64 user_id = 1;
+  string username = 2;
+  string method = 3;
+  string path = 4;
+  int64 status_code = 5;
+  int64 duration = 6;
+  int64 is_slow = 7;
+  int64 slow_threshold = 8;
+  string ip_address = 9;
+  string user_agent = 10;
+  string error_msg = 11;
+}
+
+// FileRegister / FileGetMeta 供 gateway 的 FileUpload/FileDownload：文件字节继续由
+// gateway 直接读写共享 uploads 卷（和 task/content 拆分时的既有做法一致），只有
+// admin_file 元数据的登记/查询走 RPC（该表物理属于 iam）。
+message FileRegisterRequest {
+  string name = 1;          // MD5 + 扩展名
+  string original_name = 2;
+  string path = 3;          // 代理访问路径，如 /api/v1/files/uploads/<name>
+  string base_url = 4;
+  uint64 size = 5;
+  string mime_type = 6;
+  string ext = 7;
+}
+
+message FileRegisterResponse {
+  uint64 id = 1;
+  string name = 2;
+  string original_name = 3;
+  string path = 4;
+  string base_url = 5;
+  uint64 size = 6;
+  string mime_type = 7;
+  string ext = 8;
+  bool already_existed = 9; // true 表示按 MD5 命中已有记录，未新建
+}
+
+message FileGetMetaRequest {
+  uint64 id = 1;
+}
+
+message FileGetMetaResponse {
+  bool exists = 1;
+  string original_name = 2;
+  string mime_type = 3;
+  string path = 4; // 代理访问路径，gateway 自己转换成 uploads 卷内的文件系统路径
+}
+
+// Ping 供 gateway /api/v1/ping 探测 iam-rpc 是否可达（gateway 自身不再直连 MySQL，
+// 原来的 "SELECT 1" 数据库探活改成这个最小 RPC；Redis 探活 gateway 直接查共享 Redis）。
+message PingResponse {
+  bool ok = 1;
+}
+
+// ---------- Auth ----------
+
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+  string client_ip = 3;
+  string user_agent = 4;
+}
+
+message TokenPair {
+  string access_token = 1;
+  string refresh_token = 2;
+}
+
+message RefreshRequest {
+  string refresh_token = 1;
+}
+
+message LogoutRequest {
+  string access_token = 1;
+  string refresh_token = 2;
+}
+
+message ProfileRequest {
+  uint64 user_id = 1;
+}
+
+message ProfileResponse {
+  uint64 id = 1;
+  string username = 2;
+  string nickname = 3;
+  string avatar = 4;
+  string signature = 5;
+  repeated string permissions = 6;
+}
+
+message ProfileUpdateRequest {
+  uint64 user_id = 1;
+  string nickname = 2;
+  string avatar = 3;
+  string signature = 4;
+}
+
+message PasswordChangeRequest {
+  uint64 user_id = 1;
+  string old_password = 2;
+  string new_password = 3;
+}
+
+// ---------- User ----------
+
+message UserItem {
+  uint64 id = 1;
+  string username = 2;
+  string nickname = 3;
+  string avatar = 4;
+  string signature = 5;
+  uint64 department_id = 6;
+  int64 status = 7;
+  int64 created_at = 8;
+}
+
+message UserCreateRequest {
+  string username = 1;
+  string nickname = 2;
+  string password = 3;
+  string avatar = 4;
+  string signature = 5;
+  uint64 department_id = 6;
+  int64 status = 7;
+}
+
+message UserUpdateRequest {
+  uint64 id = 1;
+  string username = 2;
+  string nickname = 3;
+  string password = 4;
+  string avatar = 5;
+  string signature = 6;
+  uint64 department_id = 7;
+  int64 status = 8;
+}
+
+message UserDeleteRequest {
+  uint64 id = 1;
+}
+
+message UserListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  string username = 3;
+}
+
+message UserListResponse {
+  int64 total = 1;
+  repeated UserItem list = 2;
+}
+
+// ---------- Role ----------
+
+message RoleItem {
+  uint64 id = 1;
+  string name = 2;
+  string code = 3;
+  string description = 4;
+  int64 status = 5;
+}
+
+message RoleCreateRequest {
+  string name = 1;
+  string code = 2;
+  string description = 3;
+  int64 status = 4;
+}
+
+message RoleUpdateRequest {
+  uint64 id = 1;
+  string name = 2;
+  string description = 3;
+  int64 status = 4;
+}
+
+message RoleDeleteRequest {
+  uint64 id = 1;
+}
+
+message RoleListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  string name = 3;
+}
+
+message RoleListResponse {
+  int64 total = 1;
+  repeated RoleItem list = 2;
+}
+
+// ---------- Permission ----------
+
+message PermissionItem {
+  uint64 id = 1;
+  string name = 2;
+  string code = 3;
+  string description = 4;
+}
+
+message PermissionCreateRequest {
+  string name = 1;
+  string code = 2;
+  string description = 3;
+}
+
+message PermissionUpdateRequest {
+  uint64 id = 1;
+  string name = 2;
+  string description = 3;
+}
+
+message PermissionDeleteRequest {
+  uint64 id = 1;
+}
+
+message PermissionListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  string name = 3;
+}
+
+message PermissionListResponse {
+  int64 total = 1;
+  repeated PermissionItem list = 2;
+}
+
+// ---------- Menu ----------
+
+message MenuItem {
+  uint64 id = 1;
+  uint64 parent_id = 2;
+  string name = 3;
+  string path = 4;
+  string component = 5;
+  string icon = 6;
+  int64 menu_type = 7;
+  int64 order_num = 8;
+  int64 visible = 9;
+  int64 status = 10;
+  string permission_code = 11;
+  repeated MenuItem children = 12;
+}
+
+message MenuCreateRequest {
+  uint64 parent_id = 1;
+  string name = 2;
+  string path = 3;
+  string component = 4;
+  string icon = 5;
+  int64 menu_type = 6;
+  int64 order_num = 7;
+  int64 visible = 8;
+  int64 status = 9;
+}
+
+message MenuUpdateRequest {
+  uint64 id = 1;
+  uint64 parent_id = 2;
+  string name = 3;
+  string path = 4;
+  string component = 5;
+  string icon = 6;
+  int64 menu_type = 7;
+  int64 order_num = 8;
+  int64 visible = 9;
+  int64 status = 10;
+}
+
+message MenuDeleteRequest {
+  uint64 id = 1;
+}
+
+message MenuTreeResponse {
+  repeated MenuItem list = 1;
+}
+
+message MenuMyTreeRequest {
+  uint64 user_id = 1;
+}
+
+// ---------- Department ----------
+
+message DepartmentItem {
+  uint64 id = 1;
+  uint64 parent_id = 2;
+  string name = 3;
+  int64 order_num = 4;
+  int64 status = 5;
+  repeated DepartmentItem children = 6;
+}
+
+message DepartmentCreateRequest {
+  uint64 parent_id = 1;
+  string name = 2;
+  int64 order_num = 3;
+  int64 status = 4;
+}
+
+message DepartmentUpdateRequest {
+  uint64 id = 1;
+  uint64 parent_id = 2;
+  string name = 3;
+  int64 order_num = 4;
+  int64 status = 5;
+}
+
+message DepartmentDeleteRequest {
+  uint64 id = 1;
+}
+
+message DepartmentTreeResponse {
+  repeated DepartmentItem list = 1;
+}
+
+// ---------- Api ----------
+
+message ApiItem {
+  uint64 id = 1;
+  string name = 2;
+  string method = 3;
+  string path = 4;
+  string description = 5;
+  int64 status = 6;
+  int64 created_at = 7;
+}
+
+message ApiCreateRequest {
+  string name = 1;
+  string method = 2;
+  string path = 3;
+  string description = 4;
+  int64 status = 5;
+}
+
+message ApiUpdateRequest {
+  uint64 id = 1;
+  string name = 2;
+  string method = 3;
+  string path = 4;
+  string description = 5;
+  int64 status = 6;
+}
+
+message ApiDeleteRequest {
+  uint64 id = 1;
+}
+
+message ApiListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  string name = 3;
+}
+
+message ApiListResponse {
+  int64 total = 1;
+  repeated ApiItem list = 2;
+}
+
+// ---------- 关联关系（PermissionMenu / PermissionApi / UserRole / RolePermission） ----------
+
+message PermissionMenuListRequest {
+  uint64 permission_id = 1;
+}
+
+message PermissionMenuListResponse {
+  repeated uint64 menu_ids = 1;
+}
+
+message PermissionMenuUpdateRequest {
+  uint64 permission_id = 1;
+  repeated uint64 menu_ids = 2;
+}
+
+message PermissionApiListRequest {
+  uint64 permission_id = 1;
+}
+
+message PermissionApiListResponse {
+  repeated uint64 api_ids = 1;
+}
+
+message PermissionApiUpdateRequest {
+  uint64 permission_id = 1;
+  repeated uint64 api_ids = 2;
+}
+
+message UserRoleListRequest {
+  uint64 user_id = 1;
+}
+
+message UserRoleListResponse {
+  repeated uint64 role_ids = 1;
+}
+
+message UserRoleUpdateRequest {
+  uint64 user_id = 1;
+  repeated uint64 role_ids = 2;
+}
+
+message RolePermissionListRequest {
+  uint64 role_id = 1;
+}
+
+message RolePermissionListResponse {
+  repeated uint64 permission_ids = 1;
+}
+
+message RolePermissionUpdateRequest {
+  uint64 role_id = 1;
+  repeated uint64 permission_ids = 2;
+}
+
+// ---------- Config ----------
+
+message ConfigItem {
+  uint64 id = 1;
+  string group = 2;
+  string key = 3;
+  string value = 4;
+  string config_type = 5;
+  string description = 6;
+  int64 created_at = 7;
+}
+
+message ConfigCreateRequest {
+  string group = 1;
+  string key = 2;
+  string value = 3;
+  string config_type = 4;
+  string description = 5;
+}
+
+message ConfigUpdateRequest {
+  uint64 id = 1;
+  string value = 2;
+  string description = 3;
+}
+
+message ConfigDeleteRequest {
+  uint64 id = 1;
+}
+
+message ConfigListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  string group = 3;
+  string key = 4;
+}
+
+message ConfigListResponse {
+  int64 total = 1;
+  repeated ConfigItem list = 2;
+}
+
+message ConfigGetRequest {
+  string key = 1;
+}
+
+message ConfigGetResponse {
+  string value = 1;
+}
+
+// ---------- Dict (DictType / DictItem / 公共查询) ----------
+
+message DictTypeItem {
+  uint64 id = 1;
+  string name = 2;
+  string code = 3;
+  string description = 4;
+  int64 status = 5;
+  int64 created_at = 6;
+}
+
+message DictTypeCreateRequest {
+  string name = 1;
+  string code = 2;
+  string description = 3;
+  int64 status = 4;
+}
+
+message DictTypeUpdateRequest {
+  uint64 id = 1;
+  string name = 2;
+  string description = 3;
+  int64 status = 4;
+}
+
+message DictTypeDeleteRequest {
+  uint64 id = 1;
+}
+
+message DictTypeListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  string name = 3;
+  string code = 4;
+}
+
+message DictTypeListResponse {
+  int64 total = 1;
+  repeated DictTypeItem list = 2;
+}
+
+message DictItemItem {
+  uint64 id = 1;
+  uint64 type_id = 2;
+  string label = 3;
+  string value = 4;
+  int64 sort = 5;
+  int64 status = 6;
+  string remark = 7;
+  int64 created_at = 8;
+}
+
+message DictItemCreateRequest {
+  uint64 type_id = 1;
+  string label = 2;
+  string value = 3;
+  int64 sort = 4;
+  int64 status = 5;
+  string remark = 6;
+}
+
+message DictItemUpdateRequest {
+  uint64 id = 1;
+  string label = 2;
+  string value = 3;
+  int64 sort = 4;
+  int64 status = 5;
+  string remark = 6;
+}
+
+message DictItemDeleteRequest {
+  uint64 id = 1;
+}
+
+message DictItemListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  uint64 type_id = 3;
+  string label = 4;
+}
+
+message DictItemListResponse {
+  int64 total = 1;
+  repeated DictItemItem list = 2;
+}
+
+// DictGet 供后台"按 code 查字典项"（登录态可选，isPublic 只影响 gateway 侧是否要求鉴权，
+// 底层查询逻辑完全一致，因此后台 DictGet 和公共 PublicDictGet 共用同一个 RPC 方法）。
+message DictGetRequest {
+  string code = 1;
+}
+
+message DictGetResponse {
+  string code = 1;
+  repeated DictItemItem items = 2;
+}
+
+message DictBatchGetRequest {
+  repeated string codes = 1;
+}
+
+message DictBatchGetResponse {
+  map<string, DictGetResponse> dicts = 1;
+}
+
+// ---------- File ----------
+
+message FileItem {
+  uint64 id = 1;
+  string name = 2;
+  string original_name = 3;
+  string path = 4;
+  string base_url = 5;
+  int64 status = 6;
+  int64 created_at = 7;
+}
+
+message FileCreateRequest {
+  string name = 1;
+  int64 status = 2;
+}
+
+message FileUpdateRequest {
+  uint64 id = 1;
+  string name = 2;
+  int64 status = 3;
+}
+
+message FileDeleteRequest {
+  uint64 id = 1;
+}
+
+message FileListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  string name = 3;
+}
+
+message FileListResponse {
+  int64 total = 1;
+  repeated FileItem list = 2;
+}
+
+// ---------- Notice ----------
+
+message NoticeItem {
+  uint64 id = 1;
+  string title = 2;
+  string content = 3;
+  int64 notice_type = 4;
+  int64 status = 5;
+  int64 publish_time = 6;
+  uint64 created_by = 7;
+  int64 created_at = 8;
+  int64 updated_at = 9;
+}
+
+message NoticeCreateRequest {
+  string title = 1;
+  string content = 2;
+  int64 notice_type = 3;
+  int64 status = 4;
+  int64 publish_time = 5;
+  uint64 operator_user_id = 6;
+}
+
+message NoticeUpdateRequest {
+  uint64 id = 1;
+  string title = 2;
+  string content = 3;
+  int64 notice_type = 4;
+  int64 status = 5;
+  int64 publish_time = 6;
+}
+
+message NoticeDeleteRequest {
+  uint64 id = 1;
+}
+
+message NoticeListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  string title = 3;
+  int64 notice_type = 4;
+  int64 status = 5;
+}
+
+message NoticeListResponse {
+  int64 total = 1;
+  repeated NoticeItem list = 2;
+}
+
+// ---------- Notification ----------
+
+message NotificationItem {
+  uint64 id = 1;
+  uint64 user_id = 2;
+  string source_type = 3;
+  uint64 source_id = 4;
+  string title = 5;
+  string content = 6;
+  int64 read_status = 7;
+  int64 read_at = 8;
+  int64 created_at = 9;
+  int64 updated_at = 10;
+}
+
+message NotificationListRequest {
+  uint64 user_id = 1;
+  int64 page = 2;
+  int64 page_size = 3;
+  string source_type = 4;
+  int64 read_status = 5;
+}
+
+message NotificationListResponse {
+  int64 total = 1;
+  repeated NotificationItem list = 2;
+}
+
+message NotificationReadRequest {
+  uint64 user_id = 1;
+  uint64 id = 2;
+}
+
+message NotificationReadAllRequest {
+  uint64 user_id = 1;
+}
+
+message NotificationClearReadRequest {
+  uint64 user_id = 1;
+}
+
+message NotificationDeleteRequest {
+  uint64 user_id = 1;
+  uint64 id = 2;
+}
+
+// ---------- OperationLog（导出走 task-rpc，不在这里；见 progress.md 记录） ----------
+
+message OperationLogItem {
+  uint64 id = 1;
+  uint64 user_id = 2;
+  string username = 3;
+  string operation_type = 4;
+  string operation_object = 5;
+  string method = 6;
+  string path = 7;
+  string request_params = 8;
+  int64 response_code = 9;
+  string response_msg = 10;
+  string ip_address = 11;
+  string user_agent = 12;
+  int64 duration = 13;
+  int64 created_at = 14;
+}
+
+message OperationLogListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  uint64 user_id = 3;
+  string username = 4;
+  string operation_type = 5;
+  string operation_object = 6;
+  string method = 7;
+  string start_time = 8;
+  string end_time = 9;
+}
+
+message OperationLogListResponse {
+  int64 total = 1;
+  repeated OperationLogItem list = 2;
+}
+
+message OperationLogDetailRequest {
+  uint64 id = 1;
+}
+
+// ---------- LoginLog ----------
+
+message LoginLogItem {
+  uint64 id = 1;
+  uint64 user_id = 2;
+  string username = 3;
+  string ip_address = 4;
+  string location = 5;
+  string browser = 6;
+  string os = 7;
+  string user_agent = 8;
+  int64 status = 9;
+  string message = 10;
+  int64 login_at = 11;
+  int64 logout_at = 12;
+  int64 created_at = 13;
+}
+
+message LoginLogListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  uint64 user_id = 3;
+  string username = 4;
+  int64 status = 5;
+  string start_time = 6;
+  string end_time = 7;
+}
+
+message LoginLogListResponse {
+  int64 total = 1;
+  repeated LoginLogItem list = 2;
+}
+
+message LoginLogDetailRequest {
+  uint64 id = 1;
+}
+
+message LoginLogStatsResponse {
+  int64 total_count = 1;
+  int64 success_count = 2;
+  int64 failure_count = 3;
+  int64 today_count = 4;
+  int64 today_success = 5;
+  int64 today_failure = 6;
+  int64 online_user_count = 7;
+}
+
+// ---------- PerformanceLog（导出走 task-rpc） ----------
+
+message PerformanceLogItem {
+  uint64 id = 1;
+  uint64 user_id = 2;
+  string username = 3;
+  string method = 4;
+  string path = 5;
+  int64 status_code = 6;
+  int64 duration = 7;
+  int64 is_slow = 8;
+  int64 slow_threshold = 9;
+  string ip_address = 10;
+  string user_agent = 11;
+  string error_msg = 12;
+  int64 created_at = 13;
+}
+
+message PerformanceLogListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  string method = 3;
+  string path = 4;
+  int64 is_slow = 5;
+  int64 status_code = 6;
+  string start_time = 7;
+  string end_time = 8;
+}
+
+message PerformanceLogListResponse {
+  int64 total = 1;
+  repeated PerformanceLogItem list = 2;
+}
+
+// ---------- AuditLog（导出走 task-rpc） ----------
+
+message AuditLogItem {
+  uint64 id = 1;
+  uint64 user_id = 2;
+  string username = 3;
+  string audit_type = 4;
+  string audit_object = 5;
+  string audit_detail = 6;
+  string ip_address = 7;
+  string user_agent = 8;
+  int64 created_at = 9;
+}
+
+message AuditLogListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  uint64 user_id = 3;
+  string username = 4;
+  string audit_type = 5;
+  string audit_object = 6;
+  string start_time = 7;
+  string end_time = 8;
+}
+
+message AuditLogListResponse {
+  int64 total = 1;
+  repeated AuditLogItem list = 2;
+}
+
+message AuditLogDetailRequest {
+  uint64 id = 1;
+}
+
+// ---------- Metric ----------
+
+message MetricReportRequest {
+  string module = 1;
+  uint64 biz_id = 2;
+  string event = 3;
+  string extra = 4;
+  string client_ip = 5;
+  string user_agent = 6;
+}
+
+message MetricStatsRequest {
+  string module = 1;
+  uint64 biz_id = 2;
+  string day = 3;
+}
+
+message MetricStatsResponse {
+  string module = 1;
+  uint64 biz_id = 2;
+  string day = 3;
+  int64 pv = 4;
+  int64 uv = 5;
+  int64 vv = 6;
+  int64 ip = 7;
+}
+
+// ---------- Monitor ----------
+
+message MonitorStatsResponse {
+  int64 user_count = 1;
+  int64 role_count = 2;
+  int64 permission_count = 3;
+  int64 menu_count = 4;
+  int64 online_user_count = 5;
+  int64 operation_log_count = 6;
+  int64 login_log_count = 7;
+}
+
+// MonitorStatus（CPU/内存/磁盘/网络）读的是 iam-rpc 进程自己所在机器的资源，不是 gateway
+// 所在机器——拆分后这是一处有意的语义变化（原来单体只有一个进程，读到的和 API 网关是
+// 同一台机器；现在读到的是 iam-rpc 容器/进程的资源），已记入 progress.md，不是 bug。
+message MonitorStatusResponse {
+  double cpu_usage = 1;
+  int32 cpu_cores = 2;
+  uint64 memory_total = 3;
+  uint64 memory_used = 4;
+  uint64 memory_available = 5;
+  double memory_usage = 6;
+  uint64 disk_total = 7;
+  uint64 disk_used = 8;
+  uint64 disk_available = 9;
+  double disk_usage = 10;
+  uint64 network_bytes_sent = 11;
+  uint64 network_bytes_recv = 12;
+  uint64 network_packets_sent = 13;
+  uint64 network_packets_recv = 14;
+}
+
+// ---------- Demo / DailyShortSentence（misc 域，标准 CRUD） ----------
+
+message DemoItem {
+  uint64 id = 1;
+  string name = 2;
+  int64 status = 3;
+  int64 created_at = 4;
+}
+
+message DemoCreateRequest {
+  string name = 1;
+  int64 status = 2;
+}
+
+message DemoUpdateRequest {
+  uint64 id = 1;
+  string name = 2;
+  int64 status = 3;
+}
+
+message DemoDeleteRequest {
+  uint64 id = 1;
+}
+
+message DemoListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  string name = 3;
+}
+
+message DemoListResponse {
+  int64 total = 1;
+  repeated DemoItem list = 2;
+}
+
+message DailyShortSentenceItem {
+  uint64 id = 1;
+  int64 sentence_type = 2;
+  string content = 3;
+  string img = 4;
+  string literature_author = 5;
+  string convert_img = 6;
+  int64 created_at = 7;
+  int64 updated_at = 8;
+}
+
+message DailyShortSentenceCreateRequest {
+  int64 sentence_type = 1;
+  string content = 2;
+  string img = 3;
+  string literature_author = 4;
+  string convert_img = 5;
+}
+
+message DailyShortSentenceUpdateRequest {
+  uint64 id = 1;
+  int64 sentence_type = 2;
+  string content = 3;
+  string img = 4;
+  string literature_author = 5;
+  string convert_img = 6;
+}
+
+message DailyShortSentenceDeleteRequest {
+  uint64 id = 1;
+}
+
+message DailyShortSentenceListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  string keyword = 3;
+  int64 sentence_type = 4;
+}
+
+message DailyShortSentenceListResponse {
+  int64 total = 1;
+  repeated DailyShortSentenceItem list = 2;
+}
+
+service Iam {
+  // 权限校验（GetUserProfile 等见 pkg/iamcallback.IamCallback，同一进程内另注册）
+  rpc CheckPermission(CheckPermissionRequest) returns (CheckPermissionResponse);
+
+  // Gateway 基础设施
+  rpc CheckApiEnabled(CheckApiEnabledRequest) returns (CheckApiEnabledResponse);
+  rpc SyncApiRoutes(SyncApiRoutesRequest) returns (Empty);
+  rpc BatchRecordOperationLog(BatchRecordOperationLogRequest) returns (Empty);
+  rpc RecordPerformanceLog(RecordPerformanceLogRequest) returns (Empty);
+  rpc FileRegister(FileRegisterRequest) returns (FileRegisterResponse);
+  rpc FileGetMeta(FileGetMetaRequest) returns (FileGetMetaResponse);
+  rpc Ping(Empty) returns (PingResponse);
+
+  // Auth
+  rpc Login(LoginRequest) returns (TokenPair);
+  rpc Refresh(RefreshRequest) returns (TokenPair);
+  rpc Logout(LogoutRequest) returns (Empty);
+  rpc Profile(ProfileRequest) returns (ProfileResponse);
+  rpc ProfileUpdate(ProfileUpdateRequest) returns (Empty);
+  rpc PasswordChange(PasswordChangeRequest) returns (Empty);
+
+  // User / Role / Permission / Menu / Department / Api
+  rpc UserCreate(UserCreateRequest) returns (Empty);
+  rpc UserUpdate(UserUpdateRequest) returns (Empty);
+  rpc UserDelete(UserDeleteRequest) returns (Empty);
+  rpc UserList(UserListRequest) returns (UserListResponse);
+
+  rpc RoleCreate(RoleCreateRequest) returns (Empty);
+  rpc RoleUpdate(RoleUpdateRequest) returns (Empty);
+  rpc RoleDelete(RoleDeleteRequest) returns (Empty);
+  rpc RoleList(RoleListRequest) returns (RoleListResponse);
+
+  rpc PermissionCreate(PermissionCreateRequest) returns (Empty);
+  rpc PermissionUpdate(PermissionUpdateRequest) returns (Empty);
+  rpc PermissionDelete(PermissionDeleteRequest) returns (Empty);
+  rpc PermissionList(PermissionListRequest) returns (PermissionListResponse);
+
+  rpc MenuCreate(MenuCreateRequest) returns (Empty);
+  rpc MenuUpdate(MenuUpdateRequest) returns (Empty);
+  rpc MenuDelete(MenuDeleteRequest) returns (Empty);
+  rpc MenuTree(Empty) returns (MenuTreeResponse);
+  rpc MenuMyTree(MenuMyTreeRequest) returns (MenuTreeResponse);
+
+  rpc DepartmentCreate(DepartmentCreateRequest) returns (Empty);
+  rpc DepartmentUpdate(DepartmentUpdateRequest) returns (Empty);
+  rpc DepartmentDelete(DepartmentDeleteRequest) returns (Empty);
+  rpc DepartmentTree(Empty) returns (DepartmentTreeResponse);
+
+  rpc ApiCreate(ApiCreateRequest) returns (Empty);
+  rpc ApiUpdate(ApiUpdateRequest) returns (Empty);
+  rpc ApiDelete(ApiDeleteRequest) returns (Empty);
+  rpc ApiList(ApiListRequest) returns (ApiListResponse);
+
+  // RBAC 关联关系
+  rpc PermissionMenuList(PermissionMenuListRequest) returns (PermissionMenuListResponse);
+  rpc PermissionMenuUpdate(PermissionMenuUpdateRequest) returns (Empty);
+  rpc PermissionApiList(PermissionApiListRequest) returns (PermissionApiListResponse);
+  rpc PermissionApiUpdate(PermissionApiUpdateRequest) returns (Empty);
+  rpc UserRoleList(UserRoleListRequest) returns (UserRoleListResponse);
+  rpc UserRoleUpdate(UserRoleUpdateRequest) returns (Empty);
+  rpc RolePermissionList(RolePermissionListRequest) returns (RolePermissionListResponse);
+  rpc RolePermissionUpdate(RolePermissionUpdateRequest) returns (Empty);
+
+  // Config / Dict
+  rpc ConfigCreate(ConfigCreateRequest) returns (Empty);
+  rpc ConfigUpdate(ConfigUpdateRequest) returns (Empty);
+  rpc ConfigDelete(ConfigDeleteRequest) returns (Empty);
+  rpc ConfigList(ConfigListRequest) returns (ConfigListResponse);
+  rpc ConfigGet(ConfigGetRequest) returns (ConfigGetResponse);
+
+  rpc DictTypeCreate(DictTypeCreateRequest) returns (Empty);
+  rpc DictTypeUpdate(DictTypeUpdateRequest) returns (Empty);
+  rpc DictTypeDelete(DictTypeDeleteRequest) returns (Empty);
+  rpc DictTypeList(DictTypeListRequest) returns (DictTypeListResponse);
+
+  rpc DictItemCreate(DictItemCreateRequest) returns (Empty);
+  rpc DictItemUpdate(DictItemUpdateRequest) returns (Empty);
+  rpc DictItemDelete(DictItemDeleteRequest) returns (Empty);
+  rpc DictItemList(DictItemListRequest) returns (DictItemListResponse);
+
+  rpc DictGet(DictGetRequest) returns (DictGetResponse);
+  rpc DictBatchGet(DictBatchGetRequest) returns (DictBatchGetResponse);
+
+  // File
+  rpc FileCreate(FileCreateRequest) returns (Empty);
+  rpc FileUpdate(FileUpdateRequest) returns (Empty);
+  rpc FileDelete(FileDeleteRequest) returns (Empty);
+  rpc FileList(FileListRequest) returns (FileListResponse);
+
+  // Notice / Notification
+  rpc NoticeCreate(NoticeCreateRequest) returns (Empty);
+  rpc NoticeUpdate(NoticeUpdateRequest) returns (Empty);
+  rpc NoticeDelete(NoticeDeleteRequest) returns (Empty);
+  rpc NoticeList(NoticeListRequest) returns (NoticeListResponse);
+
+  rpc NotificationList(NotificationListRequest) returns (NotificationListResponse);
+  rpc NotificationRead(NotificationReadRequest) returns (Empty);
+  rpc NotificationReadAll(NotificationReadAllRequest) returns (Empty);
+  rpc NotificationClearRead(NotificationClearReadRequest) returns (Empty);
+  rpc NotificationDelete(NotificationDeleteRequest) returns (Empty);
+
+  // OperationLog / LoginLog / PerformanceLog / AuditLog（列表/详情/统计；导出见
+  // services/task 的 GenericExportExecutor，走 pkg/taskcallback，不在本服务）
+  rpc OperationLogList(OperationLogListRequest) returns (OperationLogListResponse);
+  rpc OperationLogDetail(OperationLogDetailRequest) returns (OperationLogItem);
+
+  rpc LoginLogList(LoginLogListRequest) returns (LoginLogListResponse);
+  rpc LoginLogDetail(LoginLogDetailRequest) returns (LoginLogItem);
+  rpc LoginLogStats(Empty) returns (LoginLogStatsResponse);
+
+  rpc PerformanceLogList(PerformanceLogListRequest) returns (PerformanceLogListResponse);
+
+  rpc AuditLogList(AuditLogListRequest) returns (AuditLogListResponse);
+  rpc AuditLogDetail(AuditLogDetailRequest) returns (AuditLogItem);
+
+  // Metric / Monitor
+  rpc MetricReport(MetricReportRequest) returns (Empty);
+  rpc MetricStats(MetricStatsRequest) returns (MetricStatsResponse);
+  rpc MonitorStats(Empty) returns (MonitorStatsResponse);
+  rpc MonitorStatus(Empty) returns (MonitorStatusResponse);
+
+  // Demo / DailyShortSentence
+  rpc DemoCreate(DemoCreateRequest) returns (Empty);
+  rpc DemoUpdate(DemoUpdateRequest) returns (Empty);
+  rpc DemoDelete(DemoDeleteRequest) returns (Empty);
+  rpc DemoList(DemoListRequest) returns (DemoListResponse);
+
+  rpc DailyShortSentenceCreate(DailyShortSentenceCreateRequest) returns (Empty);
+  rpc DailyShortSentenceUpdate(DailyShortSentenceUpdateRequest) returns (Empty);
+  rpc DailyShortSentenceDelete(DailyShortSentenceDeleteRequest) returns (Empty);
+  rpc DailyShortSentenceList(DailyShortSentenceListRequest) returns (DailyShortSentenceListResponse);
+}

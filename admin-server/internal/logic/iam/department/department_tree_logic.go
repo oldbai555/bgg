@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -28,40 +29,25 @@ func NewDepartmentTreeLogic(ctx context.Context, svcCtx *svc.ServiceContext) *De
 }
 
 func (l *DepartmentTreeLogic) DepartmentTree() (resp *types.DepartmentTreeResp, err error) {
-	list, err := l.svcCtx.Domain.IAM.Department.ListAll(l.ctx)
+	rpcResp, err := l.svcCtx.IamRPC.DepartmentTree(l.ctx, &iamclient.Empty{})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "查询部门列表失败", err)
+		return nil, errs.WrapGRPCError("查询部门列表失败", err)
 	}
 
-	// 构建 id → DepartmentItem 映射
-	nodeMap := make(map[uint64]*types.DepartmentItem, len(list))
-	var roots []types.DepartmentItem
+	return &types.DepartmentTreeResp{List: convertDepartmentItems(rpcResp.List)}, nil
+}
 
-	for _, d := range list {
-		item := types.DepartmentItem{
-			Id:       d.Id,
-			ParentId: d.ParentId,
-			Name:     d.Name,
-			OrderNum: d.OrderNum,
-			Status:   d.Status,
-			Children: []types.DepartmentItem{},
-		}
-		nodeMap[d.Id] = &item
+func convertDepartmentItems(items []*iamclient.DepartmentItem) []types.DepartmentItem {
+	result := make([]types.DepartmentItem, 0, len(items))
+	for _, item := range items {
+		result = append(result, types.DepartmentItem{
+			Id:       item.Id,
+			ParentId: item.ParentId,
+			Name:     item.Name,
+			OrderNum: item.OrderNum,
+			Status:   item.Status,
+			Children: convertDepartmentItems(item.Children),
+		})
 	}
-
-	for _, item := range nodeMap {
-		if item.ParentId == 0 {
-			roots = append(roots, *item)
-			continue
-		}
-		if parent, ok := nodeMap[item.ParentId]; ok {
-			parent.Children = append(parent.Children, *item)
-		} else {
-			roots = append(roots, *item)
-		}
-	}
-
-	return &types.DepartmentTreeResp{
-		List: roots,
-	}, nil
+	return result
 }

@@ -5,11 +5,11 @@ package permission
 
 import (
 	"context"
-	"database/sql"
 
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -33,16 +33,13 @@ func (l *PermissionUpdateLogic) PermissionUpdate(req *types.PermissionUpdateReq)
 		return errs.New(errs.CodeBadRequest, "权限ID不能为空")
 	}
 
-	p, err := l.svcCtx.Domain.IAM.Permission.FindByID(l.ctx, req.Id)
+	_, err := l.svcCtx.IamRPC.PermissionUpdate(l.ctx, &iamclient.PermissionUpdateRequest{
+		Id:          req.Id,
+		Name:        req.Name,
+		Description: req.Description,
+	})
 	if err != nil {
-		return errs.Wrap(errs.CodeInternalError, "查询权限失败", err)
-	}
-
-	p.Name = req.Name
-	p.Description = sql.NullString{String: req.Description, Valid: req.Description != ""}
-
-	if err := l.svcCtx.Domain.IAM.Permission.Update(l.ctx, p); err != nil {
-		return errs.Wrap(errs.CodeInternalError, "更新权限失败", err)
+		return errs.WrapGRPCError("更新权限失败", err)
 	}
 	return nil
 }

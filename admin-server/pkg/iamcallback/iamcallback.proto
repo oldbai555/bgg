@@ -66,6 +66,11 @@ message RecordAuditLogRequest {
   string audit_type = 3;
   string audit_object = 4;
   string detail_json = 5;
+  // ip_address/user_agent 是 iam-rpc 拆分时补的字段：content-rpc 的两处调用点原来就传
+  // 空 *http.Request，这两个字段留空；gateway 侧自己的 6 个 RBAC 审计调用点（原
+  // pkg/audit.RecordAuditLog）有真实的 *http.Request，用这两个字段填充，不再是恒为空。
+  string ip_address = 6;
+  string user_agent = 7;
 }
 
 message RecordAuditLogResponse {}

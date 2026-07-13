@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -32,24 +33,15 @@ func (l *DepartmentUpdateLogic) DepartmentUpdate(req *types.DepartmentUpdateReq)
 		return errs.New(errs.CodeBadRequest, "部门ID不能为空")
 	}
 
-	dept, err := l.svcCtx.Domain.IAM.Department.FindByID(l.ctx, req.Id)
+	_, err := l.svcCtx.IamRPC.DepartmentUpdate(l.ctx, &iamclient.DepartmentUpdateRequest{
+		Id:       req.Id,
+		ParentId: req.ParentId,
+		Name:     req.Name,
+		OrderNum: req.OrderNum,
+		Status:   req.Status,
+	})
 	if err != nil {
-		return errs.Wrap(errs.CodeInternalError, "查询部门失败", err)
-	}
-
-	dept.ParentId = req.ParentId
-	dept.Name = req.Name
-	// OrderNum 字段：0 也是有效值，需要特殊处理
-	if req.OrderNum >= 0 {
-		dept.OrderNum = req.OrderNum
-	}
-	// Status 字段：0 是有效值（禁用），需要特殊处理
-	if req.Status == 0 || req.Status == 1 {
-		dept.Status = req.Status
-	}
-
-	if err := l.svcCtx.Domain.IAM.Department.Update(l.ctx, dept); err != nil {
-		return errs.Wrap(errs.CodeInternalError, "更新部门失败", err)
+		return errs.WrapGRPCError("更新部门失败", err)
 	}
 	return nil
 }

@@ -5,11 +5,11 @@ package menu
 
 import (
 	"context"
-	"sort"
 
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -29,107 +29,33 @@ func NewMenuTreeLogic(ctx context.Context, svcCtx *svc.ServiceContext) *MenuTree
 }
 
 func (l *MenuTreeLogic) MenuTree() (resp *types.MenuTreeResp, err error) {
-	// 尝试从缓存获取
-	cache := l.svcCtx.Repository.BusinessCache
-	var cachedResp types.MenuTreeResp
-	err = cache.GetMenuTree(l.ctx, &cachedResp)
-	if err == nil {
-		return &cachedResp, nil
-	}
-
-	// 缓存未命中，从数据库查询
-	list, err := l.svcCtx.Domain.IAM.Menu.ListAll(l.ctx)
+	rpcResp, err := l.svcCtx.IamRPC.MenuTree(l.ctx, &iamclient.Empty{})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "查询菜单列表失败", err)
+		return nil, errs.WrapGRPCError("查询菜单树失败", err)
 	}
 
-	// 获取菜单权限编码映射
-	menuPermissionMap, err := l.svcCtx.Domain.IAM.PermissionMenu.ListMenuPermissionCodes(l.ctx)
-	if err != nil {
-		// 如果查询权限关联失败，记录日志但不影响菜单树返回
-		l.Errorf("查询菜单权限关联失败: %v", err)
-		menuPermissionMap = make(map[uint64][]string)
-	}
-
-	// 构建 id → MenuItem 映射
-	nodeMap := make(map[uint64]*types.MenuItem, len(list))
-	var rootPtrs []*types.MenuItem
-
-	// 第一遍：创建所有节点
-	for _, m := range list {
-		// 获取菜单的第一个权限编码（用于前端路由权限控制）
-		var permissionCode string
-		if codes, ok := menuPermissionMap[m.Id]; ok && len(codes) > 0 {
-			permissionCode = codes[0] // 使用第一个权限编码
-		}
-
-		item := &types.MenuItem{
-			Id:             m.Id,
-			ParentId:       m.ParentId,
-			Name:           m.Name,
-			Path:           m.Path,
-			Component:      m.Component,
-			Icon:           m.Icon,
-			MenuType:       int64(m.Type),
-			OrderNum:       m.OrderNum,
-			Visible:        m.Visible,
-			Status:         m.Status,
-			PermissionCode: permissionCode,
-			Children:       []types.MenuItem{},
-		}
-		nodeMap[m.Id] = item
-	}
-
-	// 第二遍：构建树结构
-	for _, item := range nodeMap {
-		if item.ParentId == 0 {
-			rootPtrs = append(rootPtrs, item)
-			continue
-		}
-		if parent, ok := nodeMap[item.ParentId]; ok {
-			parent.Children = append(parent.Children, *item)
-		} else {
-			// 父节点不存在，作为根节点处理
-			rootPtrs = append(rootPtrs, item)
-		}
-	}
-
-	// 转换为值类型并排序
-	roots := make([]types.MenuItem, 0, len(rootPtrs))
-	for _, ptr := range rootPtrs {
-		roots = append(roots, *ptr)
-	}
-
-	// 对根节点和子节点按 orderNum 排序
-	sortMenuItems(&roots)
-	for i := range roots {
-		sortMenuItems(&roots[i].Children)
-	}
-
-	resp = &types.MenuTreeResp{
-		List: roots,
-	}
-
-	// 写入缓存（异步，不阻塞返回）
-	go func() {
-		if err := cache.SetMenuTree(context.Background(), resp); err != nil {
-			l.Errorf("设置菜单树缓存失败: %v", err)
-		}
-	}()
-
-	return resp, nil
+	return &types.MenuTreeResp{List: convertMenuItems(rpcResp.List)}, nil
 }
 
-// sortMenuItems 按 orderNum 和 id 排序菜单项
-func sortMenuItems(items *[]types.MenuItem) {
-	if items == nil || len(*items) == 0 {
-		return
+// convertMenuItems 把 iamclient.MenuItem（Children 是指针切片）转成 types.MenuItem
+// （Children 是值切片），goctl api 生成的类型历史上就是值切片形状，这里保持不变。
+func convertMenuItems(items []*iamclient.MenuItem) []types.MenuItem {
+	result := make([]types.MenuItem, 0, len(items))
+	for _, item := range items {
+		result = append(result, types.MenuItem{
+			Id:             item.Id,
+			ParentId:       item.ParentId,
+			Name:           item.Name,
+			Path:           item.Path,
+			Component:      item.Component,
+			Icon:           item.Icon,
+			MenuType:       item.MenuType,
+			OrderNum:       item.OrderNum,
+			Visible:        item.Visible,
+			Status:         item.Status,
+			PermissionCode: item.PermissionCode,
+			Children:       convertMenuItems(item.Children),
+		})
 	}
-	// 使用 sort.Slice 排序
-	sort.Slice(*items, func(i, j int) bool {
-		if (*items)[i].OrderNum != (*items)[j].OrderNum {
-			return (*items)[i].OrderNum < (*items)[j].OrderNum
-		}
-		return (*items)[i].Id < (*items)[j].Id
-	})
+	return result
 }

@@ -5,23 +5,15 @@ package auth
 
 import (
 	"context"
-	"errors"
 	"net/http"
 	"strings"
-	"time"
 
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
-	jwthelper "postapocgame/admin-server/pkg/jwt"
-	"postapocgame/admin-server/pkg/useragent"
-
-	"postapocgame/admin-server/internal/model"
-	"postapocgame/admin-server/internal/model/monitoring"
-	"postapocgame/admin-server/internal/model/system"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type LoginLogic struct {
@@ -38,215 +30,50 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic 
 	}
 }
 
+// Login iam 域已拆分成独立服务，业务逻辑（用户查找/密码校验/生成 token/登录日志/未读公告
+// 通知）整段搬进了 services/iam/internal/logic/loginlogic.go，这里只剩：从 httpReq 取出
+// IP/UA 显式传给 iam-rpc（gateway 侧已经不持有 *http.Request 之外的用户上下文）+ 映射响应。
 func (l *LoginLogic) Login(req *types.LoginReq, httpReq *http.Request) (resp *types.TokenPair, err error) {
-	if req == nil || req.Username == "" || req.Password == "" {
-		// 记录登录失败日志
-		l.recordLoginLog(0, req.Username, httpReq, "用户名和密码不能为空", false)
-		return nil, errs.New(errs.CodeBadRequest, "用户名和密码不能为空")
+	if req == nil {
+		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	user, err := l.svcCtx.Domain.IAM.User.FindByUsername(l.ctx, req.Username)
+	clientIP := ""
+	userAgent := ""
+	if httpReq != nil {
+		clientIP = getClientIPFromRequest(httpReq)
+		userAgent = httpReq.UserAgent()
+	}
+
+	rpcResp, err := l.svcCtx.IamRPC.Login(l.ctx, &iamclient.LoginRequest{
+		Username:  req.Username,
+		Password:  req.Password,
+		ClientIp:  clientIP,
+		UserAgent: userAgent,
+	})
 	if err != nil {
-		// 用户不存在或查询异常统一为未授权，避免枚举用户名。
-		if errors.Is(errors.Unwrap(err), model.ErrNotFound) || errors.Is(err, model.ErrNotFound) {
-			// 记录登录失败日志
-			l.recordLoginLog(0, req.Username, httpReq, "用户名或密码错误", false)
-			return nil, errs.New(errs.CodeUnauthorized, "用户名或密码错误")
-		}
-		// 记录登录失败日志
-		l.recordLoginLog(0, req.Username, httpReq, "查询用户失败", false)
-		return nil, errs.Wrap(errs.CodeInternalError, "查询用户失败", err)
+		return nil, errs.WrapGRPCError("登录失败", err)
 	}
-
-	if user.Status != 1 {
-		// 记录登录失败日志
-		l.recordLoginLog(user.Id, user.Username, httpReq, "账号已被禁用", false)
-		return nil, errs.New(errs.CodeForbidden, "账号已被禁用")
-	}
-
-	if bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)) != nil {
-		// 记录登录失败日志
-		l.recordLoginLog(user.Id, user.Username, httpReq, "用户名或密码错误", false)
-		return nil, errs.New(errs.CodeUnauthorized, "用户名或密码错误")
-	}
-
-	accessToken, err := jwthelper.GenerateToken(
-		l.svcCtx.Config.JWT.AccessSecret,
-		l.svcCtx.Config.JWT.Issuer,
-		l.svcCtx.Config.JWT.AccessExpire,
-		user.Id,
-		user.Username,
-		false,
-	)
-	if err != nil {
-		// 记录登录失败日志
-		l.recordLoginLog(user.Id, user.Username, httpReq, "生成访问令牌失败", false)
-		return nil, errs.Wrap(errs.CodeInternalError, "生成访问令牌失败", err)
-	}
-
-	refreshToken, err := jwthelper.GenerateToken(
-		l.svcCtx.Config.JWT.RefreshSecret,
-		l.svcCtx.Config.JWT.Issuer,
-		l.svcCtx.Config.JWT.RefreshExpire,
-		user.Id,
-		user.Username,
-		true,
-	)
-	if err != nil {
-		// 记录登录失败日志
-		l.recordLoginLog(user.Id, user.Username, httpReq, "生成刷新令牌失败", false)
-		return nil, errs.Wrap(errs.CodeInternalError, "生成刷新令牌失败", err)
-	}
-
-	// 记录登录成功日志
-	l.recordLoginLog(user.Id, user.Username, httpReq, "登录成功", true)
-
-	// 异步处理：为新用户创建未读公告通知
-	go l.createUnreadNoticeNotifications(user.Id)
 
 	return &types.TokenPair{
-		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
+		AccessToken:  rpcResp.AccessToken,
+		RefreshToken: rpcResp.RefreshToken,
 	}, nil
 }
 
-// recordLoginLog 记录登录日志（异步）
-func (l *LoginLogic) recordLoginLog(userId uint64, username string, httpReq *http.Request, message string, success bool) {
-	if httpReq == nil {
-		l.Errorf("记录登录日志失败: httpReq 为 nil, userId=%d, username=%s", userId, username)
-		return
-	}
-
-	// 获取 IP 地址
-	ip := l.getClientIP(httpReq)
-
-	// 获取 User-Agent
-	userAgent := httpReq.UserAgent()
-
-	// 解析浏览器和操作系统
-	browser, os := useragent.ParseUserAgent(userAgent)
-
-	// 登录状态（字典值：1=成功，2=失败）
-	status := int64(2)
-	if success {
-		status = 1
-	}
-
-	// 构建登录日志
-	now := time.Now().Unix()
-	loginLog := &monitoring.AdminLoginLog{
-		UserId:    userId,
-		Username:  username,
-		IpAddress: ip,
-		Location:  "", // 可以通过 IP 解析地理位置，这里暂时留空
-		Browser:   browser,
-		Os:        os,
-		UserAgent: userAgent,
-		Status:    status,
-		Message:   message,
-		LoginAt:   now,
-		LogoutAt:  0,
-		CreatedAt: now,
-		UpdatedAt: now,
-		DeletedAt: 0,
-	}
-
-	// 记录调试信息
-	l.Infof("准备记录登录日志: userId=%d, username=%s, status=%d, message=%s, ip=%s", userId, username, status, message, ip)
-
-	// 异步写入日志（使用 goroutine，避免阻塞登录流程）
-	go func() {
-		defer func() {
-			if r := recover(); r != nil {
-				l.Errorf("记录登录日志时发生 panic: %v, userId=%d, username=%s", r, userId, username)
-			}
-		}()
-
-		if err := l.svcCtx.Domain.Monitoring.LoginLog.Create(context.Background(), loginLog); err != nil {
-			l.Errorf("记录登录日志失败: userId=%d, username=%s, status=%d, message=%s, error: %v", userId, username, status, message, err)
-		} else {
-			l.Infof("成功记录登录日志: userId=%d, username=%s, status=%d, message=%s", userId, username, status, message)
-		}
-	}()
-}
-
-// createUnreadNoticeNotifications 为新用户创建未读公告通知
-func (l *LoginLogic) createUnreadNoticeNotifications(userID uint64) {
-	defer func() {
-		if r := recover(); r != nil {
-			l.Errorf("创建未读公告通知时发生 panic: %v, userId=%d", r, userID)
-		}
-	}()
-
-	// 查找已发布且用户未读的公告
-	notices, err := l.svcCtx.Domain.System.Notice.FindPublishedNotReadByUser(context.Background(), userID)
-	if err != nil {
-		l.Errorf("查询未读公告失败: userId=%d, error: %v", userID, err)
-		return
-	}
-
-	if len(notices) == 0 {
-		return
-	}
-
-	now := time.Now().Unix()
-	for _, notice := range notices {
-		// 检查是否已存在通知（避免重复创建）
-		notifications, _, err := l.svcCtx.Domain.System.Notification.FindPage(context.Background(), 1, 100, userID, "notice", -1)
-		if err == nil {
-			// 检查是否已有该公告的通知
-			hasNotification := false
-			for _, notif := range notifications {
-				if notif.SourceId == notice.Id && notif.SourceType == "notice" && notif.DeletedAt == 0 {
-					hasNotification = true
-					break
-				}
-			}
-			if hasNotification {
-				continue
-			}
-		}
-
-		// 创建通知
-		notification := &system.AdminNotification{
-			UserId:     userID,
-			SourceType: "notice",
-			SourceId:   notice.Id,
-			Title:      notice.Title,
-			Content:    notice.Content,
-			ReadStatus: 1, // 未读（字典值：1=未读，2=已读）
-			ReadAt:     0,
-			CreatedAt:  now,
-			UpdatedAt:  now,
-			DeletedAt:  0,
-		}
-
-		if err := l.svcCtx.Domain.System.Notification.Create(context.Background(), notification); err != nil {
-			l.Errorf("创建公告通知失败: userId=%d, noticeId=%d, error: %v", userID, notice.Id, err)
-		} else {
-			l.Infof("成功创建公告通知: userId=%d, noticeId=%d", userID, notice.Id)
-		}
-	}
-}
-
-// getClientIP 获取客户端 IP 地址
-func (l *LoginLogic) getClientIP(r *http.Request) string {
-	// 优先从 X-Forwarded-For 获取（代理场景）
+// getClientIPFromRequest 获取客户端 IP 地址
+func getClientIPFromRequest(r *http.Request) string {
 	ip := r.Header.Get("X-Forwarded-For")
 	if ip != "" {
-		ips := strings.Split(ip, ",")
-		if len(ips) > 0 {
-			return strings.TrimSpace(ips[0])
-		}
+		parts := strings.Split(ip, ",")
+		return strings.TrimSpace(parts[0])
 	}
 
-	// 其次从 X-Real-IP 获取
 	ip = r.Header.Get("X-Real-IP")
 	if ip != "" {
 		return ip
 	}
 
-	// 最后从 RemoteAddr 获取
 	ip = r.RemoteAddr
 	if idx := strings.LastIndex(ip, ":"); idx != -1 {
 		ip = ip[:idx]

@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -32,22 +33,12 @@ func (l *RolePermissionUpdateLogic) RolePermissionUpdate(req *types.RolePermissi
 		return errs.New(errs.CodeBadRequest, "角色ID不能为空")
 	}
 
-	if err := l.svcCtx.Domain.IAM.RBAC.UpdateRolePermissions(l.ctx, req.RoleId, req.PermissionIds); err != nil {
-		return err
+	_, err := l.svcCtx.IamRPC.RolePermissionUpdate(l.ctx, &iamclient.RolePermissionUpdateRequest{
+		RoleId:        req.RoleId,
+		PermissionIds: req.PermissionIds,
+	})
+	if err != nil {
+		return errs.WrapGRPCError("更新角色权限失败", err)
 	}
-
-	// 清除所有拥有该角色的用户的权限和菜单树缓存
-	// 注意：由于 go-zero Redis 不支持 SCAN，这里只能清除已知的缓存
-	// 实际场景中，可以通过定时任务或延迟清除策略来处理
-	// 这里先清除完整菜单树缓存，用户权限缓存会在下次查询时自动更新
-	cache := l.svcCtx.Repository.BusinessCache
-	go func() {
-		// 清除完整菜单树缓存（因为权限变更可能影响菜单显示）
-		if err := cache.DeleteMenuTree(context.Background()); err != nil {
-			l.Errorf("清除菜单树缓存失败: %v", err)
-		}
-		// 注意：无法直接清除所有用户的权限缓存，需要在查询时检查并更新
-	}()
-
 	return nil
 }

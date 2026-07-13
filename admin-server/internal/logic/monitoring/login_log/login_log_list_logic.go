@@ -5,10 +5,12 @@ package login_log
 
 import (
 	"context"
+
 	"postapocgame/admin-server/internal/logic/logicutil"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -34,27 +36,21 @@ func (l *LoginLogListLogic) LoginLogList(req *types.LoginLogListReq) (resp *type
 
 	page, pageSize := logicutil.NormalizePage(int64(req.Page), int64(req.PageSize), 20, 100)
 
-	// Status 枚举（字典 login_status）：0 = 全部（不筛选）；1 = 成功；2 = 失败
-	// DB 中 admin_login_log.status 与枚举值保持一致：1 = 成功，2 = 失败
-	l.Infof("查询登录日志: page=%d, pageSize=%d, userId=%d, username=%s, status=%d, startTime=%s, endTime=%s",
-		req.Page, req.PageSize, req.UserId, req.Username, req.Status, req.StartTime, req.EndTime)
-
-	list, total, err := l.svcCtx.Domain.Monitoring.LoginLog.FindPage(
-		l.ctx,
-		page,
-		pageSize,
-		req.UserId,
-		req.Username,
-		req.Status,
-		req.StartTime,
-		req.EndTime,
-	)
+	rpcResp, err := l.svcCtx.IamRPC.LoginLogList(l.ctx, &iamclient.LoginLogListRequest{
+		Page:      page,
+		PageSize:  pageSize,
+		UserId:    req.UserId,
+		Username:  req.Username,
+		Status:    int64(req.Status),
+		StartTime: req.StartTime,
+		EndTime:   req.EndTime,
+	})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "查询登录日志列表失败", err)
+		return nil, errs.WrapGRPCError("查询登录日志列表失败", err)
 	}
 
-	items := make([]types.LoginLogItem, 0, len(list))
-	for _, log := range list {
+	items := make([]types.LoginLogItem, 0, len(rpcResp.List))
+	for _, log := range rpcResp.List {
 		items = append(items, types.LoginLogItem{
 			Id:        log.Id,
 			UserId:    log.UserId,
@@ -74,7 +70,7 @@ func (l *LoginLogListLogic) LoginLogList(req *types.LoginLogListReq) (resp *type
 
 	return &types.LoginLogListResp{
 		List:     items,
-		Total:    total,
+		Total:    rpcResp.Total,
 		Page:     req.Page,
 		PageSize: req.PageSize,
 	}, nil

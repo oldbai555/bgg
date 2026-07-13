@@ -10,6 +10,7 @@ import (
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -34,52 +35,17 @@ func (l *ProfileLogic) Profile() (resp *types.ProfileResp, err error) {
 		return nil, errs.New(errs.CodeUnauthorized, "未登录或登录已过期")
 	}
 
-	// 获取用户权限
-	// 获取用户详细信息（包括头像和个性签名）
-	userInfo, err := l.svcCtx.Domain.IAM.User.FindByID(l.ctx, user.UserID)
+	rpcResp, err := l.svcCtx.IamRPC.Profile(l.ctx, &iamclient.ProfileRequest{UserId: user.UserID})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "获取用户信息失败", err)
-	}
-
-	// 尝试从缓存获取用户权限列表
-	cache := l.svcCtx.Repository.BusinessCache
-	codes, err := cache.GetUserPermissions(l.ctx, user.UserID)
-	if err != nil {
-		// 缓存未命中，从数据库查询
-		roleIDs, err := l.svcCtx.Domain.IAM.UserRole.ListRoleIDsByUserID(l.ctx, user.UserID)
-		if err != nil {
-			return nil, errs.Wrap(errs.CodeInternalError, "获取用户角色失败", err)
-		}
-
-		perms, err := l.svcCtx.Domain.IAM.Permission.ListByRoleIDs(l.ctx, roleIDs)
-		if err != nil {
-			return nil, errs.Wrap(errs.CodeInternalError, "获取用户权限失败", err)
-		}
-
-		codes = make([]string, 0, len(perms))
-		seen := make(map[string]struct{}, len(perms))
-		for _, p := range perms {
-			if _, ok := seen[p.Code]; ok {
-				continue
-			}
-			seen[p.Code] = struct{}{}
-			codes = append(codes, p.Code)
-		}
-
-		// 写入缓存（异步，不阻塞返回）
-		go func() {
-			if err := cache.SetUserPermissions(context.Background(), user.UserID, codes); err != nil {
-				l.Errorf("设置用户权限缓存失败: userId=%d, error=%v", user.UserID, err)
-			}
-		}()
+		return nil, errs.WrapGRPCError("获取个人信息失败", err)
 	}
 
 	return &types.ProfileResp{
-		Id:          user.UserID,
-		Username:    user.Username,
-		Nickname:    userInfo.Nickname,
-		Avatar:      userInfo.Avatar,
-		Signature:   userInfo.Signature,
-		Permissions: codes,
+		Id:          rpcResp.Id,
+		Username:    rpcResp.Username,
+		Nickname:    rpcResp.Nickname,
+		Avatar:      rpcResp.Avatar,
+		Signature:   rpcResp.Signature,
+		Permissions: rpcResp.Permissions,
 	}, nil
 }

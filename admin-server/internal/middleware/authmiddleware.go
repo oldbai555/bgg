@@ -5,21 +5,25 @@ import (
 	"strings"
 
 	"postapocgame/admin-server/internal/config"
-	"postapocgame/admin-server/internal/repository"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
+	"postapocgame/admin-server/internal/consts"
 	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 	"postapocgame/admin-server/pkg/response"
+
+	"github.com/zeromicro/go-zero/core/stores/redis"
 )
 
-// AuthMiddleware 校验 Access Token + 黑名单，并将用户信息写入 context。
+// AuthMiddleware 校验 Access Token + 黑名单，并将用户信息写入 context。iam-rpc 拆分后
+// 黑名单校验直连共享 Redis，不走 RPC（见 16-rpc-conventions.md 第 6 节：黑名单 100%
+// 基于 Redis Exists，没有触碰任何 MySQL 表，iam-rpc 侧的 Logout/Refresh 往同一个共享
+// Redis 实例写入黑名单 key，gateway 这里直接读，热路径零 RPC）。
 type AuthMiddleware struct {
-	repo      *repository.Repository
+	redis     *redis.Redis
 	jwtConfig config.JWTConf
 }
 
-func NewAuthMiddleware(cfg config.Config, repo *repository.Repository) *AuthMiddleware {
-	return &AuthMiddleware{repo: repo, jwtConfig: cfg.JWT}
+func NewAuthMiddleware(cfg config.Config, rdb *redis.Redis) *AuthMiddleware {
+	return &AuthMiddleware{redis: rdb, jwtConfig: cfg.JWT}
 }
 
 func (m *AuthMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
@@ -37,9 +41,10 @@ func (m *AuthMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 		}
 		token := parts[1]
 
-		// 黑名单校验
-		blackRepo := iamrepo.NewTokenBlacklistRepository(m.repo)
-		blacklisted, err := blackRepo.IsBlacklisted(r.Context(), token)
+		// 黑名单校验：直连共享 Redis，key 格式与 services/iam 内部的
+		// TokenBlacklistRepository 保持一致（两边各自维护一份常量，不共享包，见
+		// 16-rpc-conventions.md 第 6 节"直接复制不共享"）。
+		blacklisted, err := m.redis.Exists(consts.RedisJWTBlacklistPrefix + token)
 		if err != nil {
 			response.ErrorCtx(r.Context(), w, errs.Wrap(errs.CodeInternalError, "检查令牌黑名单失败", err))
 			return

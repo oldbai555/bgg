@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -32,21 +33,13 @@ func (l *DemoUpdateLogic) DemoUpdate(req *types.DemoUpdateReq) error {
 		return errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	demo, err := l.svcCtx.Domain.Misc.Demo.FindByID(l.ctx, req.Id)
+	_, err := l.svcCtx.IamRPC.DemoUpdate(l.ctx, &iamclient.DemoUpdateRequest{
+		Id:     req.Id,
+		Name:   req.Name,
+		Status: req.Status,
+	})
 	if err != nil {
-		return errs.Wrap(errs.CodeNotFound, "演示功能不存在", err)
-	}
-
-	// 更新字段
-	if req.Name != "" {
-		demo.Name = req.Name
-	}
-	if req.Status == 0 || req.Status == 1 {
-		demo.Status = req.Status
-	}
-
-	if err := l.svcCtx.Domain.Misc.Demo.Update(l.ctx, demo); err != nil {
-		return errs.Wrap(errs.CodeInternalError, "更新演示功能失败", err)
+		return errs.WrapGRPCError("更新演示功能失败", err)
 	}
 	return nil
 }

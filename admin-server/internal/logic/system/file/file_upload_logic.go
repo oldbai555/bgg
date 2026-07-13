@@ -6,7 +6,6 @@ package file
 import (
 	"context"
 	"crypto/md5"
-	"database/sql"
 	"fmt"
 	"io"
 	"net/http"
@@ -18,8 +17,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
-
-	"postapocgame/admin-server/internal/model/system"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -38,8 +36,10 @@ func NewFileUploadLogic(ctx context.Context, svcCtx *svc.ServiceContext) *FileUp
 	}
 }
 
+// FileUpload admin_file 表物理属于 iam-rpc，但文件字节继续由 gateway 直接读写共享
+// uploads 卷（和 task/content 拆分时的既有做法一致），只有元数据的按 MD5 去重登记走
+// IamRPC.FileRegister（原逻辑迁移自 Domain.System.File.FindByName/Create 那两步）。
 func (l *FileUploadLogic) FileUpload(r *http.Request) (resp *types.FileUploadResp, err error) {
-	// 解析 multipart/form-data
 	err = r.ParseMultipartForm(32 << 20) // 32MB max
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeBadRequest, "解析上传文件失败", err)
@@ -51,12 +51,10 @@ func (l *FileUploadLogic) FileUpload(r *http.Request) (resp *types.FileUploadRes
 	}
 	defer file.Close()
 
-	// 创建上传目录（如果不存在）
 	if err := os.MkdirAll(consts.UploadDir, 0755); err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "创建上传目录失败", err)
 	}
 
-	// 计算文件的 MD5 哈希值
 	hash := md5.New()
 	if _, err := io.Copy(hash, file); err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "计算文件MD5失败", err)
@@ -69,127 +67,80 @@ func (l *FileUploadLogic) FileUpload(r *http.Request) (resp *types.FileUploadRes
 		return nil, errs.Wrap(errs.CodeInternalError, "重置文件指针失败", err)
 	}
 
-	// 获取文件扩展名
 	ext := filepath.Ext(header.Filename)
-	// 使用 MD5 + 扩展名作为文件名
 	fileName := md5Hash + ext
-
-	// 获取基础 URL（从字典中读取）
 	baseURL := l.getStorageBaseURL()
 
-	// 检查文件是否已存在（根据 MD5）
-	existingFile, err := l.svcCtx.Domain.System.File.FindByName(l.ctx, fileName)
-	if err == nil && existingFile != nil {
-		// 文件已存在，直接返回已有记录
-		l.Infof("文件已存在，MD5: %s", md5Hash)
-		proxyPath := fmt.Sprintf("%s/%s", consts.PathFileUploads, fileName)
-		fullURL := proxyPath
-		if baseURL != "" {
-			if strings.HasPrefix(baseURL, "http://") || strings.HasPrefix(baseURL, "https://") {
-				fullURL = fmt.Sprintf("%s%s", baseURL, proxyPath)
-			}
-		}
-
-		return &types.FileUploadResp{
-			Id:           existingFile.Id,
-			Name:         existingFile.Name,
-			OriginalName: existingFile.OriginalName,
-			Path:         proxyPath,
-			BaseUrl:      existingFile.BaseUrl,
-			Url:          fullURL,
-			Size:         existingFile.Size,
-			MimeType:     existingFile.MimeType.String,
-			Ext:          existingFile.Ext.String,
-		}, nil
-	}
-
-	// 文件不存在，保存新文件
 	fileSystemPath := filepath.Join(consts.UploadDir, fileName)
-	dst, err := os.Create(fileSystemPath)
-	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "创建文件失败", err)
-	}
-	defer dst.Close()
+	proxyPath := fmt.Sprintf("%s/%s", consts.PathFileUploads, fileName)
 
-	_, err = io.Copy(dst, file)
-	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "保存文件失败", err)
+	mimeType := header.Header.Get("Content-Type")
+	if mimeType == "" {
+		mimeType = http.DetectContentType([]byte(ext))
+	}
+	extNoDot := strings.TrimPrefix(ext, ".")
+
+	// 文件已存在（按 MD5 命中）时不需要再写盘，RegisterFile 内部会直接返回已有记录。
+	if _, statErr := os.Stat(fileSystemPath); statErr != nil {
+		dst, err := os.Create(fileSystemPath)
+		if err != nil {
+			return nil, errs.Wrap(errs.CodeInternalError, "创建文件失败", err)
+		}
+		if _, err = io.Copy(dst, file); err != nil {
+			dst.Close()
+			return nil, errs.Wrap(errs.CodeInternalError, "保存文件失败", err)
+		}
+		dst.Close()
 	}
 
-	// 获取文件大小
 	fileInfo, err := os.Stat(fileSystemPath)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "获取文件信息失败", err)
 	}
 
-	// 获取 MIME 类型
-	mimeType := header.Header.Get("Content-Type")
-	if mimeType == "" {
-		mimeType = http.DetectContentType([]byte(ext))
-	}
-
-	// 保存文件记录到数据库
-	fileModel := system.AdminFile{
-		Name:         fileName, // MD5 + 扩展名
+	rpcResp, err := l.svcCtx.IamRPC.FileRegister(l.ctx, &iamclient.FileRegisterRequest{
+		Name:         fileName,
 		OriginalName: header.Filename,
-		Path:         fmt.Sprintf("%s/%s", consts.PathFileUploads, fileName), // 访问路径
-		BaseUrl:      baseURL,                                                // 基础 URL
+		Path:         proxyPath,
+		BaseUrl:      baseURL,
 		Size:         uint64(fileInfo.Size()),
-		MimeType:     sql.NullString{String: mimeType, Valid: mimeType != ""},
-		Ext:          sql.NullString{String: strings.TrimPrefix(ext, "."), Valid: ext != ""},
-		StorageType:  "local",
-		Status:       1,
-	}
-
-	if err := l.svcCtx.Domain.System.File.Create(l.ctx, &fileModel); err != nil {
-		// 如果数据库保存失败，删除已上传的文件
+		MimeType:     mimeType,
+		Ext:          extNoDot,
+	})
+	if err != nil {
 		os.Remove(fileSystemPath)
-		return nil, errs.Wrap(errs.CodeInternalError, "保存文件记录失败", err)
+		return nil, errs.WrapGRPCError("保存文件记录失败", err)
 	}
 
-	// 返回文件访问路径
-	proxyPath := fmt.Sprintf("%s/%s", consts.PathFileUploads, fileName)
-	fullURL := proxyPath
-	if baseURL != "" {
-		if strings.HasPrefix(baseURL, "http://") || strings.HasPrefix(baseURL, "https://") {
-			fullURL = fmt.Sprintf("%s%s", baseURL, proxyPath)
-		}
+	fullURL := rpcResp.Path
+	if rpcResp.BaseUrl != "" && (strings.HasPrefix(rpcResp.BaseUrl, "http://") || strings.HasPrefix(rpcResp.BaseUrl, "https://")) {
+		fullURL = rpcResp.BaseUrl + rpcResp.Path
 	}
 
 	return &types.FileUploadResp{
-		Id:           fileModel.Id,
-		Name:         fileModel.Name, // MD5 + 扩展名
-		OriginalName: fileModel.OriginalName,
-		Path:         proxyPath,
-		BaseUrl:      baseURL,
+		Id:           rpcResp.Id,
+		Name:         rpcResp.Name,
+		OriginalName: rpcResp.OriginalName,
+		Path:         rpcResp.Path,
+		BaseUrl:      rpcResp.BaseUrl,
 		Url:          fullURL,
-		Size:         fileModel.Size,
-		MimeType:     mimeType,
-		Ext:          strings.TrimPrefix(ext, "."),
+		Size:         rpcResp.Size,
+		MimeType:     rpcResp.MimeType,
+		Ext:          rpcResp.Ext,
 	}, nil
 }
 
-// getStorageBaseURL 从字典中获取存储baseURL
+// getStorageBaseURL 从字典中获取存储 baseURL（字典物理属于 iam-rpc，改成走 DictGet RPC）
 func (l *FileUploadLogic) getStorageBaseURL() string {
-	// 从字典中获取配置
-	dictType, err := l.svcCtx.Domain.System.DictType.FindByCode(l.ctx, "storage_base_url")
-	if err != nil {
-		l.Errorf("获取存储配置字典类型失败: %v", err)
+	rpcResp, err := l.svcCtx.IamRPC.DictGet(l.ctx, &iamclient.DictGetRequest{Code: consts.DictCodeStorageBaseURL})
+	if err != nil || len(rpcResp.Items) == 0 {
+		l.Errorf("获取存储配置字典失败: %v", err)
 		return ""
 	}
 
-	items, err := l.svcCtx.Domain.System.DictItem.FindByTypeID(l.ctx, dictType.Id)
-	if err != nil || len(items) == 0 {
-		l.Errorf("获取存储配置字典项失败: %v", err)
-		return ""
-	}
-
-	// 使用第一个有效的字典项值
-	baseURL := items[0].Value
+	baseURL := rpcResp.Items[0].Value
 	if baseURL == "" {
-		l.Errorf("字典中的baseURL为空")
 		return ""
 	}
-
 	return strings.TrimSuffix(baseURL, "/")
 }

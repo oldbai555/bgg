@@ -16,28 +16,32 @@ import (
 
 // InitializeApp 编译期注入组合根依赖，返回 ServiceContext 与优雅关闭函数。
 func InitializeApp(c config.Config) (*svc.ServiceContext, func(), error) {
-	repository, err := provideRepository(c)
+	redis, err := provideRedis(c)
 	if err != nil {
 		return nil, nil, err
 	}
-	domain := provideDomain(repository)
+	iam := provideIamRPC(c)
+	iamCallbackClient, err := provideIamCallbackRPC(c)
+	if err != nil {
+		return nil, nil, err
+	}
 	task := provideTaskRPC(c)
 	sdk := provideSdkRPC(c)
 	chat := provideChatRPC(c)
 	content := provideContentRPC(c)
-	authMiddleware := middleware.NewAuthMiddleware(c, repository)
-	apiEnabledMiddleware := middleware.NewApiEnabledMiddleware(repository)
-	permissionMiddleware := providePermissionMiddleware(domain)
-	operationLogMiddleware := middleware.NewOperationLogMiddleware(repository)
-	publicOperationLogMiddleware := middleware.NewPublicOperationLogMiddleware(repository)
-	rateLimitMiddleware := middleware.NewRateLimitMiddleware(c, repository)
-	performanceMiddleware := middleware.NewPerformanceMiddleware(c, repository)
+	authMiddleware := middleware.NewAuthMiddleware(c, redis)
+	apiEnabledMiddleware := middleware.NewApiEnabledMiddleware(iam)
+	permissionMiddleware := middleware.NewPermissionMiddleware(iam)
+	operationLogMiddleware := middleware.NewOperationLogMiddleware(iam)
+	publicOperationLogMiddleware := middleware.NewPublicOperationLogMiddleware(iam)
+	rateLimitMiddleware := middleware.NewRateLimitMiddleware(c, redis)
+	performanceMiddleware := middleware.NewPerformanceMiddleware(c, iam)
 	corsMiddleware := middleware.NewCorsMiddleware()
 	sdkAuthMiddleware := middleware.NewSDKAuthMiddleware(sdk)
-	sdkRateLimitMiddleware := middleware.NewSDKRateLimitMiddleware(repository, sdk)
+	sdkRateLimitMiddleware := middleware.NewSDKRateLimitMiddleware(redis, sdk)
 	sdkCallLogMiddleware := middleware.NewSDKCallLogMiddleware(sdk)
 	middlewareBundle := provideMiddlewareBundle(authMiddleware, apiEnabledMiddleware, permissionMiddleware, operationLogMiddleware, publicOperationLogMiddleware, rateLimitMiddleware, performanceMiddleware, corsMiddleware, sdkAuthMiddleware, sdkRateLimitMiddleware, sdkCallLogMiddleware)
-	serviceContext, cleanup := provideServiceContext(c, repository, domain, task, sdk, chat, content, middlewareBundle)
+	serviceContext, cleanup := provideServiceContext(c, redis, iam, iamCallbackClient, task, sdk, chat, content, middlewareBundle)
 	return serviceContext, func() {
 		cleanup()
 	}, nil

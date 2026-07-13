@@ -5,11 +5,11 @@ package config
 
 import (
 	"context"
-	"database/sql"
 
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -33,29 +33,13 @@ func (l *ConfigUpdateLogic) ConfigUpdate(req *types.ConfigUpdateReq) error {
 		return errs.New(errs.CodeBadRequest, "配置ID不能为空")
 	}
 
-	config, err := l.svcCtx.Domain.System.Config.FindByID(l.ctx, req.Id)
+	_, err := l.svcCtx.IamRPC.ConfigUpdate(l.ctx, &iamclient.ConfigUpdateRequest{
+		Id:          req.Id,
+		Value:       req.Value,
+		Description: req.Description,
+	})
 	if err != nil {
-		return errs.Wrap(errs.CodeInternalError, "查询配置失败", err)
+		return errs.WrapGRPCError("更新配置失败", err)
 	}
-
-	if req.Value != "" {
-		config.Value = sql.NullString{String: req.Value, Valid: true}
-	}
-	if req.Description != "" {
-		config.Description = sql.NullString{String: req.Description, Valid: true}
-	}
-
-	if err := l.svcCtx.Domain.System.Config.Update(l.ctx, config); err != nil {
-		return errs.Wrap(errs.CodeInternalError, "更新配置失败", err)
-	}
-
-	// 清除配置缓存
-	cache := l.svcCtx.Repository.BusinessCache
-	go func() {
-		if err := cache.DeleteConfigKey(context.Background(), config.Key); err != nil {
-			l.Errorf("清除配置缓存失败: key=%s, error=%v", config.Key, err)
-		}
-	}()
-
 	return nil
 }

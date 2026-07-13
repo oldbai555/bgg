@@ -10,6 +10,7 @@ import (
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -33,23 +34,17 @@ func (l *NotificationDeleteLogic) NotificationDelete(req *types.NotificationDele
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	// 获取当前用户
 	user, ok := jwthelper.FromContext(l.ctx)
 	if !ok {
 		return nil, errs.New(errs.CodeUnauthorized, "未登录或登录已过期")
 	}
 
-	// 验证消息通知是否属于当前用户
-	notification, err := l.svcCtx.Domain.System.Notification.FindByID(l.ctx, req.Id)
+	_, err = l.svcCtx.IamRPC.NotificationDelete(l.ctx, &iamclient.NotificationDeleteRequest{
+		Id:     req.Id,
+		UserId: user.UserID,
+	})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeNotFound, "消息通知不存在", err)
-	}
-	if notification.UserId != user.UserID {
-		return nil, errs.New(errs.CodeForbidden, "无权删除该消息通知")
-	}
-
-	if err := l.svcCtx.Domain.System.Notification.DeleteByID(l.ctx, req.Id); err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "删除消息通知失败", err)
+		return nil, errs.WrapGRPCError("删除消息通知失败", err)
 	}
 
 	return &types.Response{

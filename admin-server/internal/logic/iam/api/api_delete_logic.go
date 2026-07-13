@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -32,8 +33,9 @@ func (l *ApiDeleteLogic) ApiDelete(req *types.ApiDeleteReq) error {
 		return errs.New(errs.CodeBadRequest, "接口ID不能为空")
 	}
 
-	if err := l.svcCtx.Domain.IAM.Api.DeleteByID(l.ctx, req.Id); err != nil {
-		return errs.Wrap(errs.CodeInternalError, "删除接口失败", err)
+	_, err := l.svcCtx.IamRPC.ApiDelete(l.ctx, &iamclient.ApiDeleteRequest{Id: req.Id})
+	if err != nil {
+		return errs.WrapGRPCError("删除接口失败", err)
 	}
 	return nil
 }

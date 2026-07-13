@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -32,18 +33,10 @@ func (l *PermissionMenuListLogic) PermissionMenuList(req *types.PermissionMenuLi
 		return nil, errs.New(errs.CodeBadRequest, "权限ID不能为空")
 	}
 
-	// 验证权限是否存在
-	_, err = l.svcCtx.Domain.IAM.Permission.FindByID(l.ctx, req.PermissionId)
+	rpcResp, err := l.svcCtx.IamRPC.PermissionMenuList(l.ctx, &iamclient.PermissionMenuListRequest{PermissionId: req.PermissionId})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeBadRequest, "权限不存在", err)
+		return nil, errs.WrapGRPCError("查询权限菜单失败", err)
 	}
 
-	menuIDs, err := l.svcCtx.Domain.IAM.PermissionMenu.ListMenuIDsByPermissionID(l.ctx, req.PermissionId)
-	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "查询权限菜单失败", err)
-	}
-
-	return &types.PermissionMenuListResp{
-		MenuIds: menuIDs,
-	}, nil
+	return &types.PermissionMenuListResp{MenuIds: rpcResp.MenuIds}, nil
 }

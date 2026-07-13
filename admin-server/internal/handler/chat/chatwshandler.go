@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/gorilla/websocket"
+	"postapocgame/admin-server/internal/consts"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
@@ -14,7 +15,6 @@ import (
 	"postapocgame/admin-server/services/chat/chatclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	iamrepo "postapocgame/admin-server/internal/repository/iam"
 )
 
 var upgrader = websocket.Upgrader{
@@ -56,10 +56,9 @@ func ChatWSHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			return
 		}
 
-		// 检查黑名单——iam 域还没拆分成独立服务，token blacklist 100% 基于共享 Redis，
-		// 继续直连不需要走 RPC，见 16-rpc-conventions.md 第 6 节。
-		blackRepo := iamrepo.NewTokenBlacklistRepository(svcCtx.Repository)
-		blacklisted, err := blackRepo.IsBlacklisted(r.Context(), token)
+		// 检查黑名单：直连共享 Redis，key 格式与 services/iam 内部的
+		// TokenBlacklistRepository 保持一致，见 16-rpc-conventions.md 第 6 节"直接复制不共享"。
+		blacklisted, err := svcCtx.Redis.Exists(consts.RedisJWTBlacklistPrefix + token)
 		if err != nil {
 			response.ErrorCtx(r.Context(), w, errs.Wrap(errs.CodeInternalError, "检查令牌黑名单失败", err))
 			return

@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -32,20 +33,12 @@ func (l *UserRoleUpdateLogic) UserRoleUpdate(req *types.UserRoleUpdateReq) error
 		return errs.New(errs.CodeBadRequest, "用户ID不能为空")
 	}
 
-	if err := l.svcCtx.Domain.IAM.RBAC.UpdateUserRoles(l.ctx, req.UserId, req.RoleIds); err != nil {
-		return err
+	_, err := l.svcCtx.IamRPC.UserRoleUpdate(l.ctx, &iamclient.UserRoleUpdateRequest{
+		UserId:  req.UserId,
+		RoleIds: req.RoleIds,
+	})
+	if err != nil {
+		return errs.WrapGRPCError("更新用户角色失败", err)
 	}
-
-	// 清除该用户的权限和菜单树缓存
-	cache := l.svcCtx.Repository.BusinessCache
-	go func() {
-		if err := cache.DeleteUserPermissions(context.Background(), req.UserId); err != nil {
-			l.Errorf("清除用户权限缓存失败: userId=%d, error=%v", req.UserId, err)
-		}
-		if err := cache.DeleteUserMenuTree(context.Background(), req.UserId); err != nil {
-			l.Errorf("清除用户菜单树缓存失败: userId=%d, error=%v", req.UserId, err)
-		}
-	}()
-
 	return nil
 }

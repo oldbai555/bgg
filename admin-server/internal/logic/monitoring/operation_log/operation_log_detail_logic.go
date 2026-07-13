@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -32,16 +33,9 @@ func (l *OperationLogDetailLogic) OperationLogDetail(req *types.OperationLogDeta
 		return nil, errs.New(errs.CodeBadRequest, "操作日志ID不能为空")
 	}
 
-	id := req.Id
-
-	log, err := l.svcCtx.Domain.Monitoring.OperationLog.FindByID(l.ctx, id)
+	log, err := l.svcCtx.IamRPC.OperationLogDetail(l.ctx, &iamclient.OperationLogDetailRequest{Id: req.Id})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "查询操作日志失败", err)
-	}
-
-	requestParams := ""
-	if log.RequestParams.Valid {
-		requestParams = log.RequestParams.String
+		return nil, errs.WrapGRPCError("查询操作日志失败", err)
 	}
 
 	item := types.OperationLogItem{
@@ -52,7 +46,7 @@ func (l *OperationLogDetailLogic) OperationLogDetail(req *types.OperationLogDeta
 		OperationObject: log.OperationObject,
 		Method:          log.Method,
 		Path:            log.Path,
-		RequestParams:   requestParams,
+		RequestParams:   log.RequestParams,
 		ResponseCode:    int(log.ResponseCode),
 		ResponseMsg:     log.ResponseMsg,
 		IpAddress:       log.IpAddress,

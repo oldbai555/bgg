@@ -5,13 +5,11 @@ package role
 
 import (
 	"context"
-	"database/sql"
 
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
-
-	"postapocgame/admin-server/internal/model/iam"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -35,15 +33,14 @@ func (l *RoleCreateLogic) RoleCreate(req *types.RoleCreateReq) error {
 		return errs.New(errs.CodeBadRequest, "角色名称和编码不能为空")
 	}
 
-	role := iam.AdminRole{
+	_, err := l.svcCtx.IamRPC.RoleCreate(l.ctx, &iamclient.RoleCreateRequest{
 		Name:        req.Name,
 		Code:        req.Code,
-		Description: sql.NullString{String: req.Description, Valid: req.Description != ""},
+		Description: req.Description,
 		Status:      req.Status,
-	}
-
-	if err := l.svcCtx.Domain.IAM.Role.Create(l.ctx, &role); err != nil {
-		return errs.Wrap(errs.CodeInternalError, "创建角色失败", err)
+	})
+	if err != nil {
+		return errs.WrapGRPCError("创建角色失败", err)
 	}
 	return nil
 }

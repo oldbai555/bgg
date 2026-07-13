@@ -3,21 +3,24 @@ Host: 0.0.0.0
 Port: 20000
 Timeout: 30000  # 30秒超时（毫秒），避免 m3u8 代理请求超时
 
-# TaskCallback zrpc server：与上面的 REST server 并存，供 services/task/（task-rpc）
-# 回调取导出数据/登记导出文件。监听 0.0.0.0 而不是 127.0.0.1——docker-compose 场景下
-# task 容器要能通过服务名 app:9001 连进来，127.0.0.1 只在同一个网络命名空间内可达。
-TaskCallbackRpc:
-  Name: admin-api.taskcallback
-  ListenOn: 0.0.0.0:9001
-  Mode: pro
+# iam-rpc（services/iam/）的 zrpc client 配置。iam+system+monitoring+misc 四个域已拆分成
+# 独立服务，gateway 侧全部相关 logic 和 5 个中间件（Auth/Permission/ApiEnabled/
+# OperationLog/Performance）都通过这个 client 调用。TaskCallback/IamCallback 两个
+# zrpc server 也已经整体搬进 iam-rpc 进程（不再由 gateway 内嵌承载），task-rpc/chat-rpc/
+# content-rpc 回调时直连 iam-rpc，不再连 gateway。IAM_RPC_ENDPOINT 必须显式设置：
+# 本机同进程调试用 127.0.0.1:8081，docker-compose 用服务名 iam:8081。
+IamRpc:
+  Endpoints:
+    - "${IAM_RPC_ENDPOINT}"
+  NonBlock: true
 
-# IamCallback zrpc server：与上面的 REST server 并存，供 services/chat/（chat-rpc）
-# 回调枚举存量用户 / 取用户展示信息。iam 域还没拆分成独立服务前的临时方案，和
-# TaskCallbackRpc 同一个模式，监听 0.0.0.0 让 docker-compose 场景下的 chat 容器能连进来。
+# IamCallbackRpc 连到 iam-rpc 同一进程内注册的 pkg/iamcallback.IamCallback 服务
+# （RBAC 变更审计日志写入，pkg/audit.RecordAuditLog 用它）。和 IamRpc 指向同一个
+# iam-rpc 地址，只是调用不同的 gRPC service。
 IamCallbackRpc:
-  Name: admin-api.iamcallback
-  ListenOn: 0.0.0.0:9002
-  Mode: pro
+  Endpoints:
+    - "${IAM_CALLBACK_RPC_ENDPOINT}"
+  NonBlock: true
 
 # task-rpc（services/task/）的 zrpc client 配置。task 域已拆分成独立服务，见
 # 16-rpc-conventions.md 第 5 节"gateway 变薄机制"。初期用静态 Endpoints，不引入 etcd。

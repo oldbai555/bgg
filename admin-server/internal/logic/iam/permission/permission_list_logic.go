@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -32,27 +33,27 @@ func (l *PermissionListLogic) PermissionList(req *types.PermissionListReq) (resp
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	list, total, err := l.svcCtx.Domain.IAM.Permission.FindPage(l.ctx, req.Page, req.PageSize, req.Name)
+	rpcResp, err := l.svcCtx.IamRPC.PermissionList(l.ctx, &iamclient.PermissionListRequest{
+		Page:     req.Page,
+		PageSize: req.PageSize,
+		Name:     req.Name,
+	})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "查询权限列表失败", err)
+		return nil, errs.WrapGRPCError("查询权限列表失败", err)
 	}
 
-	items := make([]types.PermissionItem, 0, len(list))
-	for _, p := range list {
-		description := ""
-		if p.Description.Valid {
-			description = p.Description.String
-		}
+	items := make([]types.PermissionItem, 0, len(rpcResp.List))
+	for _, p := range rpcResp.List {
 		items = append(items, types.PermissionItem{
 			Id:          p.Id,
 			Name:        p.Name,
 			Code:        p.Code,
-			Description: description,
+			Description: p.Description,
 		})
 	}
 
 	return &types.PermissionListResp{
-		Total: total,
+		Total: rpcResp.Total,
 		List:  items,
 	}, nil
 }

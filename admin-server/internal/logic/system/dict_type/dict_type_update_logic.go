@@ -5,11 +5,11 @@ package dict_type
 
 import (
 	"context"
-	"database/sql"
 
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -33,24 +33,14 @@ func (l *DictTypeUpdateLogic) DictTypeUpdate(req *types.DictTypeUpdateReq) error
 		return errs.New(errs.CodeBadRequest, "字典类型ID不能为空")
 	}
 
-	dictType, err := l.svcCtx.Domain.System.DictType.FindByID(l.ctx, req.Id)
+	_, err := l.svcCtx.IamRPC.DictTypeUpdate(l.ctx, &iamclient.DictTypeUpdateRequest{
+		Id:          req.Id,
+		Name:        req.Name,
+		Description: req.Description,
+		Status:      req.Status,
+	})
 	if err != nil {
-		return errs.Wrap(errs.CodeInternalError, "查询字典类型失败", err)
-	}
-
-	if req.Name != "" {
-		dictType.Name = req.Name
-	}
-	if req.Description != "" {
-		dictType.Description = sql.NullString{String: req.Description, Valid: true}
-	}
-	// Status 字段：0 是有效值（禁用），需要特殊处理
-	if req.Status == 0 || req.Status == 1 {
-		dictType.Status = req.Status
-	}
-
-	if err := l.svcCtx.Domain.System.DictType.Update(l.ctx, dictType); err != nil {
-		return errs.Wrap(errs.CodeInternalError, "更新字典类型失败", err)
+		return errs.WrapGRPCError("更新字典类型失败", err)
 	}
 	return nil
 }

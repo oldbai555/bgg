@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -32,30 +33,30 @@ func (l *ApiListLogic) ApiList(req *types.ApiListReq) (resp *types.ApiListResp, 
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	list, total, err := l.svcCtx.Domain.IAM.Api.FindPage(l.ctx, req.Page, req.PageSize, req.Name)
+	rpcResp, err := l.svcCtx.IamRPC.ApiList(l.ctx, &iamclient.ApiListRequest{
+		Page:     req.Page,
+		PageSize: req.PageSize,
+		Name:     req.Name,
+	})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "查询接口列表失败", err)
+		return nil, errs.WrapGRPCError("查询接口列表失败", err)
 	}
 
-	items := make([]types.ApiItem, 0, len(list))
-	for _, a := range list {
-		description := ""
-		if a.Description.Valid {
-			description = a.Description.String
-		}
+	items := make([]types.ApiItem, 0, len(rpcResp.List))
+	for _, a := range rpcResp.List {
 		items = append(items, types.ApiItem{
 			Id:          a.Id,
 			Name:        a.Name,
 			Method:      a.Method,
 			Path:        a.Path,
-			Description: description,
+			Description: a.Description,
 			Status:      a.Status,
-			CreatedAt:   int64(a.CreatedAt),
+			CreatedAt:   a.CreatedAt,
 		})
 	}
 
 	return &types.ApiListResp{
-		Total: total,
+		Total: rpcResp.Total,
 		List:  items,
 	}, nil
 }

@@ -5,13 +5,11 @@ package file
 
 import (
 	"context"
-	"database/sql"
 
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
-
-	"postapocgame/admin-server/internal/model/system"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -35,25 +33,12 @@ func (l *FileCreateLogic) FileCreate(req *types.FileCreateReq) error {
 		return errs.New(errs.CodeBadRequest, "文件名称不能为空")
 	}
 
-	status := req.Status
-	if status == 0 {
-		status = 1
-	}
-
-	file := system.AdminFile{
-		Name:         req.Name,
-		OriginalName: req.Name, // 默认使用 name 作为原始名称
-		Path:         "",       // 文件访问路径需要在上传时设置
-		BaseUrl:      "",       // 基础URL需要在上传时设置
-		Size:         0,        // 文件大小需要在上传时设置
-		MimeType:     sql.NullString{Valid: false},
-		Ext:          sql.NullString{Valid: false},
-		StorageType:  "local", // 默认本地存储
-		Status:       status,
-	}
-
-	if err := l.svcCtx.Domain.System.File.Create(l.ctx, &file); err != nil {
-		return errs.Wrap(errs.CodeInternalError, "创建文件记录失败", err)
+	_, err := l.svcCtx.IamRPC.FileCreate(l.ctx, &iamclient.FileCreateRequest{
+		Name:   req.Name,
+		Status: req.Status,
+	})
+	if err != nil {
+		return errs.WrapGRPCError("创建文件记录失败", err)
 	}
 	return nil
 }

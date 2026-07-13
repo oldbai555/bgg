@@ -5,13 +5,11 @@ package api
 
 import (
 	"context"
-	"database/sql"
 
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
-
-	"postapocgame/admin-server/internal/model/iam"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -35,25 +33,15 @@ func (l *ApiCreateLogic) ApiCreate(req *types.ApiCreateReq) error {
 		return errs.New(errs.CodeBadRequest, "接口名称、方法和路径不能为空")
 	}
 
-	// 检查是否已存在相同的 method+path
-	_, err := l.svcCtx.Domain.IAM.Api.FindByMethodAndPath(l.ctx, req.Method, req.Path)
-	if err == nil {
-		return errs.New(errs.CodeBadRequest, "该接口已存在")
-	}
-
-	api := iam.AdminApi{
+	_, err := l.svcCtx.IamRPC.ApiCreate(l.ctx, &iamclient.ApiCreateRequest{
 		Name:        req.Name,
 		Method:      req.Method,
 		Path:        req.Path,
-		Description: sql.NullString{String: req.Description, Valid: req.Description != ""},
+		Description: req.Description,
 		Status:      req.Status,
-	}
-	if api.Status == 0 {
-		api.Status = 1
-	}
-
-	if err := l.svcCtx.Domain.IAM.Api.Create(l.ctx, &api); err != nil {
-		return errs.Wrap(errs.CodeInternalError, "创建接口失败", err)
+	})
+	if err != nil {
+		return errs.WrapGRPCError("创建接口失败", err)
 	}
 	return nil
 }

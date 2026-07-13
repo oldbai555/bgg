@@ -5,12 +5,12 @@ package auth
 
 import (
 	"context"
-	"time"
 
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -34,36 +34,19 @@ func (l *ProfileUpdateLogic) ProfileUpdate(req *types.ProfileUpdateReq) error {
 		return errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	// 获取当前用户
 	user, ok := jwthelper.FromContext(l.ctx)
 	if !ok {
 		return errs.New(errs.CodeUnauthorized, "未登录或登录已过期")
 	}
 
-	// 获取用户信息
-	userInfo, err := l.svcCtx.Domain.IAM.User.FindByID(l.ctx, user.UserID)
+	_, err := l.svcCtx.IamRPC.ProfileUpdate(l.ctx, &iamclient.ProfileUpdateRequest{
+		UserId:    user.UserID,
+		Nickname:  req.Nickname,
+		Avatar:    req.Avatar,
+		Signature: req.Signature,
+	})
 	if err != nil {
-		return errs.Wrap(errs.CodeInternalError, "获取用户信息失败", err)
+		return errs.WrapGRPCError("更新个人信息失败", err)
 	}
-
-	// 更新昵称、头像和个性签名
-	if req.Nickname != "" {
-		userInfo.Nickname = req.Nickname
-	}
-	if req.Avatar != "" {
-		userInfo.Avatar = req.Avatar
-	}
-	if req.Signature != "" {
-		userInfo.Signature = req.Signature
-	}
-
-	userInfo.UpdatedAt = time.Now().Unix()
-
-	// 保存更新
-	err = l.svcCtx.Domain.IAM.User.Update(l.ctx, userInfo)
-	if err != nil {
-		return errs.Wrap(errs.CodeInternalError, "更新个人信息失败", err)
-	}
-
 	return nil
 }

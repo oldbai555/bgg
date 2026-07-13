@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -32,13 +33,17 @@ func (l *DemoListLogic) DemoList(req *types.DemoListReq) (resp *types.DemoListRe
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	list, total, err := l.svcCtx.Domain.Misc.Demo.FindPage(l.ctx, req.Page, req.PageSize, req.Name)
+	rpcResp, err := l.svcCtx.IamRPC.DemoList(l.ctx, &iamclient.DemoListRequest{
+		Page:     req.Page,
+		PageSize: req.PageSize,
+		Name:     req.Name,
+	})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "查询演示功能列表失败", err)
+		return nil, errs.WrapGRPCError("查询演示功能列表失败", err)
 	}
 
-	items := make([]types.DemoItem, 0, len(list))
-	for _, d := range list {
+	items := make([]types.DemoItem, 0, len(rpcResp.List))
+	for _, d := range rpcResp.List {
 		items = append(items, types.DemoItem{
 			Id:        d.Id,
 			Name:      d.Name,
@@ -48,7 +53,7 @@ func (l *DemoListLogic) DemoList(req *types.DemoListReq) (resp *types.DemoListRe
 	}
 
 	return &types.DemoListResp{
-		Total: total,
+		Total: rpcResp.Total,
 		List:  items,
 	}, nil
 }

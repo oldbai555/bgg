@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -32,23 +33,9 @@ func (l *ConfigDeleteLogic) ConfigDelete(req *types.ConfigDeleteReq) error {
 		return errs.New(errs.CodeBadRequest, "配置ID不能为空")
 	}
 
-	// 先查询配置，获取 key
-	config, err := l.svcCtx.Domain.System.Config.FindByID(l.ctx, req.Id)
+	_, err := l.svcCtx.IamRPC.ConfigDelete(l.ctx, &iamclient.ConfigDeleteRequest{Id: req.Id})
 	if err != nil {
-		return errs.Wrap(errs.CodeInternalError, "查询配置失败", err)
+		return errs.WrapGRPCError("删除配置失败", err)
 	}
-
-	if err := l.svcCtx.Domain.System.Config.DeleteByID(l.ctx, req.Id); err != nil {
-		return errs.Wrap(errs.CodeInternalError, "删除配置失败", err)
-	}
-
-	// 清除配置缓存
-	cache := l.svcCtx.Repository.BusinessCache
-	go func() {
-		if err := cache.DeleteConfigKey(context.Background(), config.Key); err != nil {
-			l.Errorf("清除配置缓存失败: key=%s, error=%v", config.Key, err)
-		}
-	}()
-
 	return nil
 }

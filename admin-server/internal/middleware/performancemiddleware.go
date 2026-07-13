@@ -7,32 +7,27 @@ import (
 	"time"
 
 	"postapocgame/admin-server/internal/config"
-	"postapocgame/admin-server/internal/repository"
+	"postapocgame/admin-server/pkg/errs"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
 	"postapocgame/admin-server/pkg/monitor"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	"postapocgame/admin-server/internal/model/monitoring"
-	monitoringrepo "postapocgame/admin-server/internal/repository/monitoring"
 )
 
 // PerformanceMiddleware 接口性能监控中间件
 type PerformanceMiddleware struct {
-	repo          *repository.Repository
+	iamRPC        iamclient.Iam
 	monitor       *monitor.PerformanceMonitor
 	slowThreshold int64 // 慢接口阈值（毫秒）
 }
 
 // NewPerformanceMiddleware 创建接口性能监控中间件
-func NewPerformanceMiddleware(cfg config.Config, repo *repository.Repository) *PerformanceMiddleware {
+func NewPerformanceMiddleware(cfg config.Config, iamRPC iamclient.Iam) *PerformanceMiddleware {
 	slowThreshold := int64(2000) // 默认 2 秒
-	if cfg.Database.SlowQueryThreshold > 0 {
-		// 使用数据库慢查询阈值的 2 倍作为接口慢查询阈值
-		slowThreshold = int64(cfg.Database.SlowQueryThreshold) * 2
-	}
 
 	return &PerformanceMiddleware{
-		repo:          repo,
+		iamRPC:        iamRPC,
 		monitor:       monitor.NewPerformanceMonitor(slowThreshold),
 		slowThreshold: slowThreshold,
 	}
@@ -94,7 +89,7 @@ func (m *PerformanceMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 			errorMsg = http.StatusText(responseWriter.statusCode)
 		}
 
-		// 异步写入性能日志表
+		// 异步写入性能日志（原来是异步写 Repository，现在是异步调 RPC，语义不变）
 		go func() {
 			defer func() {
 				if rec := recover(); rec != nil {
@@ -102,9 +97,7 @@ func (m *PerformanceMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 				}
 			}()
 
-			performanceLogRepo := monitoringrepo.NewPerformanceLogRepository(m.repo)
-			now := time.Now().Unix()
-			log := &monitoring.AdminPerformanceLog{
+			_, err := m.iamRPC.RecordPerformanceLog(context.Background(), &iamclient.RecordPerformanceLogRequest{
 				UserId:        userId,
 				Username:      username,
 				Method:        r.Method,
@@ -116,14 +109,11 @@ func (m *PerformanceMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 				IpAddress:     getClientIP(r),
 				UserAgent:     r.UserAgent(),
 				ErrorMsg:      errorMsg,
-				CreatedAt:     now,
-				UpdatedAt:     now,
-				DeletedAt:     0,
-			}
-
-			if err := performanceLogRepo.Create(context.Background(), log); err != nil {
+			})
+			if err != nil {
 				logx.Errorf("写入性能监控日志失败: method=%s, path=%s, duration=%dms, status=%d, error=%v",
-					r.Method, r.URL.Path, durationMs, responseWriter.statusCode, err)
+					r.Method, r.URL.Path, durationMs, responseWriter.statusCode,
+					errs.WrapGRPCError("写入性能监控日志失败", err))
 			}
 		}()
 	}

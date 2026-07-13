@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
+	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -32,13 +33,17 @@ func (l *FileListLogic) FileList(req *types.FileListReq) (resp *types.FileListRe
 		return nil, errs.New(errs.CodeBadRequest, "请求参数不能为空")
 	}
 
-	list, total, err := l.svcCtx.Domain.System.File.FindPage(l.ctx, req.Page, req.PageSize, req.Name)
+	rpcResp, err := l.svcCtx.IamRPC.FileList(l.ctx, &iamclient.FileListRequest{
+		Page:     req.Page,
+		PageSize: req.PageSize,
+		Name:     req.Name,
+	})
 	if err != nil {
-		return nil, errs.Wrap(errs.CodeInternalError, "查询文件列表失败", err)
+		return nil, errs.WrapGRPCError("查询文件列表失败", err)
 	}
 
-	items := make([]types.FileItem, 0, len(list))
-	for _, f := range list {
+	items := make([]types.FileItem, 0, len(rpcResp.List))
+	for _, f := range rpcResp.List {
 		items = append(items, types.FileItem{
 			Id:           f.Id,
 			Name:         f.Name,
@@ -51,7 +56,7 @@ func (l *FileListLogic) FileList(req *types.FileListReq) (resp *types.FileListRe
 	}
 
 	return &types.FileListResp{
-		Total: total,
+		Total: rpcResp.Total,
 		List:  items,
 	}, nil
 }
