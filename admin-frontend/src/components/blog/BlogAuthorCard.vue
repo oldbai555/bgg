@@ -14,7 +14,7 @@
 
 <script setup lang="ts">
 import {ref, onMounted} from 'vue'
-import {blogApi} from '@/api/blog'
+import {contentApi} from '@/api/content'
 import type {PublicBlogAuthorInfoResp, PublicBlogArticleStatsResp} from '@/api/generated/admin'
 
 const authorInfo = ref<PublicBlogAuthorInfoResp>({
@@ -30,7 +30,7 @@ const articleStats = ref<PublicBlogArticleStatsResp>({
 
 const loadAuthorInfo = async () => {
   try {
-    const resp = await blogApi.publicAuthorInfo()
+    const resp = await contentApi.publicAuthorInfo()
     authorInfo.value = resp
   } catch (err) {
     console.error('加载作者信息失败:', err)
@@ -39,7 +39,7 @@ const loadAuthorInfo = async () => {
 
 const loadArticleStats = async () => {
   try {
-    const resp = await blogApi.publicArticleStats()
+    const resp = await contentApi.publicArticleStats()
     articleStats.value = resp
   } catch (err) {
     console.error('加载文章统计失败:', err)

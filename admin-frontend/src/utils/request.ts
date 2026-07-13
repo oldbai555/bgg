@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {useUserStore} from '@/stores/user';
 import router from '@/router';
+import {isEnvelope} from '@/types/envelope';
 
 // API 请求基础地址（仅用于 HTTP API 请求）：
 // - 开发环境：通过 Vite dev server 代理到 http://localhost:20000（baseURL 为 /api）
@@ -36,11 +37,11 @@ instance.interceptors.response.use(
   (resp) => {
     const res = resp.data;
     // 标准包裹结构：code 为数字（统一错误码）时才按 Envelope 处理
-    if (res && typeof res === 'object' && 'code' in res && typeof (res as any).code === 'number') {
-      const code = (res as any).code;
+    if (isEnvelope(res)) {
+      const code = res.code;
       // 支持 code === 0 和 code === 200 作为成功码
       if (code === 0 || code === 200) {
-        return (res as any).data;
+        return res.data;
       }
       
       // 处理 10003 错误码：访问令牌无效或已过期
@@ -64,7 +65,7 @@ instance.interceptors.response.use(
         }
       }
       
-      const msg = (res as any).msg || '请求失败';
+      const msg = res.msg || '请求失败';
       return Promise.reject(new Error(msg));
     }
     // 非标准结构，直接返回原始 data（兼容字典等特殊接口）

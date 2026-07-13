@@ -45,7 +45,7 @@
 import {ref, onMounted, watch} from 'vue'
 import {useRouter, useRoute} from 'vue-router'
 import {Search} from '@element-plus/icons-vue'
-import {blogApi} from '@/api/blog'
+import {contentApi} from '@/api/content'
 import type {PublicBlogSocialInfoListResp} from '@/api/generated/admin'
 
 const router = useRouter()
@@ -115,7 +115,7 @@ const handleSearch = () => {
 
 const loadSocialInfo = async () => {
   try {
-    const resp = await blogApi.publicSocialInfoList()
+    const resp = await contentApi.publicSocialInfoList()
     socialInfoList.value = resp.list || []
   } catch (err) {
     console.error('加载社交信息失败:', err)

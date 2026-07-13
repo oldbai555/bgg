@@ -54,7 +54,17 @@
 import {ref, computed, watch} from 'vue'
 import {ElMessage} from 'element-plus'
 import type {NotificationItem} from '@/api/generated/admin'
-import {notificationRead} from '@/api/generated/admin'
+import {systemApi} from '@/api/system'
+import {useDictOptions} from '@/composables/useDictOptions'
+
+const {getLabel: getNoticeTypeLabel} = useDictOptions(
+  'notice_type',
+  [
+    {label: '普通公告', value: '1'},
+    {label: '重要公告', value: '2'},
+    {label: '紧急公告', value: '3'}
+  ]
+)
 
 interface Props {
   notices: NotificationItem[];
@@ -88,15 +98,6 @@ return null
     publishTime: notification.createdAt || 0 // createdAt 已经是秒级时间戳
   }
 })
-
-const getNoticeTypeLabel = (type: number): string => {
-  const map: Record<number, string> = {
-    1: '普通公告',
-    2: '重要公告',
-    3: '紧急公告'
-  }
-  return map[type] || '未知'
-}
 
 const getNoticeTypeTag = (type: number): string => {
   const map: Record<number, string> = {
@@ -153,7 +154,7 @@ return
 
   try {
     // 标记当前通知为已读
-    await notificationRead({id: notification.id})
+    await systemApi.notificationRead({id: notification.id})
     emit('read', notification.id)
 
     // 如果还有下一条，自动切换到下一条

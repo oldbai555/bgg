@@ -35,7 +35,7 @@
 
 <script setup lang="ts">
 import {ref, onMounted} from 'vue'
-import {blogApi} from '@/api/blog'
+import {contentApi} from '@/api/content'
 import type {PublicBlogSocialInfoListResp, PublicBlogFriendLinkListResp} from '@/api/generated/admin'
 
 const socialInfoList = ref<PublicBlogSocialInfoListResp['list']>([])
@@ -53,7 +53,7 @@ const normalizeUrl = (url: string): string => {
 
 const loadSocialInfo = async () => {
   try {
-    const resp = await blogApi.publicSocialInfoList()
+    const resp = await contentApi.publicSocialInfoList()
     socialInfoList.value = resp.list || []
   } catch (err) {
     console.error('加载社交信息失败:', err)
@@ -62,7 +62,7 @@ const loadSocialInfo = async () => {
 
 const loadFriendLinks = async () => {
   try {
-    const resp = await blogApi.publicFriendLinkList()
+    const resp = await contentApi.publicFriendLinkList()
     friendLinkList.value = resp.list || []
   } catch (err) {
     console.error('加载友情链接失败:', err)

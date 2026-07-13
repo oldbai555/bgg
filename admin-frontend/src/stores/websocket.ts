@@ -1,9 +1,9 @@
 import {defineStore} from 'pinia';
 import {useUserStore} from './user';
-import {usePermission} from '@/hooks/usePermission';
 import {ElMessage} from 'element-plus';
 import {getWebSocketBaseURL} from '@/composables/useAppConfig';
-import {taskRecent, type TaskItem} from '@/api/generated/admin';
+import {taskApi} from '@/api/task';
+import type {TaskItem} from '@/api/generated/admin';
 
 // WebSocket 消息类型
 export enum MessageType {
@@ -88,7 +88,6 @@ export const useWebSocketStore = defineStore('websocket', {
     // 连接 WebSocket
     async connect() {
       const userStore = useUserStore();
-      const {hasPermission} = usePermission();
 
       // 在线聊天无需权限，只要登录就可以使用
       // 移除权限检查
@@ -256,7 +255,9 @@ export const useWebSocketStore = defineStore('websocket', {
       const currentPath = window.location.pathname;
       const currentHash = window.location.hash;
       // 检查是否在 ChatList.vue 页面（/chatroom/chat）
-      const isInChatListPage = currentHash === '#/chatroom/chat' || 
+      // 注意：/chatroom/chat 是 admin_menu.path（URL 路由），Phase 1 域目录重组只改了 component 字段
+      // （chatroom/ChatList → chat/ChatList），path 字段未变，这里沿用旧路径是正确的，不是遗漏
+      const isInChatListPage = currentHash === '#/chatroom/chat' ||
                                currentHash.startsWith('#/chatroom/chat?') ||
                                currentPath.includes('/chatroom/chat');
       // 检查是否在其他聊天相关页面
@@ -408,7 +409,7 @@ export const useWebSocketStore = defineStore('websocket', {
       if (!userStore.token) return;
       this.recentTasksLoading = true;
       try {
-        const resp = await taskRecent({});
+        const resp = await taskApi.taskRecent({});
         this.recentTasks = resp.list || [];
       } finally {
         this.recentTasksLoading = false;

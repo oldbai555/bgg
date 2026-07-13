@@ -1,5 +1,5 @@
 import {defineStore} from 'pinia';
-import {login, logout, profile, menuMyTree} from '@/api/generated/admin';
+import {iamApi} from '@/api/iam';
 import type {LoginReq, TokenPair, ProfileResp, MenuItem} from '@/api/generated/admin';
 
 interface UserState {
@@ -29,7 +29,7 @@ export const useUserStore = defineStore('user', {
   }),
   actions: {
     async login(payload: LoginReq) {
-      const data = await login(payload);
+      const data = await iamApi.login(payload);
       this.token = data.accessToken;
       this.refreshToken = data.refreshToken;
       localStorage.setItem(tokenKey, this.token);
@@ -51,10 +51,9 @@ export const useUserStore = defineStore('user', {
       if (!force && this.cacheValid()) {
         return;
       }
-      const profileData = await profile();
+      const profileData = await iamApi.profile();
       this.profile = profileData;
-      const perms: string[] = (profileData as any)?.permissions || [];
-      this.permissions = perms || [];
+      this.permissions = profileData.permissions || [];
       this.persistCache();
     },
     async fetchMenus(force = false) {
@@ -62,13 +61,13 @@ export const useUserStore = defineStore('user', {
         return;
       }
       // 使用 my-tree 接口，根据用户权限过滤菜单
-      const resp = await menuMyTree();
+      const resp = await iamApi.menuMyTree();
       this.menus = resp.list || [];
       this.persistCache();
     },
     async logout() {
       try {
-        await logout({
+        await iamApi.logout({
           accessToken: this.token,
           refreshToken: this.refreshToken
         });

@@ -63,7 +63,6 @@
         :drawer-columns="drawerColumns"
         :have-edit="false"
         :have-detail="true"
-        :have-add="false"
         delete-permission=""
         @size-change="handleSizeChange"
         @current-change="handlePageChange"
@@ -99,7 +98,7 @@
 <script setup lang="ts">
 import {reactive, ref, onMounted, computed} from 'vue'
 import {ElMessage, ElMessageBox} from 'element-plus'
-import {notificationList, notificationDelete, notificationReadAll, notificationClearRead} from '@/api/generated/admin'
+import {systemApi} from '@/api/system'
 import type {NotificationItem} from '@/api/generated/admin'
 import {useI18n} from 'vue-i18n'
 import D2Table from '@/components/common/D2Table.vue'
@@ -199,7 +198,7 @@ const loadData = async () => {
     if (query.readStatus > 0) {
       req.readStatus = query.readStatus
     }
-    const resp = await notificationList(req)
+    const resp = await systemApi.notificationList(req)
     list.value = resp.list
     total.value = resp.total
   } catch (err: unknown) {
@@ -232,7 +231,7 @@ const handleSizeChange = (size: number) => {
 const handleDelete = (index: number, row: NotificationItem) => {
   ElMessageBox.confirm('确定要删除该消息通知吗？', '确认删除', {type: 'warning'})
     .then(async () => {
-      await notificationDelete({id: row.id})
+      await systemApi.notificationDelete({id: row.id})
       ElMessage.success('删除成功')
       loadData()
     })
@@ -242,7 +241,7 @@ const handleDelete = (index: number, row: NotificationItem) => {
 const handleReadAll = async () => {
   readAllLoading.value = true
   try {
-    await notificationReadAll()
+    await systemApi.notificationReadAll()
     ElMessage.success('全部已读操作成功')
     loadData()
   } catch (err: unknown) {
@@ -258,7 +257,7 @@ const handleClearRead = async () => {
     .then(async () => {
       clearReadLoading.value = true
       try {
-        await notificationClearRead()
+        await systemApi.notificationClearRead()
         ElMessage.success('清除已读消息成功')
         loadData()
       } catch (err: unknown) {

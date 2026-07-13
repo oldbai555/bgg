@@ -5,7 +5,7 @@
 
 <script setup lang="ts">
 import {onMounted, watch} from 'vue'
-import {metricApi} from '@/api/metric'
+import {monitoringApi} from '@/api/monitoring'
 
 type MetricEvent = 'view' | 'play' | string;
 
@@ -36,8 +36,8 @@ const report = () => {
 return
 }
   const bizId = Number(props.bizId || 0)
-  metricApi
-    .report({
+  monitoringApi
+    .metricReport({
       module,
       bizId,
       event: props.event

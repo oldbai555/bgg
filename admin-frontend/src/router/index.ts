@@ -1,6 +1,6 @@
 import {createRouter, createWebHistory, RouteRecordRaw} from 'vue-router';
 import {useUserStore} from '@/stores/user';
-import {usePermission} from '@/hooks/usePermission';
+import {usePermission} from '@/composables/usePermission';
 import type {MenuItem} from '@/api/generated/admin';
 
 const viewModules = import.meta.glob('../views/**/*.vue');
@@ -53,55 +53,55 @@ const routes: RouteRecordRaw[] = [
         path: '/blog/article/edit',
         name: 'BlogArticleCreate',
         meta: {permission: 'blog_article:create', keepAlive: false},
-        component: () => import('@/views/blog/BlogArticleEdit.vue')
+        component: () => import('@/views/content/BlogArticleEdit.vue')
       },
       {
         path: '/blog/article/edit/:id',
         name: 'BlogArticleEdit',
         meta: {permission: 'blog_article:update', keepAlive: false},
-        component: () => import('@/views/blog/BlogArticleEdit.vue')
+        component: () => import('@/views/content/BlogArticleEdit.vue')
       },
       {
         path: '/system/role',
         name: 'RoleList',
         meta: {permission: 'role:list', keepAlive: true},
-        component: () => import('@/views/system/RoleList.vue')
+        component: () => import('@/views/iam/RoleList.vue')
       },
       {
         path: '/system/permission',
         name: 'PermissionList',
         meta: {permission: 'permission:list', keepAlive: true},
-        component: () => import('@/views/system/PermissionList.vue')
+        component: () => import('@/views/iam/PermissionList.vue')
       },
       {
         path: '/system/department',
         name: 'DepartmentList',
         meta: {permission: 'department:tree', keepAlive: true},
-        component: () => import('@/views/system/DepartmentList.vue')
+        component: () => import('@/views/iam/DepartmentList.vue')
       },
       {
         path: '/system/api',
         name: 'ApiList',
         meta: {permission: 'api:list', keepAlive: true},
-        component: () => import('@/views/system/ApiList.vue')
+        component: () => import('@/views/iam/ApiList.vue')
       },
       {
         path: '/system/profile',
         name: 'Profile',
         meta: {keepAlive: true},
-        component: () => import('@/views/system/Profile.vue')
+        component: () => import('@/views/iam/Profile.vue')
       },
       {
         path: '/system/task',
         name: 'TaskListPage',
         meta: {permission: 'task:list', keepAlive: true},
-        component: () => import('@/views/system/TaskList.vue')
+        component: () => import('@/views/task/TaskList.vue')
       },
       {
         path: '/system/metric-stats',
         name: 'MetricStats',
         meta: {permission: 'metric:stats', keepAlive: true},
-        component: () => import('@/views/system/MetricStats.vue')
+        component: () => import('@/views/monitoring/MetricStats.vue')
       },
       {
         path: '/403',
@@ -151,30 +151,30 @@ function resolveComponent(component?: string, path?: string) {
   return undefined;
 }
 
+function generateUniqueRouteName(rawPath: string, usedNames: Set<string>): string {
+  const base = rawPath.replace(/^\//, '').replace(/\//g, '_') || 'root';
+  let uniqueName = base;
+  let counter = 1;
+  while (usedNames.has(uniqueName)) {
+    uniqueName = `${base}_${counter}`;
+    counter++;
+  }
+  usedNames.add(uniqueName);
+  return uniqueName;
+}
+
 function buildRoutesFromMenus(menus: MenuItem[]): RouteRecordRaw[] {
   const res: RouteRecordRaw[] = [];
   const usedNames = new Set<string>();
-  
+
   const walk = (items: MenuItem[]) => {
     items.forEach((m) => {
       // 处理菜单（type=2）：有实际页面组件
       if (m.type === 2 && m.path) {
         const comp = resolveComponent(m.component, m.path);
         if (comp) {
-          // 生成唯一的路由名称
-          let routeName = m.path.replace(/^\//, '').replace(/\//g, '_');
-          if (routeName === '') {
-            routeName = 'root';
-          }
-          // 确保名称唯一
-          let uniqueName = routeName;
-          let counter = 1;
-          while (usedNames.has(uniqueName)) {
-            uniqueName = `${routeName}_${counter}`;
-            counter++;
-          }
-          usedNames.add(uniqueName);
-          
+          const uniqueName = generateUniqueRouteName(m.path, usedNames);
+
           res.push({
             path: m.path,
             name: uniqueName,
@@ -193,20 +193,8 @@ function buildRoutesFromMenus(menus: MenuItem[]): RouteRecordRaw[] {
         // 找到第一个有效的子菜单
         const firstChild = m.children.find((child) => child.type === 2 && child.path);
         if (firstChild && firstChild.path) {
-          // 生成唯一的路由名称
-          let routeName = m.path.replace(/^\//, '').replace(/\//g, '_');
-          if (routeName === '') {
-            routeName = 'root';
-          }
-          // 确保名称唯一
-          let uniqueName = routeName;
-          let counter = 1;
-          while (usedNames.has(uniqueName)) {
-            uniqueName = `${routeName}_${counter}`;
-            counter++;
-          }
-          usedNames.add(uniqueName);
-          
+          const uniqueName = generateUniqueRouteName(m.path, usedNames);
+
           res.push({
             path: m.path,
             name: uniqueName,

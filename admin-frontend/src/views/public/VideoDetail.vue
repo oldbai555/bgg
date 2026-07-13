@@ -48,8 +48,8 @@ import {useRouter, useRoute} from 'vue-router'
 import {ElMessage} from 'element-plus'
 import type DPlayerType from 'dplayer'
 import type {PublicVideoDetailResp} from '@/api/generated/admin'
-import {videoApi} from '@/api/video'
-import {metricApi} from '@/api/metric'
+import {contentApi} from '@/api/content'
+import {monitoringApi} from '@/api/monitoring'
 import {copyToClipboard as copyText} from '@/utils/clipboard'
 import MetricReporter from '@/components/common/MetricReporter.vue'
 import IcpFooter from '@/components/common/IcpFooter.vue'
@@ -287,8 +287,8 @@ const initDPlayer = async (options: {url: string; type: 'hls' | 'auto'}) => {
 
         if (!hasReportedPlay.value && video.value.id) {
           hasReportedPlay.value = true
-          metricApi
-            .report({
+          monitoringApi
+            .metricReport({
               module: 'video_detail',
               bizId: video.value.id,
               event: 'play'
@@ -341,7 +341,7 @@ const loadData = async () => {
 
   loading.value = true
   try {
-    const resp = await videoApi.publicDetail({id: idNum})
+    const resp = await contentApi.publicVideoDetail({id: idNum})
     video.value = resp
     hasReportedPlay.value = false
   } catch (err: unknown) {

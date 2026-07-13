@@ -60,7 +60,7 @@
 <script setup lang="ts">
 import {reactive, ref, onMounted, computed} from 'vue'
 import {ElMessage, ElMessageBox} from 'element-plus'
-import {configList, configCreate, configUpdate, configDelete} from '@/api/generated/admin'
+import {systemApi} from '@/api/system'
 import type {ConfigItem, ConfigCreateReq, ConfigUpdateReq} from '@/api/generated/admin'
 import {useI18n} from 'vue-i18n'
 import D2Table from '@/components/common/D2Table.vue'
@@ -132,7 +132,7 @@ const drawerAddColumns = computed<DrawerColumn[]>(() => [
 const loadData = async () => {
   loading.value = true
   try {
-    const resp = await configList({...query})
+    const resp = await systemApi.configList({...query})
     list.value = resp.list
     total.value = resp.total
   } catch (err: unknown) {
@@ -164,7 +164,7 @@ const handleSizeChange = (size: number) => {
 
 const handleUpdate = async (row: ConfigItem) => {
   try {
-    await configUpdate(row as ConfigUpdateReq)
+    await systemApi.configUpdate(row as ConfigUpdateReq)
     ElMessage.success('更新成功')
     loadData()
   } catch (err: unknown) {
@@ -175,7 +175,7 @@ const handleUpdate = async (row: ConfigItem) => {
 
 const handleAdd = async (row: Record<string, unknown>) => {
   try {
-    await configCreate(row as ConfigCreateReq)
+    await systemApi.configCreate(row as ConfigCreateReq)
     ElMessage.success('新增成功')
     loadData()
   } catch (err: unknown) {
@@ -187,7 +187,7 @@ const handleAdd = async (row: Record<string, unknown>) => {
 const handleDelete = (index: number, row: ConfigItem) => {
   ElMessageBox.confirm(t('common.confirmDelete'), t('common.confirm'), {type: 'warning'})
     .then(async () => {
-      await configDelete({id: row.id})
+      await systemApi.configDelete({id: row.id})
       ElMessage.success(t('common.delete'))
       loadData()
     })

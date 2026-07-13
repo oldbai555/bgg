@@ -86,7 +86,7 @@
 import {reactive, ref, onMounted, computed} from 'vue'
 import {ElMessage, ElMessageBox} from 'element-plus'
 import {DocumentCopy} from '@element-plus/icons-vue'
-import {fileList, fileCreate, fileUpdate, fileDelete} from '@/api/generated/admin'
+import {systemApi} from '@/api/system'
 import type {FileItem, FileCreateReq, FileUpdateReq} from '@/api/generated/admin'
 import {useI18n} from 'vue-i18n'
 import D2Table from '@/components/common/D2Table.vue'
@@ -174,7 +174,7 @@ const drawerAddColumns = computed<DrawerColumn[]>(() => [
 const loadData = async () => {
   loading.value = true
   try {
-    const resp = await fileList({...query})
+    const resp = await systemApi.fileList({...query})
     list.value = resp.list
     total.value = resp.total
   } catch (err: unknown) {
@@ -205,7 +205,7 @@ const handleSizeChange = (size: number) => {
 
 const handleUpdate = async (row: FileItem) => {
   try {
-    await fileUpdate(row as FileUpdateReq)
+    await systemApi.fileUpdate(row as FileUpdateReq)
     ElMessage.success('更新成功')
     loadData()
   } catch (err: unknown) {
@@ -216,7 +216,7 @@ const handleUpdate = async (row: FileItem) => {
 
 const handleAdd = async (row: Record<string, unknown>) => {
   try {
-    await fileCreate(row as FileCreateReq)
+    await systemApi.fileCreate(row as FileCreateReq)
     ElMessage.success('新增成功')
     loadData()
   } catch (err: unknown) {
@@ -228,7 +228,7 @@ const handleAdd = async (row: Record<string, unknown>) => {
 const handleDelete = (index: number, row: FileItem) => {
   ElMessageBox.confirm(t('common.confirmDelete'), t('common.confirm'), {type: 'warning'})
     .then(async () => {
-      await fileDelete({id: row.id})
+      await systemApi.fileDelete({id: row.id})
       ElMessage.success(t('common.delete'))
       loadData()
     })

@@ -85,7 +85,7 @@
 import {reactive, ref, computed, onMounted, onUnmounted, nextTick, watch} from 'vue'
 import {useRouter, useRoute} from 'vue-router'
 import {ElMessage} from 'element-plus'
-import {blogApi} from '@/api/blog'
+import {contentApi} from '@/api/content'
 import type {PublicBlogArticleListReq, PublicBlogArticleItem} from '@/api/generated/admin'
 import MetricReporter from '@/components/common/MetricReporter.vue'
 import IcpFooter from '@/components/common/IcpFooter.vue'
@@ -179,7 +179,7 @@ const loadData = async () => {
   const scrollTopToRestore = pendingScrollTop.value
 
   try {
-    const resp = await blogApi.publicArticleList(buildReq())
+    const resp = await contentApi.publicArticleList(buildReq())
     list.value = resp.list
     total.value = resp.total
   } catch (err: unknown) {

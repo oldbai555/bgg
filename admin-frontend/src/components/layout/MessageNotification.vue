@@ -40,7 +40,7 @@
           v-for="message in displayMessages"
           :key="message.id"
           class="message-notification__item"
-          :class="{ unread: message.readStatus === 0 }"
+          :class="{ unread: message.readStatus === 1 }"
           @click="handleMessageClick(message)"
         >
           <div class="message-notification__item-icon">
@@ -59,7 +59,7 @@
             <div class="message-notification__item-text">{{ message.content }}</div>
             <div class="message-notification__item-time">{{ formatTime(message.createdAt) }}</div>
           </div>
-          <div v-if="message.readStatus === 0" class="message-notification__item-dot"></div>
+          <div v-if="message.readStatus === 1" class="message-notification__item-dot"></div>
         </div>
 
         <el-empty
@@ -87,7 +87,7 @@
 import {computed, ref, onMounted, watch} from 'vue'
 import {useRouter} from 'vue-router'
 import {Bell, ChatDotRound} from '@element-plus/icons-vue'
-import {notificationList, notificationReadAll, notificationClearRead, notificationRead, dictGet} from '@/api/generated/admin'
+import {systemApi} from '@/api/system'
 import type {NotificationItem} from '@/api/generated/admin'
 import {ElMessage} from 'element-plus'
 import NoticeReader from '@/components/common/NoticeReader.vue'
@@ -105,7 +105,7 @@ const noticeNotifications = ref<NotificationItem[]>([])
 
 // 合并API通知和WebSocket消息
 const allUnreadMessages = computed(() => {
-  const apiNotifications = notifications.value.filter(n => n.readStatus === 0)
+  const apiNotifications = notifications.value.filter(n => n.readStatus === 1)
   const wsMessages = wsStore.unreadMessages.filter(m => !m.read && m.type === MessageType.CHAT)
 
   // 将WebSocket消息转换为通知格式
@@ -116,7 +116,7 @@ const allUnreadMessages = computed(() => {
     sourceId: 0,
     title: msg.title,
     content: msg.content,
-    readStatus: msg.read ? 1 : 0,
+    readStatus: msg.read ? 2 : 1, // 字典 read_status：1=未读，2=已读
     readAt: 0,
     createdAt: Math.floor(msg.timestamp / 1000), // 转换为秒级时间戳
     updatedAt: Math.floor(msg.timestamp / 1000)
@@ -165,18 +165,18 @@ return '-'
       })
     }
   } catch {
-    return timeStr
+    return '-'
   }
 }
 
 const loadNotifications = async () => {
   loading.value = true
   try {
-    // 只查询未读消息（readStatus=0）
-    const resp = await notificationList({
+    // 只查询未读消息（字典 read_status：1=未读）
+    const resp = await systemApi.notificationList({
       page: 1,
       pageSize: 100,
-      readStatus: 0
+      readStatus: 1
     })
     notifications.value = resp.list || []
   } catch (err: unknown) {
@@ -194,7 +194,7 @@ const handlePopoverShow = () => {
 // 加载聊天页面路径配置
 const loadChatPath = async () => {
   try {
-    const resp = await dictGet({code: 'chat_config'})
+    const resp = await systemApi.dictGet({code: 'chat_config'})
     if (resp && resp.items && resp.items.length > 0) {
       // 查找"在线聊天页面路径"配置项
       const pathItem = resp.items.find(item => item.label === '在线聊天页面路径')
@@ -224,7 +224,7 @@ const handleMessageClick = async (message: NotificationItem) => {
     } else {
       // API通知，标记为已读
       try {
-        await notificationRead({id: message.id})
+        await systemApi.notificationRead({id: message.id})
         await loadNotifications()
       } catch (err: unknown) {
         console.error('标记通知已读失败:', err)
@@ -236,7 +236,7 @@ const handleMessageClick = async (message: NotificationItem) => {
   } else if (message.sourceType === 'notice') {
     // 公告消息：打开公告阅读框
     // 获取所有未读的公告通知
-    const noticeNotifs = notifications.value.filter(n => n.readStatus === 0 && n.sourceType === 'notice')
+    const noticeNotifs = notifications.value.filter(n => n.readStatus === 1 && n.sourceType === 'notice')
     if (noticeNotifs.length > 0) {
       noticeNotifications.value = noticeNotifs
       noticeReaderVisible.value = true
@@ -247,7 +247,7 @@ const handleMessageClick = async (message: NotificationItem) => {
 const handleNoticeRead = async (notificationId: number) => {
   try {
     // 标记单个通知为已读
-    await notificationRead({id: notificationId})
+    await systemApi.notificationRead({id: notificationId})
     // 重新加载通知列表
     await loadNotifications()
   } catch (err: unknown) {
@@ -260,7 +260,7 @@ const handleMarkAllAsRead = async () => {
   readAllLoading.value = true
   try {
     // 标记后端API通知为已读
-    await notificationReadAll()
+    await systemApi.notificationReadAll()
     // 标记WebSocket消息为已读
     wsStore.markAllAsRead()
     ElMessage.success('全部已读成功')
@@ -276,7 +276,7 @@ const handleMarkAllAsRead = async () => {
 const handleClearRead = async () => {
   clearReadLoading.value = true
   try {
-    await notificationClearRead()
+    await systemApi.notificationClearRead()
     ElMessage.success('清除已读消息成功')
     await loadNotifications()
   } catch (err: unknown) {

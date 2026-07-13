@@ -84,7 +84,7 @@
 <script setup lang="ts">
 import {reactive, ref, onMounted, computed} from 'vue'
 import {ElMessage, ElMessageBox} from 'element-plus'
-import {noticeList, noticeCreate, noticeUpdate, noticeDelete} from '@/api/generated/admin'
+import {systemApi} from '@/api/system'
 import type {NoticeItem, NoticeCreateReq, NoticeUpdateReq} from '@/api/generated/admin'
 import {useI18n} from 'vue-i18n'
 import D2Table from '@/components/common/D2Table.vue'
@@ -177,7 +177,7 @@ const drawerColumns = computed<DrawerColumn[]>(() => [
     type: D2TableElemType.Select,
     options: computed(() => noticeStatusOptions.value.map(opt => ({label: opt.label, value: Number(opt.value)})))
   },
-  {prop: 'publishTime', label: '发布时间', type: D2TableElemType.DateTime},
+  {prop: 'publishTime', label: '发布时间', type: D2TableElemType.Datetime},
   {prop: 'createdAt', label: t('common.createdAt'), type: D2TableElemType.ConvertTime}
 ])
 
@@ -197,7 +197,7 @@ const drawerAddColumns = computed<DrawerColumn[]>(() => [
     type: D2TableElemType.Select,
     options: computed(() => noticeStatusOptions.value.map(opt => ({label: opt.label, value: Number(opt.value)})))
   },
-  {prop: 'publishTime', label: '发布时间（留空则立即发布）', type: D2TableElemType.DateTime}
+  {prop: 'publishTime', label: '发布时间（留空则立即发布）', type: D2TableElemType.Datetime}
 ])
 
 const loadData = async () => {
@@ -214,7 +214,7 @@ const loadData = async () => {
     if (query.status !== undefined && query.status >= 0) {
       req.status = query.status
     }
-    const resp = await noticeList(req)
+    const resp = await systemApi.noticeList(req)
     list.value = resp.list
     total.value = resp.total
     // 保存原始行数据用于更新时比较
@@ -293,7 +293,7 @@ const handleUpdate = async (row: NoticeItem) => {
         status: originalRow.status, // 保持原始状态
         publishTime: originalRow.publishTime // 保持原始发布时间
       }
-      await noticeUpdate(updateReq)
+      await systemApi.noticeUpdate(updateReq)
       ElMessage.success('更新成功')
       loadData()
       return
@@ -307,7 +307,7 @@ const handleUpdate = async (row: NoticeItem) => {
       status: row.status,
       publishTime: row.publishTime
     }
-    await noticeUpdate(updateReq)
+    await systemApi.noticeUpdate(updateReq)
     ElMessage.success('更新成功')
     loadData()
   } catch (err: unknown) {
@@ -325,7 +325,7 @@ const handleAdd = async (row: Record<string, unknown>) => {
       status: row.status !== undefined ? (row.status as number) : 1, // 默认草稿
       publishTime: (row.publishTime as number) || 0
     }
-    await noticeCreate(createReq)
+    await systemApi.noticeCreate(createReq)
     ElMessage.success('新增成功')
     loadData()
   } catch (err: unknown) {
@@ -337,7 +337,7 @@ const handleAdd = async (row: Record<string, unknown>) => {
 const handleDelete = (index: number, row: NoticeItem) => {
   ElMessageBox.confirm('确定要删除该公告吗？', '确认删除', {type: 'warning'})
     .then(async () => {
-      await noticeDelete({id: row.id})
+      await systemApi.noticeDelete({id: row.id})
       ElMessage.success('删除成功')
       loadData()
     })

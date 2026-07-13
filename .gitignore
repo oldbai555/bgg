@@ -39,3 +39,4 @@ admin-server/*.exe
 /admin-server/etc/local-redis.json
 # Local AI runtime state
 .atl/
+__debug_bin*

@@ -1,5 +1,5 @@
 import type {DirectiveBinding} from 'vue';
-import {usePermission} from '@/hooks/usePermission';
+import {usePermission} from '@/composables/usePermission';
 
 export default {
   mounted(el: HTMLElement, binding: DirectiveBinding<string | string[]>) {

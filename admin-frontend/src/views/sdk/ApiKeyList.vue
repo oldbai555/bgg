@@ -56,7 +56,7 @@ import {useI18n} from 'vue-i18n'
 import D2Table from '@/components/common/D2Table.vue'
 import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table'
 import {formatUnixTime} from '@/utils/date'
-import {sdkApiKeyList, sdkApiKeyCreate, sdkApiKeyUpdate, sdkApiKeyDelete} from '@/api/generated/admin'
+import {sdkApi} from '@/api/sdk'
 import type {SdkApiKeyItem, SdkApiKeyCreateReq, SdkApiKeyUpdateReq} from '@/api/generated/adminComponents'
 
 const {t} = useI18n()
@@ -146,7 +146,7 @@ const drawerAddColumns = computed<DrawerColumn[]>(() => [
 const loadData = async () => {
   loading.value = true
   try {
-    const resp = await sdkApiKeyList({
+    const resp = await sdkApi.sdkApiKeyList({
       page: query.page,
       pageSize: query.pageSize,
       name: query.name || undefined,
@@ -192,7 +192,7 @@ const handleUpdate = async (row: SdkApiKeyItem) => {
       ipWhitelist: row.ipWhitelist,
       remark: row.remark
     }
-    await sdkApiKeyUpdate(payload)
+    await sdkApi.sdkApiKeyUpdate(payload)
     ElMessage.success(t('common.updateSuccess'))
     void loadData()
   } catch (err: unknown) {
@@ -207,7 +207,7 @@ const handleAdd = async (row: Record<string, unknown>) => {
       ...(row as Record<string, unknown>),
       expireAt: row.expireAt ? Number(row.expireAt) : 0
     } as unknown as SdkApiKeyCreateReq
-    await sdkApiKeyCreate(payload)
+    await sdkApi.sdkApiKeyCreate(payload)
     ElMessage.success(t('common.createSuccess'))
     void loadData()
   } catch (err: unknown) {
@@ -219,7 +219,7 @@ const handleAdd = async (row: Record<string, unknown>) => {
 const handleDelete = (index: number, row: SdkApiKeyItem) => {
   ElMessageBox.confirm(t('common.confirmDelete'), t('common.confirm'), {type: 'warning'})
     .then(async () => {
-      await sdkApiKeyDelete({id: row.id})
+      await sdkApi.sdkApiKeyDelete({id: row.id})
       ElMessage.success(t('common.deleteSuccess'))
       void loadData()
     })

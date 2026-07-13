@@ -91,7 +91,7 @@
 import {reactive, ref, computed, onMounted, onUnmounted, nextTick} from 'vue'
 import {useRouter, useRoute} from 'vue-router'
 import {ElMessage} from 'element-plus'
-import {videoApi} from '@/api/video'
+import {contentApi} from '@/api/content'
 import type {PublicVideoListReq, PublicVideoItem} from '@/api/generated/admin'
 import MetricReporter from '@/components/common/MetricReporter.vue'
 import IcpFooter from '@/components/common/IcpFooter.vue'
@@ -200,7 +200,7 @@ const loadData = async () => {
       req.content = query.content
     }
 
-    const resp = await videoApi.publicList(req)
+    const resp = await contentApi.publicVideoList(req)
     list.value = resp.list
     total.value = resp.total
 

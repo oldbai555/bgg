@@ -3,7 +3,7 @@
  * 统一管理全局字典数据，在登录后一次性加载所有需要的字典
  */
 import {defineStore} from 'pinia';
-import {dictBatchGet} from '@/api/generated/admin';
+import {systemApi} from '@/api/system';
 import type {DictItemItem} from '@/api/generated/admin';
 
 interface DictState {
@@ -85,7 +85,7 @@ export const useDictStore = defineStore('dict', {
     async loadDicts(codes?: string[]) {
       try {
         const codesToLoad = codes || [...REQUIRED_DICT_CODES];
-        const resp = await dictBatchGet({codes: codesToLoad});
+        const resp = await systemApi.dictBatchGet({codes: codesToLoad});
         
         if (resp && resp.dicts) {
           // 更新字典数据

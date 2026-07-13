@@ -63,12 +63,7 @@ import {useI18n} from 'vue-i18n'
 import D2Table from '@/components/common/D2Table.vue'
 import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table'
 import {useDictOptions} from '@/composables/useDictOptions'
-import {
-  sdkInterfaceList,
-  sdkInterfaceCreate,
-  sdkInterfaceUpdate,
-  sdkInterfaceDelete
-} from '@/api/generated/admin'
+import {sdkApi} from '@/api/sdk'
 import type {
   SdkInterfaceItem,
   SdkInterfaceCreateReq,
@@ -170,7 +165,7 @@ const drawerAddColumns = computed<DrawerColumn[]>(() => [
 const loadData = async () => {
   loading.value = true
   try {
-    const resp = await sdkInterfaceList({
+    const resp = await sdkApi.sdkInterfaceList({
       page: query.page,
       pageSize: query.pageSize,
       name: query.name || undefined,
@@ -224,7 +219,7 @@ const handleUpdate = async (row: SdkInterfaceItem) => {
       status: row.status,
       remark: row.remark
     }
-    await sdkInterfaceUpdate(payload)
+    await sdkApi.sdkInterfaceUpdate(payload)
     ElMessage.success(t('common.updateSuccess'))
     void loadData()
   } catch (err: unknown) {
@@ -244,7 +239,7 @@ const handleAdd = async (row: Record<string, unknown>) => {
       remark: String(row.remark || '')
       // apiCode 由后端自动生成，不传
     }
-    await sdkInterfaceCreate(payload)
+    await sdkApi.sdkInterfaceCreate(payload)
     ElMessage.success(t('common.createSuccess'))
     void loadData()
   } catch (err: unknown) {
@@ -256,7 +251,7 @@ const handleAdd = async (row: Record<string, unknown>) => {
 const handleDelete = (index: number, row: SdkInterfaceItem) => {
   ElMessageBox.confirm(t('common.confirmDelete'), t('common.confirm'), {type: 'warning'})
     .then(async () => {
-      await sdkInterfaceDelete({id: row.id})
+      await sdkApi.sdkInterfaceDelete({id: row.id})
       ElMessage.success(t('common.deleteSuccess'))
       void loadData()
     })

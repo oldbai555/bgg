@@ -51,7 +51,7 @@
 <script setup lang="ts">
 import {reactive, ref, onMounted, computed} from 'vue'
 import {ElMessage, ElMessageBox} from 'element-plus'
-import {dictTypeList, dictTypeCreate, dictTypeUpdate, dictTypeDelete} from '@/api/generated/admin'
+import {systemApi} from '@/api/system'
 import type {DictTypeItem, DictTypeCreateReq, DictTypeUpdateReq} from '@/api/generated/admin'
 import {useI18n} from 'vue-i18n'
 import D2Table from '@/components/common/D2Table.vue'
@@ -114,7 +114,7 @@ const drawerAddColumns = computed<DrawerColumn[]>(() => [
 const loadData = async () => {
   loading.value = true
   try {
-    const resp = await dictTypeList({...query})
+    const resp = await systemApi.dictTypeList({...query})
     list.value = resp.list
     total.value = resp.total
   } catch (err: unknown) {
@@ -146,7 +146,7 @@ const handleSizeChange = (size: number) => {
 
 const handleUpdate = async (row: DictTypeItem) => {
   try {
-    await dictTypeUpdate(row as DictTypeUpdateReq)
+    await systemApi.dictTypeUpdate(row as DictTypeUpdateReq)
     ElMessage.success('更新成功')
     loadData()
   } catch (err: unknown) {
@@ -157,7 +157,7 @@ const handleUpdate = async (row: DictTypeItem) => {
 
 const handleAdd = async (row: Record<string, unknown>) => {
   try {
-    await dictTypeCreate(row as DictTypeCreateReq)
+    await systemApi.dictTypeCreate(row as DictTypeCreateReq)
     ElMessage.success('新增成功')
     loadData()
   } catch (err: unknown) {
@@ -169,7 +169,7 @@ const handleAdd = async (row: Record<string, unknown>) => {
 const handleDelete = (index: number, row: DictTypeItem) => {
   ElMessageBox.confirm(t('common.confirmDelete'), t('common.confirm'), {type: 'warning'})
     .then(async () => {
-      await dictTypeDelete({id: row.id})
+      await systemApi.dictTypeDelete({id: row.id})
       ElMessage.success(t('common.delete'))
       loadData()
     })

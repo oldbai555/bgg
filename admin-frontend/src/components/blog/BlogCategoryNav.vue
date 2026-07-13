@@ -24,7 +24,7 @@
 
 <script setup lang="ts">
 import {ref, onMounted} from 'vue'
-import {blogApi} from '@/api/blog'
+import {contentApi} from '@/api/content'
 import type {PublicBlogTagListResp} from '@/api/generated/admin'
 
 defineProps<{
@@ -43,7 +43,7 @@ const handleSelect = (tagId: number) => {
 
 const loadTags = async () => {
   try {
-    const resp = await blogApi.publicTagList()
+    const resp = await contentApi.publicTagList()
     tagList.value = resp.list || []
   } catch (err) {
     console.error('加载标签列表失败:', err)

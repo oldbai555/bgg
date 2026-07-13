@@ -110,7 +110,7 @@
 import {ref, computed, onMounted, watch, shallowRef, nextTick} from 'vue'
 import {useRouter, useRoute} from 'vue-router'
 import {ElMessage} from 'element-plus'
-import {blogApi} from '@/api/blog'
+import {contentApi} from '@/api/content'
 import type {
   PublicBlogArticleDetailReq,
   PublicBlogArticleDetailResp,
@@ -278,7 +278,7 @@ const loadDetail = async () => {
   loading.value = true
   try {
     const req: PublicBlogArticleDetailReq = {id}
-    const resp = await blogApi.publicArticleDetail(req)
+    const resp = await contentApi.publicArticleDetail(req)
     detail.value = resp
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : '加载文章失败'
@@ -293,7 +293,7 @@ const loadDetail = async () => {
 const loadPrevArticle = async (currentId: number) => {
   try {
     const req: PublicBlogArticlePrevReq = {id: currentId}
-    const resp = await blogApi.publicArticlePrev(req)
+    const resp = await contentApi.publicArticlePrev(req)
     if (resp.id) {
       prevArticle.value = {
         id: resp.id,
@@ -312,7 +312,7 @@ const loadPrevArticle = async (currentId: number) => {
 const loadNextArticle = async (currentId: number) => {
   try {
     const req: PublicBlogArticleNextReq = {id: currentId}
-    const resp = await blogApi.publicArticleNext(req)
+    const resp = await contentApi.publicArticleNext(req)
     if (resp.id) {
       nextArticle.value = {
         id: resp.id,

@@ -74,7 +74,7 @@ import {ElMessage} from 'element-plus'
 import {useI18n} from 'vue-i18n'
 import D2Table from '@/components/common/D2Table.vue'
 import {D2TableElemType, type TableColumn} from '@/types/table'
-import {sdkCallLogList} from '@/api/generated/admin'
+import {sdkApi} from '@/api/sdk'
 import type {SdkCallLogItem, SdkCallLogExportReq} from '@/api/generated/adminComponents'
 
 const {t} = useI18n()
@@ -113,7 +113,7 @@ const loadData = async () => {
     const startTime = start ? Math.floor(start.getTime() / 1000) : undefined
     const endTime = end ? Math.floor(end.getTime() / 1000) : undefined
 
-    const resp = await sdkCallLogList({
+    const resp = await sdkApi.sdkCallLogList({
       page: query.page,
       pageSize: query.pageSize,
       sdkKeyId: query.sdkKeyId ? Number(query.sdkKeyId) : undefined,
@@ -172,7 +172,7 @@ const handleExport = async () => {
       startTime: start ? Math.floor(start.getTime() / 1000) : undefined,
       endTime: end ? Math.floor(end.getTime() / 1000) : undefined
     }
-    await sdkCallLogExport(payload)
+    await sdkApi.sdkCallLogExport(payload)
     ElMessage.success('已创建异步导出任务，请在右下角任务列表查看进度')
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : t('common.exportFail')

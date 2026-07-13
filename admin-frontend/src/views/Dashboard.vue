@@ -33,7 +33,7 @@
 <script setup lang="ts">
 import {ref, onMounted} from 'vue'
 import {useI18n} from 'vue-i18n'
-import {dailyShortSentenceList} from '@/api/generated/admin'
+import {miscApi} from '@/api/misc'
 import type {DailyShortSentenceItem} from '@/api/generated/adminComponents'
 import {ElMessage} from 'element-plus'
 
@@ -45,7 +45,7 @@ const quotes = ref<string[]>([])
 // 加载短句列表
 const loadQuotes = async () => {
   try {
-    const resp = await dailyShortSentenceList({
+    const resp = await miscApi.dailyShortSentenceList({
       page: 1,
       pageSize: 2000 // 获取所有短句
     })
