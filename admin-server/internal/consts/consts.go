@@ -228,11 +228,19 @@ const (
 	HeaderAccessControlAllowHeaders     = "Access-Control-Allow-Headers"
 	HeaderAccessControlExposeHeaders    = "Access-Control-Expose-Headers"
 	HeaderAccessControlAllowCredentials = "Access-Control-Allow-Credentials"
+	HeaderAccessControlMaxAge           = "Access-Control-Max-Age"
 
 	// CORS 值
 	CORSAllowOriginAll      = "*"
 	CORSAllowMethodsGetOpts = "GET, OPTIONS"
 	CORSAllowHeadersDefault = "Content-Type,Authorization"
+
+	// CorsMiddleware 用（/public/* 通用跨域中间件，覆盖 GET/POST/PUT/DELETE/OPTIONS/PATCH，
+	// 比上面 M3U8/视频采集单一接口用的 CORSAllowMethodsGetOpts/CORSAllowHeadersDefault 更宽）
+	CORSAllowMethodsAll      = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+	CORSAllowHeadersPublic   = "Content-Type, Authorization, X-Requested-With, Accept, Origin"
+	CORSExposeHeadersDefault = "Content-Length, Content-Type"
+	CORSMaxAge               = "86400"
 
 	// Content-Type
 	ContentTypeM3U8        = "application/vnd.apple.mpegurl"

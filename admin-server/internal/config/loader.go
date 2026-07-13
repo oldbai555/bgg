@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"path/filepath"
 	"runtime"
 
-	"github.com/pkg/errors"
+	"postapocgame/admin-server/pkg/errs"
+
 	"gopkg.in/yaml.v3"
 )
 
@@ -37,12 +37,12 @@ func LoadRedisConfig(configPath string) (*RedisConf, error) {
 
 	// 检查文件是否存在（必须存在）
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		return nil, errors.Errorf("Redis配置文件不存在: %s，请确保文件存在", configPath)
+		return nil, errs.New(errs.CodeNotFound, fmt.Sprintf("Redis配置文件不存在: %s，请确保文件存在", configPath))
 	}
 
 	data, err := os.ReadFile(configPath)
 	if err != nil {
-		return nil, errors.Wrapf(err, "读取Redis配置文件失败: %s", configPath)
+		return nil, errs.Wrap(errs.CodeInternalError, fmt.Sprintf("读取Redis配置文件失败: %s", configPath), err)
 	}
 
 	var redisConfig struct {
@@ -55,7 +55,7 @@ func LoadRedisConfig(configPath string) (*RedisConf, error) {
 	}
 
 	if err := json.Unmarshal(data, &redisConfig); err != nil {
-		return nil, errors.Wrapf(err, "解析Redis配置文件失败: %s", configPath)
+		return nil, errs.Wrap(errs.CodeInternalError, fmt.Sprintf("解析Redis配置文件失败: %s", configPath), err)
 	}
 
 	// 解析数据库编号
@@ -92,14 +92,19 @@ func LoadMiddlewareConfig(configPath string) (*RateLimitConf, error) {
 		configPath = DefaultMiddlewareConfigPath
 	}
 
-	// 检查文件是否存在
-	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		return nil, errors.Errorf("中间件配置文件不存在: %s", configPath)
+	// 检查文件是否存在。这里必须原样返回 os.Stat 的 error（而不是包成 errs.Error），
+	// 否则调用方 MergeExternalConfig 的 os.IsNotExist(err) 永远为 false，导致"中间件
+	// 配置文件可选、不存在则回退主配置"这个语义失效。
+	if _, err := os.Stat(configPath); err != nil {
+		if os.IsNotExist(err) {
+			return nil, err
+		}
+		return nil, errs.Wrap(errs.CodeInternalError, fmt.Sprintf("检查中间件配置文件失败: %s", configPath), err)
 	}
 
 	data, err := os.ReadFile(configPath)
 	if err != nil {
-		return nil, errors.Wrapf(err, "读取中间件配置文件失败: %s", configPath)
+		return nil, errs.Wrap(errs.CodeInternalError, fmt.Sprintf("读取中间件配置文件失败: %s", configPath), err)
 	}
 
 	var middlewareConfig struct {
@@ -107,7 +112,7 @@ func LoadMiddlewareConfig(configPath string) (*RateLimitConf, error) {
 	}
 
 	if err := yaml.Unmarshal(data, &middlewareConfig); err != nil {
-		return nil, errors.Wrapf(err, "解析中间件配置文件失败: %s", configPath)
+		return nil, errs.Wrap(errs.CodeInternalError, fmt.Sprintf("解析中间件配置文件失败: %s", configPath), err)
 	}
 
 	return &middlewareConfig.RateLimit, nil
@@ -122,7 +127,7 @@ func MergeExternalConfig(c *Config, redisConfigPath, middlewareConfigPath string
 	}
 	redisConf, err := LoadRedisConfig(redisConfigPath)
 	if err != nil {
-		return errors.Wrap(err, "加载Redis配置失败，配置文件必须存在")
+		return errs.Wrap(errs.CodeInternalError, "加载Redis配置失败，配置文件必须存在", err)
 	}
 
 	// 直接使用外部文件的配置（包含所有Redis相关参数）
@@ -136,7 +141,7 @@ func MergeExternalConfig(c *Config, redisConfigPath, middlewareConfigPath string
 	if err != nil {
 		// 中间件配置可选，如果不存在则使用配置文件中的
 		if !os.IsNotExist(err) {
-			return errors.Wrap(err, "加载中间件配置失败")
+			return errs.Wrap(errs.CodeInternalError, "加载中间件配置失败", err)
 		}
 		// 使用配置文件中的中间件配置
 	} else {
@@ -145,24 +150,4 @@ func MergeExternalConfig(c *Config, redisConfigPath, middlewareConfigPath string
 	}
 
 	return nil
-}
-
-// GetConfigPath 获取配置文件路径（支持相对路径和绝对路径）
-func GetConfigPath(configFile string) string {
-	if filepath.IsAbs(configFile) {
-		return configFile
-	}
-	// 如果是相对路径，尝试从当前工作目录或可执行文件目录查找
-	if _, err := os.Stat(configFile); err == nil {
-		return configFile
-	}
-	// 尝试从可执行文件所在目录查找
-	if exe, err := os.Executable(); err == nil {
-		exeDir := filepath.Dir(exe)
-		absPath := filepath.Join(exeDir, configFile)
-		if _, err := os.Stat(absPath); err == nil {
-			return absPath
-		}
-	}
-	return configFile
 }

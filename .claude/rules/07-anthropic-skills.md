@@ -1,0 +1,30 @@
+# Anthropic Skills 市场
+
+本仓库已接入官方 [anthropics/skills](https://github.com/anthropics/skills) 技能市场，marketplace 名为 `anthropic-agent-skills`，包含 `document-skills`（Excel/Word/PPT/PDF）、`example-skills`（前端设计、Web 测试、MCP 开发等）、`claude-api`（Claude/Anthropic API 参考）三个插件。
+
+## 两个工具链的接入方式不同
+
+- **Claude Code 插件**：接入方式是仓库 `.claude/settings.json` 里的 `extraKnownMarketplaces`（注册市场源） + `enabledPlugins`（启用三个插件），全自动——Claude Code 内置的 Skill 机制会在合适场景自动发现并调用对应 `SKILL.md`，不需要手动干预。
+- **Cursor**：没有与 Claude Code 对等的"插件市场 + 自动技能调用"机制。Cursor agent 只能通过读取规则文件（本文件）获得"何时该用哪个技能"的提示，然后**主动 fetch 对应 skill 的 `SKILL.md` 原文**（`https://raw.githubusercontent.com/anthropics/skills/main/skills/<skill-name>/SKILL.md`）并照着执行，不是自动触发的工具调用。**Cursor 场景下，命中下表触发条件时，先抓取对应 SKILL.md 读一遍再动手，不要凭记忆模仿。**
+
+## 何时用哪个 skill（按本项目场景标注相关性）
+
+| skill | 触发场景 | 与本项目的关联 |
+|---|---|---|
+| `xlsx` | 打开/创建/编辑 `.xlsx`/`.csv`/`.tsv`，产出物是表格文件 | 本项目多处"导出"功能（操作日志、性能日志、SDK 调用日志等 Excel 导出）落地/调试时可用 |
+| `docx` | 产出物是 Word 文档（报告、备忘录、模板） | 用户要"生成一份 Word 版XX报告"时用 |
+| `pptx` | 涉及 `.pptx`（读/建/改幻灯片、提取内容） | 用户要做汇报/演示材料时用 |
+| `pdf` | 涉及 PDF 的读取、合并拆分、加水印、表单、OCR 等 | `docs/openapi/admin-api.json` 之类的文档如需导出 PDF 版本时可用 |
+| `frontend-design` | 新建/重塑 UI 的美学方向、排版取舍，避免"一看就是模板默认值" | `admin-frontend` 页面设计、`D2Table`/`layout` 视觉调整时参考 |
+| `webapp-testing` | 用 Playwright 验证本地 web 应用、截图、看浏览器日志 | 前端改动后端到端验证（如 CLAUDE.md 要求的"启动 dev server 实际验证"）时用 |
+| `web-artifacts-builder` | 做复杂多组件的 HTML/React/Tailwind/shadcn 类 artifact | 给用户做交互式 demo/可视化面板时用，不用于简单静态页面 |
+| `mcp-builder` | 开发/改造 MCP server（Python FastMCP 或 Node/TS MCP SDK） | 本项目自建了 `admin-server/tool/admin-mcp`，扩展它的 tool 时可参考 |
+| `doc-coauthoring` | 协作撰写文档/提案/技术方案/决策文档 | 编写 `admin-server/docs/*.md` 规划文档、`AGENTS.md` 类操作手册时可用 |
+| `internal-comms` | 写状态汇报、周报、事故报告、项目进展等内部沟通材料 | 给团队写"Phase 3 收尾汇报"这类内容时用 |
+| `skill-creator` | 创建/改造/评估自定义 skill | 如果后续要给本项目写专属 skill（而不是用市场里的通用 skill）时用 |
+| `claude-api` | 任何提到 Claude/Anthropic/模型选型/Token 计费/流式/工具调用的问题 | 本项目 AI 工具链本身用 Claude/Cursor，排查 Claude Code/API 相关问题时优先用这个而不是凭记忆回答 |
+| `brand-guidelines` / `canvas-design` / `algorithmic-art` / `theme-factory` / `slack-gif-creator` | 品牌视觉、海报、生成艺术、主题包、Slack GIF | 与本项目（go-zero 后台管理系统）业务场景基本不相关，仅在用户明确提出对应需求时才用 |
+
+## 优先级与本仓库既有规则的关系
+
+`admin-server`/`admin-frontend` 的既有规范（脚手架流程、生成目录禁止手改、squirrel、中间件顺序等，见 `00-workflow.md`/`10-go-code-style.md`/`20-frontend.md`）优先级高于这些通用 skill 的建议——skill 提供的是通用方法论（如何写 Word/Excel、如何做前端视觉设计、如何写 MCP server），不覆盖本项目自己的工程约定。两者冲突时以本仓库规则为准。

@@ -1,8 +1,6 @@
 package registry
 
 import (
-	"context"
-
 	"postapocgame/admin-server/services/iam/internal/repository"
 	iamrepo "postapocgame/admin-server/services/iam/internal/repository/iam"
 	miscrepo "postapocgame/admin-server/services/iam/internal/repository/misc"
@@ -107,14 +105,4 @@ func NewDomain(repo *repository.Repository) *Domain {
 			DailyShortSentence: miscrepo.NewDailyShortSentenceRepository(repo),
 		},
 	}
-}
-
-// Transact 在事务内执行 fn。fn 收到的 txDomain 是用换绑过事务 session 的 Repository
-// 重新调用 NewDomain 构造出来的——每个 <domain>repo.NewXxxRepository(repo) 在构造时
-// 就把 repo.DB / repo.XxxModel 捕获进内部字段，事务场景下必须重新构造一遍，不能只换
-// Repository 本身而不重建 Domain。
-func Transact(ctx context.Context, repo *repository.Repository, fn func(ctx context.Context, txDomain *Domain) error) error {
-	return repo.Transact(ctx, func(ctx context.Context, txRepo *repository.Repository) error {
-		return fn(ctx, NewDomain(txRepo))
-	})
 }

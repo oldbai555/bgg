@@ -35,10 +35,12 @@ Etcd:
 
 Telemetry:
   Name: iam-rpc
-  Endpoint: http://127.0.0.1:4318/v1/traces   # 本地/自建 OTLP collector，未部署时留空即可关闭
+  Endpoint: 127.0.0.1:4317   # 本地/自建 OTLP collector
   Sampler: 1.0        # 开发环境全采样；生产按流量调低（如 0.1）
   Batcher: otlpgrpc    # 可选 otlpgrpc / otlphttp / jaeger / zipkin / stdout
 ```
+
+**`Endpoint` 格式注意（实测踩坑）**：`Batcher: otlpgrpc` 对应 `otlptracegrpc.WithEndpoint`，期望的是纯 `host:port` 的 gRPC target 语法，**不能带 `http://` scheme 和 `/v1/traces` path**——带了会在服务启动/首次导出时触发 `dial tcp: address ...: too many colons in address`，不是"优雅降级为不发送"。只有 `Batcher: otlphttp` 才吃 `http://host:port/v1/traces` 这种完整 URL。`otlpgrpc` 的标准端口是 `4317`（`otlphttp` 是 `4318`），本文档统一用 `otlpgrpc` + `4317`，两者不要混用错端口/错格式。
 
 `gateway` 的 `etc/gateway.yaml`（HTTP 服务）同样加：
 
@@ -49,14 +51,14 @@ Port: 20000
 
 Telemetry:
   Name: gateway
-  Endpoint: http://127.0.0.1:4318/v1/traces
+  Endpoint: 127.0.0.1:4317
   Sampler: 1.0
   Batcher: otlpgrpc
 ```
 
 六个服务（`gateway`/`iam-rpc`/`content-rpc`/`chat-rpc`/`task-rpc`/`sdk-rpc`）各自的 `Telemetry.Name` 必须不同（用于在 trace 后端区分服务来源），`Endpoint` 指向同一个 collector。
 
-**本轮不部署 OTLP collector/Jaeger/Zipkin 后端**——`Telemetry` 配置块本身会自动生成并传播 trace-id，这个能力在没有后端收集时依然生效（span 数据会被静默丢弃，但 trace-id 已经写进日志字段，见第 3 节），本轮的重点是把 trace-id 打进结构化日志，让"跨服务用同一个 trace-id 搜四份日志"这件事可行；接一个真正的 trace 后端做可视化调用链，是后续可选的基础设施投入，不阻塞本轮。
+**本轮不部署 OTLP collector/Jaeger/Zipkin 后端**——`Telemetry` 配置块本身会自动生成并传播 trace-id，这个能力在没有后端收集时依然生效，本轮的重点是把 trace-id 打进结构化日志，让"跨服务用同一个 trace-id 搜四份日志"这件事可行；接一个真正的 trace 后端做可视化调用链，是后续可选的基础设施投入，不阻塞本轮。**实测行为修正**：`Endpoint` 用上面纠正后的纯 `host:port` 格式时，未部署 collector 不是"静默丢弃"，而是 span 导出会在后台报 `connection refused`（`nonblock`，不阻塞启动、不影响业务请求），trace-id 依然正确写入日志字段——效果等价，但描述准确性上是"连接被拒绝、非阻塞失败"而不是"静默丢弃"。
 
 ### 2.2 gRPC/HTTP 传播的落地位置
 
@@ -160,7 +162,7 @@ func NewPingLogic(ctx context.Context, svcCtx *svc.ServiceContext) *PingLogic {
 ## 4. 明确不做的事
 
 - **不引入日志聚合系统（ELK/Loki/Grafana Loki 等）**。每个服务继续往 stdout 打 JSON（而不是文件），复用现有的 Supervisor（Phase 1-2 过渡期）/`docker compose logs`（Phase 3 之后，见 `21-cd-and-deployment.md`）日志采集方式。JSON 格式已经是"可被任何聚合系统摄入"的标准形态，以后要接 Loki/ELK 只是加一个 Promtail/Filebeat 配置指向已有的 JSON stdout，不需要回头重写日志代码——这就是本轮只做 JSON 化、不做聚合系统选型的原因。
-- **不部署 trace 后端（Jaeger/Zipkin/Tempo）**。`Telemetry` 配置块本身在没有 collector 时不报错、不影响服务运行（span 静默丢弃），trace-id 依然会打进日志字段，本轮的排查手段是"用同一个 trace-id grep 四份 JSON 日志"，不依赖可视化调用链界面；接一个真正的 trace 后端是后续可选投入。
+- **不部署 trace 后端（Jaeger/Zipkin/Tempo）**。`Telemetry` 配置块本身在没有 collector 时不报错、不影响服务运行（span 导出报 `connection refused`，`nonblock`），trace-id 依然会打进日志字段，本轮的排查手段是"用同一个 trace-id grep 四份 JSON 日志"，不依赖可视化调用链界面；接一个真正的 trace 后端是后续可选投入。
 - **不做 metrics（Prometheus 指标）体系化接入**。`go.mod` 里已经有 `prometheus/client_golang`（go-zero 间接依赖，`/metrics` 端点 go-zero 框架自带），这部分本轮不额外设计，不在本文档范围内。
 - **不要求六个服务一次性全部接入**。可以随 Phase 2 每个服务拆分时顺手做（推荐），也可以在 Phase 2 全部拆完后统一做一次；两种顺序都不影响正确性，按实际进度选。
 
