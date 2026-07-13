@@ -21,7 +21,7 @@ SET @task_type_id = (SELECT `id` FROM `admin_dict_type` WHERE `code` = 'task_typ
 -- 3. 插入字典项：任务类型（task_type）
 INSERT INTO `admin_dict_item` (`type_id`, `label`, `value`, `sort`, `status`, `remark`, `created_at`, `updated_at`, `deleted_at`)
 VALUES
-  (@task_type_id, '异步导出Excel', '1', 1, 1, '异步导出Excel文件', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
+  (@task_type_id, '异步导出Excel', '1', 1, 1, '异步导出Excel文件', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
 ON DUPLICATE KEY UPDATE
   `label`=VALUES(`label`),
   `value`=VALUES(`value`),
