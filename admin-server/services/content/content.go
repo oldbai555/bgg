@@ -3,7 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 
+	"postapocgame/admin-server/pkg/logging"
 	"postapocgame/admin-server/services/content/content"
 	"postapocgame/admin-server/services/content/internal/config"
 	"postapocgame/admin-server/services/content/internal/server"
@@ -23,6 +25,11 @@ func main() {
 
 	var c config.Config
 	conf.MustLoad(*configFile, &c, conf.UseEnv())
+
+	if err := logging.Setup("content-rpc"); err != nil {
+		log.Fatalf("Failed to set up logging: %v", err)
+	}
+
 	ctx := svc.NewServiceContext(c)
 
 	s := zrpc.MustNewServer(c.RpcServerConf, func(grpcServer *grpc.Server) {

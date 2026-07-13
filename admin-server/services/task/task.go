@@ -3,7 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 
+	"postapocgame/admin-server/pkg/logging"
 	"postapocgame/admin-server/services/task/internal/config"
 	"postapocgame/admin-server/services/task/internal/server"
 	"postapocgame/admin-server/services/task/internal/svc"
@@ -23,6 +25,11 @@ func main() {
 
 	var c config.Config
 	conf.MustLoad(*configFile, &c, conf.UseEnv())
+
+	if err := logging.Setup("task-rpc"); err != nil {
+		log.Fatalf("Failed to set up logging: %v", err)
+	}
+
 	ctx := svc.NewServiceContext(c)
 
 	// 启动任务调度器（进程内 goroutine，扫描 admin_task 表并派发给执行器），与 zrpc server

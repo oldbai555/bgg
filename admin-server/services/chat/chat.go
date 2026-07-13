@@ -3,7 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 
+	"postapocgame/admin-server/pkg/logging"
 	"postapocgame/admin-server/services/chat/chat"
 	"postapocgame/admin-server/services/chat/internal/config"
 	"postapocgame/admin-server/services/chat/internal/server"
@@ -23,6 +25,11 @@ func main() {
 
 	var c config.Config
 	conf.MustLoad(*configFile, &c, conf.UseEnv())
+
+	if err := logging.Setup("chat-rpc"); err != nil {
+		log.Fatalf("Failed to set up logging: %v", err)
+	}
+
 	ctx := svc.NewServiceContext(c)
 
 	// 启动 chat onboarding 消费者（消费 stream:chat.user.created，进程内 goroutine），与

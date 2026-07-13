@@ -9,6 +9,7 @@ import (
 	"postapocgame/admin-server/internal/svc"
 	pb "postapocgame/admin-server/pkg/iamcallback/pb"
 	jwthelper "postapocgame/admin-server/pkg/jwt"
+	"postapocgame/admin-server/pkg/logging"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -66,7 +67,12 @@ func RecordAuditLog(svcCtx *svc.ServiceContext, ctx context.Context, httpReq *ht
 		}
 	}
 
-	// 异步写入日志（使用 goroutine，避免阻塞主流程）
+	// 异步写入日志（使用 goroutine，避免阻塞主流程）；context.WithoutCancel 保留 ctx 里
+	// Telemetry 中间件放入的 trace span context（RecordAuditLog 的 RPC 调用能和触发它的
+	// 那次 HTTP 请求共享同一个 trace-id），但摘掉请求生命周期的取消/超时信号，避免 handler
+	// 已经返回、请求 ctx 被取消导致这次异步审计调用跟着夭折。
+	traceCtx := context.WithoutCancel(ctx)
+
 	go func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -74,7 +80,9 @@ func RecordAuditLog(svcCtx *svc.ServiceContext, ctx context.Context, httpReq *ht
 			}
 		}()
 
-		_, err := svcCtx.IamCallbackRPC.RecordAuditLog(context.Background(), &pb.RecordAuditLogRequest{
+		auditLogger := logx.WithContext(traceCtx).WithFields(logx.Field(logging.FieldUserID, userId))
+
+		_, err := svcCtx.IamCallbackRPC.RecordAuditLog(traceCtx, &pb.RecordAuditLogRequest{
 			UserId:      userId,
 			Username:    username,
 			AuditType:   auditType,
@@ -84,10 +92,10 @@ func RecordAuditLog(svcCtx *svc.ServiceContext, ctx context.Context, httpReq *ht
 			UserAgent:   userAgent,
 		})
 		if err != nil {
-			logx.Errorf("记录审计日志失败: userId=%d, username=%s, auditType=%s, auditObject=%s, error: %v",
+			auditLogger.Errorf("记录审计日志失败: userId=%d, username=%s, auditType=%s, auditObject=%s, error: %v",
 				userId, username, auditType, auditObject, err)
 		} else {
-			logx.Infof("成功记录审计日志: userId=%d, username=%s, auditType=%s, auditObject=%s",
+			auditLogger.Infof("成功记录审计日志: userId=%d, username=%s, auditType=%s, auditObject=%s",
 				userId, username, auditType, auditObject)
 		}
 	}()

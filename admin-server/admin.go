@@ -18,6 +18,7 @@ import (
 	"postapocgame/admin-server/internal/handler"
 	"postapocgame/admin-server/internal/svc"
 	appwire "postapocgame/admin-server/internal/wire"
+	"postapocgame/admin-server/pkg/logging"
 	"postapocgame/admin-server/services/iam/iamclient"
 
 	"github.com/zeromicro/go-zero/core/conf"
@@ -76,10 +77,7 @@ func main() {
 		log.Fatalf("加载外部配置失败: %v", err)
 	}
 
-	err := logx.SetUp(logx.LogConf{
-		Encoding: "plain",
-	})
-	if err != nil {
+	if err := logging.Setup("gateway"); err != nil {
 		log.Fatalf("Failed to set up logging: %v", err)
 	}
 

@@ -3,7 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 
+	"postapocgame/admin-server/pkg/logging"
 	"postapocgame/admin-server/services/iam/iam"
 	"postapocgame/admin-server/services/iam/internal/config"
 	"postapocgame/admin-server/services/iam/internal/consumer"
@@ -26,6 +28,21 @@ func main() {
 
 	var c config.Config
 	conf.MustLoad(*configFile, &c, conf.UseEnv())
+
+	if c.JWT.AccessSecret == "" || c.JWT.RefreshSecret == "" {
+		log.Fatalf("JWT_ACCESS_SECRET / JWT_REFRESH_SECRET 未设置，拒绝以空密钥启动")
+	}
+	if len(c.SdkRpc.Endpoints) == 0 || c.SdkRpc.Endpoints[0] == "" {
+		log.Fatalf("SDK_RPC_ENDPOINT 未设置，拒绝以空 sdk-rpc 地址启动")
+	}
+	if len(c.ChatRpc.Endpoints) == 0 || c.ChatRpc.Endpoints[0] == "" {
+		log.Fatalf("CHAT_RPC_ENDPOINT 未设置，拒绝以空 chat-rpc 地址启动")
+	}
+
+	if err := logging.Setup("iam-rpc"); err != nil {
+		log.Fatalf("Failed to set up logging: %v", err)
+	}
+
 	ctx := svc.NewServiceContext(c)
 
 	// 同一个 zrpc.Server 上注册三个 gRPC 服务：Iam（本服务的原生契约）+ TaskCallback/
