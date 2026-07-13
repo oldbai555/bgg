@@ -73,3 +73,44 @@ jobs:
         env:
           TEST_MYSQL_DSN: root:root@tcp(127.0.0.1:3306)/admin_test
           TEST_REDIS_ADDR: 127.0.0.1:6379
+
+  build-images:
+    # 只在 push 到 main 时构建+推送镜像（feature/** push 和 PR 只跑上面三个门槛 job，
+    # 不产出镜像），见 admin-server/docs/21-cd-and-deployment.md 第 4 节。
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [lint-build, unit-test]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # gateway 对应仓库根 admin-server/Dockerfile（gateway 是 admin-server 的根 main
+        # 包 admin.go，不是独立的 cmd/gateway/ 目录，21-cd-and-deployment.md 写的
+        # cmd/gateway/Dockerfile 是当时的规划路径，落地时按 Phase 2 实际拆分结果调整）；
+        # 其余五个对应各自 services/<name>/Dockerfile。
+        include:
+          - service: gateway
+            dockerfile: Dockerfile
+          - service: iam
+            dockerfile: services/iam/Dockerfile
+          - service: content
+            dockerfile: services/content/Dockerfile
+          - service: chat
+            dockerfile: services/chat/Dockerfile
+          - service: task
+            dockerfile: services/task/Dockerfile
+          - service: sdk
+            dockerfile: services/sdk/Dockerfile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v5
+        with:
+          context: ./admin-server
+          file: ./admin-server/${{ matrix.dockerfile }}
+          push: true
+          # 六个独立镜像仓库，tag 用完整 git sha（不用 latest），保证每次部署可追溯到
+          # 具体提交，见 21-cd-and-deployment.md 第 4 节镜像命名规则。
+          tags: ghcr.io/${{ github.repository_owner }}/admin-${{ matrix.service }}:${{ github.sha }}

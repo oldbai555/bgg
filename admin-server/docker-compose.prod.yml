@@ -1,0 +1,98 @@
+# 生产环境 compose 编排：六个服务全部拉取 ghcr.io 镜像，不包含 MySQL/Redis 容器
+# ——生产 MySQL/Redis 是已有的外部实例（见 docs/14-production-deployment-checklist.md
+# 条目 2），继续通过环境变量/`-redis-config /etc/work/redis.json` 指向，不在这里容器化。
+# 本文件和本地 docker-compose.yml 是"同一种文件形状"（同样六个 service 名），差异只在
+# image: 字段指向 build（本地）还是 ghcr.io/...:${TAG}（生产），以及外部依赖是否容器化，
+# 见 docs/21-cd-and-deployment.md 第 5 节。
+#
+# 部署机制说明（本次会话只落地文件本身，不做真实部署，用户后续实际上线时再具体调整，
+# 见 docs/progress.md 对应日期条目）：
+#   - GHCR_NAMESPACE 默认取 GitHub 仓库 owner（oldbai555），镜像名 admin-<service>。
+#   - TAG 默认 latest，生产发布建议显式传入 git sha（`TAG=<sha> docker compose ... up -d`），
+#     与 CI 镜像构建时打的 tag 一致，方便回滚时明确"回滚到哪一个 tag"。
+#   - 每个服务的 etc/<service>.yaml 已经是 admin-server 仓库里的模板（挂载进容器覆盖镜像
+#     内置的默认文件），真正生效的环境变量（DSN/Redis 地址/JWT 密钥/各服务 RPC 地址）由
+#     .env 文件或部署环境的真实环境变量提供，不写入这份 compose 文件。
+
+services:
+  gateway:
+    image: ghcr.io/${GHCR_NAMESPACE:-oldbai555}/admin-gateway:${TAG:-latest}
+    ports:
+      - "20000:20000"
+    volumes:
+      - ./etc/admin-api.yaml:/app/etc/admin-api.yaml:ro
+      - ./etc/middleware.yaml:/app/etc/middleware.yaml:ro
+      - /etc/work:/etc/work:ro
+      - uploads:/app/uploads
+    environment:
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      IAM_RPC_ENDPOINT: iam:8081
+      IAM_CALLBACK_RPC_ENDPOINT: iam:8081
+      TASK_RPC_ENDPOINT: task:8090
+      SDK_RPC_ENDPOINT: sdk:8091
+      CHAT_RPC_ENDPOINT: chat:8092
+      CONTENT_RPC_ENDPOINT: content:8093
+    command: ["./admin", "-f", "etc/admin-api.yaml", "-redis-config", "/etc/work/redis.json"]
+    restart: unless-stopped
+
+  iam:
+    image: ghcr.io/${GHCR_NAMESPACE:-oldbai555}/admin-iam:${TAG:-latest}
+    volumes:
+      - ./services/iam/etc/iam.yaml:/app/etc/iam.yaml:ro
+    environment:
+      IAM_MYSQL_DSN: ${IAM_MYSQL_DSN}
+      IAM_REDIS_ADDRESS: ${IAM_REDIS_ADDRESS}
+      IAM_REDIS_PASSWORD: ${IAM_REDIS_PASSWORD}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      SDK_RPC_ENDPOINT: sdk:8091
+      CHAT_RPC_ENDPOINT: chat:8092
+    restart: unless-stopped
+
+  task:
+    image: ghcr.io/${GHCR_NAMESPACE:-oldbai555}/admin-task:${TAG:-latest}
+    volumes:
+      - ./services/task/etc/task.yaml:/app/etc/task.yaml:ro
+      - uploads:/app/uploads
+    environment:
+      TASK_MYSQL_DSN: ${TASK_MYSQL_DSN}
+      TASK_REDIS_ADDRESS: ${TASK_REDIS_ADDRESS}
+      TASK_REDIS_PASSWORD: ${TASK_REDIS_PASSWORD}
+      TASK_CALLBACK_ENDPOINT: iam:8081
+    restart: unless-stopped
+
+  sdk:
+    image: ghcr.io/${GHCR_NAMESPACE:-oldbai555}/admin-sdk:${TAG:-latest}
+    volumes:
+      - ./services/sdk/etc/sdk.yaml:/app/etc/sdk.yaml:ro
+    environment:
+      SDK_MYSQL_DSN: ${SDK_MYSQL_DSN}
+      SDK_REDIS_ADDRESS: ${SDK_REDIS_ADDRESS}
+      SDK_REDIS_PASSWORD: ${SDK_REDIS_PASSWORD}
+    restart: unless-stopped
+
+  chat:
+    image: ghcr.io/${GHCR_NAMESPACE:-oldbai555}/admin-chat:${TAG:-latest}
+    volumes:
+      - ./services/chat/etc/chat.yaml:/app/etc/chat.yaml:ro
+    environment:
+      CHAT_MYSQL_DSN: ${CHAT_MYSQL_DSN}
+      CHAT_REDIS_ADDRESS: ${CHAT_REDIS_ADDRESS}
+      CHAT_REDIS_PASSWORD: ${CHAT_REDIS_PASSWORD}
+      IAM_CALLBACK_ENDPOINT: iam:8081
+    restart: unless-stopped
+
+  content:
+    image: ghcr.io/${GHCR_NAMESPACE:-oldbai555}/admin-content:${TAG:-latest}
+    volumes:
+      - ./services/content/etc/content.yaml:/app/etc/content.yaml:ro
+    environment:
+      CONTENT_MYSQL_DSN: ${CONTENT_MYSQL_DSN}
+      CONTENT_REDIS_ADDRESS: ${CONTENT_REDIS_ADDRESS}
+      CONTENT_REDIS_PASSWORD: ${CONTENT_REDIS_PASSWORD}
+      IAM_CALLBACK_ENDPOINT: iam:8081
+    restart: unless-stopped
+
+volumes:
+  uploads:

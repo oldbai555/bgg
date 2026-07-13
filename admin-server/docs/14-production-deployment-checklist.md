@@ -175,13 +175,26 @@
 
 **状态**：`已就绪，待生产环境实际部署时执行`（本机无 Docker，`docker compose up` 本身未做容器化实测；`Login`/`Refresh`/`FileUpload`/`FileDownload`/`Notice`/`Notification` 几类写路径已于 2026-07-13 补验证通过，不再是部署前的待办项）。
 
+### 10 · Phase 3：六容器镜像 + docker-compose 生产切换（`21-cd-and-deployment.md`）
+
+**触发条件**：Phase 3 第三篇（`21-cd-and-deployment.md`）完成——CI 新增 `build-images` matrix job（六个服务并行构建+推送 `ghcr.io/<owner>/admin-<service>:<git-sha>`）、`script/admin.sh` 新增 `compose pull/deploy/status/logs` 四个子命令、新增 `docker-compose.prod.yml`。这是**前置工作**：本次会话只落地代码/配置本身，未做任何真实部署动作，用户后续实际上线时再具体调整（按用户 2026-07-13 明确要求，见 `docs/progress.md` 对应条目）。
+
+**部署时要做什么**（用户真正要切换到 compose 部署时，按顺序做）：
+1. **生产服务器一次性准备**：安装 Docker + docker compose plugin；`docker login ghcr.io`（用户自己的 PAT 或 deploy token，不是 CI 用的 `GITHUB_TOKEN`——那个只在 GitHub Actions runner 里有效）；建 `COMPOSE_REMOTE_DIR`（默认 `/home/work/admin-compose`，可通过环境变量覆盖）并把 `admin-server/docker-compose.prod.yml`、六个服务的 `etc/*.yaml` 模板文件放过去。
+2. **`.env` 或 shell 环境变量**（生产服务器上的 compose 目录，不提交仓库）：`GHCR_NAMESPACE`（默认 `oldbai555`，如果镜像推到别的 GitHub 账号/组织下要改）、`TAG`（建议每次发布显式传 git sha，不用 `latest`）、`JWT_ACCESS_SECRET`/`JWT_REFRESH_SECRET`（同条目 1，不能沿用本地开发默认值）、五个服务各自的 `<SERVICE>_MYSQL_DSN`/`<SERVICE>_REDIS_ADDRESS`/`<SERVICE>_REDIS_PASSWORD`（同条目 5-9 已经确认的生产地址，此前是 Supervisor 场景下设进进程环境，切到 compose 后改成同一批变量值放进 `.env`）。
+3. gateway 容器仍然依赖 `/etc/work/redis.json`（`-redis-config` 机制未变，见 `admin.go`），`docker-compose.prod.yml` 已把宿主机 `/etc/work` 只读挂载进容器，生产服务器上这个文件需要已经存在（和 Supervisor 部署时的要求一致，不是新增依赖）。
+4. 首次切换建议顺序：先在生产服务器上验证六个镜像都能被拉取（`bash script/admin.sh compose pull <host>`）→ 确认 `.env` 齐全 → `bash script/admin.sh compose deploy <host>` → `compose status` 确认六个容器都 `Up` → 用条目 5-9 各自记录的验证路径逐个服务复核一遍 → 确认无误后再考虑停掉旧的 Supervisor 进程（不建议同一时刻双跑，端口/Redis 键会冲突）。
+5. `GHCR_NAMESPACE` 默认值取自当前仓库实际 owner（`github.com/oldbai555/bgg`），`.github/workflows/ci.yml` 的 `build-images` job 用 `${{ github.repository_owner }}` 自动取值，两处不需要手动保持同步，但如果仓库迁移到别的 GitHub 账号/组织，两处都要注意（CI 侧自动跟着变，`docker-compose.prod.yml` 的 `GHCR_NAMESPACE` 默认值需要手动改或在 `.env` 里覆盖）。
+
+**如何验证生效**：`docker compose -f docker-compose.prod.yml ps` 六个服务全部 `Up`；`GET /api/v1/ping` 走网关公网端口返回 `database:ok,redis:ok`；按条目 5-9 各自记录的真实验证路径（不是重新设计新的验证方法）逐个复核一遍。
+
+**状态**：`已就绪，待生产环境实际部署时执行`（六个 Dockerfile 在 Phase 2 各服务拆分时已落地并可本地 `go build`/镜像构建成功；`build-images` CI job、`compose` 系列命令、`docker-compose.prod.yml` 三块本次新增，均未在真实 Docker/生产环境验证过——本机无 Docker，`docker compose config` 用 Ruby YAML 解析器做了语法校验，未做 `docker build`/`docker compose up` 实测；未引入 Kubernetes 或任何编排器）。
+
 ## Phase 2/3 预留条目类型（占位，届时按真实改动追加，现在不编造内容）
 
 以下只是"预计会出现哪类条目"的提示，**不是已确定的条目**，落地时按 Phase 2/3 实际改动的真实细节追加，不要现在就编内容占位：
 
-- Phase 2 每次服务拆分（B.6 顺序：task-rpc → sdk-rpc → chat-rpc → content-rpc → iam-rpc）对应的：新数据库 schema 创建 SQL、旧单体到新服务的数据迁移步骤、镜像/compose/Supervisor 切换步骤、服务间 zrpc `Endpoints` 生产环境实际地址配置。
 - Phase 2 服务间凭证（如果引入了服务间认证机制）的生产环境设置方式。
-- Phase 3 CI 镜像发布凭证配置（`ghcr.io` 的 push 权限 token 等）。
 - Phase 3 Telemetry/结构化日志接入后，如果需要调整生产环境日志采集方式（即使不上 ELK/Loki，Supervisor/docker-compose 的日志落盘路径可能需要调整）。
 
 ## 完成的定义

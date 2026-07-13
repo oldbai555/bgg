@@ -233,9 +233,9 @@ supervisor_install() {
 supervisor_manage() {
   local action="$1"
   local app_name="${2:-$APP_NAME}"
-  
+
   command -v supervisorctl &> /dev/null || { log_error "未找到 supervisorctl"; return 1; }
-  
+
   case "$action" in
     status) supervisorctl status "$app_name" ;;
     start) supervisorctl start "$app_name" && supervisorctl status "$app_name" ;;
@@ -244,6 +244,49 @@ supervisor_manage() {
     logs) [ -f "$SUPERVISOR_LOG_DIR/${app_name}_stdout.log" ] && tail -n 100 "$SUPERVISOR_LOG_DIR/${app_name}_stdout.log" || log_warning "日志文件不存在" ;;
     *) log_error "未知操作: $action"; return 1 ;;
   esac
+}
+
+# ============================================
+# docker-compose 管理（Phase 3 新增，与 Supervisor 模式并存，见
+# admin-server/docs/21-cd-and-deployment.md 第 5 节）
+# ============================================
+
+COMPOSE_REMOTE_HOST="${COMPOSE_REMOTE_HOST:-}"      # 生产服务器 SSH host（~/.ssh/config 别名或 user@ip）
+COMPOSE_REMOTE_DIR="${COMPOSE_REMOTE_DIR:-/home/work/admin-compose}"
+COMPOSE_FILE="docker-compose.prod.yml"
+
+compose_pull() {
+  local host="${1:-$COMPOSE_REMOTE_HOST}"
+  [ -z "$host" ] && { log_error "请指定远程主机（COMPOSE_REMOTE_HOST 或参数）"; return 1; }
+
+  log_info "在 $host 拉取最新镜像..."
+  ssh "$host" "cd $COMPOSE_REMOTE_DIR && docker compose -f $COMPOSE_FILE pull"
+}
+
+compose_deploy() {
+  local host="${1:-$COMPOSE_REMOTE_HOST}"
+  [ -z "$host" ] && { log_error "请指定远程主机（COMPOSE_REMOTE_HOST 或参数）"; return 1; }
+
+  compose_pull "$host" || return 1
+
+  log_info "在 $host 应用新镜像..."
+  ssh "$host" "cd $COMPOSE_REMOTE_DIR && docker compose -f $COMPOSE_FILE up -d"
+
+  log_info "部署完成，检查状态..."
+  compose_status "$host"
+}
+
+compose_status() {
+  local host="${1:-$COMPOSE_REMOTE_HOST}"
+  [ -z "$host" ] && { log_error "请指定远程主机"; return 1; }
+  ssh "$host" "cd $COMPOSE_REMOTE_DIR && docker compose -f $COMPOSE_FILE ps"
+}
+
+compose_logs() {
+  local host="${1:-$COMPOSE_REMOTE_HOST}"
+  local service="${2:-}"
+  [ -z "$host" ] && { log_error "请指定远程主机"; return 1; }
+  ssh "$host" "cd $COMPOSE_REMOTE_DIR && docker compose -f $COMPOSE_FILE logs --tail=200 ${service}"
 }
 
 # ============================================
@@ -280,6 +323,14 @@ Supervisor 命令:
   supervisor restart         重启服务
   supervisor logs            查看最近 100 行 stdout 日志
 
+docker-compose 命令（Phase 3 新增，六个容器镜像部署，与 Supervisor 模式并存）:
+  compose pull [host]          在远程主机拉取最新镜像（docker-compose.prod.yml）
+  compose deploy [host]        拉取镜像 + docker compose up -d + 检查状态
+  compose status [host]        查看远程主机上六个服务的容器状态
+  compose logs [host] [svc]    查看远程主机指定服务的最近 200 行日志（svc 留空查全部）
+  远程主机可通过参数传入，或设置环境变量 COMPOSE_REMOTE_HOST；
+  远程 compose 目录默认 /home/work/admin-compose，可通过 COMPOSE_REMOTE_DIR 覆盖。
+
 示例:
   # 本地构建
   bash script/admin.sh build server
@@ -298,6 +349,11 @@ Supervisor 命令:
   # 使用 Supervisor 管理服务
   bash script/admin.sh supervisor status
   bash script/admin.sh supervisor restart
+
+  # 使用 docker-compose 部署（生产服务器已配置 docker-compose.prod.yml + ghcr 登录）
+  bash script/admin.sh compose deploy myserver
+  COMPOSE_REMOTE_HOST=myserver bash script/admin.sh compose status
+  bash script/admin.sh compose logs myserver iam
 EOF
 }
 
@@ -335,6 +391,15 @@ main() {
         deploy) supervisor_deploy "${3:-}" ;;
         status|start|stop|restart|logs) supervisor_manage "$2" ;;
         *) log_error "未知命令: supervisor $2"; usage; exit 1 ;;
+      esac
+      ;;
+    compose)
+      case "${2:-}" in
+        pull) compose_pull "${3:-}" ;;
+        deploy) compose_deploy "${3:-}" ;;
+        status) compose_status "${3:-}" ;;
+        logs) compose_logs "${3:-}" "${4:-}" ;;
+        *) log_error "未知命令: compose $2"; usage; exit 1 ;;
       esac
       ;;
     *)
