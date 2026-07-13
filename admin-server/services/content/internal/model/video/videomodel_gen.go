@@ -24,17 +24,17 @@ var (
 	videoRowsExpectAutoSet   = strings.Join(stringx.Remove(videoFieldNames, "`id`", "`create_at`", "`create_time`", "`created_at`", "`update_at`", "`update_time`", "`updated_at`"), ",")
 	videoRowsWithPlaceHolder = strings.Join(stringx.Remove(videoFieldNames, "`id`", "`create_at`", "`create_time`", "`created_at`", "`update_at`", "`update_time`", "`updated_at`"), "=?,") + "=?"
 
-	cacheVideoIdPrefix = "cache:video:id:"
+	cacheVideoIdPrefix   = "cache:video:id:"
+	cacheVideoUuidPrefix = "cache:video:uuid:"
 )
 
 type (
 	videoModel interface {
 		Insert(ctx context.Context, data *Video) (sql.Result, error)
 		FindOne(ctx context.Context, id uint64) (*Video, error)
+		FindOneByUuid(ctx context.Context, uuid sql.NullString) (*Video, error)
 		Update(ctx context.Context, data *Video) error
 		Delete(ctx context.Context, id uint64) error
-		FindPage(ctx context.Context, page, pageSize int64) ([]Video, int64, error)
-		FindChunk(ctx context.Context, limit int64, lastId uint64) ([]Video, uint64, error)
 	}
 
 	defaultVideoModel struct {
@@ -46,13 +46,13 @@ type (
 		Id          uint64         `db:"id"`          // 主键 ID
 		Uuid        sql.NullString `db:"uuid"`        // 唯一标识（采集视频使用，可为空）
 		Name        string         `db:"name"`        // 视频名称
-		Cover       sql.NullString `db:"cover"`       // 视频封面URL
 		GodNum      sql.NullString `db:"god_num"`     // 番号（采集视频使用）
+		Cover       sql.NullString `db:"cover"`       // 视频封面URL
 		Duration    int64          `db:"duration"`    // 视频时长（秒）
 		PlayUrl     string         `db:"play_url"`    // 播放链接
-		XlzzUrls    sql.NullString `db:"xlzz_urls"`   // 磁力链接数组（JSON格式）
+		XlzzUrls    sql.NullString `db:"xlzz_urls"`   // 磁力链接数组（采集视频使用）
 		Description sql.NullString `db:"description"` // 视频描述
-		Type        int64          `db:"type"`        // 来源类型：1=手动添加，2=采集
+		Type        int64          `db:"type"`        // 来源类型：1=手动添加，2=采集（从字典获取）
 		CreatedAt   int64          `db:"created_at"`  // 创建时间(秒级时间戳)
 		UpdatedAt   int64          `db:"updated_at"`  // 更新时间(秒级时间戳)
 		DeletedAt   int64          `db:"deleted_at"`  // 删除时间(秒级时间戳,0表示未删除)
@@ -67,8 +67,14 @@ func newVideoModel(conn sqlx.SqlConn, c cache.CacheConf, opts ...cache.Option) *
 }
 
 func (m *defaultVideoModel) Delete(ctx context.Context, id uint64) error {
+	data, err := m.FindOne(ctx, id)
+	if err != nil {
+		return err
+	}
+
 	videoIdKey := fmt.Sprintf("%s%v", cacheVideoIdPrefix, id)
-	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
+	videoUuidKey := fmt.Sprintf("%s%v", cacheVideoUuidPrefix, data.Uuid)
+	_, err = m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		// 检查是否有 deleted_at 字段：通过检查结构体字段名列表
 		fieldNames := builder.RawFieldNames(&Video{})
 		fieldNamesStr := strings.Join(fieldNames, ",")
@@ -83,7 +89,7 @@ func (m *defaultVideoModel) Delete(ctx context.Context, id uint64) error {
 			query = fmt.Sprintf("delete from %s where `id` = ?", m.table)
 		}
 		return conn.ExecCtx(ctx, query, id)
-	}, videoIdKey)
+	}, videoIdKey, videoUuidKey)
 	return err
 }
 
@@ -110,6 +116,32 @@ func (m *defaultVideoModel) FindOne(ctx context.Context, id uint64) (*Video, err
 	}
 }
 
+func (m *defaultVideoModel) FindOneByUuid(ctx context.Context, uuid sql.NullString) (*Video, error) {
+	// 检查是否有 deleted_at 字段
+	hasDeletedAt := strings.Contains(videoRows, "deleted_at")
+	andClause := ""
+	if hasDeletedAt {
+		andClause = " and deleted_at = 0"
+	}
+	videoUuidKey := fmt.Sprintf("%s%v", cacheVideoUuidPrefix, uuid)
+	var resp Video
+	err := m.QueryRowIndexCtx(ctx, &resp, videoUuidKey, m.formatPrimary, func(ctx context.Context, conn sqlx.SqlConn, v any) (i any, e error) {
+		query := fmt.Sprintf("select %s from %s where `uuid` = ?%s limit 1", videoRows, m.table, andClause)
+		if err := conn.QueryRowCtx(ctx, &resp, query, uuid); err != nil {
+			return nil, err
+		}
+		return resp.Id, nil
+	}, m.queryPrimary)
+	switch err {
+	case nil:
+		return &resp, nil
+	case sqlc.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
+	}
+}
+
 func (m *defaultVideoModel) Insert(ctx context.Context, data *Video) (sql.Result, error) {
 	// 自动设置创建时间和更新时间
 	if data.CreatedAt == 0 {
@@ -121,20 +153,27 @@ func (m *defaultVideoModel) Insert(ctx context.Context, data *Video) (sql.Result
 	// 注意：如果表没有 deleted_at 字段，data.DeletedAt 将不存在，不能访问
 	// deleted_at 字段如果存在，它已经在 RowsExpectAutoSet 中，不需要特殊处理
 	videoIdKey := fmt.Sprintf("%s%v", cacheVideoIdPrefix, data.Id)
+	videoUuidKey := fmt.Sprintf("%s%v", cacheVideoUuidPrefix, data.Uuid)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		// 手动构建包含 created_at、updated_at 的插入语句
 		// 如果表有 deleted_at 字段，它已经在 RowsExpectAutoSet 中，不需要重复添加
-		query := fmt.Sprintf("insert into %s (%s, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?, ?, ?)", m.table, videoRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.Name, data.Cover, data.Duration, data.PlayUrl, data.Description, data.DeletedAt, data.CreatedAt, data.UpdatedAt)
-	}, videoIdKey)
+		query := fmt.Sprintf("insert into %s (%s, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, videoRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.Uuid, data.Name, data.GodNum, data.Cover, data.Duration, data.PlayUrl, data.XlzzUrls, data.Description, data.Type, data.DeletedAt, data.CreatedAt, data.UpdatedAt)
+	}, videoIdKey, videoUuidKey)
 	return ret, err
 }
 
-func (m *defaultVideoModel) Update(ctx context.Context, data *Video) error {
+func (m *defaultVideoModel) Update(ctx context.Context, newData *Video) error {
+	data, err := m.FindOne(ctx, newData.Id)
+	if err != nil {
+		return err
+	}
+
 	videoIdKey := fmt.Sprintf("%s%v", cacheVideoIdPrefix, data.Id)
-	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
+	videoUuidKey := fmt.Sprintf("%s%v", cacheVideoUuidPrefix, data.Uuid)
+	_, err = m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		// 自动设置更新时间
-		data.UpdatedAt = time.Now().Unix()
+		newData.UpdatedAt = time.Now().Unix()
 		// 检查是否有 deleted_at 字段
 		hasDeletedAt := strings.Contains(videoRowsWithPlaceHolder, "deleted_at")
 		// 手动构建包含 updated_at 的更新语句
@@ -142,9 +181,9 @@ func (m *defaultVideoModel) Update(ctx context.Context, data *Video) error {
 		if hasDeletedAt {
 			whereClause += " and deleted_at = 0"
 		}
-		query := fmt.Sprintf("update %s set %s, `updated_at` = %d %s", m.table, videoRowsWithPlaceHolder, data.UpdatedAt, whereClause)
-		return conn.ExecCtx(ctx, query, data.Name, data.Cover, data.Duration, data.PlayUrl, data.Description, data.DeletedAt, data.Id)
-	}, videoIdKey)
+		query := fmt.Sprintf("update %s set %s, `updated_at` = %d %s", m.table, videoRowsWithPlaceHolder, newData.UpdatedAt, whereClause)
+		return conn.ExecCtx(ctx, query, newData.Uuid, newData.Name, newData.GodNum, newData.Cover, newData.Duration, newData.PlayUrl, newData.XlzzUrls, newData.Description, newData.Type, newData.DeletedAt, newData.Id)
+	}, videoIdKey, videoUuidKey)
 	return err
 }
 
@@ -165,93 +204,4 @@ func (m *defaultVideoModel) queryPrimary(ctx context.Context, conn sqlx.SqlConn,
 
 func (m *defaultVideoModel) tableName() string {
 	return m.table
-}
-
-// 分页查询：根据页码和每页数量查询数据
-func (m *defaultVideoModel) FindPage(ctx context.Context, page, pageSize int64) ([]Video, int64, error) {
-	if page <= 0 {
-		page = 1
-	}
-	if pageSize <= 0 {
-		pageSize = 20
-	}
-	if pageSize > 100 {
-		pageSize = 100
-	}
-
-	offset := (page - 1) * pageSize
-
-	// 检查是否有 deleted_at 字段
-	hasDeletedAt := strings.Contains(videoRows, "deleted_at")
-	whereClause := ""
-	if hasDeletedAt {
-		whereClause = "where deleted_at = 0"
-	}
-
-	// 查询总数
-	var total int64
-	countQuery := fmt.Sprintf("select count(*) from %s %s", m.table, whereClause)
-	err := m.QueryRowNoCacheCtx(ctx, &total, countQuery)
-	if err != nil {
-		return nil, 0, err
-	}
-
-	// 查询分页数据
-	var list []Video
-	query := fmt.Sprintf("select %s from %s %s order by id desc limit %d offset %d", videoRows, m.table, whereClause, pageSize, offset)
-	err = m.QueryRowsNoCacheCtx(ctx, &list, query)
-	if err != nil {
-		return nil, 0, err
-	}
-
-	return list, total, nil
-}
-
-// 分片查询：基于lastId的分片查询，一次查询limit条，返回数据和下次查询的lastId
-// lastId=0表示第一次查询，返回的lastId用于下次查询，当返回的lastId=0或数据为空时表示无更多数据
-func (m *defaultVideoModel) FindChunk(ctx context.Context, limit int64, lastId uint64) ([]Video, uint64, error) {
-	if limit <= 0 {
-		limit = 20
-	}
-	if limit > 100 {
-		limit = 100
-	}
-
-	var list []Video
-	var err error
-
-	// 检查是否有 deleted_at 字段
-	hasDeletedAt := strings.Contains(videoRows, "deleted_at")
-	whereClause := ""
-	if hasDeletedAt {
-		whereClause = "where deleted_at = 0"
-	}
-
-	if lastId == 0 {
-		// 第一次查询
-		query := fmt.Sprintf("select %s from %s %s order by id asc limit %d", videoRows, m.table, whereClause, limit)
-		err = m.QueryRowsNoCacheCtx(ctx, &list, query)
-	} else {
-		// 基于lastId的分片查询
-		andClause := ""
-		if hasDeletedAt {
-			andClause = "where deleted_at = 0 and id > ?"
-		} else {
-			andClause = "where id > ?"
-		}
-		query := fmt.Sprintf("select %s from %s %s order by id asc limit %d", videoRows, m.table, andClause, limit)
-		err = m.QueryRowsNoCacheCtx(ctx, &list, query, lastId)
-	}
-
-	if err != nil {
-		return nil, 0, err
-	}
-
-	// 返回最后一条记录的ID，用于下次查询；如果数据为空，返回0表示无更多数据
-	nextLastId := uint64(0)
-	if len(list) > 0 {
-		nextLastId = list[len(list)-1].Id
-	}
-
-	return list, nextLastId, nil
 }

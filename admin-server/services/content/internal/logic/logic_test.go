@@ -223,8 +223,8 @@ func TestVideoCollect_DuplicateUuid(t *testing.T) {
 	svcCtx, sqlMock, cleanup := newTestSvcCtx(t, nil)
 	defer cleanup()
 
-	videoColumns := []string{"id", "uuid", "name", "cover", "god_num", "duration", "play_url", "xlzz_urls", "description", "type", "created_at", "updated_at", "deleted_at"}
-	sqlMock.ExpectQuery(regexp.QuoteMeta("FROM `video`")).
+	videoColumns := []string{"id", "uuid", "name", "god_num", "cover", "duration", "play_url", "xlzz_urls", "description", "type", "created_at", "updated_at", "deleted_at"}
+	sqlMock.ExpectQuery(regexp.QuoteMeta("from `video` where `uuid` = ?")).
 		WillReturnRows(sqlmock.NewRows(videoColumns).
 			AddRow(1, "dup-uuid", "existing", "", "", 0, "http://x", "", "", 2, 0, 0, 0))
 

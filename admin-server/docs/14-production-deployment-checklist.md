@@ -148,9 +148,9 @@
 
 **已知遗留**：
 - `docker compose up` 本身未做容器化实测（本机无 Docker，和前三次服务拆分同样的限制），已用非容器化真实进程验证过完整链路，建议用户在有 Docker 的环境跑一遍确认 `content` 容器能通过服务名连接。
-- **发现一个预先存在、和本轮拆分无关的真实 bug，未修复**：`services/content/internal/model/video/videomodel_gen.go` 的自定义 `Update` 方法（`git log -S` 定位到引入提交 `9580866`，远早于 Phase 1-2 重构）只给 SQL 绑定了 `Name/Cover/Duration/PlayUrl/Description/DeletedAt` 六个字段的值，但 SET 子句是按 `Video` 结构体全部字段（含 `Uuid`/`GodNum`/`XlzzUrls`/`Type`）动态生成的，参数个数和占位符数量对不上——`PUT /api/v1/videos`（视频编辑）从引入那一刻起就没有真正生效过，真实环境验证时用测试数据触发确认（报错而非静默失败，不会误导为"改成功了"）。这是一个标了"goctl 生成/DO NOT EDIT"的文件，按项目规则正确修法是"改模板 → 重新生成"而不是手改生成文件，不在本轮 content-rpc 拆分范围内展开，建议单独排期：核实 `.template/model/` 里对应模板的参数绑定逻辑，或者确认这是否是一次性的手工生成产物（未走标准模板流程），再决定修复路径。
+- ~~**发现一个预先存在、和本轮拆分无关的真实 bug，未修复**：`services/content/internal/model/video/videomodel_gen.go` 的自定义 `Update` 方法……~~——**已修复（2026-07-13，见 `docs/progress.md` 对应条目）**：根因是 `video` 表 DDL 后来加了 `uuid`/`god_num`/`xlzz_urls`/`type` 四个字段，但 `videomodel_gen.go` 一直没有跟着重新生成。已按项目规则重新执行 `generate-model.sh` 生成正确的 `Insert`/`Update`（`git log -S` 定位到的引入提交 `9580866` 之后首次真正修复），并顺手处理了 regenerate 带来的连带 break（`video_repository.go` 里对已被新模板移除的 `model.FindPage` 的调用，改成统一走仓库层已有的 `findPageWithFilter`）。`go build`/`go vet`/`go test`/`golangci-lint` 全绿，`PUT /api/v1/videos` 现在参数绑定正确。
 
-**状态**：`已就绪，待生产环境实际部署时执行`（本机无 Docker，`docker compose up` 本身未做容器化实测，已做过非容器化的直接进程 + 真实数据验证；`VideoUpdate` 已知 bug 需要用户决定是否在此次部署前一并修复）。
+**状态**：`已就绪，待生产环境实际部署时执行`（本机无 Docker，`docker compose up` 本身未做容器化实测，已做过非容器化的直接进程 + 真实数据验证；`VideoUpdate` 已知 bug 已于 2026-07-13 修复，不再是部署前需要额外决策的项）。
 
 ### 9 · iam-rpc 拆分（Phase 2 第五个、也是最后一个落地的服务）
 
@@ -171,9 +171,9 @@
 
 **已知遗留**：
 - `docker compose up` 本身未做容器化实测（本机无 Docker，和前四次服务拆分同样的限制），建议用户在有 Docker 的环境跑一遍确认新增的 `iam` 容器能通过服务名被 `app`/`task`/`chat`/`content` 四个容器连接。
-- 本轮真实环境验证**没有覆盖** `Login`/`Refresh`（需要真实管理员密码）、`FileUpload`/`FileDownload`（涉及本地磁盘写入）、`Notice`/`Notification` 批量通知创建（涉及真实批量写入）这几类路径，建议部署前后找一个安全窗口补一轮验证，尤其是 `Login`——这是唯一一个 token 签发逻辑发生迁移（从单体搬进 iam-rpc）的路径，理论上行为应该完全一致（近乎逐字迁移），但生产环境实际验证过和"理论上应该一致"是两回事。
+- ~~本轮真实环境验证**没有覆盖** `Login`/`Refresh`（需要真实管理员密码）、`FileUpload`/`FileDownload`（涉及本地磁盘写入）、`Notice`/`Notification` 批量通知创建（涉及真实批量写入）这几类路径……~~——**已补验证（2026-07-13，见 `docs/progress.md` 对应条目）**：起真实 iam-rpc + gateway 进程连上 oldbai，新建一次性测试账号+角色（不使用/不触碰真实管理员账号）验证了 `Login`（含内部的未读公告通知创建）、`Refresh`、`FileUpload`/`FileDownload`（磁盘字节 + `admin_file` 元数据双重核对）、`Notice`/`Notification` 批量创建（真实 3 个用户全部收到通知）全部路径，验证后精确清理，8 张相关表行数核对回到验证前基线。`Login` 迁移前后行为一致性已通过真实数据确认，不再是"理论上应该一致"。
 
-**状态**：`已就绪，待生产环境实际部署时执行`（本机无 Docker，`docker compose up` 本身未做容器化实测，已做过非容器化的直接进程 + 真实数据只读验证；`Login`/`Refresh`/`FileUpload`/`FileDownload`/`Notice`/`Notification` 几类写路径建议部署前后补验证）。
+**状态**：`已就绪，待生产环境实际部署时执行`（本机无 Docker，`docker compose up` 本身未做容器化实测；`Login`/`Refresh`/`FileUpload`/`FileDownload`/`Notice`/`Notification` 几类写路径已于 2026-07-13 补验证通过，不再是部署前的待办项）。
 
 ## Phase 2/3 预留条目类型（占位，届时按真实改动追加，现在不编造内容）
 

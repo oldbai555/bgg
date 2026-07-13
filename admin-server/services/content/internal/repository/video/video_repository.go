@@ -3,7 +3,7 @@ package video
 import (
 	"postapocgame/admin-server/services/content/internal/repository"
 	"context"
-	"time"
+	"database/sql"
 
 	"postapocgame/admin-server/pkg/errs"
 
@@ -36,36 +36,10 @@ func (r *videoRepository) FindByID(ctx context.Context, id uint64) (*videomodel.
 }
 
 func (r *videoRepository) FindByUuid(ctx context.Context, uuid string) (*videomodel.Video, error) {
-	sql, args, err := sq.Select("id", "uuid", "name", "cover", "god_num", "duration", "play_url", "xlzz_urls", "description", "type", "created_at", "updated_at", "deleted_at").
-		From("`video`").
-		Where(sq.And{
-			sq.Eq{"uuid": uuid},
-			sq.Eq{"deleted_at": 0},
-		}).
-		Limit(1).
-		ToSql()
-	if err != nil {
-		return nil, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
-	}
-
-	var video videomodel.Video
-	err = r.conn.QueryRowCtx(ctx, &video, sql, args...)
-	if err != nil {
-		return nil, err
-	}
-	return &video, nil
+	return r.model.FindOneByUuid(ctx, sql.NullString{String: uuid, Valid: uuid != ""})
 }
 
 func (r *videoRepository) FindPage(ctx context.Context, page, pageSize int64, keyword string, sourceType int64) ([]videomodel.Video, int64, error) {
-	// 如果有关键词或类型筛选，需要自定义查询
-	if keyword != "" || sourceType > 0 {
-		return r.findPageWithFilter(ctx, page, pageSize, keyword, sourceType)
-	}
-	// 否则使用生成的分页方法
-	return r.model.FindPage(ctx, page, pageSize)
-}
-
-func (r *videoRepository) findPageWithFilter(ctx context.Context, page, pageSize int64, keyword string, sourceType int64) ([]videomodel.Video, int64, error) {
 	conditions := sq.And{sq.Eq{"deleted_at": 0}}
 
 	if keyword != "" {
@@ -149,40 +123,7 @@ func (r *videoRepository) DeleteByID(ctx context.Context, id uint64) error {
 }
 
 func (r *videoRepository) Create(ctx context.Context, video *videomodel.Video) error {
-	// 使用 squirrel 手动构建插入语句，确保所有字段都正确插入
-	// 因为生成的 Insert 方法可能不包含所有新增字段（uuid, god_num, xlzz_urls, type）
-	now := time.Now().Unix()
-	if video.CreatedAt == 0 {
-		video.CreatedAt = now
-	}
-	if video.UpdatedAt == 0 {
-		video.UpdatedAt = now
-	}
-
-	// 构建插入语句
-	insert := sq.Insert("`video`").
-		Columns("`uuid`", "`name`", "`cover`", "`god_num`", "`duration`", "`play_url`", "`xlzz_urls`", "`description`", "`type`", "`deleted_at`", "`created_at`", "`updated_at`").
-		Values(
-			video.Uuid,
-			video.Name,
-			video.Cover,
-			video.GodNum,
-			video.Duration,
-			video.PlayUrl,
-			video.XlzzUrls,
-			video.Description,
-			video.Type,
-			video.DeletedAt,
-			video.CreatedAt,
-			video.UpdatedAt,
-		)
-
-	sql, args, err := insert.ToSql()
-	if err != nil {
-		return errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
-	}
-
-	result, err := r.conn.ExecCtx(ctx, sql, args...)
+	result, err := r.model.Insert(ctx, video)
 	if err != nil {
 		return errs.Wrap(errs.CodeBadDB, "插入视频失败", err)
 	}
