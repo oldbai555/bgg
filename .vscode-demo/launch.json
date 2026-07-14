@@ -34,6 +34,11 @@
   //   iam-rpc/task-rpc/sdk-rpc/chat-rpc/content-rpc 五个 RPC 服务 + gateway 六个进程。
   // - RPC 服务之间的 Endpoints 都配的是 127.0.0.1 + 固定端口（8081/8090/8091/8092/8093），
   //   和各服务 etc/*.yaml 注释里写的“本机同进程调试”端口一致，不用改。
+  // - “admin-frontend: dev”是纯前端 vite dev server（不需要 MySQL/Redis 就能起，但
+  //   页面里请求后端接口需要上面的后端链路已经在跑），用 node-terminal 类型在集成终端里
+  //   跑 npm run dev，不是真正的 Node 调试会话（前端调试请用浏览器自带的 DevTools 或
+  //   VSCode 的 JS Debug 浏览器扩展）。默认端口 5173，base path 是 /admin/。
+  // - 想要前后端一起起：选 compounds 里的 “All: gateway + 5 RPC services + admin-frontend”。
   "version": "0.2.0",
   "configurations": [
     {
@@ -135,6 +140,13 @@
         "CONTENT_REDIS_PASSWORD": "",
         "IAM_CALLBACK_ENDPOINT": "127.0.0.1:8081"
       }
+    },
+    {
+      "name": "admin-frontend: dev",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev",
+      "cwd": "${workspaceFolder}/admin-frontend"
     }
   ],
   "compounds": [
@@ -144,6 +156,12 @@
       // gateway 放最后：它对 5 个 RPC client 都是 NonBlock，但放最后启动能保证真实联调时
       // 首次请求就能拨通，不用等重试。
       "configurations": ["iam-rpc", "task-rpc", "sdk-rpc", "chat-rpc", "content-rpc", "gateway"],
+      "stopAll": true
+    },
+    {
+      "name": "All: gateway + 5 RPC services + admin-frontend",
+      // 在上面纯后端 compound 的基础上追加前端 dev server，放最后启动（等后端端口就绪）。
+      "configurations": ["iam-rpc", "task-rpc", "sdk-rpc", "chat-rpc", "content-rpc", "gateway", "admin-frontend: dev"],
       "stopAll": true
     }
   ]

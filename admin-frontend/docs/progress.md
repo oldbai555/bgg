@@ -80,3 +80,28 @@
 - `BlogDetail.vue` 仍用 `blog.scss` 的三栏布局（分类导航+正文+目录），未切到 `21-public-pages.mdc` 要求的 `public-detail.scss` 单栏卡片模板——核实过不是换 import 能解决的机械活，涉及布局取舍，按 `08-dev-execution-and-review-points.md` 的要求需要先出预览确认，留到 Phase 3（`06-responsive-and-public-pages-redesign.md`）一起做。
 - `.vue` 文件新增的 115 条 ESLint `indent` warning 未做全仓格式化，留待后续单独批次处理（避免与本轮功能性改动混在一个大 diff 里）。
 - D2Table 泛型化已提前完成，`04-component-library-refactor.md` 执行 Phase 2 时需要对照更新该文档的现状描述，避免重复规划已完成的工作。
+
+---
+
+## 2026-07-14：Phase 2 Week 3 落地（D2Table 复用收敛审计 + ChatList.vue 拆分）
+
+**What**：
+
+1. **D2Table 收敛审计**（对应 `04-component-library-refactor.md` §1）：逐一打开该文档列出的 6 处未使用 D2Table 的视图核实，结论与文档初筛一致，全部保留例外，在每个文件模板顶部补一行注释说明原因（此前均无说明，属于文档"完成的定义"里明确要求的一项）：`iam/DepartmentList.vue`/`iam/MenuList.vue`（树形数据，用 `el-tree`）、`public/BlogList.vue`/`public/VideoList.vue`（公共展示页，无权限/CRUD，不适用 D2Table；核实时发现 `BlogList.vue` 实际仍是 `blog.scss` 三栏布局、未切到 `21-public-pages.md` 的 `public-list.scss` 模板，且滚动位置恢复是死代码，与已知的 `BlogDetail.vue` 问题同源，已在该文件注释里补充说明并等 Phase 3 一起处理；`VideoList.vue` 已正确落地 `public-list-page` 模板）、`chat/ChatList.vue`（即时通讯 UI）；`monitoring/MonitorList.vue` 打开核实后确认是统计卡片 + 30 秒轮询的实时资源监控看板，不是分页列表，同样保留例外并补注释。未额外排查其余 11 个"未使用 D2Table"的文件（Login/Dashboard/Home/错误页/Profile/详情页/编辑器等）——这些本质上不是列表页，是否需要例外说明是自明的，不属于 `04` 号文档 §1 表格圈定的审计范围，加注释反而是噪音。
+
+2. **`ChatList.vue` 拆分**（1033 行 → 238 行，对应 `04` 号文档 §2）：
+   - `components/chat/ChatListItem.vue`：单条会话列表项渲染（头像/名称/群组标签/描述），含 `formatChatDesc` 纯格式化函数。
+   - `components/chat/ChatMessageBubble.vue`：单条消息气泡渲染（头像/用户名/时间/文本或图片内容），含 `formatMessageContent`/`formatTime` 两个纯格式化函数。
+   - `components/chat/ChatMessageInput.vue`：Emoji 选择器 + 图片上传 + 文本框 + 发送按钮整个输入区，内部自管理 emoji 分页状态和待发送图片暂存；发送动作通过 `onSendText`/`onSendImage` 两个回调 prop（而非普通 `emit`）交给调用方执行，因为需要 `await` 结果来决定何时清空本地输入框/暂存图片（与原实现的清空时机保持一致：文本框在发起请求前清空，暂存图片在请求成功后清空）。**顺带修复一个拆分前就存在的问题**：原 `ChatList.vue` 里 emoji 每行列数/行数写死为 `8`/`3`，注释却写"从字典获取"，但 `loadChatConfig` 只读了字典 `chat_config` 里的"聊天窗口消息数量"一项，"Emoji每行显示数量"/"Emoji显示行数"两个字典项（`db/services/iam/dict/init_dict.sql` 里已存在）从未被读取——运营在字典里改这两个值不会生效。本次拆分顺手把这两项也接进 `loadChatConfig`，通过 `emojiColsPerRow`/`emojiRows` 两个 prop（默认值 8/3 兜底）传给 `ChatMessageInput.vue`，使其名副其实地"从字典获取"，不算拆分范围外的行为改动（只是把注释已经声称的行为补齐）。
+   - `composables/useChatList.ts`：会话/消息状态（`chats`/`messages`/`selectedChat` 等）、聊天配置加载、`chatList`/`chatMessageList`/`chatMessageSend` 三个 API 调用、WebSocket `lastMessage` 监听与去重合并逻辑，完全不碰 DOM；滚动到底部通过 `onMessagesChanged` 回调交还给页面组件（页面组件持有 `messageListRef`），保持"UI 渲染"与"数据/网络同步"关注点分离，这也是 `04` 号文档要求的拆分方向。
+   - 拆分后 `ChatList.vue` 主文件只剩顶层布局 + 组件组合 + `onMounted` 启动流程，238 行，达成文档"≤300 行"的目标。
+   - 拆分是纯重构，未改变任何可观察行为；`sendTextMessage`/`sendImageMessage` 在 composable 内部对"未选中聊天"补了一道防御性 `throw`（原实现里这个判断在 `handleSendMessage` 内联一次，拆分后表单组件已经在调用前判断过，这里是双保险，不会被正常路径触发）。
+
+**验证**：`npm run typecheck`（0 error）、`npm run lint`（0 error，99 warning，比 Week 2 的 115 条更少——原 `ChatList.vue` 里未格式化的嵌套 SCSS 缩进问题随拆分自然消失）、`npm run build`（成功）、`npm run test`（7 个文件 42 个用例全部通过）四项全绿。**未能完成人工浏览器走查**：本环境没有可用的浏览器自动化工具（无 Playwright/DevTools 类 MCP），且本机 `admin-server` 需要 6 个进程（gateway + 5 个 RPC 服务）+ MySQL/Redis 才能跑通完整链路，未在本次会话拉起；只启动了 `vite` dev server 确认能正常编译服务（无运行时报错），未做真正的登录后收发消息/切换会话/未读角标人工验证。这是本条目区别于以往"验证"小节的地方，如实记录，不冒充已做浏览器验证。
+
+**Why**：按 `00-refactor-overview.md` 第 3 节 Phase 2 Week 3 排期（`04-component-library-refactor.md`）推进；D2Table 泛型化已在 Week 2 提前完成，本轮只剩收敛审计和大文件拆分两项。
+
+**已知问题 / 下一步**：
+- **需要用户后续在本机拉起完整 admin-server 链路后，人工过一遍会话列表的核心交互**（收发文本/图片消息、未读消息、切换会话、WebSocket 断线重连提示），确认拆分后行为与拆分前一致，再视为这项任务真正完成——当前只有静态检查（类型/lint/构建/单测）通过，不构成运行时行为的证明。
+- `layout/` 6 个组件（`04` 号文档 §3）本轮未动，按文档结论"组件边界合理，本轮不拆分"，样式层面的暗色模式/响应式适配留给 Phase 3。
+- Week 4（`websocket.ts` store 拆分、其余 store 审计、组件层测试覆盖、Phase 1-2 规则文档阶段性同步）尚未开始。

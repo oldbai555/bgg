@@ -1,3 +1,4 @@
+<!-- 公共展示页，无权限体系与增删改操作，走 21-public-pages.md 的响应式卡片信息流模板，不适用为管理后台 CRUD 设计的 D2Table -->
 <template>
   <div class="video-list-page public-list-page">
     <MetricReporter module="video_list" :biz-id="0" />

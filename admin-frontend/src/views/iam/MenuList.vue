@@ -1,3 +1,4 @@
+<!-- 菜单是树形数据，不用 D2Table（扁平分页表格模型），用 el-tree 展示层级 -->
 <template>
   <div class="page">
     <el-card>
