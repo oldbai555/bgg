@@ -19,6 +19,7 @@ export const useAppStore = defineStore('app', {
       this.theme = theme;
       localStorage.setItem(themeKey, theme);
       document.documentElement.setAttribute('data-theme', theme);
+      document.documentElement.classList.toggle('dark', theme === 'dark');
     },
     setLang(lang: Lang) {
       this.lang = lang;
@@ -45,6 +46,7 @@ export const useAppStore = defineStore('app', {
     },
     init() {
       document.documentElement.setAttribute('data-theme', this.theme);
+      document.documentElement.classList.toggle('dark', this.theme === 'dark');
       // 监听全屏状态变化
       document.addEventListener('fullscreenchange', () => {
         this.fullscreen = !!document.fullscreenElement;

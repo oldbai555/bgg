@@ -161,3 +161,23 @@
 - D2Table 的分页双重上抛 bug 修复后，理论上所有用 D2Table 的视图分页请求次数会减半（从每次操作 2 次变 1 次），这是行为改进但不是本轮范围内需要额外验证的独立任务，测试已覆盖回归。
 - `views/temp/` 目录本身在 Week 2 死代码清理后已清空但目录还在磁盘上（git 不追踪空目录，无需处理）。
 - **`npm run lint` 实际只检查 `.vue` 文件，裸 `.ts` 文件全仓未被检查**（本条目"关于 ESLint 覆盖范围的发现"小节已详述），需要用户决定何时安排一次独立的 `.ts` 文件规则清理批次，不建议顺带处理。
+
+---
+
+## 2026-07-14：Phase 3 Week 6 启动（暗色模式：Element Plus 官方暗色主题接入，后台侧）
+
+**What**：
+
+1. **审计发现比 `05-design-system-and-tokens.md` §3 预估的更严重**：该文档写作时假设"目前真正响应暗色切换的 CSS 规则…预计只有 `.el-card`/`.el-input__wrapper` 等个位数"；实地核查（`grep -rn "\.el-\|--el-" src/styles/*.scss`）确认现状是——`theme.scss` 里确实只有这两个手写选择器,但更根本的问题是**从未引入 Element Plus 官方暗色样式表**（`main.ts` 只 `import 'element-plus/dist/index.css'`，没有 `dark/css-vars.css`），且主题切换只设置了 `data-theme` 属性（`stores/app.ts`），从未给 `<html>` 加 `dark` class——而 Element Plus 官方暗色样式表的选择器作用域正是 `html.dark`（用 `curl` 拉取 dev server 实际编译产物验证过 `--el-color-primary`/`--el-bg-color`/`--el-text-color-primary` 等全部变量确实 scoped 在 `html.dark{...}` 下）。也就是说此前 `el-table`/`el-dialog`/`el-dropdown`/`el-select`/`el-button`/`el-pagination`/`el-message` 等几乎全部 Element Plus 组件在暗色模式下**完全没有适配**，不是"个位数覆盖"而是"零覆盖"，只有业务代码自己写的 `--color-*` 系语义令牌（`body` 背景/文字色等）在切换。
+2. **修复**（标准 Element Plus 官方方案，技术路径唯一,不涉及主观视觉判断，按 `08-dev-execution-and-review-points.md` 第 1 条"设计令牌/暗色模式技术路径已定"性质直接执行）：`main.ts` 新增 `import 'element-plus/theme-chalk/dark/css-vars.css'`（无条件引入，因为其规则本身 scoped 在 `html.dark` 下，不加 class 时零副作用）；`stores/app.ts` 的 `setTheme()`/`init()` 在原有 `setAttribute('data-theme', ...)` 之外新增 `classList.toggle('dark', theme === 'dark')`，两套机制并存——项目自定义的 `--color-*` 令牌走 `[data-theme='dark']`，Element Plus 官方 `--el-*` 变量走 `html.dark`，互不冲突。
+3. **顺带复核 Week 5 遗留的"暗色适配空白点"**：`views/monitoring/MetricStats.vue` 紫色渐变卡片上 `color: #fff` 当时刻意未改——现在确认背景本身是固定渐变（不响应 `data-theme`），白色文字在浅色/暗色下都是正确对比度，**不需要改动**，Week 5 的判断是对的。
+
+**验证**：`npm run typecheck`（0 error）、`npm run build`（成功）、`npm run lint`（0 error，99 warning，与 Week 5 持平）三项通过；`npm run dev` 启动后用 `curl` 直接拉取 Vite 编译后的 `dark/css-vars.css` 内容，确认变量声明与 `html.dark` 选择器作用域正确、模块解析无 404。**未做真实浏览器视觉验证**——本环境仍没有 Playwright/DevTools 类浏览器自动化 MCP（与 Week 3/5 记录的环境限制相同），且本机 `admin-server` 网关+RPC 服务本轮未拉起（MySQL/Redis 常驻进程本身在跑，但业务服务没起），无法登录后人工过一遍列表页/弹窗/下拉在暗色下的实际渲染。技术实现路径是 Element Plus 官方文档明确记载的标准接入方式（`html.dark` class + 官方 dark css-vars），把握较高，但仍需要用户在下次拉起完整链路后登录核对一遍（尤其是 `el-table`/`el-dialog`/`el-dropdown`/`el-pagination` 这些此前完全没有暗色样式、变化幅度最大的组件）。
+
+**Why**：按 `00-refactor-overview.md` 第 3 节 Phase 3 Week 6 排期（`05-design-system-and-tokens.md` §3"暗色模式全面适配"），令牌落地（Week 5）之后的下一步；`05` 号文档 §3 第 4 步明确公共页面暗色适配要等 `06` 号文档的响应式重构一起做（Week 7），所以本轮范围只覆盖后台管理侧。
+
+**已知问题 / 下一步**：
+- **需要用户下次拉起完整 admin-server 链路后登录人工核对**：暗色模式下 `el-table`/`el-dialog`/`el-dropdown`/`el-select`/`el-pagination`/`el-message`/`el-notification` 等组件的实际渲染效果，重点看有无残留的浅色背景块（例如某个组件内联 style 或旧的手写选择器与官方暗色变量冲突导致局部没切换）。
+- `theme.scss` 里手写的 `[data-theme='dark'] .el-input__wrapper` box-shadow 覆盖现在与官方暗色样式表功能重叠（不冲突，只是冗余）——不影响正确性，留到后续清理批次评估是否可以删除简化。
+- 公共页面（`views/public/**`、`components/blog/**`）的暗色适配仍按计划推迟到 `06-responsive-and-public-pages-redesign.md` 执行阶段一起做，不在本轮范围。
+- Week 6 剩余工作（响应式断点体系落地，对应 `05`/`06` 号文档）尚未开始。
