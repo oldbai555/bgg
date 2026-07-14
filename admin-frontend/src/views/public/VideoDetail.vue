@@ -1,43 +1,44 @@
 <template>
   <div class="video-detail-page public-detail-page">
     <MetricReporter module="video_detail" :biz-id="Number(route.params.id) || 0" />
-    <div class="container">
-      <!-- 返回按钮 -->
-      <div class="back-link" @click="goBack">← 返回列表</div>
+    <PublicHeader />
+    <div class="page-shell">
+      <div class="page-layout">
+        <div class="detail-card">
+          <div class="back-link" @click="goBack">← 返回列表</div>
 
-      <!-- 视频播放器 -->
-      <div :class="['video-container', { 'is-loading': loading }]">
-        <div class="video-wrapper">
-          <div ref="dplayerRef" class="dplayer-container"></div>
-        </div>
+          <!-- 视频播放器 -->
+          <div :class="['video-container', {'is-loading': loading}]">
+            <div class="video-wrapper">
+              <div ref="dplayerRef" class="dplayer-container"></div>
+            </div>
+          </div>
 
-        <div class="video-info-section">
-          <h1 class="video-title">{{ video.name || '未命名视频' }}</h1>
-          <div class="video-meta">
+          <h1 class="title">{{ video.name || '未命名视频' }}</h1>
+          <div class="meta">
             <span class="video-code">{{ video.godNum || '-' }}</span>
           </div>
-        </div>
-      </div>
 
-      <!-- 磁力链接 -->
-      <div class="magnet-section">
-        <h2 class="section-title">🧲 磁力链接</h2>
-        <div v-if="video.xlzzUrls && video.xlzzUrls.length > 0" class="magnet-list">
-          <div
-            v-for="(url, index) in video.xlzzUrls"
-            :key="index"
-            class="magnet-item"
-            @click="copyToClipboard(url)"
-          >
-            <div class="magnet-icon">{{ index + 1 }}</div>
-            <div class="magnet-text">{{ url }}</div>
-            <div class="copy-icon">📋</div>
+          <!-- 磁力链接 -->
+          <div class="magnet-section">
+            <h2 class="section-title">🧲 磁力链接</h2>
+            <div v-if="video.xlzzUrls && video.xlzzUrls.length > 0" class="magnet-list">
+              <div
+                v-for="(url, index) in video.xlzzUrls"
+                :key="index"
+                class="magnet-item"
+                @click="copyToClipboard(url)"
+              >
+                <div class="magnet-icon">{{ index + 1 }}</div>
+                <div class="magnet-text">{{ url }}</div>
+                <div class="copy-icon">📋</div>
+              </div>
+            </div>
+            <div v-else class="empty-message">暂无磁力链接</div>
           </div>
         </div>
-        <div v-else class="empty-message">暂无磁力链接</div>
       </div>
     </div>
-
     <IcpFooter />
   </div>
 </template>
@@ -53,6 +54,7 @@ import {monitoringApi} from '@/api/monitoring'
 import {copyToClipboard as copyText} from '@/utils/clipboard'
 import MetricReporter from '@/components/common/MetricReporter.vue'
 import IcpFooter from '@/components/common/IcpFooter.vue'
+import PublicHeader from '@/components/common/PublicHeader.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -91,11 +93,11 @@ const loadDPlayer = async (): Promise<typeof DPlayerType | null> => {
   if (typeof window === 'undefined') {
     return null
   }
-  
+
   if (DPlayer) {
     return DPlayer
   }
-  
+
   try {
     const dplayerModule = await import('dplayer')
     DPlayer = dplayerModule.default
@@ -232,7 +234,7 @@ const initDPlayer = async (options: {url: string; type: 'hls' | 'auto'}) => {
     })
 
     await nextTick()
-    
+
     if (player?.video) {
       const videoElement = player.video
       if (videoElement.readyState >= 2) {
@@ -468,30 +470,30 @@ onBeforeUnmount(() => {
 <style scoped lang="scss">
 @import '@/styles/public-detail.scss';
 
-.video-detail-page {
+.video-detail-page .page-layout {
+  grid-template-columns: 1fr;
+  max-width: 860px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.video-detail-page .detail-card {
   .video-container {
-    background: white;
-    border-radius: 12px;
+    background: var(--color-bg-secondary);
+    border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
     position: relative;
 
     &.is-loading {
-      min-height: 400px;
+      min-height: 300px;
 
       &::before {
         content: '';
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(255, 255, 255, 0.8);
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.05);
         z-index: 999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
       }
 
       &::after {
@@ -503,7 +505,7 @@ onBeforeUnmount(() => {
         height: 30px;
         margin-top: -15px;
         margin-left: -15px;
-        border: 3px solid #409eff;
+        border: 3px solid var(--color-primary);
         border-radius: 50%;
         border-top-color: transparent;
         animation: spin 1s linear infinite;
@@ -515,13 +517,6 @@ onBeforeUnmount(() => {
       :deep(.dplayer-loading),
       :deep(.dplayer-loading-icon) {
         display: none !important;
-      }
-
-      &.is-loading {
-        &::before,
-        &::after {
-          display: block;
-        }
       }
 
       &:not(.is-loading) {
@@ -541,7 +536,7 @@ onBeforeUnmount(() => {
   .video-wrapper {
     position: relative;
     width: 100%;
-    padding-top: 56.25%; /* 16:9 aspect ratio */
+    padding-top: 56.25%; // 16:9
     background: #000;
     overflow: hidden;
   }
@@ -554,150 +549,95 @@ onBeforeUnmount(() => {
     height: 100% !important;
   }
 
-  .video-info-section {
-    padding: 25px;
-  }
-
-  .video-title {
-    font-size: 24px;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 15px;
-  }
-
-  .video-meta {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    color: #666;
-    font-size: 14px;
-    margin-bottom: 25px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #e0e0e0;
-  }
-
   .video-code {
-    background: #f5f5f5;
-    padding: 6px 12px;
+    background: var(--color-bg-secondary);
+    padding: 4px 10px;
     border-radius: 6px;
     font-weight: 500;
+    font-size: 13px;
   }
 
   .magnet-section {
-    background: white;
-    border-radius: 12px;
-    padding: 25px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    margin-top: 8px;
   }
 
   .section-title {
-    font-size: 20px;
+    font-size: 17px;
     font-weight: 600;
-    color: #333;
-    margin-bottom: 15px;
+    color: var(--color-text-primary);
+    margin: 0 0 14px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
   }
 
   .magnet-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
   }
 
   .magnet-item {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 15px;
-    background: #f8f9fa;
+    padding: 13px;
+    background: var(--color-bg-secondary);
     border-radius: 8px;
     cursor: pointer;
-    transition: all 0.3s;
-    border: 2px solid transparent;
+    transition: all 0.2s;
+    border: 1px solid transparent;
 
     &:hover {
-      background: #e9ecef;
-      border-color: #667eea;
-      transform: translateX(5px);
+      border-color: var(--color-primary);
     }
   }
 
   .magnet-icon {
     flex-shrink: 0;
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-success));
     border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: #fff;
     font-weight: 600;
+    font-size: 13px;
   }
 
   .magnet-text {
     flex: 1;
     font-family: monospace;
-    font-size: 13px;
-    color: #333;
+    font-size: 12.5px;
+    color: var(--color-text-regular);
     word-break: break-all;
     line-height: 1.5;
   }
 
   .copy-icon {
     flex-shrink: 0;
-    width: 36px;
-    height: 36px;
-    background: #667eea;
+    width: 30px;
+    height: 30px;
+    background: var(--color-primary);
     border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
-    font-size: 18px;
-    transition: background 0.3s;
+    font-size: 15px;
   }
+}
 
-  .magnet-item:hover .copy-icon {
-    background: #5568d3;
-  }
-
-  .empty-message {
-    text-align: center;
-    color: #999;
-    padding: 40px;
-    font-size: 16px;
-  }
-
-  @include mobile {
-    .video-info-section {
-      padding: 18px 14px 20px;
-    }
-
-    .video-title {
-      font-size: 20px;
-      line-height: 1.3;
-    }
-
-    .video-meta {
-      flex-wrap: wrap;
-      gap: 8px;
-      font-size: 13px;
-    }
-
-    .magnet-section {
-      padding: 18px 14px 20px;
+@include mobile {
+  .video-detail-page .detail-card {
+    .video-title,
+    .title {
+      font-size: 19px;
     }
 
     .magnet-item {
       align-items: flex-start;
-      padding: 12px;
-    }
-
-    .magnet-text {
-      font-size: 12px;
     }
   }
 }

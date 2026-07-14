@@ -1,19 +1,16 @@
 /**
- * Public 详情页通用样式模板（小程序风格）
- * 
+ * Public 详情页通用样式模板（企业级响应式统一方案，Phase 3 Week 7）
+ *
  * 使用方式：
  * 1. 在组件的 <style scoped lang="scss"> 中引入：
  *    @import '@/styles/public-detail.scss';
- * 
- * 2. 在模板根元素上添加 class="public-detail-page"
- * 
- * 3. 确保 HTML 结构包含：
- *    - .container（容器）
- *    - .back-link（返回链接，可选）
- *    - .title（标题）
- *    - .meta（元信息）
- *    - .cover（封面图，可选）
- *    - .content（正文内容）
+ *
+ * 2. 在模板根元素上添加 class="public-detail-page"，内部结构：
+ *    .page-shell
+ *      .page-layout（grid 容器，列数由页面自己在 scoped style 里定义；
+ *                      没有侧栏的页面直接单列即可，不必强行套侧栏）
+ *        .detail-card（.back-link 可选 / .title / .meta / .cover 可选 / .content）
+ *        侧栏内容（如有）作为 .page-layout 的第二个 grid 子元素，自行携带卡片样式
  */
 
 // 被 @import（而非 @use）进 .vue 文件时，vite.config.ts 的全局 additionalData 只注入到
@@ -21,67 +18,82 @@
 // 的文件里，需要本文件自己显式 @use 一次（幂等，与 layout.scss 的既有写法一致）
 @use './responsive.scss' as *;
 
-.public-detail-page {
-  height: 100vh; // 固定高度，不使用 min-height，避免出现滚动条
-  overflow: hidden; // 隐藏最外层滚动条
-  background: linear-gradient(135deg, #fff7e6 0%, #ffe9d9 45%, #ffd1a4 100%);
-  padding: 16px 16px 0;
- 
-  .container {
-    max-width: 800px;
-    margin: 0 auto;
-    background: #fff;
-    padding: 20px 20px;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  }
+// 需与 components/common/PublicHeader.vue 的实际高度保持一致（sticky 侧栏定位要用）
+$public-header-height: 64px;
 
-  // 返回链接
+.public-detail-page {
+  min-height: 100vh;
+  background: var(--color-bg-secondary);
+}
+
+.page-shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 24px 40px;
+}
+
+.page-layout {
+  display: grid;
+  gap: 28px;
+  align-items: start;
+}
+
+.detail-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-light);
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+
   .back-link {
+    display: inline-block;
     cursor: pointer;
-    color: #666;
-    margin-bottom: 12px;
+    color: var(--color-text-secondary);
+    margin-bottom: 16px;
+    font-size: 14px;
+    transition: color 0.2s;
 
     &:hover {
-      color: #409eff;
+      color: var(--color-primary);
     }
   }
 
-  // 标题
   .title {
     font-size: 24px;
     font-weight: 700;
-    margin: 0 0 12px;
+    margin: 0 0 14px;
+    line-height: 1.4;
+    color: var(--color-text-primary);
   }
 
-  // 元信息（作者、时间、标签等）
   .meta {
-    font-size: 13px;
-    color: #888;
+    font-size: 12.5px;
+    color: var(--color-text-secondary);
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 4px;
-    margin-bottom: 16px;
+    gap: 6px;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--color-border-light);
+
+    .dot {
+      margin: 0 2px;
+    }
+
+    .tags {
+      display: inline-flex;
+      gap: 4px;
+    }
   }
 
-  .dot {
-    margin: 0 4px;
-  }
-
-  .tags {
-    display: inline-flex;
-    gap: 4px;
-  }
-
-  // 封面图
   .cover {
-    margin-bottom: 18px;
+    margin-bottom: 20px;
     width: 100%;
     max-height: 500px;
     overflow: hidden;
     border-radius: 10px;
-    background: #f5f5f5;
+    background: var(--color-bg-secondary);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -90,23 +102,20 @@
       width: 100%;
       height: auto;
       max-height: 500px;
-      border-radius: 10px;
       object-fit: contain;
       display: block;
     }
   }
 
-  // 正文内容
   .content {
-    font-size: 15px;
-    line-height: 1.7;
-    color: #333;
+    font-size: 14.5px;
+    line-height: 1.9;
+    color: var(--color-text-regular);
   }
 
-  // 空状态
   .empty {
     text-align: center;
-    color: #999;
+    color: var(--color-text-secondary);
     padding: 40px 0;
   }
 
@@ -125,18 +134,22 @@
   :deep(.md-editor-preview pre) {
     border-radius: 10px;
   }
+}
 
-  // 移动端适配（≤768px）
-  @include mobile {
-    padding: 12px 10px 0;
+@include mobile {
+  .page-shell {
+    padding: 14px;
+  }
 
-    .container {
-      padding: 16px 14px 18px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    }
+  .page-layout {
+    gap: 14px;
+  }
+
+  .detail-card {
+    padding: 18px;
 
     .title {
-      font-size: 21px;
+      font-size: 19px;
       margin-bottom: 10px;
     }
 
@@ -151,12 +164,6 @@
     .content {
       font-size: 14px;
       line-height: 1.75;
-      margin-top: 10px;
-      padding-bottom: 4px;
-    }
-
-    :deep(.md-editor-preview) {
-      padding: 0;
     }
 
     :deep(.md-editor-preview p) {

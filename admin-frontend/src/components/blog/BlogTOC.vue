@@ -162,15 +162,15 @@ onUnmounted(() => {
 
 <style scoped lang="scss">
 .blog-toc {
-  position: relative; // 改为 relative，因为父容器 blog-sidebar 已经使用了 sticky
-  // 移除 top: 80px，由父容器控制定位
-  width: 100%; // 改为 100%，占满父容器 blog-sidebar 的宽度
-  max-width: 240px; // 最大宽度限制为 240px
-  background: #fff;
-  border-radius: 8px;
+  position: sticky;
+  top: 88px; // PublicHeader 高度(64px) + .page-shell 顶部内边距(24px)
+  width: 100%;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-light);
+  border-radius: 12px;
   padding: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  max-height: calc(100vh - 100px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  max-height: calc(100vh - 112px);
   overflow-y: auto;
   overflow-x: visible; // 确保横向不裁剪
   box-sizing: border-box; // 确保 padding 包含在宽度内
@@ -178,10 +178,10 @@ onUnmounted(() => {
   .toc-title {
     font-size: 16px;
     font-weight: 600;
-    color: #333;
+    color: var(--color-text-primary);
     margin-bottom: 12px;
     padding-bottom: 8px;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--color-border-light);
   }
 
   .toc-list {
@@ -198,23 +198,23 @@ onUnmounted(() => {
 
     .toc-text {
       font-size: 14px;
-      color: #666;
+      color: var(--color-text-regular);
       line-height: 1.5;
     }
 
     &:hover {
-      background: #f5f5f5;
+      background: var(--color-bg-secondary);
 
       .toc-text {
-        color: #409eff;
+        color: var(--color-primary);
       }
     }
 
     &.active {
-      background: #e6f4ff;
+      background: color-mix(in srgb, var(--color-primary) 12%, transparent);
 
       .toc-text {
-        color: #409eff;
+        color: var(--color-primary);
         font-weight: 500;
       }
     }
@@ -242,7 +242,7 @@ onUnmounted(() => {
 
   .toc-empty {
     font-size: 14px;
-    color: #999;
+    color: var(--color-text-secondary);
     text-align: center;
     padding: 20px 0;
   }

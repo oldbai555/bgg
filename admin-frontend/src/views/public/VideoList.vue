@@ -1,19 +1,19 @@
-<!-- 公共展示页，无权限体系与增删改操作，走 21-public-pages.md 的响应式卡片信息流模板，不适用为管理后台 CRUD 设计的 D2Table -->
+<!-- 公共展示页，无权限体系与增删改操作，走 public-list.scss 的企业级响应式卡片网格模板，不适用为管理后台 CRUD 设计的 D2Table -->
 <template>
   <div class="video-list-page public-list-page">
     <MetricReporter module="video_list" :biz-id="0" />
-    <div class="container">
-      <div class="hero">
-        <div class="hero-title">🎬 视频列表</div>
-        <div class="hero-subtitle">发现精彩视频内容</div>
-
-        <!-- 搜索栏 -->
-        <div class="search-bar">
+    <PublicHeader />
+    <div class="page-shell">
+      <div class="page-intro">
+        <h1 class="page-intro__title">视频中心</h1>
+        <p class="page-intro__desc">发现精彩视频内容</p>
+        <div class="page-intro__search">
           <el-input
             v-model="query.content"
             placeholder="搜索视频..."
             clearable
             @keydown.enter="handleSearch"
+            @clear="handleSearch"
           >
             <template #append>
               <el-button type="primary" :loading="loading" @click="handleSearch">搜索</el-button>
@@ -22,69 +22,64 @@
         </div>
       </div>
 
-      <!-- 视频网格 -->
-      <div v-loading="loading" class="list-grid">
-        <div
-          v-for="video in list"
-          :key="video.id"
-          class="list-card video-card"
-        >
+      <div class="page-layout">
+        <div v-loading="loading" class="card-grid">
           <div
-            class="cover video-thumbnail"
-            @mouseenter="handleThumbnailHover(video)"
-            @mouseleave="handleThumbnailLeave(video)"
+            v-for="video in list"
+            :key="video.id"
+            class="list-card video-card"
+            @click="goToDetail(video.id)"
           >
-            <img
-              v-if="!hoveringVideoId || hoveringVideoId !== video.id"
-              :src="getCoverUrl(video.godNum)"
-              :alt="video.name"
-              @error="handleImageError"
-            />
-            <video
-              v-else
-              :ref="(el) => setVideoRef(video.id, el)"
-              class="video-player-inline"
-              :src="getPreviewUrl(video.godNum)"
-              autoplay
-              loop
-              muted
-              playsinline
-            ></video>
-            <div class="play-overlay">
-              <div class="play-icon"></div>
-            </div>
-          </div>
-          <div class="card-content video-info">
             <div
-              class="card-title video-title"
-              @click.stop="goToDetail(video.id)"
+              class="cover video-cover"
+              @mouseenter="handleThumbnailHover(video)"
+              @mouseleave="handleThumbnailLeave(video)"
             >
-              {{ video.name || '未命名视频' }}
+              <img
+                v-if="!hoveringVideoId || hoveringVideoId !== video.id"
+                :src="getCoverUrl(video.godNum)"
+                :alt="video.name"
+                @error="handleImageError"
+              />
+              <video
+                v-else
+                :ref="(el) => setVideoRef(video.id, el)"
+                class="video-player-inline"
+                :src="getPreviewUrl(video.godNum)"
+                autoplay
+                loop
+                muted
+                playsinline
+              ></video>
+              <div class="play-overlay">
+                <div class="play-icon"></div>
+              </div>
             </div>
-            <div class="card-meta video-code">{{ video.godNum || '-' }}</div>
+            <div class="card-content">
+              <div class="card-title">{{ video.name || '未命名视频' }}</div>
+              <div class="card-meta">{{ video.godNum || '-' }}</div>
+            </div>
+          </div>
+          <div v-if="!loading && list.length === 0" class="empty-message">
+            暂无视频数据
           </div>
         </div>
-        <div v-if="!loading && list.length === 0" class="empty-message">
-          暂无视频数据
+
+        <div class="pagination-bar">
+          <el-pagination
+            v-model:current-page="query.page"
+            v-model:page-size="query.size"
+            :total="total"
+            :page-sizes="[10, 20, 30, 50, 100]"
+            :layout="paginationLayout"
+            :size="isMobile ? 'small' : 'default'"
+            @size-change="handleSizeChange"
+            @current-change="handlePageChange"
+          />
         </div>
       </div>
-
-      <!-- 分页 -->
-      <div class="pagination">
-        <el-pagination
-          v-model:current-page="query.page"
-          v-model:page-size="query.size"
-          :total="total"
-          :page-sizes="[10, 20, 30, 50, 100]"
-          :layout="paginationLayout"
-          :size="isMobile ? 'small' : 'default'"
-          @size-change="handleSizeChange"
-          @current-change="handlePageChange"
-        />
-      </div>
-
-      <IcpFooter />
     </div>
+    <IcpFooter />
   </div>
 </template>
 
@@ -96,6 +91,7 @@ import {contentApi} from '@/api/content'
 import type {PublicVideoListReq, PublicVideoItem} from '@/api/generated/admin'
 import MetricReporter from '@/components/common/MetricReporter.vue'
 import IcpFooter from '@/components/common/IcpFooter.vue'
+import PublicHeader from '@/components/common/PublicHeader.vue'
 import {MOBILE_BREAKPOINT} from '@/constants/breakpoints'
 
 const router = useRouter()
@@ -359,41 +355,20 @@ onUnmounted(() => {
 <style scoped lang="scss">
 @import '@/styles/public-list.scss';
 
-.video-list-page {
-  background: linear-gradient(135deg, #fff7e6 0%, #ffe9d9 45%, #ffd1a4 100%);
+.video-list-page .page-layout {
+  grid-template-columns: 1fr;
+}
 
-  .video-card {
-    transition: transform 0.25s, box-shadow 0.25s;
-
-    &:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.12);
-    }
-  }
-
-  .video-thumbnail {
+.video-card {
+  .video-cover {
     position: relative;
-    padding-top: 56.25%; /* 16:9 */
-    background: #f0f0f0;
-    overflow: hidden;
-    border-radius: 10px 0 0 10px;
 
     img,
     video {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
       transition: transform 0.3s;
     }
 
-    img {
-      transform: scale(1);
-    }
-
-    .video-card:hover & img {
+    &:hover img {
       transform: scale(1.06);
     }
 
@@ -415,13 +390,13 @@ onUnmounted(() => {
     transition: opacity 0.2s;
   }
 
-  .video-card:hover .play-overlay {
+  &:hover .play-overlay {
     opacity: 1;
   }
 
   .play-icon {
-    width: 60px;
-    height: 60px;
+    width: 52px;
+    height: 52px;
     background: rgba(255, 255, 255, 0.92);
     border-radius: 50%;
     display: flex;
@@ -430,40 +405,20 @@ onUnmounted(() => {
 
     &::after {
       content: '';
-      border-left: 20px solid #667eea;
-      border-top: 12px solid transparent;
-      border-bottom: 12px solid transparent;
+      border-left: 18px solid var(--color-primary);
+      border-top: 11px solid transparent;
+      border-bottom: 11px solid transparent;
       margin-left: 4px;
     }
   }
+}
 
-  .video-info {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .video-title {
-    cursor: pointer;
-    position: relative;
-    z-index: 1;
-    flex-shrink: 0;
-
-    &:hover {
-      color: #667eea;
-    }
-  }
-
-  .video-code {
-    position: relative;
-    z-index: 0;
-    flex-shrink: 0;
-  }
-
-  @include mobile {
-    .video-thumbnail {
-      border-radius: 10px 0 0 10px;
-    }
+@include mobile {
+  .video-card .cover {
+    aspect-ratio: 16 / 9;
+    width: 140px;
+    flex: 0 0 140px;
+    height: auto;
   }
 }
 </style>

@@ -54,10 +54,11 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .blog-author-card {
-  background: #fff;
-  border-radius: 8px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-light);
+  border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
   text-align: center;
 
   .author-avatar {
@@ -66,7 +67,7 @@ onMounted(() => {
     margin: 0 auto 12px;
     border-radius: 50%;
     overflow: hidden;
-    background: #f5f5f5;
+    background: var(--color-bg-secondary);
 
     img {
       width: 100%;
@@ -82,32 +83,32 @@ onMounted(() => {
       justify-content: center;
       font-size: 32px;
       font-weight: 600;
-      color: #409eff;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      background: linear-gradient(135deg, var(--color-primary), var(--color-success));
     }
   }
 
   .author-name {
     font-size: 18px;
     font-weight: 600;
-    color: #333;
+    color: var(--color-text-primary);
     margin-bottom: 8px;
   }
 
   .author-signature {
     font-size: 14px;
-    color: #888;
+    color: var(--color-text-secondary);
     margin-bottom: 12px;
     line-height: 1.5;
   }
 
   .author-stats {
     padding-top: 12px;
-    border-top: 1px solid #f0f0f0;
+    border-top: 1px solid var(--color-border-light);
 
     .stat-item {
       font-size: 14px;
-      color: #666;
+      color: var(--color-text-regular);
     }
   }
 }

@@ -207,3 +207,49 @@
 - `content/VideoList.vue`/`iam/UserList.vue`/`public/BlogList.vue`/`public/VideoList.vue` 四处 `isMobile` + `resize` 监听逻辑高度重复（仅数值来源已在本轮统一），是否收敛成一个 `composables/useIsMobile.ts` 留给后续清理批次判断。
 - `.claude/rules/21-public-pages.md` 目前只文档化了视频页那套"小程序风格"契约，博客页实际使用的另一套布局完全没有被规则文件覆盖过——Week 7 确定方向后需要一并补齐或改写，不只是"废弃小程序风格描述"这么简单，随公共页面重构一起更新（`09-rules-and-docs-sync-checklist.md` 跟踪）。
 - `theme.scss` 里手写的 `[data-theme='dark'] .el-input__wrapper` box-shadow 冗余覆盖（Week 6 前一条目记录）仍待后续清理批次评估，本轮未处理。
+
+---
+
+## 2026-07-14：Phase 3 Week 7（公共页面完全重构：博客/视频统一为企业级响应式方案）
+
+**What**：
+
+1. **环境问题（先记录）**：按 `06` 号文档 §5 step 3，本该用 `frontend-design` skill 出视觉预览，但发现该 skill 在当前 Claude Code 会话里实际未启用——项目 `.claude/settings.json` 的 `enabledPlugins` 指向 `anthropic-agent-skills` 市场（`example-skills` 插件），但该市场没有被真正克隆到本机 `~/.claude/plugins/marketplaces/`；`frontend-design` 实际存在于另一个已安装但未在 `enabledPlugins` 里启用的市场（`claude-plugins-official`）。这是 Claude Code 插件配置层面的问题，未擅自改配置，改为直接基于项目已有设计令牌（`theme.scss`/`variables.scss` 的真实色值）自己产出一份等效的 HTML 预览（Artifact），效果达到同等目的。
+
+2. **视觉方向确认（与用户过预览后拍板）**：博客与视频统一成同一套视觉方案（用户在"统一成一套"/"保留两套风格"/"先看预览再定"三个选项里选择"统一成一套"）。方向要点：桌面端信息架构沿用历史上评审过但从未启用的"标准博客风格"（顶部导航+左侧分类导航+卡片网格/正文+右侧栏），因为它比小程序风格的单栏卡片更适合"深度阅读+浏览发现"融合的场景，视频内容套进同一套骨架；配色改用中性设计令牌+主题色强调，**不延续暖色渐变背景**——暖色渐变是小程序风格的强品牌色，与"企业级"定位冲突，也不利于暗色复用。
+
+3. **共享基建**：
+   - 新增 `src/components/common/PublicHeader.vue`：博客/视频共用顶部导航（sticky、logo、博客/视频 tab、社交图标），取代原来只服务博客的 `components/blog/BlogHeader.vue`（已删除）。原 header 内置的搜索框移到各列表页自己的 `.page-intro__search` 里（博客列表页此前实际上没有可见的搜索输入框，只是 header 里有一个此前从未被本文档记录过的搜索框，这次统一挪到页面主体后行为对齐视频列表页）。
+   - 重写 `src/styles/public-list.scss`/`public-detail.scss`：从"小程序风格"专属模板（暖色渐变、固定 768px 媒体查询、`height:100vh;overflow:hidden` 的固定视口内部滚动结构）改为企业级响应式统一模板——`.page-shell`/`.page-intro`/`.page-layout`/`.card-grid`+`.list-card`/`.detail-card` 等语义类名，全部走 `theme.scss` 的 CSS 变量令牌（`--color-primary`/`--color-bg-card`/`--color-text-*` 等）和 `responsive.scss` 的 `mobile`/`tablet-up` mixin。**一个刻意的行为变更**：原来两个模板都用 `height:100vh;overflow:hidden` 把页面钉成固定视口高度、内部区域单独滚动（更像后台管理界面的"面板"交互），改为标准的文档级自然滚动 + sticky 顶部导航——这是更符合"企业级公共网站"直觉的滚动模型，也顺带消除了 `BlogList.vue` 里"PC 端固定高度/移动端允许滚动"这条此前专门写的特例判断（不再需要）。
+   - `views/temp/`/`21-public-pages.mdc` 描述的 `.container`/`.hero`/`.list-grid` 等旧类名契约已整体替换为新契约，规则文件同步更新（见下）。
+
+4. **列表页/详情页有无侧栏的处理原则**：博客有分类（`BlogCategoryNav.vue`）和作者/社交信息，视频没有对应的数据概念（没有分类字段）——没有为视频伪造一个不存在的侧栏，而是让 `.page-layout` 的列数由各页面自己在 `scoped style` 里定义（博客三栏 `200px 1fr 240px`，视频单栏 `1fr`），共享样式文件只提供通用的 grid 容器和卡片/详情卡样式。这个决定符合项目"不做超出需求的抽象"的一贯要求，也在新版 `21-public-pages.mdc` 里写清楚了。
+
+5. **四个页面改造**：
+   - `BlogList.vue`：模板从旧的 `.blog-page-container`/`.blog-content-wrapper`/`.blog-article-card` 私有类名结构改为 `.page-shell`/`.page-layout`/`.card-grid`/`.list-card` 统一契约；新增页面内搜索框（原来挂在 header 上）；`isMobile`/`checkMobile`/`sessionStorage` 滚动位置恢复等逻辑未改动。
+   - `BlogDetail.vue`：模板改为 `.detail-card` 契约，原来几百行专门用于隐藏 md-editor-v3 工具栏/行号的 `:deep()` 覆盖规则原样保留（这部分是功能性的第三方库 UI 抑制，与视觉皮肤无关，不属于本轮重构范围）。
+   - `VideoList.vue`/`VideoDetail.vue`：卡片/详情内部结构改用与博客一致的 `.card-title`/`.card-meta`/`.detail-card` 类名（原来的 `.video-title`/`.video-code` 等私有类名去掉，统一命名，只保留悬停预览播放、磁力链接复制等视频专属交互的私有类名）。
+   - `BlogCategoryNav.vue`/`BlogAuthorCard.vue`/`BlogSocialLinks.vue`/`BlogTOC.vue`：只做 retint（硬编码色值→`theme.scss` 令牌）和定位调整（`position:sticky` 配合新的自然滚动模型，移动端 `BlogCategoryNav.vue` 改为横向滚动条），结构未大改，风险可控。
+   - 确认无剩余引用后删除死代码：`src/styles/blog.scss`、`src/components/blog/BlogHeader.vue`。
+
+6. **保留不变的产品契约**（按 `06` 号文档 §4 要求逐项核对未破坏）：`MetricReporter` 打点调用方式、`IcpFooter` 挂载、列表→详情跳转的分页/搜索/滚动位置 `sessionStorage` 持久化与恢复、详情页返回 `router.back()` 优先级逻辑，四个页面均原样保留，只改了外层视觉/布局代码，未触碰这几块逻辑。
+
+7. **规则文档同步**：改写 SSOT `.cursor/rules/21-public-pages.mdc`（不再是"小程序风格"描述，改为新的统一契约、响应式 mixin 用法、`PublicHeader.vue` 挂载要求），`make sync-claude-rules` 重新生成 `.claude/rules/21-public-pages.md`，`go run ./script/sync_claude_rules.go --check` 确认零漂移。`docs/前端开发进度.md` 同步更新 §0 目录结构、§2 已完成功能描述、§3 待办清单（删除已经实施的"博客标准风格改造"待办项）、§4 决策记录、§5 关键代码位置、§6.3 Public 页面风格小节。
+
+**验证**：`npm run typecheck`（0 error）、`npm run build`（成功，无 Sass `@import`/`@use` 报错，说明 `public-list.scss`/`public-detail.scss` 顶部显式 `@use './responsive.scss' as *;` 的写法延续正确）、`npm run lint`（0 error，105 warning，比 Week 6 末的 99 条略增，新增的是既有 `indent`/`no-explicit-any` 同类 warning，非本轮引入新问题类型）、`npm run test`（13 个测试文件、84 个用例全部通过，本轮未新增/修改任何被测的纯逻辑模块，公共页面此前也没有专门的组件级测试覆盖）四项全绿。**未做真实浏览器视觉验证**——环境限制与 Week 3/5/6 一致（本机无 Playwright/DevTools 类 MCP，未拉起完整 `admin-server` 链路）；这一轮是四个 Week 里视觉改动幅度最大的一次（模板结构、滚动模型、导航组件全部替换），比此前"硬编码色值替换成令牌"性质的改动风险更高，**强烈建议用户在下次跑通完整环境后优先人工过一遍**：博客/视频列表页的分类筛选/搜索/分页/悬停预览、详情页的 Markdown 渲染/TOC 跳转/相邻文章导航/磁力链接复制、移动端的分类横向滚动条和卡片行布局、亮色/暗色模式下的对比度。
+
+**Why**：按 `00-refactor-overview.md` 第 3 节 Phase 3 Week 7 排期（`06-responsive-and-public-pages-redesign.md` §5 step 3-5），完成用户已确认方向的公共页面重构，是 Phase 3 视觉重构的最后一块拼图。
+
+**提交前 `gga` 审查修复**：`git commit` 被拦下两个真实问题，均已修复后再次通过：
+1. **`public-detail.scss` 与两个详情页的 grid 容器类名对不上**：共享文件定义的是 `.detail-layout`，但 `BlogDetail.vue`/`VideoDetail.vue` 的模板和 scoped style 用的是 `.page-layout`（照抄了列表页的类名，写详情页时手滑没对齐）——`display:grid` 从未真正生效在页面用到的类名上，桌面端三栏布局本会退化成普通块级堆叠。已把共享文件里的 `.detail-layout` 统一改名为 `.page-layout`，与两个详情页、以及规则文档里写的契约保持一致。
+2. **`BlogList.vue` 的 sessionStorage 滚动位置只写不读**：`goToDetail` 里一直有 `sessionStorage.setItem`，但从未有对应的 `getItem` 把 `scrollTop` 接回 `pendingScrollTop`（`page`/`size`/`keyword`/`tagId` 这几项能"顺带"恢复是因为 `updateRouteQuery` 已经把它们写进了 URL、`router.back()` 会带回同一个 URL，掩盖了滚动位置这块的缺失）——核实后这是原文件本来就有的缺口，不是本轮重写引入的新问题，但既然本轮已经在改这块代码、且新版规则文档明确要求这个行为，顺手补齐：新增 `restorePendingScroll()`，在 `onMounted` 里读取 `sessionStorage`（含 1 小时过期判断，与 `VideoList.vue` 的既有实现对齐），把 `scrollTop` 接回 `pendingScrollTop` 交给 `loadData()` 完成后恢复；`goToDetail` 保存的状态同步补上 `ts` 时间戳字段。
+
+修复后四项验证（`typecheck`/`build`/`lint`/`test`）重新跑过，结果与上面"验证"小节一致。
+
+**`gga` 第二轮审查**：又指出 3 处 `docs/前端开发进度.md` 的陈旧描述（公共路由误写成 `/public/blog`、`ConfigList.vue` "刷新缓存"按钮早在 Phase 1 Week 2 已删除但文档未同步、§7 仍写"`blog.ts` 等封装层"未反映 Phase 1 合并进 `content.ts` 的事实）——均确认是本轮改动之前就存在的文档陈旧，不是本次引入，但顺手一并修正。另指出 `VideoDetail.vue` 播放事件仍直接调用 `monitoringApi.metricReport({event:'play'})` 而非通过 `MetricReporter` 组件统一上报——核实这是原文件本来就有的写法（本轮原样保留，未新增未改动），`MetricReporter.vue` 当前只支持挂载时/`bizId` 变化时声明式触发一次上报，不支持"视频真正开始播放"这种命令式的一次性业务事件；要改就要改 `MetricReporter.vue` 本身的 API（会影响其它所有引用它的页面），超出本轮"公共页面视觉重构"的范围。与用户确认后，本轮跳过这一条（`git commit --no-verify` 仅针对这一条，其余问题均已修复后正常通过审查），记录为独立待办，留给后续单独评估是否要给 `MetricReporter` 加命令式触发能力。
+
+**已知问题 / 下一步**：
+- **`VideoDetail.vue` 播放事件的埋点上报未经过 `MetricReporter` 统一入口**（见上"`gga` 第二轮审查"），是预存在写法，本轮未处理；如需收敛，需要评估给 `MetricReporter.vue` 增加命令式触发方法（`defineExpose` 一个 `report(event)` 方法或类似），并确认不影响其它引用它的公共页面，属于独立任务。
+- **本条目是本轮 Phase 1-3 重构里视觉/结构改动幅度最大、又最缺乏真实浏览器验证的一次，用户务必安排一次完整的人工回归**，重点看上面"验证"小节列出的交互点，尤其是滚动模型从"固定视口内部滚动"改成"文档级自然滚动"这个此前从未在其它 Week 出现过的行为变更。
+- `frontend-design` skill 未在 Claude Code 插件配置里生效（`.claude/settings.json` 的 `enabledPlugins` 指向未克隆的市场）是本轮发现的独立环境问题，与代码改动无关，需要用户决定是否要修复插件配置（改 `enabledPlugins` 指向 `claude-plugins-official` 的 `frontend-design`，或补齐 `anthropic-agent-skills` 市场的本地克隆），这类 Claude Code 自身配置改动不在 AI 可以自主决定的范围内。
+- Phase 3（Week 5-7）全部完成，`05`/`06` 号文档规划的工作项已清零；`00-refactor-overview.md` 规划的 Phase 1-3 三阶段整体重构到此收尾，剩余的都是本文档各 Week 条目里零散记录的"已知问题"待办（如 `.ts` 文件全仓 ESLint 覆盖、115→105 条 `indent` warning 的统一格式化批次、`useIsMobile` composable 抽取评估等），不再是 Phase 排期内的强制项，后续按需处理即可。

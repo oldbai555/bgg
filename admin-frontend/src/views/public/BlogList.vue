@@ -1,24 +1,40 @@
 <template>
-  <div class="blog-list-page">
+  <div class="blog-list-page public-list-page">
     <MetricReporter module="blog_article_list" :biz-id="0" />
-    <BlogHeader />
-    <div class="blog-page-container">
-      <div class="blog-content-wrapper">
+    <PublicHeader />
+    <div class="page-shell">
+      <div class="page-intro">
+        <h1 class="page-intro__title">技术博客</h1>
+        <p class="page-intro__desc">记录开发过程中的思考与实践</p>
+        <div class="page-intro__search">
+          <el-input
+            v-model="query.keyword"
+            placeholder="搜索文章..."
+            clearable
+            @keydown.enter="handleSearch"
+            @clear="handleSearch"
+          >
+            <template #append>
+              <el-button type="primary" :loading="loading" @click="handleSearch">搜索</el-button>
+            </template>
+          </el-input>
+        </div>
+      </div>
+
+      <div class="page-layout">
         <!-- 左侧分类导航 -->
-        <aside class="blog-sidebar-left">
-          <BlogCategoryNav :selected-tag-id="query.tagId" @select="handleTagSelect" />
-        </aside>
+        <BlogCategoryNav :selected-tag-id="query.tagId" @select="handleTagSelect" />
 
         <!-- 中间文章列表 -->
-        <main class="blog-main">
-          <div :class="['article-list', { 'is-loading': loading }]">
+        <div>
+          <div v-loading="loading" class="card-grid">
             <div
               v-for="item in list"
               :key="item.id"
-              class="blog-article-card"
+              class="list-card"
               @click="goToDetail(item.id)"
             >
-              <div class="article-cover">
+              <div class="cover">
                 <img
                   v-if="item.cover"
                   :src="item.cover"
@@ -28,18 +44,18 @@
                 <div v-else class="cover-fallback">{{ firstChar(item.title) }}</div>
                 <div v-if="item.isTop === 1" class="top-badge">置顶</div>
               </div>
-              <div class="article-content">
-                <div class="article-title">
+              <div class="card-content">
+                <div class="card-title">
                   <span v-if="item.isTop === 1" class="top-icon">📌</span>
                   {{ item.title }}
                 </div>
-                <div class="article-meta">
-                  <span class="author">{{ item.authorName || '匿名' }}</span>
+                <div class="card-summary">{{ item.summary || '暂无摘要' }}</div>
+                <div class="card-meta">
+                  <span>{{ item.authorName || '匿名' }}</span>
                   <span class="dot">·</span>
-                  <span class="time">{{ formatTime(item.publishTime) }}</span>
+                  <span>{{ formatTime(item.publishTime) }}</span>
                 </div>
-                <div class="article-summary">{{ item.summary || '暂无摘要' }}</div>
-                <div v-if="item.tagNames?.length" class="article-tags">
+                <div v-if="item.tagNames?.length" class="card-tags">
                   <el-tag
                     v-for="tag in item.tagNames"
                     :key="tag"
@@ -55,8 +71,7 @@
             <div v-if="!loading && list.length === 0" class="empty-message">暂无文章</div>
           </div>
 
-          <!-- 分页 -->
-          <div class="pagination-wrapper">
+          <div class="pagination-bar">
             <el-pagination
               v-model:current-page="query.page"
               v-model:page-size="query.size"
@@ -68,16 +83,16 @@
               @current-change="handlePageChange"
             />
           </div>
-          <IcpFooter />
-        </main>
+        </div>
 
         <!-- 右侧侧边栏 -->
-        <aside class="blog-sidebar">
+        <div class="blog-sidebar-stack">
           <BlogAuthorCard />
           <BlogSocialLinks />
-        </aside>
+        </div>
       </div>
     </div>
+    <IcpFooter />
   </div>
 </template>
 
@@ -89,7 +104,7 @@ import {contentApi} from '@/api/content'
 import type {PublicBlogArticleListReq, PublicBlogArticleItem} from '@/api/generated/admin'
 import MetricReporter from '@/components/common/MetricReporter.vue'
 import IcpFooter from '@/components/common/IcpFooter.vue'
-import BlogHeader from '@/components/blog/BlogHeader.vue'
+import PublicHeader from '@/components/common/PublicHeader.vue'
 import BlogCategoryNav from '@/components/blog/BlogCategoryNav.vue'
 import BlogAuthorCard from '@/components/blog/BlogAuthorCard.vue'
 import BlogSocialLinks from '@/components/blog/BlogSocialLinks.vue'
@@ -232,6 +247,13 @@ const handleTagSelect = (tagId: number) => {
   loadData()
 }
 
+const handleSearch = () => {
+  query.page = 1
+  updateRouteQuery()
+  pendingScrollTop.value = null
+  loadData()
+}
+
 const goToDetail = (id: number) => {
   // 保存当前状态
   if (typeof window !== 'undefined') {
@@ -241,7 +263,8 @@ const goToDetail = (id: number) => {
         size: query.size,
         keyword: query.keyword,
         tagId: query.tagId,
-        scrollTop: window.scrollY
+        scrollTop: window.scrollY,
+        ts: Date.now()
       }
       sessionStorage.setItem(SCROLL_STATE_KEY, JSON.stringify(state))
     } catch {
@@ -250,6 +273,32 @@ const goToDetail = (id: number) => {
   }
 
   router.push(`/blog/${id}`)
+}
+
+// 从详情页返回时恢复滚动位置：page/size/keyword/tagId 已经通过 route.query 恢复
+// （updateRouteQuery 在导航前已写入 URL，router.back() 会带回同一个 URL），这里只需要
+// 把 sessionStorage 里记录的 scrollTop 接回 pendingScrollTop，交给 loadData() 完成后恢复
+const restorePendingScroll = () => {
+  if (typeof window === 'undefined') {
+    return
+  }
+  try {
+    const raw = sessionStorage.getItem(SCROLL_STATE_KEY)
+    if (!raw) {
+      return
+    }
+    const parsed = JSON.parse(raw) as {scrollTop?: number; ts?: number}
+    const now = Date.now()
+    if (parsed.ts && now - parsed.ts >= 60 * 60 * 1000) {
+      sessionStorage.removeItem(SCROLL_STATE_KEY)
+      return
+    }
+    if (typeof parsed.scrollTop === 'number' && parsed.scrollTop > 0) {
+      pendingScrollTop.value = parsed.scrollTop
+    }
+  } catch {
+    // 忽略解析错误
+  }
 }
 
 // 从路由参数初始化查询条件
@@ -282,6 +331,7 @@ onMounted(() => {
     window.addEventListener('resize', handleResize)
   }
   initFromRoute()
+  restorePendingScroll()
   loadData()
 })
 
@@ -293,67 +343,25 @@ onUnmounted(() => {
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/blog.scss';
+@import '@/styles/public-list.scss';
 
-.blog-list-page {
-  min-height: 100vh; // 使用 min-height，允许内容超出时滚动
-  background: #f5f5f5;
-
-  // PC 端：固定高度，隐藏滚动条
-  @include tablet-up {
-    height: 100vh;
-    overflow: hidden;
-  }
-
-  // 移动端：允许滚动
-  @include mobile {
-    height: auto;
-    overflow: visible;
-  }
-
-  .article-list {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    margin-bottom: 24px;
-  }
-
-  .cover-fallback {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 48px;
-    font-weight: 600;
-    color: #fff;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  }
-
-  .empty-message {
-    text-align: center;
-    color: #999;
-    padding: 40px 0;
-    font-size: 14px;
-  }
-
-  .pagination-wrapper {
-    display: flex;
-    justify-content: center;
-    padding: 20px 0;
-  }
+.blog-list-page .page-layout {
+  grid-template-columns: 200px 1fr 240px;
 }
 
-// 移动端适配
-@include mobile {
-  .blog-list-page {
-    .blog-page-container {
-      padding-top: 50px;
-    }
+.blog-sidebar-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
 
-    .article-list {
-      gap: 16px;
-    }
+@include mobile {
+  .blog-list-page .page-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .blog-sidebar-stack {
+    order: 2;
   }
 }
 </style>

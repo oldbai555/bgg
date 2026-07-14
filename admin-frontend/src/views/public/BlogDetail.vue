@@ -1,108 +1,101 @@
 <template>
-  <div :class="['blog-detail-page', { 'is-loading': loading }]">
+  <div :class="['blog-detail-page', 'public-detail-page', {'is-loading': loading}]">
     <MetricReporter module="blog_article_detail" :biz-id="Number(route.params.id) || 0" />
-    <BlogHeader />
-    <div class="blog-page-container">
-      <div class="blog-content-wrapper">
+    <PublicHeader />
+    <div class="page-shell">
+      <div class="page-layout">
         <!-- 左侧分类导航 -->
-        <aside class="blog-sidebar-left">
-          <BlogCategoryNav :selected-tag-id="currentTagId" @select="handleTagSelect" />
-        </aside>
+        <BlogCategoryNav :selected-tag-id="currentTagId" @select="handleTagSelect" />
 
         <!-- 中间文章内容 -->
-        <main class="blog-main">
-          <div v-if="detail" class="blog-detail-container">
-            <!-- 返回按钮 -->
-            <div class="back-link" @click="goBack">← 返回列表</div>
-            <h1 class="detail-title">{{ detail.title }}</h1>
+        <article v-if="detail" class="detail-card">
+          <div class="back-link" @click="goBack">← 返回列表</div>
+          <h1 class="title">{{ detail.title }}</h1>
 
-            <div class="detail-meta">
-              <span class="meta-item">
-                <span class="author">{{ detail.authorName || '匿名' }}</span>
-              </span>
-              <span class="meta-item">
-                <span class="time">{{ formatTime(detail.publishTime || 0) }}</span>
-              </span>
-              <span v-if="wordCount > 0" class="meta-item">
-                <span class="word-count">约{{ wordCount }}字</span>
-              </span>
-              <span v-if="readingTime > 0" class="meta-item">
-                <span class="reading-time">大约{{ readingTime }}分钟</span>
-              </span>
-              <span v-if="detail.tags?.length" class="meta-item">
-                <el-tag
-                  v-for="tag in detail.tags"
-                  :key="tag.id"
-                  size="small"
-                  effect="plain"
-                >
-                  {{ tag.name }}
-                </el-tag>
-              </span>
-            </div>
-
-            <div v-if="detail.cover" class="detail-cover">
-              <img :src="detail.cover" :alt="detail.title" @error="handleImageError" />
-            </div>
-
-            <div class="detail-content">
-              <component
-                v-if="mdPreviewLoaded && MdPreview && detail?.content"
-                :is="MdPreview"
-                :editor-id="'public-blog-detail'"
-                :model-value="detail.content"
-                :preview-theme="'github'"
-                @html-changed="handleContentRendered"
-              />
-              <div v-else-if="!mdPreviewLoaded || !MdPreview" class="loading-placeholder">
-                加载中...
-              </div>
-              <div v-else-if="!detail?.content" class="empty-content">
-                暂无内容
-              </div>
-            </div>
-
-            <!-- 相邻文章导航 -->
-            <div v-if="prevArticle || nextArticle" class="detail-navigation">
-              <router-link
-                v-if="prevArticle"
-                :to="`/blog/${prevArticle.id}`"
-                class="nav-item nav-prev"
+          <div class="meta">
+            <span>{{ detail.authorName || '匿名' }}</span>
+            <span class="dot">·</span>
+            <span>{{ formatTime(detail.publishTime || 0) }}</span>
+            <template v-if="wordCount > 0">
+              <span class="dot">·</span>
+              <span>约{{ wordCount }}字</span>
+            </template>
+            <template v-if="readingTime > 0">
+              <span class="dot">·</span>
+              <span>大约{{ readingTime }}分钟</span>
+            </template>
+            <span v-if="detail.tags?.length" class="tags">
+              <el-tag
+                v-for="tag in detail.tags"
+                :key="tag.id"
+                size="small"
+                effect="plain"
               >
-                <div class="nav-label">← 上一页</div>
-                <div class="nav-title">{{ prevArticle.title }}</div>
-              </router-link>
-              <div v-else class="nav-item nav-prev disabled">
-                <div class="nav-label">← 上一页</div>
-                <div class="nav-title">没有更多了</div>
-              </div>
-
-              <router-link
-                v-if="nextArticle"
-                :to="`/blog/${nextArticle.id}`"
-                class="nav-item nav-next"
-              >
-                <div class="nav-label">下一页 →</div>
-                <div class="nav-title">{{ nextArticle.title }}</div>
-              </router-link>
-              <div v-else class="nav-item nav-next disabled">
-                <div class="nav-label">下一页 →</div>
-                <div class="nav-title">没有更多了</div>
-              </div>
-            </div>
-            <IcpFooter />
+                {{ tag.name }}
+              </el-tag>
+            </span>
           </div>
 
-          <div v-else-if="!loading" class="empty">文章不存在或已下架</div>
-        </main>
+          <div v-if="detail.cover" class="cover">
+            <img :src="detail.cover" :alt="detail.title" @error="handleImageError" />
+          </div>
+
+          <div class="content">
+            <component
+              v-if="mdPreviewLoaded && MdPreview && detail?.content"
+              :is="MdPreview"
+              :editor-id="'public-blog-detail'"
+              :model-value="detail.content"
+              :preview-theme="'github'"
+              @html-changed="handleContentRendered"
+            />
+            <div v-else-if="!mdPreviewLoaded || !MdPreview" class="loading-placeholder">
+              加载中...
+            </div>
+            <div v-else-if="!detail?.content" class="empty-content">
+              暂无内容
+            </div>
+          </div>
+
+          <!-- 相邻文章导航 -->
+          <div v-if="prevArticle || nextArticle" class="detail-navigation">
+            <router-link
+              v-if="prevArticle"
+              :to="`/blog/${prevArticle.id}`"
+              class="nav-item nav-prev"
+            >
+              <div class="nav-label">← 上一页</div>
+              <div class="nav-title">{{ prevArticle.title }}</div>
+            </router-link>
+            <div v-else class="nav-item nav-prev disabled">
+              <div class="nav-label">← 上一页</div>
+              <div class="nav-title">没有更多了</div>
+            </div>
+
+            <router-link
+              v-if="nextArticle"
+              :to="`/blog/${nextArticle.id}`"
+              class="nav-item nav-next"
+            >
+              <div class="nav-label">下一页 →</div>
+              <div class="nav-title">{{ nextArticle.title }}</div>
+            </router-link>
+            <div v-else class="nav-item nav-next disabled">
+              <div class="nav-label">下一页 →</div>
+              <div class="nav-title">没有更多了</div>
+            </div>
+          </div>
+        </article>
+
+        <div v-else-if="!loading" class="detail-card">
+          <div class="empty">文章不存在或已下架</div>
+        </div>
 
         <!-- 右侧目录 -->
-        <aside class="blog-sidebar">
-          <BlogTOC v-if="detail?.content" :content="detail.content" />
-        </aside>
+        <BlogTOC v-if="detail?.content" :content="detail.content" />
       </div>
     </div>
-
+    <IcpFooter />
   </div>
 </template>
 
@@ -119,7 +112,7 @@ import type {
 } from '@/api/generated/admin'
 import MetricReporter from '@/components/common/MetricReporter.vue'
 import IcpFooter from '@/components/common/IcpFooter.vue'
-import BlogHeader from '@/components/blog/BlogHeader.vue'
+import PublicHeader from '@/components/common/PublicHeader.vue'
 import BlogCategoryNav from '@/components/blog/BlogCategoryNav.vue'
 import BlogTOC from '@/components/blog/BlogTOC.vue'
 
@@ -356,43 +349,56 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/blog.scss';
+@import '@/styles/public-detail.scss';
 
-.blog-detail-page {
-  height: 100vh;
-  overflow: hidden;
-  background: #f5f5f5;
-  position: relative;
+.blog-detail-page .page-layout {
+  grid-template-columns: 200px 1fr 240px;
+}
 
-  .back-link {
-    cursor: pointer;
-    color: #666;
-    margin-bottom: 12px;
-    font-size: 14px;
-    display: inline-block;
-    transition: color 0.3s;
-    flex-shrink: 0;
-
-    &:hover {
-      color: #409eff;
-    }
-  }
-
+.blog-detail-page .detail-card {
   .detail-navigation {
-    .nav-item.disabled {
-      cursor: not-allowed;
-      opacity: 0.5;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--color-border-light);
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+
+    .nav-item {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 6px;
+      background: var(--color-bg-secondary);
+      text-decoration: none;
+      color: var(--color-text-regular);
+      transition: all 0.2s;
 
       &:hover {
-        background: #f5f5f5;
-        color: #666;
+        background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+        color: var(--color-primary);
+      }
+
+      &.disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+      }
+
+      .nav-label {
+        font-size: 12px;
+        color: var(--color-text-secondary);
+        margin-bottom: 4px;
+      }
+
+      .nav-title {
+        font-size: 14px;
+        font-weight: 500;
       }
     }
   }
 
-  .detail-content {
-    // 全局隐藏 rn-wrapper 行号（md-editor-v3 使用的行号包装器）
-    // 在 detail-content 作用域内的所有层级都要隐藏
+  // 全局隐藏 rn-wrapper 行号（md-editor-v3 使用的行号包装器）
+  // 在 .content 作用域内的所有层级都要隐藏
+  .content {
     :deep([rn-wrapper]),
     :deep(span[rn-wrapper]),
     :deep(*[rn-wrapper]) {
@@ -407,13 +413,6 @@ onMounted(() => {
       left: -9999px !important;
     }
     min-height: 200px;
-    width: 100% !important;
-    height: auto !important;
-    font-size: 16px;
-    line-height: 1.8;
-    color: #333;
-    box-sizing: border-box;
-    overflow: visible !important;
 
     :deep(.md-editor) {
       border: none !important;
@@ -481,9 +480,6 @@ onMounted(() => {
       opacity: 1 !important;
       min-height: 200px !important;
       height: auto !important;
-      color: #333 !important;
-      font-size: 16px !important;
-      line-height: 1.8 !important;
       overflow: visible !important;
 
       // 隐藏 rn-wrapper 行号（md-editor-v3 使用的行号包装器）
@@ -502,20 +498,17 @@ onMounted(() => {
 
       // 隐藏代码块行号（针对 highlight.js 生成的行号）
       pre {
-        // 隐藏 highlight.js 行号（hljs-ln 是 highlight.js 的行号结构）
         .hljs-ln-numbers,
         .hljs-ln-n {
           display: none !important;
         }
 
-        // 调整代码区域，移除行号占用的空间
         .hljs-ln-code,
         .hljs-ln-line {
           padding-left: 0 !important;
           margin-left: 0 !important;
         }
 
-        // 隐藏行号容器
         .hljs-ln {
           .hljs-ln-numbers {
             display: none !important;
@@ -523,19 +516,16 @@ onMounted(() => {
         }
 
         code {
-          // 确保代码内容没有因为行号而添加的 padding
           padding-left: 0 !important;
           margin-left: 0 !important;
         }
 
-        // 隐藏所有可能的行号相关类名
         [class*='line-number'],
         [class*='ln-numbers'],
         [class*='ln-n'] {
           display: none !important;
         }
 
-        // 隐藏 rn-wrapper 行号（md-editor-v3 可能使用的行号包装器）
         [rn-wrapper],
         span[rn-wrapper] {
           display: none !important;
@@ -551,29 +541,14 @@ onMounted(() => {
         display: none !important;
       }
 
-      // 确保代码内容区域占满空间
       .cm-content {
         padding-left: 0 !important;
       }
 
-      // 隐藏其他可能的行号显示方式
       .line-number,
       .code-line-number,
       .line-numbers {
         display: none !important;
-      }
-
-      // 隐藏 rn-wrapper 行号（md-editor-v3 使用的行号包装器）
-      // 这个选择器需要在 :deep(.md-editor-preview) 作用域内，但也要匹配所有层级的元素
-      [rn-wrapper],
-      span[rn-wrapper],
-      *[rn-wrapper] {
-        display: none !important;
-        visibility: hidden !important;
-        width: 0 !important;
-        height: 0 !important;
-        padding: 0 !important;
-        margin: 0 !important;
       }
     }
 
@@ -581,16 +556,14 @@ onMounted(() => {
     .empty-content {
       text-align: center;
       padding: 40px 0;
-      color: #999;
+      color: var(--color-text-secondary);
     }
   }
 }
 
 @include mobile {
-  .blog-detail-page {
-    .blog-page-container {
-      padding-top: 50px;
-    }
+  .blog-detail-page .page-layout {
+    grid-template-columns: 1fr;
   }
 }
 </style>

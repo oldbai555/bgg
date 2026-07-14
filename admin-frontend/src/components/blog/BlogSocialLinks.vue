@@ -83,18 +83,19 @@ onMounted(() => {
 
   .social-section,
   .friend-link-section {
-    background: #fff;
-    border-radius: 8px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border-light);
+    border-radius: 12px;
     padding: 16px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
 
     .section-title {
       font-size: 16px;
       font-weight: 600;
-      color: #333;
+      color: var(--color-text-primary);
       margin-bottom: 12px;
       padding-bottom: 8px;
-      border-bottom: 1px solid #f0f0f0;
+      border-bottom: 1px solid var(--color-border-light);
     }
   }
 
@@ -108,13 +109,13 @@ onMounted(() => {
   .social-item,
   .friend-link-item {
     font-size: 14px;
-    color: #666;
+    color: var(--color-text-regular);
     text-decoration: none;
     padding: 6px 0;
     transition: color 0.2s;
 
     &:hover {
-      color: #409eff;
+      color: var(--color-primary);
     }
   }
 }

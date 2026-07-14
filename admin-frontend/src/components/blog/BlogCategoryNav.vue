@@ -57,22 +57,23 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .blog-category-nav {
-  width: 100%; // 占满父容器（blog-sidebar-left）
-  background: #fff;
-  border-radius: 8px;
+  width: 100%; // 占满父容器 grid 单元格
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-light);
+  border-radius: 12px;
   padding: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  position: relative; // 确保定位上下文
-  z-index: 10; // 提高层级，确保在中间内容之上
-  box-sizing: border-box; // 确保 padding 包含在宽度内
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  box-sizing: border-box;
+  position: sticky;
+  top: 88px; // PublicHeader 高度(64px) + .page-shell 顶部内边距(24px)
 
   .nav-title {
     font-size: 16px;
     font-weight: 600;
-    color: #333;
+    color: var(--color-text-primary);
     margin-bottom: 12px;
     padding-bottom: 8px;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--color-border-light);
   }
 
   .nav-list {
@@ -88,22 +89,22 @@ onMounted(() => {
 
       .nav-label {
         font-size: 14px;
-        color: #666;
+        color: var(--color-text-regular);
       }
 
       &:hover {
-        background: #f5f5f5;
+        background: var(--color-bg-secondary);
 
         .nav-label {
-          color: #409eff;
+          color: var(--color-primary);
         }
       }
 
       &.active {
-        background: #e6f4ff;
+        background: color-mix(in srgb, var(--color-primary) 12%, transparent);
 
         .nav-label {
-          color: #409eff;
+          color: var(--color-primary);
           font-weight: 500;
         }
       }
@@ -111,11 +112,26 @@ onMounted(() => {
   }
 }
 
-// 移动端适配
+// 移动端适配：横向导航条，随内容自然滚动，不再 sticky
 @include mobile {
   .blog-category-nav {
-    width: 100%;
-    margin-bottom: 16px;
+    position: static;
+    padding: 8px;
+    margin-bottom: 14px;
+
+    .nav-title {
+      display: none;
+    }
+
+    .nav-list {
+      flex-direction: row;
+      overflow-x: auto;
+      gap: 6px;
+
+      .nav-item {
+        white-space: nowrap;
+      }
+    }
   }
 }
 </style>
