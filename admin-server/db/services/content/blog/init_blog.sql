@@ -18,7 +18,7 @@
 
 -- 2.1 博客管理主菜单
 INSERT INTO `admin_menu` (`parent_id`, `name`, `path`, `component`, `icon`, `type`, `order_num`, `visible`, `status`, `created_at`, `updated_at`, `deleted_at`)
-SELECT 0, '博客管理', '/blog', 'blog/BlogLayout', 'ele-Document', 1, 0, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0
+SELECT 0, '博客管理', '/blog', 'blog/BlogLayout', 'ele-Document', 1, 20, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0
 FROM DUAL
 WHERE NOT EXISTS (SELECT 1 FROM `admin_menu` WHERE `path` = '/blog' AND `deleted_at` = 0);
 
