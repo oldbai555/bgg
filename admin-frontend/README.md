@@ -4,7 +4,7 @@
 
 ## 技术栈
 
-Vite 5 + Vue 3.4（Composition API）+ TypeScript 5.3 + Element Plus + Pinia + Axios + vue-i18n + video.js。**不是 Nuxt**——曾有过 Nuxt SSR 迁移实验，已完全回滚。
+Vite 5 + Vue 3.4（Composition API）+ TypeScript 5.9 + Element Plus + Pinia + Axios + vue-i18n + dplayer（视频播放）+ vitest。**不是 Nuxt**——曾有过 Nuxt SSR 迁移实验，已完全回滚。
 
 ## 目录结构
 
@@ -12,13 +12,13 @@ Vite 5 + Vue 3.4（Composition API）+ TypeScript 5.3 + Element Plus + Pinia + A
 src/
 ├── api/
 │   ├── generated/   # goctl 从后端 .api 生成的接口代码，禁止手改
-│   └── *.ts          # 对 generated 的二次封装，业务代码统一从这里导入
+│   └── *.ts          # 对 generated 的二次封装（iam/system/monitoring/content/chat/sdk/task/misc/public），业务代码统一从这里导入
 ├── components/common/ # 通用组件（D2Table 等，见 components/common/README.md）
-├── composables/ hooks/ # useDictOptions、usePermission 等
+├── composables/        # useDictOptions、usePermission、useAppConfig 等
 ├── directives/permission.ts # v-permission 指令
 ├── stores/            # Pinia：app/dict/user/websocket
 ├── styles/             # 含公共页样式模板 public-list.scss / public-detail.scss
-└── views/               # system/ blog/ video/ chatroom/ 后台页面 + public/ 公共页面
+└── views/               # 按后端域分目录：iam/system/monitoring/misc/content/chat/sdk/task 后台页面 + public/ 公共页面
 ```
 
 详细规范（API 分层、字典/权限用法、命名规则）见根目录 [`AGENTS.md`](../AGENTS.md) 与 [`.cursor/rules/20-frontend.mdc`](../.cursor/rules/20-frontend.mdc)、[`.cursor/rules/21-public-pages.mdc`](../.cursor/rules/21-public-pages.mdc)。
@@ -46,8 +46,10 @@ pnpm dev
 | `pnpm preview` | 预览构建产物 |
 | `pnpm typecheck` | `vue-tsc --noEmit` 类型检查 |
 | `pnpm lint` | ESLint 检查 |
+| `pnpm test` | vitest 单测（`vitest run`） |
+| `pnpm test:watch` | vitest watch 模式 |
 
-**注意**：`package.json` 里的 `api:gen` 脚本已失效（对应的 `scripts/api-gen.mjs` 不存在），真正的接口代码生成入口是 `admin-server/scripts/generate-ts.sh`。
+**注意**：接口代码生成入口是 `admin-server/scripts/generate-ts.sh`（产物在 `src/api/generated/`，禁止手改）；`package.json` 曾有的 `api:gen` 死脚本（对应 `scripts/api-gen.mjs` 从未存在）已在 Phase 1 Week 2 清理移除。
 
 ## 新增页面/模块
 

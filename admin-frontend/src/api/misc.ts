@@ -1,9 +1,5 @@
 import {
   ping,
-  demoList,
-  demoCreate,
-  demoUpdate,
-  demoDelete,
   dailyShortSentenceList,
   dailyShortSentenceCreate,
   dailyShortSentenceUpdate,
@@ -11,15 +7,11 @@ import {
 } from '@/api/generated/admin'
 
 /**
- * Misc 域 API 封装（健康检查 + demo 脚手架示例 + 每日一言）
- * demo/daily_short_sentence 的去留结论见 07-cleanup-and-tooling.md，Week 2 清理时按结论调整本文件。
+ * Misc 域 API 封装（健康检查 + 每日一言）
+ * demo 相关接口去留结论见 07-cleanup-and-tooling.md：DemoList.vue 是开发流程示例脚手架，Week 2 已删除，本文件同步移除对应导出。
  */
 export const miscApi = {
   ping,
-  demoList,
-  demoCreate,
-  demoUpdate,
-  demoDelete,
   dailyShortSentenceList,
   dailyShortSentenceCreate,
   dailyShortSentenceUpdate,

@@ -20,6 +20,7 @@ admin-server/*.exe
 **/node_modules
 **/*.exe
 /admin-*/dist/
+/admin-frontend/tsconfig.tsbuildinfo
 /package/*
 /admin-server/api/*.api.temp
 /admin-server/uploads/**

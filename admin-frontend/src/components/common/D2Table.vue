@@ -410,7 +410,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" generic="T">
 import {computed, ref} from 'vue'
 import {ElMessage} from 'element-plus'
 import {Picture} from '@element-plus/icons-vue'
@@ -425,11 +425,15 @@ const {t} = useI18n()
 const {hasPermission} = usePermission()
 
 // Props
-interface Props {
+// data 对外按调用方传入的具体行类型 T 强类型（配合 onclick-delete/onclick-update-row 事件），
+// 组件内部（动态 column.prop 取值、抽屉表单）仍按 Record<string, unknown> 处理，边界处做一次 cast
+// 泛型组件下 Props 类型内联在 defineProps 里，而不是声明单独的 interface：
+// 独立声明的 interface（无论加不加 export）在 vue-tsc 处理泛型 SFC 的类型生成时都会报错，内联写法可以绕开
+const props = withDefaults(defineProps<{
   /** 表格列配置 */
   columns: TableColumn[];
   /** 表格数据 */
-  data: Record<string, unknown>[]
+  data: T[]
   /** 总条数 */
   total: number;
   /** 每页显示条数 */
@@ -470,9 +474,7 @@ interface Props {
   detailPermission?: string;
   /** 自定义按钮权限编码（可选） */
   customPermission?: string;
-}
-
-const props = withDefaults(defineProps<Props>(), {
+}>(), {
   pageSize: 10,
   currentPage: 1,
   baseUrl: '',
@@ -496,17 +498,18 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   'size-change': [size: number]
   'current-change': [page: number]
-  'onclick-delete': [index: number, row: Record<string, unknown>]
-  'onclick-updateRow': [row: Record<string, unknown>]
+  'onclick-delete': [index: number, row: T]
+  'onclick-updateRow': [row: T]
   'onclick-addRow': [row: Record<string, unknown>]
-  'onclick-btnCustom': [index: number, row: Record<string, unknown>]
+  'onclick-btnCustom': [index: number, row: T]
 }>()
 
 // 内部状态
 const drawerVisible = ref(false)
 const drawerVisibleAdd = ref(false)
-const drawerRow = ref<Record<string, unknown>>({})
-const drawerAddRow = ref<Record<string, unknown>>({})
+// 动态表单数据：column.prop 是运行时字符串、v-model 需要双向可写，用 any 是刻意的（而非疏漏）
+const drawerRow = ref<Record<string, any>>({})
+const drawerAddRow = ref<Record<string, any>>({})
 const isEdit = ref(false)
 
 // 分页模型（支持 v-model）
@@ -527,7 +530,8 @@ const pageSizeModel = computed({
 })
 
 // 计算属性
-const displayedData = computed(() => props.data)
+// 内部模板通过动态 column.prop 字符串取值，转回 Record<string, unknown> 便于任意 key 访问
+const displayedData = computed(() => props.data as Record<string, unknown>[])
 
 // 权限相关计算属性（未传权限编码时默认允许）
 const canCreate = computed(
@@ -570,11 +574,11 @@ const handleEdit = (index: number, row: Record<string, unknown>, edit: boolean) 
 }
 
 const handleDelete = (index: number, row: Record<string, unknown>) => {
-  emit('onclick-delete', index, row)
+  emit('onclick-delete', index, row as T)
 }
 
 const updateItem = () => {
-  emit('onclick-updateRow', drawerRow.value)
+  emit('onclick-updateRow', drawerRow.value as T)
   cancelEdit()
 }
 
@@ -610,7 +614,7 @@ const handleCopyUrl = async (url: string) => {
 }
 
 const handleBtnCustom = (index: number, row: Record<string, unknown>) => {
-  emit('onclick-btnCustom', index, row)
+  emit('onclick-btnCustom', index, row as T)
 }
 </script>
 

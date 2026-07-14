@@ -104,12 +104,11 @@ module.exports = {
     }], // 最多 2 个空行
     'eol-last': ['warn', 'always'] // 文件末尾换行
   },
+  // 没有装 Prettier，indent 规则统一由上面的 ESLint 规则管，.vue 文件不例外；
+  // 这个 override 本身仍然是必须的——`eslint .` 靠 overrides[].files 的 glob 才会把 *.vue 纳入检查范围
   overrides: [
     {
-      files: ['*.vue'],
-      rules: {
-        'indent': 'off' // Vue 文件使用 prettier 格式化
-      }
+      files: ['*.vue']
     }
   ],
   ignorePatterns: [

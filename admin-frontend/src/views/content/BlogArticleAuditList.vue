@@ -36,8 +36,9 @@
         :total="total"
         :page-size="query.pageSize"
         :current-page="query.page"
+        :drawer-columns="[]"
         :have-edit="false"
-        :have-detail="true"
+        :have-detail="false"
         @size-change="handleSizeChange"
         @current-change="handlePageChange"
       >

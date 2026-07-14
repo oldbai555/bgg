@@ -202,7 +202,7 @@ const parentOptions = computed(() => {
   const filterTree = (items: MenuItem[], excludeId?: number): MenuItem[] => {
     return items
       .filter(item => item.id !== excludeId) // 排除自己
-      .map(item => {
+      .map((item): MenuItem | null => {
         let include = false
 
         if (form.type === 1) {

@@ -68,5 +68,9 @@ export interface DrawerColumn extends TableColumn {
   required?: boolean;
   /** 是否禁用（只读） */
   disabled?: boolean;
+  /** 占位提示（Datetime 等类型使用） */
+  placeholder?: string;
+  /** 默认值（新增抽屉使用） */
+  default?: unknown;
 }
 

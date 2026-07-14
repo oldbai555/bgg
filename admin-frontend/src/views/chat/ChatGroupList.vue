@@ -257,9 +257,10 @@ const loadUsers = async () => {
       .map(user => ({
         id: user.id,
         username: user.username,
-        nickname: user.nickname,
-        departmentName: user.departmentName || '',
-        roleNames: user.roleNames || []
+        nickname: user.nickname || '',
+        // UserItem 不带部门/角色名称字段（需要额外接口 join），此处暂时留空，与此前的运行时行为一致
+        departmentName: '',
+        roleNames: [] as string[]
       }))
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : '加载用户列表失败'
@@ -320,9 +321,9 @@ const handleUpdate = async (row: ChatGroupItem) => {
 const handleAdd = async (row: Record<string, unknown>) => {
   try {
     await chatApi.chatGroupCreate({
-      name: row.name,
-      avatar: row.avatar || '',
-      description: row.description || '',
+      name: String(row.name || ''),
+      avatar: String(row.avatar || ''),
+      description: String(row.description || ''),
       userIds: [] // 初始成员为空，创建后可以添加
     } as ChatGroupCreateReq)
     ElMessage.success('创建成功')

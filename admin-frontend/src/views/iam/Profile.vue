@@ -214,7 +214,7 @@ return
       passwordForm.oldPassword = ''
       passwordForm.newPassword = ''
       passwordForm.confirmPassword = ''
-      passwordFormRef.value.resetFields()
+      passwordFormRef.value?.resetFields()
       // 延迟退出登录，让用户看到成功提示
       setTimeout(() => {
         userStore.logout()

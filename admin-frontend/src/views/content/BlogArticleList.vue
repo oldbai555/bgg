@@ -333,8 +333,8 @@ const canUnpublish = (row: BlogArticleItem) => {
 
 // 获取 isTop 值（兼容不同数据类型）
 const getIsTopValue = (row: BlogArticleItem): number => {
-  const article = row as BlogArticleItem & {isTop?: number | string}
-  const isTop = article.isTop
+  // 后端类型是 number，但历史上出现过序列化成字符串的情况，这里用 unknown 保留防御性双重比较
+  const isTop = row.isTop as unknown
   if (isTop === 1 || isTop === '1' || String(isTop) === '1') {
     return 1
   }

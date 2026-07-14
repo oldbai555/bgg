@@ -6,11 +6,8 @@
         <el-form-item label="发送用户">
           <el-input v-model="query.fromUserName" placeholder="请输入发送用户名" clearable />
         </el-form-item>
-        <el-form-item label="接收用户">
-          <el-input v-model="query.toUserName" placeholder="请输入接收用户名" clearable />
-        </el-form-item>
-        <el-form-item label="聊天室ID">
-          <el-input v-model="query.roomId" placeholder="请输入聊天室ID" clearable />
+        <el-form-item label="聊天ID">
+          <el-input-number v-model="query.chatId" :min="0" placeholder="请输入聊天ID" clearable />
         </el-form-item>
         <el-form-item label="消息类型">
           <el-select
@@ -53,8 +50,8 @@
       >
         <!-- 自定义消息类型列 -->
         <template #cell="{row, column}">
-          <el-tag v-if="column.prop === 'messageType'" :type="getMessageTypeTagType(row.messageType)">
-            {{ getMessageTypeLabel(row.messageType) }}
+          <el-tag v-if="column.prop === 'messageType'" :type="getMessageTypeTagType(row.messageType as number)">
+            {{ getMessageTypeLabel(row.messageType as number) }}
           </el-tag>
           <!-- 消息内容：如果是图片，显示图片预览 -->
           <div v-else-if="column.prop === 'content' && row.messageType === 2" class="message-content-image">
@@ -107,13 +104,11 @@ import {buildFileUrlFromResponse} from '@/utils/file'
 import {formatUnixTime} from '@/utils/date'
 import {useDictOptions} from '@/composables/useDictOptions'
 
-const query = reactive<ChatMessageListReq & {fromUserName?: string; toUserName?: string; messageType?: number}>({
+const query = reactive<ChatMessageListReq & {fromUserName?: string; messageType?: number}>({
   page: 1,
   pageSize: 10,
-  roomId: '',
-  userId: 0,
+  chatId: undefined,
   fromUserName: '',
-  toUserName: '',
   messageType: undefined
 })
 const list = ref<ChatMessageItem[]>([])
@@ -134,8 +129,7 @@ const {options: messageTypeOptions, getLabel: getMessageTypeLabelFromDict} = use
 const columns = computed<TableColumn[]>(() => [
   {prop: 'id', label: 'ID', width: 80},
   {prop: 'fromUserName', label: '发送用户', width: 120},
-  {prop: 'toUserName', label: '接收用户', width: 120},
-  {prop: 'roomId', label: '聊天室ID', width: 150},
+  {prop: 'chatId', label: '聊天ID', width: 100},
   {prop: 'content', label: '消息内容', minWidth: 200},
   {prop: 'messageType', label: '消息类型', width: 100},
   {prop: 'createdAt', label: '发送时间', width: 180}
@@ -145,8 +139,7 @@ const columns = computed<TableColumn[]>(() => [
 const drawerColumns = computed<DrawerColumn[]>(() => [
   {prop: 'id', label: 'ID', type: D2TableElemType.Tag},
   {prop: 'fromUserName', label: '发送用户', type: D2TableElemType.Tag},
-  {prop: 'toUserName', label: '接收用户', type: D2TableElemType.Tag},
-  {prop: 'roomId', label: '聊天室ID', type: D2TableElemType.Tag},
+  {prop: 'chatId', label: '聊天ID', type: D2TableElemType.Tag},
   {prop: 'content', label: '消息内容'},
   {prop: 'messageType', label: '消息类型'},
   {prop: 'createdAt', label: '发送时间', type: D2TableElemType.ConvertTime}
@@ -170,26 +163,20 @@ const getMessageTypeTagType = (type: number): 'success' | 'warning' | 'info' => 
 const loadData = async () => {
   loading.value = true
   try {
-    // 构建查询参数（后端只支持 roomId 和 userId，前端需要先查询用户ID）
+    // 后端只支持按 chatId 筛选，发送用户名/消息类型在前端过滤
     const req: ChatMessageListReq = {
       page: query.page,
       pageSize: query.pageSize,
-      roomId: query.roomId || '',
-      userId: query.userId || 0
+      chatId: query.chatId || undefined
     }
 
     const resp = await chatApi.chatMessageListAdmin(req)
     let filteredList = resp.list || []
 
-    // 前端过滤：根据发送用户名和接收用户名过滤
+    // 前端过滤：根据发送用户名过滤
     if (query.fromUserName) {
       filteredList = filteredList.filter(item =>
         item.fromUserName?.toLowerCase().includes(query.fromUserName!.toLowerCase())
-      )
-    }
-    if (query.toUserName) {
-      filteredList = filteredList.filter(item =>
-        item.toUserName?.toLowerCase().includes(query.toUserName!.toLowerCase())
       )
     }
     if (query.messageType !== undefined && query.messageType !== null) {
@@ -207,7 +194,9 @@ const loadData = async () => {
     })
 
     list.value = filteredList
-    total.value = filteredList.length // 注意：这里使用的是过滤后的数量，实际应该从后端获取总数
+    // 用后端返回的 total（按 chatId 服务端筛选后的总数），而不是前端二次过滤后的页内数量，
+    // 否则分页会算错；发送用户名/消息类型是纯前端展示层过滤，不影响分页语义
+    total.value = resp.total
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : '查询失败'
     ElMessage.error(message)
@@ -219,10 +208,8 @@ const loadData = async () => {
 const handleReset = () => {
   query.page = 1
   query.pageSize = 10
-  query.roomId = ''
-  query.userId = 0
+  query.chatId = undefined
   query.fromUserName = ''
-  query.toUserName = ''
   query.messageType = undefined
   loadData()
 }

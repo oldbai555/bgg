@@ -133,7 +133,9 @@ const mdPreviewLoaded = ref(false)
 // 在客户端加载 md-editor-v3
 if (typeof window !== 'undefined') {
   import('md-editor-v3').then((module) => {
-    MdPreview.value = module.MdPreview || module.default?.MdPreview || module.default
+    // md-editor-v3 的类型声明只有具名导出，但不同打包场景下运行时可能落在 default 上，这里做防御性兜底
+    const mod = module as unknown as {MdPreview?: unknown; default?: {MdPreview?: unknown} | unknown}
+    MdPreview.value = mod.MdPreview || (mod.default as {MdPreview?: unknown} | undefined)?.MdPreview || mod.default
     mdPreviewLoaded.value = true
   }).catch((err) => {
     console.error('加载 md-editor-v3 失败:', err)
@@ -201,25 +203,25 @@ const handleContentRendered = (html: string) => {
       const toolbarWrapper = document.querySelector('.md-editor-toolbar-wrapper')
       const toolbar = document.querySelector('.md-editor-toolbar')
       if (toolbarWrapper) {
-        ;(toolbarWrapper as HTMLElement).style.display = 'none'
+        (toolbarWrapper as HTMLElement).style.display = 'none'
       }
       if (toolbar) {
-        ;(toolbar as HTMLElement).style.display = 'none'
+        (toolbar as HTMLElement).style.display = 'none'
       }
 
       const inputWrapper = document.querySelector('.md-editor-input-wrapper')
       if (inputWrapper) {
-        ;(inputWrapper as HTMLElement).style.display = 'none'
+        (inputWrapper as HTMLElement).style.display = 'none'
       }
 
       const footer = document.querySelector('.md-editor-footer')
       if (footer) {
-        ;(footer as HTMLElement).style.display = 'none'
+        (footer as HTMLElement).style.display = 'none'
       }
 
       const catalog = document.querySelector('.md-editor-catalog')
       if (catalog) {
-        ;(catalog as HTMLElement).style.display = 'none'
+        (catalog as HTMLElement).style.display = 'none'
       }
     })
   }

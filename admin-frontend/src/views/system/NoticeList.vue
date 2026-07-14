@@ -169,13 +169,13 @@ const drawerColumns = computed<DrawerColumn[]>(() => [
     prop: 'type',
     label: '公告类型',
     type: D2TableElemType.Select,
-    options: computed(() => noticeTypeOptions.value.map(opt => ({label: opt.label, value: Number(opt.value)})))
+    options: noticeTypeOptions.value.map(opt => ({label: opt.label, value: Number(opt.value)}))
   },
   {
     prop: 'status',
     label: '状态',
     type: D2TableElemType.Select,
-    options: computed(() => noticeStatusOptions.value.map(opt => ({label: opt.label, value: Number(opt.value)})))
+    options: noticeStatusOptions.value.map(opt => ({label: opt.label, value: Number(opt.value)}))
   },
   {prop: 'publishTime', label: '发布时间', type: D2TableElemType.Datetime},
   {prop: 'createdAt', label: t('common.createdAt'), type: D2TableElemType.ConvertTime}
@@ -189,13 +189,13 @@ const drawerAddColumns = computed<DrawerColumn[]>(() => [
     prop: 'type',
     label: '公告类型',
     type: D2TableElemType.Select,
-    options: computed(() => noticeTypeOptions.value.map(opt => ({label: opt.label, value: Number(opt.value)})))
+    options: noticeTypeOptions.value.map(opt => ({label: opt.label, value: Number(opt.value)}))
   },
   {
     prop: 'status',
     label: '状态',
     type: D2TableElemType.Select,
-    options: computed(() => noticeStatusOptions.value.map(opt => ({label: opt.label, value: Number(opt.value)})))
+    options: noticeStatusOptions.value.map(opt => ({label: opt.label, value: Number(opt.value)}))
   },
   {prop: 'publishTime', label: '发布时间（留空则立即发布）', type: D2TableElemType.Datetime}
 ])

@@ -1,4 +1,5 @@
-import {defineConfig} from 'vite';
+import {defineConfig} from 'vitest/config';
+import type {ViteDevServer} from 'vite';
 import vue from '@vitejs/plugin-vue';
 import {fileURLToPath, URL} from 'node:url';
 
@@ -18,7 +19,7 @@ export default defineConfig(({mode}) => {
         ? [
             {
               name: 'redirect-admin',
-              configureServer(server) {
+              configureServer(server: ViteDevServer) {
                 server.middlewares.use((req, res, next) => {
                   // 如果访问 /admin（不带尾部斜杠），重定向到 /admin/
                   if (req.url === '/admin' && !req.url.endsWith('/')) {
@@ -48,6 +49,13 @@ export default defineConfig(({mode}) => {
           changeOrigin: true
         }
       }
+    },
+    test: {
+      // happy-dom 15.x 在本机 Node 26 环境下 window.localStorage 取不到值（已验证是 happy-dom 自身问题，
+      // 不是本项目代码问题），按 03 号文档"除非遇到兼容性问题否则优先用 happy-dom"的例外条款切到 jsdom
+      environment: 'jsdom',
+      globals: true,
+      setupFiles: ['./src/test-setup.ts']
     }
   };
 });

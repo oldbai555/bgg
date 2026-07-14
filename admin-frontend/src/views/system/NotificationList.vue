@@ -195,7 +195,7 @@ const loadData = async () => {
       req.sourceType = query.sourceType
     }
     // readStatus：0 不传表示不筛选，其余（1=未读，2=已读）直接透传给后端（由后端映射到 DB 值）
-    if (query.readStatus > 0) {
+    if ((query.readStatus ?? 0) > 0) {
       req.readStatus = query.readStatus
     }
     const resp = await systemApi.notificationList(req)

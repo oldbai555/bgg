@@ -91,7 +91,7 @@
 import {reactive, ref, onMounted, computed} from 'vue'
 import {ElMessage, ElMessageBox} from 'element-plus'
 import {Picture} from '@element-plus/icons-vue'
-import {dailyShortSentenceList, dailyShortSentenceCreate, dailyShortSentenceUpdate, dailyShortSentenceDelete} from '@/api/generated/admin'
+import {miscApi} from '@/api/misc'
 import type {DailyShortSentenceItem, DailyShortSentenceCreateReq, DailyShortSentenceUpdateReq} from '@/api/generated/admin'
 import {useI18n} from 'vue-i18n'
 import D2Table from '@/components/common/D2Table.vue'
@@ -167,7 +167,7 @@ const drawerAddColumns = computed<DrawerColumn[]>(() => [
 const loadData = async () => {
   loading.value = true
   try {
-    const resp = await dailyShortSentenceList({
+    const resp = await miscApi.dailyShortSentenceList({
       page: query.page,
       pageSize: query.pageSize,
       keyword: query.keyword || undefined,
@@ -208,7 +208,7 @@ const handleSizeChange = (size: number) => {
 
 const handleUpdate = async (row: DailyShortSentenceItem) => {
   try {
-    await dailyShortSentenceUpdate({
+    await miscApi.dailyShortSentenceUpdate({
       id: row.id,
       type: row.type,
       content: row.content,
@@ -226,7 +226,7 @@ const handleUpdate = async (row: DailyShortSentenceItem) => {
 
 const handleAdd = async (row: Record<string, unknown>) => {
   try {
-    await dailyShortSentenceCreate({
+    await miscApi.dailyShortSentenceCreate({
       type: (row.type as number) || 1,
       content: row.content as string,
       literatureAuthor: row.literatureAuthor as string,
@@ -244,7 +244,7 @@ const handleAdd = async (row: Record<string, unknown>) => {
 const handleDelete = (index: number, row: DailyShortSentenceItem) => {
   ElMessageBox.confirm(t('common.confirmDelete'), t('common.confirm'), {type: 'warning'})
     .then(async () => {
-      await dailyShortSentenceDelete({id: row.id})
+      await miscApi.dailyShortSentenceDelete({id: row.id})
       ElMessage.success(t('common.delete'))
       loadData()
     })

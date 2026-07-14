@@ -12,15 +12,6 @@
         <el-form-item>
           <el-button type="primary" :loading="loading" @click="loadData">{{ t('common.search') }}</el-button>
           <el-button @click="handleReset">{{ t('common.reset') }}</el-button>
-          <el-button
-            v-permission="'config:update'"
-            type="warning"
-            :loading="refreshLoading"
-            icon="Refresh"
-            @click="handleRefreshCache"
-          >
-            刷新缓存
-          </el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -77,7 +68,6 @@ const query = reactive({
 const list = ref<ConfigItem[]>([])
 const total = ref(0)
 const loading = ref(false)
-const refreshLoading = ref(false)
 
 // 获取配置类型的标签类型
 const getConfigTypeTag = (type: string): string => {
@@ -175,7 +165,7 @@ const handleUpdate = async (row: ConfigItem) => {
 
 const handleAdd = async (row: Record<string, unknown>) => {
   try {
-    await systemApi.configCreate(row as ConfigCreateReq)
+    await systemApi.configCreate(row as unknown as ConfigCreateReq)
     ElMessage.success('新增成功')
     loadData()
   } catch (err: unknown) {
@@ -192,19 +182,6 @@ const handleDelete = (index: number, row: ConfigItem) => {
       loadData()
     })
     .catch(() => {})
-}
-
-// 刷新缓存
-const handleRefreshCache = async () => {
-  try {
-    refreshLoading.value = true
-    ElMessage.success('缓存刷新成功')
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : '缓存刷新失败'
-    ElMessage.error(message)
-  } finally {
-    refreshLoading.value = false
-  }
 }
 
 onMounted(loadData)

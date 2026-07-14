@@ -14,8 +14,12 @@
             style="width: 140px"
           >
             <el-option label="全部" :value="0" />
-            <el-option label="启用" :value="1" />
-            <el-option label="禁用" :value="2" />
+            <el-option
+              v-for="item in statusOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="Number(item.value)"
+            />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -48,7 +52,7 @@
       >
         <template #cell="{ row, column }">
           <el-tag v-if="column.prop === 'status'" :type="row.status === 1 ? 'success' : 'info'" size="small">
-            {{ row.status === 1 ? '启用' : '禁用' }}
+            {{ getStatusLabel(row.status as number) }}
           </el-tag>
         </template>
       </D2Table>
@@ -68,6 +72,14 @@ import type {
 } from '@/api/generated/admin'
 import D2Table from '@/components/common/D2Table.vue'
 import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table'
+import {useDictOptions} from '@/composables/useDictOptions'
+
+// 字典 blog_tag_status 建表注释里已声明但尚未建（见 db/services/content/blog/create_table_blog.sql 的列注释），
+// 这里先用 useDictOptions 的 fallback 保证功能不受影响，字典项补齐后自动切换为字典数据，无需再改代码
+const {options: statusOptions, getLabel: getStatusLabel} = useDictOptions('blog_tag_status', [
+  {label: '启用', value: 1},
+  {label: '禁用', value: 2}
+])
 
 const query = reactive<BlogTagListReq>({
   page: 1,
@@ -94,11 +106,8 @@ const drawerColumns = computed<DrawerColumn[]>(() => [
   {
     prop: 'status',
     label: '状态',
-    type: D2TableElemType.EditSelect,
-    options: [
-      {label: '启用', value: 1},
-      {label: '禁用', value: 2}
-    ],
+    type: D2TableElemType.Select,
+    options: statusOptions.value,
     default: 1
   },
   {prop: 'remark', label: '备注', type: D2TableElemType.EditTextarea}

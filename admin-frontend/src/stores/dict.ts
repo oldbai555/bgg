@@ -32,13 +32,17 @@ export const REQUIRED_DICT_CODES = [
   'storage_base_url', // 存储baseURL（配置）
   'websocket_base_url', // WebSocket baseURL（配置）
   'sdk_http_method', // SDK 接口管理-HTTP方法
+  'sdk_status', // SDK Key/接口状态
   'task_type', // 任务类型
   'task_execution_type', // 任务执行类型
   'task_status', // 任务状态
   'task_config', // 任务配置（如最近任务数量）
   // 博客相关字典
   'blog_article_status', // 博客文章业务状态
-  'blog_article_audit_status' // 博客文章审核状态
+  'blog_article_audit_status', // 博客文章审核状态
+  'blog_tag_status', // 博客标签状态
+  'blog_friend_link_status', // 友情链接状态
+  'blog_social_info_status' // 社交信息状态
 ] as const;
 
 export const useDictStore = defineStore('dict', {

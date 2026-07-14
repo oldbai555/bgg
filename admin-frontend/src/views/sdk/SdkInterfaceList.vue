@@ -15,8 +15,12 @@
             :placeholder="t('common.all')"
             style="min-width: 160px"
           >
-            <el-option :label="t('status.enabled')" :value="1" />
-            <el-option :label="t('status.disabled')" :value="2" />
+            <el-option
+              v-for="item in statusOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="Number(item.value)"
+            />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -48,7 +52,7 @@
       >
         <template #cell="{row, column}">
           <el-tag v-if="column.prop === 'status'" :type="row.status === 1 ? 'success' : 'info'">
-            {{ row.status === 1 ? t('status.enabled') : row.status === 2 ? t('status.disabled') : '-' }}
+            {{ getStatusLabel(row.status as number) }}
           </el-tag>
         </template>
       </D2Table>
@@ -84,6 +88,10 @@ const list = ref<SdkInterfaceItem[]>([])
 const total = ref(0)
 const loading = ref(false)
 const {options: httpMethodOptions} = useDictOptions('sdk_http_method')
+const {options: statusOptions, getLabel: getStatusLabel} = useDictOptions('sdk_status', [
+  {label: t('status.enabled'), value: 1},
+  {label: t('status.disabled'), value: 2}
+])
 
 const columns = computed<TableColumn[]>(() => [
   {prop: 'id', label: 'ID', width: 80},
@@ -118,10 +126,7 @@ const drawerColumns = computed<DrawerColumn[]>(() => [
     prop: 'status',
     label: t('common.status'),
     type: D2TableElemType.Select,
-    options: [
-      {label: t('status.enabled'), value: 1},
-      {label: t('status.disabled'), value: 2}
-    ]
+    options: statusOptions.value
   },
   {
     prop: 'remark',
@@ -150,10 +155,7 @@ const drawerAddColumns = computed<DrawerColumn[]>(() => [
     prop: 'status',
     label: t('common.status'),
     type: D2TableElemType.Select,
-    options: [
-      {label: t('status.enabled'), value: 1},
-      {label: t('status.disabled'), value: 2}
-    ]
+    options: statusOptions.value
   },
   {
     prop: 'remark',
@@ -232,12 +234,14 @@ const handleAdd = async (row: Record<string, unknown>) => {
   try {
     const payload: SdkInterfaceCreateReq = {
       name: String(row.name || ''),
+      // apiCode 由后端根据 path/method 自动生成并覆盖（见 sdkinterfacecreatelogic.go），
+      // 但 admin.api 的 SdkInterfaceCreateReq 未加 optional 标签，这里传空串占位，不代表前端需要生成它
+      apiCode: '',
       path: String(row.path || ''),
       method: String(row.method || ''),
       rateLimitDefault: row.rateLimitDefault ? Number(row.rateLimitDefault) : 0,
       status: row.status ? Number(row.status) : 1, // 默认启用
       remark: String(row.remark || '')
-      // apiCode 由后端自动生成，不传
     }
     await sdkApi.sdkInterfaceCreate(payload)
     ElMessage.success(t('common.createSuccess'))

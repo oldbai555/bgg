@@ -225,7 +225,7 @@ const handleUpdate = async (row: PermissionItem) => {
 
 const handleAdd = async (row: Record<string, unknown>) => {
   try {
-    await iamApi.permissionCreate(row as PermissionCreateReq)
+    await iamApi.permissionCreate(row as unknown as PermissionCreateReq)
     ElMessage.success('新增成功')
     loadData()
   } catch (err: unknown) {

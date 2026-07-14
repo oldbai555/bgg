@@ -1,4 +1,7 @@
 // 使用项目的 request (axios) 替代原生 fetch
+// 注意：这个文件在 src/api/generated/ 下，会被 generate-ts.sh（goctl api ts）整体覆盖生成，
+// 上面这行 axios 替换和下面的 webapi.options 方法都是历史遗留的手工补丁，重新生成后需要手动重新应用，
+// 否则会打回 goctl 默认的 fetch 实现、并再次缺失 options 方法（导致 admin.api 里 xxxOptions() 探测接口报错）
 import request from '@/utils/request';
 
 /**
@@ -63,6 +66,10 @@ export const webapi = {
     patch<T>(url: string, req?: unknown, config?: unknown): Promise<T> {
         const cleanUrl = url.replace(/^\/api/, '');
         return request.patch<T>(cleanUrl, req) as Promise<T>;
+    },
+    options<T>(url: string, req?: unknown, config?: unknown): Promise<T> {
+        const cleanUrl = url.replace(/^\/api/, '');
+        return request.options<T>(cleanUrl, req ? {params: req} : {}) as Promise<T>;
     }
 };
 

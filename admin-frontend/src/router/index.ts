@@ -1,9 +1,13 @@
 import {createRouter, createWebHistory, RouteRecordRaw} from 'vue-router';
+import {ElMessage} from 'element-plus';
 import {useUserStore} from '@/stores/user';
 import {usePermission} from '@/composables/usePermission';
 import type {MenuItem} from '@/api/generated/admin';
 
 const viewModules = import.meta.glob('../views/**/*.vue');
+const knownViewKeys = new Set(
+  Object.keys(viewModules).map((key) => key.replace(/^\.\.\/views\//, '').replace(/\.vue$/, ''))
+);
 
 const routes: RouteRecordRaw[] = [
   {
@@ -151,7 +155,7 @@ function resolveComponent(component?: string, path?: string) {
   return undefined;
 }
 
-function generateUniqueRouteName(rawPath: string, usedNames: Set<string>): string {
+export function generateUniqueRouteName(rawPath: string, usedNames: Set<string>): string {
   const base = rawPath.replace(/^\//, '').replace(/\//g, '_') || 'root';
   let uniqueName = base;
   let counter = 1;
@@ -214,6 +218,37 @@ function buildRoutesFromMenus(menus: MenuItem[]): RouteRecordRaw[] {
   return res;
 }
 
+let menusValidated = false;
+
+// dev 环境启动期校验：把菜单 component 与 views/ 目录的失配从"点击后静默 404"提前到"登录后立即可见"
+function validateMenuComponents(menus: MenuItem[]) {
+  if (!import.meta.env.DEV || menusValidated) {
+    return;
+  }
+  menusValidated = true;
+
+  const mismatched: string[] = [];
+  const walk = (items: MenuItem[]) => {
+    items.forEach((m) => {
+      if (m.type === 2 && m.component) {
+        const clean = m.component.replace(/^\//, '');
+        if (!knownViewKeys.has(clean)) {
+          mismatched.push(`「${m.name}」component="${m.component}"`);
+        }
+      }
+      if (m.children?.length) {
+        walk(m.children);
+      }
+    });
+  };
+  walk(menus);
+
+  if (mismatched.length > 0) {
+    console.warn(`[Router] 以下菜单的 component 在 src/views 下找不到对应文件，页面将无法访问：\n${mismatched.join('\n')}`);
+    ElMessage.warning(`发现 ${mismatched.length} 个菜单的 component 路径失配，详见控制台`);
+  }
+}
+
 router.beforeEach(async (to, _from, next) => {
   try {
     const userStore = useUserStore();
@@ -238,6 +273,7 @@ router.beforeEach(async (to, _from, next) => {
         }
         try {
           await userStore.fetchMenus();
+          validateMenuComponents(userStore.menus);
         } catch (err) {
           console.error('[Router] 获取菜单失败:', err);
         }

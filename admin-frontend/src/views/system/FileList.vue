@@ -149,6 +149,8 @@ const drawerColumns = computed<DrawerColumn[]>(() => [
   {
     prop: 'status',
     label: t('common.status'),
+    // admin_file.status 是原始 DB 布尔列（1 正常/0 禁用），不是字典驱动的业务枚举，
+    // 这里的 0 不是"字典 value 从 1 开始"规则里的占位值，写死匹配真实 DB 取值是正确的
     type: D2TableElemType.Select,
     options: [
       {label: t('status.enabled'), value: 1},
@@ -163,6 +165,8 @@ const drawerAddColumns = computed<DrawerColumn[]>(() => [
   {
     prop: 'status',
     label: t('common.status'),
+    // admin_file.status 是原始 DB 布尔列（1 正常/0 禁用），不是字典驱动的业务枚举，
+    // 这里的 0 不是"字典 value 从 1 开始"规则里的占位值，写死匹配真实 DB 取值是正确的
     type: D2TableElemType.Select,
     options: [
       {label: t('status.enabled'), value: 1},
@@ -216,7 +220,7 @@ const handleUpdate = async (row: FileItem) => {
 
 const handleAdd = async (row: Record<string, unknown>) => {
   try {
-    await systemApi.fileCreate(row as FileCreateReq)
+    await systemApi.fileCreate(row as unknown as FileCreateReq)
     ElMessage.success('新增成功')
     loadData()
   } catch (err: unknown) {

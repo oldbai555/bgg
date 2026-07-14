@@ -53,7 +53,7 @@
         <!-- 自定义状态列 -->
         <template #cell="{row, column}">
           <el-tag v-if="column.prop === 'status'" :type="row.status === 1 ? 'success' : 'info'">
-            {{ row.status === 1 ? '启用' : '禁用' }}
+            {{ getStatusLabel(row.status as number) }}
           </el-tag>
           <el-link
             v-else-if="column.prop === 'url'"
@@ -84,7 +84,7 @@ import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/tabl
 import {useDictOptions} from '@/composables/useDictOptions'
 
 // 状态选项（从字典获取）
-const {options: statusOptions} = useDictOptions('blog_social_info_status', [
+const {options: statusOptions, getLabel: getStatusLabel} = useDictOptions('blog_social_info_status', [
   {label: '启用', value: 1},
   {label: '禁用', value: 2}
 ])
@@ -119,7 +119,7 @@ const drawerColumns = computed<DrawerColumn[]>(() => [
   {
     prop: 'orderNum',
     label: '排序值',
-    type: D2TableElemType.EditInputNumber,
+    type: D2TableElemType.Number,
     required: false
   },
   {
@@ -139,7 +139,7 @@ const drawerAddColumns = computed<DrawerColumn[]>(() => [
   {
     prop: 'orderNum',
     label: '排序值',
-    type: D2TableElemType.EditInputNumber,
+    type: D2TableElemType.Number,
     required: false
   },
   {
@@ -197,7 +197,7 @@ const handleUpdate = async (row: BlogSocialInfoItem) => {
 
 const handleAdd = async (row: Record<string, unknown>) => {
   try {
-    await contentApi.socialInfoCreate(row as BlogSocialInfoCreateReq)
+    await contentApi.socialInfoCreate(row as unknown as BlogSocialInfoCreateReq)
     ElMessage.success('新增成功')
     loadData()
   } catch (err: unknown) {

@@ -176,7 +176,7 @@ const drawerColumns = computed<DrawerColumn[]>(() => [
   {prop: 'id', label: 'ID', type: D2TableElemType.Tag},
   {prop: 'name', label: '视频名称', type: D2TableElemType.EditInput, required: true},
   {prop: 'cover', label: '封面URL', type: D2TableElemType.EditInput},
-  {prop: 'sourceType', label: '来源类型', type: D2TableElemType.EditSelect, options: sourceTypeOptions},
+  {prop: 'sourceType', label: '来源类型', type: D2TableElemType.Select, options: sourceTypeOptions.value},
   {prop: 'duration', label: '时长（秒）', type: D2TableElemType.EditInput},
   {prop: 'playUrl', label: '播放链接', type: D2TableElemType.EditInput, required: true},
   {prop: 'description', label: '描述', type: D2TableElemType.EditTextarea}
@@ -186,7 +186,7 @@ const drawerColumns = computed<DrawerColumn[]>(() => [
 const drawerAddColumns = computed<DrawerColumn[]>(() => [
   {prop: 'name', label: '视频名称', type: D2TableElemType.EditInput, required: true},
   {prop: 'cover', label: '封面URL', type: D2TableElemType.EditInput},
-  {prop: 'sourceType', label: '来源类型', type: D2TableElemType.EditSelect, options: sourceTypeOptions, default: 1},
+  {prop: 'sourceType', label: '来源类型', type: D2TableElemType.Select, options: sourceTypeOptions.value, default: 1},
   {prop: 'duration', label: '时长（秒）', type: D2TableElemType.EditInput},
   {prop: 'playUrl', label: '播放链接', type: D2TableElemType.EditInput, required: true},
   {prop: 'description', label: '描述', type: D2TableElemType.EditTextarea}

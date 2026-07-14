@@ -87,6 +87,8 @@ const drawerColumns = computed<DrawerColumn[]>(() => [
   {
     prop: 'status',
     label: t('common.status'),
+    // admin_dict_type.status 是原始 DB 布尔列（1 启用/0 禁用），不是另一层字典驱动的业务枚举，
+    // 这里的 0 不是"字典 value 从 1 开始"规则里的占位值，写死匹配真实 DB 取值是正确的
     type: D2TableElemType.Select,
     options: [
       {label: t('status.enabled'), value: 1},
@@ -103,6 +105,8 @@ const drawerAddColumns = computed<DrawerColumn[]>(() => [
   {
     prop: 'status',
     label: t('common.status'),
+    // admin_dict_type.status 是原始 DB 布尔列（1 启用/0 禁用），不是另一层字典驱动的业务枚举，
+    // 这里的 0 不是"字典 value 从 1 开始"规则里的占位值，写死匹配真实 DB 取值是正确的
     type: D2TableElemType.Select,
     options: [
       {label: t('status.enabled'), value: 1},
@@ -157,7 +161,7 @@ const handleUpdate = async (row: DictTypeItem) => {
 
 const handleAdd = async (row: Record<string, unknown>) => {
   try {
-    await systemApi.dictTypeCreate(row as DictTypeCreateReq)
+    await systemApi.dictTypeCreate(row as unknown as DictTypeCreateReq)
     ElMessage.success('新增成功')
     loadData()
   } catch (err: unknown) {
@@ -187,17 +191,6 @@ onMounted(loadData)
 }
 .mb-12 {
   margin-bottom: 12px;
-}
-
-/* 修复刷新缓存按钮样式 */
-:deep(.el-button--warning) {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-:deep(.el-button--warning .el-icon) {
-  margin-right: 4px;
 }
 </style>
 

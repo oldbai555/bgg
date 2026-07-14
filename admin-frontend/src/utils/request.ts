@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, {type AxiosResponse, type AxiosError} from 'axios';
 import {useUserStore} from '@/stores/user';
 import router from '@/router';
 import {isEnvelope} from '@/types/envelope';
@@ -24,84 +24,80 @@ instance.interceptors.request.use((config) => {
 });
 
 // 判断当前路由是否是公共页面（不需要登录）
-const isPublicPath = (): boolean => {
-  if (typeof window === 'undefined') {
-    return false;
+export const isPublicPath = (): boolean => {
+  // 用路由解析后的 path（不含 base 前缀），不要用 window.location.pathname——
+  // 生产环境部署在 /admin/ 下（见 vite.config.ts base），真实 URL 是 /admin/blog/...，
+  // 直接判断 pathname.startsWith('/blog') 永远不成立，会导致公共页游客的 10003 也被强制跳登录页
+  const path = router.currentRoute.value.path;
+  return path === '/' || path.startsWith('/blog') || path.startsWith('/videos');
+};
+
+// token 失效（10003）时的清理逻辑：先清本地状态，非公共页面才跳登录
+export const handleTokenExpired = (): void => {
+  const userStore = useUserStore();
+  userStore.token = '';
+  userStore.refreshToken = '';
+  userStore.profile = null;
+  userStore.permissions = [];
+  userStore.menus = [];
+  localStorage.removeItem('admin_token');
+  localStorage.removeItem('admin_refresh_token');
+  localStorage.removeItem('admin_permissions');
+  localStorage.removeItem('admin_menus');
+  localStorage.removeItem('admin_cache_at');
+
+  if (!isPublicPath()) {
+    router.push('/login');
   }
-  const path = window.location.pathname;
-  return path.startsWith('/blog') || path.startsWith('/videos');
 };
 
 // 根据后端 Envelope 结构统一处理响应：{ code, msg, data }
-instance.interceptors.response.use(
-  (resp) => {
-    const res = resp.data;
-    // 标准包裹结构：code 为数字（统一错误码）时才按 Envelope 处理
-    if (isEnvelope(res)) {
-      const code = res.code;
-      // 支持 code === 0 和 code === 200 作为成功码
-      if (code === 0 || code === 200) {
-        return res.data;
-      }
-      
-      // 处理 10003 错误码：访问令牌无效或已过期
-      if (code === 10003) {
-        const userStore = useUserStore();
-        // 先清除本地状态，避免发送不必要的请求
-        userStore.token = '';
-        userStore.refreshToken = '';
-        userStore.profile = null;
-        userStore.permissions = [];
-        userStore.menus = [];
-        localStorage.removeItem('admin_token');
-        localStorage.removeItem('admin_refresh_token');
-        localStorage.removeItem('admin_permissions');
-        localStorage.removeItem('admin_menus');
-        localStorage.removeItem('admin_cache_at');
-        
-        // 如果不是公共页面，才跳转到登录页
-        if (!isPublicPath()) {
-          router.push('/login');
-        }
-      }
-      
-      const msg = res.msg || '请求失败';
-      return Promise.reject(new Error(msg));
+export const handleResponse = (resp: {data: unknown}) => {
+  const res = resp.data;
+  // 标准包裹结构：code 为数字（统一错误码）时才按 Envelope 处理
+  if (isEnvelope(res)) {
+    const code = res.code;
+    // 支持 code === 0 和 code === 200 作为成功码
+    if (code === 0 || code === 200) {
+      return res.data;
     }
-    // 非标准结构，直接返回原始 data（兼容字典等特殊接口）
-    return res;
-  },
-  (error) => {
-    const data = error?.response?.data;
-    const code = data?.code;
-    
-    // 处理 10003 错误码（可能在 error.response.data 中）
+
+    // 处理 10003 错误码：访问令牌无效或已过期
     if (code === 10003) {
-      const userStore = useUserStore();
-      // 先清除本地状态，避免发送不必要的请求
-      userStore.token = '';
-      userStore.refreshToken = '';
-      userStore.profile = null;
-      userStore.permissions = [];
-      userStore.menus = [];
-      localStorage.removeItem('admin_token');
-      localStorage.removeItem('admin_refresh_token');
-      localStorage.removeItem('admin_permissions');
-      localStorage.removeItem('admin_menus');
-      localStorage.removeItem('admin_cache_at');
-      
-      // 如果不是公共页面，才跳转到登录页
-      if (!isPublicPath()) {
-        router.push('/login');
-      }
+      handleTokenExpired();
     }
-    
-    const msg =
-      (data && (data.msg || data.message)) ||
-      error.message ||
-      '请求失败';
+
+    const msg = res.msg || '请求失败';
     return Promise.reject(new Error(msg));
   }
+  // 非标准结构，直接返回原始 data（兼容字典等特殊接口）
+  return res;
+};
+
+export const handleResponseError = (error: {
+  response?: {data?: {code?: number; msg?: string; message?: string}};
+  message?: string;
+}) => {
+  const data = error?.response?.data;
+  const code = data?.code;
+
+  // 处理 10003 错误码（可能在 error.response.data 中）
+  if (code === 10003) {
+    handleTokenExpired();
+  }
+
+  const msg =
+    (data && (data.msg || data.message)) ||
+    error.message ||
+    '请求失败';
+  return Promise.reject(new Error(msg));
+};
+
+// handleResponse 故意返回解包后的 res.data 而不是完整 AxiosResponse（项目约定的"响应拦截器直接拆包"），
+// 与 axios 声明的拦截器类型不完全一致，这里用 as 桥接；handleResponse/handleResponseError 保持宽松的参数类型是为了单测里能直接构造纯对象调用
+instance.interceptors.response.use(
+  handleResponse as unknown as (resp: AxiosResponse) => AxiosResponse,
+  handleResponseError as unknown as (error: AxiosError) => Promise<never>
 );
 
 export default instance;
