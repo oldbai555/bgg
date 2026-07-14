@@ -4,14 +4,14 @@
 sync-claude-rules:
 	@go run ./script/sync_claude_rules.go
 
-# Claude Code 项目 MCP：.mcp.json 为团队 SSOT（已提交 git），见 docs/AI工具链上手.md
+# Claude Code 项目 MCP：.mcp.json 已提交 git，由 .cursor/mcp.json（唯一手改入口）经 sync-claude-mcp-import 全量生成，禁止手改，见 docs/AI工具链上手.md
 sync-claude-mcp-check:
 	@bash ./script/sync_claude_mcp.sh check
 
 sync-claude-mcp-approve:
 	@bash ./script/sync_claude_mcp.sh approve
 
-# 维护者：从 ~/.cursor/mcp.json 导入并规范化路径，更新 .mcp.json 后需 commit
+# 维护者：从项目 .cursor/mcp.json 导入并规范化路径，更新 .mcp.json 后需 commit
 sync-claude-mcp-import:
 	@bash ./script/sync_claude_mcp.sh import-cursor
 

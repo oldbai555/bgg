@@ -5,12 +5,12 @@ alwaysApply: true
 
 # MCP 工具链（必读）
 
-本项目配置了 **10 个 MCP server**（清单 SSOT：仓库根 `.mcp.json`；上手见 `docs/AI工具链上手.md`）。
+本项目配置了 **9 个 MCP server**（唯一权威来源：仓库内 `.cursor/mcp.json`，按本项目实际需要精简加载，不含 `mongodb`/`redis`；`.mcp.json` 由它 `import-cursor` 全量生成，两者服务器列表始终一致；上手见 `docs/AI工具链上手.md`）。
 
 | 通道 | MCP 配置来源 |
 |------|----------------|
-| **Cursor**（Chat / Agent / Composer） | `~/.cursor/mcp.json`（本机） |
-| **Claude Code 插件** | `.mcp.json` + `.claude/settings.local.json` 的 `env` |
+| **Cursor**（Chat / Agent / Composer） | 仓库内 `.cursor/mcp.json`（已提交 git，团队 SSOT，唯一手改入口；个人跨项目的 server 放 `~/.cursor/mcp.json`，不影响本项目） |
+| **Claude Code 插件** | `.mcp.json`（`make sync-claude-mcp-import` 全量生成，禁止手改）+ `.claude/settings.local.json` 的 `env` |
 
 两通道 **server 名称一致**，但进程独立；终端 `claude mcp list` 全绿 ≠ 插件已连通。
 
@@ -32,7 +32,7 @@ alwaysApply: true
 | Vue/TS 符号定义、引用、诊断（`admin-frontend/**`） | **vue-lsp** | `definition` / `references` / `diagnostics` / `hover` |
 | 本项目 UI 组件（D2Table、layout、blog 组件） | **frontend-ui** | `ui_get_component` / `ui_list_components` / `ui_get_patterns` |
 | go-zero 框架概念、goctl 参数、配置校验 | **mcp-zero** | `query_docs`、`validate_config`、`analyze_project` |
-| 查本地 MySQL / Mongo / Redis 运行数据（调试联调） | **mysql** / **mongodb** / **redis** | 仅在本机服务已启动时使用；MySQL 默认只读 |
+| 查本地 MySQL 运行数据（调试联调） | **mysql** | 仅在本机服务已启动时使用；默认只读；`mongodb`/`redis` 本项目未启用，需要时先加回 `.cursor/mcp.json` 再 `make sync-claude-mcp-import` |
 | 跨会话决策、踩坑、团队约定 | **engram** | `mem_search` / `mem_save` / `mem_context` |
 
 ## 与本项目工作流的边界（硬约束）
@@ -45,6 +45,8 @@ alwaysApply: true
 | engram 记决策与约定 | 用 engram 代替更新 `docs/后端开发进度.md` |
 
 新增标准 CRUD 模块仍走 `00-workflow.mdc` 的 `generate-sql.sh` 脚手架；mcp-zero 仅作**查阅与校验**，不绕过项目生成脚本。
+
+**唯一例外**：`admin-mcp` 的 `generate_sql`/`generate_model`/`generate_api`/`generate_ts` 会自动确认脚本自带的交互提示直接执行，这不是绕开上面这条边界，而是 `00-workflow.mdc`「开发期执行策略的例外」授权给 admin-server 重构项目的既定政策落到代码里（授权范围见 `admin-server/docs/10-dev-execution-and-review-points.md`），不代表其它场景/其它 MCP 可以替用户执行 `generate-*.sh`。
 
 ## 反模式（降低 MCP 命中率时自查）
 
@@ -65,8 +67,8 @@ alwaysApply: true
 2. **codegraph** 不可用 → `Grep` + `Read`（范围尽量小）
 3. **context7** 不可用 → 查项目内 `docs/` 与 `.ai-context/zero-skills/`
 4. **engram** 不可用 → 读 `docs/后端开发进度.md` 历史决策
-5. **mysql/mongodb/redis** 不可用 → 不查库，改让用户确认或启动本地服务
+5. **mysql** 不可用 → 不查库，改让用户确认或启动本地服务（`mongodb`/`redis` 本项目未启用，见上）
 
 ## 维护者
 
-Cursor 增删 MCP 后：`make sync-claude-mcp-import` → commit `.mcp.json`。改本规则后：`make sync-claude-rules`。
+改 `.cursor/mcp.json`（Cursor 增删 MCP）后：`make sync-claude-mcp-import` → 检查 `.mcp.json` diff → 两个文件一起 commit。改本规则后：`make sync-claude-rules`。

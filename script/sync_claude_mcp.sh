@@ -2,21 +2,22 @@
 # Claude Code 项目 MCP 管理。
 #
 # 团队 SSOT：仓库根 .mcp.json（已提交 git，第三人 clone 即可见项目需要哪些 MCP）
+# Cursor 侧团队 SSOT：仓库内 .cursor/mcp.json（已提交 git，项目按需加载，与 ~/.cursor/mcp.json 全局个人配置分开）
 #
 # 用法:
 #   ./script/sync_claude_mcp.sh check           # 检查项目 .mcp.json 与 claude mcp 状态（默认）
 #   ./script/sync_claude_mcp.sh approve         # 写入本机 .claude/settings.local.json 自动批准
-#   ./script/sync_claude_mcp.sh import-cursor   # 维护者：从 ~/.cursor/mcp.json 导入并规范化路径后更新 .mcp.json
+#   ./script/sync_claude_mcp.sh import-cursor   # 维护者：从项目 .cursor/mcp.json 导入并规范化路径后更新 .mcp.json
 #   ./script/sync_claude_mcp.sh import-cursor --dry-run
 #
 # 环境变量（import-cursor 写入 .mcp.json 时用于替换本机绝对路径）:
-#   CURSOR_MCP_JSON      源文件，默认 ~/.cursor/mcp.json
+#   CURSOR_MCP_JSON      源文件，默认仓库内 .cursor/mcp.json（旧用法可指向 ~/.cursor/mcp.json 个人全局配置）
 #   GO_ZERO_MCP_PATH     mcp-zero 可执行文件路径（第三人需在 shell 或 .env 中设置）
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-CURSOR_MCP_JSON="${CURSOR_MCP_JSON:-$HOME/.cursor/mcp.json}"
+CURSOR_MCP_JSON="${CURSOR_MCP_JSON:-$REPO_ROOT/.cursor/mcp.json}"
 TARGET_MCP_JSON="$REPO_ROOT/.mcp.json"
 SETTINGS_JSON="$REPO_ROOT/.claude/settings.json"
 SETTINGS_LOCAL="$REPO_ROOT/.claude/settings.local.json"
@@ -32,11 +33,11 @@ Claude Code 项目 MCP（.mcp.json 为团队 SSOT，已提交 git）
 子命令:
   check (默认)     列出项目 .mcp.json 中的 server，并运行 claude mcp list
   approve          写入 settings.json + settings.local.json（对话插件 env/批准）
-  import-cursor    维护者专用：从 ~/.cursor/mcp.json 导入并规范化路径，更新 .mcp.json
+  import-cursor    维护者专用：从项目 .cursor/mcp.json 导入并规范化路径，更新 .mcp.json
                    加 --dry-run 仅预览
 
 第三人上手:
-  1. git clone 后阅读 .mcp.json 与 docs/AI工具链上手.md
+  1. git clone 后阅读 .mcp.json、.cursor/mcp.json 与 docs/AI工具链上手.md
   2. make setup-ai
   3. 设置 GO_ZERO_MCP_PATH（若使用 mcp-zero）
   4. 在终端 REPL: claude → /mcp reconnect all
@@ -70,6 +71,8 @@ from pathlib import Path
 source = Path(sys.argv[1])
 raw = source.read_text(encoding="utf-8")
 converted = raw.replace("${workspaceFolder}", "${CLAUDE_PROJECT_DIR:-.}")
+# Cursor 的 ${env:VAR} 引用语法 -> Claude Code 的 ${VAR} 语法（同样是运行时从 shell 环境取值）
+converted = re.sub(r"\$\{env:([A-Za-z_][A-Za-z0-9_]*)\}", r"${\1}", converted)
 
 data = json.loads(converted)
 servers = data.get("mcpServers")
@@ -288,8 +291,8 @@ run_check() {
   print_project_mcp "$TARGET_MCP_JSON" "项目 .mcp.json"
 
   echo ""
-  echo "========== 维护者 Cursor 配置（参考）=========="
-  print_project_mcp "$CURSOR_MCP_JSON" "Cursor ~/.cursor/mcp.json"
+  echo "========== Cursor 项目 MCP（团队 SSOT，已提交 git）=========="
+  print_project_mcp "$CURSOR_MCP_JSON" "项目 .cursor/mcp.json"
 
   echo ""
   echo "========== 环境变量（按需设置）=========="

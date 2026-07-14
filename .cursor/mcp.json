@@ -22,7 +22,7 @@
         "serve",
         "--mcp",
         "--path",
-        "${CLAUDE_PROJECT_DIR:-.}"
+        "${workspaceFolder}"
       ],
       "type": "stdio"
     },
@@ -30,7 +30,7 @@
       "command": "mcp-language-server",
       "args": [
         "--workspace",
-        "${CLAUDE_PROJECT_DIR:-.}/admin-server",
+        "${workspaceFolder}/admin-server",
         "--lsp",
         "gopls"
       ],
@@ -40,7 +40,7 @@
       "command": "mcp-language-server",
       "args": [
         "--workspace",
-        "${CLAUDE_PROJECT_DIR:-.}/admin-frontend",
+        "${workspaceFolder}/admin-frontend",
         "--lsp",
         "node",
         "--",
@@ -52,20 +52,20 @@
     "frontend-ui": {
       "command": "node",
       "args": [
-        "${CLAUDE_PROJECT_DIR:-.}/admin-frontend/mcp/dist/index.js"
+        "${workspaceFolder}/admin-frontend/mcp/dist/index.js"
       ],
       "type": "stdio"
     },
     "mcp-zero": {
-      "command": "${GO_ZERO_MCP_PATH}",
+      "command": "${env:GO_ZERO_MCP_PATH}",
       "env": {
-        "GOCTL_PATH": "${GOCTL_PATH}"
+        "GOCTL_PATH": "${env:GOCTL_PATH}"
       }
     },
     "mysql": {
       "command": "bash",
       "args": [
-        "${CLAUDE_PROJECT_DIR:-.}/script/mysql_mcp.sh"
+        "${workspaceFolder}/script/mysql_mcp.sh"
       ],
       "env": {
         "ALLOW_INSERT_OPERATION": "false",
@@ -75,7 +75,7 @@
       "type": "stdio"
     },
     "admin-mcp": {
-      "command": "${CLAUDE_PROJECT_DIR:-.}/admin-server/tool/admin-mcp/bin/admin-mcp",
+      "command": "${workspaceFolder}/admin-server/tool/admin-mcp/bin/admin-mcp",
       "type": "stdio"
     }
   }

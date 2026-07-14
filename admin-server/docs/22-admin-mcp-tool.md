@@ -321,10 +321,10 @@ rules:
 
 ## 7. 注册进 `.mcp.json`
 
-仓库现有流程（`AGENTS.md` 第 8 节、`script/sync_claude_mcp.sh`）是：维护者在 **Cursor** 自己的 `~/.cursor/mcp.json` 里增删 MCP server，然后跑 `make sync-claude-mcp-import` 把 Cursor 配置规范化路径后同步进项目内提交的 `.mcp.json`（Claude Code 读这份）。`admin-mcp` 走同一条路径，不新开一条注册机制：
+仓库现有流程（`AGENTS.md` 第 8 节、`script/sync_claude_mcp.sh`）是：维护者在仓库内提交 git 的 **`.cursor/mcp.json`**（Cursor 通道团队 SSOT，按项目按需加载）里增删 MCP server，然后跑 `make sync-claude-mcp-import` 把 Cursor 配置规范化路径后同步进项目内提交的 `.mcp.json`（Claude Code 读这份）。`admin-mcp` 走同一条路径，不新开一条注册机制：
 
 1. 本地构建二进制：`cd admin-server/tool/admin-mcp && ./build.sh`（产出 `bin/admin-mcp`，参考 `sqlgen/build.sh` 的单行 `go build` 风格；`bin/` 目录加进 `.gitignore`，二进制不提交）。
-2. 在 `~/.cursor/mcp.json` 的 `mcpServers` 里新增一条，**用 Cursor 的 `${workspaceFolder}` 变量指向仓库内的构建产物路径**（不要写死本机绝对路径，`import-cursor` 的 `normalize_cursor_mcp_json` 会把 `${workspaceFolder}` 整体替换成 `${CLAUDE_PROJECT_DIR:-.}`，这个替换是对文件原始文本做字符串替换、发生在 JSON 解析之前，所以直接写在 `command` 字段里也能被正确替换，不需要额外处理）：
+2. 在仓库内 `.cursor/mcp.json` 的 `mcpServers` 里新增一条，**用 Cursor 的 `${workspaceFolder}` 变量指向仓库内的构建产物路径**（不要写死本机绝对路径，`import-cursor` 的 `normalize_cursor_mcp_json` 会把 `${workspaceFolder}` 整体替换成 `${CLAUDE_PROJECT_DIR:-.}`，这个替换是对文件原始文本做字符串替换、发生在 JSON 解析之前，所以直接写在 `command` 字段里也能被正确替换，不需要额外处理）：
    ```json
    "admin-mcp": {
      "command": "${workspaceFolder}/admin-server/tool/admin-mcp/bin/admin-mcp"
@@ -332,7 +332,7 @@ rules:
    ```
 3. 完全重启 Cursor 或执行 `/mcp reconnect all` 确认 Cursor 侧能连上。
 4. 维护者跑 `make sync-claude-mcp-import`（内部是 `script/sync_claude_mcp.sh import-cursor`），确认输出里出现新的 `admin-mcp` 条目、且 `command` 字段已经变成 `${CLAUDE_PROJECT_DIR:-.}/admin-server/tool/admin-mcp/bin/admin-mcp`。
-5. **commit `.mcp.json`**（`AGENTS.md` 明确要求这一步，`.mcp.json` 是团队 SSOT）。
+5. **commit `.cursor/mcp.json` + `.mcp.json`**（`AGENTS.md` 明确要求这一步，两者都是团队 SSOT）。
 6. 在集成终端里 `claude mcp list` 确认 `admin-mcp` 出现且状态正常；`make sync-claude-mcp-check` 也会跑这条命令，可以复用做验证。
 
 不需要 `env` 字段——`admin-mcp` 不像 `go-lsp`/`mongodb`/`redis` 那样需要指向外部资源的连接参数，它只在自己所在的仓库内跑 `git status`/`exec.Command` 调本仓库内的脚本，天然是仓库相对路径，不需要环境变量注入。
