@@ -73,7 +73,8 @@
 **验证**：`npm run lint`（0 error，115 warning）、`npm run typecheck`（0 error）、`npm run build`（成功，既有的 chunk 过大警告与本轮无关）、`npm run test`（7 个测试文件、41 个用例全部通过）四项全绿。
 
 **已知问题 / 下一步**：
-- 三条 SQL 待用户审阅执行：`fix_menu_component_path_20260713.sql`（Week 1，域目录重组的 6 个域）、`fix_menu_daily_short_sentence_component_20260713.sql`（Week 2，`temp/DailyShortSentenceList` → `misc/DailyShortSentenceList`）、`dict_blog_tag_status_20260714.sql`（补齐建表时就声明但一直没建的 `blog_tag_status` 字典）；前两条执行前对应旧菜单路径仍是预期中的 404 中间态，第三条执行前 `BlogTagList.vue` 的状态下拉靠 `useDictOptions` 的 fallback 正常工作，不阻塞使用。
+- `fix_menu_daily_short_sentence_component_20260713.sql`、`dict_blog_tag_status_20260714.sql` 已由用户确认后在本机开发库（`root@127.0.0.1:3306/admin`，对应 `.vscode/launch.json` 的 `IAM_MYSQL_DSN`）执行并核实生效；执行方式是直接 `mysql` CLI，不是走 `mysql` MCP（MCP 的 `ALLOW_INSERT/UPDATE_OPERATION` 仍保持 `.mcp.json` 里团队共享的只读默认值未动，只在 `~/.config/bgg/mysql-mcp.env`（机器本地、未提交）补了连接信息，方便后续用 MCP 查数据）。
+- `fix_menu_component_path_20260713.sql`（Week 1，域目录重组的 6 个域）仍待执行，执行前对应旧菜单路径仍是预期中的 404 中间态。
 - `SdkInterfaceCreateReq.apiCode` 后端定义与实现不一致（后端忽略该字段但 `.api` 未标 `optional`）——本轮只在前端传空串绕过，未改后端 `.api`/重新生成，后续如需彻底修正需要走 `.api` 改动 + `generate-api.sh`（用户执行）流程。
 - `ChatGroupList.vue` 选人框部门/角色列一直空白（`UserItem` 没有对应字段）：类型已修正为诚实反映现状，视觉/数据补全是独立的功能增强，不在本轮范围。
 - `BlogDetail.vue` 仍用 `blog.scss` 的三栏布局（分类导航+正文+目录），未切到 `21-public-pages.mdc` 要求的 `public-detail.scss` 单栏卡片模板——核实过不是换 import 能解决的机械活，涉及布局取舍，按 `08-dev-execution-and-review-points.md` 的要求需要先出预览确认，留到 Phase 3（`06-responsive-and-public-pages-redesign.md`）一起做。
