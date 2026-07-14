@@ -11,7 +11,7 @@
 | **Cursor**（Chat / Agent / Composer） | 日常对话、改代码、子 Agent | `.cursor/rules/*.mdc`（SSOT） | 仓库内 **`.cursor/mcp.json`**（已提交 git，团队 SSOT，唯一手改入口） |
 | **Claude Code 插件**（Cursor 侧边栏） | SDD 工作流、Task 子代理、长任务 | `.claude/rules/*.md`（由 Cursor 规则同步） | 仓库根 **`.mcp.json`**（已提交 git，由 `.cursor/mcp.json` 全量生成，禁止手改） |
 
-`.cursor/mcp.json` 是唯一权威来源，按当前项目实际需要精简（本项目未启用 `mongodb`/`redis`）；`.mcp.json` 跑 `make sync-claude-mcp-import` 全量生成，两者 server 列表**始终一致**。个人跨项目才用的 server 放 `~/.cursor/mcp.json`（本机全局，不提交，不影响本项目）。
+`.cursor/mcp.json` 是唯一权威来源，按当前项目实际需要精简（本项目未启用 `mongodb`；`redis` 已启用，见下文）；`.mcp.json` 跑 `make sync-claude-mcp-import` 全量生成，两者 server 列表**始终一致**。个人跨项目才用的 server 放 `~/.cursor/mcp.json`（本机全局，不提交，不影响本项目）。
 
 两者共享同一套 Gentle-AI 生态（Engram 记忆、CodeGraph、GGA、Skills），但配置入口不同。`make setup-ai` 会**同时初始化两者**。
 
@@ -186,7 +186,7 @@ bgg/
 
 ## 项目 MCP 清单（`.mcp.json`）
 
-仓库内 `.cursor/mcp.json` 是唯一权威来源（已提交 git，按本项目实际需要精简加载，不含 `mongodb`/`redis`）。仓库根 `.mcp.json` 由它跑 `make sync-claude-mcp-import` **全量生成**，第三人 clone 即可知道本项目依赖哪些 MCP，Claude Code 插件启动时会读取该文件（首次需在工作区信任对话框中确认）。两份清单的 server 列表**始终一致**——新增/删除 server 一律改 `.cursor/mcp.json`，改完跑 import 同步进 `.mcp.json`，不要单独手改 `.mcp.json`。
+仓库内 `.cursor/mcp.json` 是唯一权威来源（已提交 git，按本项目实际需要精简加载，含 `redis`，不含 `mongodb`）。仓库根 `.mcp.json` 由它跑 `make sync-claude-mcp-import` **全量生成**，第三人 clone 即可知道本项目依赖哪些 MCP，Claude Code 插件启动时会读取该文件（首次需在工作区信任对话框中确认）。两份清单的 server 列表**始终一致**——新增/删除 server 一律改 `.cursor/mcp.json`，改完跑 import 同步进 `.mcp.json`，不要单独手改 `.mcp.json`。
 
 | Server | 用途 | 安装方式 | 必需 |
 |--------|------|----------|------|
@@ -199,8 +199,9 @@ bgg/
 | `mcp-zero` | go-zero / goctl 脚手架辅助 | 本机编译 `go-zero-mcp` 并设置 `GO_ZERO_MCP_PATH` | ✅ 后端开发 |
 | `admin-mcp` | 本仓库自建脚手架/进度查询工具 | 本机构建 `admin-server/tool/admin-mcp`（见 `admin-server/docs/22-admin-mcp-tool.md`） | ✅ 后端开发 |
 | `mysql` | 本地 MySQL 查询（默认只读） | `npx` + 本机 MySQL 在跑；连接信息见 `MYSQL_*` 环境变量 | 可选 |
+| `redis` | 本地 Redis 查询（调试 `sqlc.CachedConn` 缓存与 MySQL 不一致问题） | `uvx --from git+https://github.com/redis/mcp-redis.git redis-mcp-server` + 本机 Redis 在跑（默认 127.0.0.1:6379，见 `REDIS_HOST`/`REDIS_PORT`） | 可选 |
 
-`mongodb`/`redis` 本项目当前**未注册为 MCP server**（不是仅本机服务未启动）；团队需要时先在 `.cursor/mcp.json` 里加回对应条目（参考 `git log` 里本次改动之前的版本，或按 Cursor `${env:VAR}` 语法重新配置连接参数），再跑 `make sync-claude-mcp-import` 同步进 `.mcp.json`。
+`mongodb` 本项目当前**未注册为 MCP server**（不是仅本机服务未启动）；团队需要时先在 `.cursor/mcp.json` 里加回对应条目（参考 Cursor `${env:VAR}` 语法配置连接参数），再跑 `make sync-claude-mcp-import` 同步进 `.mcp.json`。
 
 ### 第三人必做（Claude Code 对话插件）
 
@@ -305,7 +306,7 @@ cd admin-frontend && pnpm install
 |--------|------|--------|
 | `mysql` | 本机 MySQL 在跑；设置 `MYSQL_HOST`/`MYSQL_PORT`/`MYSQL_USER`/`MYSQL_PASS`/`MYSQL_DB`（可与 `config/mysql.json.example` 或 `/etc/work/mysql.json` 对齐） | `check` 失败可忽略；团队不用可从 `.cursor/mcp.json` 删除后 `import` 同步 |
 
-`mongodb`/`redis` 本项目当前未注册（见上文「项目 MCP 清单」）；需要时先在 `.cursor/mcp.json` 加回对应 server 再 `import`。
+`mongodb` 本项目当前未注册（见上文「项目 MCP 清单」）；需要时先在 `.cursor/mcp.json` 加回对应 server 再 `import`。
 
 `mysql` MCP 默认 **只读**（`ALLOW_*_OPERATION=false`），用于调试联调查表/跑 SELECT，不替代业务代码里的 Repository 层。
 
@@ -323,7 +324,17 @@ Claude Code 插件需 `make sync-claude-mcp-approve` 把上述 env 写入 `.clau
 
 推荐把凭据放在 **`~/.config/bgg/mysql-mcp.env`**（`chmod 600`），`~/.zshrc` 里 source 该文件。Cursor / Claude Code 均通过仓库内 **`script/mysql_mcp.sh`** 启动 `mysql` MCP（自动补全 `HOME` 并 source 上述 env 文件），避免密码写进 mcp.json。
 
-### 6. Claude Code MCP 重连
+### 6. `redis` MCP（可选）
+
+| Server | 前提 | 不用时 |
+|--------|------|--------|
+| `redis` | `uvx` 可用（`brew install uv` 或参考 [astral-sh/uv](https://github.com/astral-sh/uv)）；本机 Redis 在跑；Cursor 侧 `.cursor/mcp.json` 里 `env.REDIS_HOST`/`env.REDIS_PORT` 硬编码 `127.0.0.1`/`6379`（开箱可用），连别的 host/port 需直接改这两个字段再 `import` | `check` 失败可忽略；团队不用可从 `.cursor/mcp.json` 删除后 `import` 同步 |
+
+Claude Code 侧 `.mcp.json` 由 `import-cursor` 自动把上述字段转成 `${REDIS_HOST:-127.0.0.1}`/`${REDIS_PORT:-6379}`，支持用 shell 环境变量临时覆盖；Cursor 侧无此机制，改连接目标必须直接编辑 `.cursor/mcp.json`。
+
+主要用于排查 go-zero `sqlc.CachedConn` 缓存与 MySQL 数据不一致的问题——例如手动 `TRUNCATE`/`DELETE` 重置开发库表时绕过了 Model 层的 `Insert`/`Update`/`Delete`，导致 Redis 里按主键缓存的旧记录（`cache:<model>:id:<id>`）未被失效，后续 `FindOne`/`FindByID` 读到脏数据而走 squirrel 直查的 `FindPage`/列表接口正常。排查方法：`GET`/`KEYS`/`TTL` 确认缓存内容与 MySQL 是否一致，确认脏读后 `DEL` 对应 key 即可（cache-aside 模式下下次读取会自动回源重建缓存）。
+
+### 7. Claude Code MCP 重连
 
 `setup-ai` 后在 **Cursor 集成终端**（非对话面板）：
 
@@ -335,7 +346,7 @@ claude
 
 期望：必需 server 为 Connected；`mcp-zero` 在设置 `GO_ZERO_MCP_PATH` 后应 Connected。
 
-### 7. 维护者：双通道 MCP 同步纪律
+### 8. 维护者：双通道 MCP 同步纪律
 
 | 你改了什么 | 必须做什么 |
 |------------|------------|
@@ -432,7 +443,11 @@ CodeGraph 默认**自动同步**文件变更，一般无需手动 `codegraph syn
 
 ### `mysql` 连接失败
 
-本机未启动 MySQL 服务或连接信息未配置——可忽略。若全员不用，维护者从 `.cursor/mcp.json` 删除后 `import` 同步进 `.mcp.json` 一起 commit。`mongodb`/`redis` 本项目当前未注册，不适用本节。
+本机未启动 MySQL 服务或连接信息未配置——可忽略。若全员不用，维护者从 `.cursor/mcp.json` 删除后 `import` 同步进 `.mcp.json` 一起 commit。`mongodb` 本项目当前未注册，不适用本节。
+
+### `redis` 连接失败
+
+本机未启动 Redis 服务、`uvx` 不存在，或 `REDIS_HOST`/`REDIS_PORT` 配置不对——可忽略（属可选 server）。首次连接需要 `uvx` 从 GitHub 拉取并构建 `redis/mcp-redis`，耗时较久属正常现象。若全员不用，维护者从 `.cursor/mcp.json` 删除后 `import` 同步进 `.mcp.json` 一起 commit。
 
 **`mysql` 日志出现 `Connection closed`（连上立刻断开）** 常见两类原因：
 

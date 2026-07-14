@@ -1,6 +1,6 @@
 # MCP 工具链（必读）
 
-本项目配置了 **9 个 MCP server**（唯一权威来源：仓库内 `.cursor/mcp.json`，按本项目实际需要精简加载，不含 `mongodb`/`redis`；`.mcp.json` 由它 `import-cursor` 全量生成，两者服务器列表始终一致；上手见 `docs/AI工具链上手.md`）。
+本项目配置了 **10 个 MCP server**（唯一权威来源：仓库内 `.cursor/mcp.json`，按本项目实际需要精简加载，含 `redis`（本机 127.0.0.1:6379 调试用），不含 `mongodb`；`.mcp.json` 由它 `import-cursor` 全量生成，两者服务器列表始终一致；上手见 `docs/AI工具链上手.md`）。
 
 | 通道 | MCP 配置来源 |
 |------|----------------|
@@ -27,7 +27,8 @@
 | Vue/TS 符号定义、引用、诊断（`admin-frontend/**`） | **vue-lsp** | `definition` / `references` / `diagnostics` / `hover` |
 | 本项目 UI 组件（D2Table、layout、blog 组件） | **frontend-ui** | `ui_get_component` / `ui_list_components` / `ui_get_patterns` |
 | go-zero 框架概念、goctl 参数、配置校验 | **mcp-zero** | `query_docs`、`validate_config`、`analyze_project` |
-| 查本地 MySQL 运行数据（调试联调） | **mysql** | 仅在本机服务已启动时使用；默认只读；`mongodb`/`redis` 本项目未启用，需要时先加回 `.cursor/mcp.json` 再 `make sync-claude-mcp-import` |
+| 查本地 MySQL 运行数据（调试联调） | **mysql** | 仅在本机服务已启动时使用；默认只读；`mongodb` 本项目未启用，需要时先加回 `.cursor/mcp.json` 再 `make sync-claude-mcp-import` |
+| 查本地 Redis 缓存数据（调试缓存脏读/过期问题） | **redis** | 仅在本机服务已启动时使用（127.0.0.1:6379）；用于排查 go-zero `sqlc.CachedConn` 缓存与 MySQL 不一致的问题（如手动 `TRUNCATE`/`DELETE` 绕过 Model 层导致的 key 未失效） |
 | 跨会话决策、踩坑、团队约定 | **engram** | `mem_search` / `mem_save` / `mem_context` |
 
 ## 与本项目工作流的边界（硬约束）
@@ -62,7 +63,7 @@
 2. **codegraph** 不可用 → `Grep` + `Read`（范围尽量小）
 3. **context7** 不可用 → 查项目内 `docs/` 与 `.ai-context/zero-skills/`
 4. **engram** 不可用 → 读 `docs/后端开发进度.md` 历史决策
-5. **mysql** 不可用 → 不查库，改让用户确认或启动本地服务（`mongodb`/`redis` 本项目未启用，见上）
+5. **mysql**/**redis** 不可用 → 不查库/不查缓存，改让用户确认或启动本地服务（`mongodb` 本项目未启用，见上）
 
 ## 维护者
 
