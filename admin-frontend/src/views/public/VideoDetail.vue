@@ -330,14 +330,14 @@ const loadData = async () => {
 
   if (!id) {
     ElMessage.error('视频ID不能为空')
-    router.push('/videos')
+    router.push('/front/videos')
     return
   }
 
   const idNum = Number(id)
   if (!idNum || idNum === 0) {
     ElMessage.error('视频ID格式错误')
-    router.push('/videos')
+    router.push('/front/videos')
     return
   }
 
@@ -349,7 +349,7 @@ const loadData = async () => {
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : '加载失败'
     ElMessage.error(message)
-    router.push('/videos')
+    router.push('/front/videos')
   } finally {
     loading.value = false
   }
@@ -380,7 +380,7 @@ const goBack = () => {
             content?: string
           }
           router.push({
-            path: '/videos',
+            path: '/front/videos',
             query: {
               ...(parsed.page && {page: String(parsed.page)}),
               ...(parsed.size && {size: String(parsed.size)}),
@@ -393,7 +393,7 @@ const goBack = () => {
         // 忽略解析错误
       }
     }
-    router.push('/videos')
+    router.push('/front/videos')
   }
 }
 

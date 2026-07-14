@@ -229,7 +229,7 @@ const handleReset = () => {
 const handlePlay = (row: VideoItem) => {
   // 跳转到视频播放器页面，传递视频URL
   router.push({
-    path: '/video/player',
+    path: '/admin/video/player',
     query: {url: row.playUrl}
   })
 }

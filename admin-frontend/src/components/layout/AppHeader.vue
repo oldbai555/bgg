@@ -120,7 +120,7 @@ const lang = computed(() => appStore.lang)
 const fullscreen = computed(() => appStore.fullscreen)
 
 const handleLogoClick = () => {
-  router.push('/')
+  router.push('/admin/dashboard')
 }
 
 const handleToggleCollapse = () => {

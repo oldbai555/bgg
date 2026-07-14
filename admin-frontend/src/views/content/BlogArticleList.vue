@@ -299,11 +299,11 @@ const handleSizeChange = (size: number) => {
 }
 
 const goCreate = () => {
-  router.push('/blog/article/edit')
+  router.push('/admin/blog/article/edit')
 }
 
 const goEdit = (id: number) => {
-  router.push(`/blog/article/edit/${id}`)
+  router.push(`/admin/blog/article/edit/${id}`)
 }
 
 const handleDelete = (_index: number, row: BlogArticleItem) => {

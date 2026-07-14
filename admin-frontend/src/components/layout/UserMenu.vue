@@ -58,11 +58,11 @@ const handleCommand = (command: string) => {
   switch (command) {
     case 'profile':
       // 跳转到个人信息页面
-      router.push('/system/profile')
+      router.push('/admin/system/profile')
       break
     case 'password':
       // 跳转到个人信息页面（该页面包含修改密码功能）
-      router.push('/system/profile')
+      router.push('/admin/system/profile')
       break
     case 'logout':
       emit('logout')

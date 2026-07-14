@@ -17,11 +17,11 @@ vi.mock('element-plus', () => ({
 describe('useNotificationStore', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
-    window.location.hash = ''
+    history.pushState(null, '', '/bgg/admin/dashboard')
   })
 
   afterEach(() => {
-    window.location.hash = ''
+    history.pushState(null, '', '/bgg/admin/dashboard')
   })
 
   it('addUnreadMessage 新消息插到最前面，超过 50 条按最新 50 条截断', () => {
@@ -105,13 +105,26 @@ describe('useNotificationStore', () => {
     const store = useNotificationStore()
     const userStore = useUserStore()
     userStore.profile = {id: 1} as never
-    window.location.hash = '#/chatroom/chat'
+    history.pushState(null, '', '/bgg/admin/chatroom/chat')
     const wsStore = useWebSocketStore()
 
     wsStore.handleMessage({type: MessageType.CHAT, fromId: 2, fromName: '张三', content: '你好'})
     await nextTick()
 
     expect(store.unreadCount).toBe(0)
+  })
+
+  it('在聊天记录管理/群组管理页面（同前缀但不是聊天页）收到 CHAT 消息仍计入未读', async () => {
+    const store = useNotificationStore()
+    const userStore = useUserStore()
+    userStore.profile = {id: 1} as never
+    history.pushState(null, '', '/bgg/admin/chatroom/chat-message')
+    const wsStore = useWebSocketStore()
+
+    wsStore.handleMessage({type: MessageType.CHAT, fromId: 2, fromName: '张三', content: '你好'})
+    await nextTick()
+
+    expect(store.unreadCount).toBe(1)
   })
 
   it('带 taskName 的 TASK_PROGRESS 消息计入未读，不带 taskName 的不计入', async () => {

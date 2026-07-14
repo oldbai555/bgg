@@ -26,10 +26,11 @@ instance.interceptors.request.use((config) => {
 // 判断当前路由是否是公共页面（不需要登录）
 export const isPublicPath = (): boolean => {
   // 用路由解析后的 path（不含 base 前缀），不要用 window.location.pathname——
-  // 生产环境部署在 /admin/ 下（见 vite.config.ts base），真实 URL 是 /admin/blog/...，
-  // 直接判断 pathname.startsWith('/blog') 永远不成立，会导致公共页游客的 10003 也被强制跳登录页
+  // 生产环境部署在 /bgg/ 下（见 vite.config.ts base），真实 URL 是 /bgg/front/blog/...，
+  // 直接判断 pathname.startsWith(...) 永远不成立，会导致公共页游客的 10003 也被强制跳登录页。
+  // 公共页统一收在 /front 分支下，和后台 /admin 分支不共享任何路径前缀段。
   const path = router.currentRoute.value.path;
-  return path === '/' || path.startsWith('/blog') || path.startsWith('/videos');
+  return path.startsWith('/front');
 };
 
 // token 失效（10003）时的清理逻辑：先清本地状态，非公共页面才跳登录
@@ -47,7 +48,7 @@ export const handleTokenExpired = (): void => {
   localStorage.removeItem('admin_cache_at');
 
   if (!isPublicPath()) {
-    router.push('/login');
+    router.push('/admin/login');
   }
 };
 

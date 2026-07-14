@@ -163,7 +163,7 @@ const handleClickTask = (item: {id: number}) => {
   panelVisible.value = false
   router
     .push({
-      path: '/system/task',
+      path: '/admin/system/task',
       query: {taskId: String(item.id)}
     })
     .catch((err) => {

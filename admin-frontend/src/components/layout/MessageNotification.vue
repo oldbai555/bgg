@@ -141,7 +141,7 @@ const unreadCount = computed(() => allUnreadMessages.value.length)
 const displayMessages = computed(() => allUnreadMessages.value.slice(0, 10)) // 最多显示 10 条
 
 // 聊天页面路径（从字典读取）
-const chatPath = ref('/chatroom/chat') // 默认值
+const chatPath = ref('/admin/chatroom/chat') // 默认值
 
 const formatTime = (timestamp: number) => {
   if (!timestamp) {
@@ -205,7 +205,7 @@ const loadChatPath = async () => {
     }
   } catch (err: unknown) {
     console.warn('加载聊天页面路径配置失败，使用默认值:', err)
-    chatPath.value = '/chatroom/chat'
+    chatPath.value = '/admin/chatroom/chat'
   }
 }
 
@@ -290,7 +290,7 @@ const handleClearRead = async () => {
 }
 
 const handleViewAll = () => {
-  router.push('/system/notification')
+  router.push('/admin/system/notification')
 }
 
 // 监听公告阅读框关闭

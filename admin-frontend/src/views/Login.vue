@@ -84,7 +84,7 @@ return
       await userStore.login(form)
       ElMessage.success(t('auth.loginSuccess'))
       // 登录成功后跳转到后台管理首页（Dashboard）
-      router.push('/dashboard')
+      router.push('/admin/dashboard')
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : t('auth.loginFail')
       ElMessage.error(message)

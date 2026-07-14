@@ -226,7 +226,7 @@ return
 }
 
 const goBack = () => {
-  router.push('/blog/article')
+  router.push('/admin/blog/article')
 }
 
 const handleSave = async () => {

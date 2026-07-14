@@ -11,35 +11,39 @@ const knownViewKeys = new Set(
 
 const routes: RouteRecordRaw[] = [
   {
-    path: '/login',
-    name: 'Login',
-    component: () => import('@/views/Login.vue')
+    path: '/',
+    redirect: '/front'
   },
   // 公共页面（不需要登录）
   {
-    path: '/',
+    path: '/front',
     name: 'Home',
     component: () => import('@/views/Home.vue')
   },
   {
-    path: '/blog',
+    path: '/front/blog',
     name: 'BlogList',
     component: () => import('@/views/public/BlogList.vue')
   },
   {
-    path: '/blog/:id',
+    path: '/front/blog/:id',
     name: 'BlogDetail',
     component: () => import('@/views/public/BlogDetail.vue')
   },
   {
-    path: '/videos',
+    path: '/front/videos',
     name: 'VideoList',
     component: () => import('@/views/public/VideoList.vue')
   },
   {
-    path: '/videos/:id',
+    path: '/front/videos/:id',
     name: 'VideoDetail',
     component: () => import('@/views/public/VideoDetail.vue')
+  },
+  {
+    path: '/admin/login',
+    name: 'Login',
+    component: () => import('@/views/Login.vue')
   },
   {
     path: '/layout',
@@ -47,68 +51,68 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/layouts/DefaultLayout.vue'),
     children: [
       {
-        path: '/dashboard',
+        path: '/admin/dashboard',
         name: 'Dashboard',
         meta: {keepAlive: true},
         component: () => import('@/views/Dashboard.vue')
       },
       // 博客文章编辑页（不挂菜单，通过文章列表跳转进入）
       {
-        path: '/blog/article/edit',
+        path: '/admin/blog/article/edit',
         name: 'BlogArticleCreate',
         meta: {permission: 'blog_article:create', keepAlive: false},
         component: () => import('@/views/content/BlogArticleEdit.vue')
       },
       {
-        path: '/blog/article/edit/:id',
+        path: '/admin/blog/article/edit/:id',
         name: 'BlogArticleEdit',
         meta: {permission: 'blog_article:update', keepAlive: false},
         component: () => import('@/views/content/BlogArticleEdit.vue')
       },
       {
-        path: '/system/role',
+        path: '/admin/system/role',
         name: 'RoleList',
         meta: {permission: 'role:list', keepAlive: true},
         component: () => import('@/views/iam/RoleList.vue')
       },
       {
-        path: '/system/permission',
+        path: '/admin/system/permission',
         name: 'PermissionList',
         meta: {permission: 'permission:list', keepAlive: true},
         component: () => import('@/views/iam/PermissionList.vue')
       },
       {
-        path: '/system/department',
+        path: '/admin/system/department',
         name: 'DepartmentList',
         meta: {permission: 'department:tree', keepAlive: true},
         component: () => import('@/views/iam/DepartmentList.vue')
       },
       {
-        path: '/system/api',
+        path: '/admin/system/api',
         name: 'ApiList',
         meta: {permission: 'api:list', keepAlive: true},
         component: () => import('@/views/iam/ApiList.vue')
       },
       {
-        path: '/system/profile',
+        path: '/admin/system/profile',
         name: 'Profile',
         meta: {keepAlive: true},
         component: () => import('@/views/iam/Profile.vue')
       },
       {
-        path: '/system/task',
+        path: '/admin/system/task',
         name: 'TaskListPage',
         meta: {permission: 'task:list', keepAlive: true},
         component: () => import('@/views/task/TaskList.vue')
       },
       {
-        path: '/system/metric-stats',
+        path: '/admin/system/metric-stats',
         name: 'MetricStats',
         meta: {permission: 'metric:stats', keepAlive: true},
         component: () => import('@/views/monitoring/MetricStats.vue')
       },
       {
-        path: '/403',
+        path: '/admin/403',
         name: 'NoAccess',
         component: () => import('@/views/error/NoAccess.vue')
       }
@@ -122,7 +126,7 @@ const routes: RouteRecordRaw[] = [
 ];
 
 const router = createRouter({
-  history: createWebHistory('/admin/'),
+  history: createWebHistory('/bgg/'),
   routes
 });
 
@@ -254,11 +258,12 @@ router.beforeEach(async (to, _from, next) => {
     const userStore = useUserStore();
     const {hasPermission} = usePermission();
 
-    // 公共页面不需要登录（包括导航页）
-    const isPublicPath = to.path === '/' || to.path.startsWith('/blog') || to.path.startsWith('/videos');
+    // 公共页面不需要登录：路由方案里公共页统一收在 /front 分支下，
+    // 和后台 /admin 分支不共享任何路径前缀段，两者永不冲突
+    const isPublicPath = to.path.startsWith('/front');
 
-    if (!isPublicPath && to.path !== '/login' && !userStore.token) {
-      next('/login');
+    if (!isPublicPath && to.path !== '/admin/login' && !userStore.token) {
+      next('/admin/login');
       return;
     }
 
@@ -278,26 +283,30 @@ router.beforeEach(async (to, _from, next) => {
           console.error('[Router] 获取菜单失败:', err);
         }
       }
-      
+
       // 添加动态路由
       if (userStore.menus && userStore.menus.length > 0) {
         const dynRoutes = buildRoutesFromMenus(userStore.menus);
+        let addedNew = false;
         dynRoutes.forEach((r) => {
           if (!dynamicAdded.has(r.path as string)) {
             try {
               router.addRoute('Root', r);
               dynamicAdded.add(r.path as string);
+              addedNew = true;
             } catch (err) {
               console.error(`[Router] 添加路由失败: ${r.path}`, err);
             }
           }
         });
 
-        // 首次加载时，如果当前路由是 404，但动态路由刚刚注入，需要重新匹配一次
-        if (to.name === 'NotFound') {
+        // 首次加载（尤其是硬刷新）时，本次导航可能是在动态路由注册前就已经解析完成的，
+        // 无论当时解析到的是 NotFound 还是某个碰巧匹配上但并非目标页面的静态路由，
+        // 只要这一轮确实新注册了路由，就用 to.fullPath 重新解析一次，解析结果和当前不一致就纠正过去，
+        // 避免只处理 NotFound 这一种情况而漏掉"匹配到错误页面"的情况
+        if (addedNew) {
           const resolved = router.resolve(to.fullPath);
-          // 只有在新匹配结果不是 NotFound 时才重定向，避免死循环
-          if (resolved.name && resolved.name !== 'NotFound') {
+          if (resolved.name && resolved.name !== to.name) {
             next({...resolved, replace: true});
             return;
           }
@@ -308,7 +317,7 @@ router.beforeEach(async (to, _from, next) => {
     // 权限检查：只有当 meta.permission 存在且不为空时才检查权限
     const needPerm = to.meta?.permission as string | undefined;
     if (needPerm && needPerm.trim() !== '' && !hasPermission(needPerm)) {
-      next('/403');
+      next('/admin/403');
       return;
     }
 
@@ -321,4 +330,3 @@ router.beforeEach(async (to, _from, next) => {
 });
 
 export default router;
-

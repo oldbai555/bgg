@@ -10,7 +10,7 @@ Cursor 用户请注意：本文件内容与 `.cursor/rules/*.mdc` 同源，`.cur
 
 **项目是什么**：前后端分离的管理系统。
 - `admin-server`：go-zero 后端，Go 1.24，模块 `postapocgame/admin-server`，统一提供所有 API（后台管理接口 + 公共接口）
-- `admin-frontend`：Vite 5 + Vue 3.4 + TypeScript + Element Plus，同时承载后台管理页面（`/admin/*`，需登录）和公共展示页面（`/blog/*`、`/videos/*`，无需登录）
+- `admin-frontend`：Vite 5 + Vue 3.4 + TypeScript + Element Plus，同时承载后台管理页面（`/bgg/admin/*`，需登录）和公共展示页面（`/bgg/front/*`，无需登录）——两个分支不共享任何路径前缀段（见 `admin-frontend/docs/10-route-namespace-migration.md`）
 - `script/`：生产环境构建/部署/Supervisor 管理脚本（`admin.sh`），开发环境建议直接用 IDE 运行
 - `config/`：Nginx / MySQL / Redis 参考配置
 - `docs/`：历史记录类文档（已完成功能、技术决策、关键代码位置索引），**不是规则文件**，规则统一在下面第 2 条的文件里

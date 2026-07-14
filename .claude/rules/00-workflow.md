@@ -2,7 +2,7 @@
 
 本仓库是前后端分离的管理系统：
 - `admin-server`：go-zero 后端，统一提供所有 API（后台管理接口 + 公共接口）
-- `admin-frontend`：Vue3 + TS 前端，同时承载后台管理页面（`/admin/*`，需登录）和公共展示页面（`/blog/*`、`/videos/*`，无需登录）
+- `admin-frontend`：Vue3 + TS 前端，同时承载后台管理页面（`/bgg/admin/*`，需登录）和公共展示页面（`/bgg/front/*`，无需登录）——两个分支不共享任何路径前缀段（见 `admin-frontend/docs/10-route-namespace-migration.md`）
 
 规则文件地图：
 - 本文件（`00-workflow.mdc`）：全局工作流 + 绝对禁止事项

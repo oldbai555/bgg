@@ -253,3 +253,22 @@
 - **本条目是本轮 Phase 1-3 重构里视觉/结构改动幅度最大、又最缺乏真实浏览器验证的一次，用户务必安排一次完整的人工回归**，重点看上面"验证"小节列出的交互点，尤其是滚动模型从"固定视口内部滚动"改成"文档级自然滚动"这个此前从未在其它 Week 出现过的行为变更。
 - `frontend-design` skill 未在 Claude Code 插件配置里生效（`.claude/settings.json` 的 `enabledPlugins` 指向未克隆的市场）是本轮发现的独立环境问题，与代码改动无关，需要用户决定是否要修复插件配置（改 `enabledPlugins` 指向 `claude-plugins-official` 的 `frontend-design`，或补齐 `anthropic-agent-skills` 市场的本地克隆），这类 Claude Code 自身配置改动不在 AI 可以自主决定的范围内。
 - Phase 3（Week 5-7）全部完成，`05`/`06` 号文档规划的工作项已清零；`00-refactor-overview.md` 规划的 Phase 1-3 三阶段整体重构到此收尾，剩余的都是本文档各 Week 条目里零散记录的"已知问题"待办（如 `.ts` 文件全仓 ESLint 覆盖、115→105 条 `indent` warning 的统一格式化批次、`useIsMobile` composable 抽取评估等），不再是 Phase 排期内的强制项，后续按需处理即可。
+
+## 2026-07-14：路由命名空间彻底分离（`/bgg/admin/*` vs `/bgg/front/*`，修复 F5 硬刷新误跳公共页 bug）
+
+不属于 Phase 1-3 排期内的条目，是用户反馈的独立 bug：后台「博客管理」相关页面 F5 硬刷新后经常莫名跳到公共博客列表页，视频管理也有类似现象。
+
+**根因**（codegraph + mysql MCP 交叉核对源码和真实数据确认，完整记录见 `10-route-namespace-migration.md`）：`admin-frontend` 之前用同一个 `createWebHistory('/admin/')` 同时承载后台管理页面（登录后异步拉取菜单才注册的动态路由）和公共展示页面（启动时就注册的静态路由），两者在路由 path 层面共用同一套字面量前缀（`admin_menu` 表里「博客管理」目录的 `path` 就是字面量 `/blog`，和公共博客列表页路由 path 完全相同）。F5 硬刷新时如果地址栏恰好落在这类重复前缀上，会在动态路由注册完成前被公共静态路由抢先精确匹配；原有"重新解析"补救逻辑只处理"匹配到 NotFound"，没处理"匹配到了一个存在但错误的路由"这种情况，于是停留在了公共页面。
+
+**方案**：用户确认未上线、无需兼容性、要求"做彻底"，选择结构性方案而非修补时序——路由 base 改为 `/bgg/`，内部分成互不共享前缀段的 `/admin/*`（后台，原有子路径原样加前缀）和 `/front/*`（公共）两个命名空间，逐条核对现有全部后台子路径确认新方案下无任何交叉，从结构上消除这类冲突的可能性；同时顺手加固了"重新解析"逻辑（不再只在 NotFound 时才补救）作为防御性补强。
+
+**涉及改动**：`router/index.ts`/`utils/request.ts` 核心路由与 guard 改造；全项目约 15 个文件的硬编码路由字面量批量改前缀；`stores/notification.ts` 聊天页检测字面量同步；`vite.config.ts` base 从 `/admin/` 改 `/bgg/`；`config/nginxconfig.txt` 的 `location /admin` 改 `location /bgg`（部署配置改动，未执行任何实际部署动作）；新增 `admin-server/db/services/iam/menu/migrations/add_admin_prefix_to_menu_path_20260714.sql`（`admin_menu.path` 统一加 `/admin` 前缀 + 修正 `chat_config` 字典项，已确认后台鉴权按菜单 id 关联、不按 path 字符串匹配，不影响权限逻辑；**已按用户要求执行**，执行后核对 0 条遗漏、字典值同步更新）；`AGENTS.md`、`.cursor/rules/00-workflow.mdc`（SSOT，已跑 `make sync-claude-rules` 同步）的 URL 约定描述同步更新；`request.spec.ts`/`notification.spec.ts` 断言同步更新。
+
+详细方案、涉及文件清单、验证步骤见 `admin-frontend/docs/10-route-namespace-migration.md`，不在本文重复。
+
+**验证**：`npm run typecheck`（0 error）、`npm run test`（13 个测试文件、85 个用例全部通过，含本轮更新的 `request.spec.ts`/`notification.spec.ts`）均已跑过并全绿；DB 迁移已执行并核对（`admin_menu`/`chat_config` 0 条遗漏）。拉起 dev server 后用 Playwright 直接验证过路由结构：裸 `/bgg/` → 重定向到 `/bgg/front`（Home 正确渲染）、未登录访问 `/bgg/admin/blog/article` → 正确跳转 `/bgg/admin/login`（guard 生效）、`/bgg/front/blog` 免登录可访问且拉到真实数据、`/bgg/admin/login` 直接访问保持不跳转。**唯一未验证的场景**：登录状态下在 `/bgg/admin/blog/article` 做 F5 硬刷新这一原始 bug 复现场景——没有测试账号密码，无法在 AI 侧完成，需要用户在本机登录后手动验证一次。
+
+**已知问题 / 下一步**：
+- 登录态下的 F5 硬刷新复现场景（见上）需要用户手动验证一次，验证通过后本条目才算完全收尾。
+- `config/nginxconfig.txt` 的改动只落库到仓库文件，实际生产 nginx 配置未同步（未上线，不影响当前开发），后续部署时需要一并同步。
+- Code review 过程中被反复挡出的 `VideoDetail.vue` 播放事件埋点未走 `MetricReporter` 统一入口——这是本轮改动之前就存在的问题（上一条 Phase 3 Week 7 记录已确认过），本轮对该文件的改动只涉及公共路由前缀（`/videos` → `/front/videos`），未新增未修复这个问题，维持之前"独立评估 `MetricReporter` 命令式触发能力"的待办结论不变。

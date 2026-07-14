@@ -264,7 +264,7 @@ const goToDetail = (id: number) => {
   }
 
   router.push({
-    path: `/videos/${id}`,
+    path: `/front/videos/${id}`,
     query: {
       page: String(query.page),
       size: String(query.size),

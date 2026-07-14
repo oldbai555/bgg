@@ -182,7 +182,7 @@ const handleToggleCollapse = () => {
 const handleLogout = async () => {
   await userStore.logout()
   ElMessage.success(t('common.logout'))
-  router.push('/login')
+  router.push('/admin/login')
 }
 </script>
 

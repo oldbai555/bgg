@@ -272,7 +272,7 @@ const goToDetail = (id: number) => {
     }
   }
 
-  router.push(`/blog/${id}`)
+  router.push(`/front/blog/${id}`)
 }
 
 // 从详情页返回时恢复滚动位置：page/size/keyword/tagId 已经通过 route.query 恢复

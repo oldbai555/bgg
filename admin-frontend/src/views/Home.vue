@@ -4,9 +4,9 @@
       <h1 class="title">欢迎</h1>
       <p class="subtitle">博客与视频内容展示</p>
       <div class="links">
-        <router-link to="/blog" class="link-button">📝 博客</router-link>
-        <router-link to="/videos" class="link-button">🎬 视频</router-link>
-        <router-link to="/login" class="link-button">🔐 后台</router-link>
+        <router-link to="/front/blog" class="link-button">📝 博客</router-link>
+        <router-link to="/front/videos" class="link-button">🎬 视频</router-link>
+        <router-link to="/admin/login" class="link-button">🔐 后台</router-link>
       </div>
     </div>
     <IcpFooter />

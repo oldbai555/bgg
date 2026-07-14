@@ -144,21 +144,21 @@ server {
     # ------------------------------------------------------------
     # Vue应用的访问路径（history 路由模式）
     # ------------------------------------------------------------
-    location /admin {
+    location /bgg {
         alias /tmp/admin-cache;
         index index.html index.htm;
         # 对于 SPA history 路由，所有路径都回退到 index.html
-        try_files $uri $uri/ /admin/index.html;
-        
+        try_files $uri $uri/ /bgg/index.html;
+
         # 静态资源缓存
-        location ~ ^/admin/.*\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+        location ~ ^/bgg/.*\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
             expires 1y;
             add_header Cache-Control "public, immutable";
             access_log off;
         }
-        
+
         # HTML文件不缓存
-        location ~ ^/admin/.*\.html$ {
+        location ~ ^/bgg/.*\.html$ {
             add_header Cache-Control "no-cache, no-store, must-revalidate";
             add_header Pragma "no-cache";
             add_header Expires "0";
@@ -166,11 +166,11 @@ server {
     }
 
     # ------------------------------------------------------------
-    # 默认入口：访问 oldbai.top/ 自动进入导航页（Home.vue）
-    # Vue 使用 history 路由，base 是 /admin/，所以重定向到 /admin/
+    # 默认入口：访问 oldbai.top/ 自动进入公共首页（Home.vue，/bgg/front 分支）
+    # Vue 使用 history 路由，base 是 /bgg/，公共页面收在 /bgg/front 下，所以重定向到 /bgg/front/
     # ------------------------------------------------------------
     location = / {
-        return 302 /admin/;
+        return 302 /bgg/front/;
     }
 
     # ------------------------------------------------------------

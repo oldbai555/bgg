@@ -5,10 +5,10 @@
         <span class="public-header__logo">BGG</span>
       </div>
       <nav class="public-header__nav">
-        <router-link to="/blog" class="public-header__nav-item" :class="{'is-active': activeTab === 'blog'}">
+        <router-link to="/front/blog" class="public-header__nav-item" :class="{'is-active': activeTab === 'blog'}">
           博客
         </router-link>
-        <router-link to="/videos" class="public-header__nav-item" :class="{'is-active': activeTab === 'video'}">
+        <router-link to="/front/videos" class="public-header__nav-item" :class="{'is-active': activeTab === 'video'}">
           视频
         </router-link>
       </nav>
@@ -41,8 +41,8 @@ const route = useRoute()
 const socialInfoList = ref<PublicBlogSocialInfoListResp['list']>([])
 
 const activeTab = computed<'blog' | 'video' | ''>(() => {
-  if (route.path.startsWith('/blog')) return 'blog'
-  if (route.path.startsWith('/videos')) return 'video'
+  if (route.path.startsWith('/front/blog')) return 'blog'
+  if (route.path.startsWith('/front/videos')) return 'video'
   return ''
 })
 
@@ -63,7 +63,7 @@ const getSocialIconText = (name: string): string => {
 }
 
 const goHome = () => {
-  router.push('/blog')
+  router.push('/front/blog')
 }
 
 const loadSocialInfo = async () => {

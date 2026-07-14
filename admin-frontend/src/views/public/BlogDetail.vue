@@ -61,7 +61,7 @@
           <div v-if="prevArticle || nextArticle" class="detail-navigation">
             <router-link
               v-if="prevArticle"
-              :to="`/blog/${prevArticle.id}`"
+              :to="`/front/blog/${prevArticle.id}`"
               class="nav-item nav-prev"
             >
               <div class="nav-label">← 上一页</div>
@@ -74,7 +74,7 @@
 
             <router-link
               v-if="nextArticle"
-              :to="`/blog/${nextArticle.id}`"
+              :to="`/front/blog/${nextArticle.id}`"
               class="nav-item nav-next"
             >
               <div class="nav-label">下一页 →</div>
@@ -222,7 +222,7 @@ const handleContentRendered = (html: string) => {
 
 const handleTagSelect = (tagId: number) => {
   router.push({
-    path: '/blog',
+    path: '/front/blog',
     query: {tagId: tagId > 0 ? tagId : undefined}
   })
 }
@@ -244,7 +244,7 @@ const goBack = () => {
             scrollTop?: number
           }
           router.push({
-            path: '/blog',
+            path: '/front/blog',
             query: {
               ...(parsed.page && {page: String(parsed.page)}),
               ...(parsed.size && {size: String(parsed.size)}),
@@ -258,7 +258,7 @@ const goBack = () => {
         // 忽略解析错误
       }
     }
-    router.push('/blog')
+    router.push('/front/blog')
   }
 }
 

@@ -14,7 +14,7 @@ export function generateBreadcrumb(
   // 首页
   breadcrumbs.push({
     title: '首页',
-    path: '/dashboard'
+    path: '/admin/dashboard'
   });
 
   // 查找当前路由对应的菜单项

@@ -18,22 +18,22 @@ const setPath = (path: string) => {
 }
 
 describe('isPublicPath', () => {
-  it('/blog 和 /videos 开头的路径判定为公共页面', () => {
-    setPath('/blog/1')
+  it('/front 开头的路径判定为公共页面', () => {
+    setPath('/front/blog/1')
     expect(isPublicPath()).toBe(true)
-    setPath('/videos')
+    setPath('/front/videos')
     expect(isPublicPath()).toBe(true)
   })
 
   it('后台管理路径判定为非公共页面', () => {
-    setPath('/dashboard')
+    setPath('/admin/dashboard')
     expect(isPublicPath()).toBe(false)
   })
 
-  it('用路由解析后的 path 判断，不受生产环境 /admin base 前缀影响', () => {
+  it('用路由解析后的 path 判断，不受生产环境 /bgg base 前缀影响', () => {
     // router.currentRoute.value.path 本身就是去掉 base 前缀之后的路径（Vue Router 行为），
-    // 这里模拟的正是这种"真实 URL 是 /admin/blog，但 route.path 是 /blog"的场景
-    setPath('/blog/1')
+    // 这里模拟的正是这种"真实 URL 是 /bgg/front/blog，但 route.path 是 /front/blog"的场景
+    setPath('/front/blog/1')
     expect(isPublicPath()).toBe(true)
   })
 })
@@ -42,7 +42,7 @@ describe('handleResponse', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
     vi.clearAllMocks()
-    setPath('/dashboard')
+    setPath('/admin/dashboard')
   })
 
   it('code 为 0 时解包并返回 data', () => {
@@ -80,11 +80,11 @@ describe('handleResponse', () => {
     expect(userStore.token).toBe('')
     expect(userStore.permissions).toEqual([])
     expect(localStorage.getItem('admin_token')).toBeNull()
-    expect(router.push).toHaveBeenCalledWith('/login')
+    expect(router.push).toHaveBeenCalledWith('/admin/login')
   })
 
   it('公共页面上 10003 不跳转登录页（避免打断游客浏览）', async () => {
-    setPath('/blog/1')
+    setPath('/front/blog/1')
     await expect(
       Promise.resolve(handleResponse({data: {code: 10003, msg: '登录已过期', data: null}}))
     ).rejects.toThrow()
@@ -96,7 +96,7 @@ describe('handleResponseError', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
     vi.clearAllMocks()
-    setPath('/dashboard')
+    setPath('/admin/dashboard')
   })
 
   it('优先使用 response.data.msg 作为错误信息', async () => {
@@ -124,6 +124,6 @@ describe('handleResponseError', () => {
     ).rejects.toThrow()
 
     expect(userStore.token).toBe('')
-    expect(router.push).toHaveBeenCalledWith('/login')
+    expect(router.push).toHaveBeenCalledWith('/admin/login')
   })
 })
