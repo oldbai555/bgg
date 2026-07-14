@@ -126,8 +126,38 @@
 **Why**：按 `00-refactor-overview.md` 第 3 节 Phase 2 Week 4 排期收尾 Phase 2；`03`/`09` 号文档均明确"完成的定义"包含测试覆盖和规则文档同步这两项，不是可选项。
 
 **已知问题 / 下一步**：
-- **需要用户后续找机会实际执行一次 `generate-sql.sh` 验证脚手架模板改动**：确认生成出的 `<GroupUpper>List.vue` 确实 `import` 了正确的域 wrapper 且能正常编译/运行，本轮只做了离线模板渲染验证，未走完整生成流程。
+- **脚手架模板改动（`list_page.vue.tpl` 的 domain 化 import）验证方式已与用户确认：不单独安排验证动作，等后面新增业务模块时顺路走一次 `generate-sql.sh` 自然验证，不需要为此专门开一次生成流程。**
 - Phase 2（Week 3-4）全部完成，`04`/`03` 号文档规划的工作项已清零；下一步进入 Phase 3（Week 5-7，视觉与响应式重构），起点是 `05-design-system-and-tokens.md` 的设计令牌落地。
+
+---
+
+## 2026-07-14：Phase 3 Week 5 启动（设计令牌落地第一批：admin 侧硬编码色值清零）
+
+**What**：
+
+1. **范围决策（与用户确认）**：`grep` 全仓发现 23 个文件有硬编码十六进制色值（比 `05` 号文档写文档时的 17 处又多了几处，是文档产出后到执行前之间新写的代码）。这 23 个文件天然分两类——admin 侧管理页面（13 个）和公共展示页（`views/public/**` 4 个 + `components/blog/**` 5 个，共 10 个）。因为 `06-responsive-and-public-pages-redesign.md` 规划了公共页面的整体重构（且 `05` 号文档自己也说暗色适配要"先做 06 号文档的公共页面重构，再回来"），现在对这 10 个文件做令牌替换大概率会被 06 的重写推翻、做无用功——征得用户同意后，本轮**只做 admin 侧文件，公共页面延后到 06 号文档重构时一起做令牌化**。
+2. **范围执行中的修正**：最初把 `src/views/Home.vue`（路由 `/`）算进 admin 侧 13 个文件之一，读完内容才发现它其实是网站根路径的公共着陆页（链接到 `/blog`/`/videos`/`/login`，暖色渐变 `#fff7e6/#ffe9d9/#ffd1a4` 与 `views/public/**` 是同一套公共页面品牌色），不是 admin 页面——已改口把它并入"延后到 06 号文档"的公共页面批次，实际本轮只处理 12 个文件：`Dashboard.vue`、`Login.vue`、`components/common/D2Table.vue`、`components/common/ImageUpload.vue`、`views/iam/MenuList.vue`、`views/monitoring/MetricStats.vue`、`views/monitoring/MonitorList.vue`、`views/misc/DailyShortSentenceList.vue`、`views/content/VideoList.vue`、`views/content/BlogArticleEdit.vue`（另外 `components/chat/ChatMessageBubble.vue`/`views/chat/ChatGroupList.vue`/`views/iam/DepartmentList.vue` 三个文件初筛 grep 命中的其实是 `#default`/`&#039;` 这类假阳性，核实后无需改动）。
+3. **`vite.config.ts` 全局注入 `variables.scss`**（对应 `05` 号文档 §2.3）：加了 `css.preprocessorOptions.scss.additionalData`，让所有 `.vue` 文件的 `<style lang="scss">` 块无需 `@import`/`@use` 即可直接用 `$spacing-md` 等 SCSS 变量。**踩坑**：第一版用 `@import "@/styles/variables.scss";` 注入，`npm run build` 时在 `layout.scss`（本身第一行是 `@use './variables.scss' as *;`）报错 `@use rules must be written before any other rules`——因为 additionalData 是**前置拼接**到每个文件内容前面，`@import`（非 `@use`）排在文件自己的 `@use` 之前就违反了 Sass "`@use`/`@forward` 必须在文件最前面"的规则。改成用 `@use "@/styles/variables.scss" as *;` 注入后问题消失（两次 `@use` 同一个模块——一次来自全局注入，一次来自文件自己已有的 `@use`——是幂等的，不会报错，`layout.scss`/`PageHeader.vue`/`AppHeader.vue`/`AppSidebar.vue` 这几个此前手动 `@use` 变量文件的组件不需要跟着改，两种写法共存不冲突）。
+4. **`theme.scss` 补充两个此前缺失的语义令牌**：Element Plus 的灰阶其实是三档（`#303133` 主文本 / `#606266` 常规文本 / `#909399` 次要文本），但项目原来的 `--color-text-primary`/`--color-text-secondary` 只覆盖了两档，`#606266` 这档在硬编码色值里出现频率很高（Dashboard/Login/MetricStats/MonitorList 都有）却没有对应令牌——新增 `--color-text-regular`（浅色 `#606266`/深色 `#cfd3dc`，深色值参考 Element Plus 官方暗色规范里同一档的对应值）。同理补了 `--color-border-light`（浅色 `#ebeef5`/深色 `#363637`，对应"更浅一档"的分隔线，MetricStats 图表条的 inset 阴影在用）。另外为 Login.vue 的背景渐变、MetricStats 统计卡片的紫色渐变各新增一个具名令牌（`--gradient-login-bg`、`--gradient-purple-banner`）——**这两个渐变令牌刻意只写了浅色值，没有配暗色变体**：渐变本身是否要在暗色模式下改样式属于视觉判断（`08` 号文档执行策略表第 2 条"暗色模式下具体视觉细节的取舍…如有明显主观判断空间需要问"），本轮职责只是把硬编码值原样搬进令牌（浅色渲染结果零变化），暗色下要不要单独设计留给 Phase 3 后续的"暗色模式全面适配"步骤（`05` 号文档 §3）决定，不在本轮擅自拍板。
+5. **12 个文件的硬编码色值逐一替换**：多数是精确匹配（如 `#409eff`→`var(--color-primary)`、`#303133`→`var(--color-text-primary)`，色值字面完全相等，浅色模式下渲染结果不可能有像素级差异）；3 处是语义近似替换而非字面相等——`ImageUpload.vue` 的 `#8c939d`、`content/VideoList.vue` 的 `#999`、`content/BlogArticleEdit.vue` 的 `#666`，三者都换成了 `var(--color-text-secondary)`/`var(--color-text-regular)`，视觉上是同一档次的灰色调但十六进制值不完全相等（如 `#666666` vs 令牌的 `#606266`），肉眼基本不可辨，如实记录不是"零差异"替换。`MetricStats.vue`/`MonitorList.vue` 里有几处色值是在 `<script>` 里作为 JS 字符串赋给统计卡图标/进度条颜色（如 `{color: '#67c23a'}` 这种数据数组，运行时通过 `:style="{backgroundColor: item.color}"`/`el-progress` 的 `:color` prop 消费），确认这类内联 style 绑定同样能正确解析 `var(--xxx)` 字符串后才替换（CSS 自定义属性的解析不区分是在静态样式表还是运行时内联 style 里出现）。`MetricStats.vue` 紫色渐变卡片上的 `color: #fff` **刻意没有改**——这个白色文字是叠在固定紫色渐变背景上的装饰性配色，渐变本身当前不响应暗色模式，文字颜色跟着改成 `var(--color-text-xxx)` 反而会在浅色模式下就破坏对比度，等 Phase 3 暗色适配阶段一并设计这张卡片的暗色版本时再处理。
+6. **验证**：`npm run typecheck`（0 error）、`npm run build`（成功，警告与本轮无关的既有 chunk 过大提示）、`npm run lint`（0 error，99 warning，与改动前持平）三项通过。**未做真实浏览器视觉验证**——本环境没有 Playwright/DevTools 类浏览器自动化 MCP，且本机没有拉起 `admin-server` 完整链路（同 Week 3 `ChatList.vue` 拆分时记录的环境限制），`npm run dev` 只确认了页面能正常编译返回 200，未登录查看 Dashboard/MonitorList/MetricStats 等需要鉴权的页面实际渲染效果；`Login.vue`（唯一不需要登录的改动页面）也未截图核对。浅色模式下的正确性有较强把握（大多数替换是十六进制值逐字节相等，数学上不可能有视觉差异，仅 3 处近似替换有极小色差），但仍需要用户在下次有条件跑通完整环境时人工过一遍这几个页面确认。
+
+**Why**：按 `00-refactor-overview.md` 第 3 节 Phase 3 排期，`05-design-system-and-tokens.md` §2"设计令牌落地"是暗色模式全面适配的前置步骤（令牌化之后大部分视图能"顺带"响应暗色切换）；`08-dev-execution-and-review-points.md` 第 1 条已明确"设计令牌落地（硬编码色值替换为 CSS 变量/SCSS 变量）…可以直接执行"，不需要逐次停下确认。
+
+**已知问题 / 下一步**：
+- **需要用户下次跑通完整 admin-server 链路后，人工核对本轮改动的 12 个文件在浅色/暗色下的实际渲染**，尤其是新增的 `--color-text-regular`/`--color-border-light` 两个此前不存在的令牌——它们首次让这些位置的颜色在暗色模式下和浅色模式下不同（此前是硬编码，不管什么主题都是同一个颜色），这是预期中的行为变化（暗色适配的一部分），但没有截图/人工看过，不能排除对比度不理想的情况。
+- 公共页面（`views/public/**` 4 个文件 + `components/blog/**` 5 个 + `views/Home.vue`，共 11 个文件）的令牌化延后到 `06-responsive-and-public-pages-redesign.md` 执行阶段一并做，不在 Week 5 范围内，避免与后续重写冲突。
+- `--gradient-login-bg`/`--gradient-purple-banner` 两个渐变令牌暂无暗色变体，`05` 号文档 §3"暗色模式全面适配"执行时需要专门设计这两处的暗色呈现（或者判断维持渐变不变、只调文字/阴影）。
+- `05` 号文档 §2 提到的"全仓 46 处内联 `style="..."` 属性，需要抽查分类哪些是动态计算值必须内联、哪些应该挪进令牌"这一项本轮未做，只顺带处理了内联 style 里恰好是硬编码色值的几处（D2Table.vue 一处），其余可能是尺寸/定位类的内联 style 未排查，留给 Week 5 剩余工作或 Week 6。
+- `views/monitoring/MonitorList.vue`/`views/monitoring/MetricStats.vue` 的图标/进度条颜色本轮改成了 `var(--xxx)` 字符串，逻辑等价但引入了一个新的隐性依赖：这些颜色值现在依赖 `theme.scss` 的 `:root`/`[data-theme='dark']` 定义是否加载，如果这两个文件未来被抽成独立组件/在没有全局样式的上下文里渲染（目前没有这种场景），需要注意这个隐性依赖。
+
+**提交前 `gga` 审查修复**：首次 `git commit` 被 `gga` 拦下 3 个问题，逐一核实后确认都是本轮 diff 未触碰过的存量代码（与设计令牌改动本身无关），与用户确认后选择顺带修好再提交（而不是像 Week 1/2/4 先例那样 `--no-verify` 跳过）：
+
+1. **`views/content/VideoList.vue` 的 `video_source_type` 字典未生效**：字典本身在 `db/services/iam/dict/init_dict.sql` 里早已存在，问题出在 `stores/dict.ts` 的 `REQUIRED_DICT_CODES` 漏收了这个 code——`fetchDicts()` 不传显式 code 时只预载 `REQUIRED_DICT_CODES` 里的字典，导致这个下拉此前几乎总是走 `useDictOptions` 的硬编码 fallback，字典链路名存实亡。同时顺手补上了本轮新引入的 `metric_module`（见下）。一行修复，无副作用。
+2. **`views/misc/DailyShortSentenceList.vue` 的 `createdAt` 列缺 `type: D2TableElemType.ConvertTime`**：核对同批其它列表页（`content/VideoList.vue`/`chat/ChatMessageList.vue`/`content/BlogArticleAuditList.vue`/`content/BlogArticleList.vue`）全部对 `createdAt` 用了 `ConvertTime`，这里独漏，此前会把后端返回的 int64 秒级时间戳原样展示成一串数字而不是格式化时间——真实展示 bug，一行修复。
+3. **`views/monitoring/MetricStats.vue` 的"业务模块"下拉硬编码四个 `<el-option>`**：核实这四个值（`blog_article_list`/`blog_article_detail`/`video_list`/`video_detail`）对应后端 `internal/consts/blog.go` 的 `MetricModuleXxx` Go 常量，此前既不是数据库字典也不是任何业务表的枚举列，纯粹是埋点标识符——不能像 `20-frontend.md` 里"实体自身原始 DB 布尔状态列不强行字典化"那条例外一样简单豁免，因为这是货真价实的下拉选项且未来可能增加新模块，理应可通过字典管理界面维护标签文案。新增 `admin-server/db/services/iam/metric/migrations/dict_metric_module_20260714.sql`（`metric_module` 字典类型 + 4 个字典项，`value` 直接用 Go 常量字符串，参照 `sdk_http_method` 字典同样是字符串 value 而非数字的先例，不受"字典 value 从 1 开始"规则约束——那条规则只管数字型枚举）；前端改用 `useDictOptions('metric_module', [...同样四个值兜底])`，`REQUIRED_DICT_CODES` 加入 `metric_module`。**SQL 未执行**，按 `08-dev-execution-and-review-points.md` 第 3 条"数据修正/新增字典 SQL 需要用户确认"的既有口径，等待用户在本机开发库确认后执行；执行前这个下拉走 `useDictOptions` 的 fallback 照常工作，与此前硬编码的视觉/行为完全一致。
+
+三处修复后 `gga` 复审通过，`npm run typecheck`/`npm run build`/`npm run lint`（0 error，99 warning，与本轮此前持平）三项重新验证全绿。
 - D2Table 的分页双重上抛 bug 修复后，理论上所有用 D2Table 的视图分页请求次数会减半（从每次操作 2 次变 1 次），这是行为改进但不是本轮范围内需要额外验证的独立任务，测试已覆盖回归。
 - `views/temp/` 目录本身在 Week 2 死代码清理后已清空但目录还在磁盘上（git 不追踪空目录，无需处理）。
 - **`npm run lint` 实际只检查 `.vue` 文件，裸 `.ts` 文件全仓未被检查**（本条目"关于 ESLint 覆盖范围的发现"小节已详述），需要用户决定何时安排一次独立的 `.ts` 文件规则清理批次，不建议顺带处理。

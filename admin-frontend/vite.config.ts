@@ -39,6 +39,16 @@ export default defineConfig(({mode}) => {
         '@': fileURLToPath(new URL('./src', import.meta.url))
       }
     },
+    css: {
+      preprocessorOptions: {
+        scss: {
+          // 全局注入间距/圆角/阴影等 SCSS 令牌，业务 .vue 文件无需逐个 @use；
+          // 必须用 @use（而非 @import）——Sass 要求 @use 出现在文件其它规则之前，
+          // 部分文件（如 layout.scss）已自带 @use './variables.scss' as *，两次 @use 同一模块是幂等的
+          additionalData: `@use "@/styles/variables.scss" as *;`
+        }
+      }
+    },
     server: {
       port: 5173,
       // 开发服务器自动打开浏览器时使用正确的路径

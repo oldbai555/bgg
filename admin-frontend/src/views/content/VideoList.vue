@@ -351,7 +351,7 @@ onUnmounted(() => {
 }
 
 .no-cover {
-  color: #999;
+  color: var(--color-text-secondary);
   font-size: 12px;
 }
 

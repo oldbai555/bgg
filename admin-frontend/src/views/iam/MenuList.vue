@@ -403,7 +403,7 @@ onMounted(loadData)
 }
 .form-tip {
   font-size: 12px;
-  color: #909399;
+  color: var(--color-text-secondary);
   margin-top: 4px;
 }
 </style>

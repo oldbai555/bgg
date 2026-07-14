@@ -167,13 +167,13 @@ const monitorStatsData = ref<MonitorStatsResp>({
 
 // 统计卡片数据
 const statsCards = computed(() => [
-  {key: 'user', label: '用户总数', value: monitorStatsData.value.userCount, icon: User, color: '#409EFF'},
-  {key: 'role', label: '角色总数', value: monitorStatsData.value.roleCount, icon: Key, color: '#67C23A'},
-  {key: 'permission', label: '权限总数', value: monitorStatsData.value.permissionCount, icon: Key, color: '#E6A23C'},
-  {key: 'menu', label: '菜单总数', value: monitorStatsData.value.menuCount, icon: Menu, color: '#F56C6C'},
-  {key: 'online', label: '在线用户', value: monitorStatsData.value.onlineUserCount, icon: Connection, color: '#909399'},
-  {key: 'operationLog', label: '操作日志', value: monitorStatsData.value.operationLogCount, icon: Document, color: '#606266'},
-  {key: 'loginLog', label: '登录日志', value: monitorStatsData.value.loginLogCount, icon: Document, color: '#909399'}
+  {key: 'user', label: '用户总数', value: monitorStatsData.value.userCount, icon: User, color: 'var(--color-primary)'},
+  {key: 'role', label: '角色总数', value: monitorStatsData.value.roleCount, icon: Key, color: 'var(--color-success)'},
+  {key: 'permission', label: '权限总数', value: monitorStatsData.value.permissionCount, icon: Key, color: 'var(--color-warning)'},
+  {key: 'menu', label: '菜单总数', value: monitorStatsData.value.menuCount, icon: Menu, color: 'var(--color-danger)'},
+  {key: 'online', label: '在线用户', value: monitorStatsData.value.onlineUserCount, icon: Connection, color: 'var(--color-text-secondary)'},
+  {key: 'operationLog', label: '操作日志', value: monitorStatsData.value.operationLogCount, icon: Document, color: 'var(--color-text-regular)'},
+  {key: 'loginLog', label: '登录日志', value: monitorStatsData.value.loginLogCount, icon: Document, color: 'var(--color-text-secondary)'}
 ])
 
 // 监控状态数据（用于显示）
@@ -223,12 +223,12 @@ return '0 B'
 // 获取进度条颜色
 const getProgressColor = (percentage: number) => {
   if (percentage < 50) {
-return '#67c23a'
+return 'var(--color-success)'
 }
   if (percentage < 80) {
-return '#e6a23c'
+return 'var(--color-warning)'
 }
-  return '#f56c6c'
+  return 'var(--color-danger)'
 }
 
 // 定时刷新
@@ -291,14 +291,14 @@ onUnmounted(() => {
 
   &__label {
     font-size: 14px;
-    color: #909399;
+    color: var(--color-text-secondary);
     margin-bottom: 4px;
   }
 
   &__value {
     font-size: 24px;
     font-weight: bold;
-    color: #303133;
+    color: var(--color-text-primary);
   }
 }
 
@@ -311,7 +311,7 @@ onUnmounted(() => {
 .monitor-item {
   &__label {
     font-size: 14px;
-    color: #606266;
+    color: var(--color-text-regular);
     margin-bottom: 8px;
   }
 
@@ -320,7 +320,7 @@ onUnmounted(() => {
     gap: 16px;
     margin-top: 8px;
     font-size: 12px;
-    color: #909399;
+    color: var(--color-text-secondary);
   }
 
   &__network {
@@ -334,14 +334,14 @@ onUnmounted(() => {
 
   &__label {
     font-size: 12px;
-    color: #909399;
+    color: var(--color-text-secondary);
     margin-bottom: 4px;
   }
 
   &__value {
     font-size: 18px;
     font-weight: bold;
-    color: #303133;
+    color: var(--color-text-primary);
     margin-bottom: 4px;
   }
 }

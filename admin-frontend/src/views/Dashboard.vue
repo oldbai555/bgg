@@ -130,7 +130,7 @@ onMounted(() => {
 }
 
 .is-selected {
-  color: #409eff;
+  color: var(--color-primary);
 }
 
 .date-text {
@@ -146,7 +146,7 @@ onMounted(() => {
 .daily-quote {
   margin: 4px 0 0 0;
   font-size: 12px;
-  color: #606266;
+  color: var(--color-text-regular);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

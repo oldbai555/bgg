@@ -364,7 +364,7 @@ onMounted(async () => {
     margin-bottom: 8px;
 
     .hint {
-      color: #666;
+      color: var(--color-text-regular);
       font-size: 12px;
     }
   }

@@ -315,7 +315,7 @@
                 </div>
               </template>
             </el-image>
-            <span v-else-if="!isEdit && !drawerRow[column.prop]" style="color: #909399">暂无图片</span>
+            <span v-else-if="!isEdit && !drawerRow[column.prop]" style="color: var(--color-text-secondary)">暂无图片</span>
           </div>
           <!-- 默认标签 -->
           <el-tag v-else>

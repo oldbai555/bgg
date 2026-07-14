@@ -126,7 +126,7 @@ const columns = computed<TableColumn[]>(() => [
   {prop: 'content', label: '短句内容', minWidth: 200},
   {prop: 'type', label: '类型', width: 100},
   {prop: 'literatureAuthor', label: '作者', width: 120},
-  {prop: 'createdAt', label: t('common.createdAt'), width: 180}
+  {prop: 'createdAt', label: t('common.createdAt'), width: 180, type: D2TableElemType.ConvertTime}
 ])
 
 // 详情/编辑抽屉列配置
@@ -298,8 +298,8 @@ onMounted(loadData)
   justify-content: center;
   width: 100px;
   height: 100px;
-  background-color: #f5f7fa;
-  color: #909399;
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-secondary);
   font-size: 12px;
   border-radius: 4px;
 }

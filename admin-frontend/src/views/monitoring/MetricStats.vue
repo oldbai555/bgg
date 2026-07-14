@@ -10,10 +10,12 @@
             clearable
             style="width: 200px"
           >
-            <el-option label="博客文章列表" value="blog_article_list" />
-            <el-option label="博客文章详情" value="blog_article_detail" />
-            <el-option label="视频列表" value="video_list" />
-            <el-option label="视频详情" value="video_detail" />
+            <el-option
+              v-for="option in moduleOptions"
+              :key="option.value"
+              :label="option.label"
+              :value="option.value"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="业务ID">
@@ -108,7 +110,16 @@
 import {computed, reactive, ref} from 'vue'
 import {ElMessage} from 'element-plus'
 import {monitoringApi} from '@/api/monitoring'
+import {useDictOptions} from '@/composables/useDictOptions'
 import type {MetricStatsReq, MetricStatsResp} from '@/api/generated/admin'
+
+// 业务模块选项（字典 metric_module，value 对应后端 MetricModuleXxx 常量字符串）
+const {options: moduleOptions} = useDictOptions('metric_module', [
+  {label: '博客文章列表', value: 'blog_article_list'},
+  {label: '博客文章详情', value: 'blog_article_detail'},
+  {label: '视频列表', value: 'video_list'},
+  {label: '视频详情', value: 'video_detail'}
+])
 
 const loading = ref(false)
 const stats = ref<MetricStatsResp | null>(null)
@@ -132,10 +143,10 @@ const chartData = computed(() => {
 return []
 }
   const items = [
-    {key: 'pv', label: 'PV', value: stats.value.pv, color: '#67c23a'},
-    {key: 'uv', label: 'UV', value: stats.value.uv, color: '#409eff'},
-    {key: 'vv', label: 'VV', value: stats.value.vv, color: '#e6a23c'},
-    {key: 'ip', label: 'IP', value: stats.value.ip, color: '#f56c6c'}
+    {key: 'pv', label: 'PV', value: stats.value.pv, color: 'var(--color-success)'},
+    {key: 'uv', label: 'UV', value: stats.value.uv, color: 'var(--color-primary)'},
+    {key: 'vv', label: 'VV', value: stats.value.vv, color: 'var(--color-warning)'},
+    {key: 'ip', label: 'IP', value: stats.value.ip, color: 'var(--color-danger)'}
   ]
   const max = Math.max(...items.map((i) => i.value), 1) // 避免全 0 时除以 0
   return items.map((i) => ({
@@ -186,20 +197,20 @@ const handleReset = () => {
   .stats-header {
     margin-bottom: 24px;
     padding-bottom: 16px;
-    border-bottom: 1px solid #e4e7ed;
+    border-bottom: 1px solid var(--color-border);
 
     h3 {
       margin: 0 0 12px;
       font-size: 18px;
       font-weight: 600;
-      color: #303133;
+      color: var(--color-text-primary);
     }
 
     .stats-meta {
       display: flex;
       gap: 24px;
       font-size: 14px;
-      color: #606266;
+      color: var(--color-text-regular);
 
       span {
         display: inline-flex;
@@ -216,7 +227,7 @@ const handleReset = () => {
 
   .stat-card {
     padding: 20px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--gradient-purple-banner);
     border-radius: 12px;
     color: #fff;
     text-align: center;
@@ -251,13 +262,13 @@ const handleReset = () => {
 .chart-wrapper {
   margin-top: 32px;
   padding-top: 20px;
-  border-top: 1px dashed #e4e7ed;
+  border-top: 1px dashed var(--color-border);
 
   .chart-title {
     margin: 0 0 16px;
     font-size: 16px;
     font-weight: 600;
-    color: #303133;
+    color: var(--color-text-primary);
   }
 
   .chart-bars {
@@ -274,7 +285,7 @@ const handleReset = () => {
     flex-direction: column;
     align-items: center;
     font-size: 13px;
-    color: #606266;
+    color: var(--color-text-regular);
   }
 
   .chart-bar {
@@ -285,8 +296,8 @@ const handleReset = () => {
     justify-content: center;
     padding: 4px 0;
     border-radius: 999px;
-    background: #f5f7fa;
-    box-shadow: inset 0 0 0 1px #ebeef5;
+    background: var(--color-bg-secondary);
+    box-shadow: inset 0 0 0 1px var(--color-border-light);
     margin-bottom: 8px;
   }
 
@@ -308,7 +319,7 @@ const handleReset = () => {
 
 .empty-tip {
   text-align: center;
-  color: #909399;
+  color: var(--color-text-secondary);
   padding: 60px 0;
   font-size: 14px;
 }

@@ -102,7 +102,7 @@ return
   grid-template-rows: 1fr auto;
   justify-items: center;
   align-items: center;
-  background: radial-gradient(120% 120% at 50% 20%, #eef2ff, #f7f9fc);
+  background: var(--gradient-login-bg);
   padding: 24px;
   box-sizing: border-box;
   overflow: hidden; /* 防止出现滚动条 */
@@ -111,7 +111,7 @@ return
 .login-card {
   width: min(420px, calc(100vw - 48px));
   padding: 32px 32px 24px;
-  background: var(--color-card, #fff);
+  background: var(--color-card);
   border-radius: 16px;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
   border: 1px solid rgba(0, 0, 0, 0.04);
@@ -123,16 +123,16 @@ return
 .logo {
   font-size: 22px;
   font-weight: 700;
-  color: var(--color-primary, #409eff);
+  color: var(--color-primary);
 }
 .subtitle {
   margin-top: 6px;
-  color: #606266;
+  color: var(--color-text-regular);
   font-size: 14px;
 }
 .login-form :deep(.el-form-item__label) {
   font-weight: 600;
-  color: #303133;
+  color: var(--color-text-primary);
 }
 .login-actions {
   margin-top: 8px;

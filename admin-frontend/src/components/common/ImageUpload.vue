@@ -197,7 +197,7 @@ onMounted(async () => {
 
     .uploader-icon {
       font-size: 28px;
-      color: #8c939d;
+      color: var(--color-text-secondary);
       width: 100px;
       height: 100px;
       line-height: 100px;

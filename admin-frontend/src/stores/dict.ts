@@ -42,7 +42,9 @@ export const REQUIRED_DICT_CODES = [
   'blog_article_audit_status', // 博客文章审核状态
   'blog_tag_status', // 博客标签状态
   'blog_friend_link_status', // 友情链接状态
-  'blog_social_info_status' // 社交信息状态
+  'blog_social_info_status', // 社交信息状态
+  'video_source_type', // 视频来源类型
+  'metric_module' // 性能日志-业务模块
 ] as const;
 
 export const useDictStore = defineStore('dict', {

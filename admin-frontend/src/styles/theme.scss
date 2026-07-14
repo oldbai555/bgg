@@ -15,8 +15,14 @@
   --color-bg-secondary: #f5f7fa;
   --color-bg-card: #ffffff;
   --color-border: #e4e7ed;
+  --color-border-light: #ebeef5;
   --color-text-primary: #303133;
+  --color-text-regular: #606266;
   --color-text-secondary: #909399;
+
+  /* 装饰性渐变（暂无暗色变体，Phase 3 暗色适配阶段再补） */
+  --gradient-purple-banner: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-login-bg: radial-gradient(120% 120% at 50% 20%, #eef2ff, #f7f9fc);
 }
 
 [data-theme='dark'] {
@@ -34,7 +40,9 @@
   --color-bg-secondary: #141414;
   --color-bg-card: #1f1f1f;
   --color-border: #303133;
+  --color-border-light: #363637;
   --color-text-primary: #e5eaf3;
+  --color-text-regular: #cfd3dc;
   --color-text-secondary: #909399;
 }
 
