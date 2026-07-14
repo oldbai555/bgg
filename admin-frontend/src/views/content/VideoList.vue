@@ -115,6 +115,7 @@ import {useI18n} from 'vue-i18n'
 import D2Table from '@/components/common/D2Table.vue'
 import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table'
 import {useDictOptions} from '@/composables/useDictOptions'
+import {MOBILE_BREAKPOINT} from '@/constants/breakpoints'
 
 const {t} = useI18n()
 const router = useRouter()
@@ -132,7 +133,7 @@ const isMobile = ref(false)
 
 // 检测屏幕尺寸
 const checkMobile = () => {
-  isMobile.value = window.innerWidth <= 768
+  isMobile.value = window.innerWidth <= MOBILE_BREAKPOINT
 }
 
 // 监听窗口大小变化
@@ -299,7 +300,7 @@ onUnmounted(() => {
   gap: 12px;
   padding: 16px 24px;
 
-  @media (max-width: 768px) {
+  @include mobile {
     padding: 8px 12px;
     gap: 8px;
   }
@@ -308,7 +309,7 @@ onUnmounted(() => {
 .mb-12 {
   margin-bottom: 12px;
 
-  @media (max-width: 768px) {
+  @include mobile {
     margin-bottom: 8px;
   }
 }

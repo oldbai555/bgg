@@ -586,7 +586,7 @@ onMounted(() => {
   }
 }
 
-@media (max-width: 768px) {
+@include mobile {
   .blog-detail-page {
     .blog-page-container {
       padding-top: 50px;

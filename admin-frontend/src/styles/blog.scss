@@ -1,12 +1,17 @@
 /**
  * 博客页面通用样式
- * 
+ *
  * 使用方式：
  * 1. 在组件的 <style scoped lang="scss"> 中引入：
  *    @import '@/styles/blog.scss';
- * 
+ *
  * 2. 确保 HTML 结构符合规范
  */
+
+// 被 @import（而非 @use）进 .vue 文件时，vite.config.ts 的全局 additionalData 只注入到
+// 入口文件本身，@content 形式的 mixin（如 responsive.scss 的 mobile）不会传递到被 @import
+// 的文件里，需要本文件自己显式 @use 一次（幂等，与 layout.scss 的既有写法一致）
+@use './responsive.scss' as *;
 
 // 博客页面布局容器
 .blog-page-container {
@@ -68,7 +73,7 @@
 }
 
 // 移动端布局
-@media (max-width: 768px) {
+@include mobile {
   .blog-page-container {
     padding-top: 50px; // 移动端头部高度为50px
     height: auto; // 移动端允许自然高度
@@ -391,7 +396,7 @@
 }
 
 // 移动端适配
-@media (max-width: 768px) {
+@include mobile {
   .blog-detail-container {
     padding: 20px 16px;
 

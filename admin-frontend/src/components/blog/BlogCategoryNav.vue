@@ -112,7 +112,7 @@ onMounted(() => {
 }
 
 // 移动端适配
-@media (max-width: 768px) {
+@include mobile {
   .blog-category-nav {
     width: 100%;
     margin-bottom: 16px;

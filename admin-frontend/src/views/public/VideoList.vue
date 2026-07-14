@@ -96,6 +96,7 @@ import {contentApi} from '@/api/content'
 import type {PublicVideoListReq, PublicVideoItem} from '@/api/generated/admin'
 import MetricReporter from '@/components/common/MetricReporter.vue'
 import IcpFooter from '@/components/common/IcpFooter.vue'
+import {MOBILE_BREAKPOINT} from '@/constants/breakpoints'
 
 const router = useRouter()
 const route = useRoute()
@@ -121,7 +122,7 @@ const paginationLayout = computed(() => {
 
 const checkMobile = () => {
   if (typeof window !== 'undefined') {
-    isMobile.value = window.innerWidth <= 768
+    isMobile.value = window.innerWidth <= MOBILE_BREAKPOINT
   }
 }
 
@@ -459,7 +460,7 @@ onUnmounted(() => {
     flex-shrink: 0;
   }
 
-  @media (max-width: 768px) {
+  @include mobile {
     .video-thumbnail {
       border-radius: 10px 0 0 10px;
     }

@@ -240,7 +240,7 @@ onMounted(() => {
 }
 
 // 移动端适配
-@media (max-width: 768px) {
+@include mobile {
   .blog-header {
     .header-container {
       padding: 0 12px;

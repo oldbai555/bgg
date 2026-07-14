@@ -249,7 +249,7 @@ onUnmounted(() => {
 }
 
 // 移动端适配
-@media (max-width: 768px) {
+@include mobile {
   .blog-toc {
     display: none; // 移动端隐藏，通过浮层显示
   }

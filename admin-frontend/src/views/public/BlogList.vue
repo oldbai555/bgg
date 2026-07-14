@@ -93,6 +93,7 @@ import BlogHeader from '@/components/blog/BlogHeader.vue'
 import BlogCategoryNav from '@/components/blog/BlogCategoryNav.vue'
 import BlogAuthorCard from '@/components/blog/BlogAuthorCard.vue'
 import BlogSocialLinks from '@/components/blog/BlogSocialLinks.vue'
+import {MOBILE_BREAKPOINT} from '@/constants/breakpoints'
 
 const router = useRouter()
 const route = useRoute()
@@ -156,7 +157,7 @@ const paginationLayout = computed(() =>
 
 const checkMobile = () => {
   if (typeof window !== 'undefined') {
-    isMobile.value = window.innerWidth <= 768
+    isMobile.value = window.innerWidth <= MOBILE_BREAKPOINT
   }
 }
 
@@ -299,13 +300,13 @@ onUnmounted(() => {
   background: #f5f5f5;
 
   // PC 端：固定高度，隐藏滚动条
-  @media (min-width: 769px) {
+  @include tablet-up {
     height: 100vh;
     overflow: hidden;
   }
 
   // 移动端：允许滚动
-  @media (max-width: 768px) {
+  @include mobile {
     height: auto;
     overflow: visible;
   }
@@ -344,7 +345,7 @@ onUnmounted(() => {
 }
 
 // 移动端适配
-@media (max-width: 768px) {
+@include mobile {
   .blog-list-page {
     .blog-page-container {
       padding-top: 50px;

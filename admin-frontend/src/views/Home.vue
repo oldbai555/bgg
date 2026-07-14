@@ -96,7 +96,7 @@ import IcpFooter from '@/components/common/IcpFooter.vue'
   }
 }
 
-@media (max-width: 768px) {
+@include mobile {
   .home-page {
     .container {
       padding: 8px 16px; // 减小移动端内边距

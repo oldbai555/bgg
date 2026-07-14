@@ -324,7 +324,7 @@ const handleReset = () => {
   font-size: 14px;
 }
 
-@media (max-width: 768px) {
+@include mobile {
   .stats-grid {
     grid-template-columns: 1fr;
   }

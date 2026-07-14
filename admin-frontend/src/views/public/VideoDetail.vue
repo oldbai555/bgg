@@ -511,7 +511,7 @@ onBeforeUnmount(() => {
       }
     }
 
-    @media (max-width: 768px) {
+    @include mobile {
       :deep(.dplayer-loading),
       :deep(.dplayer-loading-icon) {
         display: none !important;
@@ -671,7 +671,7 @@ onBeforeUnmount(() => {
     font-size: 16px;
   }
 
-  @media (max-width: 768px) {
+  @include mobile {
     .video-info-section {
       padding: 18px 14px 20px;
     }
