@@ -27,4 +27,4 @@
 
 ## 优先级与本仓库既有规则的关系
 
-`admin-server`/`admin-frontend` 的既有规范（脚手架流程、生成目录禁止手改、squirrel、中间件顺序等，见 `00-workflow.md`/`10-go-code-style.md`/`20-frontend.md`）优先级高于这些通用 skill 的建议——skill 提供的是通用方法论（如何写 Word/Excel、如何做前端视觉设计、如何写 MCP server），不覆盖本项目自己的工程约定。两者冲突时以本仓库规则为准。
+`admin-server`/`admin-frontend` 的既有规范（脚手架流程、生成目录禁止手改、squirrel、中间件顺序等，见 `00-workflow.mdc`/`10-go-code-style.mdc`/`20-frontend.mdc`）优先级高于这些通用 skill 的建议——skill 提供的是通用方法论（如何写 Word/Excel、如何做前端视觉设计、如何写 MCP server），不覆盖本项目自己的工程约定。两者冲突时以本仓库规则为准。

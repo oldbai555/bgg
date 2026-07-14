@@ -84,17 +84,18 @@
 </template>
 
 <script setup lang="ts">
-import {computed, ref, onMounted, watch} from 'vue'
+import {computed, ref, onMounted, onUnmounted, watch} from 'vue'
 import {useRouter} from 'vue-router'
 import {Bell, ChatDotRound} from '@element-plus/icons-vue'
 import {systemApi} from '@/api/system'
 import type {NotificationItem} from '@/api/generated/admin'
 import {ElMessage} from 'element-plus'
 import NoticeReader from '@/components/common/NoticeReader.vue'
-import {useWebSocketStore, MessageType} from '@/stores/websocket'
+import {MessageType} from '@/stores/websocket'
+import {useNotificationStore} from '@/stores/notification'
 
 const router = useRouter()
-const wsStore = useWebSocketStore()
+const notificationStore = useNotificationStore()
 
 const notifications = ref<NotificationItem[]>([])
 const loading = ref(false)
@@ -106,7 +107,7 @@ const noticeNotifications = ref<NotificationItem[]>([])
 // 合并API通知和WebSocket消息
 const allUnreadMessages = computed(() => {
   const apiNotifications = notifications.value.filter(n => n.readStatus === 1)
-  const wsMessages = wsStore.unreadMessages.filter(m => !m.read && m.type === MessageType.CHAT)
+  const wsMessages = notificationStore.unreadMessages.filter(m => !m.read && m.type === MessageType.CHAT)
 
   // 将WebSocket消息转换为通知格式
   const wsNotifications: NotificationItem[] = wsMessages.map((msg, index) => ({
@@ -213,13 +214,13 @@ const handleMessageClick = async (message: NotificationItem) => {
   if (message.sourceType === 'chat') {
     // 如果是WebSocket消息（userId为0），标记为已读
     if (message.userId === 0) {
-      const wsMessage = wsStore.unreadMessages.find(m =>
+      const wsMessage = notificationStore.unreadMessages.find(m =>
         m.type === MessageType.CHAT &&
         m.title === message.title &&
         Math.abs(m.timestamp - message.createdAt * 1000) < 5000
       )
       if (wsMessage) {
-        wsStore.markAsRead(wsMessage.id)
+        notificationStore.markAsRead(wsMessage.id)
       }
     } else {
       // API通知，标记为已读
@@ -262,7 +263,7 @@ const handleMarkAllAsRead = async () => {
     // 标记后端API通知为已读
     await systemApi.notificationReadAll()
     // 标记WebSocket消息为已读
-    wsStore.markAllAsRead()
+    notificationStore.markAllAsRead()
     ElMessage.success('全部已读成功')
     await loadNotifications()
   } catch (err: unknown) {
@@ -277,6 +278,7 @@ const handleClearRead = async () => {
   clearReadLoading.value = true
   try {
     await systemApi.notificationClearRead()
+    notificationStore.clearReadMessages()
     ElMessage.success('清除已读消息成功')
     await loadNotifications()
   } catch (err: unknown) {
@@ -299,14 +301,22 @@ watch(noticeReaderVisible, (newVal) => {
   }
 })
 
+let refreshTimer: number | undefined
+
 onMounted(() => {
   loadChatPath()
   loadNotifications()
 
   // 定期刷新通知列表（每30秒）
-  setInterval(() => {
+  refreshTimer = window.setInterval(() => {
     loadNotifications()
   }, 30000)
+})
+
+onUnmounted(() => {
+  if (refreshTimer !== undefined) {
+    window.clearInterval(refreshTimer)
+  }
 })
 </script>
 
@@ -318,16 +328,16 @@ onMounted(() => {
     align-items: center;
     padding: 12px 16px;
     border-bottom: 1px solid var(--el-border-color-light);
+  }
 
-    &-title {
-      font-weight: 600;
-      font-size: 16px;
-    }
+  &__title {
+    font-weight: 600;
+    font-size: 16px;
+  }
 
-    &-actions {
-      display: flex;
-      gap: 8px;
-    }
+  &__actions {
+    display: flex;
+    gap: 8px;
   }
 
   &__list {

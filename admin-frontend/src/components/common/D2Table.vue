@@ -169,8 +169,6 @@
         :page-sizes="pageSizes"
         :total="total"
         :layout="paginationLayout"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
       />
     </div>
 
@@ -556,14 +554,6 @@ const formatBytes = (bytes: number): string => {
     return '0MB'
   }
   return `${(bytes / (1024 * 1024)).toFixed(2)}MB`
-}
-
-const handleSizeChange = (size: number) => {
-  emit('size-change', size)
-}
-
-const handleCurrentChange = (page: number) => {
-  emit('current-change', page)
 }
 
 const handleEdit = (index: number, row: Record<string, unknown>, edit: boolean) => {

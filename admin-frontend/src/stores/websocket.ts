@@ -1,9 +1,10 @@
-import {defineStore} from 'pinia';
-import {useUserStore} from './user';
-import {ElMessage} from 'element-plus';
-import {getWebSocketBaseURL} from '@/composables/useAppConfig';
-import {taskApi} from '@/api/task';
-import type {TaskItem} from '@/api/generated/admin';
+// 职责边界：只管 WebSocket 连接生命周期（连接/重连/心跳）+ 原始消息广播（lastMessage）+ 任务浮球的最近任务列表。
+// 未读消息列表/已读状态属于 stores/notification.ts，不要把两者揉回同一个 store。
+import {defineStore} from 'pinia'
+import {useUserStore} from './user'
+import {getWebSocketBaseURL} from '@/composables/useAppConfig'
+import {taskApi} from '@/api/task'
+import type {TaskItem} from '@/api/generated/admin'
 
 // WebSocket 消息类型
 export enum MessageType {
@@ -35,16 +36,6 @@ export interface WSMessage {
   level?: 'info' | 'success' | 'warning' | 'error';
 }
 
-// 未读消息
-export interface UnreadMessage {
-  id: string;
-  type: MessageType | string;
-  title: string;
-  content: string;
-  timestamp: number;
-  read: boolean;
-}
-
 interface WebSocketState {
   connected: boolean;
   connecting: boolean;
@@ -52,7 +43,6 @@ interface WebSocketState {
   maxReconnectAttempts: number;
   reconnectDelay: number;
   ws: WebSocket | null;
-  unreadMessages: UnreadMessage[];
   lastMessage: WSMessage | null;
   // 最近任务列表（用于浮动任务球）
   recentTasks: TaskItem[];
@@ -60,8 +50,8 @@ interface WebSocketState {
   recentTasksUpdateTimer: number | null;
 }
 
-const RECONNECT_DELAY_BASE = 3000; // 基础重连延迟（毫秒）
-const MAX_RECONNECT_ATTEMPTS = 10;
+const RECONNECT_DELAY_BASE = 3000 // 基础重连延迟（毫秒）
+const MAX_RECONNECT_ATTEMPTS = 10
 
 export const useWebSocketStore = defineStore('websocket', {
   state: (): WebSocketState => ({
@@ -71,57 +61,50 @@ export const useWebSocketStore = defineStore('websocket', {
     maxReconnectAttempts: MAX_RECONNECT_ATTEMPTS,
     reconnectDelay: RECONNECT_DELAY_BASE,
     ws: null,
-    unreadMessages: [],
     lastMessage: null,
     recentTasks: [],
     recentTasksLoading: false,
     recentTasksUpdateTimer: null
   }),
 
-  getters: {
-    unreadCount: (state) => state.unreadMessages.filter((m) => !m.read).length,
-    hasUnreadChat: (state) =>
-      state.unreadMessages.some((m) => !m.read && m.type === MessageType.CHAT)
-  },
-
   actions: {
     // 连接 WebSocket
     async connect() {
-      const userStore = useUserStore();
+      const userStore = useUserStore()
 
       // 在线聊天无需权限，只要登录就可以使用
       // 移除权限检查
 
       if (this.connecting || this.connected) {
-        return;
+        return
       }
 
-      const token = userStore.token;
+      const token = userStore.token
       if (!token) {
-        console.log('未登录，跳过 WebSocket 连接');
-        return;
+        console.log('未登录，跳过 WebSocket 连接')
+        return
       }
 
-      this.connecting = true;
+      this.connecting = true
 
       // 开发环境强制使用本地服务，忽略字典配置
-      let wsBaseURL: string;
+      let wsBaseURL: string
       if (import.meta.env.DEV) {
         // 开发环境：直接连接本地后端服务
-        wsBaseURL = 'localhost:20000';
+        wsBaseURL = 'localhost:20000'
       } else {
         // 生产环境：从字典获取配置，如果没有则使用默认值
-        wsBaseURL = await getWebSocketBaseURL();
+        wsBaseURL = await getWebSocketBaseURL()
         if (!wsBaseURL) {
-          wsBaseURL = 'oldbai.top';
+          wsBaseURL = 'oldbai.top'
         }
       }
 
       // 构建 WebSocket URL
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const wsPath = '/api/v1/chats/ws';
-      let wsUrl: string;
-      
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+      const wsPath = '/api/v1/chats/ws'
+      let wsUrl: string
+
       // 处理 baseURL：
       // 开发环境：直接连接后端，路径为 ws://localhost:20000/api/v1/chats/ws
       // 生产环境：
@@ -131,299 +114,133 @@ export const useWebSocketStore = defineStore('websocket', {
       //      那么直接连接后端：ws://oldbai.top/api/v1/chats/ws
       if (import.meta.env.DEV) {
         // 开发环境：直接连接本地后端，不添加 /ws 前缀
-        wsUrl = `${protocol}//${wsBaseURL}${wsPath}?token=${encodeURIComponent(token)}&roomId=default`;
+        wsUrl = `${protocol}//${wsBaseURL}${wsPath}?token=${encodeURIComponent(token)}&roomId=default`
       } else if (wsBaseURL.includes('/ws')) {
         // 生产环境：baseURL 已经包含 /ws，直接拼接
-        wsUrl = `${protocol}//${wsBaseURL}${wsPath}?token=${encodeURIComponent(token)}&roomId=default`;
+        wsUrl = `${protocol}//${wsBaseURL}${wsPath}?token=${encodeURIComponent(token)}&roomId=default`
       } else {
         // 生产环境：baseURL 不包含 /ws，直接连接后端（不添加 /ws 前缀）
-        wsUrl = `${protocol}//${wsBaseURL}${wsPath}?token=${encodeURIComponent(token)}&roomId=default`;
+        wsUrl = `${protocol}//${wsBaseURL}${wsPath}?token=${encodeURIComponent(token)}&roomId=default`
       }
 
       try {
-        const ws = new WebSocket(wsUrl);
+        const ws = new WebSocket(wsUrl)
 
         ws.onopen = () => {
-          this.connected = true;
-          this.connecting = false;
-          this.reconnectAttempts = 0;
-          this.reconnectDelay = RECONNECT_DELAY_BASE;
-        };
+          this.connected = true
+          this.connecting = false
+          this.reconnectAttempts = 0
+          this.reconnectDelay = RECONNECT_DELAY_BASE
+        }
 
         ws.onmessage = (event) => {
           try {
-            const data = JSON.parse(event.data) as WSMessage;
-            this.handleMessage(data);
+            const data = JSON.parse(event.data) as WSMessage
+            this.handleMessage(data)
           } catch (err) {
-            console.error('解析 WebSocket 消息失败:', err);
+            console.error('解析 WebSocket 消息失败:', err)
           }
-        };
+        }
 
         ws.onerror = (error) => {
-          console.error('WebSocket 错误:', error);
-          console.error('WebSocket URL:', wsUrl.replace(/token=[^&]+/, 'token=***'));
+          console.error('WebSocket 错误:', error)
+          console.error('WebSocket URL:', wsUrl.replace(/token=[^&]+/, 'token=***'))
           // 尝试输出更详细的错误信息
           if (ws.readyState === WebSocket.CLOSED) {
-            console.error('WebSocket 连接已关闭，可能的原因：');
-            console.error('1. 后端服务未运行');
-            console.error('2. Nginx 配置错误（如果通过代理）');
-            console.error('3. 路径不匹配');
-            console.error('4. 防火墙或网络问题');
+            console.error('WebSocket 连接已关闭，可能的原因：')
+            console.error('1. 后端服务未运行')
+            console.error('2. Nginx 配置错误（如果通过代理）')
+            console.error('3. 路径不匹配')
+            console.error('4. 防火墙或网络问题')
           }
-          this.connecting = false;
-        };
+          this.connecting = false
+        }
 
         ws.onclose = () => {
-          this.connected = false;
-          this.connecting = false;
-          this.ws = null;
-          console.log('WebSocket 连接已断开');
+          this.connected = false
+          this.connecting = false
+          this.ws = null
+          console.log('WebSocket 连接已断开')
 
           // 自动重连
           if (this.reconnectAttempts < this.maxReconnectAttempts) {
-            this.reconnectAttempts++;
+            this.reconnectAttempts++
             const delay = Math.min(
               this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1),
               30000
-            );
-            console.log(`将在 ${delay}ms 后尝试重连 (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+            )
+            console.log(`将在 ${delay}ms 后尝试重连 (${this.reconnectAttempts}/${this.maxReconnectAttempts})`)
             setTimeout(() => {
-              this.connect();
-            }, delay);
+              this.connect()
+            }, delay)
           } else {
-            console.error('达到最大重连次数，停止重连');
+            console.error('达到最大重连次数，停止重连')
           }
-        };
+        }
 
-        this.ws = ws;
+        this.ws = ws
       } catch (err) {
-        console.error('创建 WebSocket 连接失败:', err);
-        this.connecting = false;
+        console.error('创建 WebSocket 连接失败:', err)
+        this.connecting = false
       }
     },
 
     // 断开连接
     disconnect() {
       if (this.ws) {
-        this.ws.close();
-        this.ws = null;
+        this.ws.close()
+        this.ws = null
       }
-      this.connected = false;
-      this.connecting = false;
-      this.reconnectAttempts = 0;
+      this.connected = false
+      this.connecting = false
+      this.reconnectAttempts = 0
     },
 
-    // 处理接收到的消息
+    // 广播原始消息给外部订阅者（stores/notification.ts、composables/useChatList.ts 等通过 watch lastMessage 消费），
+    // 顺带刷新任务浮球——这是本 store 自己持有的状态，不下放给消费方各自处理。
     handleMessage(data: WSMessage) {
-      this.lastMessage = data;
+      this.lastMessage = data
 
-      // 根据消息类型处理
-      switch (data.type) {
-        case MessageType.CHAT:
-          this.handleChatMessage(data);
-          break;
-        case MessageType.TASK_PROGRESS:
-          this.handleTaskProgress(data);
-          break;
-        case MessageType.NOTIFICATION:
-          this.handleNotification(data);
-          break;
-        case MessageType.SYSTEM:
-          this.handleSystemMessage(data);
-          break;
-        default:
-          // 未知消息类型，忽略
-          break;
+      if (data.type === MessageType.TASK_PROGRESS) {
+        this.scheduleRefreshRecentTasks()
+      } else if (data.type === MessageType.NOTIFICATION && data.taskId) {
+        this.scheduleRefreshRecentTasks()
       }
-    },
-
-    // 处理聊天消息
-    handleChatMessage(data: WSMessage) {
-      // 获取当前用户ID
-      const userStore = useUserStore();
-      const currentUserId = userStore.profile?.id || 0;
-      
-      // 只有不是自己发的消息才需要显示未读通知
-      const isMyMessage = data.fromId && Number(data.fromId) === Number(currentUserId);
-      if (isMyMessage) {
-        // 自己发的消息不需要添加到未读消息
-        return;
-      }
-
-      // 检查当前是否在聊天页面（支持多种路径格式）
-      // 注意：使用 hash 路由时，路径在 hash 中
-      const currentPath = window.location.pathname;
-      const currentHash = window.location.hash;
-      // 检查是否在 ChatList.vue 页面（/chatroom/chat）
-      // 注意：/chatroom/chat 是 admin_menu.path（URL 路由），Phase 1 域目录重组只改了 component 字段
-      // （chatroom/ChatList → chat/ChatList），path 字段未变，这里沿用旧路径是正确的，不是遗漏
-      const isInChatListPage = currentHash === '#/chatroom/chat' ||
-                               currentHash.startsWith('#/chatroom/chat?') ||
-                               currentPath.includes('/chatroom/chat');
-      // 检查是否在其他聊天相关页面
-      const isInOtherChatPage = currentHash.includes('/temp/chat') || 
-                                currentHash.includes('/chat') ||
-                                currentPath.includes('/temp/chat') || 
-                                currentPath.includes('/chat');
-      const isInChatPage = isInChatListPage || isInOtherChatPage;
-
-      // 如果不在聊天页面，添加到未读消息并显示提示
-      if (!isInChatPage) {
-        // 构建消息标题和内容
-        const chatId = data.chatId || 0;
-        const isGroupChat = chatId > 0; // 如果有chatId且大于0，可能是群聊
-        const title = isGroupChat 
-          ? `群聊消息：来自 ${data.fromName || '未知用户'}`
-          : `来自 ${data.fromName || '未知用户'}`;
-        
-        const content = data.content || '';
-        // 如果是图片消息，显示特殊提示
-        const displayContent = data.messageType === 2 ? '[图片]' : content;
-
-        // 添加到未读消息
-        this.addUnreadMessage({
-          id: `chat_${data.messageId || Date.now()}_${chatId}`,
-          type: MessageType.CHAT,
-          title: title,
-          content: displayContent,
-          timestamp: Date.now(),
-          read: false
-        });
-
-        // 显示提示消息
-        ElMessage.info({
-          message: `${title}: ${displayContent}`,
-          duration: 3000,
-          showClose: true
-        });
-      }
-    },
-
-    // 处理任务进度
-    handleTaskProgress(data: WSMessage) {
-      console.log('任务进度更新:', data);
-      // 刷新最近任务列表（防抖）
-      this.scheduleRefreshRecentTasks();
-      // 如果需要，也可以添加到未读消息
-      if (data.taskName) {
-        this.addUnreadMessage({
-          id: `task_${data.taskId || Date.now()}`,
-          type: MessageType.TASK_PROGRESS,
-          title: `任务进度: ${data.taskName}`,
-          content: `进度: ${data.progress || 0}% - ${data.status || ''}`,
-          timestamp: Date.now(),
-          read: false
-        });
-      }
-    },
-
-    // 处理通知消息
-    handleNotification(data: WSMessage) {
-      // 如果是任务相关通知（包含 taskId），交给任务通知处理
-      if (data.taskId) {
-        this.handleTaskNotification(data);
-        return;
-      }
-      const level = data.level || 'info';
-      ElMessage[level](data.content || data.title || '新通知');
-
-      this.addUnreadMessage({
-        id: `notify_${Date.now()}`,
-        type: MessageType.NOTIFICATION,
-        title: data.title || '通知',
-        content: data.content || '',
-        timestamp: Date.now(),
-        read: false
-      });
-    },
-
-    // 处理系统消息
-    handleSystemMessage(data: WSMessage) {
-      console.log('系统消息:', data);
-      // 系统消息通常不需要添加到未读消息列表
-    },
-
-    // 添加未读消息
-    addUnreadMessage(message: UnreadMessage) {
-      this.unreadMessages.unshift(message);
-      // 限制未读消息数量，最多保留 50 条
-      if (this.unreadMessages.length > 50) {
-        this.unreadMessages = this.unreadMessages.slice(0, 50);
-      }
-    },
-
-    // 标记消息为已读
-    markAsRead(messageId: string) {
-      const message = this.unreadMessages.find((m) => m.id === messageId);
-      if (message) {
-        message.read = true;
-      }
-    },
-
-    // 标记所有消息为已读
-    markAllAsRead() {
-      this.unreadMessages.forEach((m) => {
-        m.read = true;
-      });
-    },
-
-    // 清除已读消息
-    clearReadMessages() {
-      this.unreadMessages = this.unreadMessages.filter((m) => !m.read);
-    },
-
-    // 任务通知处理（用于浮动任务球）
-    handleTaskNotification(data: WSMessage) {
-      const level = data.level || 'info';
-      // 刷新最近任务列表（防抖）
-      this.scheduleRefreshRecentTasks();
-
-      // 显示任务相关通知
-      ElMessage[level](data.content || data.title || '任务状态已更新');
-
-      // 记录到未读消息列表
-      this.addUnreadMessage({
-        id: `task_notify_${data.taskId || Date.now()}`,
-        type: MessageType.NOTIFICATION,
-        title: data.title || '任务通知',
-        content: data.content || '',
-        timestamp: Date.now(),
-        read: false
-      });
     },
 
     // 调用后端接口刷新最近任务列表（带防抖）
     scheduleRefreshRecentTasks() {
       if (this.recentTasksUpdateTimer) {
-        clearTimeout(this.recentTasksUpdateTimer);
+        clearTimeout(this.recentTasksUpdateTimer)
       }
       this.recentTasksUpdateTimer = window.setTimeout(() => {
         this.refreshRecentTasks().catch((err) => {
-          console.error('刷新最近任务列表失败:', err);
-        });
-      }, 500);
+          console.error('刷新最近任务列表失败:', err)
+        })
+      }, 500)
     },
 
     async refreshRecentTasks() {
-      const userStore = useUserStore();
-      if (!userStore.token) return;
-      this.recentTasksLoading = true;
+      const userStore = useUserStore()
+      if (!userStore.token) {
+        return
+      }
+      this.recentTasksLoading = true
       try {
-        const resp = await taskApi.taskRecent({});
-        this.recentTasks = resp.list || [];
+        const resp = await taskApi.taskRecent({})
+        this.recentTasks = resp.list || []
       } finally {
-        this.recentTasksLoading = false;
+        this.recentTasksLoading = false
       }
     },
 
     // 发送消息（如果需要）
-    sendMessage(message: any) {
+    sendMessage(message: unknown) {
       if (this.ws && this.connected) {
-        this.ws.send(JSON.stringify(message));
+        this.ws.send(JSON.stringify(message))
       } else {
-        console.error('WebSocket 未连接，无法发送消息');
+        console.error('WebSocket 未连接，无法发送消息')
       }
     }
   }
-});
-
+})

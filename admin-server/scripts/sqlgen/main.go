@@ -17,6 +17,7 @@ import (
 type Config struct {
 	Group       string // 功能组名（如 user, file）
 	Name        string // 功能名称（如 用户管理, 文件管理）
+	Domain      string // 前端 API 域名（如 iam, system, content），对应 admin-frontend/src/api/<Domain>.ts
 	OutputDir   string // 输出目录
 	TemplateDir string // 模板目录
 	ParentID    string // 父菜单ID（可选，不填则使用父目录路径查找或临时目录）
@@ -26,6 +27,7 @@ type Config struct {
 type TemplateData struct {
 	Group         string // 功能组名（如 user）
 	Name          string // 功能名称（如 用户管理）
+	Domain        string // 前端 API 域名（如 iam），对应 admin-frontend/src/api/<Domain>.ts 导出的 <Domain>Api
 	GroupUpper    string // 大写的组名（如 User）
 	GroupLower    string // 小写的组名（如 user，用于 API 对象名）
 	GroupFuncName string // 函数名（首字母小写，如 fileList）
@@ -95,6 +97,7 @@ func main() {
 	var config Config
 	flag.StringVar(&config.Group, "group", "", "功能组名（必需，如 user, file）")
 	flag.StringVar(&config.Name, "name", "", "功能名称（必需，如 用户管理, 文件管理）")
+	flag.StringVar(&config.Domain, "domain", "", "前端 API 域名（必需，如 iam, system, content，对应 admin-frontend/src/api/<Domain>.ts）")
 	flag.StringVar(&config.OutputDir, "output", "", "输出目录（可选，默认 admin-server/db）")
 	flag.StringVar(&config.TemplateDir, "template", "", "模板目录（可选，默认 scripts/sqlgen/templates）")
 	flag.StringVar(&config.ParentID, "parent-id", "", "父菜单ID（可选，不填则根据父目录路径查找，默认使用临时目录）")
@@ -106,6 +109,7 @@ func main() {
 		originalName := config.Name
 		config.Name = fixEncoding(config.Name)
 		config.Group = fixEncoding(config.Group)
+		config.Domain = fixEncoding(config.Domain)
 		config.OutputDir = fixEncoding(config.OutputDir)
 		config.TemplateDir = fixEncoding(config.TemplateDir)
 		config.ParentID = fixEncoding(config.ParentID)
@@ -119,10 +123,10 @@ func main() {
 		}
 	}
 
-	if config.Group == "" || config.Name == "" {
-		fmt.Fprintf(os.Stderr, "错误: 必须提供 -group 和 -name 参数\n")
-		fmt.Fprintf(os.Stderr, "用法: %s -group <group> -name <name>\n", os.Args[0])
-		fmt.Fprintf(os.Stderr, "示例: %s -group user -name 用户管理\n", os.Args[0])
+	if config.Group == "" || config.Name == "" || config.Domain == "" {
+		fmt.Fprintf(os.Stderr, "错误: 必须提供 -group、-name 和 -domain 参数\n")
+		fmt.Fprintf(os.Stderr, "用法: %s -group <group> -name <name> -domain <domain>\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "示例: %s -group user -name 用户管理 -domain iam\n", os.Args[0])
 		os.Exit(1)
 	}
 
@@ -174,7 +178,7 @@ func main() {
 	}
 
 	// 准备模板数据
-	data := prepareTemplateData(config.Group, config.Name, config.ParentID, config.ParentPath)
+	data := prepareTemplateData(config.Group, config.Name, config.Domain, config.ParentID, config.ParentPath)
 
 	// 生成建表 SQL 文件
 	createTableFile := filepath.Join(config.OutputDir, fmt.Sprintf("create_table_%s.sql", config.Group))
@@ -227,7 +231,7 @@ func main() {
 }
 
 // prepareTemplateData 准备模板数据
-func prepareTemplateData(group, name, parentID, parentPath string) TemplateData {
+func prepareTemplateData(group, name, domain, parentID, parentPath string) TemplateData {
 	// 将 group 转换为首字母大写（用于组件名）
 	groupUpper := strings.ToUpper(group[:1]) + group[1:]
 	// 如果 group 包含下划线，需要处理（如 user_role -> UserRole）
@@ -271,6 +275,7 @@ func prepareTemplateData(group, name, parentID, parentPath string) TemplateData 
 	return TemplateData{
 		Group:         group,
 		Name:          name,
+		Domain:        domain,
 		GroupUpper:    groupUpper,
 		GroupLower:    groupLower,
 		GroupFuncName: groupFuncName,

@@ -5,13 +5,13 @@
 - `admin-frontend`：Vue3 + TS 前端，同时承载后台管理页面（`/admin/*`，需登录）和公共展示页面（`/blog/*`、`/videos/*`，无需登录）
 
 规则文件地图：
-- 本文件（`00-workflow.md`）：全局工作流 + 绝对禁止事项
-- `05-go-zero-ai-context.md`：go-zero AI 上下文（zero-skills 子模块，编辑 `admin-server/**` 时）
-- `06-mcp-toolchain.md`：MCP 工具链使用契约（CodeGraph / Engram / context7 等，**会话探索代码前必读**）
-- `07-anthropic-skills.md`：Anthropic 官方 Skills 市场接入说明 + 何时用哪个 skill
-- `10-go-code-style.md`：`admin-server/**` 后端规范
-- `20-frontend.md`：`admin-frontend/**` 前端规范
-- `21-public-pages.md`：公共展示页专属样式/交互契约
+- 本文件（`00-workflow.mdc`）：全局工作流 + 绝对禁止事项
+- `05-go-zero-ai-context.mdc`：go-zero AI 上下文（zero-skills 子模块，编辑 `admin-server/**` 时）
+- `06-mcp-toolchain.mdc`：MCP 工具链使用契约（CodeGraph / Engram / context7 等，**会话探索代码前必读**）
+- `07-anthropic-skills.mdc`：Anthropic 官方 Skills 市场接入说明 + 何时用哪个 skill
+- `10-go-code-style.mdc`：`admin-server/**` 后端规范
+- `20-frontend.mdc`：`admin-frontend/**` 前端规范
+- `21-public-pages.mdc`：公共展示页专属样式/交互契约
 - 根目录 `AGENTS.md`：面向任意 AI 工具的整合版操作手册
 - `docs/AI工具链上手.md`：Gentle-AI / CodeGraph / MCP / Engram 换设备与第三人上手（**新维护者必读**）
 - `docs/后端开发进度.md` / `docs/前端开发进度.md`：已完成功能、技术决策记录、关键代码位置索引（历史/背景，不是规则）
@@ -40,8 +40,8 @@
 步骤4：补齐 SQL 字段（`created_at`/`updated_at`/`deleted_at`，均为 BIGINT 秒级时间戳，默认 0）
 
 步骤5：补齐 `.api` 接口参数和中间件声明
-- 中间件按执行顺序声明（见 `10-go-code-style.md`）
-- 所有 Query 参数和可选字段必须加 `optional` 标签（详见 `10-go-code-style.md`）
+- 中间件按执行顺序声明（见 `10-go-code-style.mdc`）
+- 所有 Query 参数和可选字段必须加 `optional` 标签（详见 `10-go-code-style.mdc`）
 
 步骤6：**用户**执行 `generate-model.sh <sql_file>`，确认生成 Model 代码
 

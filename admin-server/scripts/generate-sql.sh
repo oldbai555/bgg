@@ -34,6 +34,17 @@ domain_to_service() {
     esac
 }
 
+# 域→前端 API wrapper 映射（admin-frontend/docs/02-domain-reorg-and-api-layer.md SSOT）：
+# 前端按 8 个域分 wrapper（iam/system/monitoring/misc/content/chat/sdk/task），blog/video
+# 合并进同一个 content.ts，其余域名与后端 domain 一致。用于生成的 list_page.vue.tpl
+# import '@/api/<前端 Domain>'，不是 import '@/api/generated/admin'。
+domain_to_frontend_api() {
+    case "$1" in
+        blog|blog_extension|video) echo "content" ;;
+        *) echo "$1" ;;
+    esac
+}
+
 # 显示使用说明
 usage() {
     echo -e "${GREEN}SQL 脚本生成工具${NC}"
@@ -134,6 +145,7 @@ if [ -z "$SERVICE" ]; then
     echo -e "${RED}错误: 未知 domain: ${DOMAIN}（有效值: iam, system, monitoring, misc, blog, video, chat, task, sdk，或直接写服务名 iam/content/chat/task/sdk）${NC}"
     exit 1
 fi
+FRONTEND_DOMAIN="$(domain_to_frontend_api "$DOMAIN")"
 OUTPUT_DIR="${PROJECT_ROOT}/db/services/${SERVICE}/${MODULE}"
 GROUP="$MODULE"
 
@@ -187,7 +199,7 @@ go build -o sqlgen main.go
 # 运行程序
 # 注意：在 Windows 环境下，如果遇到中文乱码问题，请使用 chcp 65001 设置代码页为 UTF-8
 # 或者在 PowerShell 中设置：$OutputEncoding = [System.Text.Encoding]::UTF8
-./sqlgen -group "$GROUP" -name "$NAME" -output "$OUTPUT_DIR" -template "${SQLGEN_DIR}/templates" -parent-id "$PARENT_ID" -parent-path "$PARENT_PATH"
+./sqlgen -group "$GROUP" -name "$NAME" -domain "$FRONTEND_DOMAIN" -output "$OUTPUT_DIR" -template "${SQLGEN_DIR}/templates" -parent-id "$PARENT_ID" -parent-path "$PARENT_PATH"
 SQLGEN_EXIT_CODE=$?
 
 # 清理编译产物

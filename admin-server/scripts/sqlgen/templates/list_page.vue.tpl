@@ -48,7 +48,7 @@
 <script setup lang="ts">
 import {reactive, ref, onMounted, computed} from 'vue'
 import {ElMessage, ElMessageBox} from 'element-plus'
-import { {{.GroupFuncName}}List, {{.GroupFuncName}}Create, {{.GroupFuncName}}Update, {{.GroupFuncName}}Delete } from '@/api/generated/admin'
+import { {{.Domain}}Api } from '@/api/{{.Domain}}'
 import type { {{.GroupUpper}}Item, {{.GroupUpper}}CreateReq, {{.GroupUpper}}UpdateReq } from '@/api/generated/admin'
 import {useI18n} from 'vue-i18n'
 import D2Table from '@/components/common/D2Table.vue'
@@ -105,7 +105,7 @@ const drawerAddColumns = computed<DrawerColumn[]>(() => [
 const loadData = async () => {
   loading.value = true
   try {
-    const resp = await {{.GroupFuncName}}List({...query})
+    const resp = await {{.Domain}}Api.{{.GroupFuncName}}List({...query})
     list.value = resp.list
     total.value = resp.total
   } catch (err: unknown) {
@@ -136,7 +136,7 @@ const handleSizeChange = (size: number) => {
 
 const handleUpdate = async (row: {{.GroupUpper}}Item) => {
   try {
-    await {{.GroupFuncName}}Update(row as {{.GroupUpper}}UpdateReq)
+    await {{.Domain}}Api.{{.GroupFuncName}}Update(row as {{.GroupUpper}}UpdateReq)
     ElMessage.success('更新成功')
     loadData()
   } catch (err: unknown) {
@@ -147,7 +147,7 @@ const handleUpdate = async (row: {{.GroupUpper}}Item) => {
 
 const handleAdd = async (row: Record<string, unknown>) => {
   try {
-    await {{.GroupFuncName}}Create(row as {{.GroupUpper}}CreateReq)
+    await {{.Domain}}Api.{{.GroupFuncName}}Create(row as {{.GroupUpper}}CreateReq)
     ElMessage.success('新增成功')
     loadData()
   } catch (err: unknown) {
@@ -159,14 +159,14 @@ const handleAdd = async (row: Record<string, unknown>) => {
 const handleDelete = (index: number, row: {{.GroupUpper}}Item) => {
   ElMessageBox.confirm(t('common.confirmDelete'), t('common.confirm'), {type: 'warning'})
     .then(async () => {
-      await {{.GroupFuncName}}Delete({id: row.id})
+      await {{.Domain}}Api.{{.GroupFuncName}}Delete({id: row.id})
       ElMessage.success(t('common.delete'))
       loadData()
     })
     .catch(() => {})
 }
 
-onMounted(loadData);
+onMounted(loadData)
 </script>
 
 <style scoped>
