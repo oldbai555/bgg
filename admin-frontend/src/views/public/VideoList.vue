@@ -84,7 +84,7 @@
 </template>
 
 <script setup lang="ts">
-import {reactive, ref, computed, onMounted, onUnmounted, nextTick} from 'vue'
+import {reactive, ref, computed, onMounted, nextTick} from 'vue'
 import {useRouter, useRoute} from 'vue-router'
 import {ElMessage} from 'element-plus'
 import {contentApi} from '@/api/content'
@@ -92,7 +92,7 @@ import type {PublicVideoListReq, PublicVideoItem} from '@/api/generated/admin'
 import MetricReporter from '@/components/common/MetricReporter.vue'
 import IcpFooter from '@/components/common/IcpFooter.vue'
 import PublicHeader from '@/components/common/PublicHeader.vue'
-import {MOBILE_BREAKPOINT} from '@/constants/breakpoints'
+import {useIsMobile} from '@/composables/useIsMobile'
 
 const router = useRouter()
 const route = useRoute()
@@ -110,21 +110,11 @@ const loading = ref(false)
 const hoveringVideoId = ref<number | null>(null)
 const videoRefs = ref<Map<number, HTMLVideoElement>>(new Map())
 const pendingScrollTop = ref<number | null>(null)
-const isMobile = ref(false)
+const {isMobile} = useIsMobile()
 
 const paginationLayout = computed(() => {
   return isMobile.value ? 'prev, pager, next' : 'total, sizes, prev, pager, next, jumper'
 })
-
-const checkMobile = () => {
-  if (typeof window !== 'undefined') {
-    isMobile.value = window.innerWidth <= MOBILE_BREAKPOINT
-  }
-}
-
-const handleResize = () => {
-  checkMobile()
-}
 
 const getCoverUrl = (godNum: string): string => {
   if (!godNum) {
@@ -338,17 +328,6 @@ onMounted(() => {
 
   updateRouteQuery()
   loadData()
-
-  checkMobile()
-  if (typeof window !== 'undefined') {
-    window.addEventListener('resize', handleResize)
-  }
-})
-
-onUnmounted(() => {
-  if (typeof window !== 'undefined') {
-    window.removeEventListener('resize', handleResize)
-  }
 })
 </script>
 

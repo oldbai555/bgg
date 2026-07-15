@@ -130,10 +130,10 @@ watch(() => props.content, (newContent) => {
     tocItems.value = []
     return
   }
-  
+
   const extracted = extractTOC(newContent)
   tocItems.value = extracted
-  
+
   // 延迟执行，等待Markdown渲染完成
   if (typeof window !== 'undefined') {
     setTimeout(() => {

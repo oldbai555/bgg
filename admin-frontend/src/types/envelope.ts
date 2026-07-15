@@ -10,5 +10,5 @@ export function isEnvelope(res: unknown): res is Envelope {
     res !== null &&
     'code' in res &&
     typeof (res as {code: unknown}).code === 'number'
-  );
+  )
 }

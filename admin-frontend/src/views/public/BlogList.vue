@@ -97,7 +97,7 @@
 </template>
 
 <script setup lang="ts">
-import {reactive, ref, computed, onMounted, onUnmounted, nextTick, watch} from 'vue'
+import {reactive, ref, computed, onMounted, nextTick, watch} from 'vue'
 import {useRouter, useRoute} from 'vue-router'
 import {ElMessage} from 'element-plus'
 import {contentApi} from '@/api/content'
@@ -108,7 +108,7 @@ import PublicHeader from '@/components/common/PublicHeader.vue'
 import BlogCategoryNav from '@/components/blog/BlogCategoryNav.vue'
 import BlogAuthorCard from '@/components/blog/BlogAuthorCard.vue'
 import BlogSocialLinks from '@/components/blog/BlogSocialLinks.vue'
-import {MOBILE_BREAKPOINT} from '@/constants/breakpoints'
+import {useIsMobile} from '@/composables/useIsMobile'
 
 const router = useRouter()
 const route = useRoute()
@@ -164,21 +164,11 @@ const buildReq = (): PublicBlogArticleListReq => {
 }
 
 const pendingScrollTop = ref<number | null>(null)
-const isMobile = ref(false)
+const {isMobile} = useIsMobile()
 
 const paginationLayout = computed(() =>
   isMobile.value ? 'prev, pager, next' : 'total, sizes, prev, pager, next, jumper'
 )
-
-const checkMobile = () => {
-  if (typeof window !== 'undefined') {
-    isMobile.value = window.innerWidth <= MOBILE_BREAKPOINT
-  }
-}
-
-const handleResize = () => {
-  checkMobile()
-}
 
 const restoreScrollPosition = async (scrollTop: number) => {
   if (typeof window === 'undefined') {
@@ -326,19 +316,9 @@ watch(
 )
 
 onMounted(() => {
-  checkMobile()
-  if (typeof window !== 'undefined') {
-    window.addEventListener('resize', handleResize)
-  }
   initFromRoute()
   restorePendingScroll()
   loadData()
-})
-
-onUnmounted(() => {
-  if (typeof window !== 'undefined') {
-    window.removeEventListener('resize', handleResize)
-  }
 })
 </script>
 

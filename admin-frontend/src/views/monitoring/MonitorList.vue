@@ -212,8 +212,8 @@ const formatNumber = (num: number) => {
 // 格式化字节数
 const formatBytes = (bytes: number) => {
   if (bytes === 0) {
-return '0 B'
-}
+    return '0 B'
+  }
   const k = 1024
   const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
   const i = Math.floor(Math.log(bytes) / Math.log(k))
@@ -223,11 +223,11 @@ return '0 B'
 // 获取进度条颜色
 const getProgressColor = (percentage: number) => {
   if (percentage < 50) {
-return 'var(--color-success)'
-}
+    return 'var(--color-success)'
+  }
   if (percentage < 80) {
-return 'var(--color-warning)'
-}
+    return 'var(--color-warning)'
+  }
   return 'var(--color-danger)'
 }
 

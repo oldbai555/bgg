@@ -1521,6 +1521,7 @@ type UserItem struct {
 	DepartmentId  uint64                 `protobuf:"varint,6,opt,name=department_id,json=departmentId,proto3" json:"department_id,omitempty"`
 	Status        int64                  `protobuf:"varint,7,opt,name=status,proto3" json:"status,omitempty"`
 	CreatedAt     int64                  `protobuf:"varint,8,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	RoleNames     []string               `protobuf:"bytes,9,rep,name=role_names,json=roleNames,proto3" json:"role_names,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1609,6 +1610,13 @@ func (x *UserItem) GetCreatedAt() int64 {
 		return x.CreatedAt
 	}
 	return 0
+}
+
+func (x *UserItem) GetRoleNames() []string {
+	if x != nil {
+		return x.RoleNames
+	}
+	return nil
 }
 
 type UserCreateRequest struct {
@@ -9892,7 +9900,7 @@ const file_rpc_iam_proto_rawDesc = "" +
 	"\x15PasswordChangeRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12!\n" +
 	"\fold_password\x18\x02 \x01(\tR\voldPassword\x12!\n" +
-	"\fnew_password\x18\x03 \x01(\tR\vnewPassword\"\xe4\x01\n" +
+	"\fnew_password\x18\x03 \x01(\tR\vnewPassword\"\x83\x02\n" +
 	"\bUserItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x1a\n" +
 	"\busername\x18\x02 \x01(\tR\busername\x12\x1a\n" +
@@ -9902,7 +9910,9 @@ const file_rpc_iam_proto_rawDesc = "" +
 	"\rdepartment_id\x18\x06 \x01(\x04R\fdepartmentId\x12\x16\n" +
 	"\x06status\x18\a \x01(\x03R\x06status\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\b \x01(\x03R\tcreatedAt\"\xda\x01\n" +
+	"created_at\x18\b \x01(\x03R\tcreatedAt\x12\x1d\n" +
+	"\n" +
+	"role_names\x18\t \x03(\tR\troleNames\"\xda\x01\n" +
 	"\x11UserCreateRequest\x12\x1a\n" +
 	"\busername\x18\x01 \x01(\tR\busername\x12\x1a\n" +
 	"\bnickname\x18\x02 \x01(\tR\bnickname\x12\x1a\n" +

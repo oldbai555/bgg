@@ -194,13 +194,13 @@ const handleSaveProfile = async () => {
 // 修改密码
 const handleChangePassword = async () => {
   if (!passwordFormRef.value) {
-return
-}
+    return
+  }
 
   await passwordFormRef.value.validate(async (valid) => {
     if (!valid) {
-return
-}
+      return
+    }
 
     changingPassword.value = true
     try {

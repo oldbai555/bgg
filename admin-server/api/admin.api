@@ -95,14 +95,15 @@ type (
 	}
 	// 用户管理
 	UserItem {
-		id           uint64 `json:"id"`
-		username     string `json:"username"`
-		nickname     string `json:"nickname,optional"`
-		avatar       string `json:"avatar,optional"`
-		signature    string `json:"signature,optional"`
-		departmentId uint64 `json:"departmentId"`
-		status       int64  `json:"status"`
-		createdAt    int64  `json:"createdAt"` // 创建时间(秒级时间戳)
+		id           uint64   `json:"id"`
+		username     string   `json:"username"`
+		nickname     string   `json:"nickname,optional"`
+		avatar       string   `json:"avatar,optional"`
+		signature    string   `json:"signature,optional"`
+		departmentId uint64   `json:"departmentId"`
+		status       int64    `json:"status"`
+		createdAt    int64    `json:"createdAt"` // 创建时间(秒级时间戳)
+		roleNames    []string `json:"roleNames,optional"` // 角色名称列表（一次 JOIN 批量查询得出，供选人类场景直接展示，不需要再调 /users/roles 逐个查）
 	}
 	UserListReq {
 		page     int64  `json:"page,optional" form:"page,optional"`
@@ -2209,7 +2210,7 @@ type (
 		sourceId   uint64 `json:"sourceId"` // 来源ID（如公告ID、聊天消息ID等）
 		title      string `json:"title"`
 		content    string `json:"content"`
-		readStatus int64  `json:"readStatus"` // 已读状态：1 已读，0 未读
+		readStatus int64  `json:"readStatus"` // 已读状态（字典 read_status）：1 未读，2 已读
 		readAt     int64  `json:"readAt"` // 已读时间(秒级时间戳)
 		createdAt  int64  `json:"createdAt"` // 创建时间(秒级时间戳)
 		updatedAt  int64  `json:"updatedAt"` // 更新时间(秒级时间戳)
@@ -2345,9 +2346,9 @@ type (
 		total int64              `json:"total"`
 		list  []SdkInterfaceItem `json:"list"`
 	}
+	// apiCode 由后端根据 path+method 自动生成（services/sdk 的 SdkInterfaceCreateLogic），前端不需要也不应该传
 	SdkInterfaceCreateReq {
 		name             string `json:"name"`
-		apiCode          string `json:"apiCode"`
 		path             string `json:"path"`
 		method           string `json:"method"`
 		rateLimitDefault int64  `json:"rateLimitDefault,optional"`

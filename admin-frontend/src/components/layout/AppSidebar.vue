@@ -1,5 +1,10 @@
 <template>
-  <aside :class="['app-sidebar', {'app-sidebar--collapsed': collapsed}]">
+  <div
+    v-if="mobileOpen"
+    class="app-sidebar__backdrop"
+    @click="$emit('close-mobile')"
+  ></div>
+  <aside :class="['app-sidebar', {'app-sidebar--collapsed': collapsed, 'app-sidebar--mobile-open': mobileOpen}]">
     <el-menu
       :default-active="activePath"
       :collapse="collapsed"
@@ -52,13 +57,19 @@ import type {MenuItem} from '@/api/generated/admin'
 
 interface Props {
   collapsed?: boolean;
+  mobileOpen?: boolean;
   menus: MenuItem[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
   collapsed: false,
+  mobileOpen: false,
   menus: () => []
 })
+
+defineEmits<{
+  'close-mobile': [];
+}>()
 
 const route = useRoute()
 const router = useRouter()
@@ -117,16 +128,16 @@ const displayMenus = computed(() => props.menus)
 
 const isMenu = (item: MenuItem | undefined | null) => {
   if (!item) {
-return false
-}
+    return false
+  }
   return item.type === 2 || item.type === 1
 }
 
 // 获取菜单图标
 const getMenuIcon = (iconName?: string) => {
   if (!iconName) {
-return null
-}
+    return null
+  }
   // Element Plus Icons 映射
   const iconMap: Record<string, unknown> = ElementPlusIconsVue
   return iconMap[iconName] || null
@@ -135,8 +146,8 @@ return null
 // 获取子菜单的 index：目录类型使用第一个子菜单的路径，其他使用自身路径
 const getSubMenuIndex = (item: MenuItem): string => {
   if (!item) {
-return ''
-}
+    return ''
+  }
   // 如果是目录类型（type=1）且有子菜单，返回第一个子菜单的路径
   if (item.type === 1 && item.children && item.children.length > 0) {
     const firstChild = item.children.find((child) => child && child.type === 2 && child.path)
@@ -151,6 +162,7 @@ return ''
 
 <style scoped lang="scss">
 @use '@/styles/variables.scss' as *;
+@use '@/styles/responsive.scss' as *;
 
 .app-sidebar {
   width: $sidebar-width;
@@ -171,6 +183,47 @@ return ''
     &:not(.el-menu--collapse) {
       width: $sidebar-width;
     }
+  }
+
+  // 移动端：固定宽度改为可滑入/滑出的覆盖式抽屉，不再挤占内容区宽度
+  @include mobile {
+    position: fixed;
+    top: $header-height;
+    left: 0;
+    bottom: 0;
+    z-index: 1001;
+    width: $sidebar-width;
+    transform: translateX(-100%);
+    transition: transform $transition-base;
+    box-shadow: $shadow-lg;
+
+    &--collapsed {
+      // 移动端不需要"窄图标栏"这个中间态，折叠语义在这里等同于"关闭"
+      width: $sidebar-width;
+    }
+
+    &--mobile-open {
+      transform: translateX(0);
+    }
+
+    &__menu:not(.el-menu--collapse) {
+      width: $sidebar-width;
+    }
+  }
+}
+
+.app-sidebar__backdrop {
+  display: none;
+
+  @include mobile {
+    display: block;
+    position: fixed;
+    top: $header-height;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
   }
 }
 </style>

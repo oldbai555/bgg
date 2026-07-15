@@ -10,4 +10,3 @@ export function publicDictGet(params: DictGetReq) {
   return request.get<DictGetResp>('/v1/public/dict', {params})
 }
 
-

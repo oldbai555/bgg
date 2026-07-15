@@ -2,9 +2,9 @@
  * 字典管理 Store
  * 统一管理全局字典数据，在登录后一次性加载所有需要的字典
  */
-import {defineStore} from 'pinia';
-import {systemApi} from '@/api/system';
-import type {DictItemItem} from '@/api/generated/admin';
+import {defineStore} from 'pinia'
+import {systemApi} from '@/api/system'
+import type {DictItemItem} from '@/api/generated/admin'
 
 interface DictState {
   // 字典数据，key为字典类型编码，value为字典项列表
@@ -45,7 +45,7 @@ export const REQUIRED_DICT_CODES = [
   'blog_social_info_status', // 社交信息状态
   'video_source_type', // 视频来源类型
   'metric_module' // 性能日志-业务模块
-] as const;
+] as const
 
 export const useDictStore = defineStore('dict', {
   state: (): DictState => ({
@@ -59,27 +59,27 @@ export const useDictStore = defineStore('dict', {
      * 根据字典类型编码获取字典项列表
      */
     getDictItems: (state) => (code: string): DictItemItem[] => {
-      return state.dicts[code] || [];
+      return state.dicts[code] || []
     },
 
     /**
      * 根据字典类型编码和值获取标签
      */
     getDictLabel: (state) => (code: string, value: string | number): string => {
-      const items = state.dicts[code] || [];
-      const item = items.find((item) => item.value === String(value));
-      return item ? item.label : String(value);
+      const items = state.dicts[code] || []
+      const item = items.find((item) => item.value === String(value))
+      return item ? item.label : String(value)
     },
 
     /**
      * 根据字典类型编码获取选项列表（用于el-select等组件）
      */
     getDictOptions: (state) => (code: string): Array<{label: string; value: string | number}> => {
-      const items = state.dicts[code] || [];
+      const items = state.dicts[code] || []
       return items.map((item) => ({
         label: item.label,
         value: item.value
-      }));
+      }))
     }
   },
 
@@ -90,21 +90,21 @@ export const useDictStore = defineStore('dict', {
      */
     async loadDicts(codes?: string[]) {
       try {
-        const codesToLoad = codes || [...REQUIRED_DICT_CODES];
-        const resp = await systemApi.dictBatchGet({codes: codesToLoad});
-        
+        const codesToLoad = codes || [...REQUIRED_DICT_CODES]
+        const resp = await systemApi.dictBatchGet({codes: codesToLoad})
+
         if (resp && resp.dicts) {
           // 更新字典数据
           Object.keys(resp.dicts).forEach((code) => {
-            this.dicts[code] = resp.dicts[code].items || [];
-          });
-          
-          this.loaded = true;
-          this.loadAt = Date.now();
+            this.dicts[code] = resp.dicts[code].items || []
+          })
+
+          this.loaded = true
+          this.loadAt = Date.now()
         }
       } catch (err) {
-        console.error('批量加载字典失败:', err);
-        throw err;
+        console.error('批量加载字典失败:', err)
+        throw err
       }
     },
 
@@ -112,18 +112,18 @@ export const useDictStore = defineStore('dict', {
      * 刷新字典数据
      */
     async refreshDicts(codes?: string[]) {
-      this.loaded = false;
-      await this.loadDicts(codes);
+      this.loaded = false
+      await this.loadDicts(codes)
     },
 
     /**
      * 清除字典数据
      */
     clearDicts() {
-      this.dicts = {};
-      this.loaded = false;
-      this.loadAt = 0;
+      this.dicts = {}
+      this.loaded = false
+      this.loadAt = 0
     }
   }
-});
+})
 

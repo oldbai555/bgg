@@ -205,6 +205,7 @@ message UserItem {
   uint64 department_id = 6;
   int64 status = 7;
   int64 created_at = 8;
+  repeated string role_names = 9;
 }
 
 message UserCreateRequest {

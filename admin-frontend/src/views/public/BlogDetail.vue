@@ -42,8 +42,8 @@
 
           <div class="content">
             <component
-              v-if="mdPreviewLoaded && MdPreview && detail?.content"
               :is="MdPreview"
+              v-if="mdPreviewLoaded && MdPreview && detail?.content"
               :editor-id="'public-blog-detail'"
               :model-value="detail.content"
               :preview-theme="'github'"
@@ -119,7 +119,8 @@ import BlogTOC from '@/components/blog/BlogTOC.vue'
 const route = useRoute()
 const router = useRouter()
 
-// md-editor-v3 动态导入
+// md-editor-v3 动态导入组件，运行时类型取决于打包场景，用 any 是刻意的
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const MdPreview = shallowRef<any>(null)
 const mdPreviewLoaded = ref(false)
 
@@ -189,7 +190,7 @@ const handleImageError = (e: Event) => {
   img.style.display = 'none'
 }
 
-const handleContentRendered = (html: string) => {
+const handleContentRendered = (_html: string) => {
   // Markdown渲染完成后，为标题添加ID
   if (typeof window !== 'undefined') {
     nextTick(() => {

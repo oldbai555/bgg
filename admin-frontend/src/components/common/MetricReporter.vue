@@ -30,17 +30,19 @@ const props = withDefaults(
   }
 )
 
-const report = () => {
+/** 命令式触发时可覆盖 event/bizId（如"视频真正开始播放"这类一次性业务事件，不适合用 props 声明式表达） */
+const report = (override?: {event?: MetricEvent; bizId?: number}) => {
   const module = (props.module || '').trim()
   if (!props.enabled || !module) {
-return
-}
-  const bizId = Number(props.bizId || 0)
+    return
+  }
+  const bizId = Number(override?.bizId ?? props.bizId ?? 0)
+  const event = override?.event ?? props.event
   monitoringApi
     .metricReport({
       module,
       bizId,
-      event: props.event
+      event
     })
     .catch(() => {})
 }
@@ -53,10 +55,12 @@ watch(
   () => props.bizId,
   () => {
     if (!props.watchBizId) {
-return
-}
+      return
+    }
     report()
   }
 )
+
+defineExpose({report})
 </script>
 

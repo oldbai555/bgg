@@ -99,18 +99,18 @@ const form = reactive({
 })
 const parentName = computed(() => {
   if (form.parentId === 0) {
-return '根节点'
-}
+    return '根节点'
+  }
   const find = (list: DepartmentItem[], id: number): DepartmentItem | undefined => {
     for (const item of list) {
       if (item.id === id) {
-return item
-}
+        return item
+      }
       if (item.children) {
         const got = find(item.children, id)
         if (got) {
-return got
-}
+          return got
+        }
       }
     }
     return undefined
@@ -156,8 +156,8 @@ const openEdit = (data: DepartmentItem) => {
 const handleSubmit = () => {
   formRef.value?.validate(async (valid) => {
     if (!valid) {
-return
-}
+      return
+    }
     submitLoading.value = true
     try {
       if (isEdit.value) {

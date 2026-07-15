@@ -132,16 +132,16 @@ const query = reactive<MetricStatsReq>({
 
 const formatDay = (day: string): string => {
   if (!day || day.length !== 8) {
-return day
-}
+    return day
+  }
   return `${day.substring(0, 4)}-${day.substring(4, 6)}-${day.substring(6, 8)}`
 }
 
 // 图表数据：基于当前返回的 PV/UV/VV/IP 生成简单对比柱状图
 const chartData = computed(() => {
   if (!stats.value) {
-return []
-}
+    return []
+  }
   const items = [
     {key: 'pv', label: 'PV', value: stats.value.pv, color: 'var(--color-success)'},
     {key: 'uv', label: 'UV', value: stats.value.uv, color: 'var(--color-primary)'},

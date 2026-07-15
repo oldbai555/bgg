@@ -1,6 +1,6 @@
 <template>
   <div class="video-detail-page public-detail-page">
-    <MetricReporter module="video_detail" :biz-id="Number(route.params.id) || 0" />
+    <MetricReporter ref="metricReporterRef" module="video_detail" :biz-id="Number(route.params.id) || 0" />
     <PublicHeader />
     <div class="page-shell">
       <div class="page-layout">
@@ -50,7 +50,6 @@ import {ElMessage} from 'element-plus'
 import type DPlayerType from 'dplayer'
 import type {PublicVideoDetailResp} from '@/api/generated/admin'
 import {contentApi} from '@/api/content'
-import {monitoringApi} from '@/api/monitoring'
 import {copyToClipboard as copyText} from '@/utils/clipboard'
 import MetricReporter from '@/components/common/MetricReporter.vue'
 import IcpFooter from '@/components/common/IcpFooter.vue'
@@ -75,6 +74,7 @@ const video = ref<PublicVideoDetailResp>({
 })
 const loading = ref(false)
 const dplayerRef = ref<HTMLDivElement | null>(null)
+const metricReporterRef = ref<InstanceType<typeof MetricReporter> | null>(null)
 let player: DPlayerType | null = null
 let DPlayer: typeof DPlayerType | null = null
 let isInitializing = false
@@ -289,13 +289,7 @@ const initDPlayer = async (options: {url: string; type: 'hls' | 'auto'}) => {
 
         if (!hasReportedPlay.value && video.value.id) {
           hasReportedPlay.value = true
-          monitoringApi
-            .metricReport({
-              module: 'video_detail',
-              bizId: video.value.id,
-              event: 'play'
-            })
-            .catch(() => {})
+          metricReporterRef.value?.report({event: 'play', bizId: video.value.id})
         }
       })
 

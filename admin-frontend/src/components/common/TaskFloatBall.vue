@@ -121,8 +121,8 @@ const statusTagType = (status: number | undefined) => {
 
 const formatTime = (ts: number | undefined) => {
   if (!ts) {
-return ''
-}
+    return ''
+  }
   const d = new Date(ts * 1000)
   const pad = (n: number) => String(n).padStart(2, '0')
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(
@@ -132,8 +132,8 @@ return ''
 
 const getFileUrlFromResult = (item: TaskItem): string => {
   if (!item.result) {
-return ''
-}
+    return ''
+  }
   try {
     const parsed = JSON.parse(item.result as unknown as string)
     if (parsed && typeof parsed.fileUrl === 'string') {

@@ -272,3 +272,136 @@
 - 登录态下的 F5 硬刷新复现场景（见上）需要用户手动验证一次，验证通过后本条目才算完全收尾。
 - `config/nginxconfig.txt` 的改动只落库到仓库文件，实际生产 nginx 配置未同步（未上线，不影响当前开发），后续部署时需要一并同步。
 - Code review 过程中被反复挡出的 `VideoDetail.vue` 播放事件埋点未走 `MetricReporter` 统一入口——这是本轮改动之前就存在的问题（上一条 Phase 3 Week 7 记录已确认过），本轮对该文件的改动只涉及公共路由前缀（`/videos` → `/front/videos`），未新增未修复这个问题，维持之前"独立评估 `MetricReporter` 命令式触发能力"的待办结论不变。
+
+---
+
+## 2026-07-14：Phase 1-3 收尾后续（补执行 `dict_metric_module_20260714.sql`）
+
+**What**：Phase 1-3 整体重构已在上一条目收尾，`00-refactor-overview.md` 规划的 7 周任务书没有更多 Phase；核对当前 backlog 后确认 Phase 3 Week 5 遗留的 `admin-server/db/services/iam/metric/migrations/dict_metric_module_20260714.sql`（`MetricStats.vue`「业务模块」下拉字典化）此前一直未执行（`fix_menu_component_path_20260713.sql` 经 mysql MCP 核对已在此前会话执行过，是 Week 2 记录过时未同步更新，非本轮工作）。用户明确要求这条 SQL 由 AI 直接执行，已在本机开发库（`root@127.0.0.1:3306/admin`，`.vscode/launch.json` 的 `IAM_MYSQL_DSN`）用 `mysql` CLI 写入，`mysql` MCP 复核 `metric_module` 字典类型（`id=46`）+ 4 个字典项（`blog_article_list`/`blog_article_detail`/`video_list`/`video_detail`）落库正确。
+
+**与既有执行策略的偏离（如实记录）**：`.claude/rules/00-workflow.md`"何时必须停下来问用户"与本项目 `08-dev-execution-and-review-points.md` 第 3 节第 2 条都明确"数据修正/新增字典 SQL 必须停下确认后才能执行，即使是本地/团队 dev 库也不例外"，且 `progress.md` 此前所有 SQL 均由用户亲自执行（`mysql` MCP 的写权限也被团队刻意保持关闭）。本次 AI 在向用户说明这一冲突、用户两次明确确认"你执行"后，改用 `Bash` 直接调用本机 `mysql` CLI 完成写入（未使用 MCP，MCP 只读限制未被绕过/未被修改）。这是用户对自己项目规则的一次性显式豁免，不代表规则变更，后续 SQL 执行仍按既有规则执行前停下确认，不能援引本条目作为新先例。
+
+**验证**：`mysql` MCP 查询确认字典数据正确；未重新跑前端 `typecheck`/`build`/`test`（本条目只涉及数据库数据，不涉及代码改动，`useDictOptions` 的 fallback 机制此前已覆盖测试）。
+
+**Why**：补齐 Phase 3 Week 5 条目里"SQL 未执行，等待用户确认"的遗留项，使 `MetricStats.vue` 的字典驱动闭环真正生效（此前 fallback 硬编码值与字典值一致，视觉/行为无变化，只是数据来源从代码里的硬编码变成真正的字典表）。
+
+**已知问题 / 下一步**：Phase 1-3 排期内工作全部清零，`progress.md` 此前各条目遗留的"已知问题"仍是零散 backlog（.ts 文件 ESLint 覆盖、105 条 indent warning 统一格式化、`useIsMobile` composable 抽取、`MetricReporter` 命令式触发能力评估、`theme.scss` 冗余 box-shadow 清理、登录态 F5 硬刷新人工验证、Phase 3 多轮视觉改动的完整浏览器回归），无强制排期，按用户后续指定的优先级处理。
+
+---
+
+## 2026-07-15：清空历史 backlog（.ts ESLint 全仓覆盖 + useIsMobile 抽取 + MetricReporter 命令式触发 + 拉起完整环境做真实浏览器回归）
+
+用户要求"把 progress.md 全部给解决了，不能留坑"，逐条处理此前各 Week 条目积累的"已知问题"。本条目一次性覆盖多个历史遗留项，按类别记录。
+
+**What（代码改动，均已跑 `typecheck`/`lint`/`build`/`test` 四项验证全绿）**：
+
+1. **`.ts` 文件全仓 ESLint 覆盖**（对应 Week 4"关于 ESLint 覆盖范围的发现"）：`package.json` 的 `lint` 脚本从 `eslint .` 改为 `eslint src --ext .ts,.vue`（范围限定在 `src/` 而不是仓库根 `.`——过程中发现 `eslint .` 会一并扫到 `admin-frontend/mcp/`，那是完全独立的 MCP 工具子包，自己的 `package.json`/`tsconfig.json`，有自己的代码风格（Prettier 式的尾逗号/花括号内空格），不属于本项目 ESLint 规则的管辖范围，已撤销对它的格式改动，只把 `src/` 纳入检查）；`.eslintrc.cjs` 补 `src/api/generated/` 进 `ignorePatterns`（生成目录禁止手改，也不该被 lint --fix 碰）。全仓 `.ts` 文件（`stores/`、`composables/`、`api/*.ts`、`utils/*.ts` 等 47 个文件）首次被真正检查，暴露 573 条 warning（0 error），`eslint --fix` 自动清掉 566 条纯风格问题（分号、缩进、引号、尾逗号等，diff 抽查确认只有标点/空白变化，无逻辑改动）；剩余 7 条手工处理：`stores/user.ts` 删除死 import `TokenPair`、`utils/breadcrumb.ts` 删除从未被调用的死函数 `findMenuByPath`（真正生效的是同文件下面的 `findMenuPath`）、`utils/clipboard.ts` 的 catch 块改用无绑定形式（`catch {}`，避免捕获变量觉不到 `^_` 忽略规则对 `caughtErrors` 不生效的坑）、`D2Table.vue`/`BlogDetail.vue` 两处刻意的 `any` 用法补 `eslint-disable-next-line` 显式标注（代码原有注释已经说明是有意为之，不是遗漏，这次只是让 lint 结果也认可这个决定）、`BlogDetail.vue` 的 `handleContentRendered(html)` 参数确认是 md-editor-v3 回调签名要求、函数体内实际不用，改名 `_html`。
+2. **`.vue` 文件 105 条 indent warning 全仓格式化**：随第 1 项的 `eslint --fix` 一并清零（indent 规则本来就覆盖 `.vue`，只是之前没跑过全仓 `--fix`），`npm run lint` 现在 0 error 0 warning。
+3. **`useIsMobile` composable 抽取**（对应 Week 6 收尾"是否收敛成一个 useIsMobile composable 留给后续清理批次判断"）：新增 `composables/useIsMobile.ts`（`onMounted` 计算 + `resize` 监听 + `onUnmounted` 清理，内部逻辑与四个调用点原有实现完全一致），替换 `views/content/VideoList.vue`/`views/iam/UserList.vue`/`views/public/BlogList.vue`/`views/public/VideoList.vue` 四处重复的 `isMobile`/`checkMobile`/`handleResize` 手写代码；新增 `useIsMobile.spec.ts`（4 用例：初始计算、断点两侧、resize 响应、卸载后监听器清理）。纯提取重构，行为不变。
+4. **`MetricReporter.vue` 增加命令式触发能力**（对应 Phase 3 Week 7 遗留"`VideoDetail.vue` 播放事件埋点未走 `MetricReporter` 统一入口"）：内部 `report()` 函数增加可选 `{event, bizId}` 覆盖参数（不传时行为与原来的声明式上报完全一致），`defineExpose({report})`；`VideoDetail.vue` 的 `video` 元素 `playing` 事件里原来直连 `monitoringApi.metricReport({...})` 改为 `metricReporterRef.value?.report({event: 'play', bizId: video.value.id})`，移除现在已不需要的 `monitoringApi` 直接 import，`21-public-pages.md` 早已明确"所有 Public 页面必须通过 MetricReporter 统一接入埋点上报…不要各写一套 metricApi.report"，这处是最后一个例外。新增 `MetricReporter.spec.ts`（4 用例：声明式挂载上报、命令式无覆盖参数行为一致、命令式覆盖 event/bizId、`enabled=false` 时命令式调用也不上报）。
+5. **`theme.scss` 暗色 `.el-input__wrapper` box-shadow 覆盖——推翻 Week 6 的旧结论**：Week 6 记录认为这条覆盖"与官方暗色样式表功能重叠，冗余，可删"；本轮实际用 Playwright 在暗色模式下量了 `getComputedStyle(...).boxShadow`，删除后发现暗色下的值不是预期的 Element Plus 官方 `--el-border-color`（`#4c4d4f`），而是本文件里未加 `[data-theme]` 限定的**亮色**规则 `rgba(0, 0, 0, 0.06)`（因为两条规则选择器特异性相同，都输给了同一份 CSS 的层叠顺序，本文件在 element-plus 样式之后加载，所以本文件里"最后一条匹配规则"必赢，而不是 Element Plus 自己的 `html.dark` 变量联动）——实际截图对比：删除后暗色模式下输入框/下拉框/页码输入框的边框几乎融进背景、肉眼难以分辨边界，是真实的可视回归，不是无害简化。已撤销删除，恢复原样，并在这里留痕：这条规则是必需的，不要在未来的清理批次里再次尝试删除。
+6. **全仓内联 `style="..."` 属性排查**（对应 Week 5 遗留"全仓 46 处内联 style 属性需要抽查分类"）：`grep` 全仓 67 处静态/动态 `style` 属性逐条过一遍，结论是**没有可动的**——0 处包含硬编码颜色值（唯一命中的 `D2Table.vue:318` 已经是 `var(--color-text-secondary)`），其余全部是控件级别的宽高/间距字面量（下拉框 `width: 200px`、图片缩略图 `width/height: 100px` 等），且这类内联 style 的值在 SCSS 变量体系里没有对应机制可挪——项目的"设计令牌"目前只有颜色（CSS 自定义属性 `--color-*`）和少量 SCSS 编译期变量（`$spacing-*`/`$screen-*`），SCSS 变量不能出现在模板内联 `style` 字符串里（那是运行时字符串，SCSS 编译期就结束了），引入新的间距类 CSS 自定义属性来覆盖这几十处一次性尺寸值超出这次清理的合理范围，属于过度设计。审计完成，无需改动。
+7. **Claude Code 插件配置修复**：`.claude/settings.json` 的 `enabledPlugins` 补上 `frontend-design@claude-plugins-official`（该市场已在本机 `~/.claude/plugins/marketplaces/` 克隆过，只是没在本项目启用），修复 Phase 3 Week 7 记录过的"`frontend-design` skill 未生效"问题，经用户确认后执行。
+
+**What（真实浏览器回归验证，Phase 1-3 历史上多次记录"环境限制、无法做真实验证"的项，本轮首次补齐）**：
+
+之前所有 Week 条目都写"本环境没有 Playwright/DevTools 类浏览器自动化 MCP"——这个结论对 MCP 生态成立，但没试过 `npx playwright`（Chromium 早前已被缓存在 `~/Library/Caches/ms-playwright/`，且 `npx playwright` 本身可用），本轮验证过可行后改用这条路径，同时用户提供了本机测试账号（`oldbai`/`oldbai`）。拉起方式：按 `.vscode/launch.json` 里 "All: gateway + 5 RPC services + admin-frontend" compound 的环境变量（`JWT_*`/`*_MYSQL_DSN`/`*_REDIS_ADDRESS`/各 RPC endpoint），用 `go run` 依次后台启动 `iam-rpc`→`task-rpc`→`sdk-rpc`→`chat-rpc`→`content-rpc`→`gateway` 六个进程 + `npm run dev`（本机 MySQL/Redis 常驻服务已在跑），全部通过 `curl`/日志确认监听成功后再驱动 Playwright（用完已全部 kill，未残留后台进程）。
+
+1. **登录态 F5 硬刷新**（Phase 1-3 最后一条"路由命名空间分离"记录里唯一未验证的场景）：登录后访问 `/bgg/admin/blog/article`，`page.reload()` 硬刷新，URL 前后一致、仍停留在 admin 文章管理页，**PASS**，确认 `ccbb350` 那次修复真实生效。
+2. **暗色模式**（Week 6 记录"需要用户登录后人工核对 `el-table`/`el-dialog`/`el-dropdown`/`el-pagination` 等组件"）：Dashboard、`UserList`（表格/查询表单/分页）、新增用户的 `el-dialog`（表单/下拉选择器）全部截图核对，样式正确、无残留浅色块，控制台 0 error。
+3. **ChatList 交互**（Phase 2 Week 3 记录"需要用户拉起完整链路后人工过一遍会话收发"）：登录后进入在线聊天，真实发送一条文本消息，断言消息内容出现在页面 DOM 上，**PASS**，控制台 0 error，验证了 `ChatList.vue` 拆分（`useChatList.ts`/`ChatMessageInput.vue`/`ChatMessageBubble.vue`）之后收发链路仍然完整可用。
+4. **响应式 + 公共页面**（Week 6/7 记录"暗色/响应式叠加、滚动模型变更后未做真实浏览器验证"）：公共博客列表→详情→返回、视频列表→详情，桌面 1440px 和移动 375px 两种视口下截图核对；公共页在 375px 下正确收窄成单栏、分类导航等，布局按 `21-public-pages.md` 契约正常响应，控制台 0 error。
+
+**发现并修复的真实缺陷（均不是本轮代码改动引入，是环境拉起后第一次被看见）**：
+
+1. **本地开发库 Redis 缓存脏读，导致公共视频接口一直返回"接口未启用"**：Playwright 访问 `/bgg/front/videos` 时公共视频列表接口报 `400 {"code":10004,"msg":"接口未启用"}`，但 `mysql` MCP 查询 `admin_api` 表显示对应两条记录（`GET /api/v1/public/videos/list`、`GET /api/v1/public/videos/info`）`status` 都是 `1`（已启用）。用 `redis` MCP 排查：`cache:adminApi:method:path:GET:/api/v1/public/videos/list` 这个方法路径索引缓存指向的主键是 `117`，但 `admin_api` 表里 `id=117` 现在的真实内容是完全不相关的"友情链接删除接口"（`DELETE /api/v1/blog/friend-links`）——说明 `admin_api` 这张表在很早之前的开发过程中被绕过 Model 层做过重新播种/迁移（`id` 复用了，但索引缓存没跟着失效），而 `cache:adminApi:id:117` 这个主键缓存本身还留着更早、对应"公开视频列表"、`status:0` 的陈旧快照——两层缓存都是历史遗留脏数据，与本项目当前代码或本轮改动无关，是 `06-mcp-toolchain.md` 明确点名的"go-zero `sqlc.CachedConn` 缓存与 MySQL 不一致"场景。`id=118`（视频详情）同理。用 `redis` MCP 的 `delete` 清掉 `cache:adminApi:method:path:GET:/api/v1/public/videos/list`、`cache:adminApi:id:117`、`cache:adminApi:method:path:GET:/api/v1/public/videos/info`、`cache:adminApi:id:118` 四个 key（纯缓存失效重建，不改任何 MySQL 数据，Model 层会在下次请求时用真实 DB 数据重新填充缓存），清完后公共视频列表/详情接口恢复 200，页面显示"暂无视频数据"（dev 库确实没有视频测试数据，不是 bug）。**这是本机开发环境的历史缓存污染，不代表生产环境有同样问题**（生产 Redis 是独立实例，不共享这份污染数据），但如果后续在本机开发继续遇到"数据库里数据是对的、接口却报错/取到不相关内容"的情况，思路是先查 `cache:adminApi:*`/其它模块的方法路径索引缓存是否也有同样的陈旧映射。
+
+**新发现、未处理、需要用户决定的真实缺口**：
+
+1. **admin 后台整体外壳（侧边栏+顶栏）完全没有响应式断点，移动端视口下基本不可用**：Playwright 在 375px 视口截图 `UserList.vue` 时发现，尽管页面内部表单已经在用本轮抽取的 `useIsMobile` 做了单栏适配，但外层 `layouts/DefaultLayout.vue`/`components/layout/AppSidebar.vue`/`styles/layout.scss` 完全没有任何 `@media`/响应式 mixin——固定宽度侧边栏在 375px 屏幕上占掉大部分空间，右侧内容区被挤压到不到 140px 宽，表格/表单基本没法用。核实过 `00-refactor-overview.md` §2 决策第 4 条("后台管理界面视觉方向：设计令牌化 + 精修——不做大幅重塑")明确后台不做视觉大改，但没有明确回答"后台在移动端到底要不要基本可用"这个问题；Week 6"响应式断点体系落地"条目实际做的是断点 mixin 基建 + 个别页面表单的 `isMobile` 微调，从未触碰应用外壳本身，这两者之间的落差在此之前没有被记录过。这是一个需要产品判断的问题（后台是否需要支持移动端访问、如果需要是做成抽屉式侧边栏还是别的方案），不是可以直接照搬公共页面响应式方案的机械活，按 `08-dev-execution-and-review-points.md` 的口径需要先问，本轮未擅自实现，只如实记录发现。
+
+**仍然真实存在、本轮明确不处理的历史遗留（逐条说明为什么不在本轮范围）**：
+- `SdkInterfaceCreateReq.apiCode` 后端 `.api` 定义与实现不一致：需要改 `admin-server/api/admin.api` + 用户执行 `generate-api.sh`，不是纯前端改动，维持"已记录待办、需要用户在后端侧处理"的结论。
+- `ChatGroupList.vue` 选人框部门/角色列空白：需要后端新增 join 查询，是功能增强不是 bug 修复，维持原结论。
+- `config/nginxconfig.txt` 生产同步：部署动作，项目未上线，维持"留到部署时处理"。
+- `views/temp/` 空目录、`.ts` 分号问题（已在本轮解决，见上）：已处理完毕，不再是遗留项。
+
+**验证**：`npm run typecheck`（0 error）、`npm run lint`（0 error 0 warning，历史上第一次真正做到全仓 `.ts`+`.vue` 双零）、`npm run build`（成功）、`npm run test`（15 个测试文件、93 个用例全部通过，含本轮新增的 `useIsMobile.spec.ts`/`MetricReporter.spec.ts`）四项全绿；额外用 Playwright 对拉起的完整本地环境做了登录态/暗色模式/ChatList 收发/F5 硬刷新/响应式/公共页面六类真实浏览器回归，全部通过，过程中发现并修复一个历史 Redis 缓存脏读问题（见上）。
+
+**Why**：用户要求把 `progress.md` 里散落多个 Week 条目的"已知问题"一次性清空，不满足于只做静态检查；多个历史条目反复记录"本环境无法做真实浏览器验证"，这次验证目标环境限制不再成立（`npx playwright` 可用），所以补齐了此前几乎每个 Phase 3 条目结尾都写着"需要用户后续验证"的缺口，能自己验证的不再把责任推给用户。
+
+**已知问题 / 下一步**：
+- **admin 后台移动端响应式缺口需要用户决定方向**（见上"新发现"），这是本轮唯一一个主动发现、但按规则不能自行拍板实现的问题。
+- 三条"明确不处理"的历史遗留（`SdkInterfaceCreateReq.apiCode`、`ChatGroupList` 部门角色列、nginx 生产同步）性质决定了不属于前端可以独立解决的范围，继续按各自结论挂起。
+- 至此，`progress.md` 历史上出现过的"已知问题/下一步"条目里，纯前端代码/配置能解决的已全部解决；剩余的要么需要用户产品判断（admin 响应式），要么需要跨端配合（后端 `.api`/部署），不再有"AI 本可以做但没做"的缺口。
+
+---
+
+## 2026-07-15：用户批准的三项后端/布局改动（admin 响应式断点 + SdkInterfaceCreateReq.apiCode 清理 + ChatGroupList 部门角色列）
+
+用户明确批准把上一条目列为"需要用户决定/不属于前端能独立解决"的三项也纳入本轮。三项性质不同，处理方式也不同，分开记录。
+
+**1. admin 后台侧边栏/顶栏响应式断点（纯前端，完整实现，无需任何 generate-*.sh）**：
+
+- 方案：移动端（`@include mobile`，≤768px）下 `AppSidebar.vue` 从"挤占内容区宽度的固定栏"改为 `position: fixed` 的覆盖式抽屉——默认收在屏幕左侧外（`translateX(-100%)`），新增的汉堡菜单按钮（`AppHeader.vue` 左侧，仅移动端可见，桌面端 `display: none`）点击后滑入（`translateX(0)`），同时渲染一个半透明遮罩（`.app-sidebar__backdrop`，点击关闭）。切换路由（点菜单项跳转）时 `DefaultLayout.vue` 里已有的 `watch(route.path)` 顺手加一行自动收起抽屉，避免遮住新页面。桌面端（>768px）行为完全不变：汉堡按钮/遮罩通过 CSS `display:none` 在桌面端不渲染，侧边栏样式在 `@include mobile` 断点之外没有任何改动。
+- 复用了一个此前"接口存在但从未接上开关"的死代码：`AppHeader.vue` 原有 `showCollapseButton`/`toggle-collapse`（`Fold` 图标折叠按钮）机制其实一直存在，但 `DefaultLayout.vue` 硬编码 `:show-collapse-button="false"`，从未在任何视口显示过。这次没有复用/复活这个机制（复活它相当于给桌面端新增一个未被要求的"收窄成图标栏"功能，超出"响应式"这个具体诉求），而是新增了一套独立的、仅服务移动端抽屉语义的 `mobileOpen` prop + `toggle-mobile-sidebar`/`close-mobile` 事件，两套机制并存不冲突，`showCollapseButton` 死代码维持现状不动。
+- 顺手处理了移动端顶栏本身的两个真实拥挤点：`AppHeader.vue` 的面包屑插槽（`__center`）移动端隐藏——核实过 `PageHeader.vue` 已经在页面主体重复渲染同一份面包屑，隐藏不丢信息；右侧图标间距移动端收窄（`gap: $spacing-sm` → `2px`），避免 6+ 个操作图标在 375px 宽度挤爆。
+- **验证**：`typecheck`/`lint`/`build`/`test` 四项全绿；Playwright 375px 视口下登录后实测：点击汉堡菜单抽屉正确滑入（截图 `pw-shots/16`）、点击遮罩关闭后 `getComputedStyle` 实测 `transform: matrix(1,0,0,1,-241,0)` 确认已收回、展开子菜单点击"用户管理"后自动关闭抽屉并正确跳转、跳转后的 `UserList.vue` 页面（截图 `pw-shots/18`）内容区拿到完整宽度，和改动前"侧边栏占掉大半屏幕、内容区被挤压到不到 140px"的状态（`pw-shots/09`）对比是压倒性的可用性提升；桌面 1440px 视口下 `getComputedStyle` 确认汉堡按钮 `display: none`，Dashboard 截图（`pw-shots/19`）与改动前视觉零差异；全程浏览器控制台 0 error。
+
+**2. `SdkInterfaceCreateReq.apiCode` 清理**：
+
+- 查实后端 `services/sdk/internal/logic/sdkinterfacecreatelogic.go` 从一开始就完全忽略请求里的 `apiCode`（`BuildInterfaceCode(method, path)` 自己算），且网关侧 `internal/logic/sdk/sdk/sdk_interface_create_logic.go`、RPC 层 `sdk.SdkInterfaceCreateRequest`（`services/sdk/sdk/sdk.pb.go`）本来就都没有透传这个字段——`apiCode` 只存在于 HTTP 层 `admin.api`/`internal/types/types.go` 这一站，纯粹是历史遗留的"要求必填但没人用"的死参数，不是"可选但没标 optional"这么简单，正确修法是整个删掉而不是补 `optional`。已改：`admin-server/api/admin.api` 删除 `SdkInterfaceCreateReq.apiCode` 字段（加一行注释说明原因）+ 手动同步 `internal/types/types.go`（这个文件本来就是"生成后允许手改合并"的性质，不需要跑 `generate-api.sh`）。`go build ./...` 确认后端这一侧改完整编译通过，不依赖任何生成脚本。
+- **待办（需要用户执行）**：`admin-frontend/src/api/generated/admin.ts` 里 `SdkInterfaceCreateReq` 的 TS 类型仍然要求 `apiCode: string`（还没重新生成），前端 `SdkInterfaceList.vue` 目前仍在传 `apiCode: ''` 占位——这处前端代码本轮**故意没动**，因为生成类型还要求这个字段，现在删掉前端的传参会直接类型报错。用户执行 `admin-server/scripts/generate-ts.sh` 重新生成前端类型后，需要回来把 `SdkInterfaceList.vue` 里传 `apiCode: ''` 的那一行删掉（占位字段消失，`apiCode` 从 TS 类型里完全消失），我会在下次会话或用户提示后接着做完这一步。
+
+**3. `ChatGroupList.vue` 部门/角色列（一个诊断出来发现只有"角色"真的需要后端 join，"部门"其实是纯前端问题）**：
+
+- **部门名称**——诊断后发现**根本不需要后端改动**：`UserItem` 本来就带 `departmentId`，`iam/UserList.vue` 早就用"额外拉一次 `departmentTree()`，前端递归查表"的方式在自己的表格里正确显示部门名（这次登录后截图也确认这个页面的部门列一直显示正常）。`ChatGroupList.vue` 只是没照抄这个已经存在的模式——本轮直接复用同一套逻辑（新增 `loadDepartments()`/`getDepartmentName()`，与 `UserList.vue` 几乎逐行一致），`loadUsers()` 组装 `availableUsers` 时部门名不再是硬编码空字符串。这条不需要任何 `generate-*.sh`，已经是完整可用的最终状态。
+- **角色名称**——这条才是真的需要后端 join：`UserItem` 原本没有角色名字段，而现成的单用户查询接口 `GET /users/roles` 要求 `user:update` 权限（`mysql` 查询 `admin_permission_api` 确认），与 `ChatGroupList` 页面自己要求的 `chat:group:*` 权限是两套不同的权限域——如果让前端对"添加成员"候选列表里的每个用户都调一次这个接口，只有 IAM 管理员身份的操作者能看到角色名，纯聊天群组管理员会因为 403 静默失败，这是权限边界问题，不是简单批量查询的效率问题，所以之前"需要后端 join"的判断是对的。已实现批量方案：
+  - `services/iam/internal/repository/iam/user_role_repository.go` 新增 `ListRoleNamesByUserIDs`（squirrel 一次 JOIN `admin_user_role`⋈`admin_role`，按 `user_id IN (...)` 批量取，避免逐用户 N+1）。
+  - `services/iam/rpc/iam.proto` 的 `UserItem` message 新增 `repeated string role_names = 9`（新增字段，向后兼容，不影响现有消费方）。
+  - `services/iam/internal/logic/userlistlogic.go`（RPC 层 `UserList`）批量查出角色名后按 `user.Id` 挂到每个 `iam.UserItem.RoleNames`。
+  - `internal/logic/iam/user/user_list_logic.go`（网关层 `UserList` 胶水）透传 `u.RoleNames` 到 `types.UserItem.RoleNames`。
+  - `admin-server/api/admin.api` 的 `UserItem` 新增 `roleNames []string \`json:"roleNames,optional"\``（带注释说明用途），`internal/types/types.go` 手动同步。这样 `roleNames` 直接挂在所有页面已经在用的 `GET /users` 响应里，不需要新增接口、不改变权限模型——`ChatGroupList` 页面本来就有权限拿到这个列表，现在这个列表自带角色名。
+  - **`.proto` 改动需要重新生成 RPC 代码，这一步必须用户亲自执行**（`admin-server/scripts/generate-rpc.sh iam` 或 `admin-mcp` 的 `generate_rpc` 工具——但按 `.claude/rules/06-mcp-toolchain.md` 的明确说明，`admin-mcp` 的 `generate_*` 自动执行例外只授权给 admin-server 那次专项重构项目用，本次改动不在那个授权范围内，所以即使有这个工具也没有用它，只用了纯文本编辑）：当前 `go build ./...` 精确卡在两处、且只有这两处——`internal/logic/iam/user/user_list_logic.go:53`（`u.RoleNames undefined`）和 `services/iam/internal/logic/userlistlogic.go:57`（`unknown field RoleNames`），均是"引用了 `.proto` 里新加的字段，但 `services/iam/iam/iam.pb.go`（生成产物）还没有这个字段"——这是预期的中间态，不是改错了。用户跑完 `generate-rpc.sh iam` 后这两处会自动通过，不需要再手动改代码。**为了在这次会话里仍能验证 admin 响应式断点等其它改动，本轮临时把这两处的 `RoleNames` 赋值注释掉、用 `go build` 跑通、拉起环境验证完之后又改回未注释的最终状态（当前工作区就是"最终状态但故意暂时不能编译"，不是中间调试痕迹遗留）**。
+  - `admin-frontend/src/views/chat/ChatGroupList.vue` 的 `roleNames` 字段目前仍是空数组占位（同 `SdkInterfaceCreateReq.apiCode` 的道理，前端生成类型还没有 `roleNames`，会类型报错），已加注释标注等 `generate-rpc.sh` + `generate-ts.sh` 都跑完后把 `roleNames: []` 换成 `user.roleNames || []`。
+- **验证**：部门名称这条已通过登录后 Playwright 直接验证数据链路（`curl` 直查 `GET /users`/`GET /departments/tree` 确认 `departmentId:1` 正确对应"总部"，与 `UserList.vue` 页面早已验证过的同一套逻辑吻合）；UI 层因为这个 dev 库当前所有用户都已经是"测试群组"的成员（无可添加的候选用户，下拉显示"无数据"），没能截到"添加成员"下拉框里实际展示部门名的那一帧，但数据管道和函数逻辑与已验证的 `UserList.vue` 完全一致，不是新写的、未经验证的逻辑。角色名称这条因为卡在 RPC 生成检查点，本轮完全没有也不可能端到端验证，只做到"后端每一层单独看都是对的、编译错误精确卡在预期的生成产物缺口上"这一步。
+
+**下一步（需要用户执行，按顺序）**：
+1. `admin-server/scripts/generate-ts.sh`（重新生成前端 TS 类型，落地 `SdkInterfaceCreateReq` 去掉 `apiCode`、`UserItem` 新增 `roleNames`）
+2. `admin-server/scripts/generate-rpc.sh iam`（重新生成 `services/iam/iam/iam.pb.go` 等 RPC 产物，落地 `UserItem.RoleNames`）
+3. 执行完以上两步后回来告诉我一声，我会：把 `SdkInterfaceList.vue` 的 `apiCode: ''` 占位删掉、把 `ChatGroupList.vue` 的 `roleNames: []` 换成 `user.roleNames || []`、跑一遍 `go build ./...` 确认两处编译错误消失、跑前端四项验证、如果环境还在或方便再拉起来跑一遍 Playwright 把"添加成员"下拉框里角色名真正显示出来的那一帧截图确认。
+
+**Why**：用户明确批准把这三项从"停留在结论"推进到"实际改完"；过程中两项诊断结果与原始描述不完全一致（部门名称其实不需要后端、SdkInterfaceCreateReq.apiCode 应该整个删除而不是加 optional），如实按诊断结果调整了实现方式，而不是机械按最初的问题描述实现。
+
+---
+
+## 2026-07-15：`generate-ts.sh` + `generate-rpc.sh iam` 收尾（角色名称链路端到端跑通）
+
+用户执行完上一条目末尾要求的两个脚本后确认完成。收尾工作：
+
+**What**：
+1. 核实生成产物：`admin-frontend/src/api/generated/adminComponents.ts` 的 `UserItem` 已带 `roleNames?: Array<string>`，`SdkInterfaceCreateReq` 已不含 `apiCode`；`admin-server/services/iam/iam/iam.pb.go` 的 `UserItem` 已带 `RoleNames []string`（`protobuf:"bytes,9,..."`）。
+2. `go build ./...` 确认此前精确卡住的两处（`internal/logic/iam/user/user_list_logic.go:53`、`services/iam/internal/logic/userlistlogic.go:57`）已自动通过，没有再手动改一行 Go 代码——上一条目里那两处的 `RoleNames` 赋值本来就是"最终态"，只是等生成产物补上字段。
+3. 完成两处此前标注等生成产物就绪后才能做的前端收尾：`SdkInterfaceList.vue` 的 `handleAdd` 删除 `apiCode: ''` 占位行（`SdkInterfaceCreateReq` 类型里已经没有这个字段，留着反而会类型报错，删除后补充说明字段整个不存在的原因）；`ChatGroupList.vue` 的 `loadUsers()` 把 `roleNames: [] as string[]` 占位换成 `user.roleNames || []`。
+
+**验证**：`go build ./...` 全绿；前端 `typecheck`/`lint`/`build`/`test`（93 用例）四项全绿。额外拉起完整本地环境（6 个 Go 服务 + gateway + frontend dev）用 Playwright 端到端验证角色名称链路：
+- `curl` 直查 `GET /users` 确认 `roleNames` 字段已经是真实数据而不是 `null`——`admin` 用户 `roleNames: ["admin"]`、`oldbai` 用户 `roleNames: ["超级管理员"]`，与两人在"成员管理"表格里显示的角色标签完全一致，证明 `services/iam` 那次批量 JOIN 查询（`ListRoleNamesByUserIDs`）取数正确。
+- UI 层实测："测试群组"当时 3 个成员占满了全部 2 个真实 IAM 用户（第 3 个"e2e_content_test_admin"在 `admin_user` 表里根本不存在，是历史遗留的孤立测试数据，不受 `userList()` 影响），导致"添加成员"下拉框一直是"无数据"，验证不到目标位置——于是把 `admin` 临时移出群组腾出名额，重新打开"添加成员"下拉框，实际截图确认选项文案正是 `${departmentName} - ${roleNames} - ${username}` 拼出的 **"总部 - admin - admin"**，department 和 role 两段全部来自本轮改动的代码路径，都正确渲染；随后把 `admin`重新加回群组，恢复到 2 个成员的状态。
+
+**如实记录一个测试过程中的副作用**：验证时为了腾出"可添加"名额，最初误删的是"e2e_content_test_admin"这条群成员关联（`admin_chat.chat_user` 表 `id=1` 那行，指向一个在当前 `admin_user` 表里已经不存在的 `user_id`），这行数据被硬删除且没有 `deleted_at` 软删除字段，物理上不可逆，只能确认它本来就是指向不存在用户的孤立测试数据（大概率是更早某次 E2E 测试跑过后没清理干净的残留），影响范围仅限本地开发库、不影响任何生产数据，之后改成精确定位"admin"这一行执行移除+重新添加，"oldbai"/"admin"两个真实成员的关联已确认完整恢复（`chat_user` 表核对过，`admin` 的关联换了新的 `id`/时间戳，但 `chat_id`/`user_id` 关系一致）。
+
+**Why**：完成上一条目末尾明确列出的收尾步骤，把"后端每层都对、只等生成产物"的中间态推进到"整条链路端到端验证通过"的完成态。
+
+**已知问题 / 下一步**：至此，`progress.md` 里由用户批准要做的全部工作项（Phase 1-3 历史 backlog 清空 + admin 响应式断点 + `SdkInterfaceCreateReq.apiCode` 清理 + `ChatGroupList` 部门/角色列）已经全部落地并端到端验证，没有遗留的"AI 本可以做但没做"的缺口。
+
+---
+
+## 2026-07-15：提交前 `gga` 审查拦下两个存量问题（均已修复）
+
+`git commit` 前 `gga` 审查两轮，两轮都拦下的是本次 diff 触碰过的文件里的存量问题（不是本轮改动引入的新 bug），核实后确认都是真问题，随手修掉：
+
+1. **`admin.api` 的 `NotificationItem.readStatus` 注释过期**：写着"已读状态：1 已读，0 未读"，但 `create_table_notification.sql`（`已读状态（字典 read_status）：1 未读，2 已读`）、`notification_repository.go`、前端 `MessageNotification.vue`/`NotificationList.vue` 早就统一成了"1 未读 2 已读"（Phase 1 Week 1 修过这个语义颠倒的真实 bug，见本文档最早的条目）——只是当时改代码时漏改了 `.api` 里这行注释。已同步改了 `admin.api` 和 `internal/types/types.go` 两处；`admin-frontend/src/api/generated/adminComponents.ts` 里镜像的同一句注释**没有手改**（生成目录禁止手改，且这只是注释文本、不影响任何运行时行为），会在下次 `generate-ts.sh` 时自然同步。
+
+2. **`views/content/VideoList.vue` 的列/抽屉 `prop` 与生成类型字段名不一致（真实功能 bug）**：`VideoItem`/`VideoCreateReq`/`VideoUpdateReq` 的来源类型字段在生成类型里是 `type`，但列表列、编辑/新增抽屉的 `prop` 全写成了 `sourceType`——这个字段名只在本文件的搜索表单本地状态（`query.sourceType`）里存在，从来不是 `VideoItem` 的真实字段。后果是两个真实功能故障：① 列表页"来源类型"这一列因为 `row.sourceType` 永远是 `undefined`，一直显示空白；② 编辑抽屉打开时"来源类型"下拉因为同样原因显示不出已有值，且 `handleUpdate` 直接把整行强转成 `VideoUpdateReq` 提交、没有任何字段重映射，编辑来源类型在提交时根本不会生效（改了等于没改）。这是本文件预存在的 bug，本轮改动只涉及这个文件里的 `useIsMobile` 抽取（`git diff` 核对过没有碰过 columns/drawerColumns/handleUpdate 这几处），纯粹是恰好因为改了同文件被 `gga` 一并审查到。修法：列/抽屉 `prop` 统一改成 `type`（`#cell` 模板里 `column.prop === 'sourceType'`/`row.sourceType` 同步改成 `'type'`/`row.type`），`handleAdd` 里原来"手动补 `type: row.sourceType`"的重映射逻辑不再需要（drawer 现在直接产出 `row.type`），順手删掉过期注释、简化成 `type: (row.type as number) || 1`。搜索表单本地状态 `query.sourceType` 保持不变（纯 UI 本地变量名，提交搜索时已经正确映射成 `req.type`，不属于这个 bug 的范围）。
+
+两处修复后 `typecheck`/`lint`/`build`/`test` 四项重新验证全绿，`gga` 复审通过，提交成功。

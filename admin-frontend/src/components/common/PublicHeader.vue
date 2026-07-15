@@ -41,24 +41,42 @@ const route = useRoute()
 const socialInfoList = ref<PublicBlogSocialInfoListResp['list']>([])
 
 const activeTab = computed<'blog' | 'video' | ''>(() => {
-  if (route.path.startsWith('/front/blog')) return 'blog'
-  if (route.path.startsWith('/front/videos')) return 'video'
+  if (route.path.startsWith('/front/blog')) {
+    return 'blog'
+  }
+  if (route.path.startsWith('/front/videos')) {
+    return 'video'
+  }
   return ''
 })
 
 const normalizeUrl = (url: string): string => {
-  if (!url) return ''
-  if (url.startsWith('http://') || url.startsWith('https://')) return url
+  if (!url) {
+    return ''
+  }
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url
+  }
   return `https://${url}`
 }
 
 const getSocialIconText = (name: string): string => {
   const nameLower = name.toLowerCase()
-  if (nameLower.includes('github')) return 'G'
-  if (nameLower.includes('gitee')) return '码'
-  if (nameLower.includes('bilibili') || nameLower.includes('b站')) return 'B'
-  if (nameLower.includes('wechat') || nameLower.includes('微信')) return '微'
-  if (nameLower.includes('email') || nameLower.includes('邮件')) return '邮'
+  if (nameLower.includes('github')) {
+    return 'G'
+  }
+  if (nameLower.includes('gitee')) {
+    return '码'
+  }
+  if (nameLower.includes('bilibili') || nameLower.includes('b站')) {
+    return 'B'
+  }
+  if (nameLower.includes('wechat') || nameLower.includes('微信')) {
+    return '微'
+  }
+  if (nameLower.includes('email') || nameLower.includes('邮件')) {
+    return '邮'
+  }
   return name.charAt(0).toUpperCase()
 }
 

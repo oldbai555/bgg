@@ -77,8 +77,8 @@ const loading = ref(false)
 const handleSubmit = () => {
   formRef.value?.validate(async (valid) => {
     if (!valid) {
-return
-}
+      return
+    }
     loading.value = true
     try {
       await userStore.login(form)

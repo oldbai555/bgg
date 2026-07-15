@@ -6,6 +6,7 @@
       :show-collapse-button="false"
       :user="userStore.profile"
       @toggle-collapse="handleToggleCollapse"
+      @toggle-mobile-sidebar="mobileSidebarOpen = !mobileSidebarOpen"
       @logout="handleLogout"
     >
       <!-- 面包屑导航 -->
@@ -17,7 +18,9 @@
       <!-- 侧边栏 -->
       <AppSidebar
         :collapsed="appStore.sidebarCollapsed"
+        :mobile-open="mobileSidebarOpen"
         :menus="displayMenus"
+        @close-mobile="mobileSidebarOpen = false"
       />
 
       <!-- 内容区域 -->
@@ -45,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import {computed, watch, onMounted, onUnmounted} from 'vue'
+import {computed, ref, watch, onMounted, onUnmounted} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {ElMessage} from 'element-plus'
 import {useI18n} from 'vue-i18n'
@@ -66,6 +69,7 @@ import type {MenuItem} from '@/api/generated/admin'
 
 const route = useRoute()
 const router = useRouter()
+const mobileSidebarOpen = ref(false)
 const userStore = useUserStore()
 const {hasPermission} = usePermission()
 const appStore = useAppStore()
@@ -118,6 +122,9 @@ watch(
 watch(
   () => route.path,
   () => {
+    // 移动端点击菜单跳转后自动收起抽屉式侧边栏，避免遮住新页面
+    mobileSidebarOpen.value = false
+
     // 如果连接断开，尝试重连
     if (userStore.token && !wsStore.connected && !wsStore.connecting) {
       wsStore.connect()

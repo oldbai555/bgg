@@ -81,12 +81,12 @@ const currentIndex = ref(0)
 
 const currentNotice = computed(() => {
   if (props.notices.length === 0) {
-return null
-}
+    return null
+  }
   const notification = props.notices[currentIndex.value]
   if (!notification) {
-return null
-}
+    return null
+  }
 
   // 从通知中获取公告信息（需要根据 sourceId 查询公告详情）
   // 这里暂时使用通知的 title 和 content
@@ -110,8 +110,8 @@ const getNoticeTypeTag = (type: number): string => {
 
 const formatTime = (timestamp: number): string => {
   if (!timestamp) {
-return '-'
-}
+    return '-'
+  }
   const date = new Date(timestamp * 1000)
   return date.toLocaleString('zh-CN', {
     year: 'numeric',
@@ -124,8 +124,8 @@ return '-'
 
 const formatContent = (content: string): string => {
   if (!content) {
-return ''
-}
+    return ''
+  }
   // 简单的换行处理
   return content.replace(/\n/g, '<br>')
 }
@@ -144,13 +144,13 @@ const handleNext = () => {
 
 const handleMarkAsRead = async () => {
   if (!currentNotice.value) {
-return
-}
+    return
+  }
 
   const notification = props.notices[currentIndex.value]
   if (!notification) {
-return
-}
+    return
+  }
 
   try {
     // 标记当前通知为已读

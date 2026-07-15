@@ -506,7 +506,9 @@ const emit = defineEmits<{
 const drawerVisible = ref(false)
 const drawerVisibleAdd = ref(false)
 // 动态表单数据：column.prop 是运行时字符串、v-model 需要双向可写，用 any 是刻意的（而非疏漏）
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const drawerRow = ref<Record<string, any>>({})
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const drawerAddRow = ref<Record<string, any>>({})
 const isEdit = ref(false)
 

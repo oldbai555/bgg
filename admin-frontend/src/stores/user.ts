@@ -1,6 +1,6 @@
-import {defineStore} from 'pinia';
-import {iamApi} from '@/api/iam';
-import type {LoginReq, TokenPair, ProfileResp, MenuItem} from '@/api/generated/admin';
+import {defineStore} from 'pinia'
+import {iamApi} from '@/api/iam'
+import type {LoginReq, ProfileResp, MenuItem} from '@/api/generated/admin'
 
 interface UserState {
   token: string;
@@ -11,12 +11,12 @@ interface UserState {
   cacheAt: number;
 }
 
-const tokenKey = 'admin_token';
-const refreshKey = 'admin_refresh_token';
-const permKey = 'admin_permissions';
-const menuKey = 'admin_menus';
-const cacheAtKey = 'admin_cache_at';
-const CACHE_TTL = 5 * 60 * 1000;
+const tokenKey = 'admin_token'
+const refreshKey = 'admin_refresh_token'
+const permKey = 'admin_permissions'
+const menuKey = 'admin_menus'
+const cacheAtKey = 'admin_cache_at'
+const CACHE_TTL = 5 * 60 * 1000
 
 export const useUserStore = defineStore('user', {
   state: (): UserState => ({
@@ -29,84 +29,86 @@ export const useUserStore = defineStore('user', {
   }),
   actions: {
     async login(payload: LoginReq) {
-      const data = await iamApi.login(payload);
-      this.token = data.accessToken;
-      this.refreshToken = data.refreshToken;
-      localStorage.setItem(tokenKey, this.token);
-      localStorage.setItem(refreshKey, this.refreshToken);
-      await this.fetchProfile(true);
-      await this.fetchMenus(true);
-      
+      const data = await iamApi.login(payload)
+      this.token = data.accessToken
+      this.refreshToken = data.refreshToken
+      localStorage.setItem(tokenKey, this.token)
+      localStorage.setItem(refreshKey, this.refreshToken)
+      await this.fetchProfile(true)
+      await this.fetchMenus(true)
+
       // 登录后加载字典数据
-      const {useDictStore} = await import('./dict');
-      const dictStore = useDictStore();
-      await dictStore.loadDicts();
-      
+      const {useDictStore} = await import('./dict')
+      const dictStore = useDictStore()
+      await dictStore.loadDicts()
+
       // 登录后自动连接 WebSocket（如果有权限）
-      const {useWebSocketStore} = await import('./websocket');
-      const wsStore = useWebSocketStore();
-      wsStore.connect();
+      const {useWebSocketStore} = await import('./websocket')
+      const wsStore = useWebSocketStore()
+      wsStore.connect()
     },
     async fetchProfile(force = false) {
       if (!force && this.cacheValid()) {
-        return;
+        return
       }
-      const profileData = await iamApi.profile();
-      this.profile = profileData;
-      this.permissions = profileData.permissions || [];
-      this.persistCache();
+      const profileData = await iamApi.profile()
+      this.profile = profileData
+      this.permissions = profileData.permissions || []
+      this.persistCache()
     },
     async fetchMenus(force = false) {
       if (!force && this.cacheValid() && this.menus.length > 0) {
-        return;
+        return
       }
       // 使用 my-tree 接口，根据用户权限过滤菜单
-      const resp = await iamApi.menuMyTree();
-      this.menus = resp.list || [];
-      this.persistCache();
+      const resp = await iamApi.menuMyTree()
+      this.menus = resp.list || []
+      this.persistCache()
     },
     async logout() {
       try {
         await iamApi.logout({
           accessToken: this.token,
           refreshToken: this.refreshToken
-        });
+        })
       } catch {
         // ignore
       }
-      
+
       // 退出登录时断开 WebSocket
-      const {useWebSocketStore} = await import('./websocket');
-      const wsStore = useWebSocketStore();
-      wsStore.disconnect();
-      
-      this.token = '';
-      this.refreshToken = '';
-      this.profile = null;
-      this.permissions = [];
-      this.menus = [];
-      this.cacheAt = 0;
-      localStorage.removeItem(tokenKey);
-      localStorage.removeItem(refreshKey);
-      localStorage.removeItem(permKey);
-      localStorage.removeItem(menuKey);
-      localStorage.removeItem(cacheAtKey);
-      
+      const {useWebSocketStore} = await import('./websocket')
+      const wsStore = useWebSocketStore()
+      wsStore.disconnect()
+
+      this.token = ''
+      this.refreshToken = ''
+      this.profile = null
+      this.permissions = []
+      this.menus = []
+      this.cacheAt = 0
+      localStorage.removeItem(tokenKey)
+      localStorage.removeItem(refreshKey)
+      localStorage.removeItem(permKey)
+      localStorage.removeItem(menuKey)
+      localStorage.removeItem(cacheAtKey)
+
       // 退出登录时清除字典数据
-      const {useDictStore} = await import('./dict');
-      const dictStore = useDictStore();
-      dictStore.clearDicts();
+      const {useDictStore} = await import('./dict')
+      const dictStore = useDictStore()
+      dictStore.clearDicts()
     },
     cacheValid() {
-      if (!this.cacheAt) return false;
-      return Date.now() - this.cacheAt < CACHE_TTL;
+      if (!this.cacheAt) {
+        return false
+      }
+      return Date.now() - this.cacheAt < CACHE_TTL
     },
     persistCache() {
-      this.cacheAt = Date.now();
-      localStorage.setItem(permKey, JSON.stringify(this.permissions || []));
-      localStorage.setItem(menuKey, JSON.stringify(this.menus || []));
-      localStorage.setItem(cacheAtKey, String(this.cacheAt));
+      this.cacheAt = Date.now()
+      localStorage.setItem(permKey, JSON.stringify(this.permissions || []))
+      localStorage.setItem(menuKey, JSON.stringify(this.menus || []))
+      localStorage.setItem(cacheAtKey, String(this.cacheAt))
     }
   }
-});
+})
 

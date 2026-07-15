@@ -169,7 +169,8 @@ import type {
   ChatGroupItem,
   ChatGroupCreateReq,
   ChatGroupUpdateReq,
-  ChatGroupMemberItem
+  ChatGroupMemberItem,
+  DepartmentItem
 } from '@/api/generated/admin'
 import D2Table from '@/components/common/D2Table.vue'
 import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table'
@@ -192,12 +193,13 @@ const memberList = ref<ChatGroupMemberItem[]>([])
 const availableUsers = ref<Array<{id: number; username: string; nickname: string; departmentName: string; roleNames: string[]}>>([])
 const selectedUserIds = ref<number[]>([])
 const memberLoading = ref(false)
+const departmentList = ref<DepartmentItem[]>([])
 
 // 格式化时间
 const formatTime = (timestamp: number): string => {
   if (!timestamp) {
-return '-'
-}
+    return '-'
+  }
   const date = new Date(timestamp * 1000)
   return date.toLocaleString('zh-CN')
 }
@@ -246,6 +248,35 @@ const loadData = async () => {
   }
 }
 
+// 加载部门树（用于客户端解析 departmentId -> 名称，与 iam/UserList.vue 的做法一致）
+const loadDepartments = async () => {
+  try {
+    const resp = await iamApi.departmentTree()
+    departmentList.value = resp.list || []
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '加载部门列表失败'
+    ElMessage.error(message)
+  }
+}
+
+const getDepartmentName = (departmentId: number): string => {
+  const find = (items: DepartmentItem[], id: number): DepartmentItem | undefined => {
+    for (const item of items) {
+      if (item.id === id) {
+        return item
+      }
+      if (item.children) {
+        const found = find(item.children, id)
+        if (found) {
+          return found
+        }
+      }
+    }
+    return undefined
+  }
+  return find(departmentList.value, departmentId)?.name || ''
+}
+
 // 加载用户列表（用于添加成员）
 const loadUsers = async () => {
   try {
@@ -258,9 +289,8 @@ const loadUsers = async () => {
         id: user.id,
         username: user.username,
         nickname: user.nickname || '',
-        // UserItem 不带部门/角色名称字段（需要额外接口 join），此处暂时留空，与此前的运行时行为一致
-        departmentName: '',
-        roleNames: [] as string[]
+        departmentName: getDepartmentName(user.departmentId),
+        roleNames: user.roleNames || []
       }))
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : '加载用户列表失败'
@@ -272,7 +302,7 @@ const loadUsers = async () => {
 const loadMembers = async (groupId: number) => {
   memberLoading.value = true
   try {
-    const resp = await chatApi.chatGroupMemberList({ id: groupId })
+    const resp = await chatApi.chatGroupMemberList({id: groupId})
     memberList.value = resp.list
     // 重新加载用户列表（排除已加入的成员）
     await loadUsers()
@@ -403,7 +433,10 @@ const handleRemoveMember = (member: ChatGroupMemberItem) => {
     .catch(() => {})
 }
 
-onMounted(loadData)
+onMounted(() => {
+  loadData()
+  loadDepartments()
+})
 </script>
 
 <style scoped>

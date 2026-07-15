@@ -116,7 +116,8 @@ module.exports = {
     'dist/',
     'build/',
     '*.min.js',
-    '*.d.ts'
+    '*.d.ts',
+    'src/api/generated/'
   ]
 }
 

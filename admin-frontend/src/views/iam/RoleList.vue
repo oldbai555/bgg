@@ -300,8 +300,8 @@ const handleAssignPermissions = async (row: RoleItem) => {
 // 保存权限分配
 const handleSavePermissions = async () => {
   if (!permissionTreeRef.value) {
-return
-}
+    return
+  }
 
   const checkedKeys = permissionTreeRef.value.getCheckedKeys(false) as number[]
   // 过滤掉模块节点

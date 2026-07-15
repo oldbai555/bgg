@@ -145,8 +145,8 @@ const chatPath = ref('/admin/chatroom/chat') // 默认值
 
 const formatTime = (timestamp: number) => {
   if (!timestamp) {
-return '-'
-}
+    return '-'
+  }
   try {
     const date = new Date(timestamp * 1000) // 秒级时间戳转换为毫秒
     const now = new Date()

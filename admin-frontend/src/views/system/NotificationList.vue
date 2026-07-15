@@ -149,8 +149,8 @@ const getSourceTypeTag = (sourceType: string): string | undefined => {
 // 格式化时间
 const formatTime = (timestamp: number): string => {
   if (!timestamp) {
-return '-'
-}
+    return '-'
+  }
   const date = new Date(timestamp * 1000)
   return date.toLocaleString('zh-CN', {
     year: 'numeric',

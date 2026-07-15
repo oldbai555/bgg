@@ -1052,7 +1052,7 @@ type NotificationItem struct {
 	SourceId   uint64 `json:"sourceId"`   // 来源ID（如公告ID、聊天消息ID等）
 	Title      string `json:"title"`
 	Content    string `json:"content"`
-	ReadStatus int64  `json:"readStatus"` // 已读状态：1 已读，0 未读
+	ReadStatus int64  `json:"readStatus"` // 已读状态（字典 read_status）：1 未读，2 已读
 	ReadAt     int64  `json:"readAt"`     // 已读时间(秒级时间戳)
 	CreatedAt  int64  `json:"createdAt"`  // 创建时间(秒级时间戳)
 	UpdatedAt  int64  `json:"updatedAt"`  // 更新时间(秒级时间戳)
@@ -1588,7 +1588,6 @@ type SdkFileUploadResp struct {
 
 type SdkInterfaceCreateReq struct {
 	Name             string `json:"name"`
-	ApiCode          string `json:"apiCode"`
 	Path             string `json:"path"`
 	Method           string `json:"method"`
 	RateLimitDefault int64  `json:"rateLimitDefault,optional"`
@@ -1722,14 +1721,15 @@ type UserDeleteReq struct {
 }
 
 type UserItem struct {
-	Id           uint64 `json:"id"`
-	Username     string `json:"username"`
-	Nickname     string `json:"nickname,optional"`
-	Avatar       string `json:"avatar,optional"`
-	Signature    string `json:"signature,optional"`
-	DepartmentId uint64 `json:"departmentId"`
-	Status       int64  `json:"status"`
-	CreatedAt    int64  `json:"createdAt"` // 创建时间(秒级时间戳)
+	Id           uint64   `json:"id"`
+	Username     string   `json:"username"`
+	Nickname     string   `json:"nickname,optional"`
+	Avatar       string   `json:"avatar,optional"`
+	Signature    string   `json:"signature,optional"`
+	DepartmentId uint64   `json:"departmentId"`
+	Status       int64    `json:"status"`
+	CreatedAt    int64    `json:"createdAt"` // 创建时间(秒级时间戳)
+	RoleNames    []string `json:"roleNames,optional"`
 }
 
 type UserListReq struct {

@@ -237,8 +237,8 @@ const parentOptions = computed(() => {
 // 过滤父级节点（用于搜索）
 const filterParentNode = (value: string, data: MenuItem) => {
   if (!value) {
-return true
-}
+    return true
+  }
   return data.name.toLowerCase().includes(value.toLowerCase())
 }
 
@@ -263,8 +263,8 @@ const rules = {
 
 const getMenuIcon = (iconName?: string) => {
   if (!iconName) {
-return null
-}
+    return null
+  }
   const iconMap: Record<string, unknown> = ElementPlusIconsVue
   // 处理 icon 名称，可能是 "ele-DataBoard" 格式，需要转换为 "DataBoard"
   const iconKey = iconName.startsWith('ele-') ? iconName.substring(4) : iconName
@@ -323,8 +323,8 @@ const submitLoading = ref(false)
 const handleSubmit = () => {
   formRef.value?.validate(async (valid) => {
     if (!valid) {
-return
-}
+      return
+    }
     submitLoading.value = true
     try {
       if (isEdit.value) {

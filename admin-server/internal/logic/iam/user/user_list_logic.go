@@ -50,6 +50,7 @@ func (l *UserListLogic) UserList(req *types.UserListReq) (resp *types.UserListRe
 			DepartmentId: u.DepartmentId,
 			Status:       u.Status,
 			CreatedAt:    u.CreatedAt,
+			RoleNames:    u.RoleNames,
 		})
 	}
 

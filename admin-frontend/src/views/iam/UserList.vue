@@ -122,14 +122,14 @@
 </template>
 
 <script setup lang="ts">
-import {reactive, ref, onMounted, onUnmounted, computed} from 'vue'
+import {reactive, ref, onMounted, computed} from 'vue'
 import {ElMessage, ElMessageBox} from 'element-plus'
 import {iamApi} from '@/api/iam'
 import type {UserItem, UserCreateReq, UserUpdateReq, DepartmentItem, RoleItem} from '@/api/generated/admin'
 import {useI18n} from 'vue-i18n'
 import D2Table from '@/components/common/D2Table.vue'
 import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table'
-import {MOBILE_BREAKPOINT} from '@/constants/breakpoints'
+import {useIsMobile} from '@/composables/useIsMobile'
 
 const {t} = useI18n()
 
@@ -147,17 +147,7 @@ const list = ref<UserItem[]>([])
 const total = ref(0)
 const loading = ref(false)
 const departmentList = ref<DepartmentItem[]>([])
-const isMobile = ref(false)
-
-// 检测屏幕尺寸
-const checkMobile = () => {
-  isMobile.value = window.innerWidth <= MOBILE_BREAKPOINT
-}
-
-// 监听窗口大小变化
-const handleResize = () => {
-  checkMobile()
-}
+const {isMobile} = useIsMobile()
 
 // 角色分配相关
 const roleDialogVisible = ref(false)
@@ -177,13 +167,13 @@ const getDepartmentName = (departmentId: number): string => {
   const find = (items: DepartmentItem[], id: number): DepartmentItem | undefined => {
     for (const item of items) {
       if (item.id === id) {
-return item
-}
+        return item
+      }
       if (item.children) {
         const found = find(item.children, id)
         if (found) {
-return found
-}
+          return found
+        }
       }
     }
     return undefined
@@ -422,14 +412,8 @@ const handleRoleDialogClose = () => {
 }
 
 onMounted(async () => {
-  checkMobile()
-  window.addEventListener('resize', handleResize)
   await loadDepartments()
   loadData()
-})
-
-onUnmounted(() => {
-  window.removeEventListener('resize', handleResize)
 })
 </script>
 

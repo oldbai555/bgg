@@ -80,11 +80,11 @@
               </div>
             </el-tooltip>
             <el-tag
-              v-else-if="column.prop === 'sourceType'"
-              :type="row.sourceType === 1 ? 'primary' : 'success'"
+              v-else-if="column.prop === 'type'"
+              :type="row.type === 1 ? 'primary' : 'success'"
               size="small"
             >
-              {{ getSourceTypeLabel(row.sourceType) }}
+              {{ getSourceTypeLabel(row.type) }}
             </el-tag>
             <span v-else-if="column.prop === 'duration'">{{ formatDuration(row.duration) }}</span>
           </template>
@@ -106,7 +106,7 @@
 </template>
 
 <script setup lang="ts">
-import {reactive, ref, onMounted, onUnmounted, computed} from 'vue'
+import {reactive, ref, onMounted, computed} from 'vue'
 import {ElMessage, ElMessageBox} from 'element-plus'
 import {useRouter} from 'vue-router'
 import {contentApi} from '@/api/content'
@@ -115,7 +115,7 @@ import {useI18n} from 'vue-i18n'
 import D2Table from '@/components/common/D2Table.vue'
 import {D2TableElemType, type TableColumn, type DrawerColumn} from '@/types/table'
 import {useDictOptions} from '@/composables/useDictOptions'
-import {MOBILE_BREAKPOINT} from '@/constants/breakpoints'
+import {useIsMobile} from '@/composables/useIsMobile'
 
 const {t} = useI18n()
 const router = useRouter()
@@ -129,17 +129,7 @@ const query = reactive({
 const list = ref<VideoItem[]>([])
 const total = ref(0)
 const loading = ref(false)
-const isMobile = ref(false)
-
-// 检测屏幕尺寸
-const checkMobile = () => {
-  isMobile.value = window.innerWidth <= MOBILE_BREAKPOINT
-}
-
-// 监听窗口大小变化
-const handleResize = () => {
-  checkMobile()
-}
+const {isMobile} = useIsMobile()
 
 // 视频来源类型选项（字典 video_source_type：1=手动添加，2=采集）
 const {options: sourceTypeOptions, getLabel: getSourceTypeLabel} = useDictOptions('video_source_type', [
@@ -150,8 +140,8 @@ const {options: sourceTypeOptions, getLabel: getSourceTypeLabel} = useDictOption
 // 格式化时长（秒转时分秒）
 const formatDuration = (seconds: number): string => {
   if (!seconds || seconds < 0) {
-return '00:00'
-}
+    return '00:00'
+  }
   const h = Math.floor(seconds / 3600)
   const m = Math.floor((seconds % 3600) / 60)
   const s = seconds % 60
@@ -166,7 +156,7 @@ const columns = computed<TableColumn[]>(() => [
   {prop: 'id', label: 'ID', width: 80},
   {prop: 'cover', label: '封面', width: 120},
   {prop: 'name', label: '视频名称', minWidth: 200},
-  {prop: 'sourceType', label: '来源类型', width: 120},
+  {prop: 'type', label: '来源类型', width: 120},
   {prop: 'duration', label: '时长', width: 100},
   {prop: 'playUrl', label: '播放链接', minWidth: 300, showOverflowTooltip: true},
   {prop: 'createdAt', label: '创建时间', width: 180, type: D2TableElemType.ConvertTime}
@@ -177,7 +167,7 @@ const drawerColumns = computed<DrawerColumn[]>(() => [
   {prop: 'id', label: 'ID', type: D2TableElemType.Tag},
   {prop: 'name', label: '视频名称', type: D2TableElemType.EditInput, required: true},
   {prop: 'cover', label: '封面URL', type: D2TableElemType.EditInput},
-  {prop: 'sourceType', label: '来源类型', type: D2TableElemType.Select, options: sourceTypeOptions.value},
+  {prop: 'type', label: '来源类型', type: D2TableElemType.Select, options: sourceTypeOptions.value},
   {prop: 'duration', label: '时长（秒）', type: D2TableElemType.EditInput},
   {prop: 'playUrl', label: '播放链接', type: D2TableElemType.EditInput, required: true},
   {prop: 'description', label: '描述', type: D2TableElemType.EditTextarea}
@@ -187,7 +177,7 @@ const drawerColumns = computed<DrawerColumn[]>(() => [
 const drawerAddColumns = computed<DrawerColumn[]>(() => [
   {prop: 'name', label: '视频名称', type: D2TableElemType.EditInput, required: true},
   {prop: 'cover', label: '封面URL', type: D2TableElemType.EditInput},
-  {prop: 'sourceType', label: '来源类型', type: D2TableElemType.Select, options: sourceTypeOptions.value, default: 1},
+  {prop: 'type', label: '来源类型', type: D2TableElemType.Select, options: sourceTypeOptions.value, default: 1},
   {prop: 'duration', label: '时长（秒）', type: D2TableElemType.EditInput},
   {prop: 'playUrl', label: '播放链接', type: D2TableElemType.EditInput, required: true},
   {prop: 'description', label: '描述', type: D2TableElemType.EditTextarea}
@@ -258,10 +248,9 @@ const handleUpdate = async (row: VideoItem) => {
 
 const handleAdd = async (row: Record<string, unknown>) => {
   try {
-    // 确保sourceType字段正确传递（API使用type字段，默认1=手动添加）
     const createData = {
       ...row,
-      type: (row.sourceType as number) || 1
+      type: (row.type as number) || 1
     } as VideoCreateReq
     await contentApi.videoCreate(createData)
     ElMessage.success('新增成功')
@@ -283,13 +272,7 @@ const handleDelete = (index: number, row: VideoItem) => {
 }
 
 onMounted(() => {
-  checkMobile()
-  window.addEventListener('resize', handleResize)
   loadData()
-})
-
-onUnmounted(() => {
-  window.removeEventListener('resize', handleResize)
 })
 </script>
 

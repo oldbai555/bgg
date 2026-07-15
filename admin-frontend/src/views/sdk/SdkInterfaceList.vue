@@ -235,8 +235,7 @@ const handleAdd = async (row: Record<string, unknown>) => {
     const payload: SdkInterfaceCreateReq = {
       name: String(row.name || ''),
       // apiCode 由后端根据 path/method 自动生成并覆盖（见 sdkinterfacecreatelogic.go），
-      // 但 admin.api 的 SdkInterfaceCreateReq 未加 optional 标签，这里传空串占位，不代表前端需要生成它
-      apiCode: '',
+      // admin.api 的 SdkInterfaceCreateReq 已不再包含这个字段，前端不需要也不能再传
       path: String(row.path || ''),
       method: String(row.method || ''),
       rateLimitDefault: row.rateLimitDefault ? Number(row.rateLimitDefault) : 0,

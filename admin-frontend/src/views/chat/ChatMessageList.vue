@@ -7,7 +7,12 @@
           <el-input v-model="query.fromUserName" placeholder="请输入发送用户名" clearable />
         </el-form-item>
         <el-form-item label="聊天ID">
-          <el-input-number v-model="query.chatId" :min="0" placeholder="请输入聊天ID" clearable />
+          <el-input-number
+            v-model="query.chatId"
+            :min="0"
+            placeholder="请输入聊天ID"
+            clearable
+          />
         </el-form-item>
         <el-form-item label="消息类型">
           <el-select

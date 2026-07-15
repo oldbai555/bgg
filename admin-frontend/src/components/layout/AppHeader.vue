@@ -2,6 +2,13 @@
   <header class="app-header">
     <!-- 左侧：Logo + 折叠按钮 -->
     <div class="app-header__left">
+      <el-button
+        :icon="Menu"
+        text
+        circle
+        class="app-header__mobile-menu-btn"
+        @click="handleToggleMobileSidebar"
+      />
       <div class="app-header__logo" @click="handleLogoClick">
         <span class="app-header__logo-text">Admin System</span>
       </div>
@@ -81,6 +88,7 @@ import {computed} from 'vue'
 import {useRouter} from 'vue-router'
 import {
   Fold,
+  Menu,
   FullScreen,
   Aim,
   Refresh,
@@ -108,6 +116,7 @@ withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   'toggle-collapse': [];
+  'toggle-mobile-sidebar': [];
   'logout': [];
 }>()
 
@@ -125,6 +134,10 @@ const handleLogoClick = () => {
 
 const handleToggleCollapse = () => {
   emit('toggle-collapse')
+}
+
+const handleToggleMobileSidebar = () => {
+  emit('toggle-mobile-sidebar')
 }
 
 const handleFullscreen = () => {
@@ -152,6 +165,7 @@ const handleLogout = () => {
 
 <style scoped lang="scss">
 @use '@/styles/variables.scss' as *;
+@use '@/styles/responsive.scss' as *;
 
 .app-header {
   display: flex;
@@ -162,6 +176,10 @@ const handleLogout = () => {
   background: var(--color-bg-primary);
   border-bottom: 1px solid var(--color-border);
   box-shadow: $shadow-sm;
+
+  @include mobile {
+    padding: 0 $spacing-sm;
+  }
 
   &__left {
     display: flex;
@@ -179,6 +197,11 @@ const handleLogout = () => {
       font-size: 18px;
       font-weight: 600;
       color: var(--color-primary);
+      white-space: nowrap;
+
+      @include mobile {
+        font-size: 15px;
+      }
     }
   }
 
@@ -186,17 +209,34 @@ const handleLogout = () => {
     font-size: 18px;
   }
 
+  &__mobile-menu-btn {
+    display: none;
+    font-size: 18px;
+
+    @include mobile {
+      display: inline-flex;
+    }
+  }
+
   &__center {
     flex: 1;
     display: flex;
     justify-content: center;
     padding: 0 $spacing-lg;
+    // 移动端隐藏：PageHeader 组件已经在页面主体重复渲染同一份面包屑，收起这份不丢信息
+    @include mobile {
+      display: none;
+    }
   }
 
   &__right {
     display: flex;
     align-items: center;
     gap: $spacing-sm;
+
+    @include mobile {
+      gap: 2px;
+    }
   }
 
   &__action-btn {

@@ -34,6 +34,15 @@ func (l *UserListLogic) UserList(in *iam.UserListRequest) (*iam.UserListResponse
 		return nil, toGRPCStatus(errs.Wrap(errs.CodeInternalError, "查询用户列表失败", err))
 	}
 
+	userIDs := make([]uint64, 0, len(list))
+	for _, u := range list {
+		userIDs = append(userIDs, u.Id)
+	}
+	roleNamesByUser, err := l.svcCtx.Domain.IAM.UserRole.ListRoleNamesByUserIDs(l.ctx, userIDs)
+	if err != nil {
+		return nil, toGRPCStatus(errs.Wrap(errs.CodeInternalError, "查询用户角色失败", err))
+	}
+
 	items := make([]*iam.UserItem, 0, len(list))
 	for _, u := range list {
 		items = append(items, &iam.UserItem{
@@ -45,6 +54,7 @@ func (l *UserListLogic) UserList(in *iam.UserListRequest) (*iam.UserListResponse
 			DepartmentId: u.DepartmentId,
 			Status:       u.Status,
 			CreatedAt:    int64(u.CreatedAt),
+			RoleNames:    roleNamesByUser[u.Id],
 		})
 	}
 

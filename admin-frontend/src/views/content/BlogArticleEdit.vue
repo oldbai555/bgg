@@ -172,27 +172,27 @@ const auditStatus = ref<number>(0) // 审核状态
 // 编辑权限：上架状态（4）不可编辑，其他状态可编辑
 const canEdit = computed(() => {
   if (!isEdit.value) {
-return true
-} // 新增模式始终可编辑
+    return true
+  } // 新增模式始终可编辑
   return articleStatus.value !== 4 // 上架状态不可编辑
 })
 
 // 保存按钮文案：根据原状态显示不同文案
 const saveButtonText = computed(() => {
   if (!isEdit.value) {
-return '保存草稿'
-}
+    return '保存草稿'
+  }
   if (articleStatus.value === 1) {
-return '保存草稿'
-} // 草稿状态
+    return '保存草稿'
+  } // 草稿状态
   return '保存并重新提交审核' // 其他状态（待审核、审核通过-未上架、下架）
 })
 
 // 是否可以提交审核：仅草稿状态可以提交审核
 const canSubmitAudit = computed(() => {
   if (!isEdit.value) {
-return false
-} // 新增模式需要先保存
+    return false
+  } // 新增模式需要先保存
   return articleStatus.value === 1 // 仅草稿状态可以提交审核
 })
 
@@ -207,8 +207,8 @@ const loadTagOptions = async () => {
 
 const loadDetail = async () => {
   if (!isEdit.value || id.value <= 0) {
-return
-}
+    return
+  }
   try {
     const resp = await contentApi.articleDetail({id: id.value})
     form.title = resp.title
@@ -237,8 +237,8 @@ const handleSave = async () => {
 
   const ok = await formRef.value?.validate().catch(() => false)
   if (!ok) {
-return
-}
+    return
+  }
 
   loading.value = true
   try {
@@ -310,8 +310,8 @@ const handleSubmit = async () => {
 
 const insertContentImage = () => {
   if (!contentImageUrl.value) {
-return
-}
+    return
+  }
   const md = `\n![](${contentImageUrl.value})\n`
   form.content = (form.content || '') + md
   ElMessage.success('已插入到正文末尾')
