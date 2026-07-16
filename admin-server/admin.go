@@ -11,6 +11,7 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/zeromicro/go-zero/core/logx"
 
@@ -131,7 +132,12 @@ func syncRoutesToAdminAPI(ctx *svc.ServiceContext, server *rest.Server) {
 		routeRefs = append(routeRefs, &iamclient.ApiRouteRef{Method: method, Path: path})
 	}
 
-	if _, err := ctx.IamRPC.SyncApiRoutes(context.Background(), &iamclient.SyncApiRoutesRequest{Routes: routeRefs}); err != nil {
+	// 外部托管 MySQL 场景下单条 SQL 往返延迟可能到几百毫秒，~150 条路由逐条查询容易超过 zrpc
+	// client 默认的 2s 超时，这里单独给这次一次性启动同步放宽超时，不影响 IamRpc 共享 client
+	// 用于常规请求（Auth/Permission 等中间件）时的默认超时。
+	syncCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	if _, err := ctx.IamRPC.SyncApiRoutes(syncCtx, &iamclient.SyncApiRoutesRequest{Routes: routeRefs}); err != nil {
 		logx.Errorf("同步路由到 admin_api 表失败: %v", err)
 	}
 	logx.Infof("====== 同步路由到 admin_api 表结束 ======")
