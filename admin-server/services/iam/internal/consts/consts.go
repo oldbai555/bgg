@@ -293,6 +293,10 @@ const (
 	// FeishuDefaultRoleCode 飞书首次登录自动建号时默认分配的角色 code，
 	// 角色本身及其权限见 db/services/iam/role/migrations/add_feishu_role_20260716.sql
 	FeishuDefaultRoleCode = "feishu"
+	// FeishuDefaultDepartmentName 飞书首次登录自动建号时默认分配的部门名称，
+	// 部门本身见 db/services/iam/department/migrations/add_feishu_pending_department_20260716.sql，
+	// 用于 HR/管理员一眼看出哪些飞书用户还没被正式分配到部门，后续手动改分到正式部门
+	FeishuDefaultDepartmentName = "飞书待分配"
 )
 
 // Metric 上报模块常量（原 internal/consts/blog.go，MetricReport/MetricStats 需要）

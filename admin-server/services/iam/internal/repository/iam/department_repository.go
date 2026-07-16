@@ -11,6 +11,7 @@ import (
 
 type DepartmentRepository interface {
 	FindByID(ctx context.Context, id uint64) (*iammodel.AdminDepartment, error)
+	FindByName(ctx context.Context, name string) (*iammodel.AdminDepartment, error)
 	ListAll(ctx context.Context) ([]iammodel.AdminDepartment, error)
 	ListChildren(ctx context.Context, parentID uint64) ([]iammodel.AdminDepartment, error)
 	Create(ctx context.Context, dept *iammodel.AdminDepartment) error
@@ -29,6 +30,20 @@ func NewDepartmentRepository(repo *repository.Repository) DepartmentRepository {
 
 func (r *departmentRepository) FindByID(ctx context.Context, id uint64) (*iammodel.AdminDepartment, error) {
 	return r.model.FindOne(ctx, id)
+}
+
+// FindByName 按名称查部门。admin_department 没有 name 唯一键（历史遗留，见
+// docs/后端开发进度.md 第 23 节同类问题记录），同名重复只取 id 最小的一条。
+func (r *departmentRepository) FindByName(ctx context.Context, name string) (*iammodel.AdminDepartment, error) {
+	var list []iammodel.AdminDepartment
+	query := "select * from admin_department where deleted_at = 0 and name = ? order by id asc limit 1"
+	if err := r.conn.QueryRowsCtx(ctx, &list, query, name); err != nil {
+		return nil, err
+	}
+	if len(list) == 0 {
+		return nil, iammodel.ErrNotFound
+	}
+	return &list[0], nil
 }
 
 func (r *departmentRepository) ListAll(ctx context.Context) ([]iammodel.AdminDepartment, error) {

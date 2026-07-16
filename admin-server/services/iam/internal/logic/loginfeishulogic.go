@@ -113,11 +113,12 @@ func (l *LoginFeishuLogic) findOrCreateUser(userInfo *feishu.UserInfo) (*iammode
 	}
 
 	user, err := l.svcCtx.Domain.IAM.UserService.CreateUser(l.ctx, iamdomain.CreateUserInput{
-		Username: username,
-		Nickname: nickname,
-		Password: uuid.NewString(),
-		Avatar:   userInfo.AvatarUrl,
-		Status:   1,
+		Username:     username,
+		Nickname:     nickname,
+		Password:     uuid.NewString(),
+		Avatar:       userInfo.AvatarUrl,
+		Status:       1,
+		DepartmentId: l.resolveDefaultDepartmentID(),
 	})
 	if err != nil {
 		// 建号失败大概率是并发首次登录竞态（两个请求同时发现未绑定、同时建号），或者
@@ -146,6 +147,18 @@ func (l *LoginFeishuLogic) findOrCreateUser(userInfo *feishu.UserInfo) (*iammode
 	}
 
 	return user, nil
+}
+
+// resolveDefaultDepartmentID 查"飞书待分配"部门 ID，尽力而为：部门未初始化（尚未跑
+// 迁移 SQL）时返回 0（未分配部门），不阻塞登录——用户管理列表会显示部门为空，
+// 提醒管理员补跑迁移或手动分配，而不是让飞书用户完全无法登录。
+func (l *LoginFeishuLogic) resolveDefaultDepartmentID() uint64 {
+	dept, err := l.svcCtx.Domain.IAM.Department.FindByName(l.ctx, consts.FeishuDefaultDepartmentName)
+	if err != nil {
+		logx.Errorf("查询飞书待分配部门失败，新用户将不归属任何部门: err=%v", err)
+		return 0
+	}
+	return dept.Id
 }
 
 // assignDefaultRole 给新建的飞书用户分配默认角色，尽力而为：角色未初始化（尚未跑迁移
