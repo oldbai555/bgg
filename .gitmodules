@@ -1,0 +1,3 @@
+[submodule ".ai-context/zero-skills"]
+	path = .ai-context/zero-skills
+	url = https://github.com/zeromicro/zero-skills.git

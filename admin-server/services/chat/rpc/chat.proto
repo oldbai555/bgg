@@ -1,0 +1,270 @@
+syntax = "proto3";
+
+package chat;
+
+option go_package = "./chat";
+
+// ==================== 后台/前台 CRUD：字段对齐 api/admin.api 里 chat/chat、chat/group、
+// chat/message 三个 group 现有的 Chat* 类型，逐一核对过。====================
+//
+// jwthelper.FromContext 拿到的当前用户信息在 gateway 侧解析（AuthMiddleware 仍然留在
+// gateway，chat-rpc 不做 JWT 解析），业务逻辑真正用到 user_id/username 的方法
+// （ChatMessageSend/ChatList/ChatGroupCreate）在请求里显式带 operator_user_id/
+// operator_username 字段，和 services/task/rpc/task.proto 的 TaskCancelRequest 带
+// operator_user_id 同一个模式（见 16-rpc-conventions.md、18-service-extraction-runbook.md）。
+// 其余方法只需要"已登录"这个前提（已经在 gateway AuthMiddleware 那一层判断过），不需要
+// 具体的 user_id 值，proto 里不带这个字段。
+
+message ChatItem {
+  uint64 chat_id = 1;
+  string name = 2;
+  int64 chat_type = 3; // 1私聊，2群组
+  string avatar = 4;
+  string description = 5;
+  uint64 user_id = 6;          // 私聊时对方用户 ID（群组为 0）
+  string username = 7;         // 私聊时对方用户名
+  string nickname = 8;         // 私聊时对方昵称
+  string department_name = 9;  // 私聊时对方部门名称
+  repeated string role_names = 10; // 私聊时对方角色名称列表
+  int64 unread_count = 11;
+  string last_message = 12;
+  int64 last_message_at = 13;
+}
+
+message ChatListRequest {
+  uint64 operator_user_id = 1;
+}
+
+message ChatListResponse {
+  repeated ChatItem list = 1;
+}
+
+message ChatMessageItem {
+  uint64 id = 1;
+  uint64 chat_id = 2;
+  uint64 from_user_id = 3;
+  string from_user_name = 4;
+  string content = 5;
+  int64 message_type = 6;
+  int64 status = 7;
+  int64 created_at = 8;
+}
+
+message ChatMessageListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  uint64 chat_id = 3;
+}
+
+message ChatMessageListResponse {
+  int64 total = 1;
+  repeated ChatMessageItem list = 2;
+}
+
+message ChatMessageSendRequest {
+  uint64 chat_id = 1;
+  string content = 2;
+  int64 message_type = 3;
+  uint64 operator_user_id = 4;
+  string operator_username = 5;
+}
+
+message ChatMessageSendResponse {
+  uint64 id = 1;
+}
+
+message ChatMessageDeleteRequest {
+  uint64 id = 1;
+}
+
+message ChatGroupItem {
+  uint64 id = 1;
+  string name = 2;
+  string avatar = 3;
+  string description = 4;
+  uint64 created_by = 5;
+  int64 created_at = 6;
+  int64 member_count = 7;
+}
+
+message ChatGroupListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  string name = 3;
+}
+
+message ChatGroupListResponse {
+  int64 total = 1;
+  repeated ChatGroupItem list = 2;
+}
+
+message ChatGroupCreateRequest {
+  string name = 1;
+  string avatar = 2;
+  string description = 3;
+  repeated uint64 user_ids = 4; // 初始成员（不含创建人）
+  uint64 operator_user_id = 5;
+}
+
+message ChatGroupUpdateRequest {
+  uint64 id = 1;
+  string name = 2;
+  string avatar = 3;
+  string description = 4;
+}
+
+message ChatGroupDeleteRequest {
+  uint64 id = 1;
+}
+
+message ChatGroupDetailRequest {
+  uint64 id = 1;
+}
+
+message ChatGroupMemberItem {
+  uint64 user_id = 1;
+  string username = 2;
+  string nickname = 3;
+  string avatar = 4;
+  string department_name = 5;
+  repeated string role_names = 6;
+  int64 joined_at = 7;
+}
+
+message ChatGroupDetailResponse {
+  uint64 id = 1;
+  string name = 2;
+  string avatar = 3;
+  string description = 4;
+  uint64 created_by = 5;
+  int64 created_at = 6;
+  int64 member_count = 7;
+  repeated ChatGroupMemberItem members = 8;
+}
+
+message ChatGroupMemberListRequest {
+  uint64 id = 1;
+}
+
+message ChatGroupMemberListResponse {
+  repeated ChatGroupMemberItem list = 1;
+}
+
+message ChatGroupMemberAddRequest {
+  uint64 chat_id = 1;
+  repeated uint64 user_ids = 2;
+}
+
+message ChatGroupMemberRemoveRequest {
+  uint64 chat_id = 1;
+  uint64 user_id = 2;
+}
+
+message Empty {}
+
+// GetOnlineUserCountResponse 供 internal/logic/monitoring/monitor/monitor_stats_logic.go、
+// internal/logic/monitoring/login_log/login_log_stats_logic.go 统计在线用户数——原来直接读
+// svcCtx.ChatHub.GetOnlineUsers()，ChatHub 连接表搬进 chat-rpc 后改成这个 RPC。
+message GetOnlineUserCountResponse {
+  int64 count = 1;
+}
+
+// ==================== 供其它服务向在线用户推送任意消息 ====================
+// 迁移前 internal/consumer/task_notification_consumer.go（消费 stream:task.notification，
+// 写 admin_notification + 推 WS 通知）直接持有 *hub.ChatHub 调 SendToUser。chat 域拆分后
+// ChatHub 的连接表搬进了 chat-rpc，这个仍然留在单体里的消费者拿不到连接表了，改成回调
+// 这个方法——payload_json 就是原来拼好准备喂给 hub.SendToUser 的那段 JSON（hub.ChatMessage
+// 结构不变，只是从进程内函数调用换成一次 RPC），chat-rpc 收到后原样转发给目标用户的
+// 在线连接，不解析 payload 内容（chat-rpc 不需要认识 iam/task 域定义的通知语义）。
+message PushToUserRequest {
+  uint64 user_id = 1;
+  string payload_json = 2;
+}
+
+message PushToUserResponse {
+  bool delivered = 1; // 目标用户不在线时为 false，调用方不需要当作错误处理
+}
+
+// ==================== WebSocket <-> gRPC 双向流桥接 ====================
+// gateway 继续终结 WebSocket 连接（唯一有公网端口的进程不变），每条 WS 连接桥接一条到
+// chat-rpc 的 Stream。契约与 16-rpc-conventions.md 第 7 节给出的骨架一致。
+//
+// 现状说明（迁移时如实记录，不是臆造）：当前真实前端只用 WS 做"服务端推送"（新消息广播、
+// 加入提示），发消息走的是上面的 ChatMessageSend 这个普通 unary 请求（REST POST），
+// internal/hub/chathub.go 的 Client.ReadPump 现状也只是把收到的帧打日志、不做任何业务
+// 处理。SendMessageFrame 这条"客户端经 WS 发消息"路径按文档骨架实现以保持契约完整，
+// 但当前没有真实前端调用方在用，未做真实前端联调，只做了 wscat 级别的手工验证（见
+// docs/progress.md 对应条目）。
+
+message JoinFrame {
+  uint64 user_id = 1;
+  string username = 2;
+}
+
+message SendMessageFrame {
+  uint64 chat_id = 1;
+  string content = 2;
+  int32 message_type = 3;
+}
+
+message PingFrame {}
+
+message ClientFrame {
+  oneof payload {
+    JoinFrame join = 1;
+    SendMessageFrame send = 2;
+    PingFrame ping = 3;
+  }
+}
+
+// MessageFrame 故意不用结构化字段，而是原样透传 payload_json——这是历史遗留的
+// internal/hub.ChatMessage JSON 结构（type/fromId/fromName/chatId/content/messageId/
+// createdAt，外加任务进度/通知字段 taskId/taskName/progress/status/title/level），拆分前
+// 前端直接按这个 JSON 形状解析 WS 消息。为了不需要同时改前端，chat-rpc 内部继续按老结构build
+// 这段 JSON（services/chat/internal/hub 里的 ChatMessage 类型定义搬自原
+// internal/hub/chathub.go 同名类型），gateway 侧的桥接 handler 收到这一帧后原样把
+// payload_json 的字节写回 WS 连接，不做二次解析/重新编码。
+message MessageFrame {
+  string payload_json = 1;
+}
+
+message AckFrame {
+  uint64 message_id = 1;
+}
+
+message PongFrame {}
+
+message ErrorFrame {
+  string message = 1;
+}
+
+message ServerFrame {
+  oneof payload {
+    MessageFrame message = 1;
+    AckFrame ack = 2;
+    PongFrame pong = 3;
+    ErrorFrame error = 4;
+  }
+}
+
+service Chat {
+  rpc ChatList(ChatListRequest) returns (ChatListResponse);
+  rpc ChatMessageList(ChatMessageListRequest) returns (ChatMessageListResponse);
+  rpc ChatMessageSend(ChatMessageSendRequest) returns (ChatMessageSendResponse);
+  rpc ChatMessageListAdmin(ChatMessageListRequest) returns (ChatMessageListResponse);
+  rpc ChatMessageDelete(ChatMessageDeleteRequest) returns (Empty);
+
+  rpc ChatGroupList(ChatGroupListRequest) returns (ChatGroupListResponse);
+  rpc ChatGroupCreate(ChatGroupCreateRequest) returns (Empty);
+  rpc ChatGroupUpdate(ChatGroupUpdateRequest) returns (Empty);
+  rpc ChatGroupDelete(ChatGroupDeleteRequest) returns (Empty);
+  rpc ChatGroupDetail(ChatGroupDetailRequest) returns (ChatGroupDetailResponse);
+  rpc ChatGroupMemberList(ChatGroupMemberListRequest) returns (ChatGroupMemberListResponse);
+  rpc ChatGroupMemberAdd(ChatGroupMemberAddRequest) returns (Empty);
+  rpc ChatGroupMemberRemove(ChatGroupMemberRemoveRequest) returns (Empty);
+
+  rpc PushToUser(PushToUserRequest) returns (PushToUserResponse);
+  rpc GetOnlineUserCount(Empty) returns (GetOnlineUserCountResponse);
+
+  rpc Stream(stream ClientFrame) returns (stream ServerFrame);
+}

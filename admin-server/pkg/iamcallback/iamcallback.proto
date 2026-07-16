@@ -1,0 +1,82 @@
+syntax = "proto3";
+
+package iamcallback;
+
+option go_package = "./iamcallback";
+
+// IamCallback 是给"已经拆分、但 iam-rpc 还没拆分"的服务用的最小回调接口，和
+// pkg/taskcallback 是同一个设计模式（task-rpc 拆分时定下的先例：新拆出去的服务如果
+// 需要还留在单体里的域的数据，单体临时实现一份可以被回调的最小接口，等那个域真正拆分
+// 成独立服务时把实现原样搬过去，契约不变）。
+//
+// 当前唯一的调用方是 chat-rpc（services/chat/）：
+//   1. FindActiveUserChunk 供 onboarding 消费者批量遍历"未删除、启用中"的用户 ID，
+//      用途和原来 internal/domain/chat/onboarding.go 的 UserLister.FindChunk 完全一致，
+//      只是从进程内接口调用换成跨进程 RPC。
+//   2. GetUserProfile 供 chat-rpc 侧 7 个需要展示对方用户信息（用户名/昵称/头像/部门名/
+//      角色名列表）的 logic 使用（ChatList/ChatMessageList/ChatMessageListAdmin/
+//      ChatGroupCreate/ChatGroupMemberAdd/ChatGroupMemberList/ChatGroupDetail），content-rpc
+//      拆分时复用同一个方法读取 public_blog_author_info_logic.go 需要的作者信息（新增
+//      signature 字段，chat-rpc 不需要这个字段，留空即可）。
+//   3. RecordAuditLog（content-rpc 拆分时新增）供 content-rpc 的
+//      BlogArticleAudit/BlogArticleAuditUnpublish 写审计日志——这两个方法原来直接调用
+//      单体内 pkg/audit.RecordAuditLog(svcCtx, ...)，该函数持有的是 gateway 自己的
+//      *svc.ServiceContext、写的 admin_audit_log 表物理属于 iam（internal/model/monitoring），
+//      content-rpc 拆分后两者都拿不到。审计日志写入本身在原实现里就是"异步、失败只记日志"
+//      （内部 `go func` + recover），所以 content-rpc 侧改成同步调这个 RPC 但外层仍然包一层
+//      "失败只记日志，不影响主流程"的 goroutine，语义不变。
+//
+// 这不是 16-rpc-conventions.md 第 4 节规划的最终 iam.proto（那份 UserProfile message
+// 只有 department_id，没有 department_name/role_names）——iam-rpc 真正拆分时要重新核对
+// 这份临时契约暴露出的真实需求（是否要把部门名/角色名解析下沉到 iam-rpc 内部，还是让
+// chat-rpc/content-rpc 自己再查一次部门/角色列表），不是照搬这份 proto，见
+// docs/17-async-eventing.md 的记录。
+
+message FindActiveUserChunkRequest {
+  int64 limit = 1;
+  uint64 last_id = 2;
+}
+
+message ActiveUserRef {
+  uint64 id = 1;
+}
+
+message FindActiveUserChunkResponse {
+  repeated ActiveUserRef users = 1;
+  uint64 next_last_id = 2;
+}
+
+message GetUserProfileRequest {
+  uint64 user_id = 1;
+}
+
+message GetUserProfileResponse {
+  bool exists = 1;    // false 表示用户不存在或已删除，调用方按"跳过"处理
+  string username = 2;
+  string nickname = 3;
+  string avatar = 4;
+  string department_name = 5;
+  repeated string role_names = 6;
+  string signature = 7; // 个性签名，目前只有 content-rpc（public_blog_author_info_logic.go）用
+}
+
+message RecordAuditLogRequest {
+  uint64 user_id = 1;
+  string username = 2;
+  string audit_type = 3;
+  string audit_object = 4;
+  string detail_json = 5;
+  // ip_address/user_agent 是 iam-rpc 拆分时补的字段：content-rpc 的两处调用点原来就传
+  // 空 *http.Request，这两个字段留空；gateway 侧自己的 6 个 RBAC 审计调用点（原
+  // pkg/audit.RecordAuditLog）有真实的 *http.Request，用这两个字段填充，不再是恒为空。
+  string ip_address = 6;
+  string user_agent = 7;
+}
+
+message RecordAuditLogResponse {}
+
+service IamCallback {
+  rpc FindActiveUserChunk(FindActiveUserChunkRequest) returns (FindActiveUserChunkResponse);
+  rpc GetUserProfile(GetUserProfileRequest) returns (GetUserProfileResponse);
+  rpc RecordAuditLog(RecordAuditLogRequest) returns (RecordAuditLogResponse);
+}

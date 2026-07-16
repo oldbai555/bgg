@@ -1,0 +1,7 @@
+.git
+*.log
+*.exe
+admin-server.exe
+scripts/sqlgen/sqlgen.exe
+tool/admin-mcp/bin/
+uploads/

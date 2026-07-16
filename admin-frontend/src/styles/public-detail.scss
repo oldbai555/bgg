@@ -1,0 +1,183 @@
+/**
+ * Public 详情页通用样式模板（企业级响应式统一方案，Phase 3 Week 7）
+ *
+ * 使用方式：
+ * 1. 在组件的 <style scoped lang="scss"> 中引入：
+ *    @import '@/styles/public-detail.scss';
+ *
+ * 2. 在模板根元素上添加 class="public-detail-page"，内部结构：
+ *    .page-shell
+ *      .page-layout（grid 容器，列数由页面自己在 scoped style 里定义；
+ *                      没有侧栏的页面直接单列即可，不必强行套侧栏）
+ *        .detail-card（.back-link 可选 / .title / .meta / .cover 可选 / .content）
+ *        侧栏内容（如有）作为 .page-layout 的第二个 grid 子元素，自行携带卡片样式
+ */
+
+// 被 @import（而非 @use）进 .vue 文件时，vite.config.ts 的全局 additionalData 只注入到
+// 入口文件本身，@content 形式的 mixin（如 responsive.scss 的 mobile）不会传递到被 @import
+// 的文件里，需要本文件自己显式 @use 一次（幂等，与 layout.scss 的既有写法一致）
+@use './responsive.scss' as *;
+
+// 需与 components/common/PublicHeader.vue 的实际高度保持一致（sticky 侧栏定位要用）
+$public-header-height: 64px;
+
+.public-detail-page {
+  min-height: 100vh;
+  background: var(--color-bg-secondary);
+}
+
+.page-shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 24px 40px;
+}
+
+.page-layout {
+  display: grid;
+  gap: 28px;
+  align-items: start;
+}
+
+.detail-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-light);
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+
+  .back-link {
+    display: inline-block;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    margin-bottom: 16px;
+    font-size: 14px;
+    transition: color 0.2s;
+
+    &:hover {
+      color: var(--color-primary);
+    }
+  }
+
+  .title {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 14px;
+    line-height: 1.4;
+    color: var(--color-text-primary);
+  }
+
+  .meta {
+    font-size: 12.5px;
+    color: var(--color-text-secondary);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--color-border-light);
+
+    .dot {
+      margin: 0 2px;
+    }
+
+    .tags {
+      display: inline-flex;
+      gap: 4px;
+    }
+  }
+
+  .cover {
+    margin-bottom: 20px;
+    width: 100%;
+    max-height: 500px;
+    overflow: hidden;
+    border-radius: 10px;
+    background: var(--color-bg-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      width: 100%;
+      height: auto;
+      max-height: 500px;
+      object-fit: contain;
+      display: block;
+    }
+  }
+
+  .content {
+    font-size: 14.5px;
+    line-height: 1.9;
+    color: var(--color-text-regular);
+  }
+
+  .empty {
+    text-align: center;
+    color: var(--color-text-secondary);
+    padding: 40px 0;
+  }
+
+  // Markdown 内容样式
+  :deep(.md-editor-preview) {
+    padding: 0;
+    background: transparent;
+  }
+
+  :deep(.md-editor-preview img) {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+  }
+
+  :deep(.md-editor-preview pre) {
+    border-radius: 10px;
+  }
+}
+
+@include mobile {
+  .page-shell {
+    padding: 14px;
+  }
+
+  .page-layout {
+    gap: 14px;
+  }
+
+  .detail-card {
+    padding: 18px;
+
+    .title {
+      font-size: 19px;
+      margin-bottom: 10px;
+    }
+
+    .cover {
+      max-height: 240px;
+
+      img {
+        max-height: 240px;
+      }
+    }
+
+    .content {
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    :deep(.md-editor-preview p) {
+      margin: 0 0 10px;
+    }
+
+    :deep(.md-editor-preview h1),
+    :deep(.md-editor-preview h2),
+    :deep(.md-editor-preview h3) {
+      margin: 14px 0 8px;
+    }
+
+    :deep(.md-editor-preview img) {
+      margin: 6px 0;
+    }
+  }
+}

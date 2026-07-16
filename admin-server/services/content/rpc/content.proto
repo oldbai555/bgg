@@ -1,0 +1,544 @@
+syntax = "proto3";
+
+package content;
+
+option go_package = "./content";
+
+// content-rpc 承载 blog 域（文章/标签/审核/友情链接/社交信息/公共展示）+ video 域
+// （视频管理/采集/公共展示），方法集合对应 api/admin.api 里 blog/* 和 video/* 现有的
+// 全部接口，字段名逐一核对 internal/types/types.go 现有的 Blog*/Video*/PublicBlog*/
+// PublicVideo* 结构体。18-service-extraction-runbook.md 2.4 节把这次拆分定性为
+// "机械，不是有风险"——blog/video 内部都是单表/几张关联表的标准 CRUD。
+//
+// 两处不进这份 proto 的 gateway 端点：
+//   1. M3u8Proxy（video/m3u8 group）：纯 HTTP 代理转发，不访问任何 blog/video 域数据，
+//      继续留在 gateway 侧不动。
+//   2. VideoCollectOptions（video/video_collect group）：CORS 预检占位 stub，从来只是
+//      `return nil`，不访问域数据，继续留在 gateway。
+//
+// operator_user_id/operator_username 显式带在请求里（BlogArticleCreate/Update、
+// BlogArticleAudit/AuditUnpublish）：content-rpc 不解析 JWT，gateway 侧从已鉴权的
+// context 里取出显式传入，和 services/task/services/chat 的 operator_user_id 同一个模式。
+
+// ==================== Blog 标签 ====================
+
+message BlogTagItem {
+  uint64 id = 1;
+  string name = 2;
+  int64 status = 3;
+  string remark = 4;
+  int64 created_at = 5;
+  int64 updated_at = 6;
+}
+
+message BlogTagListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  string name = 3;
+  int64 status = 4;
+}
+
+message BlogTagListResponse {
+  int64 total = 1;
+  repeated BlogTagItem list = 2;
+}
+
+message BlogTagOptionItem {
+  uint64 id = 1;
+  string name = 2;
+}
+
+message BlogTagOptionsRequest {
+  int64 limit = 1;
+}
+
+message BlogTagOptionsResponse {
+  repeated BlogTagOptionItem list = 1;
+}
+
+message BlogTagCreateRequest {
+  string name = 1;
+  int64 status = 2;
+  string remark = 3;
+}
+
+message BlogTagUpdateRequest {
+  uint64 id = 1;
+  string name = 2;
+  int64 status = 3;
+  string remark = 4;
+}
+
+message BlogTagDeleteRequest {
+  uint64 id = 1;
+}
+
+// ==================== Blog 文章 ====================
+
+message BlogArticleItem {
+  uint64 id = 1;
+  string title = 2;
+  int64 status = 3;
+  int64 audit_status = 4;
+  string cover = 5;
+  uint64 author_id = 6;
+  string author_name = 7;
+  repeated uint64 tag_ids = 8;
+  repeated string tag_names = 9;
+  int64 publish_time = 10;
+  int64 is_top = 11;
+  int64 created_at = 12;
+  int64 updated_at = 13;
+}
+
+message BlogArticleListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  string title = 3;
+  int64 status = 4;
+  int64 audit_status = 5;
+  uint64 tag_id = 6;
+  int64 start_time = 7;
+  int64 end_time = 8;
+}
+
+message BlogArticleListResponse {
+  int64 total = 1;
+  repeated BlogArticleItem list = 2;
+}
+
+message BlogArticleDetailRequest {
+  uint64 id = 1;
+}
+
+message BlogArticleDetailResponse {
+  uint64 id = 1;
+  string title = 2;
+  string content = 3;
+  int64 status = 4;
+  int64 audit_status = 5;
+  string cover = 6;
+  uint64 author_id = 7;
+  string author_name = 8;
+  int64 publish_time = 9;
+  string summary = 10;
+  repeated BlogTagItem tags = 11;
+  int64 created_at = 12;
+  int64 updated_at = 13;
+}
+
+message BlogArticleCreateRequest {
+  string title = 1;
+  string content = 2;
+  repeated uint64 tag_ids = 3;
+  string cover = 4;
+  string summary = 5;
+  uint64 operator_user_id = 6;
+  string operator_username = 7;
+}
+
+message BlogArticleUpdateRequest {
+  uint64 id = 1;
+  string title = 2;
+  string content = 3;
+  repeated uint64 tag_ids = 4;
+  string cover = 5;
+  string summary = 6;
+}
+
+message BlogArticleDeleteRequest {
+  uint64 id = 1;
+}
+
+message BlogArticleSubmitRequest {
+  uint64 id = 1;
+}
+
+message BlogArticlePublishRequest {
+  uint64 id = 1;
+}
+
+message BlogArticleUnpublishRequest {
+  uint64 id = 1;
+}
+
+message BlogArticleTopRequest {
+  uint64 id = 1;
+}
+
+message BlogArticleUntopRequest {
+  uint64 id = 1;
+}
+
+message BlogArticleAuditRequest {
+  uint64 id = 1;
+  int64 result = 2;
+  string remark = 3;
+  uint64 operator_user_id = 4;
+  string operator_username = 5;
+}
+
+message BlogArticleAuditUnpublishRequest {
+  uint64 id = 1;
+  string remark = 2;
+  uint64 operator_user_id = 3;
+  string operator_username = 4;
+}
+
+// ==================== Blog 友情链接 ====================
+
+message BlogFriendLinkItem {
+  uint64 id = 1;
+  string name = 2;
+  string url = 3;
+  string remark = 4;
+  int64 status = 5;
+  int64 order_num = 6;
+  int64 created_at = 7;
+  int64 updated_at = 8;
+}
+
+message BlogFriendLinkListRequest {
+  int64 page = 1;
+  int64 size = 2;
+  int64 status = 3;
+  string keyword = 4;
+}
+
+message BlogFriendLinkListResponse {
+  int64 total = 1;
+  int64 page = 2;
+  int64 size = 3;
+  repeated BlogFriendLinkItem list = 4;
+}
+
+message BlogFriendLinkCreateRequest {
+  string name = 1;
+  string url = 2;
+  string remark = 3;
+  int64 status = 4;
+  int64 order_num = 5;
+}
+
+message BlogFriendLinkUpdateRequest {
+  uint64 id = 1;
+  string name = 2;
+  string url = 3;
+  string remark = 4;
+  int64 status = 5;
+  int64 order_num = 6;
+}
+
+message BlogFriendLinkDeleteRequest {
+  uint64 id = 1;
+}
+
+// ==================== Blog 社交信息 ====================
+
+message BlogSocialInfoItem {
+  uint64 id = 1;
+  string name = 2;
+  string url = 3;
+  string remark = 4;
+  int64 status = 5;
+  int64 order_num = 6;
+  int64 created_at = 7;
+  int64 updated_at = 8;
+}
+
+message BlogSocialInfoListRequest {
+  int64 page = 1;
+  int64 size = 2;
+  int64 status = 3;
+  string keyword = 4;
+}
+
+message BlogSocialInfoListResponse {
+  int64 total = 1;
+  int64 page = 2;
+  int64 size = 3;
+  repeated BlogSocialInfoItem list = 4;
+}
+
+message BlogSocialInfoCreateRequest {
+  string name = 1;
+  string url = 2;
+  string remark = 3;
+  int64 status = 4;
+  int64 order_num = 5;
+}
+
+message BlogSocialInfoUpdateRequest {
+  uint64 id = 1;
+  string name = 2;
+  string url = 3;
+  string remark = 4;
+  int64 status = 5;
+  int64 order_num = 6;
+}
+
+message BlogSocialInfoDeleteRequest {
+  uint64 id = 1;
+}
+
+// ==================== Blog 公共展示（未登录访问） ====================
+
+message PublicBlogArticleItem {
+  uint64 id = 1;
+  string title = 2;
+  string cover = 3;
+  string author_name = 4;
+  string summary = 5;
+  repeated string tag_names = 6;
+  int64 publish_time = 7;
+  int64 is_top = 8;
+}
+
+message PublicBlogArticleListRequest {
+  int64 page = 1;
+  int64 size = 2;
+  uint64 tag_id = 3;
+  string keyword = 4;
+}
+
+message PublicBlogArticleListResponse {
+  repeated PublicBlogArticleItem list = 1;
+  int64 page = 2;
+  int64 size = 3;
+  int64 total = 4;
+}
+
+message PublicBlogArticleDetailRequest {
+  uint64 id = 1;
+}
+
+message PublicBlogArticleDetailResponse {
+  uint64 id = 1;
+  string title = 2;
+  string content = 3;
+  string cover = 4;
+  string author_name = 5;
+  int64 publish_time = 6;
+  repeated BlogTagItem tags = 7;
+}
+
+message PublicBlogArticlePrevNextRequest {
+  uint64 id = 1;
+}
+
+message PublicBlogArticlePrevNextResponse {
+  uint64 id = 1;
+  string title = 2;
+  int64 publish_time = 3;
+}
+
+message PublicBlogArticleStatsResponse {
+  int64 total_articles = 1;
+}
+
+message PublicBlogAuthorInfoResponse {
+  uint64 id = 1;
+  string nickname = 2;
+  string avatar = 3;
+  string signature = 4;
+}
+
+message PublicBlogFriendLinkItem {
+  uint64 id = 1;
+  string name = 2;
+  string url = 3;
+  string remark = 4;
+  int64 order_num = 5;
+}
+
+message PublicBlogFriendLinkListResponse {
+  repeated PublicBlogFriendLinkItem list = 1;
+}
+
+message PublicBlogSocialInfoItem {
+  uint64 id = 1;
+  string name = 2;
+  string url = 3;
+  string remark = 4;
+  int64 order_num = 5;
+}
+
+message PublicBlogSocialInfoListResponse {
+  repeated PublicBlogSocialInfoItem list = 1;
+}
+
+message PublicBlogTagListResponse {
+  repeated BlogTagItem list = 1;
+}
+
+// ==================== Video ====================
+
+message VideoItem {
+  uint64 id = 1;
+  string uuid = 2;
+  string name = 3;
+  string cover = 4;
+  string god_num = 5;
+  int64 duration = 6;
+  string play_url = 7;
+  repeated string xlzz_urls = 8;
+  string description = 9;
+  int64 source_type = 10;
+  int64 created_at = 11;
+  int64 updated_at = 12;
+}
+
+message VideoListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  string keyword = 3;
+  int64 source_type = 4;
+}
+
+message VideoListResponse {
+  int64 total = 1;
+  repeated VideoItem list = 2;
+}
+
+message VideoCreateRequest {
+  string name = 1;
+  string cover = 2;
+  string god_num = 3;
+  int64 duration = 4;
+  string play_url = 5;
+  repeated string xlzz_urls = 6;
+  string description = 7;
+  int64 source_type = 8;
+}
+
+message VideoUpdateRequest {
+  uint64 id = 1;
+  string name = 2;
+  string cover = 3;
+  string god_num = 4;
+  int64 duration = 5;
+  string play_url = 6;
+  repeated string xlzz_urls = 7;
+  string description = 8;
+}
+
+message VideoDeleteRequest {
+  uint64 id = 1;
+}
+
+message VideoCollectRequest {
+  string uuid = 1;
+  string player_url = 2;
+  string name = 3;
+  string god_num = 4;
+  repeated string xlzz_urls = 5;
+}
+
+message VideoCollectResponse {
+  VideoItem data = 1;
+}
+
+message PublicVideoItem {
+  uint64 id = 1;
+  string uuid = 2;
+  string name = 3;
+  string god_num = 4;
+}
+
+message PublicVideoListRequest {
+  int64 page = 1;
+  int64 size = 2;
+  string content = 3;
+}
+
+message PublicVideoListResponse {
+  repeated PublicVideoItem list = 1;
+  int64 page = 2;
+  int64 size = 3;
+  int64 total = 4;
+}
+
+message PublicVideoDetailRequest {
+  uint64 id = 1;
+}
+
+message PublicVideoDetailResponse {
+  uint64 id = 1;
+  string uuid = 2;
+  string name = 3;
+  string cover = 4;
+  string god_num = 5;
+  int64 duration = 6;
+  string play_url = 7;
+  repeated string xlzz_urls = 8;
+  string description = 9;
+  int64 source_type = 10;
+  int64 created_at = 11;
+  int64 updated_at = 12;
+}
+
+// PublicBlogGlobalRequest 供不带业务参数、只需要一个空请求占位的公共展示接口共用
+// （PublicBlogArticleStats/PublicBlogAuthorInfo/PublicBlogFriendLinkList/
+// PublicBlogSocialInfoList/PublicBlogTagList）。
+message PublicBlogGlobalRequest {}
+
+message Empty {}
+
+service Content {
+  // 标签
+  rpc BlogTagList(BlogTagListRequest) returns (BlogTagListResponse);
+  rpc BlogTagOptions(BlogTagOptionsRequest) returns (BlogTagOptionsResponse);
+  rpc BlogTagCreate(BlogTagCreateRequest) returns (Empty);
+  rpc BlogTagUpdate(BlogTagUpdateRequest) returns (Empty);
+  rpc BlogTagDelete(BlogTagDeleteRequest) returns (Empty);
+
+  // 文章
+  rpc BlogArticleList(BlogArticleListRequest) returns (BlogArticleListResponse);
+  rpc BlogArticleDetail(BlogArticleDetailRequest) returns (BlogArticleDetailResponse);
+  rpc BlogArticleCreate(BlogArticleCreateRequest) returns (Empty);
+  rpc BlogArticleUpdate(BlogArticleUpdateRequest) returns (Empty);
+  rpc BlogArticleDelete(BlogArticleDeleteRequest) returns (Empty);
+  rpc BlogArticleSubmit(BlogArticleSubmitRequest) returns (Empty);
+  rpc BlogArticlePublish(BlogArticlePublishRequest) returns (Empty);
+  rpc BlogArticleUnpublish(BlogArticleUnpublishRequest) returns (Empty);
+  rpc BlogArticleTop(BlogArticleTopRequest) returns (Empty);
+  rpc BlogArticleUntop(BlogArticleUntopRequest) returns (Empty);
+
+  // 审核
+  rpc BlogArticleAudit(BlogArticleAuditRequest) returns (Empty);
+  rpc BlogArticleAuditUnpublish(BlogArticleAuditUnpublishRequest) returns (Empty);
+
+  // 友情链接
+  rpc BlogFriendLinkList(BlogFriendLinkListRequest) returns (BlogFriendLinkListResponse);
+  rpc BlogFriendLinkCreate(BlogFriendLinkCreateRequest) returns (Empty);
+  rpc BlogFriendLinkUpdate(BlogFriendLinkUpdateRequest) returns (Empty);
+  rpc BlogFriendLinkDelete(BlogFriendLinkDeleteRequest) returns (Empty);
+
+  // 社交信息
+  rpc BlogSocialInfoList(BlogSocialInfoListRequest) returns (BlogSocialInfoListResponse);
+  rpc BlogSocialInfoCreate(BlogSocialInfoCreateRequest) returns (Empty);
+  rpc BlogSocialInfoUpdate(BlogSocialInfoUpdateRequest) returns (Empty);
+  rpc BlogSocialInfoDelete(BlogSocialInfoDeleteRequest) returns (Empty);
+
+  // 公共博客展示
+  rpc PublicBlogArticleList(PublicBlogArticleListRequest) returns (PublicBlogArticleListResponse);
+  rpc PublicBlogArticleDetail(PublicBlogArticleDetailRequest) returns (PublicBlogArticleDetailResponse);
+  rpc PublicBlogArticlePrev(PublicBlogArticlePrevNextRequest) returns (PublicBlogArticlePrevNextResponse);
+  rpc PublicBlogArticleNext(PublicBlogArticlePrevNextRequest) returns (PublicBlogArticlePrevNextResponse);
+  rpc PublicBlogArticleStats(PublicBlogGlobalRequest) returns (PublicBlogArticleStatsResponse);
+  rpc PublicBlogAuthorInfo(PublicBlogGlobalRequest) returns (PublicBlogAuthorInfoResponse);
+  rpc PublicBlogFriendLinkList(PublicBlogGlobalRequest) returns (PublicBlogFriendLinkListResponse);
+  rpc PublicBlogSocialInfoList(PublicBlogGlobalRequest) returns (PublicBlogSocialInfoListResponse);
+  rpc PublicBlogTagList(PublicBlogGlobalRequest) returns (PublicBlogTagListResponse);
+
+  // Video
+  rpc VideoList(VideoListRequest) returns (VideoListResponse);
+  rpc VideoCreate(VideoCreateRequest) returns (Empty);
+  rpc VideoUpdate(VideoUpdateRequest) returns (Empty);
+  rpc VideoDelete(VideoDeleteRequest) returns (Empty);
+  rpc VideoCollect(VideoCollectRequest) returns (VideoCollectResponse);
+
+  // 公共视频展示
+  rpc PublicVideoList(PublicVideoListRequest) returns (PublicVideoListResponse);
+  rpc PublicVideoDetail(PublicVideoDetailRequest) returns (PublicVideoDetailResponse);
+}

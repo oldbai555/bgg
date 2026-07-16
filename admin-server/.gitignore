@@ -1,0 +1,15 @@
+# go-zero 生成的可执行文件
+admin-server.exe
+admin-server
+
+# 临时文件
+*.tmp
+*.log
+
+# 本地开发/联调用的外部 MySQL/Redis 凭证文件（-mysql-config/-redis-config 指向），
+# 不进仓库，见 admin-server/docs/progress.md 2026-07-11（续三）条目。
+/etc/local-mysql.json
+/etc/local-redis.json
+/services/sdk/etc/local-sdk.yaml
+
+/scripts/test-video-collect.sh

@@ -1,0 +1,41 @@
+package logic
+
+import (
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
+	"postapocgame/admin-server/pkg/errs"
+)
+
+// toGRPCStatus 把内部 *errs.Error 转成 gRPC status error，和 services/task、
+// services/sdk、services/chat、services/content 的同名函数完全同构——不转换的话，
+// *errs.Error 原样穿过 gRPC 边界会被 gateway 侧 errs.WrapGRPCError 识别成未映射的
+// gRPC code，一律退化成 CodeInternalError，等于白建了这套错误码映射。
+func toGRPCStatus(err error) error {
+	if err == nil {
+		return nil
+	}
+	e, ok := errs.FromError(err)
+	if !ok {
+		return err
+	}
+
+	code := codes.Internal
+	switch e.Code {
+	case errs.CodeNotFound:
+		code = codes.NotFound
+	case errs.CodeBadRequest:
+		code = codes.InvalidArgument
+	case errs.CodeForbidden:
+		code = codes.PermissionDenied
+	case errs.CodeUnauthorized:
+		code = codes.Unauthenticated
+	case errs.CodeConflict:
+		code = codes.AlreadyExists
+	case errs.CodeTooManyRequests:
+		code = codes.ResourceExhausted
+	case errs.CodeBadGateway:
+		code = codes.Unavailable
+	}
+	return status.Error(code, e.Message)
+}

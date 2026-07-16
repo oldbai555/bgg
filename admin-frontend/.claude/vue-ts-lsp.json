@@ -1,0 +1,3 @@
+{
+  "ignoreDirectories": ["dist", "node_modules"]
+}

@@ -1,21 +1,52 @@
-/lbserver/cmd/application.yaml
-/lbserver/resource/
-/web/.idea/
-/webv2/admin/node_modules/
 /.idea/inspectionProfiles/Project_Default.xml
 /.idea/jsLibraryMappings.xml
 /.idea/*
 /.idea/**
 /.idea
-git remote set-url origin https://token@github.com/oldbai555/bgg.git
-/client/lb/lb_client.go
-/client/lb/lb_conn.go
-/client/lb/lb_rpc_cmd_path_autogen.go
-/build_temp/
-/service/lboss/storage/
-/service/lboss/levelDB/
-/service/lboss/go_build_github_com_oldbai555_bgg_service_lboss.exe
-/script/baix/.env.bak
-/singlesrv/d2admin/
-/singlesrv/cmd/go_build_github_com_oldbai555_bgg_singlesrv_cmd.exe
-/service/gateway/go_build_github_com_oldbai555_bgg_service_gateway.exe
+**/.idea
+
+.DS_Store
+**/.DS_Store
+
+/files.zip
+/files*.zip
+/admin-server/*.exe
+/Claude*framework_*.json
+/.vscode/
+/output/
+*.cs.uid
+# Admin server executables
+admin-server/*.exe
+**/node_modules
+**/*.exe
+/admin-*/dist/
+/admin-frontend/tsconfig.tsbuildinfo
+/package/*
+/admin-server/api/*.api.temp
+/admin-server/uploads/**
+/history
+/history/**
+/admin-server/uploads/**
+/admin-frontend/eslintcheckresult.txt
+/__dummy__
+
+# Claude Code 本机偏好（项目级 MCP 清单见仓库根 .mcp.json，已提交 git）
+.claude/settings.local.json
+
+# 本地真实数据库/Redis 连接配置，禁止提交；参考 config/*.json.example 自行创建
+/config/mysql.json
+/config/redis.json
+/admin-server/etc/local-mysql.json
+/admin-server/etc/local-redis.json
+
+# 前端本地环境变量（如飞书 App ID 等第三方凭据），Vite 约定 *.local 为本机私有覆盖
+/admin-frontend/.env*.local
+
+# docker-compose.dev-mixed.yml 的真实密钥（JWT/DSN/飞书 Secret），参考
+# admin-server/.env.dev-mixed.example 自行创建，只放在部署目标机器本地
+/admin-server/.env
+/admin-server/.env.*
+!/admin-server/.env.*.example
+# Local AI runtime state
+.atl/
+__debug_bin*

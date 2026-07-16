@@ -1,0 +1,105 @@
+syntax = "proto3";
+
+package task;
+
+option go_package = "./task";
+
+// TaskItem 对应 api/admin.api 里的 TaskItem，字段名/类型逐一对齐（timestamp 字段用 int64
+// 秒级时间戳，和项目既有约定一致，不用 proto 自带的 Timestamp 类型）。
+message TaskItem {
+  uint64 id = 1;
+  string name = 2;
+  int64 task_type = 3;       // 字典 task_type
+  int64 execution_type = 4;  // 字典 task_execution_type
+  int64 status = 5;          // 字典 task_status
+  uint64 user_id = 6;
+  int64 scheduled_at = 7;
+  int64 started_at = 8;
+  int64 finished_at = 9;
+  int64 created_at = 10;
+  string params = 11;
+  string result = 12;
+  string error_message = 13;
+}
+
+message TaskListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  string name = 3;
+  int64 task_type = 4;
+  int64 execution_type = 5;
+  int64 status = 6;
+  uint64 user_id = 7;
+  int64 start_time = 8;
+  int64 end_time = 9;
+}
+
+message TaskListResponse {
+  int64 total = 1;
+  repeated TaskItem list = 2;
+}
+
+message TaskDetailRequest {
+  uint64 id = 1;
+}
+
+message TaskDetailResponse {
+  uint64 id = 1;
+  string name = 2;
+  int64 task_type = 3;
+  int64 execution_type = 4;
+  int64 status = 5;
+  string params = 6;
+  string result = 7;
+  string error_message = 8;
+  uint64 user_id = 9;
+  int64 scheduled_at = 10;
+  int64 started_at = 11;
+  int64 finished_at = 12;
+  int64 created_at = 13;
+  int64 updated_at = 14;
+}
+
+message TaskCancelRequest {
+  uint64 id = 1;
+  // gateway 侧从 JWT context 取出登录用户后显式传入——task-rpc 拆分后不再能访问登录态，
+  // 见 admin-server-docs-progress-md-phase-2-15-magical-steele.md 计划第 3 节。
+  uint64 operator_user_id = 2;
+}
+
+message TaskCancelResponse {
+}
+
+message TaskRecentRequest {
+  int64 limit = 1;         // 不传（0）则使用 task-rpc 自己的静态配置 RecentTaskLimit
+  uint64 user_id = 2;
+}
+
+message TaskRecentResponse {
+  repeated TaskItem list = 1;
+}
+
+// SubmitTask 对应 AsyncTaskBackend.Submit 的 RPC 化，供 iam-rpc/sdk-rpc（当前阶段：单体
+// 主进程的 4 个 monitoring *_export_logic.go + sdk_call_log_export_logic.go）创建异步导出
+// 任务。原来的行为是"创建 admin_task 记录失败直接把错误返回给前端"，属于
+// 17-async-eventing.md 判断规则里的同步 RPC，不是 Streams。
+message SubmitTaskRequest {
+  string name = 1;
+  int64 task_type = 2;
+  int64 execution_type = 3;
+  string params = 4;        // JSON 编码的任务参数（如 ExcelExportParams）
+  uint64 user_id = 5;
+  int64 scheduled_at = 6;   // 0 表示立即执行
+}
+
+message SubmitTaskResponse {
+  uint64 task_id = 1;
+}
+
+service Task {
+  rpc TaskList(TaskListRequest) returns (TaskListResponse);
+  rpc TaskDetail(TaskDetailRequest) returns (TaskDetailResponse);
+  rpc TaskCancel(TaskCancelRequest) returns (TaskCancelResponse);
+  rpc TaskRecent(TaskRecentRequest) returns (TaskRecentResponse);
+  rpc SubmitTask(SubmitTaskRequest) returns (SubmitTaskResponse);
+}

@@ -1,0 +1,261 @@
+syntax = "proto3";
+
+package sdk;
+
+option go_package = "./sdk";
+
+// ==================== 后台管理面：API Key / 接口 / 绑定 / 调用记录 CRUD ====================
+// 字段名/类型对齐 api/admin.api 里 sdk/sdk group 现有的 Sdk* 类型，逐一核对过。
+
+message SdkApiKeyItem {
+  uint64 id = 1;
+  string name = 2;
+  string api_key = 3;
+  string api_secret = 4;
+  int64 status = 5;
+  int64 expire_at = 6;
+  string ip_whitelist = 7;
+  string remark = 8;
+  int64 created_at = 9;
+}
+
+message SdkApiKeyListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  string name = 3;
+  int64 status = 4;
+}
+
+message SdkApiKeyListResponse {
+  int64 total = 1;
+  repeated SdkApiKeyItem list = 2;
+}
+
+message SdkApiKeyCreateRequest {
+  string name = 1;
+  int64 status = 2;
+  int64 expire_at = 3;
+  string ip_whitelist = 4;
+  string remark = 5;
+}
+
+message SdkApiKeyCreateResponse {
+  uint64 id = 1;
+  string api_key = 2;
+  string api_secret = 3;
+}
+
+message SdkApiKeyUpdateRequest {
+  uint64 id = 1;
+  string name = 2;
+  int64 status = 3;
+  int64 expire_at = 4;
+  string ip_whitelist = 5;
+  string remark = 6;
+}
+
+message SdkApiKeyDeleteRequest {
+  uint64 id = 1;
+}
+
+message SdkApiKeyBindItem {
+  uint64 sdk_interface_id = 1;
+  string api_code = 2;
+  string name = 3;
+  string path = 4;
+  string method = 5;
+  int64 rate_limit = 6;
+  int64 bound = 7;
+  int64 custom_rate_limit = 8;
+}
+
+message SdkApiKeyBindListRequest {
+  uint64 sdk_key_id = 1;
+}
+
+message SdkApiKeyBindListResponse {
+  repeated SdkApiKeyBindItem list = 1;
+}
+
+message SdkApiKeyBinding {
+  uint64 sdk_interface_id = 1;
+  int64 custom_rate_limit = 2;
+}
+
+message SdkApiKeyBindSaveRequest {
+  uint64 sdk_key_id = 1;
+  repeated SdkApiKeyBinding bindings = 2;
+}
+
+message SdkInterfaceItem {
+  uint64 id = 1;
+  string name = 2;
+  string api_code = 3;
+  string path = 4;
+  string method = 5;
+  int64 rate_limit_default = 6;
+  int64 status = 7;
+  string remark = 8;
+  int64 created_at = 9;
+}
+
+message SdkInterfaceListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  string name = 3;
+  string api_code = 4;
+  int64 status = 5;
+}
+
+message SdkInterfaceListResponse {
+  int64 total = 1;
+  repeated SdkInterfaceItem list = 2;
+}
+
+message SdkInterfaceCreateRequest {
+  string name = 1;
+  string path = 2;
+  string method = 3;
+  int64 rate_limit_default = 4;
+  int64 status = 5;
+  string remark = 6;
+}
+
+message SdkInterfaceUpdateRequest {
+  uint64 id = 1;
+  string name = 2;
+  string path = 3;
+  string method = 4;
+  int64 rate_limit_default = 5;
+  int64 status = 6;
+  string remark = 7;
+}
+
+message SdkInterfaceDeleteRequest {
+  uint64 id = 1;
+}
+
+message SdkCallLogItem {
+  uint64 id = 1;
+  uint64 sdk_key_id = 2;
+  uint64 sdk_interface_id = 3;
+  string api_code = 4;
+  string path = 5;
+  string method = 6;
+  string ip = 7;
+  int64 resp_code = 8;
+  int64 duration_ms = 9;
+  int64 created_at = 10;
+}
+
+message SdkCallLogListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  uint64 sdk_key_id = 3;
+  string api_code = 4;
+  int64 resp_code = 5;
+  string ip = 6;
+  int64 start_time = 7;
+  int64 end_time = 8;
+}
+
+message SdkCallLogListResponse {
+  int64 total = 1;
+  repeated SdkCallLogItem list = 2;
+}
+
+// HTTP 侧的 SdkCallLogExport 接口（internal/logic/sdk/sdk/sdk_call_log_export_logic.go）不在
+// 这个服务里：它只是拼参数调 TaskRPC.SubmitTask 创建异步导出任务，从未直接访问
+// sdk_key/sdk_interface/sdk_call_log，原样留在 gateway。
+//
+// 但异步任务真正执行时（task-rpc 回调 TaskCallback.FetchExportData，见
+// internal/rpcserver/taskcallback/server.go 的 fetchSdkCallLog），需要真的查 sdk_call_log
+// 表——这张表现在物理上属于 sdk-rpc，所以补一个专用的导出方法（对应原
+// SdkAdminRepository.ExportCallLogs，maxRows 上限 2000，比 SdkCallLogList 给管理页用的
+// 200 上限更宽，两者语义不同不合并复用）。
+message SdkCallLogExportRequest {
+  int64 max_rows = 1;
+  uint64 sdk_key_id = 2;
+  string api_code = 3;
+  int64 resp_code = 4;
+  string ip = 5;
+  int64 start_time = 6;
+  int64 end_time = 7;
+}
+
+message SdkCallLogExportResponse {
+  repeated SdkCallLogItem list = 1;
+}
+
+// ==================== 对外 SDK 调用面：供 gateway 中间件调用 ====================
+// SDKAuthMiddleware/SDKRateLimitMiddleware/SDKCallLogMiddleware 三个中间件本身继续留在
+// gateway（HTTP 请求最早触达的地方），内部实现从直连 Repository 改成调这三个 RPC。
+// 见 18-service-extraction-runbook.md 第 2.2 节。
+
+message VerifyApiKeyRequest {
+  string api_key = 1;
+  string api_secret = 2;
+  string method = 3;
+  string path = 4;
+  string client_ip = 5;
+}
+
+// VerifyApiKeyResponse 故意不用 gRPC status error 表达"鉴权未通过"：SDKAuthMiddleware 原有
+// 7 种具体失败文案（缺少凭证/无效Key/Secret不匹配/已禁用/已过期/IP不在白名单/接口未开通）
+// 是外部 SDK 调用方依赖的公开契约，WrapGRPCError 那种"每个调用点一个通用 msg"的既有转换
+// 方式（task-rpc 用的那种）会把这些文案压缩成一句话，对内部管理后台可以接受，但对外部
+// 第三方调用方是真实的体验倒退，所以改成显式字段透传，valid=false 时 code/message 直接
+// 对应网关侧要返回的 errs.Code*/文案。
+message VerifyApiKeyResponse {
+  bool valid = 1;
+  int64 code = 2;    // valid=false 时有效，取值是 errs.CodeUnauthorized/errs.CodeForbidden
+  string message = 3; // valid=false 时有效，直接透传给 SDK 调用方
+  uint64 sdk_key_id = 4;
+  string api_key = 5;
+  uint64 sdk_interface_id = 6;
+  string api_code = 7;
+}
+
+message GetEffectiveRateLimitRequest {
+  uint64 sdk_key_id = 1;
+  uint64 sdk_interface_id = 2;
+}
+
+message GetEffectiveRateLimitResponse {
+  int64 limit = 1;
+}
+
+message RecordCallLogRequest {
+  uint64 sdk_key_id = 1;
+  uint64 sdk_interface_id = 2;
+  string api_code = 3;
+  string path = 4;
+  string method = 5;
+  string ip = 6;
+  string user_agent = 7;
+  string req_body = 8;
+  string resp_body = 9;
+  int64 resp_code = 10;
+  int64 duration_ms = 11;
+}
+
+message Empty {}
+
+service Sdk {
+  rpc SdkApiKeyList(SdkApiKeyListRequest) returns (SdkApiKeyListResponse);
+  rpc SdkApiKeyCreate(SdkApiKeyCreateRequest) returns (SdkApiKeyCreateResponse);
+  rpc SdkApiKeyUpdate(SdkApiKeyUpdateRequest) returns (Empty);
+  rpc SdkApiKeyDelete(SdkApiKeyDeleteRequest) returns (Empty);
+  rpc SdkApiKeyBindList(SdkApiKeyBindListRequest) returns (SdkApiKeyBindListResponse);
+  rpc SdkApiKeyBindSave(SdkApiKeyBindSaveRequest) returns (Empty);
+  rpc SdkInterfaceList(SdkInterfaceListRequest) returns (SdkInterfaceListResponse);
+  rpc SdkInterfaceCreate(SdkInterfaceCreateRequest) returns (Empty);
+  rpc SdkInterfaceUpdate(SdkInterfaceUpdateRequest) returns (Empty);
+  rpc SdkInterfaceDelete(SdkInterfaceDeleteRequest) returns (Empty);
+  rpc SdkCallLogList(SdkCallLogListRequest) returns (SdkCallLogListResponse);
+  rpc SdkCallLogExport(SdkCallLogExportRequest) returns (SdkCallLogExportResponse);
+
+  rpc VerifyApiKey(VerifyApiKeyRequest) returns (VerifyApiKeyResponse);
+  rpc GetEffectiveRateLimit(GetEffectiveRateLimitRequest) returns (GetEffectiveRateLimitResponse);
+  rpc RecordCallLog(RecordCallLogRequest) returns (Empty);
+}

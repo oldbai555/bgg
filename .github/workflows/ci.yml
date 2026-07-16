@@ -1,0 +1,116 @@
+name: CI
+
+on:
+  push:
+    branches: [main, feature/**]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          working-directory: admin-server
+          # Phase 1 Week 4-5 扩大范围：golangci-lint run ./... 复核全仓库结果是 0 issue，
+          # 直接扫全仓库，不再限制路径（见 admin-server/docs/09-ci-cd-and-deployability.md 第 3 节）。
+          args: --timeout=5m ./...
+      - name: go build
+        run: cd admin-server && go build ./...
+
+  unit-test:
+    runs-on: ubuntu-latest
+    needs: lint-build
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+      - name: go test (unit)
+        # 范围严格对齐 08-testing-strategy.md 的口径：只跑领域服务 + repository 层，
+        # 不是 go test ./...；集成测试（//go:build integration）默认不会被这条命令带上。
+        # services/task/...、services/sdk/...、services/chat/...、services/content/...、
+        # services/iam/... 是 Phase 2 拆出的 task-rpc/sdk-rpc/chat-rpc/content-rpc/iam-rpc，
+        # 全部领域的领域服务/repository/TaskCallback+IamCallback server 实现都已经搬到这里，
+        # internal/domain/、internal/repository/、internal/rpcserver/ 三个目录已整体删除。
+        run: cd admin-server && go test ./services/task/... ./services/sdk/... ./services/chat/... ./services/content/... ./services/iam/... -race -count=1
+
+  integration-test:
+    runs-on: ubuntu-latest
+    needs: lint-build
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: admin_test
+        ports: ["3306:3306"]
+        options: >-
+          --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=5s --health-retries=10
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd="redis-cli ping" --health-interval=5s --health-timeout=5s --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+      - name: 初始化测试库
+        # 顺序与 admin-server/db/services/init-dev-db.sh 保持一致，两处如果后续调整需要同步改。
+        run: |
+          MYSQL_ROOT_PASSWORD=root MYSQL_DATABASE=admin_test \
+            admin-server/db/services/init-dev-db.sh -h127.0.0.1
+      - name: go test (integration)
+        run: cd admin-server && go test -tags=integration ./... -count=1
+        env:
+          TEST_MYSQL_DSN: root:root@tcp(127.0.0.1:3306)/admin_test
+          TEST_REDIS_ADDR: 127.0.0.1:6379
+
+  build-images:
+    # 只在 push 到 main 时构建+推送镜像（feature/** push 和 PR 只跑上面三个门槛 job，
+    # 不产出镜像），见 admin-server/docs/21-cd-and-deployment.md 第 4 节。
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [lint-build, unit-test]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # gateway 对应仓库根 admin-server/Dockerfile（gateway 是 admin-server 的根 main
+        # 包 admin.go，不是独立的 cmd/gateway/ 目录，21-cd-and-deployment.md 写的
+        # cmd/gateway/Dockerfile 是当时的规划路径，落地时按 Phase 2 实际拆分结果调整）；
+        # 其余五个对应各自 services/<name>/Dockerfile。
+        include:
+          - service: gateway
+            dockerfile: Dockerfile
+          - service: iam
+            dockerfile: services/iam/Dockerfile
+          - service: content
+            dockerfile: services/content/Dockerfile
+          - service: chat
+            dockerfile: services/chat/Dockerfile
+          - service: task
+            dockerfile: services/task/Dockerfile
+          - service: sdk
+            dockerfile: services/sdk/Dockerfile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v5
+        with:
+          context: ./admin-server
+          file: ./admin-server/${{ matrix.dockerfile }}
+          push: true
+          # 六个独立镜像仓库，tag 用完整 git sha（不用 latest），保证每次部署可追溯到
+          # 具体提交，见 21-cd-and-deployment.md 第 4 节镜像命名规则。
+          tags: ghcr.io/${{ github.repository_owner }}/admin-${{ matrix.service }}:${{ github.sha }}

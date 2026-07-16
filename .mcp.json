@@ -1,0 +1,95 @@
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "--package=@upstash/context7-mcp@2.2.5",
+        "--",
+        "context7-mcp"
+      ]
+    },
+    "engram": {
+      "command": "engram",
+      "args": [
+        "mcp",
+        "--tools=agent"
+      ]
+    },
+    "codegraph": {
+      "command": "codegraph",
+      "args": [
+        "serve",
+        "--mcp",
+        "--path",
+        "${CLAUDE_PROJECT_DIR:-.}"
+      ],
+      "type": "stdio"
+    },
+    "go-lsp": {
+      "command": "mcp-language-server",
+      "args": [
+        "--workspace",
+        "${CLAUDE_PROJECT_DIR:-.}/admin-server",
+        "--lsp",
+        "gopls"
+      ],
+      "type": "stdio"
+    },
+    "vue-lsp": {
+      "command": "mcp-language-server",
+      "args": [
+        "--workspace",
+        "${CLAUDE_PROJECT_DIR:-.}/admin-frontend",
+        "--lsp",
+        "node",
+        "--",
+        "node_modules/@vue/language-server/bin/vue-language-server.js",
+        "--stdio"
+      ],
+      "type": "stdio"
+    },
+    "frontend-ui": {
+      "command": "node",
+      "args": [
+        "${CLAUDE_PROJECT_DIR:-.}/admin-frontend/mcp/dist/index.js"
+      ],
+      "type": "stdio"
+    },
+    "mcp-zero": {
+      "command": "${GO_ZERO_MCP_PATH}",
+      "env": {
+        "GOCTL_PATH": "${GOCTL_PATH}"
+      }
+    },
+    "mysql": {
+      "command": "bash",
+      "args": [
+        "${CLAUDE_PROJECT_DIR:-.}/script/mysql_mcp.sh"
+      ],
+      "env": {
+        "ALLOW_INSERT_OPERATION": "false",
+        "ALLOW_UPDATE_OPERATION": "false",
+        "ALLOW_DELETE_OPERATION": "false"
+      },
+      "type": "stdio"
+    },
+    "admin-mcp": {
+      "command": "${CLAUDE_PROJECT_DIR:-.}/admin-server/tool/admin-mcp/bin/admin-mcp",
+      "type": "stdio"
+    },
+    "redis": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/redis/mcp-redis.git",
+        "redis-mcp-server"
+      ],
+      "env": {
+        "REDIS_HOST": "${REDIS_HOST:-127.0.0.1}",
+        "REDIS_PORT": "${REDIS_PORT:-6379}"
+      },
+      "type": "stdio"
+    }
+  }
+}

@@ -1,0 +1,37 @@
+# 种子数据来自 AGENTS.md 第 3、5 节。按 glob 规则从上到下匹配，第一条命中的规则生效
+# （越靠前越具体）。policy 枚举值固定 5 种，见各条目的 note。
+rules:
+  - glob: "internal/handler/**"
+    exceptions: ["**/custom_routes.go"]
+    policy: forbidden_generated
+    note: "goctl 生成，禁止手改（custom_routes.go 除外）"
+  - glob: "internal/model/**/*_gen.go"
+    policy: forbidden_generated
+    note: "goctl 生成，禁止手改"
+  - glob: "internal/model/**/*.go"
+    policy: editable_sibling
+    note: "手改 sibling 文件（业务定制扩展 goctl 生成的 Model）"
+  - glob: "admin-frontend/src/api/generated/**"
+    policy: forbidden_generated
+    note: "goctl 生成前端 TS，禁止手改，二次封装写在 src/api/*.ts"
+  - glob: "internal/logic/**"
+    policy: editable_generated_skeleton
+    note: "goctl 生成骨架 + 手写业务逻辑，允许改方法体"
+  - glob: "internal/repository/**"
+    policy: editable_handwritten
+    note: "手写，强制用 squirrel 构建 SQL，禁止 fmt.Sprintf 拼接"
+  - glob: "internal/domain/**"
+    policy: editable_handwritten
+    note: "手写领域服务，Phase 1 起按 5 服务分组组织（iam 含 system/monitoring/misc，content 含 blog/video，chat/task/sdk 各自独立），不是按 9 个业务域各建一个包，见 01-architecture-target.md A.2"
+  - glob: "api/admin.api"
+    policy: editable_handwritten
+    note: "唯一 .api 定义文件，手改后需重新执行 generate-api.sh/generate-ts.sh"
+  - glob: "etc/admin-api.yaml"
+    policy: editable_handwritten
+    note: "开发环境配置，允许改；生产环境配置需要用户亲自确认，见 AGENTS.md 第 6 节"
+  - glob: "/etc/work/*.json"
+    policy: stop_and_ask
+    note: "生产环境配置，AGENTS.md 明令必须停下来问用户，AI 不得直接改"
+  - glob: "**/*"
+    policy: normal_business_code
+    note: "未命中以上任何规则，视为普通业务代码，正常手改"
