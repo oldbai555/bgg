@@ -1,0 +1,69 @@
+# 11 · 本轮明确不做的事项（Descoped）
+
+## 这篇文档的作用
+
+区分"暂时没做"和"本轮刻意不做"。前者是待办，后者是有明确理由的边界，避免执行过程中有人（AI 或人）"顺手"把这里列的东西也做了，导致范围蔓延、偏离"做简单"的目标。如果推进过程中发现某一条理由不再成立（比如维护者规模变化、外部使用方出现），**先跟用户确认要不要收回这条 descope，不要自行决定动手**。
+
+## 1. 不是全部 161 个 logic 文件都建领域服务
+
+**范围**：只有约 35-40 个满足"跨 ≥2 表写、跨仓储读写、跨域、或有非平凡业务规则（RBAC 授权、密码/认证、任务状态机）"标准的方法会被提取成 `internal/domain/<domain>/` 下的领域服务，具体标准见 `01-architecture-target.md`（对应 A.2）。其余约 120+ 个纯单表读/简单写的 logic 文件，只做机械的路径迁移（`svcCtx.Domain.X.Y` 直调），不套领域服务模板。
+
+**理由**：给单表 CRUD logic 包一层领域服务是纯粹的过度工程——多一层没有任何业务规则可言的转发代码，除了增加认知负担和维护成本，不会带来任何测试性/可维护性收益。`00-refactor-overview.md`/`01-architecture-target.md` 的分层判断标准已经把这条量化成可执行的规则，不是凭感觉判断。
+
+## 2. 不做 HTTP handler 层的端到端测试套件
+
+**范围**：不为 goctl 生成的 `internal/handler/**` 写覆盖"发 HTTP 请求 → 断言 HTTP 响应"的端到端测试。
+
+**理由**：handler 是纯粹的解析请求→调 logic→序列化响应的胶水层，业务分支全部在 logic/domain 层，已经被 `08-testing-strategy.md` 的领域服务测试和 logic 层测试覆盖。handler 代码本身随 `.api` 文件重新生成就会整体重写，一套跟着生成代码变化的 E2E 测试维护成本高、价值低，测试失败大概率是生成代码变了要更新测试，而不是发现了真实 bug。
+
+## 3. 不做 WebSocket 聊天的并发/压力测试
+
+**范围**：不为 `internal/hub/chathub.go` 写模拟高并发连接、消息风暴的压力测试。
+
+**理由**：WebSocket 并发模型的真实风险主要在生产真实负载特征下才会暴露（连接数、消息频率、网络抖动），手写的并发模拟测试很难真实还原这些特征，投入产出比低。当前阶段真正的风险重灾区是无事务保护的多表写（`user_create_logic.go` 那一类），测试资源优先投在那里。Phase 2 chat 拆分成独立的 `chat-rpc` 之后，如果生产上真的出现并发问题，再针对性补测，比现在预先猜测场景更有效。
+
+## 4. CI 不设全局覆盖率百分比门槛
+
+**范围**：`.github/workflows/ci.yml` 的 `unit-test` job 检查"该测的测了、测试全部通过"，不检查"整体覆盖率是否达到 X%"。
+
+**理由**：覆盖率百分比是结果指标，会激励"测什么最容易拉高数字"而不是"测什么真的有风险"。最快拉高覆盖率的方式是给 goctl 生成的透传方法、简单 getter/setter 写测试——这正是 `08-testing-strategy.md` 明确排除的低价值目标。一旦设了门槛，反而会挤占本该花在领域服务事务回滚测试这类高价值场景上的时间。详细论证见 `08-testing-strategy.md` 第 6 节。
+
+## 5. 不上 Kubernetes
+
+**范围**：Phase 3 的生产部署方案用 docker-compose，不引入 K8s / 任何编排调度器。
+
+**理由**：独立维护者场景下 K8s 是过度工程——没有多机弹性伸缩、没有多团队协作的运维复杂度分摊需求，引入 K8s 只是白白增加学习成本和运维负担。docker-compose 足够覆盖"一台服务器、一个人按部署按钮"的实际场景，且当前的服务边界划分（每个服务独立 DSN/配置）已经给未来真要扩展到多机留了后路，不是不可逆的选择。
+
+## 6. 不做多 module monorepo
+
+**范围**：Phase 2 拆分成 6 个部署单元后，仍然是单一 Go module（`module postapocgame/admin-server` 不变），多个 `main` 包（`cmd/gateway/`、`services/<name>/`），不拆成多个独立 `go.mod`。
+
+**理由**：多 module monorepo 需要处理 `replace` 指令、`go.work`、跨 module 版本号管理，这些复杂度对独立维护者而言纯粹是负担，没有对应的收益（多 module 主要解决"不同子项目需要独立发版/独立版本兼容矩阵"的问题，本项目所有服务同源同步演进，不存在这个需求）。单 module 多 `main` 二进制是 Go 生态里对这类场景的标准做法。
+
+## 7. 不引入 etcd 服务发现
+
+**范围**：Phase 2 的 zrpc 服务间调用初期用静态 `Endpoints`（host:port 列表配置），不引入 etcd 做动态服务发现。
+
+**理由**：静态 target 列表足够覆盖"几个固定部署位置的服务"这个当前规模，引入 etcd 意味着多一个需要独立部署、监控、备份的有状态基础设施组件，运维复杂度和当前收益不成比例。这个决定可以后续无痛升级——zrpc client 从静态 target 切到 etcd 发现只是配置层面的改动，不需要现在就为"将来可能需要"预先引入。
+
+## 8. 不引入 Kafka/RabbitMQ
+
+**范围**：Phase 2 的跨服务异步一致性场景（B.4）全部用已有的 Redis Streams 承载，不引入独立的消息队列中间件。
+
+**理由**：`go-redis/v9` 已经在依赖里（零新增依赖），Redis Streams 的消费者组模型足够覆盖当前"尽力而为的副作用事件"这个使用场景（用户创建后异步初始化聊天数据、审计日志异步写入）。Kafka/RabbitMQ 是为更高吞吐、更严格的消息保序/持久化保证设计的，会带来独立部署单元和运维成本，本项目当前的事件量级不需要。
+
+## 9. 不做日志聚合系统（ELK/Loki）
+
+**范围**：Phase 3 的可观测性方案（C.1）只做到"每个服务往 stdout 打结构化 JSON 日志"，不引入集中式日志聚合/检索系统。
+
+**理由**：日志聚合系统本身是一套需要独立部署、存储、维护的基础设施（Elasticsearch/Loki + 采集端 + 展示端），对独立维护者是显著的额外运维负担。结构化 JSON 日志先落地是关键的前置工作——一旦日志本身是结构化的，以后要接入任何聚合系统都只是配置变更（加一个采集器指向 stdout），不需要回头重写日志埋点。当前用现有的 Supervisor/docker-compose 日志采集方式（`docker logs`/`docker compose logs`）配合 `trace_id` 字段已经能满足排查需求。
+
+## 10. Week 3 Day 5 扫尾发现的直连 Model 调用（新发现，不在本轮处理）
+
+**范围**：`blog_article_publish_logic.go`、`blog_article_unpublish_logic.go`、`blog_article_submit_logic.go` 三个文件都用 `l.svcCtx.Repository.BlogArticleModel.Update(l.ctx, article)` 直接绕过 Repository 层改文章状态字段（仅改 1-2 个字段，单表写，不满足"跨 ≥2 表写"门槛，不需要领域服务）。`06-domain-blog-video-sdk.md` 当时只审计到 `blog_article_audit_logic.go:82` 这一处同类问题并已随 `BlogArticleService` 顺带修掉，这三处是 Day 5 扫尾时才发现的同类遗留，按 `07-domain-monitoring-system-misc.md` 第 4.3 节的规则记录不改。
+
+**理由**：这三处都是单表单字段写，不满足领域服务门槛；Day 5 扫尾的任务边界是"纯路径替换，不改行为"，顺手把直连 Model 改成走 `blogrepo.NewBlogArticleRepository(...).Update(...)`（该方法已经在本轮为 `BlogArticleService` 新增）虽然是低风险小改动，但仍然是行为不变前提下的额外代码改动，按扫尾任务的既定边界不在本轮夹带处理，留给下次专门清理"直连 Model 技术债"的会话统一处理。
+
+## 完成的定义
+
+本篇是边界声明文档，不需要"完成"。使用方式：Phase 1-3 执行过程中，任何人（AI 或用户）如果考虑"要不要顺手把这个也做了"，先检查这里是否已经列了对应条目并给出了理由；如果理由在具体场景下不再成立，提出来跟用户确认，不要自行决定收回 descope。

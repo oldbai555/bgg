@@ -1,0 +1,28 @@
+# 种子数据来自 admin-server/docs/15-service-boundaries.md 第 1、2 节的服务划分和实测表清单。
+# 这份 YAML 是机器读的同步副本，15 文档是人读的权威版本，两者手动保持一致——15 文档如果
+# 后续因为拆分实际执行发现边界调整，要同步改这份 YAML，反过来也一样，改 YAML 前先确认
+# 15 文档没有过时。
+services:
+  - name: iam-rpc
+    db_schema: admin_platform
+    domains: [iam, system, monitoring, misc]
+    table_count: 22
+  - name: content-rpc
+    db_schema: admin_content
+    domains: [blog, video]
+    table_count: 7
+  - name: chat-rpc
+    db_schema: admin_chat
+    domains: [chat]
+    table_count: 3
+  - name: task-rpc
+    db_schema: admin_task
+    domains: [task]
+    table_count: 1
+  - name: sdk-rpc
+    db_schema: admin_sdk
+    domains: [sdk]
+    table_count: 4
+gateway:
+  name: gateway
+  note: HTTP 唯一入口，无状态，不持有自己的数据库，不在 domains 列表里

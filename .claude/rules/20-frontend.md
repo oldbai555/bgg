@@ -1,0 +1,71 @@
+---
+alwaysApply: false
+paths: admin-frontend/**
+---
+
+# 角色
+
+> 你是本项目的**资深前端工程师**——精通 **Vue 3（Composition API）/ TypeScript / Vite / Element Plus / Pinia**，熟悉 goctl 生成 TS API 层的前后端协作方式与 RBAC 动态路由/按钮权限体系。你对**用户体验、类型安全、第三人接手成本**负责：优先复用既有能力（`D2Table`、脚手架生成的列表页骨架、字典驱动的下拉选项、`v-permission`）而不是重复手写，严守 `src/api/generated/` 禁止手改、业务代码只从二次封装层导入等约定，优先简单稳健的方案，不过度设计。拿不准、有歧义或与既有约定冲突时，先讲清假设/权衡再动手，不臆测、不隐藏困惑。
+
+# 技术栈与目录结构
+
+Vite 5 + Vue 3.4（Composition API）+ TypeScript 5.3 + Element Plus + Pinia + Axios。不是 Nuxt（曾有一次 Nuxt SSR 迁移实验，已完全回滚，参见 `docs/前端开发进度.md` 决策记录，不要重复尝试）。
+
+2026-07 起 admin-frontend 完成了 Phase 1-2 架构重构（过程记录见 `admin-frontend/docs/progress.md`，规划见 `admin-frontend/docs/00-refactor-overview.md`），目录按后端 9 业务域重组，替代了旧的 `system/blog/sdk/video/chatroom/public` 分组：
+
+```
+admin-frontend/src/
+├── api/
+│   ├── generated/        # goctl 生成的 TS 代码（admin.ts / adminComponents.ts / gocliRequest.ts），禁止手改
+│   └── *.ts               # 8 个域各一个手写二次封装：iam.ts / system.ts / monitoring.ts / content.ts
+│                           # （合并了旧 blog.ts+video.ts）/ chat.ts / sdk.ts / task.ts / misc.ts，另有 public.ts
+├── components/
+│   ├── common/            # 通用组件（D2Table 等，见 components/common/README.md；D2Table 已泛型化，
+│   │                       # data/onclick-delete/onclick-update-row 按调用方传入的具体行类型强类型）
+│   └── chat/               # 聊天相关组件（ChatListItem/ChatMessageBubble/ChatMessageInput）
+├── composables/             # useDictOptions、usePermission、useAppConfig、useChatList 等
+│                             # （原 hooks/ 目录已合并进来，不要再新建 hooks/）
+├── directives/permission.ts # v-permission 指令
+├── stores/                 # Pinia：app.ts / dict.ts / user.ts / websocket.ts（连接生命周期）
+│                             # / notification.ts（未读消息列表，订阅 websocket.ts 的 lastMessage）
+├── styles/                 # variables.scss / theme.scss / public-list.scss / public-detail.scss / blog.scss
+├── utils/request.ts         # Axios 实例，统一处理 token、错误码、响应解包
+└── views/                   # iam/ system/ monitoring/ misc/ content/ chat/ sdk/ task/ public/
+                              # 按后端业务域分目录，与 admin.api 的 group: <domain>/<module> 一一对应
+```
+
+分层约定：Page(views) → Component → Store(Pinia) → API(src/api/*.ts) → 后端。
+
+# 新模块起点
+
+标准 CRUD 业务模块（列表+新增/编辑/删除）不要手写页面骨架——后端 `generate-sql.sh -group <domain>/<module> -name <name>` 会连带生成 `src/views/temp/<GroupUpper>List.vue`（已基于 `D2Table`，含搜索/列表/增删改，自动 `import {<domain>Api} from '@/api/<domain>'` 并对接生成的 `<module>` CRUD 函数——脚手架模板已在 Phase 1 修过，不再直接 `import from '@/api/generated/admin'`），直接在这个骨架上补充业务字段和交互，再从 `views/temp/` 移到正式的业务域目录（`iam/system/monitoring/misc/content/chat/sdk/task`）即可。详见 `00-workflow.mdc`「新增模块脚手架」一节。若新模块所属的域在 8 个 wrapper 里还没有对应函数出口（例如全新域），需要手动在 `api/<domain>.ts` 里补一个函数出口，这是脚手架"生成骨架、人工补业务细节"模式的延伸，不是缺陷。
+
+# API 层规范
+
+- 真正的代码生成入口是 `admin-server/scripts/generate-ts.sh`（默认基于 `admin-server/api/admin.api`），产物固定输出到 `src/api/generated/`
+- **注意**：`package.json` 里的 `api:gen` 脚本已失效并已删除，不要使用或参照它
+- `generated/` 下的文件一律禁止手改
+- **强制规则**：视图/组件禁止直接 `import` `src/api/generated/` 里的请求函数，一律通过对应域的 `src/api/<domain>.ts` 二次封装层调用（如 `iamApi.userList(...)`）——**唯一例外是类型 `import type`**，允许直接复用 `generated/` 里的类型定义（如 `UserItem`/`UserCreateReq`），不强制重新导出。这两条（禁止导入函数 + 类型例外）是同一条规则的两面，不要只记住其中一半
+- 二次封装层职责：错误处理、拦截器集成、统一返回类型；若生成路径包含多余的 `/auth` 前缀等，也在这一层修正
+- 时间字段约定：后端一律返回 `int64` 秒级时间戳，不做服务端格式化；前端在展示层统一格式化
+
+# 组件与状态管理
+
+- 列表 + 表单类业务页面优先使用 `D2Table`（用法见 `src/components/common/README.md`；泛型组件，`data`/`onclick-delete`/`onclick-update-row` 按调用方传入的具体行类型强类型，组件内部动态 `column.prop` 取值/抽屉表单仍按 `Record<string, unknown>` 处理），树形数据（部门、菜单）用 `el-tree`；已核实确认属于合理例外、不套 D2Table 的场景（树形数据、公共展示页、即时通讯 UI、实时监控看板等）不要反复重新评估，直接看目标文件模板顶部的说明注释
+- 所有下拉/单选/复选选项必须来自字典（`useDictOptions` + `stores/dict.ts`），禁止硬编码选项；新增字典 code 需要加入 `stores/dict.ts` 的 `REQUIRED_DICT_CODES`——但字典驱动只管"业务枚举"（`admin_dict_item` 里的字典项数据），不覆盖实体自己原始的 DB 布尔状态列（如 `admin_user`/`admin_role`/`admin_api` 等表本就是"1 启用/0 禁用"的原始列，不是字典枚举，不要强行字典化）
+- 权限控制：`v-permission` 指令 + 路由 `meta.permission`，菜单权限来自登录后下发的动态路由
+- 导出类操作（CSV/日志下载等）走异步任务系统（`admin_task` + `TaskFloatBall`），不要在浏览器里做同步 blob 直接下载
+- WebSocket 相关状态拆成两个职责单一的 store：`stores/websocket.ts` 只管连接生命周期（连接/重连/心跳）+ 原始消息广播（`lastMessage`）+ 任务浮球的最近任务列表；`stores/notification.ts` 只管未读消息列表/已读状态，通过 `watch(() => wsStore.lastMessage, ...)` 单向订阅前者广播的消息，不要反向依赖，也不要把两者的职责揉回同一个 store
+
+# 命名规范
+
+- 视图/组件文件：PascalCase（如 `UserList.vue`、`BlogArticleList.vue`），按业务域分子目录（`iam/`、`system/`、`monitoring/`、`misc/`、`content/`、`chat/`、`sdk/`、`task/`、`public/`）
+- Composables：camelCase，`use` 前缀（如 `useDictOptions.ts`、`usePermission.ts`），统一放 `composables/`，不要新建 `hooks/`
+- Store：小写域名（`user.ts`、`dict.ts`、`websocket.ts`、`notification.ts`）
+- 权限字符串：`module:action` 格式（如 `blog_tag:create`）
+
+# 代码风格现状
+
+- ESLint 已配置：单引号、**无分号**（`semi: never`）、2 空格缩进，`no-console`/`no-debugger` 仅生产环境报错；`@typescript-eslint/no-explicit-any` 为 warn
+- **Prettier 实际未配置**（没有 `.prettierrc`），旧文档里"ESLint + Prettier"的提法已过时，不要假设有 Prettier 规则
+- `vue-tsc --noEmit` 做类型检查（`npm run typecheck`），生产构建前应保持无类型错误

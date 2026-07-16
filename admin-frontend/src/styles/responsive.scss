@@ -1,0 +1,45 @@
+@use './variables.scss' as *;
+
+/**
+ * 响应式断点体系（Phase 3 Week 6，对应 docs/06-responsive-and-public-pages-redesign.md §5 step 1）
+ *
+ * 断点数值唯一来源是 variables.scss 的 $screen-sm/md/lg，本文件只是在此基础上
+ * 封装成语义化 mixin，业务代码里不要再写字面量 768px/1024px/1280px。
+ *
+ * 划分依据（与既有"移动端 ≤768px"硬编码约定保持数值不变，零视觉差异）：
+ *   - mobile ：  < $screen-sm（移动端）
+ *   - tablet ：  $screen-sm ~ $screen-md（平板）
+ *   - desktop：  > $screen-md（桌面/Web 端）
+ *   - wide   ：  >= $screen-lg（大屏桌面，用于需要更宽网格的场景）
+ */
+
+@mixin mobile {
+  @media (max-width: $screen-sm) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: ($screen-sm + 1)) and (max-width: $screen-md) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: ($screen-md + 1)) {
+    @content;
+  }
+}
+
+// 移动优先的补充写法：从平板起（含平板）应用，用于"桌面/平板共用一套，仅移动端例外"的场景
+@mixin tablet-up {
+  @media (min-width: ($screen-sm + 1)) {
+    @content;
+  }
+}
+
+@mixin wide {
+  @media (min-width: $screen-lg) {
+    @content;
+  }
+}

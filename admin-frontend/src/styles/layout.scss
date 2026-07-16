@@ -1,0 +1,55 @@
+@use './variables.scss' as *;
+
+/**
+ * 布局通用样式
+ */
+.app-layout {
+  // 整个布局高度锁定为视口高度，避免因为子元素高度导致出现全局滚动条
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  &__header {
+    height: $header-height;
+    background: var(--color-bg-primary, #ffffff);
+    border-bottom: 1px solid var(--color-border, #e4e7ed);
+    box-shadow: $shadow-sm;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 $spacing-lg;
+    transition: $transition-base;
+    z-index: 1000;
+  }
+
+  &__main {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    // 固定主区域高度为「视口高度 - 头部高度」，
+    // 这样当左侧菜单过长时，只在侧边栏内部滚动，不撑高整个页面
+    height: calc(100vh - $header-height);
+  }
+
+  &__sidebar {
+    width: $sidebar-width;
+    background: var(--color-bg-primary, #ffffff);
+    border-right: 1px solid var(--color-border, #e4e7ed);
+    transition: width $transition-base;
+    overflow: hidden;
+
+    &--collapsed {
+      width: $sidebar-collapsed-width;
+    }
+  }
+
+  &__content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--color-bg-secondary, #f5f7fa);
+  }
+}
+

@@ -1,0 +1,8 @@
+{
+  "host": "your-redis-host",
+  "port": "6379",
+  "password": "your-password",
+  "database": "3",
+  "timeout": 5,
+  "dialTimeout": 5
+}

@@ -1,0 +1,2592 @@
+syntax = "v1"
+
+info (
+	title:   "Admin System API"
+	desc:    "后台管理系统完整接口"
+	version: "1.0.0"
+)
+
+type (
+	// 通用
+	PingResp {
+		status    string `json:"status"` // 服务状态：ok/error
+		message   string `json:"message"` // 响应消息
+		database  string `json:"database"` // 数据库状态：ok/error
+		redis     string `json:"redis"` // Redis状态：ok/error
+		version   string `json:"version"` // 服务版本
+		startTime int64  `json:"startTime"` // 启动时间（秒级时间戳）
+		uptime    int64  `json:"uptime"` // 运行时长（秒）
+	}
+	// 通用响应（用于删除等操作）
+	Response {
+		code    int    `json:"code"`
+		message string `json:"message"`
+	}
+	// 系统监控
+	MonitorStatusResp {
+		cpu     CPUInfo     `json:"cpu"` // CPU信息
+		memory  MemoryInfo  `json:"memory"` // 内存信息
+		disk    DiskInfo    `json:"disk"` // 磁盘信息
+		network NetworkInfo `json:"network"` // 网络信息
+	}
+	CPUInfo {
+		usage float64 `json:"usage"` // CPU使用率（百分比）
+		cores int     `json:"cores"` // CPU核心数
+	}
+	MemoryInfo {
+		total     uint64  `json:"total"` // 总内存（字节）
+		used      uint64  `json:"used"` // 已用内存（字节）
+		available uint64  `json:"available"` // 可用内存（字节）
+		usage     float64 `json:"usage"` // 内存使用率（百分比）
+	}
+	DiskInfo {
+		total     uint64  `json:"total"` // 总磁盘空间（字节）
+		used      uint64  `json:"used"` // 已用磁盘空间（字节）
+		available uint64  `json:"available"` // 可用磁盘空间（字节）
+		usage     float64 `json:"usage"` // 磁盘使用率（百分比）
+	}
+	NetworkInfo {
+		bytesSent   uint64 `json:"bytesSent"` // 发送字节数
+		bytesRecv   uint64 `json:"bytesRecv"` // 接收字节数
+		packetsSent uint64 `json:"packetsSent"` // 发送包数
+		packetsRecv uint64 `json:"packetsRecv"` // 接收包数
+	}
+	MonitorStatsResp {
+		userCount         int64 `json:"userCount"` // 用户总数
+		roleCount         int64 `json:"roleCount"` // 角色总数
+		permissionCount   int64 `json:"permissionCount"` // 权限总数
+		menuCount         int64 `json:"menuCount"` // 菜单总数
+		onlineUserCount   int64 `json:"onlineUserCount"` // 在线用户数
+		operationLogCount int64 `json:"operationLogCount"` // 操作日志总数
+		loginLogCount     int64 `json:"loginLogCount"` // 登录日志总数
+	}
+	// 认证相关
+	LoginReq {
+		username string `json:"username"`
+		password string `json:"password"`
+	}
+	LoginFeishuReq {
+		code  string `json:"code"`
+		state string `json:"state,optional"`
+	}
+	TokenPair {
+		accessToken  string `json:"accessToken"`
+		refreshToken string `json:"refreshToken"`
+	}
+	RefreshReq {
+		refreshToken string `json:"refreshToken"`
+	}
+	LogoutReq {
+		accessToken  string `json:"accessToken"`
+		refreshToken string `json:"refreshToken"`
+	}
+	ProfileResp {
+		id          uint64   `json:"id"`
+		username    string   `json:"username"`
+		nickname    string   `json:"nickname,optional"`
+		avatar      string   `json:"avatar,optional"`
+		signature   string   `json:"signature,optional"`
+		permissions []string `json:"permissions,optional"`
+	}
+	ProfileUpdateReq {
+		nickname  string `json:"nickname,optional"`
+		avatar    string `json:"avatar,optional"`
+		signature string `json:"signature,optional"`
+	}
+	PasswordChangeReq {
+		oldPassword string `json:"oldPassword"`
+		newPassword string `json:"newPassword"`
+	}
+	// 用户管理
+	UserItem {
+		id           uint64   `json:"id"`
+		username     string   `json:"username"`
+		nickname     string   `json:"nickname,optional"`
+		avatar       string   `json:"avatar,optional"`
+		signature    string   `json:"signature,optional"`
+		departmentId uint64   `json:"departmentId"`
+		status       int64    `json:"status"`
+		createdAt    int64    `json:"createdAt"` // 创建时间(秒级时间戳)
+		roleNames    []string `json:"roleNames,optional"` // 角色名称列表（一次 JOIN 批量查询得出，供选人类场景直接展示，不需要再调 /users/roles 逐个查）
+	}
+	UserListReq {
+		page     int64  `json:"page,optional" form:"page,optional"`
+		pageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		username string `json:"username,optional" form:"username,optional"`
+	}
+	UserListResp {
+		total int64      `json:"total"`
+		list  []UserItem `json:"list"`
+	}
+	UserCreateReq {
+		username     string `json:"username"`
+		nickname     string `json:"nickname,optional"`
+		password     string `json:"password"`
+		avatar       string `json:"avatar,optional"`
+		signature    string `json:"signature,optional"`
+		departmentId uint64 `json:"departmentId"`
+		status       int64  `json:"status,optional"`
+	}
+	UserUpdateReq {
+		id           uint64 `json:"id"`
+		username     string `json:"username,optional"`
+		nickname     string `json:"nickname,optional"`
+		password     string `json:"password,optional"`
+		avatar       string `json:"avatar,optional"`
+		signature    string `json:"signature,optional"`
+		departmentId uint64 `json:"departmentId,optional"`
+		status       int64  `json:"status,optional"`
+	}
+	UserDeleteReq {
+		id uint64 `json:"id"`
+	}
+	// 角色管理
+	RoleItem {
+		id          uint64 `json:"id"`
+		name        string `json:"name"`
+		code        string `json:"code"`
+		description string `json:"description"`
+		status      int64  `json:"status"`
+	}
+	RoleListReq {
+		page     int64  `json:"page,optional" form:"page,optional"`
+		pageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		name     string `json:"name,optional" form:"name,optional"`
+	}
+	RoleListResp {
+		total int64      `json:"total"`
+		list  []RoleItem `json:"list"`
+	}
+	RoleCreateReq {
+		name        string `json:"name"`
+		code        string `json:"code"`
+		description string `json:"description,optional"`
+		status      int64  `json:"status,optional"`
+	}
+	RoleUpdateReq {
+		id          uint64 `json:"id"`
+		name        string `json:"name"`
+		description string `json:"description,optional"`
+		status      int64  `json:"status,optional"`
+	}
+	RoleDeleteReq {
+		id uint64 `json:"id"`
+	}
+	// 权限管理
+	PermissionItem {
+		id          uint64 `json:"id"`
+		name        string `json:"name"`
+		code        string `json:"code"`
+		description string `json:"description"`
+	}
+	PermissionListReq {
+		page     int64  `json:"page,optional" form:"page,optional"`
+		pageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		name     string `json:"name,optional" form:"name,optional"`
+	}
+	PermissionListResp {
+		total int64            `json:"total"`
+		list  []PermissionItem `json:"list"`
+	}
+	PermissionCreateReq {
+		name        string `json:"name"`
+		code        string `json:"code"`
+		description string `json:"description,optional"`
+	}
+	PermissionUpdateReq {
+		id          uint64 `json:"id"`
+		name        string `json:"name"`
+		description string `json:"description,optional"`
+	}
+	PermissionDeleteReq {
+		id uint64 `json:"id"`
+	}
+	// 部门管理
+	DepartmentItem {
+		id       uint64           `json:"id"`
+		parentId uint64           `json:"parentId"`
+		name     string           `json:"name"`
+		orderNum int64            `json:"orderNum"`
+		status   int64            `json:"status"`
+		children []DepartmentItem `json:"children,optional"`
+	}
+	DepartmentTreeResp {
+		list []DepartmentItem `json:"list"`
+	}
+	DepartmentCreateReq {
+		parentId uint64 `json:"parentId"`
+		name     string `json:"name"`
+		orderNum int64  `json:"orderNum,optional"`
+		status   int64  `json:"status,optional"`
+	}
+	DepartmentUpdateReq {
+		id       uint64 `json:"id"`
+		parentId uint64 `json:"parentId"`
+		name     string `json:"name"`
+		orderNum int64  `json:"orderNum,optional"`
+		status   int64  `json:"status,optional"`
+	}
+	DepartmentDeleteReq {
+		id uint64 `json:"id"`
+	}
+	// 菜单管理
+	MenuItem {
+		id             uint64     `json:"id"`
+		parentId       uint64     `json:"parentId"`
+		name           string     `json:"name"`
+		path           string     `json:"path"`
+		component      string     `json:"component"`
+		icon           string     `json:"icon"`
+		menuType       int64      `json:"type"` // 1 目录 2 菜单 3 按钮
+		orderNum       int64      `json:"orderNum"`
+		visible        int64      `json:"visible"`
+		status         int64      `json:"status"`
+		permissionCode string     `json:"permissionCode,optional"` // 权限编码（菜单绑定的第一个权限编码，用于前端路由权限控制）
+		children       []MenuItem `json:"children,optional"`
+	}
+	MenuTreeResp {
+		list []MenuItem `json:"list"`
+	}
+	MenuCreateReq {
+		parentId  uint64 `json:"parentId"`
+		name      string `json:"name"`
+		path      string `json:"path,optional"`
+		component string `json:"component,optional"`
+		icon      string `json:"icon,optional"`
+		menuType  int64  `json:"type"`
+		orderNum  int64  `json:"orderNum,optional"`
+		visible   int64  `json:"visible,optional"`
+		status    int64  `json:"status,optional"`
+	}
+	MenuUpdateReq {
+		id        uint64 `json:"id"`
+		parentId  uint64 `json:"parentId"`
+		name      string `json:"name"`
+		path      string `json:"path,optional"`
+		component string `json:"component,optional"`
+		icon      string `json:"icon,optional"`
+		menuType  int64  `json:"type"`
+		orderNum  int64  `json:"orderNum,optional"`
+		visible   int64  `json:"visible,optional"`
+		status    int64  `json:"status,optional"`
+	}
+	MenuDeleteReq {
+		id uint64 `json:"id"`
+	}
+	// API管理
+	ApiItem {
+		id          uint64 `json:"id"`
+		name        string `json:"name"`
+		method      string `json:"method"`
+		path        string `json:"path"`
+		description string `json:"description"`
+		status      int64  `json:"status"`
+		createdAt   int64  `json:"createdAt"` // 创建时间(秒级时间戳)
+	}
+	ApiListReq {
+		page     int64  `json:"page,optional" form:"page,optional"`
+		pageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		name     string `json:"name,optional" form:"name,optional"`
+	}
+	ApiListResp {
+		total int64     `json:"total"`
+		list  []ApiItem `json:"list"`
+	}
+	ApiCreateReq {
+		name        string `json:"name"`
+		method      string `json:"method"`
+		path        string `json:"path"`
+		description string `json:"description,optional"`
+		status      int64  `json:"status,optional"`
+	}
+	ApiUpdateReq {
+		id          uint64 `json:"id"`
+		name        string `json:"name,optional"`
+		method      string `json:"method,optional"`
+		path        string `json:"path,optional"`
+		description string `json:"description,optional"`
+		status      int64  `json:"status,optional"`
+	}
+	ApiDeleteReq {
+		id uint64 `json:"id"`
+	}
+	// 用户-角色关联
+	UserRoleListReq {
+		userId uint64 `json:"userId,optional" form:"userId,optional"`
+	}
+	UserRoleListResp {
+		roleIds []uint64 `json:"roleIds"`
+	}
+	UserRoleUpdateReq {
+		userId  uint64   `json:"userId"`
+		roleIds []uint64 `json:"roleIds"`
+	}
+	// 角色-权限关联
+	RolePermissionListReq {
+		roleId uint64 `json:"roleId,optional" form:"roleId,optional"`
+	}
+	RolePermissionListResp {
+		permissionIds []uint64 `json:"permissionIds"`
+	}
+	RolePermissionUpdateReq {
+		roleId        uint64   `json:"roleId"`
+		permissionIds []uint64 `json:"permissionIds"`
+	}
+	// 权限-菜单关联
+	PermissionMenuListReq {
+		permissionId uint64 `json:"permissionId,optional" form:"permissionId,optional"`
+	}
+	PermissionMenuListResp {
+		menuIds []uint64 `json:"menuIds"`
+	}
+	PermissionMenuUpdateReq {
+		permissionId uint64   `json:"permissionId"`
+		menuIds      []uint64 `json:"menuIds"`
+	}
+	// 权限-接口关联
+	PermissionApiListReq {
+		permissionId uint64 `json:"permissionId,optional" form:"permissionId,optional"`
+	}
+	PermissionApiListResp {
+		apiIds []uint64 `json:"apiIds"`
+	}
+	PermissionApiUpdateReq {
+		permissionId uint64   `json:"permissionId"`
+		apiIds       []uint64 `json:"apiIds"`
+	}
+	// 文件管理
+	FileItem {
+		id           uint64 `json:"id"`
+		name         string `json:"name"` // MD5 短链（文件名）
+		originalName string `json:"originalName"` // 原始文件名
+		path         string `json:"path"` // 文件访问路径（相对路径）
+		baseUrl      string `json:"baseUrl"` // 基础URL
+		status       int64  `json:"status"`
+		createdAt    int64  `json:"createdAt"` // 创建时间(秒级时间戳)
+	}
+	FileListReq {
+		page     int64  `json:"page,optional" form:"page,optional"`
+		pageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		name     string `json:"name,optional" form:"name,optional"`
+	}
+	FileListResp {
+		total int64      `json:"total"`
+		list  []FileItem `json:"list"`
+	}
+	FileCreateReq {
+		name   string `json:"name"`
+		status int64  `json:"status,optional"`
+	}
+	FileUpdateReq {
+		id     uint64 `json:"id"`
+		name   string `json:"name,optional"`
+		status int64  `json:"status,optional"`
+	}
+	FileDeleteReq {
+		id uint64 `json:"id"`
+	}
+	FileUploadResp {
+		id           uint64 `json:"id"`
+		name         string `json:"name"`
+		originalName string `json:"originalName"`
+		path         string `json:"path"` // 文件访问路径（相对路径，如 /uploads/xxx）
+		baseUrl      string `json:"baseUrl"` // 基础URL（如 http://localhost:8888）
+		url          string `json:"url"` // 完整URL（兼容字段，等于 baseUrl + path）
+		size         uint64 `json:"size"`
+		mimeType     string `json:"mimeType"`
+		ext          string `json:"ext"`
+	}
+	FileDownloadReq {
+		id uint64 `json:"id,optional" form:"id,optional"` // 文件ID（查询参数）
+	}
+	FileDownloadResp {
+		url string `json:"url"`
+	}
+	// 系统配置管理
+	ConfigItem {
+		id          uint64 `json:"id"`
+		group       string `json:"group"`
+		key         string `json:"key"`
+		value       string `json:"value"`
+		configType  string `json:"type"`
+		description string `json:"description"`
+		createdAt   int64  `json:"createdAt"` // 创建时间(秒级时间戳)
+	}
+	ConfigListReq {
+		page     int64  `json:"page,optional" form:"page,optional"`
+		pageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		group    string `json:"group,optional" form:"group,optional"`
+		key      string `json:"key,optional" form:"key,optional"`
+	}
+	ConfigListResp {
+		total int64        `json:"total"`
+		list  []ConfigItem `json:"list"`
+	}
+	ConfigCreateReq {
+		group       string `json:"group"`
+		key         string `json:"key"`
+		value       string `json:"value"`
+		configType  string `json:"type,optional"`
+		description string `json:"description,optional"`
+	}
+	ConfigUpdateReq {
+		id          uint64 `json:"id"`
+		value       string `json:"value,optional"`
+		description string `json:"description,optional"`
+	}
+	ConfigDeleteReq {
+		id uint64 `json:"id"`
+	}
+	ConfigGetReq {
+		key string `json:"key,optional" form:"key,optional"`
+	}
+	ConfigGetResp {
+		value string `json:"value"`
+	}
+	// 数据字典类型管理
+	DictTypeItem {
+		id          uint64 `json:"id"`
+		name        string `json:"name"`
+		code        string `json:"code"`
+		description string `json:"description"`
+		status      int64  `json:"status"`
+		createdAt   int64  `json:"createdAt"` // 创建时间(秒级时间戳)
+	}
+	DictTypeListReq {
+		page     int64  `json:"page,optional" form:"page,optional"`
+		pageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		name     string `json:"name,optional" form:"name,optional"`
+		code     string `json:"code,optional" form:"code,optional"`
+	}
+	DictTypeListResp {
+		total int64          `json:"total"`
+		list  []DictTypeItem `json:"list"`
+	}
+	DictTypeCreateReq {
+		name        string `json:"name"`
+		code        string `json:"code"`
+		description string `json:"description,optional"`
+		status      int64  `json:"status,optional"`
+	}
+	DictTypeUpdateReq {
+		id          uint64 `json:"id"`
+		name        string `json:"name,optional"`
+		description string `json:"description,optional"`
+		status      int64  `json:"status,optional"`
+	}
+	DictTypeDeleteReq {
+		id uint64 `json:"id"`
+	}
+	// 数据字典项管理
+	DictItemItem {
+		id        uint64 `json:"id"`
+		typeId    uint64 `json:"typeId"`
+		label     string `json:"label"`
+		value     string `json:"value"`
+		sort      int64  `json:"sort"`
+		status    int64  `json:"status"`
+		remark    string `json:"remark"`
+		createdAt int64  `json:"createdAt"` // 创建时间(秒级时间戳)
+	}
+	DictItemListReq {
+		page     int64  `json:"page,optional" form:"page,optional"`
+		pageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		typeId   uint64 `json:"typeId,optional" form:"typeId,optional"`
+		label    string `json:"label,optional" form:"label,optional"`
+	}
+	DictItemListResp {
+		total int64          `json:"total"`
+		list  []DictItemItem `json:"list"`
+	}
+	DictItemCreateReq {
+		typeId uint64 `json:"typeId"`
+		label  string `json:"label"`
+		value  string `json:"value"`
+		sort   int64  `json:"sort,optional"`
+		status int64  `json:"status,optional"`
+		remark string `json:"remark,optional"`
+	}
+	DictItemUpdateReq {
+		id     uint64 `json:"id"`
+		label  string `json:"label,optional"`
+		value  string `json:"value,optional"`
+		sort   int64  `json:"sort,optional"`
+		status int64  `json:"status,optional"`
+		remark string `json:"remark,optional"`
+	}
+	DictItemDeleteReq {
+		id uint64 `json:"id"`
+	}
+	// 字典查询接口（供前端使用）
+	DictGetReq {
+		code string `json:"code,optional" form:"code,optional"`
+	}
+	DictGetResp {
+		code  string         `json:"code"`
+		items []DictItemItem `json:"items"`
+	}
+	// 批量获取字典接口（登录后一次性获取所有需要的字典）
+	DictBatchGetReq {
+		codes []string `json:"codes"` // 需要获取的字典类型编码列表
+	}
+	DictBatchGetResp {
+		dicts map[string]DictGetResp `json:"dicts"` // key为字典类型编码，value为字典数据
+	}
+	// 操作日志项
+	OperationLogItem {
+		id              uint64 `json:"id"`
+		userId          uint64 `json:"userId"`
+		username        string `json:"username"`
+		operationType   string `json:"operationType"`
+		operationObject string `json:"operationObject"`
+		method          string `json:"method"`
+		path            string `json:"path"`
+		requestParams   string `json:"requestParams,optional"`
+		responseCode    int    `json:"responseCode"`
+		responseMsg     string `json:"responseMsg"`
+		ipAddress       string `json:"ipAddress"`
+		userAgent       string `json:"userAgent,optional"`
+		duration        int    `json:"duration"`
+		createdAt       int64  `json:"createdAt"` // 创建时间(秒级时间戳)
+	}
+	// 操作日志列表请求
+	OperationLogListReq {
+		page            int64  `json:"page,optional" form:"page,optional"`
+		pageSize        int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		userId          uint64 `json:"userId,optional" form:"userId,optional"`
+		username        string `json:"username,optional" form:"username,optional"`
+		operationType   string `json:"operationType,optional" form:"operationType,optional"`
+		operationObject string `json:"operationObject,optional" form:"operationObject,optional"`
+		method          string `json:"method,optional" form:"method,optional"`
+		startTime       string `json:"startTime,optional" form:"startTime,optional"`
+		endTime         string `json:"endTime,optional" form:"endTime,optional"`
+	}
+	// 操作日志列表响应
+	OperationLogListResp {
+		total int64              `json:"total"`
+		list  []OperationLogItem `json:"list"`
+	}
+	// 操作日志详情请求
+	OperationLogDetailReq {
+		// 必填，但作为 Query 参数必须标记 optional，必填校验在 Logic 做
+		id uint64 `json:"id,optional" form:"id,optional"`
+	}
+	// 操作日志详情响应
+	OperationLogDetailResp {
+		operationLog OperationLogItem `json:"operationLog"`
+	}
+	// 操作日志导出请求
+	OperationLogExportReq {
+		userId          uint64 `json:"userId,optional" form:"userId,optional"`
+		username        string `json:"username,optional" form:"username,optional"`
+		operationType   string `json:"operationType,optional" form:"operationType,optional"`
+		operationObject string `json:"operationObject,optional" form:"operationObject,optional"`
+		method          string `json:"method,optional" form:"method,optional"`
+		startTime       string `json:"startTime,optional" form:"startTime,optional"`
+		endTime         string `json:"endTime,optional" form:"endTime,optional"`
+	}
+	// 操作日志导出响应（实际在 Handler 中直接返回文件流，此类型仅用于 API 定义）
+	OperationLogExportResp {
+		url string `json:"url"`
+	}
+)
+
+@server (
+	group:      misc/ping
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware
+)
+service admin-api {
+	@handler Ping
+	get /ping returns (PingResp)
+}
+
+@server (
+	group:      monitoring/monitor
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler MonitorStatus
+	get /monitor/status returns (MonitorStatusResp)
+
+	@handler MonitorStats
+	get /monitor/stats returns (MonitorStatsResp)
+}
+
+@server (
+	group:      iam/auth
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware
+)
+service admin-api {
+	@handler Login
+	post /login (LoginReq) returns (TokenPair)
+
+	@handler LoginFeishu
+	post /login/feishu (LoginFeishuReq) returns (TokenPair)
+
+	@handler Refresh
+	post /refresh (RefreshReq) returns (TokenPair)
+}
+
+@server (
+	group:      iam/auth
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,ApiEnabledMiddleware
+)
+service admin-api {
+	@handler Logout
+	post /logout (LogoutReq)
+
+	@handler Profile
+	get /profile returns (ProfileResp)
+
+	@handler ProfileUpdate
+	put /profile (ProfileUpdateReq)
+
+	@handler PasswordChange
+	post /profile/password (PasswordChangeReq)
+}
+
+@server (
+	group:      iam/user
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler UserList
+	get /users (UserListReq) returns (UserListResp)
+
+	@handler UserCreate
+	post /users (UserCreateReq)
+
+	@handler UserUpdate
+	put /users (UserUpdateReq)
+
+	@handler UserDelete
+	delete /users (UserDeleteReq)
+}
+
+@server (
+	group:      iam/role
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler RoleList
+	get /roles (RoleListReq) returns (RoleListResp)
+
+	@handler RoleCreate
+	post /roles (RoleCreateReq)
+
+	@handler RoleUpdate
+	put /roles (RoleUpdateReq)
+
+	@handler RoleDelete
+	delete /roles (RoleDeleteReq)
+}
+
+@server (
+	group:      iam/permission
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler PermissionList
+	get /permissions (PermissionListReq) returns (PermissionListResp)
+
+	@handler PermissionCreate
+	post /permissions (PermissionCreateReq)
+
+	@handler PermissionUpdate
+	put /permissions (PermissionUpdateReq)
+
+	@handler PermissionDelete
+	delete /permissions (PermissionDeleteReq)
+}
+
+@server (
+	group:      iam/department
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler DepartmentTree
+	get /departments/tree returns (DepartmentTreeResp)
+
+	@handler DepartmentCreate
+	post /departments (DepartmentCreateReq)
+
+	@handler DepartmentUpdate
+	put /departments (DepartmentUpdateReq)
+
+	@handler DepartmentDelete
+	delete /departments (DepartmentDeleteReq)
+}
+
+@server (
+	group:      iam/menu
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler MenuTree
+	get /menus/tree returns (MenuTreeResp)
+
+	@handler MenuCreate
+	post /menus (MenuCreateReq)
+
+	@handler MenuUpdate
+	put /menus (MenuUpdateReq)
+
+	@handler MenuDelete
+	delete /menus (MenuDeleteReq)
+}
+
+@server (
+	group:      iam/menu
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,ApiEnabledMiddleware
+)
+service admin-api {
+	@handler MenuMyTree
+	get /menus/my-tree returns (MenuTreeResp)
+}
+
+@server (
+	group:      iam/api
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler ApiList
+	get /apis (ApiListReq) returns (ApiListResp)
+
+	@handler ApiCreate
+	post /apis (ApiCreateReq)
+
+	@handler ApiUpdate
+	put /apis (ApiUpdateReq)
+
+	@handler ApiDelete
+	delete /apis (ApiDeleteReq)
+}
+
+@server (
+	group:      iam/user_role
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler UserRoleList
+	get /users/roles (UserRoleListReq) returns (UserRoleListResp)
+
+	@handler UserRoleUpdate
+	put /users/roles (UserRoleUpdateReq)
+}
+
+@server (
+	group:      iam/role_permission
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler RolePermissionList
+	get /roles/permissions (RolePermissionListReq) returns (RolePermissionListResp)
+
+	@handler RolePermissionUpdate
+	put /roles/permissions (RolePermissionUpdateReq)
+}
+
+@server (
+	group:      iam/permission_menu
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler PermissionMenuList
+	get /permissions/menus (PermissionMenuListReq) returns (PermissionMenuListResp)
+
+	@handler PermissionMenuUpdate
+	put /permissions/menus (PermissionMenuUpdateReq)
+}
+
+@server (
+	group:      iam/permission_api
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler PermissionApiList
+	get /permissions/apis (PermissionApiListReq) returns (PermissionApiListResp)
+
+	@handler PermissionApiUpdate
+	put /permissions/apis (PermissionApiUpdateReq)
+}
+
+@server (
+	group:      system/file
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler FileList
+	get /files (FileListReq) returns (FileListResp)
+
+	@handler FileCreate
+	post /files (FileCreateReq)
+
+	@handler FileUpdate
+	put /files (FileUpdateReq)
+
+	@handler FileDelete
+	delete /files (FileDeleteReq)
+}
+
+@server (
+	group:      system/file
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,ApiEnabledMiddleware
+)
+service admin-api {
+	@handler FileUpload
+	post /files/upload returns (FileUploadResp)
+
+	@handler FileDownload
+	get /files/download (FileDownloadReq) returns (FileDownloadResp)
+}
+
+@server (
+	group:      system/config
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler ConfigList
+	get /configs (ConfigListReq) returns (ConfigListResp)
+
+	@handler ConfigGet
+	get /configs/get (ConfigGetReq) returns (ConfigGetResp)
+
+	@handler ConfigCreate
+	post /configs (ConfigCreateReq)
+
+	@handler ConfigUpdate
+	put /configs (ConfigUpdateReq)
+
+	@handler ConfigDelete
+	delete /configs (ConfigDeleteReq)
+}
+
+@server (
+	group:      system/dict_type
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler DictTypeList
+	get /dict-types (DictTypeListReq) returns (DictTypeListResp)
+
+	@handler DictTypeCreate
+	post /dict-types (DictTypeCreateReq)
+
+	@handler DictTypeUpdate
+	put /dict-types (DictTypeUpdateReq)
+
+	@handler DictTypeDelete
+	delete /dict-types (DictTypeDeleteReq)
+}
+
+@server (
+	group:      system/dict_item
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler DictItemList
+	get /dict-items (DictItemListReq) returns (DictItemListResp)
+
+	@handler DictItemCreate
+	post /dict-items (DictItemCreateReq)
+
+	@handler DictItemUpdate
+	put /dict-items (DictItemUpdateReq)
+
+	@handler DictItemDelete
+	delete /dict-items (DictItemDeleteReq)
+}
+
+@server (
+	group:      system/dict
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,AuthMiddleware,ApiEnabledMiddleware
+)
+service admin-api {
+	@handler DictGet
+	get /dict (DictGetReq) returns (DictGetResp)
+}
+
+// 公共只读字典接口（白名单 code，例如 video_proxy_url）
+@server (
+	group:      misc/public
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,CorsMiddleware,ApiEnabledMiddleware
+)
+service admin-api {
+	@handler PublicDictGet
+	get /public/dict (DictGetReq) returns (DictGetResp)
+}
+
+@server (
+	group:      system/dict
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,AuthMiddleware,ApiEnabledMiddleware
+)
+service admin-api {
+	@handler DictBatchGet
+	post /dict/batch (DictBatchGetReq) returns (DictBatchGetResp)
+}
+
+type (
+	CacheRefreshResp {
+		message string `json:"message"`
+	}
+	// 演示功能
+	DemoItem {
+		id        uint64 `json:"id"`
+		name      string `json:"name"`
+		status    int64  `json:"status"`
+		createdAt int64  `json:"createdAt"` // 创建时间(秒级时间戳)
+	}
+	DemoListReq {
+		// 注意：GET 请求的查询参数需要同时包含 json 和 form 标签
+		// json 标签用于请求体（POST/PUT/DELETE），form 标签用于查询参数（GET）
+		// 重要：form 标签中必须包含 optional，否则 httpx.Parse 无法正确解析查询参数
+		page     int64  `json:"page,optional" form:"page,optional"`
+		pageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		name     string `json:"name,optional" form:"name,optional"`
+	}
+	DemoListResp {
+		total int64      `json:"total"`
+		list  []DemoItem `json:"list"`
+	}
+	DemoCreateReq {
+		name   string `json:"name"`
+		status int64  `json:"status,optional"`
+	}
+	DemoUpdateReq {
+		id     uint64 `json:"id"`
+		name   string `json:"name,optional"`
+		status int64  `json:"status,optional"`
+	}
+	DemoDeleteReq {
+		id uint64 `json:"id"`
+	}
+	// 每日短句
+	DailyShortSentenceItem {
+		id               uint64 `json:"id"`
+		sentenceType     int64  `json:"type"` // 类型：1普通，2文学
+		content          string `json:"content"` // 短句内容
+		img              string `json:"img,optional"` // 图片URL
+		literatureAuthor string `json:"literatureAuthor,optional"` // 作者
+		convertImg       string `json:"convertImg,optional"` // 转换后的图片URL
+		createdAt        int64  `json:"createdAt"` // 创建时间(秒级时间戳)
+		updatedAt        int64  `json:"updatedAt"` // 更新时间(秒级时间戳)
+	}
+	DailyShortSentenceListReq {
+		page         int64  `json:"page,optional" form:"page,optional"`
+		pageSize     int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		keyword      string `json:"keyword,optional" form:"keyword,optional"` // 搜索关键词（内容、作者）
+		sentenceType int64  `json:"type,optional" form:"type,optional"` // 类型筛选
+	}
+	DailyShortSentenceListResp {
+		total int64                    `json:"total"`
+		list  []DailyShortSentenceItem `json:"list"`
+	}
+	DailyShortSentenceCreateReq {
+		sentenceType     int64  `json:"type,optional"` // 类型：1普通，2文学
+		content          string `json:"content"` // 短句内容
+		img              string `json:"img,optional"` // 图片URL
+		literatureAuthor string `json:"literatureAuthor,optional"` // 作者
+		convertImg       string `json:"convertImg,optional"` // 转换后的图片URL
+	}
+	DailyShortSentenceUpdateReq {
+		id               uint64 `json:"id"`
+		sentenceType     int64  `json:"type,optional"` // 类型：1普通，2文学
+		content          string `json:"content,optional"` // 短句内容
+		img              string `json:"img,optional"` // 图片URL
+		literatureAuthor string `json:"literatureAuthor,optional"` // 作者
+		convertImg       string `json:"convertImg,optional"` // 转换后的图片URL
+	}
+	DailyShortSentenceDeleteReq {
+		id uint64 `json:"id"`
+	}
+	// 视频管理
+	VideoItem {
+		id          uint64   `json:"id"`
+		uuid        string   `json:"uuid,optional"` // 唯一标识（采集视频使用）
+		name        string   `json:"name"` // 视频名称
+		cover       string   `json:"cover,optional"` // 视频封面URL
+		godNum      string   `json:"godNum,optional"` // 番号（采集视频使用）
+		duration    int64    `json:"duration"` // 视频时长（秒）
+		playUrl     string   `json:"playUrl"` // 播放链接
+		xlzzUrls    []string `json:"xlzzUrls,optional"` // 磁力链接数组（采集视频使用）
+		description string   `json:"description,optional"` // 视频描述
+		sourceType  int64    `json:"type"` // 来源类型：1=手动添加，2=采集
+		createdAt   int64    `json:"createdAt"` // 创建时间(秒级时间戳)
+		updatedAt   int64    `json:"updatedAt"` // 更新时间(秒级时间戳)
+	}
+	VideoListReq {
+		page       int64  `json:"page,optional" form:"page,optional"`
+		pageSize   int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		keyword    string `json:"keyword,optional" form:"keyword,optional"` // 搜索关键词（名称、描述）
+		sourceType int64  `json:"type,optional" form:"type,optional"` // 来源类型筛选（0=全部，1=手动添加，2=采集）
+	}
+	VideoListResp {
+		total int64       `json:"total"`
+		list  []VideoItem `json:"list"`
+	}
+	VideoCreateReq {
+		name        string   `json:"name"` // 视频名称
+		cover       string   `json:"cover,optional"` // 视频封面URL
+		godNum      string   `json:"godNum,optional"` // 番号（采集视频使用）
+		duration    int64    `json:"duration,optional"` // 视频时长（秒）
+		playUrl     string   `json:"playUrl"` // 播放链接
+		xlzzUrls    []string `json:"xlzzUrls,optional"` // 磁力链接数组（采集视频使用）
+		description string   `json:"description,optional"` // 视频描述
+		sourceType  int64    `json:"type,optional"` // 来源类型：1=手动添加，2=采集（默认1）
+	}
+	VideoUpdateReq {
+		id          uint64   `json:"id"`
+		name        string   `json:"name,optional"` // 视频名称
+		cover       string   `json:"cover,optional"` // 视频封面URL
+		godNum      string   `json:"godNum,optional"` // 番号（采集视频使用）
+		duration    int64    `json:"duration,optional"` // 视频时长（秒）
+		playUrl     string   `json:"playUrl,optional"` // 播放链接
+		xlzzUrls    []string `json:"xlzzUrls,optional"` // 磁力链接数组（采集视频使用）
+		description string   `json:"description,optional"` // 视频描述
+		sourceType  int64    `json:"type,optional"` // 来源类型：1=手动添加，2=采集
+	}
+	VideoDeleteReq {
+		id uint64 `json:"id"`
+	}
+	// 视频采集相关
+	VideoCollectReq {
+		uuid      string   `json:"uuid"` // 唯一标识
+		playerUrl string   `json:"playerUrl"` // 播放URL（m3u8地址）
+		name      string   `json:"name"` // 视频名称
+		godNum    string   `json:"godNum,optional"` // 番号
+		xlzzUrls  []string `json:"xlzzUrls,optional"` // 磁力链接数组
+	}
+	VideoCollectResp {
+		code int64     `json:"code"`
+		msg  string    `json:"msg"`
+		data VideoItem `json:"data,omitempty"`
+	}
+	// 公开视频列表请求
+	PublicVideoListReq {
+		page    int64  `json:"page,optional" form:"page,optional"` // 页码，默认1
+		size    int64  `json:"size,optional" form:"size,optional"` // 每页数量，默认10
+		content string `json:"content,optional" form:"content,optional"` // 搜索关键词
+	}
+	// 公开视频列表响应（与项目其他接口保持一致，直接返回数据）
+	PublicVideoListResp {
+		list  []PublicVideoItem `json:"list"`
+		page  int64             `json:"page"`
+		size  int64             `json:"size"`
+		total int64             `json:"total"`
+	}
+	// 公开视频项（列表页使用，字段较少）
+	PublicVideoItem {
+		id     uint64 `json:"id"`
+		uuid   string `json:"uuid"`
+		name   string `json:"name"`
+		godNum string `json:"godNum"`
+	}
+	// 公开视频详情请求
+	PublicVideoDetailReq {
+		id uint64 `json:"id,optional" form:"id,optional"` // 视频ID
+	}
+	// 公开视频详情响应（与项目其他接口保持一致，直接返回数据）
+	PublicVideoDetailResp {
+		id          uint64   `json:"id"`
+		uuid        string   `json:"uuid,optional"` // 唯一标识（采集视频使用）
+		name        string   `json:"name"` // 视频名称
+		cover       string   `json:"cover,optional"` // 视频封面URL
+		godNum      string   `json:"godNum,optional"` // 番号（采集视频使用）
+		duration    int64    `json:"duration"` // 视频时长（秒）
+		playUrl     string   `json:"playUrl"` // 播放链接
+		xlzzUrls    []string `json:"xlzzUrls,optional"` // 磁力链接数组（采集视频使用）
+		description string   `json:"description,optional"` // 视频描述
+		sourceType  int64    `json:"type"` // 来源类型：1=手动添加，2=采集
+		createdAt   int64    `json:"createdAt"` // 创建时间(秒级时间戳)
+		updatedAt   int64    `json:"updatedAt"` // 更新时间(秒级时间戳)
+	}
+	// m3u8代理请求
+	M3u8ProxyReq {
+		url string `json:"url,optional" form:"url,optional"` // 要代理的URL
+	}
+	// ================================
+	// 博客模块类型定义
+	// ================================
+	// 博客标签
+	BlogTagItem {
+		id        uint64 `json:"id"`
+		name      string `json:"name"`
+		status    int64  `json:"status"` // 字典：blog_tag_status
+		remark    string `json:"remark,optional"` // 备注
+		createdAt int64  `json:"createdAt"` // 创建时间(秒级时间戳)
+		updatedAt int64  `json:"updatedAt"` // 更新时间(秒级时间戳)
+	}
+	BlogTagListReq {
+		page     int64  `json:"page,optional" form:"page,optional"`
+		pageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		name     string `json:"name,optional" form:"name,optional"` // 标签名称模糊搜索
+		status   int64  `json:"status,optional" form:"status,optional"` // 状态筛选：0=全部，>0 对应字典值
+	}
+	BlogTagListResp {
+		total int64         `json:"total"`
+		list  []BlogTagItem `json:"list"`
+	}
+	BlogTagCreateReq {
+		name   string `json:"name"` // 标签名称
+		status int64  `json:"status,optional"` // 状态（字典：blog_tag_status）
+		remark string `json:"remark,optional"` // 备注
+	}
+	BlogTagUpdateReq {
+		id     uint64 `json:"id"`
+		name   string `json:"name,optional"`
+		status int64  `json:"status,optional"`
+		remark string `json:"remark,optional"`
+	}
+	BlogTagDeleteReq {
+		id uint64 `json:"id"`
+	}
+	// 标签下拉选项（仅返回启用标签）
+	BlogTagOptionItem {
+		id   uint64 `json:"id"`
+		name string `json:"name"`
+	}
+	BlogTagOptionsReq {
+		limit int64 `json:"limit,optional" form:"limit,optional"` // 限制数量，默认1000
+	}
+	BlogTagOptionsResp {
+		list []BlogTagOptionItem `json:"list"`
+	}
+	// 博客文章（后台列表项）
+	BlogArticleItem {
+		id          uint64   `json:"id"`
+		title       string   `json:"title"`
+		status      int64    `json:"status"` // 字典：blog_article_status
+		auditStatus int64    `json:"auditStatus"` // 字典：blog_article_audit_status
+		cover       string   `json:"cover,optional"`
+		authorId    uint64   `json:"authorId"`
+		authorName  string   `json:"authorName"`
+		tagIds      []uint64 `json:"tagIds,optional"` // 关联标签ID列表
+		tagNames    []string `json:"tagNames,optional"` // 关联标签名称列表
+		publishTime int64    `json:"publishTime"` // 上架时间(秒级时间戳)
+		isTop       int64    `json:"isTop"` // 是否置顶：0=否，1=是
+		createdAt   int64    `json:"createdAt"` // 创建时间(秒级时间戳)
+		updatedAt   int64    `json:"updatedAt"` // 更新时间(秒级时间戳)
+	}
+	BlogArticleListReq {
+		page        int64  `json:"page,optional" form:"page,optional"`
+		pageSize    int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		title       string `json:"title,optional" form:"title,optional"` // 标题关键字
+		status      int64  `json:"status,optional" form:"status,optional"` // 字典：blog_article_status，0=全部
+		auditStatus int64  `json:"auditStatus,optional" form:"auditStatus,optional"` // 字典：blog_article_audit_status，0=全部
+		tagId       uint64 `json:"tagId,optional" form:"tagId,optional"` // 标签筛选
+		startTime   int64  `json:"startTime,optional" form:"startTime,optional"` // 创建时间起
+		endTime     int64  `json:"endTime,optional" form:"endTime,optional"` // 创建时间止
+	}
+	BlogArticleListResp {
+		total int64             `json:"total"`
+		list  []BlogArticleItem `json:"list"`
+	}
+	// 博客文章详情（后台）
+	BlogArticleDetailReq {
+		id uint64 `json:"id,optional" form:"id,optional"` // 文章ID（必填，但 query 参数需标记为 optional）
+	}
+	BlogArticleDetailResp {
+		id          uint64        `json:"id"`
+		title       string        `json:"title"`
+		content     string        `json:"content"` // Markdown 原文
+		status      int64         `json:"status"`
+		auditStatus int64         `json:"auditStatus"`
+		cover       string        `json:"cover,optional"`
+		authorId    uint64        `json:"authorId"`
+		authorName  string        `json:"authorName"`
+		publishTime int64         `json:"publishTime"`
+		summary     string        `json:"summary,optional"`
+		tags        []BlogTagItem `json:"tags,optional"`
+		createdAt   int64         `json:"createdAt"`
+		updatedAt   int64         `json:"updatedAt"`
+	}
+	BlogArticleCreateReq {
+		title   string   `json:"title"` // 标题
+		content string   `json:"content"` // Markdown 内容
+		tagIds  []uint64 `json:"tagIds"` // 标签ID列表（至少1个）
+		cover   string   `json:"cover,optional"` // 封面URL
+		summary string   `json:"summary,optional"` // 摘要（可选）
+	}
+	BlogArticleUpdateReq {
+		id      uint64   `json:"id"`
+		title   string   `json:"title,optional"`
+		content string   `json:"content,optional"`
+		tagIds  []uint64 `json:"tagIds,optional"`
+		cover   string   `json:"cover,optional"`
+		summary string   `json:"summary,optional"`
+	}
+	BlogArticleDeleteReq {
+		id uint64 `json:"id"`
+	}
+	// 文章提交审核/上架/下架
+	BlogArticleSubmitReq {
+		id uint64 `json:"id"`
+	}
+	BlogArticlePublishReq {
+		id uint64 `json:"id"`
+	}
+	BlogArticleUnpublishReq {
+		id uint64 `json:"id"`
+	}
+	// 文章审核请求（通过/驳回）
+	BlogArticleAuditReq {
+		id     uint64 `json:"id"` // 文章ID
+		result int64  `json:"result"` // 审核结果：3=通过，4=驳回（字典：blog_article_audit_status）
+		remark string `json:"remark,optional"` // 审核意见
+	}
+	// 审核员执行下架请求
+	BlogArticleAuditUnpublishReq {
+		id     uint64 `json:"id"` // 文章ID
+		remark string `json:"remark,optional"` // 下架原因
+	}
+	// 公共文章列表/详情 VO
+	PublicBlogArticleItem {
+		id          uint64   `json:"id"`
+		title       string   `json:"title"`
+		cover       string   `json:"cover,optional"`
+		authorName  string   `json:"authorName"`
+		summary     string   `json:"summary"`
+		tagNames    []string `json:"tagNames,optional"`
+		publishTime int64    `json:"publishTime"`
+		isTop       int64    `json:"isTop"` // 是否置顶：0=否，1=是
+	}
+	PublicBlogArticleListReq {
+		page    int64  `json:"page,optional" form:"page,optional"` // 页码
+		size    int64  `json:"size,optional" form:"size,optional"` // 每页数量
+		tagId   uint64 `json:"tagId,optional" form:"tagId,optional"` // 标签筛选
+		keyword string `json:"keyword,optional" form:"keyword,optional"` // 标题/摘要搜索
+	}
+	PublicBlogArticleListResp {
+		list  []PublicBlogArticleItem `json:"list"`
+		page  int64                   `json:"page"`
+		size  int64                   `json:"size"`
+		total int64                   `json:"total"`
+	}
+	PublicBlogArticleDetailReq {
+		id uint64 `json:"id,optional" form:"id,optional"` // 文章ID
+	}
+	PublicBlogArticleDetailResp {
+		id          uint64        `json:"id"`
+		title       string        `json:"title"`
+		content     string        `json:"content"` // Markdown 原文
+		cover       string        `json:"cover,optional"`
+		authorName  string        `json:"authorName"`
+		publishTime int64         `json:"publishTime"`
+		tags        []BlogTagItem `json:"tags,optional"`
+	}
+	// 友情链接管理
+	BlogFriendLinkItem {
+		id        uint64 `json:"id"`
+		name      string `json:"name"`
+		url       string `json:"url"`
+		remark    string `json:"remark,optional"`
+		status    int64  `json:"status"`
+		orderNum  int64  `json:"orderNum"`
+		createdAt int64  `json:"createdAt"`
+		updatedAt int64  `json:"updatedAt"`
+	}
+	BlogFriendLinkListReq {
+		page    int64  `json:"page,optional" form:"page,optional"`
+		size    int64  `json:"size,optional" form:"size,optional"`
+		status  int64  `json:"status,optional" form:"status,optional"` // 状态筛选（0=全部，1=启用，2=禁用）
+		keyword string `json:"keyword,optional" form:"keyword,optional"` // 名称/备注搜索
+	}
+	BlogFriendLinkListResp {
+		list  []BlogFriendLinkItem `json:"list"`
+		page  int64                `json:"page"`
+		size  int64                `json:"size"`
+		total int64                `json:"total"`
+	}
+	BlogFriendLinkCreateReq {
+		name     string `json:"name"` // 链接名称
+		url      string `json:"url"` // 目标链接
+		remark   string `json:"remark,optional"` // 备注
+		status   int64  `json:"status"` // 状态：1=启用，2=禁用
+		orderNum int64  `json:"orderNum,optional"` // 排序值
+	}
+	BlogFriendLinkUpdateReq {
+		id       uint64 `json:"id"`
+		name     string `json:"name,optional"`
+		url      string `json:"url,optional"`
+		remark   string `json:"remark,optional"`
+		status   int64  `json:"status,optional"`
+		orderNum int64  `json:"orderNum,optional"`
+	}
+	BlogFriendLinkDeleteReq {
+		id uint64 `json:"id"`
+	}
+	// 社交信息管理
+	BlogSocialInfoItem {
+		id        uint64 `json:"id"`
+		name      string `json:"name"`
+		url       string `json:"url"`
+		remark    string `json:"remark,optional"`
+		status    int64  `json:"status"`
+		orderNum  int64  `json:"orderNum"`
+		createdAt int64  `json:"createdAt"`
+		updatedAt int64  `json:"updatedAt"`
+	}
+	BlogSocialInfoListReq {
+		page    int64  `json:"page,optional" form:"page,optional"`
+		size    int64  `json:"size,optional" form:"size,optional"`
+		status  int64  `json:"status,optional" form:"status,optional"` // 状态筛选（0=全部，1=启用，2=禁用）
+		keyword string `json:"keyword,optional" form:"keyword,optional"` // 名称/备注搜索
+	}
+	BlogSocialInfoListResp {
+		list  []BlogSocialInfoItem `json:"list"`
+		page  int64                `json:"page"`
+		size  int64                `json:"size"`
+		total int64                `json:"total"`
+	}
+	BlogSocialInfoCreateReq {
+		name     string `json:"name"` // 社交平台名称
+		url      string `json:"url"` // 目标链接
+		remark   string `json:"remark,optional"` // 备注
+		status   int64  `json:"status"` // 状态：1=启用，2=禁用
+		orderNum int64  `json:"orderNum,optional"` // 排序值
+	}
+	BlogSocialInfoUpdateReq {
+		id       uint64 `json:"id"`
+		name     string `json:"name,optional"`
+		url      string `json:"url,optional"`
+		remark   string `json:"remark,optional"`
+		status   int64  `json:"status,optional"`
+		orderNum int64  `json:"orderNum,optional"`
+	}
+	BlogSocialInfoDeleteReq {
+		id uint64 `json:"id"`
+	}
+	// 文章置顶
+	BlogArticleTopReq {
+		id uint64 `json:"id"` // 文章ID
+	}
+	BlogArticleUntopReq {
+		id uint64 `json:"id"` // 文章ID
+	}
+	// 公共接口返回类型
+	PublicBlogFriendLinkItem {
+		id       uint64 `json:"id"`
+		name     string `json:"name"`
+		url      string `json:"url"`
+		remark   string `json:"remark,optional"`
+		orderNum int64  `json:"orderNum"`
+	}
+	PublicBlogFriendLinkListResp {
+		list []PublicBlogFriendLinkItem `json:"list"`
+	}
+	PublicBlogSocialInfoItem {
+		id       uint64 `json:"id"`
+		name     string `json:"name"`
+		url      string `json:"url"`
+		remark   string `json:"remark,optional"`
+		orderNum int64  `json:"orderNum"`
+	}
+	PublicBlogSocialInfoListResp {
+		list []PublicBlogSocialInfoItem `json:"list"`
+	}
+	PublicBlogTagListResp {
+		list []BlogTagItem `json:"list"`
+	}
+	PublicBlogAuthorInfoResp {
+		id        uint64 `json:"id"` // 用户ID（固定为1）
+		nickname  string `json:"nickname"` // 昵称
+		avatar    string `json:"avatar"` // 头像URL
+		signature string `json:"signature"` // 个性签名
+	}
+	PublicBlogArticleStatsResp {
+		totalArticles int64 `json:"totalArticles"` // 文章总数（已发布）
+	}
+	PublicBlogArticlePrevReq {
+		id uint64 `json:"id,optional" form:"id,optional"` // 当前文章ID
+	}
+	PublicBlogArticlePrevResp {
+		id          uint64 `json:"id"` // 文章ID
+		title       string `json:"title"` // 标题
+		publishTime int64  `json:"publishTime"` // 发布时间
+	}
+	PublicBlogArticleNextReq {
+		id uint64 `json:"id,optional" form:"id,optional"` // 当前文章ID
+	}
+	PublicBlogArticleNextResp {
+		id          uint64 `json:"id"` // 文章ID
+		title       string `json:"title"` // 标题
+		publishTime int64  `json:"publishTime"` // 发布时间
+	}
+	// 通用打点上报
+	MetricReportReq {
+		module string `json:"module"` // 业务模块标识，如 blog_article_list/blog_article_detail/video_list/video_detail
+		bizId  uint64 `json:"bizId,optional"` // 业务ID（文章ID、视频ID等）
+		event  string `json:"event,optional"` // 事件类型，如 view/play 等
+		extra  string `json:"extra,optional"` // 额外信息（JSON字符串）
+	}
+	// 通用打点统计查询（管理后台使用）
+	MetricStatsReq {
+		module string `json:"module,optional" form:"module,optional"` // 业务模块标识，如 blog_article_list/blog_article_detail/video_list/video_detail
+		bizId  uint64 `json:"bizId,optional" form:"bizId,optional"` // 业务ID（文章ID、视频ID等）
+		day    string `json:"day,optional" form:"day,optional"` // 统计日期：YYYYMMDD（默认今天）
+	}
+	MetricStatsResp {
+		module string `json:"module"`
+		bizId  uint64 `json:"bizId"`
+		day    string `json:"day"`
+		pv     int64  `json:"pv"`
+		uv     int64  `json:"uv"`
+		vv     int64  `json:"vv"`
+		ip     int64  `json:"ip"`
+	}
+)
+
+@server (
+	group:      misc/demo
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler DemoList
+	get /demos (DemoListReq) returns (DemoListResp)
+
+	@handler DemoCreate
+	post /demos (DemoCreateReq)
+
+	@handler DemoUpdate
+	put /demos (DemoUpdateReq)
+
+	@handler DemoDelete
+	delete /demos (DemoDeleteReq)
+}
+
+@server (
+	group:      misc/daily_short_sentence
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler DailyShortSentenceList
+	get /daily-short-sentences (DailyShortSentenceListReq) returns (DailyShortSentenceListResp)
+
+	@handler DailyShortSentenceCreate
+	post /daily-short-sentences (DailyShortSentenceCreateReq)
+
+	@handler DailyShortSentenceUpdate
+	put /daily-short-sentences (DailyShortSentenceUpdateReq)
+
+	@handler DailyShortSentenceDelete
+	delete /daily-short-sentences (DailyShortSentenceDeleteReq)
+}
+
+@server (
+	group:      video/video
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler VideoList
+	get /videos (VideoListReq) returns (VideoListResp)
+
+	@handler VideoCreate
+	post /videos (VideoCreateReq)
+
+	@handler VideoUpdate
+	put /videos (VideoUpdateReq)
+
+	@handler VideoDelete
+	delete /videos (VideoDeleteReq)
+}
+
+// m3u8代理服务
+@server (
+	group:      video/m3u8
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,CorsMiddleware,ApiEnabledMiddleware,PublicOperationLogMiddleware
+)
+service admin-api {
+	@handler M3u8Proxy
+	get /m3u8/proxy (M3u8ProxyReq)
+}
+
+// 视频采集服务
+@server (
+	group:      video/video_collect
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,CorsMiddleware,ApiEnabledMiddleware,PublicOperationLogMiddleware
+)
+service admin-api {
+	@handler VideoCollect
+	post /videos/collect (VideoCollectReq) returns (VideoCollectResp)
+
+	// 支持OPTIONS请求（CORS预检）
+	@handler VideoCollectOptions
+	options /videos/collect
+}
+
+// 公开视频服务
+@server (
+	group:      video/public
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,CorsMiddleware,ApiEnabledMiddleware,PublicOperationLogMiddleware
+)
+service admin-api {
+	@handler PublicVideoList
+	get /public/videos/list (PublicVideoListReq) returns (PublicVideoListResp)
+
+	@handler PublicVideoDetail
+	get /public/videos/info (PublicVideoDetailReq) returns (PublicVideoDetailResp)
+}
+
+// 博客标签管理
+@server (
+	group:      blog/tag
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler BlogTagList
+	get /blog/tags (BlogTagListReq) returns (BlogTagListResp)
+
+	@handler BlogTagOptions
+	get /blog/tags/options (BlogTagOptionsReq) returns (BlogTagOptionsResp)
+
+	@handler BlogTagCreate
+	post /blog/tags (BlogTagCreateReq)
+
+	@handler BlogTagUpdate
+	put /blog/tags (BlogTagUpdateReq)
+
+	@handler BlogTagDelete
+	delete /blog/tags (BlogTagDeleteReq)
+}
+
+// 博客文章管理
+@server (
+	group:      blog/article
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler BlogArticleList
+	get /blog/articles (BlogArticleListReq) returns (BlogArticleListResp)
+
+	@handler BlogArticleDetail
+	get /blog/articles/detail (BlogArticleDetailReq) returns (BlogArticleDetailResp)
+
+	@handler BlogArticleCreate
+	post /blog/articles (BlogArticleCreateReq) returns (Response)
+
+	@handler BlogArticleUpdate
+	put /blog/articles (BlogArticleUpdateReq) returns (Response)
+
+	@handler BlogArticleDelete
+	delete /blog/articles (BlogArticleDeleteReq) returns (Response)
+
+	@handler BlogArticleSubmit
+	post /blog/articles/submit (BlogArticleSubmitReq) returns (Response)
+
+	@handler BlogArticlePublish
+	post /blog/articles/publish (BlogArticlePublishReq) returns (Response)
+
+	@handler BlogArticleUnpublish
+	post /blog/articles/unpublish (BlogArticleUnpublishReq) returns (Response)
+
+	@handler BlogArticleTop
+	post /blog/articles/top (BlogArticleTopReq) returns (Response)
+
+	@handler BlogArticleUntop
+	post /blog/articles/untop (BlogArticleUntopReq) returns (Response)
+}
+
+// 博客文章审核（审核员）
+@server (
+	group:      blog/article_audit
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler BlogArticleAudit
+	post /blog/articles/audit (BlogArticleAuditReq) returns (Response)
+
+	@handler BlogArticleAuditUnpublish
+	post /blog/articles/audit/unpublish (BlogArticleAuditUnpublishReq) returns (Response)
+}
+
+// 公共博客文章接口（未登录访问）
+@server (
+	group:      blog/public
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,CorsMiddleware,ApiEnabledMiddleware,PublicOperationLogMiddleware
+)
+service admin-api {
+	@handler PublicBlogArticleList
+	get /public/blog/articles (PublicBlogArticleListReq) returns (PublicBlogArticleListResp)
+
+	@handler PublicBlogArticleDetail
+	get /public/blog/articles/info (PublicBlogArticleDetailReq) returns (PublicBlogArticleDetailResp)
+
+	@handler PublicBlogFriendLinkList
+	get /public/blog/friend-links returns (PublicBlogFriendLinkListResp)
+
+	@handler PublicBlogSocialInfoList
+	get /public/blog/social-infos returns (PublicBlogSocialInfoListResp)
+
+	@handler PublicBlogTagList
+	get /public/blog/tags returns (PublicBlogTagListResp)
+
+	@handler PublicBlogAuthorInfo
+	get /public/blog/author-info returns (PublicBlogAuthorInfoResp)
+
+	@handler PublicBlogArticleStats
+	get /public/blog/article-stats returns (PublicBlogArticleStatsResp)
+
+	@handler PublicBlogArticlePrev
+	get /public/blog/articles/prev (PublicBlogArticlePrevReq) returns (PublicBlogArticlePrevResp)
+
+	@handler PublicBlogArticleNext
+	get /public/blog/articles/next (PublicBlogArticleNextReq) returns (PublicBlogArticleNextResp)
+}
+
+// 友情链接管理
+@server (
+	group:      blog/friend_link
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler BlogFriendLinkList
+	get /blog/friend-links (BlogFriendLinkListReq) returns (BlogFriendLinkListResp)
+
+	@handler BlogFriendLinkCreate
+	post /blog/friend-links (BlogFriendLinkCreateReq) returns (Response)
+
+	@handler BlogFriendLinkUpdate
+	put /blog/friend-links (BlogFriendLinkUpdateReq) returns (Response)
+
+	@handler BlogFriendLinkDelete
+	delete /blog/friend-links (BlogFriendLinkDeleteReq) returns (Response)
+}
+
+// 社交信息管理
+@server (
+	group:      blog/social_info
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler BlogSocialInfoList
+	get /blog/social-infos (BlogSocialInfoListReq) returns (BlogSocialInfoListResp)
+
+	@handler BlogSocialInfoCreate
+	post /blog/social-infos (BlogSocialInfoCreateReq) returns (Response)
+
+	@handler BlogSocialInfoUpdate
+	put /blog/social-infos (BlogSocialInfoUpdateReq) returns (Response)
+
+	@handler BlogSocialInfoDelete
+	delete /blog/social-infos (BlogSocialInfoDeleteReq) returns (Response)
+}
+
+// 通用打点上报接口（PV/UV/VV/IP，文章与视频共用）
+@server (
+	group:      monitoring/metric
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,CorsMiddleware,ApiEnabledMiddleware,PublicOperationLogMiddleware
+)
+service admin-api {
+	@handler MetricReport
+	post /metrics/report (MetricReportReq) returns (Response)
+
+	// 支持OPTIONS请求（CORS预检）
+	@handler MetricReportOptions
+	options /metrics/report
+}
+
+// 通用打点统计查询（管理后台）
+@server (
+	group:      monitoring/metric_admin
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler MetricStats
+	get /metrics/stats (MetricStatsReq) returns (MetricStatsResp)
+}
+
+type (
+	// 聊天消息
+	ChatMessageItem {
+		id           uint64 `json:"id"`
+		chatId       uint64 `json:"chatId"` // 聊天ID（关联chat表）
+		fromUserId   uint64 `json:"fromUserId"`
+		fromUserName string `json:"fromUserName"`
+		content      string `json:"content"`
+		messageType  int64  `json:"messageType"`
+		status       int64  `json:"status"`
+		createdAt    int64  `json:"createdAt"` // 创建时间(秒级时间戳)
+	}
+	// 消息列表请求
+	ChatMessageListReq {
+		page     int64  `json:"page,optional" form:"page,optional"`
+		pageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		chatId   uint64 `json:"chatId,optional" form:"chatId,optional"` // 聊天ID（关联chat表）
+	}
+	// 消息列表响应
+	ChatMessageListResp {
+		total int64             `json:"total"`
+		list  []ChatMessageItem `json:"list"`
+	}
+	// 发送消息请求
+	ChatMessageSendReq {
+		chatId      uint64 `json:"chatId"` // 聊天ID（关联chat表）
+		content     string `json:"content"` // 消息内容
+		messageType int64  `json:"messageType,optional"` // 消息类型：1文本，2图片，3文件
+	}
+	// 发送消息响应
+	ChatMessageSendResp {
+		id uint64 `json:"id"`
+	}
+	// 删除聊天消息请求
+	ChatMessageDeleteReq {
+		id uint64 `json:"id"`
+	}
+	// 聊天列表请求
+	ChatListReq  {}
+	// 聊天列表响应
+	ChatItem {
+		chatId         uint64   `json:"chatId"`
+		name           string   `json:"name"` // 聊天名称（群组名称，私聊显示对方昵称或用户名）
+		chatType       int64    `json:"type"` // 聊天类型：1私聊，2群组
+		avatar         string   `json:"avatar,optional"` // 头像URL
+		description    string   `json:"description,optional"` // 描述（群组描述）
+		userId         uint64   `json:"userId,optional"` // 私聊时的对方用户ID（群组为0）
+		username       string   `json:"username,optional"` // 私聊时的对方用户名
+		nickname       string   `json:"nickname,optional"` // 私聊时的对方昵称
+		departmentName string   `json:"departmentName,optional"` // 私聊时的对方部门名称
+		roleNames      []string `json:"roleNames,optional"` // 私聊时的对方角色名称列表
+		unreadCount    int64    `json:"unreadCount,optional"` // 未读消息数
+		lastMessage    string   `json:"lastMessage,optional"` // 最后一条消息内容
+		lastMessageAt  int64    `json:"lastMessageAt,optional"` // 最后一条消息时间(秒级时间戳)
+	}
+	ChatListResp {
+		list []ChatItem `json:"list"`
+	}
+	// 群组列表请求
+	ChatGroupListReq {
+		page     int64  `form:"page,optional"` // 页码
+		pageSize int64  `form:"pageSize,optional"` // 每页数量
+		name     string `form:"name,optional"` // 群组名称（模糊搜索）
+	}
+	// 群组列表项
+	ChatGroupItem {
+		id          uint64 `json:"id"` // 群组ID
+		name        string `json:"name"` // 群组名称
+		avatar      string `json:"avatar,optional"` // 群组头像
+		description string `json:"description,optional"` // 群组描述
+		createdBy   uint64 `json:"createdBy"` // 创建人ID
+		createdAt   int64  `json:"createdAt"` // 创建时间(秒级时间戳)
+		memberCount int64  `json:"memberCount"` // 成员数量
+	}
+	// 群组列表响应
+	ChatGroupListResp {
+		total int64           `json:"total"` // 总数
+		list  []ChatGroupItem `json:"list"` // 群组列表
+	}
+	// 群组创建请求
+	ChatGroupCreateReq {
+		name        string   `json:"name"` // 群组名称
+		avatar      string   `json:"avatar,optional"` // 群组头像
+		description string   `json:"description,optional"` // 群组描述
+		userIds     []uint64 `json:"userIds,optional"` // 初始成员用户ID列表（不包括创建人）
+	}
+	// 群组更新请求
+	ChatGroupUpdateReq {
+		id          uint64 `json:"id"` // 群组ID
+		name        string `json:"name,optional"` // 群组名称
+		avatar      string `json:"avatar,optional"` // 群组头像
+		description string `json:"description,optional"` // 群组描述
+	}
+	// 群组删除请求
+	ChatGroupDeleteReq {
+		id uint64 `json:"id"` // 群组ID
+	}
+	// 群组详情请求（使用 Query 参数，避免路径参数 :id）
+	ChatGroupDetailReq {
+		id uint64 `json:"id,optional" form:"id,optional"` // 群组ID（必填，但 Query 需标记 optional）
+	}
+	// 群组详情响应
+	ChatGroupDetailResp {
+		id          uint64                `json:"id"`
+		name        string                `json:"name"`
+		avatar      string                `json:"avatar,optional"`
+		description string                `json:"description,optional"`
+		createdBy   uint64                `json:"createdBy"`
+		createdAt   int64                 `json:"createdAt"`
+		memberCount int64                 `json:"memberCount"` // 成员数量
+		members     []ChatGroupMemberItem `json:"members,optional"` // 成员列表
+	}
+	// 群组成员项
+	ChatGroupMemberItem {
+		userId         uint64   `json:"userId"`
+		username       string   `json:"username"`
+		nickname       string   `json:"nickname,optional"`
+		avatar         string   `json:"avatar,optional"`
+		departmentName string   `json:"departmentName,optional"`
+		roleNames      []string `json:"roleNames,optional"`
+		joinedAt       int64    `json:"joinedAt"` // 加入时间
+	}
+	// 群组成员添加请求
+	ChatGroupMemberAddReq {
+		chatId  uint64   `json:"chatId"` // 群组ID
+		userIds []uint64 `json:"userIds"` // 要添加的用户ID列表
+	}
+	// 群组成员移除请求
+	ChatGroupMemberRemoveReq {
+		chatId uint64 `json:"chatId"` // 群组ID
+		userId uint64 `json:"userId"` // 要移除的用户ID
+	}
+	// 群组成员列表请求（使用 Query 参数，避免路径参数 :id）
+	ChatGroupMemberListReq {
+		id uint64 `json:"id,optional" form:"id,optional"` // 群组ID（必填，但 Query 需标记 optional）
+	}
+	// 群组成员列表响应
+	ChatGroupMemberListResp {
+		list []ChatGroupMemberItem `json:"list"`
+	}
+)
+
+@server (
+	group:      chat/chat
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,ApiEnabledMiddleware
+)
+service admin-api {
+	@handler ChatMessageSend
+	post /chats/messages (ChatMessageSendReq) returns (ChatMessageSendResp)
+
+	@handler ChatList
+	get /chats returns (ChatListResp)
+
+	@handler ChatMessageList
+	get /chats/messages/list (ChatMessageListReq) returns (ChatMessageListResp)
+}
+
+@server (
+	group:      chat/group
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler ChatGroupList
+	get /chats/groups (ChatGroupListReq) returns (ChatGroupListResp)
+
+	@handler ChatGroupCreate
+	post /chats/groups (ChatGroupCreateReq) returns (Response)
+
+	@handler ChatGroupUpdate
+	put /chats/groups (ChatGroupUpdateReq) returns (Response)
+
+	@handler ChatGroupDelete
+	delete /chats/groups (ChatGroupDeleteReq) returns (Response)
+
+	@handler ChatGroupDetail
+	get /chats/groups/detail (ChatGroupDetailReq) returns (ChatGroupDetailResp)
+
+	@handler ChatGroupMemberList
+	get /chats/groups/members (ChatGroupMemberListReq) returns (ChatGroupMemberListResp)
+
+	@handler ChatGroupMemberAdd
+	post /chats/groups/members (ChatGroupMemberAddReq) returns (Response)
+
+	@handler ChatGroupMemberRemove
+	delete /chats/groups/members (ChatGroupMemberRemoveReq) returns (Response)
+}
+
+@server (
+	group:      chat/message
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler ChatMessageListAdmin
+	get /chats/messages (ChatMessageListReq) returns (ChatMessageListResp)
+
+	@handler ChatMessageDelete
+	delete /chats/messages (ChatMessageDeleteReq) returns (Response)
+}
+
+@server (
+	group:      monitoring/operation_log
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler OperationLogList
+	get /operation-logs (OperationLogListReq) returns (OperationLogListResp)
+
+	@handler OperationLogDetail
+	get /operation-logs/detail (OperationLogDetailReq) returns (OperationLogDetailResp)
+
+	@handler OperationLogExport
+	get /operation-logs/export (OperationLogExportReq) returns (OperationLogExportResp)
+}
+
+// 登录日志相关类型定义
+type (
+	// 登录日志项
+	LoginLogItem {
+		id        uint64 `json:"id"`
+		userId    uint64 `json:"userId"`
+		username  string `json:"username"`
+		ipAddress string `json:"ipAddress"`
+		location  string `json:"location"`
+		browser   string `json:"browser"`
+		os        string `json:"os"`
+		userAgent string `json:"userAgent"`
+		status    int    `json:"status"` // 0失败 1成功
+		message   string `json:"message"`
+		loginAt   int64  `json:"loginAt"`
+		logoutAt  int64  `json:"logoutAt"`
+		createdAt int64  `json:"createdAt"`
+	}
+	// 登录日志列表请求
+	LoginLogListReq {
+		page      int    `json:"page,optional,default=1" form:"page,optional,default=1"`
+		pageSize  int    `json:"pageSize,optional,default=20" form:"pageSize,optional,default=20"`
+		userId    uint64 `json:"userId,optional" form:"userId,optional"`
+		username  string `json:"username,optional" form:"username,optional"`
+		status    int    `json:"status,optional" form:"status,optional"` // 0失败 1成功
+		startTime string `json:"startTime,optional" form:"startTime,optional"` // 格式：YYYY-MM-DD HH:mm:ss
+		endTime   string `json:"endTime,optional" form:"endTime,optional"` // 格式：YYYY-MM-DD HH:mm:ss
+	}
+	// 登录日志列表响应
+	LoginLogListResp {
+		list     []LoginLogItem `json:"list"`
+		total    int64          `json:"total"`
+		page     int            `json:"page"`
+		pageSize int            `json:"pageSize"`
+	}
+	// 登录日志详情请求
+	LoginLogDetailReq {
+		// 必填，但作为 Query 参数必须标记 optional，必填校验在 Logic 做
+		id uint64 `json:"id,optional" form:"id,optional"`
+	}
+	// 登录日志详情响应
+	LoginLogDetailResp {
+		LoginLogItem
+	}
+	// 登录日志导出请求
+	LoginLogExportReq {
+		userId    uint64 `json:"userId,optional" form:"userId,optional"`
+		username  string `json:"username,optional" form:"username,optional"`
+		status    int    `json:"status,optional" form:"status,optional"`
+		startTime string `json:"startTime,optional" form:"startTime,optional"`
+		endTime   string `json:"endTime,optional" form:"endTime,optional"`
+	}
+	// 登录日志导出响应（异步导出任务创建结果）
+	LoginLogExportResp {
+		code    int64  `json:"code"`
+		message string `json:"message"`
+	}
+	// 登录日志统计响应
+	LoginLogStatsResp {
+		totalCount      int64 `json:"totalCount"` // 总登录次数
+		successCount    int64 `json:"successCount"` // 成功次数
+		failureCount    int64 `json:"failureCount"` // 失败次数
+		todayCount      int64 `json:"todayCount"` // 今日登录次数
+		todaySuccess    int64 `json:"todaySuccess"` // 今日成功次数
+		todayFailure    int64 `json:"todayFailure"` // 今日失败次数
+		onlineUserCount int64 `json:"onlineUserCount"` // 当前在线用户数（需要从其他表查询）
+	}
+	// 性能监控日志
+	PerformanceLogItem {
+		id            uint64 `json:"id"`
+		userId        uint64 `json:"userId"`
+		username      string `json:"username"`
+		method        string `json:"method"`
+		path          string `json:"path"`
+		statusCode    int64  `json:"statusCode"`
+		duration      int64  `json:"duration"` // 耗时（毫秒）
+		isSlow        int64  `json:"isSlow"` // 是否慢接口：0 否，1 是
+		slowThreshold int64  `json:"slowThreshold"` // 慢接口阈值（毫秒）
+		ipAddress     string `json:"ipAddress"`
+		userAgent     string `json:"userAgent"`
+		errorMsg      string `json:"errorMsg"`
+		createdAt     int64  `json:"createdAt"`
+	}
+	PerformanceLogListReq {
+		page       int64  `json:"page,optional" form:"page,optional"`
+		pageSize   int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		method     string `json:"method,optional" form:"method,optional"`
+		path       string `json:"path,optional" form:"path,optional"`
+		isSlow     int64  `json:"isSlow,optional" form:"isSlow,optional"` // 0/1 过滤，其他值表示不过滤
+		statusCode int64  `json:"statusCode,optional" form:"statusCode,optional"` // 精确匹配状态码
+		startTime  string `json:"startTime,optional" form:"startTime,optional"` // 开始时间（yyyy-MM-dd HH:mm:ss）
+		endTime    string `json:"endTime,optional" form:"endTime,optional"` // 结束时间
+	}
+	PerformanceLogListResp {
+		total int64                `json:"total"`
+		list  []PerformanceLogItem `json:"list"`
+	}
+	// 性能日志导出
+	PerformanceLogExportReq {
+		method     string `json:"method,optional" form:"method,optional"`
+		path       string `json:"path,optional" form:"path,optional"`
+		isSlow     int64  `json:"isSlow,optional" form:"isSlow,optional"`
+		statusCode int64  `json:"statusCode,optional" form:"statusCode,optional"`
+		startTime  string `json:"startTime,optional" form:"startTime,optional"`
+		endTime    string `json:"endTime,optional" form:"endTime,optional"`
+	}
+	PerformanceLogExportResp {
+		code    int64  `json:"code"`
+		message string `json:"message"`
+	}
+)
+
+@server (
+	group:      monitoring/login_log
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler LoginLogList
+	get /login-logs (LoginLogListReq) returns (LoginLogListResp)
+
+	@handler LoginLogDetail
+	get /login-logs/detail (LoginLogDetailReq) returns (LoginLogDetailResp)
+
+	@handler LoginLogExport
+	get /login-logs/export (LoginLogExportReq) returns (LoginLogExportResp)
+
+	@handler LoginLogStats
+	get /login-logs/stats returns (LoginLogStatsResp)
+}
+
+// 审计日志相关类型定义
+type (
+	// 审计日志项
+	AuditLogItem {
+		id          uint64 `json:"id"`
+		userId      uint64 `json:"userId"`
+		username    string `json:"username"`
+		auditType   string `json:"auditType"` // 审计类型：permission_assign/role_change/config_modify/data_delete等
+		auditObject string `json:"auditObject"` // 审计对象（模块/表名，如user_role/role_permission/role/config）
+		auditDetail string `json:"auditDetail"` // 审计详情（JSON格式，记录变更前后的数据）
+		ipAddress   string `json:"ipAddress"`
+		userAgent   string `json:"userAgent"`
+		createdAt   int64  `json:"createdAt"`
+	}
+	// 审计日志列表请求
+	AuditLogListReq {
+		page        int    `json:"page,optional,default=1" form:"page,optional,default=1"`
+		pageSize    int    `json:"pageSize,optional,default=20" form:"pageSize,optional,default=20"`
+		userId      uint64 `json:"userId,optional" form:"userId,optional"`
+		username    string `json:"username,optional" form:"username,optional"`
+		auditType   string `json:"auditType,optional" form:"auditType,optional"` // 审计类型
+		auditObject string `json:"auditObject,optional" form:"auditObject,optional"` // 审计对象
+		startTime   string `json:"startTime,optional" form:"startTime,optional"` // 格式：YYYY-MM-DD HH:mm:ss
+		endTime     string `json:"endTime,optional" form:"endTime,optional"` // 格式：YYYY-MM-DD HH:mm:ss
+	}
+	// 审计日志列表响应
+	AuditLogListResp {
+		list     []AuditLogItem `json:"list"`
+		total    int64          `json:"total"`
+		page     int            `json:"page"`
+		pageSize int            `json:"pageSize"`
+	}
+	// 审计日志详情请求
+	AuditLogDetailReq {
+		// 必填，但作为 Query 参数必须标记 optional，必填校验在 Logic 做
+		id uint64 `json:"id,optional" form:"id,optional"`
+	}
+	// 审计日志详情响应
+	AuditLogDetailResp {
+		AuditLogItem
+	}
+	// 审计日志导出请求
+	AuditLogExportReq {
+		userId      uint64 `json:"userId,optional" form:"userId,optional"`
+		username    string `json:"username,optional" form:"username,optional"`
+		auditType   string `json:"auditType,optional" form:"auditType,optional"`
+		auditObject string `json:"auditObject,optional" form:"auditObject,optional"`
+		startTime   string `json:"startTime,optional" form:"startTime,optional"`
+		endTime     string `json:"endTime,optional" form:"endTime,optional"`
+	}
+	// 审计日志导出响应（异步导出任务创建结果）
+	AuditLogExportResp {
+		code    int64  `json:"code"`
+		message string `json:"message"`
+	}
+)
+
+@server (
+	group:      monitoring/audit_log
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler AuditLogList
+	get /audit-logs (AuditLogListReq) returns (AuditLogListResp)
+
+	@handler AuditLogDetail
+	get /audit-logs/detail (AuditLogDetailReq) returns (AuditLogDetailResp)
+
+	@handler AuditLogExport
+	get /audit-logs/export (AuditLogExportReq) returns (AuditLogExportResp)
+}
+
+@server (
+	group:      monitoring/performance_log
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler PerformanceLogList
+	get /performance-logs (PerformanceLogListReq) returns (PerformanceLogListResp)
+
+	@handler PerformanceLogExport
+	get /performance-logs/export (PerformanceLogExportReq) returns (PerformanceLogExportResp)
+}
+
+type (
+	// 公告管理
+	NoticeItem {
+		id          uint64 `json:"id"`
+		title       string `json:"title"`
+		content     string `json:"content"`
+		noticeType  int64  `json:"type"` // 公告类型：1 普通公告，2 重要公告，3 紧急公告
+		status      int64  `json:"status"` // 状态：1 草稿，2 已发布
+		publishTime int64  `json:"publishTime"` // 发布时间(秒级时间戳)
+		createdBy   uint64 `json:"createdBy"` // 创建人ID
+		createdAt   int64  `json:"createdAt"` // 创建时间(秒级时间戳)
+		updatedAt   int64  `json:"updatedAt"` // 更新时间(秒级时间戳)
+	}
+	NoticeListReq {
+		page       int64  `json:"page,optional" form:"page,optional"`
+		pageSize   int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		title      string `json:"title,optional" form:"title,optional"`
+		noticeType int64  `json:"type,optional" form:"type,optional"` // 0表示未传入，>0表示传入的类型
+		status     int64  `json:"status,optional" form:"status,optional"` // -1表示未传入，1表示草稿，2表示已发布
+	}
+	NoticeListResp {
+		total int64        `json:"total"`
+		list  []NoticeItem `json:"list"`
+	}
+	NoticeCreateReq {
+		title       string `json:"title"`
+		content     string `json:"content"`
+		noticeType  int64  `json:"type,optional"` // 公告类型：1 普通公告，2 重要公告，3 紧急公告
+		status      int64  `json:"status,optional"` // 状态：1 草稿，2 已发布
+		publishTime int64  `json:"publishTime,optional"` // 发布时间(秒级时间戳)，0表示立即发布
+	}
+	NoticeUpdateReq {
+		id          uint64 `json:"id"`
+		title       string `json:"title,optional"`
+		content     string `json:"content,optional"`
+		noticeType  int64  `json:"type,optional"`
+		status      int64  `json:"status,optional"`
+		publishTime int64  `json:"publishTime,optional"`
+	}
+	NoticeDeleteReq {
+		id uint64 `json:"id"`
+	}
+	// 消息通知管理
+	NotificationItem {
+		id         uint64 `json:"id"`
+		userId     uint64 `json:"userId"`
+		sourceType string `json:"sourceType"` // 消息来源类型（chat、notice、system等）
+		sourceId   uint64 `json:"sourceId"` // 来源ID（如公告ID、聊天消息ID等）
+		title      string `json:"title"`
+		content    string `json:"content"`
+		readStatus int64  `json:"readStatus"` // 已读状态（字典 read_status）：1 未读，2 已读
+		readAt     int64  `json:"readAt"` // 已读时间(秒级时间戳)
+		createdAt  int64  `json:"createdAt"` // 创建时间(秒级时间戳)
+		updatedAt  int64  `json:"updatedAt"` // 更新时间(秒级时间戳)
+	}
+	NotificationListReq {
+		page       int64  `json:"page,optional" form:"page,optional"`
+		pageSize   int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		sourceType string `json:"sourceType,optional" form:"sourceType,optional"`
+		readStatus int64  `json:"readStatus,optional" form:"readStatus,optional"`
+	}
+	NotificationListResp {
+		total int64              `json:"total"`
+		list  []NotificationItem `json:"list"`
+	}
+	NotificationDeleteReq {
+		id uint64 `json:"id"`
+	}
+	NotificationReadReq {
+		id uint64 `json:"id"`
+	}
+)
+
+@server (
+	group:      system/notice
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler NoticeList
+	get /notices (NoticeListReq) returns (NoticeListResp)
+
+	@handler NoticeCreate
+	post /notices (NoticeCreateReq) returns (Response)
+
+	@handler NoticeUpdate
+	put /notices (NoticeUpdateReq) returns (Response)
+
+	@handler NoticeDelete
+	delete /notices (NoticeDeleteReq) returns (Response)
+}
+
+@server (
+	group:      system/notification
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,AuthMiddleware,ApiEnabledMiddleware
+)
+service admin-api {
+	@handler NotificationList
+	get /notifications (NotificationListReq) returns (NotificationListResp)
+
+	@handler NotificationReadAll
+	put /notifications/read-all returns (Response)
+
+	@handler NotificationRead
+	put /notifications/read (NotificationReadReq) returns (Response)
+
+	@handler NotificationClearRead
+	delete /notifications/read returns (Response)
+
+	@handler NotificationDelete
+	delete /notifications (NotificationDeleteReq) returns (Response)
+}
+
+// ================================
+// SDK 管理（API Key / 接口 / 调用记录）
+// ================================
+type (
+	// API Key
+	SdkApiKeyItem {
+		id          uint64 `json:"id"`
+		name        string `json:"name"`
+		apiKey      string `json:"apiKey"`
+		apiSecret   string `json:"apiSecret"`
+		status      int64  `json:"status"`
+		expireAt    int64  `json:"expireAt"`
+		ipWhitelist string `json:"ipWhitelist"`
+		remark      string `json:"remark"`
+		createdAt   int64  `json:"createdAt"`
+	}
+	SdkApiKeyListReq {
+		page     int64  `json:"page,optional" form:"page,optional"`
+		pageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		name     string `json:"name,optional" form:"name,optional"`
+		status   int64  `json:"status,optional" form:"status,optional"`
+	}
+	SdkApiKeyListResp {
+		total int64           `json:"total"`
+		list  []SdkApiKeyItem `json:"list"`
+	}
+	SdkApiKeyCreateReq {
+		name        string `json:"name"`
+		status      int64  `json:"status,optional"`
+		expireAt    int64  `json:"expireAt,optional"`
+		ipWhitelist string `json:"ipWhitelist,optional"`
+		remark      string `json:"remark,optional"`
+	}
+	SdkApiKeyCreateResp {
+		id        uint64 `json:"id"`
+		apiKey    string `json:"apiKey"`
+		apiSecret string `json:"apiSecret"`
+	}
+	SdkApiKeyUpdateReq {
+		id          uint64 `json:"id"`
+		name        string `json:"name,optional"`
+		status      int64  `json:"status,optional"`
+		expireAt    int64  `json:"expireAt,optional"`
+		ipWhitelist string `json:"ipWhitelist,optional"`
+		remark      string `json:"remark,optional"`
+	}
+	SdkApiKeyDeleteReq {
+		id uint64 `json:"id"`
+	}
+	// 接口管理与授权
+	SdkInterfaceItem {
+		id               uint64 `json:"id"`
+		name             string `json:"name"`
+		apiCode          string `json:"apiCode"`
+		path             string `json:"path"`
+		method           string `json:"method"`
+		rateLimitDefault int64  `json:"rateLimitDefault"`
+		status           int64  `json:"status"`
+		remark           string `json:"remark"`
+		createdAt        int64  `json:"createdAt"`
+	}
+	SdkInterfaceListReq {
+		page     int64  `json:"page,optional" form:"page,optional"`
+		pageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		name     string `json:"name,optional" form:"name,optional"`
+		apiCode  string `json:"apiCode,optional" form:"apiCode,optional"`
+		status   int64  `json:"status,optional" form:"status,optional"`
+	}
+	SdkInterfaceListResp {
+		total int64              `json:"total"`
+		list  []SdkInterfaceItem `json:"list"`
+	}
+	// apiCode 由后端根据 path+method 自动生成（services/sdk 的 SdkInterfaceCreateLogic），前端不需要也不应该传
+	SdkInterfaceCreateReq {
+		name             string `json:"name"`
+		path             string `json:"path"`
+		method           string `json:"method"`
+		rateLimitDefault int64  `json:"rateLimitDefault,optional"`
+		status           int64  `json:"status,optional"`
+		remark           string `json:"remark,optional"`
+	}
+	SdkInterfaceUpdateReq {
+		id               uint64 `json:"id"`
+		name             string `json:"name,optional"`
+		apiCode          string `json:"apiCode,optional"`
+		path             string `json:"path,optional"`
+		method           string `json:"method,optional"`
+		rateLimitDefault int64  `json:"rateLimitDefault,optional"`
+		status           int64  `json:"status,optional"`
+		remark           string `json:"remark,optional"`
+	}
+	SdkInterfaceDeleteReq {
+		id uint64 `json:"id"`
+	}
+	SdkApiKeyBindListReq {
+		sdkKeyId uint64 `json:"sdkKeyId,optional" form:"sdkKeyId,optional"`
+	}
+	SdkApiKeyBindItem {
+		sdkInterfaceId  uint64 `json:"sdkInterfaceId"`
+		apiCode         string `json:"apiCode"`
+		name            string `json:"name"`
+		path            string `json:"path"`
+		method          string `json:"method"`
+		bound           int64  `json:"bound"`
+		rateLimit       int64  `json:"rateLimit"`
+		customRateLimit int64  `json:"customRateLimit"`
+	}
+	SdkApiKeyBindListResp {
+		list []SdkApiKeyBindItem `json:"list"`
+	}
+	SdkApiKeyBindSaveReq {
+		sdkKeyId uint64                  `json:"sdkKeyId"`
+		bindings []SdkApiKeyBindSaveItem `json:"bindings"`
+	}
+	SdkApiKeyBindSaveItem {
+		sdkInterfaceId  uint64 `json:"sdkInterfaceId"`
+		customRateLimit int64  `json:"customRateLimit,optional"`
+	}
+	// 调用记录
+	SdkCallLogItem {
+		id             uint64 `json:"id"`
+		sdkKeyId       uint64 `json:"sdkKeyId"`
+		sdkInterfaceId uint64 `json:"sdkInterfaceId"`
+		apiCode        string `json:"apiCode"`
+		path           string `json:"path"`
+		method         string `json:"method"`
+		ip             string `json:"ip"`
+		respCode       int64  `json:"respCode"`
+		durationMs     int64  `json:"durationMs"`
+		createdAt      int64  `json:"createdAt"`
+	}
+	SdkCallLogListReq {
+		page      int64  `json:"page,optional" form:"page,optional"`
+		pageSize  int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		sdkKeyId  uint64 `json:"sdkKeyId,optional" form:"sdkKeyId,optional"`
+		apiCode   string `json:"apiCode,optional" form:"apiCode,optional"`
+		respCode  int64  `json:"respCode,optional" form:"respCode,optional"`
+		ip        string `json:"ip,optional" form:"ip,optional"`
+		startTime int64  `json:"startTime,optional" form:"startTime,optional"`
+		endTime   int64  `json:"endTime,optional" form:"endTime,optional"`
+	}
+	SdkCallLogListResp {
+		total int64            `json:"total"`
+		list  []SdkCallLogItem `json:"list"`
+	}
+	SdkCallLogExportReq {
+		sdkKeyId  uint64 `json:"sdkKeyId,optional" form:"sdkKeyId,optional"`
+		apiCode   string `json:"apiCode,optional" form:"apiCode,optional"`
+		respCode  int64  `json:"respCode,optional" form:"respCode,optional"`
+		ip        string `json:"ip,optional" form:"ip,optional"`
+		startTime int64  `json:"startTime,optional" form:"startTime,optional"`
+		endTime   int64  `json:"endTime,optional" form:"endTime,optional"`
+	}
+	// SDK 文件上传（对外）
+	SdkFileUploadResp {
+		fileId uint64 `json:"fileId"`
+		url    string `json:"url"`
+		name   string `json:"name"`
+	}
+	// 异步任务模块
+	TaskItem {
+		id            uint64 `json:"id"`
+		name          string `json:"name"`
+		taskType      int64  `json:"type"` // 任务类型（字典：task_type）
+		executionType int64  `json:"executionType"` // 执行类型（字典：task_execution_type）
+		status        int64  `json:"status"` // 任务状态（字典：task_status）
+		userId        uint64 `json:"userId"` // 创建用户ID
+		scheduledAt   int64  `json:"scheduledAt"` // 计划执行时间
+		startedAt     int64  `json:"startedAt"` // 开始执行时间
+		finishedAt    int64  `json:"finishedAt"` // 完成时间
+		createdAt     int64  `json:"createdAt"` // 创建时间
+		params        string `json:"params"` // 任务参数JSON
+		result        string `json:"result"` // 任务结果JSON
+		errorMessage  string `json:"errorMessage"` // 错误信息
+	}
+	TaskListReq {
+		page          int64  `json:"page,optional" form:"page,optional"`
+		pageSize      int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		name          string `json:"name,optional" form:"name,optional"`
+		taskType      int64  `json:"type,optional" form:"type,optional"`
+		executionType int64  `json:"executionType,optional" form:"executionType,optional"`
+		status        int64  `json:"status,optional" form:"status,optional"`
+		userId        uint64 `json:"userId,optional" form:"userId,optional"`
+		startTime     int64  `json:"startTime,optional" form:"startTime,optional"`
+		endTime       int64  `json:"endTime,optional" form:"endTime,optional"`
+	}
+	TaskListResp {
+		total int64      `json:"total"`
+		list  []TaskItem `json:"list"`
+	}
+	TaskDetailReq {
+		// 必填，但作为 Query 参数必须标记 optional，必填校验在 Logic 做
+		id uint64 `json:"id,optional" form:"id,optional"`
+	}
+	TaskDetailResp {
+		id            uint64 `json:"id"`
+		name          string `json:"name"`
+		taskType      int64  `json:"type"`
+		executionType int64  `json:"executionType"`
+		status        int64  `json:"status"`
+		params        string `json:"params"` // 参数JSON
+		result        string `json:"result"` // 结果JSON
+		errorMessage  string `json:"errorMessage"` // 错误信息
+		userId        uint64 `json:"userId"`
+		scheduledAt   int64  `json:"scheduledAt"`
+		startedAt     int64  `json:"startedAt"`
+		finishedAt    int64  `json:"finishedAt"`
+		createdAt     int64  `json:"createdAt"`
+		updatedAt     int64  `json:"updatedAt"`
+	}
+	TaskCancelReq {
+		id uint64 `json:"id"`
+	}
+	TaskRecentReq {
+		limit int64 `json:"limit,optional" form:"limit,optional"` // 最近N条任务记录（不传则使用字典配置）
+	}
+	TaskRecentResp {
+		list []TaskItem `json:"list"`
+	}
+)
+
+@server (
+	group:      sdk/sdk
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	// API Key 管理
+	@handler SdkApiKeyList
+	get /sdk/key/list (SdkApiKeyListReq) returns (SdkApiKeyListResp)
+
+	@handler SdkApiKeyCreate
+	post /sdk/key/create (SdkApiKeyCreateReq) returns (SdkApiKeyCreateResp)
+
+	@handler SdkApiKeyUpdate
+	post /sdk/key/update (SdkApiKeyUpdateReq)
+
+	@handler SdkApiKeyDelete
+	post /sdk/key/delete (SdkApiKeyDeleteReq)
+
+	// 接口授权
+	@handler SdkApiKeyBindList
+	get /sdk/key/apis (SdkApiKeyBindListReq) returns (SdkApiKeyBindListResp)
+
+	@handler SdkApiKeyBindSave
+	post /sdk/key/apis/save (SdkApiKeyBindSaveReq)
+
+	// SDK 接口管理
+	@handler SdkInterfaceList
+	get /sdk/interface/list (SdkInterfaceListReq) returns (SdkInterfaceListResp)
+
+	@handler SdkInterfaceCreate
+	post /sdk/interface/create (SdkInterfaceCreateReq)
+
+	@handler SdkInterfaceUpdate
+	post /sdk/interface/update (SdkInterfaceUpdateReq)
+
+	@handler SdkInterfaceDelete
+	post /sdk/interface/delete (SdkInterfaceDeleteReq)
+
+	// 调用记录
+	@handler SdkCallLogList
+	get /sdk/call/log/list (SdkCallLogListReq) returns (SdkCallLogListResp)
+
+	@handler SdkCallLogExport
+	get /sdk/call/log/export (SdkCallLogExportReq)
+}
+
+@server (
+	group:      task/task
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	// 任务列表
+	@handler TaskList
+	get /tasks (TaskListReq) returns (TaskListResp)
+
+	// 任务详情
+	@handler TaskDetail
+	get /tasks/detail (TaskDetailReq) returns (TaskDetailResp)
+
+	// 取消任务
+	@handler TaskCancel
+	post /tasks/cancel (TaskCancelReq) returns (Response)
+}
+
+// 最近任务（给前端浮动球使用，登录即可访问）
+@server (
+	group:      task/public
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler TaskRecent
+	get /tasks/recent (TaskRecentReq) returns (TaskRecentResp)
+}
+
+// SDK 对外接口组（走 SDK 鉴权/限频/调用记录）
+@server (
+	group:      sdk/public
+	prefix:     /sdk
+	middleware: PerformanceMiddleware,SDKAuthMiddleware,SDKRateLimitMiddleware,SDKCallLogMiddleware
+)
+service admin-api {
+	@handler SdkFileUpload
+	post /file/upload returns (SdkFileUploadResp)
+}
+

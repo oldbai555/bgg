@@ -1,0 +1,12 @@
+{
+  "addr": "your-mysql-host",
+  "port": 3306,
+  "username": "root",
+  "password": "your-password",
+  "database": "postapoc_admin",
+  "maxOpen": 20,
+  "maxIdle": 10,
+  "connMaxLifetime": 300,
+  "connMaxIdleTime": 600,
+  "slowQueryThreshold": 1000
+}

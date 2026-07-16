@@ -1,0 +1,168 @@
+{
+  // admin-server 本地调试启动配置（Cursor/VSCode Go 扩展）。
+  //
+  // 前置条件：
+  // 1. 本机需要 MySQL + Redis 可用。最简单的办法是只起 admin-server 自带
+  //    docker-compose.yml 里的 mysql/redis 两个依赖服务（不需要 app 容器）：
+  //      cd admin-server && docker-compose up -d mysql redis
+  //    这样 MySQL 会监听 127.0.0.1:3306（root/devroot），Redis 监听 127.0.0.1:6379，
+  //    和下面各服务的 env 默认值完全对上。如果你本机已经有自己的 MySQL/Redis，把对应
+  //    env 里的连接串改成你自己的即可。
+  // 2. gateway 的 -redis-config 指向 etc/local-redis.json，这个文件是 gitignore 的
+  //    个人本地配置（不是仓库自带的 etc/dev-redis.json——那份 host 写的是 docker-compose
+  //    容器内的服务名 "redis"，在宿主机上跑 F5 调试解析不了）。首次用先复制一份：
+  //      cd admin-server && cp etc/local-redis.example.json etc/local-redis.json
+  // 3. 建库/建表：5 个 RPC 服务各自独立 schema（admin/admin_task/admin_sdk/admin_chat/
+  //    admin_content），docker-compose.yml 把 db/docker-init.sh（内部跑 init-dev-db.sh
+  //    建 admin 库）+ db/services/init-{task,sdk,chat,content}-db.sh 四个脚本都挂进了
+  //    MySQL 容器的 docker-entrypoint-initdb.d/。这类脚本只在 mysql_data 这个 volume是
+  //    全新、空的时候才会自动跑一次，所以第 1 步的 docker-compose up -d mysql redis
+  //    只要是"第一次拉起"（没有残留旧 volume）就会自动把全部 5 个库建完+灌好初始化数据，
+  //    不需要再手动执行任何 init 脚本。
+  //    如果之前起过又清过库、卡在半初始化状态，最简单的办法是清掉全部 volume 重来（会
+  //    丢弃 mysql_data + uploads 两个 volume 里的所有数据，仅限本地开发库操作）：
+  //      cd admin-server && docker-compose down -v && docker-compose up -d mysql redis
+  //    （这四个 init-*-db.sh 脚本本身用的是容器内绝对路径 /db/...，不支持在宿主机直接跑，
+  //    只能通过 docker-compose 的自动初始化机制执行，和新增业务模块用的 generate-sql.sh
+  //    脚手架是完全不同的两回事）。
+  // 4. JWT_ACCESS_SECRET / JWT_REFRESH_SECRET 下面给的是仅供本地调试的占位值，
+  //    不要沿用到生产环境。
+  //
+  // 用法：
+  // - 单独调试某个服务：在“运行和调试”面板选对应名称的配置直接 F5。
+  // - 起完整链路：选 compounds 里的 “All: gateway + 5 RPC services”，会按顺序拉起
+  //   iam-rpc/task-rpc/sdk-rpc/chat-rpc/content-rpc 五个 RPC 服务 + gateway 六个进程。
+  // - RPC 服务之间的 Endpoints 都配的是 127.0.0.1 + 固定端口（8081/8090/8091/8092/8093），
+  //   和各服务 etc/*.yaml 注释里写的“本机同进程调试”端口一致，不用改。
+  // - “admin-frontend: dev”是纯前端 vite dev server（不需要 MySQL/Redis 就能起，但
+  //   页面里请求后端接口需要上面的后端链路已经在跑），用 node-terminal 类型在集成终端里
+  //   跑 npm run dev，不是真正的 Node 调试会话（前端调试请用浏览器自带的 DevTools 或
+  //   VSCode 的 JS Debug 浏览器扩展）。默认端口 5173，base path 是 /admin/。
+  // - 想要前后端一起起：选 compounds 里的 “All: gateway + 5 RPC services + admin-frontend”。
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "gateway",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/admin-server",
+      "cwd": "${workspaceFolder}/admin-server",
+      "args": [
+        "-f", "etc/admin-api.yaml",
+        "-redis-config", "etc/local-redis.json",
+        "-middleware-config", "etc/middleware.yaml"
+      ],
+      "env": {
+        "JWT_ACCESS_SECRET": "dev-access-secret-change-me",
+        "JWT_REFRESH_SECRET": "dev-refresh-secret-change-me",
+        "IAM_RPC_ENDPOINT": "127.0.0.1:8081",
+        "IAM_CALLBACK_RPC_ENDPOINT": "127.0.0.1:8081",
+        "TASK_RPC_ENDPOINT": "127.0.0.1:8090",
+        "SDK_RPC_ENDPOINT": "127.0.0.1:8091",
+        "CHAT_RPC_ENDPOINT": "127.0.0.1:8092",
+        "CONTENT_RPC_ENDPOINT": "127.0.0.1:8093"
+      }
+    },
+    {
+      "name": "iam-rpc",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/admin-server/services/iam",
+      "cwd": "${workspaceFolder}/admin-server/services/iam",
+      "args": ["-f", "etc/iam.yaml"],
+      "env": {
+        "JWT_ACCESS_SECRET": "dev-access-secret-change-me",
+        "JWT_REFRESH_SECRET": "dev-refresh-secret-change-me",
+        "IAM_MYSQL_DSN": "root:devroot@tcp(127.0.0.1:3306)/admin?charset=utf8mb4&parseTime=true&loc=Local",
+        "IAM_REDIS_ADDRESS": "127.0.0.1:6379",
+        "IAM_REDIS_PASSWORD": "",
+        "SDK_RPC_ENDPOINT": "127.0.0.1:8091",
+        "CHAT_RPC_ENDPOINT": "127.0.0.1:8092"
+      }
+    },
+    {
+      "name": "task-rpc",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/admin-server/services/task",
+      "cwd": "${workspaceFolder}/admin-server/services/task",
+      "args": ["-f", "etc/task.yaml"],
+      "env": {
+        "TASK_MYSQL_DSN": "root:devroot@tcp(127.0.0.1:3306)/admin_task?charset=utf8mb4&parseTime=true&loc=Local",
+        "TASK_REDIS_ADDRESS": "127.0.0.1:6379",
+        "TASK_REDIS_PASSWORD": "",
+        "TASK_CALLBACK_ENDPOINT": "127.0.0.1:8081"
+      }
+    },
+    {
+      "name": "sdk-rpc",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/admin-server/services/sdk",
+      "cwd": "${workspaceFolder}/admin-server/services/sdk",
+      "args": ["-f", "etc/sdk.yaml"],
+      "env": {
+        "SDK_MYSQL_DSN": "root:devroot@tcp(127.0.0.1:3306)/admin_sdk?charset=utf8mb4&parseTime=true&loc=Local",
+        "SDK_REDIS_ADDRESS": "127.0.0.1:6379",
+        "SDK_REDIS_PASSWORD": ""
+      }
+    },
+    {
+      "name": "chat-rpc",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/admin-server/services/chat",
+      "cwd": "${workspaceFolder}/admin-server/services/chat",
+      "args": ["-f", "etc/chat.yaml"],
+      "env": {
+        "CHAT_MYSQL_DSN": "root:devroot@tcp(127.0.0.1:3306)/admin_chat?charset=utf8mb4&parseTime=true&loc=Local",
+        "CHAT_REDIS_ADDRESS": "127.0.0.1:6379",
+        "CHAT_REDIS_PASSWORD": "",
+        "IAM_CALLBACK_ENDPOINT": "127.0.0.1:8081"
+      }
+    },
+    {
+      "name": "content-rpc",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/admin-server/services/content",
+      "cwd": "${workspaceFolder}/admin-server/services/content",
+      "args": ["-f", "etc/content.yaml"],
+      "env": {
+        "CONTENT_MYSQL_DSN": "root:devroot@tcp(127.0.0.1:3306)/admin_content?charset=utf8mb4&parseTime=true&loc=Local",
+        "CONTENT_REDIS_ADDRESS": "127.0.0.1:6379",
+        "CONTENT_REDIS_PASSWORD": "",
+        "IAM_CALLBACK_ENDPOINT": "127.0.0.1:8081"
+      }
+    },
+    {
+      "name": "admin-frontend: dev",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev",
+      "cwd": "${workspaceFolder}/admin-frontend"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "All: gateway + 5 RPC services",
+      // iam-rpc 放最前面：task/chat/content 三个服务的 IamCallbackRpc/回调路径依赖它，
+      // gateway 放最后：它对 5 个 RPC client 都是 NonBlock，但放最后启动能保证真实联调时
+      // 首次请求就能拨通，不用等重试。
+      "configurations": ["iam-rpc", "task-rpc", "sdk-rpc", "chat-rpc", "content-rpc", "gateway"],
+      "stopAll": true
+    },
+    {
+      "name": "All: gateway + 5 RPC services + admin-frontend",
+      // 在上面纯后端 compound 的基础上追加前端 dev server，放最后启动（等后端端口就绪）。
+      "configurations": ["iam-rpc", "task-rpc", "sdk-rpc", "chat-rpc", "content-rpc", "gateway", "admin-frontend: dev"],
+      "stopAll": true
+    }
+  ]
+}

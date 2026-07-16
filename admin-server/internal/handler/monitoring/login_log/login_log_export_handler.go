@@ -1,0 +1,31 @@
+// Code scaffolded by goctl. Safe to edit.
+// goctl 1.10.1
+
+package login_log
+
+import (
+	"net/http"
+
+	"github.com/zeromicro/go-zero/rest/httpx"
+	"postapocgame/admin-server/internal/logic/monitoring/login_log"
+	"postapocgame/admin-server/internal/svc"
+	"postapocgame/admin-server/internal/types"
+)
+
+func LoginLogExportHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req types.LoginLogExportReq
+		if err := httpx.Parse(r, &req); err != nil {
+			httpx.ErrorCtx(r.Context(), w, err)
+			return
+		}
+
+		l := login_log.NewLoginLogExportLogic(r.Context(), svcCtx)
+		resp, err := l.LoginLogExport(&req)
+		if err != nil {
+			httpx.ErrorCtx(r.Context(), w, err)
+		} else {
+			httpx.OkJsonCtx(r.Context(), w, resp)
+		}
+	}
+}

@@ -1,0 +1,19 @@
+run:
+  timeout: 5m
+
+linters:
+  disable-all: true
+  enable:
+    - govet
+    - staticcheck
+    - errcheck
+    - ineffassign
+    - unused
+    - gosimple
+
+issues:
+  exclude-dirs-use-default: true
+
+linters-settings:
+  staticcheck:
+    checks: ["all", "-SA5008"]   # 与 admin-server/.staticcheck.conf 保持一致的例外
