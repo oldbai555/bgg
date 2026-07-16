@@ -1203,6 +1203,74 @@ func (x *RefreshRequest) GetRefreshToken() string {
 	return ""
 }
 
+type LoginFeishuRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`
+	State         string                 `protobuf:"bytes,2,opt,name=state,proto3" json:"state,omitempty"`
+	ClientIp      string                 `protobuf:"bytes,3,opt,name=client_ip,json=clientIp,proto3" json:"client_ip,omitempty"`
+	UserAgent     string                 `protobuf:"bytes,4,opt,name=user_agent,json=userAgent,proto3" json:"user_agent,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LoginFeishuRequest) Reset() {
+	*x = LoginFeishuRequest{}
+	mi := &file_rpc_iam_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LoginFeishuRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoginFeishuRequest) ProtoMessage() {}
+
+func (x *LoginFeishuRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LoginFeishuRequest.ProtoReflect.Descriptor instead.
+func (*LoginFeishuRequest) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *LoginFeishuRequest) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+func (x *LoginFeishuRequest) GetState() string {
+	if x != nil {
+		return x.State
+	}
+	return ""
+}
+
+func (x *LoginFeishuRequest) GetClientIp() string {
+	if x != nil {
+		return x.ClientIp
+	}
+	return ""
+}
+
+func (x *LoginFeishuRequest) GetUserAgent() string {
+	if x != nil {
+		return x.UserAgent
+	}
+	return ""
+}
+
 type LogoutRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	AccessToken   string                 `protobuf:"bytes,1,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
@@ -1213,7 +1281,7 @@ type LogoutRequest struct {
 
 func (x *LogoutRequest) Reset() {
 	*x = LogoutRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[18]
+	mi := &file_rpc_iam_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1225,7 +1293,7 @@ func (x *LogoutRequest) String() string {
 func (*LogoutRequest) ProtoMessage() {}
 
 func (x *LogoutRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[18]
+	mi := &file_rpc_iam_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1238,7 +1306,7 @@ func (x *LogoutRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LogoutRequest.ProtoReflect.Descriptor instead.
 func (*LogoutRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{18}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *LogoutRequest) GetAccessToken() string {
@@ -1264,7 +1332,7 @@ type ProfileRequest struct {
 
 func (x *ProfileRequest) Reset() {
 	*x = ProfileRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[19]
+	mi := &file_rpc_iam_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1276,7 +1344,7 @@ func (x *ProfileRequest) String() string {
 func (*ProfileRequest) ProtoMessage() {}
 
 func (x *ProfileRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[19]
+	mi := &file_rpc_iam_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1289,7 +1357,7 @@ func (x *ProfileRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ProfileRequest.ProtoReflect.Descriptor instead.
 func (*ProfileRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{19}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *ProfileRequest) GetUserId() uint64 {
@@ -1313,7 +1381,7 @@ type ProfileResponse struct {
 
 func (x *ProfileResponse) Reset() {
 	*x = ProfileResponse{}
-	mi := &file_rpc_iam_proto_msgTypes[20]
+	mi := &file_rpc_iam_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1325,7 +1393,7 @@ func (x *ProfileResponse) String() string {
 func (*ProfileResponse) ProtoMessage() {}
 
 func (x *ProfileResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[20]
+	mi := &file_rpc_iam_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1338,7 +1406,7 @@ func (x *ProfileResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ProfileResponse.ProtoReflect.Descriptor instead.
 func (*ProfileResponse) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{20}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *ProfileResponse) GetId() uint64 {
@@ -1395,7 +1463,7 @@ type ProfileUpdateRequest struct {
 
 func (x *ProfileUpdateRequest) Reset() {
 	*x = ProfileUpdateRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[21]
+	mi := &file_rpc_iam_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1407,7 +1475,7 @@ func (x *ProfileUpdateRequest) String() string {
 func (*ProfileUpdateRequest) ProtoMessage() {}
 
 func (x *ProfileUpdateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[21]
+	mi := &file_rpc_iam_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1420,7 +1488,7 @@ func (x *ProfileUpdateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ProfileUpdateRequest.ProtoReflect.Descriptor instead.
 func (*ProfileUpdateRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{21}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *ProfileUpdateRequest) GetUserId() uint64 {
@@ -1462,7 +1530,7 @@ type PasswordChangeRequest struct {
 
 func (x *PasswordChangeRequest) Reset() {
 	*x = PasswordChangeRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[22]
+	mi := &file_rpc_iam_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1474,7 +1542,7 @@ func (x *PasswordChangeRequest) String() string {
 func (*PasswordChangeRequest) ProtoMessage() {}
 
 func (x *PasswordChangeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[22]
+	mi := &file_rpc_iam_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1487,7 +1555,7 @@ func (x *PasswordChangeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PasswordChangeRequest.ProtoReflect.Descriptor instead.
 func (*PasswordChangeRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{22}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *PasswordChangeRequest) GetUserId() uint64 {
@@ -1528,7 +1596,7 @@ type UserItem struct {
 
 func (x *UserItem) Reset() {
 	*x = UserItem{}
-	mi := &file_rpc_iam_proto_msgTypes[23]
+	mi := &file_rpc_iam_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1540,7 +1608,7 @@ func (x *UserItem) String() string {
 func (*UserItem) ProtoMessage() {}
 
 func (x *UserItem) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[23]
+	mi := &file_rpc_iam_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1553,7 +1621,7 @@ func (x *UserItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserItem.ProtoReflect.Descriptor instead.
 func (*UserItem) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{23}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *UserItem) GetId() uint64 {
@@ -1634,7 +1702,7 @@ type UserCreateRequest struct {
 
 func (x *UserCreateRequest) Reset() {
 	*x = UserCreateRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[24]
+	mi := &file_rpc_iam_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1646,7 +1714,7 @@ func (x *UserCreateRequest) String() string {
 func (*UserCreateRequest) ProtoMessage() {}
 
 func (x *UserCreateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[24]
+	mi := &file_rpc_iam_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1659,7 +1727,7 @@ func (x *UserCreateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserCreateRequest.ProtoReflect.Descriptor instead.
 func (*UserCreateRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{24}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *UserCreateRequest) GetUsername() string {
@@ -1727,7 +1795,7 @@ type UserUpdateRequest struct {
 
 func (x *UserUpdateRequest) Reset() {
 	*x = UserUpdateRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[25]
+	mi := &file_rpc_iam_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1739,7 +1807,7 @@ func (x *UserUpdateRequest) String() string {
 func (*UserUpdateRequest) ProtoMessage() {}
 
 func (x *UserUpdateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[25]
+	mi := &file_rpc_iam_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1752,7 +1820,7 @@ func (x *UserUpdateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserUpdateRequest.ProtoReflect.Descriptor instead.
 func (*UserUpdateRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{25}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *UserUpdateRequest) GetId() uint64 {
@@ -1820,7 +1888,7 @@ type UserDeleteRequest struct {
 
 func (x *UserDeleteRequest) Reset() {
 	*x = UserDeleteRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[26]
+	mi := &file_rpc_iam_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1832,7 +1900,7 @@ func (x *UserDeleteRequest) String() string {
 func (*UserDeleteRequest) ProtoMessage() {}
 
 func (x *UserDeleteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[26]
+	mi := &file_rpc_iam_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1845,7 +1913,7 @@ func (x *UserDeleteRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserDeleteRequest.ProtoReflect.Descriptor instead.
 func (*UserDeleteRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{26}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *UserDeleteRequest) GetId() uint64 {
@@ -1866,7 +1934,7 @@ type UserListRequest struct {
 
 func (x *UserListRequest) Reset() {
 	*x = UserListRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[27]
+	mi := &file_rpc_iam_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1878,7 +1946,7 @@ func (x *UserListRequest) String() string {
 func (*UserListRequest) ProtoMessage() {}
 
 func (x *UserListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[27]
+	mi := &file_rpc_iam_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1891,7 +1959,7 @@ func (x *UserListRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserListRequest.ProtoReflect.Descriptor instead.
 func (*UserListRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{27}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *UserListRequest) GetPage() int64 {
@@ -1925,7 +1993,7 @@ type UserListResponse struct {
 
 func (x *UserListResponse) Reset() {
 	*x = UserListResponse{}
-	mi := &file_rpc_iam_proto_msgTypes[28]
+	mi := &file_rpc_iam_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1937,7 +2005,7 @@ func (x *UserListResponse) String() string {
 func (*UserListResponse) ProtoMessage() {}
 
 func (x *UserListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[28]
+	mi := &file_rpc_iam_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1950,7 +2018,7 @@ func (x *UserListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserListResponse.ProtoReflect.Descriptor instead.
 func (*UserListResponse) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{28}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *UserListResponse) GetTotal() int64 {
@@ -1980,7 +2048,7 @@ type RoleItem struct {
 
 func (x *RoleItem) Reset() {
 	*x = RoleItem{}
-	mi := &file_rpc_iam_proto_msgTypes[29]
+	mi := &file_rpc_iam_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1992,7 +2060,7 @@ func (x *RoleItem) String() string {
 func (*RoleItem) ProtoMessage() {}
 
 func (x *RoleItem) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[29]
+	mi := &file_rpc_iam_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2005,7 +2073,7 @@ func (x *RoleItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RoleItem.ProtoReflect.Descriptor instead.
 func (*RoleItem) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{29}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *RoleItem) GetId() uint64 {
@@ -2055,7 +2123,7 @@ type RoleCreateRequest struct {
 
 func (x *RoleCreateRequest) Reset() {
 	*x = RoleCreateRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[30]
+	mi := &file_rpc_iam_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2067,7 +2135,7 @@ func (x *RoleCreateRequest) String() string {
 func (*RoleCreateRequest) ProtoMessage() {}
 
 func (x *RoleCreateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[30]
+	mi := &file_rpc_iam_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2080,7 +2148,7 @@ func (x *RoleCreateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RoleCreateRequest.ProtoReflect.Descriptor instead.
 func (*RoleCreateRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{30}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *RoleCreateRequest) GetName() string {
@@ -2123,7 +2191,7 @@ type RoleUpdateRequest struct {
 
 func (x *RoleUpdateRequest) Reset() {
 	*x = RoleUpdateRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[31]
+	mi := &file_rpc_iam_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2135,7 +2203,7 @@ func (x *RoleUpdateRequest) String() string {
 func (*RoleUpdateRequest) ProtoMessage() {}
 
 func (x *RoleUpdateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[31]
+	mi := &file_rpc_iam_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2148,7 +2216,7 @@ func (x *RoleUpdateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RoleUpdateRequest.ProtoReflect.Descriptor instead.
 func (*RoleUpdateRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{31}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *RoleUpdateRequest) GetId() uint64 {
@@ -2188,7 +2256,7 @@ type RoleDeleteRequest struct {
 
 func (x *RoleDeleteRequest) Reset() {
 	*x = RoleDeleteRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[32]
+	mi := &file_rpc_iam_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2200,7 +2268,7 @@ func (x *RoleDeleteRequest) String() string {
 func (*RoleDeleteRequest) ProtoMessage() {}
 
 func (x *RoleDeleteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[32]
+	mi := &file_rpc_iam_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2213,7 +2281,7 @@ func (x *RoleDeleteRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RoleDeleteRequest.ProtoReflect.Descriptor instead.
 func (*RoleDeleteRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{32}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *RoleDeleteRequest) GetId() uint64 {
@@ -2234,7 +2302,7 @@ type RoleListRequest struct {
 
 func (x *RoleListRequest) Reset() {
 	*x = RoleListRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[33]
+	mi := &file_rpc_iam_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2246,7 +2314,7 @@ func (x *RoleListRequest) String() string {
 func (*RoleListRequest) ProtoMessage() {}
 
 func (x *RoleListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[33]
+	mi := &file_rpc_iam_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2259,7 +2327,7 @@ func (x *RoleListRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RoleListRequest.ProtoReflect.Descriptor instead.
 func (*RoleListRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{33}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *RoleListRequest) GetPage() int64 {
@@ -2293,7 +2361,7 @@ type RoleListResponse struct {
 
 func (x *RoleListResponse) Reset() {
 	*x = RoleListResponse{}
-	mi := &file_rpc_iam_proto_msgTypes[34]
+	mi := &file_rpc_iam_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2305,7 +2373,7 @@ func (x *RoleListResponse) String() string {
 func (*RoleListResponse) ProtoMessage() {}
 
 func (x *RoleListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[34]
+	mi := &file_rpc_iam_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2318,7 +2386,7 @@ func (x *RoleListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RoleListResponse.ProtoReflect.Descriptor instead.
 func (*RoleListResponse) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{34}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *RoleListResponse) GetTotal() int64 {
@@ -2347,7 +2415,7 @@ type PermissionItem struct {
 
 func (x *PermissionItem) Reset() {
 	*x = PermissionItem{}
-	mi := &file_rpc_iam_proto_msgTypes[35]
+	mi := &file_rpc_iam_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2359,7 +2427,7 @@ func (x *PermissionItem) String() string {
 func (*PermissionItem) ProtoMessage() {}
 
 func (x *PermissionItem) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[35]
+	mi := &file_rpc_iam_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2372,7 +2440,7 @@ func (x *PermissionItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PermissionItem.ProtoReflect.Descriptor instead.
 func (*PermissionItem) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{35}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *PermissionItem) GetId() uint64 {
@@ -2414,7 +2482,7 @@ type PermissionCreateRequest struct {
 
 func (x *PermissionCreateRequest) Reset() {
 	*x = PermissionCreateRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[36]
+	mi := &file_rpc_iam_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2426,7 +2494,7 @@ func (x *PermissionCreateRequest) String() string {
 func (*PermissionCreateRequest) ProtoMessage() {}
 
 func (x *PermissionCreateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[36]
+	mi := &file_rpc_iam_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2439,7 +2507,7 @@ func (x *PermissionCreateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PermissionCreateRequest.ProtoReflect.Descriptor instead.
 func (*PermissionCreateRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{36}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *PermissionCreateRequest) GetName() string {
@@ -2474,7 +2542,7 @@ type PermissionUpdateRequest struct {
 
 func (x *PermissionUpdateRequest) Reset() {
 	*x = PermissionUpdateRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[37]
+	mi := &file_rpc_iam_proto_msgTypes[38]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2486,7 +2554,7 @@ func (x *PermissionUpdateRequest) String() string {
 func (*PermissionUpdateRequest) ProtoMessage() {}
 
 func (x *PermissionUpdateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[37]
+	mi := &file_rpc_iam_proto_msgTypes[38]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2499,7 +2567,7 @@ func (x *PermissionUpdateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PermissionUpdateRequest.ProtoReflect.Descriptor instead.
 func (*PermissionUpdateRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{37}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{38}
 }
 
 func (x *PermissionUpdateRequest) GetId() uint64 {
@@ -2532,7 +2600,7 @@ type PermissionDeleteRequest struct {
 
 func (x *PermissionDeleteRequest) Reset() {
 	*x = PermissionDeleteRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[38]
+	mi := &file_rpc_iam_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2544,7 +2612,7 @@ func (x *PermissionDeleteRequest) String() string {
 func (*PermissionDeleteRequest) ProtoMessage() {}
 
 func (x *PermissionDeleteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[38]
+	mi := &file_rpc_iam_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2557,7 +2625,7 @@ func (x *PermissionDeleteRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PermissionDeleteRequest.ProtoReflect.Descriptor instead.
 func (*PermissionDeleteRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{38}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *PermissionDeleteRequest) GetId() uint64 {
@@ -2578,7 +2646,7 @@ type PermissionListRequest struct {
 
 func (x *PermissionListRequest) Reset() {
 	*x = PermissionListRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[39]
+	mi := &file_rpc_iam_proto_msgTypes[40]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2590,7 +2658,7 @@ func (x *PermissionListRequest) String() string {
 func (*PermissionListRequest) ProtoMessage() {}
 
 func (x *PermissionListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[39]
+	mi := &file_rpc_iam_proto_msgTypes[40]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2603,7 +2671,7 @@ func (x *PermissionListRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PermissionListRequest.ProtoReflect.Descriptor instead.
 func (*PermissionListRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{39}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{40}
 }
 
 func (x *PermissionListRequest) GetPage() int64 {
@@ -2637,7 +2705,7 @@ type PermissionListResponse struct {
 
 func (x *PermissionListResponse) Reset() {
 	*x = PermissionListResponse{}
-	mi := &file_rpc_iam_proto_msgTypes[40]
+	mi := &file_rpc_iam_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2649,7 +2717,7 @@ func (x *PermissionListResponse) String() string {
 func (*PermissionListResponse) ProtoMessage() {}
 
 func (x *PermissionListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[40]
+	mi := &file_rpc_iam_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2662,7 +2730,7 @@ func (x *PermissionListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PermissionListResponse.ProtoReflect.Descriptor instead.
 func (*PermissionListResponse) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{40}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *PermissionListResponse) GetTotal() int64 {
@@ -2699,7 +2767,7 @@ type MenuItem struct {
 
 func (x *MenuItem) Reset() {
 	*x = MenuItem{}
-	mi := &file_rpc_iam_proto_msgTypes[41]
+	mi := &file_rpc_iam_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2711,7 +2779,7 @@ func (x *MenuItem) String() string {
 func (*MenuItem) ProtoMessage() {}
 
 func (x *MenuItem) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[41]
+	mi := &file_rpc_iam_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2724,7 +2792,7 @@ func (x *MenuItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MenuItem.ProtoReflect.Descriptor instead.
 func (*MenuItem) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{41}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *MenuItem) GetId() uint64 {
@@ -2828,7 +2896,7 @@ type MenuCreateRequest struct {
 
 func (x *MenuCreateRequest) Reset() {
 	*x = MenuCreateRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[42]
+	mi := &file_rpc_iam_proto_msgTypes[43]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2840,7 +2908,7 @@ func (x *MenuCreateRequest) String() string {
 func (*MenuCreateRequest) ProtoMessage() {}
 
 func (x *MenuCreateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[42]
+	mi := &file_rpc_iam_proto_msgTypes[43]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2853,7 +2921,7 @@ func (x *MenuCreateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MenuCreateRequest.ProtoReflect.Descriptor instead.
 func (*MenuCreateRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{42}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{43}
 }
 
 func (x *MenuCreateRequest) GetParentId() uint64 {
@@ -2937,7 +3005,7 @@ type MenuUpdateRequest struct {
 
 func (x *MenuUpdateRequest) Reset() {
 	*x = MenuUpdateRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[43]
+	mi := &file_rpc_iam_proto_msgTypes[44]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2949,7 +3017,7 @@ func (x *MenuUpdateRequest) String() string {
 func (*MenuUpdateRequest) ProtoMessage() {}
 
 func (x *MenuUpdateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[43]
+	mi := &file_rpc_iam_proto_msgTypes[44]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2962,7 +3030,7 @@ func (x *MenuUpdateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MenuUpdateRequest.ProtoReflect.Descriptor instead.
 func (*MenuUpdateRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{43}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{44}
 }
 
 func (x *MenuUpdateRequest) GetId() uint64 {
@@ -3044,7 +3112,7 @@ type MenuDeleteRequest struct {
 
 func (x *MenuDeleteRequest) Reset() {
 	*x = MenuDeleteRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[44]
+	mi := &file_rpc_iam_proto_msgTypes[45]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3056,7 +3124,7 @@ func (x *MenuDeleteRequest) String() string {
 func (*MenuDeleteRequest) ProtoMessage() {}
 
 func (x *MenuDeleteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[44]
+	mi := &file_rpc_iam_proto_msgTypes[45]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3069,7 +3137,7 @@ func (x *MenuDeleteRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MenuDeleteRequest.ProtoReflect.Descriptor instead.
 func (*MenuDeleteRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{44}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{45}
 }
 
 func (x *MenuDeleteRequest) GetId() uint64 {
@@ -3088,7 +3156,7 @@ type MenuTreeResponse struct {
 
 func (x *MenuTreeResponse) Reset() {
 	*x = MenuTreeResponse{}
-	mi := &file_rpc_iam_proto_msgTypes[45]
+	mi := &file_rpc_iam_proto_msgTypes[46]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3100,7 +3168,7 @@ func (x *MenuTreeResponse) String() string {
 func (*MenuTreeResponse) ProtoMessage() {}
 
 func (x *MenuTreeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[45]
+	mi := &file_rpc_iam_proto_msgTypes[46]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3113,7 +3181,7 @@ func (x *MenuTreeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MenuTreeResponse.ProtoReflect.Descriptor instead.
 func (*MenuTreeResponse) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{45}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{46}
 }
 
 func (x *MenuTreeResponse) GetList() []*MenuItem {
@@ -3132,7 +3200,7 @@ type MenuMyTreeRequest struct {
 
 func (x *MenuMyTreeRequest) Reset() {
 	*x = MenuMyTreeRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[46]
+	mi := &file_rpc_iam_proto_msgTypes[47]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3144,7 +3212,7 @@ func (x *MenuMyTreeRequest) String() string {
 func (*MenuMyTreeRequest) ProtoMessage() {}
 
 func (x *MenuMyTreeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[46]
+	mi := &file_rpc_iam_proto_msgTypes[47]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3157,7 +3225,7 @@ func (x *MenuMyTreeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MenuMyTreeRequest.ProtoReflect.Descriptor instead.
 func (*MenuMyTreeRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{46}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{47}
 }
 
 func (x *MenuMyTreeRequest) GetUserId() uint64 {
@@ -3181,7 +3249,7 @@ type DepartmentItem struct {
 
 func (x *DepartmentItem) Reset() {
 	*x = DepartmentItem{}
-	mi := &file_rpc_iam_proto_msgTypes[47]
+	mi := &file_rpc_iam_proto_msgTypes[48]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3193,7 +3261,7 @@ func (x *DepartmentItem) String() string {
 func (*DepartmentItem) ProtoMessage() {}
 
 func (x *DepartmentItem) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[47]
+	mi := &file_rpc_iam_proto_msgTypes[48]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3206,7 +3274,7 @@ func (x *DepartmentItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DepartmentItem.ProtoReflect.Descriptor instead.
 func (*DepartmentItem) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{47}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{48}
 }
 
 func (x *DepartmentItem) GetId() uint64 {
@@ -3263,7 +3331,7 @@ type DepartmentCreateRequest struct {
 
 func (x *DepartmentCreateRequest) Reset() {
 	*x = DepartmentCreateRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[48]
+	mi := &file_rpc_iam_proto_msgTypes[49]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3275,7 +3343,7 @@ func (x *DepartmentCreateRequest) String() string {
 func (*DepartmentCreateRequest) ProtoMessage() {}
 
 func (x *DepartmentCreateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[48]
+	mi := &file_rpc_iam_proto_msgTypes[49]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3288,7 +3356,7 @@ func (x *DepartmentCreateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DepartmentCreateRequest.ProtoReflect.Descriptor instead.
 func (*DepartmentCreateRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{48}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{49}
 }
 
 func (x *DepartmentCreateRequest) GetParentId() uint64 {
@@ -3332,7 +3400,7 @@ type DepartmentUpdateRequest struct {
 
 func (x *DepartmentUpdateRequest) Reset() {
 	*x = DepartmentUpdateRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[49]
+	mi := &file_rpc_iam_proto_msgTypes[50]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3344,7 +3412,7 @@ func (x *DepartmentUpdateRequest) String() string {
 func (*DepartmentUpdateRequest) ProtoMessage() {}
 
 func (x *DepartmentUpdateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[49]
+	mi := &file_rpc_iam_proto_msgTypes[50]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3357,7 +3425,7 @@ func (x *DepartmentUpdateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DepartmentUpdateRequest.ProtoReflect.Descriptor instead.
 func (*DepartmentUpdateRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{49}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{50}
 }
 
 func (x *DepartmentUpdateRequest) GetId() uint64 {
@@ -3404,7 +3472,7 @@ type DepartmentDeleteRequest struct {
 
 func (x *DepartmentDeleteRequest) Reset() {
 	*x = DepartmentDeleteRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[50]
+	mi := &file_rpc_iam_proto_msgTypes[51]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3416,7 +3484,7 @@ func (x *DepartmentDeleteRequest) String() string {
 func (*DepartmentDeleteRequest) ProtoMessage() {}
 
 func (x *DepartmentDeleteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[50]
+	mi := &file_rpc_iam_proto_msgTypes[51]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3429,7 +3497,7 @@ func (x *DepartmentDeleteRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DepartmentDeleteRequest.ProtoReflect.Descriptor instead.
 func (*DepartmentDeleteRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{50}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{51}
 }
 
 func (x *DepartmentDeleteRequest) GetId() uint64 {
@@ -3448,7 +3516,7 @@ type DepartmentTreeResponse struct {
 
 func (x *DepartmentTreeResponse) Reset() {
 	*x = DepartmentTreeResponse{}
-	mi := &file_rpc_iam_proto_msgTypes[51]
+	mi := &file_rpc_iam_proto_msgTypes[52]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3460,7 +3528,7 @@ func (x *DepartmentTreeResponse) String() string {
 func (*DepartmentTreeResponse) ProtoMessage() {}
 
 func (x *DepartmentTreeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[51]
+	mi := &file_rpc_iam_proto_msgTypes[52]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3473,7 +3541,7 @@ func (x *DepartmentTreeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DepartmentTreeResponse.ProtoReflect.Descriptor instead.
 func (*DepartmentTreeResponse) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{51}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{52}
 }
 
 func (x *DepartmentTreeResponse) GetList() []*DepartmentItem {
@@ -3498,7 +3566,7 @@ type ApiItem struct {
 
 func (x *ApiItem) Reset() {
 	*x = ApiItem{}
-	mi := &file_rpc_iam_proto_msgTypes[52]
+	mi := &file_rpc_iam_proto_msgTypes[53]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3510,7 +3578,7 @@ func (x *ApiItem) String() string {
 func (*ApiItem) ProtoMessage() {}
 
 func (x *ApiItem) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[52]
+	mi := &file_rpc_iam_proto_msgTypes[53]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3523,7 +3591,7 @@ func (x *ApiItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ApiItem.ProtoReflect.Descriptor instead.
 func (*ApiItem) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{52}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{53}
 }
 
 func (x *ApiItem) GetId() uint64 {
@@ -3588,7 +3656,7 @@ type ApiCreateRequest struct {
 
 func (x *ApiCreateRequest) Reset() {
 	*x = ApiCreateRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[53]
+	mi := &file_rpc_iam_proto_msgTypes[54]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3600,7 +3668,7 @@ func (x *ApiCreateRequest) String() string {
 func (*ApiCreateRequest) ProtoMessage() {}
 
 func (x *ApiCreateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[53]
+	mi := &file_rpc_iam_proto_msgTypes[54]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3613,7 +3681,7 @@ func (x *ApiCreateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ApiCreateRequest.ProtoReflect.Descriptor instead.
 func (*ApiCreateRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{53}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{54}
 }
 
 func (x *ApiCreateRequest) GetName() string {
@@ -3665,7 +3733,7 @@ type ApiUpdateRequest struct {
 
 func (x *ApiUpdateRequest) Reset() {
 	*x = ApiUpdateRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[54]
+	mi := &file_rpc_iam_proto_msgTypes[55]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3677,7 +3745,7 @@ func (x *ApiUpdateRequest) String() string {
 func (*ApiUpdateRequest) ProtoMessage() {}
 
 func (x *ApiUpdateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[54]
+	mi := &file_rpc_iam_proto_msgTypes[55]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3690,7 +3758,7 @@ func (x *ApiUpdateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ApiUpdateRequest.ProtoReflect.Descriptor instead.
 func (*ApiUpdateRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{54}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{55}
 }
 
 func (x *ApiUpdateRequest) GetId() uint64 {
@@ -3744,7 +3812,7 @@ type ApiDeleteRequest struct {
 
 func (x *ApiDeleteRequest) Reset() {
 	*x = ApiDeleteRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[55]
+	mi := &file_rpc_iam_proto_msgTypes[56]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3756,7 +3824,7 @@ func (x *ApiDeleteRequest) String() string {
 func (*ApiDeleteRequest) ProtoMessage() {}
 
 func (x *ApiDeleteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[55]
+	mi := &file_rpc_iam_proto_msgTypes[56]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3769,7 +3837,7 @@ func (x *ApiDeleteRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ApiDeleteRequest.ProtoReflect.Descriptor instead.
 func (*ApiDeleteRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{55}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{56}
 }
 
 func (x *ApiDeleteRequest) GetId() uint64 {
@@ -3790,7 +3858,7 @@ type ApiListRequest struct {
 
 func (x *ApiListRequest) Reset() {
 	*x = ApiListRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[56]
+	mi := &file_rpc_iam_proto_msgTypes[57]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3802,7 +3870,7 @@ func (x *ApiListRequest) String() string {
 func (*ApiListRequest) ProtoMessage() {}
 
 func (x *ApiListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[56]
+	mi := &file_rpc_iam_proto_msgTypes[57]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3815,7 +3883,7 @@ func (x *ApiListRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ApiListRequest.ProtoReflect.Descriptor instead.
 func (*ApiListRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{56}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{57}
 }
 
 func (x *ApiListRequest) GetPage() int64 {
@@ -3849,7 +3917,7 @@ type ApiListResponse struct {
 
 func (x *ApiListResponse) Reset() {
 	*x = ApiListResponse{}
-	mi := &file_rpc_iam_proto_msgTypes[57]
+	mi := &file_rpc_iam_proto_msgTypes[58]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3861,7 +3929,7 @@ func (x *ApiListResponse) String() string {
 func (*ApiListResponse) ProtoMessage() {}
 
 func (x *ApiListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[57]
+	mi := &file_rpc_iam_proto_msgTypes[58]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3874,7 +3942,7 @@ func (x *ApiListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ApiListResponse.ProtoReflect.Descriptor instead.
 func (*ApiListResponse) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{57}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{58}
 }
 
 func (x *ApiListResponse) GetTotal() int64 {
@@ -3900,7 +3968,7 @@ type PermissionMenuListRequest struct {
 
 func (x *PermissionMenuListRequest) Reset() {
 	*x = PermissionMenuListRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[58]
+	mi := &file_rpc_iam_proto_msgTypes[59]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3912,7 +3980,7 @@ func (x *PermissionMenuListRequest) String() string {
 func (*PermissionMenuListRequest) ProtoMessage() {}
 
 func (x *PermissionMenuListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[58]
+	mi := &file_rpc_iam_proto_msgTypes[59]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3925,7 +3993,7 @@ func (x *PermissionMenuListRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PermissionMenuListRequest.ProtoReflect.Descriptor instead.
 func (*PermissionMenuListRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{58}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{59}
 }
 
 func (x *PermissionMenuListRequest) GetPermissionId() uint64 {
@@ -3944,7 +4012,7 @@ type PermissionMenuListResponse struct {
 
 func (x *PermissionMenuListResponse) Reset() {
 	*x = PermissionMenuListResponse{}
-	mi := &file_rpc_iam_proto_msgTypes[59]
+	mi := &file_rpc_iam_proto_msgTypes[60]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3956,7 +4024,7 @@ func (x *PermissionMenuListResponse) String() string {
 func (*PermissionMenuListResponse) ProtoMessage() {}
 
 func (x *PermissionMenuListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[59]
+	mi := &file_rpc_iam_proto_msgTypes[60]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3969,7 +4037,7 @@ func (x *PermissionMenuListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PermissionMenuListResponse.ProtoReflect.Descriptor instead.
 func (*PermissionMenuListResponse) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{59}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{60}
 }
 
 func (x *PermissionMenuListResponse) GetMenuIds() []uint64 {
@@ -3989,7 +4057,7 @@ type PermissionMenuUpdateRequest struct {
 
 func (x *PermissionMenuUpdateRequest) Reset() {
 	*x = PermissionMenuUpdateRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[60]
+	mi := &file_rpc_iam_proto_msgTypes[61]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4001,7 +4069,7 @@ func (x *PermissionMenuUpdateRequest) String() string {
 func (*PermissionMenuUpdateRequest) ProtoMessage() {}
 
 func (x *PermissionMenuUpdateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[60]
+	mi := &file_rpc_iam_proto_msgTypes[61]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4014,7 +4082,7 @@ func (x *PermissionMenuUpdateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PermissionMenuUpdateRequest.ProtoReflect.Descriptor instead.
 func (*PermissionMenuUpdateRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{60}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{61}
 }
 
 func (x *PermissionMenuUpdateRequest) GetPermissionId() uint64 {
@@ -4040,7 +4108,7 @@ type PermissionApiListRequest struct {
 
 func (x *PermissionApiListRequest) Reset() {
 	*x = PermissionApiListRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[61]
+	mi := &file_rpc_iam_proto_msgTypes[62]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4052,7 +4120,7 @@ func (x *PermissionApiListRequest) String() string {
 func (*PermissionApiListRequest) ProtoMessage() {}
 
 func (x *PermissionApiListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[61]
+	mi := &file_rpc_iam_proto_msgTypes[62]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4065,7 +4133,7 @@ func (x *PermissionApiListRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PermissionApiListRequest.ProtoReflect.Descriptor instead.
 func (*PermissionApiListRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{61}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{62}
 }
 
 func (x *PermissionApiListRequest) GetPermissionId() uint64 {
@@ -4084,7 +4152,7 @@ type PermissionApiListResponse struct {
 
 func (x *PermissionApiListResponse) Reset() {
 	*x = PermissionApiListResponse{}
-	mi := &file_rpc_iam_proto_msgTypes[62]
+	mi := &file_rpc_iam_proto_msgTypes[63]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4096,7 +4164,7 @@ func (x *PermissionApiListResponse) String() string {
 func (*PermissionApiListResponse) ProtoMessage() {}
 
 func (x *PermissionApiListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[62]
+	mi := &file_rpc_iam_proto_msgTypes[63]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4109,7 +4177,7 @@ func (x *PermissionApiListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PermissionApiListResponse.ProtoReflect.Descriptor instead.
 func (*PermissionApiListResponse) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{62}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{63}
 }
 
 func (x *PermissionApiListResponse) GetApiIds() []uint64 {
@@ -4129,7 +4197,7 @@ type PermissionApiUpdateRequest struct {
 
 func (x *PermissionApiUpdateRequest) Reset() {
 	*x = PermissionApiUpdateRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[63]
+	mi := &file_rpc_iam_proto_msgTypes[64]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4141,7 +4209,7 @@ func (x *PermissionApiUpdateRequest) String() string {
 func (*PermissionApiUpdateRequest) ProtoMessage() {}
 
 func (x *PermissionApiUpdateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[63]
+	mi := &file_rpc_iam_proto_msgTypes[64]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4154,7 +4222,7 @@ func (x *PermissionApiUpdateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PermissionApiUpdateRequest.ProtoReflect.Descriptor instead.
 func (*PermissionApiUpdateRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{63}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{64}
 }
 
 func (x *PermissionApiUpdateRequest) GetPermissionId() uint64 {
@@ -4180,7 +4248,7 @@ type UserRoleListRequest struct {
 
 func (x *UserRoleListRequest) Reset() {
 	*x = UserRoleListRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[64]
+	mi := &file_rpc_iam_proto_msgTypes[65]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4192,7 +4260,7 @@ func (x *UserRoleListRequest) String() string {
 func (*UserRoleListRequest) ProtoMessage() {}
 
 func (x *UserRoleListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[64]
+	mi := &file_rpc_iam_proto_msgTypes[65]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4205,7 +4273,7 @@ func (x *UserRoleListRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserRoleListRequest.ProtoReflect.Descriptor instead.
 func (*UserRoleListRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{64}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{65}
 }
 
 func (x *UserRoleListRequest) GetUserId() uint64 {
@@ -4224,7 +4292,7 @@ type UserRoleListResponse struct {
 
 func (x *UserRoleListResponse) Reset() {
 	*x = UserRoleListResponse{}
-	mi := &file_rpc_iam_proto_msgTypes[65]
+	mi := &file_rpc_iam_proto_msgTypes[66]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4236,7 +4304,7 @@ func (x *UserRoleListResponse) String() string {
 func (*UserRoleListResponse) ProtoMessage() {}
 
 func (x *UserRoleListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[65]
+	mi := &file_rpc_iam_proto_msgTypes[66]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4249,7 +4317,7 @@ func (x *UserRoleListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserRoleListResponse.ProtoReflect.Descriptor instead.
 func (*UserRoleListResponse) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{65}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{66}
 }
 
 func (x *UserRoleListResponse) GetRoleIds() []uint64 {
@@ -4269,7 +4337,7 @@ type UserRoleUpdateRequest struct {
 
 func (x *UserRoleUpdateRequest) Reset() {
 	*x = UserRoleUpdateRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[66]
+	mi := &file_rpc_iam_proto_msgTypes[67]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4281,7 +4349,7 @@ func (x *UserRoleUpdateRequest) String() string {
 func (*UserRoleUpdateRequest) ProtoMessage() {}
 
 func (x *UserRoleUpdateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[66]
+	mi := &file_rpc_iam_proto_msgTypes[67]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4294,7 +4362,7 @@ func (x *UserRoleUpdateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserRoleUpdateRequest.ProtoReflect.Descriptor instead.
 func (*UserRoleUpdateRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{66}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{67}
 }
 
 func (x *UserRoleUpdateRequest) GetUserId() uint64 {
@@ -4320,7 +4388,7 @@ type RolePermissionListRequest struct {
 
 func (x *RolePermissionListRequest) Reset() {
 	*x = RolePermissionListRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[67]
+	mi := &file_rpc_iam_proto_msgTypes[68]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4332,7 +4400,7 @@ func (x *RolePermissionListRequest) String() string {
 func (*RolePermissionListRequest) ProtoMessage() {}
 
 func (x *RolePermissionListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[67]
+	mi := &file_rpc_iam_proto_msgTypes[68]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4345,7 +4413,7 @@ func (x *RolePermissionListRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RolePermissionListRequest.ProtoReflect.Descriptor instead.
 func (*RolePermissionListRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{67}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{68}
 }
 
 func (x *RolePermissionListRequest) GetRoleId() uint64 {
@@ -4364,7 +4432,7 @@ type RolePermissionListResponse struct {
 
 func (x *RolePermissionListResponse) Reset() {
 	*x = RolePermissionListResponse{}
-	mi := &file_rpc_iam_proto_msgTypes[68]
+	mi := &file_rpc_iam_proto_msgTypes[69]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4376,7 +4444,7 @@ func (x *RolePermissionListResponse) String() string {
 func (*RolePermissionListResponse) ProtoMessage() {}
 
 func (x *RolePermissionListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[68]
+	mi := &file_rpc_iam_proto_msgTypes[69]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4389,7 +4457,7 @@ func (x *RolePermissionListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RolePermissionListResponse.ProtoReflect.Descriptor instead.
 func (*RolePermissionListResponse) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{68}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{69}
 }
 
 func (x *RolePermissionListResponse) GetPermissionIds() []uint64 {
@@ -4409,7 +4477,7 @@ type RolePermissionUpdateRequest struct {
 
 func (x *RolePermissionUpdateRequest) Reset() {
 	*x = RolePermissionUpdateRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[69]
+	mi := &file_rpc_iam_proto_msgTypes[70]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4421,7 +4489,7 @@ func (x *RolePermissionUpdateRequest) String() string {
 func (*RolePermissionUpdateRequest) ProtoMessage() {}
 
 func (x *RolePermissionUpdateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[69]
+	mi := &file_rpc_iam_proto_msgTypes[70]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4434,7 +4502,7 @@ func (x *RolePermissionUpdateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RolePermissionUpdateRequest.ProtoReflect.Descriptor instead.
 func (*RolePermissionUpdateRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{69}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{70}
 }
 
 func (x *RolePermissionUpdateRequest) GetRoleId() uint64 {
@@ -4466,7 +4534,7 @@ type ConfigItem struct {
 
 func (x *ConfigItem) Reset() {
 	*x = ConfigItem{}
-	mi := &file_rpc_iam_proto_msgTypes[70]
+	mi := &file_rpc_iam_proto_msgTypes[71]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4478,7 +4546,7 @@ func (x *ConfigItem) String() string {
 func (*ConfigItem) ProtoMessage() {}
 
 func (x *ConfigItem) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[70]
+	mi := &file_rpc_iam_proto_msgTypes[71]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4491,7 +4559,7 @@ func (x *ConfigItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConfigItem.ProtoReflect.Descriptor instead.
 func (*ConfigItem) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{70}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{71}
 }
 
 func (x *ConfigItem) GetId() uint64 {
@@ -4556,7 +4624,7 @@ type ConfigCreateRequest struct {
 
 func (x *ConfigCreateRequest) Reset() {
 	*x = ConfigCreateRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[71]
+	mi := &file_rpc_iam_proto_msgTypes[72]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4568,7 +4636,7 @@ func (x *ConfigCreateRequest) String() string {
 func (*ConfigCreateRequest) ProtoMessage() {}
 
 func (x *ConfigCreateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[71]
+	mi := &file_rpc_iam_proto_msgTypes[72]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4581,7 +4649,7 @@ func (x *ConfigCreateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConfigCreateRequest.ProtoReflect.Descriptor instead.
 func (*ConfigCreateRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{71}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{72}
 }
 
 func (x *ConfigCreateRequest) GetGroup() string {
@@ -4630,7 +4698,7 @@ type ConfigUpdateRequest struct {
 
 func (x *ConfigUpdateRequest) Reset() {
 	*x = ConfigUpdateRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[72]
+	mi := &file_rpc_iam_proto_msgTypes[73]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4642,7 +4710,7 @@ func (x *ConfigUpdateRequest) String() string {
 func (*ConfigUpdateRequest) ProtoMessage() {}
 
 func (x *ConfigUpdateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[72]
+	mi := &file_rpc_iam_proto_msgTypes[73]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4655,7 +4723,7 @@ func (x *ConfigUpdateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConfigUpdateRequest.ProtoReflect.Descriptor instead.
 func (*ConfigUpdateRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{72}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{73}
 }
 
 func (x *ConfigUpdateRequest) GetId() uint64 {
@@ -4688,7 +4756,7 @@ type ConfigDeleteRequest struct {
 
 func (x *ConfigDeleteRequest) Reset() {
 	*x = ConfigDeleteRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[73]
+	mi := &file_rpc_iam_proto_msgTypes[74]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4700,7 +4768,7 @@ func (x *ConfigDeleteRequest) String() string {
 func (*ConfigDeleteRequest) ProtoMessage() {}
 
 func (x *ConfigDeleteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[73]
+	mi := &file_rpc_iam_proto_msgTypes[74]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4713,7 +4781,7 @@ func (x *ConfigDeleteRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConfigDeleteRequest.ProtoReflect.Descriptor instead.
 func (*ConfigDeleteRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{73}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{74}
 }
 
 func (x *ConfigDeleteRequest) GetId() uint64 {
@@ -4735,7 +4803,7 @@ type ConfigListRequest struct {
 
 func (x *ConfigListRequest) Reset() {
 	*x = ConfigListRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[74]
+	mi := &file_rpc_iam_proto_msgTypes[75]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4747,7 +4815,7 @@ func (x *ConfigListRequest) String() string {
 func (*ConfigListRequest) ProtoMessage() {}
 
 func (x *ConfigListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[74]
+	mi := &file_rpc_iam_proto_msgTypes[75]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4760,7 +4828,7 @@ func (x *ConfigListRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConfigListRequest.ProtoReflect.Descriptor instead.
 func (*ConfigListRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{74}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{75}
 }
 
 func (x *ConfigListRequest) GetPage() int64 {
@@ -4801,7 +4869,7 @@ type ConfigListResponse struct {
 
 func (x *ConfigListResponse) Reset() {
 	*x = ConfigListResponse{}
-	mi := &file_rpc_iam_proto_msgTypes[75]
+	mi := &file_rpc_iam_proto_msgTypes[76]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4813,7 +4881,7 @@ func (x *ConfigListResponse) String() string {
 func (*ConfigListResponse) ProtoMessage() {}
 
 func (x *ConfigListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[75]
+	mi := &file_rpc_iam_proto_msgTypes[76]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4826,7 +4894,7 @@ func (x *ConfigListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConfigListResponse.ProtoReflect.Descriptor instead.
 func (*ConfigListResponse) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{75}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{76}
 }
 
 func (x *ConfigListResponse) GetTotal() int64 {
@@ -4852,7 +4920,7 @@ type ConfigGetRequest struct {
 
 func (x *ConfigGetRequest) Reset() {
 	*x = ConfigGetRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[76]
+	mi := &file_rpc_iam_proto_msgTypes[77]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4864,7 +4932,7 @@ func (x *ConfigGetRequest) String() string {
 func (*ConfigGetRequest) ProtoMessage() {}
 
 func (x *ConfigGetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[76]
+	mi := &file_rpc_iam_proto_msgTypes[77]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4877,7 +4945,7 @@ func (x *ConfigGetRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConfigGetRequest.ProtoReflect.Descriptor instead.
 func (*ConfigGetRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{76}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{77}
 }
 
 func (x *ConfigGetRequest) GetKey() string {
@@ -4896,7 +4964,7 @@ type ConfigGetResponse struct {
 
 func (x *ConfigGetResponse) Reset() {
 	*x = ConfigGetResponse{}
-	mi := &file_rpc_iam_proto_msgTypes[77]
+	mi := &file_rpc_iam_proto_msgTypes[78]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4908,7 +4976,7 @@ func (x *ConfigGetResponse) String() string {
 func (*ConfigGetResponse) ProtoMessage() {}
 
 func (x *ConfigGetResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[77]
+	mi := &file_rpc_iam_proto_msgTypes[78]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4921,7 +4989,7 @@ func (x *ConfigGetResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConfigGetResponse.ProtoReflect.Descriptor instead.
 func (*ConfigGetResponse) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{77}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{78}
 }
 
 func (x *ConfigGetResponse) GetValue() string {
@@ -4945,7 +5013,7 @@ type DictTypeItem struct {
 
 func (x *DictTypeItem) Reset() {
 	*x = DictTypeItem{}
-	mi := &file_rpc_iam_proto_msgTypes[78]
+	mi := &file_rpc_iam_proto_msgTypes[79]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4957,7 +5025,7 @@ func (x *DictTypeItem) String() string {
 func (*DictTypeItem) ProtoMessage() {}
 
 func (x *DictTypeItem) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[78]
+	mi := &file_rpc_iam_proto_msgTypes[79]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4970,7 +5038,7 @@ func (x *DictTypeItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DictTypeItem.ProtoReflect.Descriptor instead.
 func (*DictTypeItem) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{78}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{79}
 }
 
 func (x *DictTypeItem) GetId() uint64 {
@@ -5027,7 +5095,7 @@ type DictTypeCreateRequest struct {
 
 func (x *DictTypeCreateRequest) Reset() {
 	*x = DictTypeCreateRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[79]
+	mi := &file_rpc_iam_proto_msgTypes[80]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5039,7 +5107,7 @@ func (x *DictTypeCreateRequest) String() string {
 func (*DictTypeCreateRequest) ProtoMessage() {}
 
 func (x *DictTypeCreateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[79]
+	mi := &file_rpc_iam_proto_msgTypes[80]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5052,7 +5120,7 @@ func (x *DictTypeCreateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DictTypeCreateRequest.ProtoReflect.Descriptor instead.
 func (*DictTypeCreateRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{79}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{80}
 }
 
 func (x *DictTypeCreateRequest) GetName() string {
@@ -5095,7 +5163,7 @@ type DictTypeUpdateRequest struct {
 
 func (x *DictTypeUpdateRequest) Reset() {
 	*x = DictTypeUpdateRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[80]
+	mi := &file_rpc_iam_proto_msgTypes[81]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5107,7 +5175,7 @@ func (x *DictTypeUpdateRequest) String() string {
 func (*DictTypeUpdateRequest) ProtoMessage() {}
 
 func (x *DictTypeUpdateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[80]
+	mi := &file_rpc_iam_proto_msgTypes[81]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5120,7 +5188,7 @@ func (x *DictTypeUpdateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DictTypeUpdateRequest.ProtoReflect.Descriptor instead.
 func (*DictTypeUpdateRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{80}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{81}
 }
 
 func (x *DictTypeUpdateRequest) GetId() uint64 {
@@ -5160,7 +5228,7 @@ type DictTypeDeleteRequest struct {
 
 func (x *DictTypeDeleteRequest) Reset() {
 	*x = DictTypeDeleteRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[81]
+	mi := &file_rpc_iam_proto_msgTypes[82]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5172,7 +5240,7 @@ func (x *DictTypeDeleteRequest) String() string {
 func (*DictTypeDeleteRequest) ProtoMessage() {}
 
 func (x *DictTypeDeleteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[81]
+	mi := &file_rpc_iam_proto_msgTypes[82]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5185,7 +5253,7 @@ func (x *DictTypeDeleteRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DictTypeDeleteRequest.ProtoReflect.Descriptor instead.
 func (*DictTypeDeleteRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{81}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{82}
 }
 
 func (x *DictTypeDeleteRequest) GetId() uint64 {
@@ -5207,7 +5275,7 @@ type DictTypeListRequest struct {
 
 func (x *DictTypeListRequest) Reset() {
 	*x = DictTypeListRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[82]
+	mi := &file_rpc_iam_proto_msgTypes[83]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5219,7 +5287,7 @@ func (x *DictTypeListRequest) String() string {
 func (*DictTypeListRequest) ProtoMessage() {}
 
 func (x *DictTypeListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[82]
+	mi := &file_rpc_iam_proto_msgTypes[83]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5232,7 +5300,7 @@ func (x *DictTypeListRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DictTypeListRequest.ProtoReflect.Descriptor instead.
 func (*DictTypeListRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{82}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{83}
 }
 
 func (x *DictTypeListRequest) GetPage() int64 {
@@ -5273,7 +5341,7 @@ type DictTypeListResponse struct {
 
 func (x *DictTypeListResponse) Reset() {
 	*x = DictTypeListResponse{}
-	mi := &file_rpc_iam_proto_msgTypes[83]
+	mi := &file_rpc_iam_proto_msgTypes[84]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5285,7 +5353,7 @@ func (x *DictTypeListResponse) String() string {
 func (*DictTypeListResponse) ProtoMessage() {}
 
 func (x *DictTypeListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[83]
+	mi := &file_rpc_iam_proto_msgTypes[84]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5298,7 +5366,7 @@ func (x *DictTypeListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DictTypeListResponse.ProtoReflect.Descriptor instead.
 func (*DictTypeListResponse) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{83}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{84}
 }
 
 func (x *DictTypeListResponse) GetTotal() int64 {
@@ -5331,7 +5399,7 @@ type DictItemItem struct {
 
 func (x *DictItemItem) Reset() {
 	*x = DictItemItem{}
-	mi := &file_rpc_iam_proto_msgTypes[84]
+	mi := &file_rpc_iam_proto_msgTypes[85]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5343,7 +5411,7 @@ func (x *DictItemItem) String() string {
 func (*DictItemItem) ProtoMessage() {}
 
 func (x *DictItemItem) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[84]
+	mi := &file_rpc_iam_proto_msgTypes[85]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5356,7 +5424,7 @@ func (x *DictItemItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DictItemItem.ProtoReflect.Descriptor instead.
 func (*DictItemItem) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{84}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{85}
 }
 
 func (x *DictItemItem) GetId() uint64 {
@@ -5429,7 +5497,7 @@ type DictItemCreateRequest struct {
 
 func (x *DictItemCreateRequest) Reset() {
 	*x = DictItemCreateRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[85]
+	mi := &file_rpc_iam_proto_msgTypes[86]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5441,7 +5509,7 @@ func (x *DictItemCreateRequest) String() string {
 func (*DictItemCreateRequest) ProtoMessage() {}
 
 func (x *DictItemCreateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[85]
+	mi := &file_rpc_iam_proto_msgTypes[86]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5454,7 +5522,7 @@ func (x *DictItemCreateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DictItemCreateRequest.ProtoReflect.Descriptor instead.
 func (*DictItemCreateRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{85}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{86}
 }
 
 func (x *DictItemCreateRequest) GetTypeId() uint64 {
@@ -5513,7 +5581,7 @@ type DictItemUpdateRequest struct {
 
 func (x *DictItemUpdateRequest) Reset() {
 	*x = DictItemUpdateRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[86]
+	mi := &file_rpc_iam_proto_msgTypes[87]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5525,7 +5593,7 @@ func (x *DictItemUpdateRequest) String() string {
 func (*DictItemUpdateRequest) ProtoMessage() {}
 
 func (x *DictItemUpdateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[86]
+	mi := &file_rpc_iam_proto_msgTypes[87]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5538,7 +5606,7 @@ func (x *DictItemUpdateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DictItemUpdateRequest.ProtoReflect.Descriptor instead.
 func (*DictItemUpdateRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{86}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{87}
 }
 
 func (x *DictItemUpdateRequest) GetId() uint64 {
@@ -5592,7 +5660,7 @@ type DictItemDeleteRequest struct {
 
 func (x *DictItemDeleteRequest) Reset() {
 	*x = DictItemDeleteRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[87]
+	mi := &file_rpc_iam_proto_msgTypes[88]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5604,7 +5672,7 @@ func (x *DictItemDeleteRequest) String() string {
 func (*DictItemDeleteRequest) ProtoMessage() {}
 
 func (x *DictItemDeleteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[87]
+	mi := &file_rpc_iam_proto_msgTypes[88]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5617,7 +5685,7 @@ func (x *DictItemDeleteRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DictItemDeleteRequest.ProtoReflect.Descriptor instead.
 func (*DictItemDeleteRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{87}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{88}
 }
 
 func (x *DictItemDeleteRequest) GetId() uint64 {
@@ -5639,7 +5707,7 @@ type DictItemListRequest struct {
 
 func (x *DictItemListRequest) Reset() {
 	*x = DictItemListRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[88]
+	mi := &file_rpc_iam_proto_msgTypes[89]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5651,7 +5719,7 @@ func (x *DictItemListRequest) String() string {
 func (*DictItemListRequest) ProtoMessage() {}
 
 func (x *DictItemListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[88]
+	mi := &file_rpc_iam_proto_msgTypes[89]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5664,7 +5732,7 @@ func (x *DictItemListRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DictItemListRequest.ProtoReflect.Descriptor instead.
 func (*DictItemListRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{88}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{89}
 }
 
 func (x *DictItemListRequest) GetPage() int64 {
@@ -5705,7 +5773,7 @@ type DictItemListResponse struct {
 
 func (x *DictItemListResponse) Reset() {
 	*x = DictItemListResponse{}
-	mi := &file_rpc_iam_proto_msgTypes[89]
+	mi := &file_rpc_iam_proto_msgTypes[90]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5717,7 +5785,7 @@ func (x *DictItemListResponse) String() string {
 func (*DictItemListResponse) ProtoMessage() {}
 
 func (x *DictItemListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[89]
+	mi := &file_rpc_iam_proto_msgTypes[90]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5730,7 +5798,7 @@ func (x *DictItemListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DictItemListResponse.ProtoReflect.Descriptor instead.
 func (*DictItemListResponse) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{89}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{90}
 }
 
 func (x *DictItemListResponse) GetTotal() int64 {
@@ -5758,7 +5826,7 @@ type DictGetRequest struct {
 
 func (x *DictGetRequest) Reset() {
 	*x = DictGetRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[90]
+	mi := &file_rpc_iam_proto_msgTypes[91]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5770,7 +5838,7 @@ func (x *DictGetRequest) String() string {
 func (*DictGetRequest) ProtoMessage() {}
 
 func (x *DictGetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[90]
+	mi := &file_rpc_iam_proto_msgTypes[91]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5783,7 +5851,7 @@ func (x *DictGetRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DictGetRequest.ProtoReflect.Descriptor instead.
 func (*DictGetRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{90}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{91}
 }
 
 func (x *DictGetRequest) GetCode() string {
@@ -5803,7 +5871,7 @@ type DictGetResponse struct {
 
 func (x *DictGetResponse) Reset() {
 	*x = DictGetResponse{}
-	mi := &file_rpc_iam_proto_msgTypes[91]
+	mi := &file_rpc_iam_proto_msgTypes[92]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5815,7 +5883,7 @@ func (x *DictGetResponse) String() string {
 func (*DictGetResponse) ProtoMessage() {}
 
 func (x *DictGetResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[91]
+	mi := &file_rpc_iam_proto_msgTypes[92]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5828,7 +5896,7 @@ func (x *DictGetResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DictGetResponse.ProtoReflect.Descriptor instead.
 func (*DictGetResponse) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{91}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{92}
 }
 
 func (x *DictGetResponse) GetCode() string {
@@ -5854,7 +5922,7 @@ type DictBatchGetRequest struct {
 
 func (x *DictBatchGetRequest) Reset() {
 	*x = DictBatchGetRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[92]
+	mi := &file_rpc_iam_proto_msgTypes[93]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5866,7 +5934,7 @@ func (x *DictBatchGetRequest) String() string {
 func (*DictBatchGetRequest) ProtoMessage() {}
 
 func (x *DictBatchGetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[92]
+	mi := &file_rpc_iam_proto_msgTypes[93]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5879,7 +5947,7 @@ func (x *DictBatchGetRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DictBatchGetRequest.ProtoReflect.Descriptor instead.
 func (*DictBatchGetRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{92}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{93}
 }
 
 func (x *DictBatchGetRequest) GetCodes() []string {
@@ -5898,7 +5966,7 @@ type DictBatchGetResponse struct {
 
 func (x *DictBatchGetResponse) Reset() {
 	*x = DictBatchGetResponse{}
-	mi := &file_rpc_iam_proto_msgTypes[93]
+	mi := &file_rpc_iam_proto_msgTypes[94]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5910,7 +5978,7 @@ func (x *DictBatchGetResponse) String() string {
 func (*DictBatchGetResponse) ProtoMessage() {}
 
 func (x *DictBatchGetResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[93]
+	mi := &file_rpc_iam_proto_msgTypes[94]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5923,7 +5991,7 @@ func (x *DictBatchGetResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DictBatchGetResponse.ProtoReflect.Descriptor instead.
 func (*DictBatchGetResponse) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{93}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{94}
 }
 
 func (x *DictBatchGetResponse) GetDicts() map[string]*DictGetResponse {
@@ -5948,7 +6016,7 @@ type FileItem struct {
 
 func (x *FileItem) Reset() {
 	*x = FileItem{}
-	mi := &file_rpc_iam_proto_msgTypes[94]
+	mi := &file_rpc_iam_proto_msgTypes[95]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5960,7 +6028,7 @@ func (x *FileItem) String() string {
 func (*FileItem) ProtoMessage() {}
 
 func (x *FileItem) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[94]
+	mi := &file_rpc_iam_proto_msgTypes[95]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5973,7 +6041,7 @@ func (x *FileItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FileItem.ProtoReflect.Descriptor instead.
 func (*FileItem) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{94}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{95}
 }
 
 func (x *FileItem) GetId() uint64 {
@@ -6035,7 +6103,7 @@ type FileCreateRequest struct {
 
 func (x *FileCreateRequest) Reset() {
 	*x = FileCreateRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[95]
+	mi := &file_rpc_iam_proto_msgTypes[96]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6047,7 +6115,7 @@ func (x *FileCreateRequest) String() string {
 func (*FileCreateRequest) ProtoMessage() {}
 
 func (x *FileCreateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[95]
+	mi := &file_rpc_iam_proto_msgTypes[96]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6060,7 +6128,7 @@ func (x *FileCreateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FileCreateRequest.ProtoReflect.Descriptor instead.
 func (*FileCreateRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{95}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{96}
 }
 
 func (x *FileCreateRequest) GetName() string {
@@ -6088,7 +6156,7 @@ type FileUpdateRequest struct {
 
 func (x *FileUpdateRequest) Reset() {
 	*x = FileUpdateRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[96]
+	mi := &file_rpc_iam_proto_msgTypes[97]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6100,7 +6168,7 @@ func (x *FileUpdateRequest) String() string {
 func (*FileUpdateRequest) ProtoMessage() {}
 
 func (x *FileUpdateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[96]
+	mi := &file_rpc_iam_proto_msgTypes[97]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6113,7 +6181,7 @@ func (x *FileUpdateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FileUpdateRequest.ProtoReflect.Descriptor instead.
 func (*FileUpdateRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{96}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{97}
 }
 
 func (x *FileUpdateRequest) GetId() uint64 {
@@ -6146,7 +6214,7 @@ type FileDeleteRequest struct {
 
 func (x *FileDeleteRequest) Reset() {
 	*x = FileDeleteRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[97]
+	mi := &file_rpc_iam_proto_msgTypes[98]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6158,7 +6226,7 @@ func (x *FileDeleteRequest) String() string {
 func (*FileDeleteRequest) ProtoMessage() {}
 
 func (x *FileDeleteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[97]
+	mi := &file_rpc_iam_proto_msgTypes[98]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6171,7 +6239,7 @@ func (x *FileDeleteRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FileDeleteRequest.ProtoReflect.Descriptor instead.
 func (*FileDeleteRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{97}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{98}
 }
 
 func (x *FileDeleteRequest) GetId() uint64 {
@@ -6192,7 +6260,7 @@ type FileListRequest struct {
 
 func (x *FileListRequest) Reset() {
 	*x = FileListRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[98]
+	mi := &file_rpc_iam_proto_msgTypes[99]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6204,7 +6272,7 @@ func (x *FileListRequest) String() string {
 func (*FileListRequest) ProtoMessage() {}
 
 func (x *FileListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[98]
+	mi := &file_rpc_iam_proto_msgTypes[99]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6217,7 +6285,7 @@ func (x *FileListRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FileListRequest.ProtoReflect.Descriptor instead.
 func (*FileListRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{98}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{99}
 }
 
 func (x *FileListRequest) GetPage() int64 {
@@ -6251,7 +6319,7 @@ type FileListResponse struct {
 
 func (x *FileListResponse) Reset() {
 	*x = FileListResponse{}
-	mi := &file_rpc_iam_proto_msgTypes[99]
+	mi := &file_rpc_iam_proto_msgTypes[100]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6263,7 +6331,7 @@ func (x *FileListResponse) String() string {
 func (*FileListResponse) ProtoMessage() {}
 
 func (x *FileListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[99]
+	mi := &file_rpc_iam_proto_msgTypes[100]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6276,7 +6344,7 @@ func (x *FileListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FileListResponse.ProtoReflect.Descriptor instead.
 func (*FileListResponse) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{99}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{100}
 }
 
 func (x *FileListResponse) GetTotal() int64 {
@@ -6310,7 +6378,7 @@ type NoticeItem struct {
 
 func (x *NoticeItem) Reset() {
 	*x = NoticeItem{}
-	mi := &file_rpc_iam_proto_msgTypes[100]
+	mi := &file_rpc_iam_proto_msgTypes[101]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6322,7 +6390,7 @@ func (x *NoticeItem) String() string {
 func (*NoticeItem) ProtoMessage() {}
 
 func (x *NoticeItem) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[100]
+	mi := &file_rpc_iam_proto_msgTypes[101]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6335,7 +6403,7 @@ func (x *NoticeItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NoticeItem.ProtoReflect.Descriptor instead.
 func (*NoticeItem) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{100}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{101}
 }
 
 func (x *NoticeItem) GetId() uint64 {
@@ -6415,7 +6483,7 @@ type NoticeCreateRequest struct {
 
 func (x *NoticeCreateRequest) Reset() {
 	*x = NoticeCreateRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[101]
+	mi := &file_rpc_iam_proto_msgTypes[102]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6427,7 +6495,7 @@ func (x *NoticeCreateRequest) String() string {
 func (*NoticeCreateRequest) ProtoMessage() {}
 
 func (x *NoticeCreateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[101]
+	mi := &file_rpc_iam_proto_msgTypes[102]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6440,7 +6508,7 @@ func (x *NoticeCreateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NoticeCreateRequest.ProtoReflect.Descriptor instead.
 func (*NoticeCreateRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{101}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{102}
 }
 
 func (x *NoticeCreateRequest) GetTitle() string {
@@ -6499,7 +6567,7 @@ type NoticeUpdateRequest struct {
 
 func (x *NoticeUpdateRequest) Reset() {
 	*x = NoticeUpdateRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[102]
+	mi := &file_rpc_iam_proto_msgTypes[103]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6511,7 +6579,7 @@ func (x *NoticeUpdateRequest) String() string {
 func (*NoticeUpdateRequest) ProtoMessage() {}
 
 func (x *NoticeUpdateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[102]
+	mi := &file_rpc_iam_proto_msgTypes[103]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6524,7 +6592,7 @@ func (x *NoticeUpdateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NoticeUpdateRequest.ProtoReflect.Descriptor instead.
 func (*NoticeUpdateRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{102}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{103}
 }
 
 func (x *NoticeUpdateRequest) GetId() uint64 {
@@ -6578,7 +6646,7 @@ type NoticeDeleteRequest struct {
 
 func (x *NoticeDeleteRequest) Reset() {
 	*x = NoticeDeleteRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[103]
+	mi := &file_rpc_iam_proto_msgTypes[104]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6590,7 +6658,7 @@ func (x *NoticeDeleteRequest) String() string {
 func (*NoticeDeleteRequest) ProtoMessage() {}
 
 func (x *NoticeDeleteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[103]
+	mi := &file_rpc_iam_proto_msgTypes[104]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6603,7 +6671,7 @@ func (x *NoticeDeleteRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NoticeDeleteRequest.ProtoReflect.Descriptor instead.
 func (*NoticeDeleteRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{103}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{104}
 }
 
 func (x *NoticeDeleteRequest) GetId() uint64 {
@@ -6626,7 +6694,7 @@ type NoticeListRequest struct {
 
 func (x *NoticeListRequest) Reset() {
 	*x = NoticeListRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[104]
+	mi := &file_rpc_iam_proto_msgTypes[105]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6638,7 +6706,7 @@ func (x *NoticeListRequest) String() string {
 func (*NoticeListRequest) ProtoMessage() {}
 
 func (x *NoticeListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[104]
+	mi := &file_rpc_iam_proto_msgTypes[105]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6651,7 +6719,7 @@ func (x *NoticeListRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NoticeListRequest.ProtoReflect.Descriptor instead.
 func (*NoticeListRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{104}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{105}
 }
 
 func (x *NoticeListRequest) GetPage() int64 {
@@ -6699,7 +6767,7 @@ type NoticeListResponse struct {
 
 func (x *NoticeListResponse) Reset() {
 	*x = NoticeListResponse{}
-	mi := &file_rpc_iam_proto_msgTypes[105]
+	mi := &file_rpc_iam_proto_msgTypes[106]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6711,7 +6779,7 @@ func (x *NoticeListResponse) String() string {
 func (*NoticeListResponse) ProtoMessage() {}
 
 func (x *NoticeListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[105]
+	mi := &file_rpc_iam_proto_msgTypes[106]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6724,7 +6792,7 @@ func (x *NoticeListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NoticeListResponse.ProtoReflect.Descriptor instead.
 func (*NoticeListResponse) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{105}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{106}
 }
 
 func (x *NoticeListResponse) GetTotal() int64 {
@@ -6759,7 +6827,7 @@ type NotificationItem struct {
 
 func (x *NotificationItem) Reset() {
 	*x = NotificationItem{}
-	mi := &file_rpc_iam_proto_msgTypes[106]
+	mi := &file_rpc_iam_proto_msgTypes[107]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6771,7 +6839,7 @@ func (x *NotificationItem) String() string {
 func (*NotificationItem) ProtoMessage() {}
 
 func (x *NotificationItem) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[106]
+	mi := &file_rpc_iam_proto_msgTypes[107]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6784,7 +6852,7 @@ func (x *NotificationItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NotificationItem.ProtoReflect.Descriptor instead.
 func (*NotificationItem) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{106}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{107}
 }
 
 func (x *NotificationItem) GetId() uint64 {
@@ -6870,7 +6938,7 @@ type NotificationListRequest struct {
 
 func (x *NotificationListRequest) Reset() {
 	*x = NotificationListRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[107]
+	mi := &file_rpc_iam_proto_msgTypes[108]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6882,7 +6950,7 @@ func (x *NotificationListRequest) String() string {
 func (*NotificationListRequest) ProtoMessage() {}
 
 func (x *NotificationListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[107]
+	mi := &file_rpc_iam_proto_msgTypes[108]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6895,7 +6963,7 @@ func (x *NotificationListRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NotificationListRequest.ProtoReflect.Descriptor instead.
 func (*NotificationListRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{107}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{108}
 }
 
 func (x *NotificationListRequest) GetUserId() uint64 {
@@ -6943,7 +7011,7 @@ type NotificationListResponse struct {
 
 func (x *NotificationListResponse) Reset() {
 	*x = NotificationListResponse{}
-	mi := &file_rpc_iam_proto_msgTypes[108]
+	mi := &file_rpc_iam_proto_msgTypes[109]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6955,7 +7023,7 @@ func (x *NotificationListResponse) String() string {
 func (*NotificationListResponse) ProtoMessage() {}
 
 func (x *NotificationListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[108]
+	mi := &file_rpc_iam_proto_msgTypes[109]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6968,7 +7036,7 @@ func (x *NotificationListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NotificationListResponse.ProtoReflect.Descriptor instead.
 func (*NotificationListResponse) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{108}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{109}
 }
 
 func (x *NotificationListResponse) GetTotal() int64 {
@@ -6995,7 +7063,7 @@ type NotificationReadRequest struct {
 
 func (x *NotificationReadRequest) Reset() {
 	*x = NotificationReadRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[109]
+	mi := &file_rpc_iam_proto_msgTypes[110]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7007,7 +7075,7 @@ func (x *NotificationReadRequest) String() string {
 func (*NotificationReadRequest) ProtoMessage() {}
 
 func (x *NotificationReadRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[109]
+	mi := &file_rpc_iam_proto_msgTypes[110]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7020,7 +7088,7 @@ func (x *NotificationReadRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NotificationReadRequest.ProtoReflect.Descriptor instead.
 func (*NotificationReadRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{109}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{110}
 }
 
 func (x *NotificationReadRequest) GetUserId() uint64 {
@@ -7046,7 +7114,7 @@ type NotificationReadAllRequest struct {
 
 func (x *NotificationReadAllRequest) Reset() {
 	*x = NotificationReadAllRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[110]
+	mi := &file_rpc_iam_proto_msgTypes[111]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7058,7 +7126,7 @@ func (x *NotificationReadAllRequest) String() string {
 func (*NotificationReadAllRequest) ProtoMessage() {}
 
 func (x *NotificationReadAllRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[110]
+	mi := &file_rpc_iam_proto_msgTypes[111]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7071,7 +7139,7 @@ func (x *NotificationReadAllRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NotificationReadAllRequest.ProtoReflect.Descriptor instead.
 func (*NotificationReadAllRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{110}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{111}
 }
 
 func (x *NotificationReadAllRequest) GetUserId() uint64 {
@@ -7090,7 +7158,7 @@ type NotificationClearReadRequest struct {
 
 func (x *NotificationClearReadRequest) Reset() {
 	*x = NotificationClearReadRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[111]
+	mi := &file_rpc_iam_proto_msgTypes[112]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7102,7 +7170,7 @@ func (x *NotificationClearReadRequest) String() string {
 func (*NotificationClearReadRequest) ProtoMessage() {}
 
 func (x *NotificationClearReadRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[111]
+	mi := &file_rpc_iam_proto_msgTypes[112]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7115,7 +7183,7 @@ func (x *NotificationClearReadRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NotificationClearReadRequest.ProtoReflect.Descriptor instead.
 func (*NotificationClearReadRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{111}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{112}
 }
 
 func (x *NotificationClearReadRequest) GetUserId() uint64 {
@@ -7135,7 +7203,7 @@ type NotificationDeleteRequest struct {
 
 func (x *NotificationDeleteRequest) Reset() {
 	*x = NotificationDeleteRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[112]
+	mi := &file_rpc_iam_proto_msgTypes[113]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7147,7 +7215,7 @@ func (x *NotificationDeleteRequest) String() string {
 func (*NotificationDeleteRequest) ProtoMessage() {}
 
 func (x *NotificationDeleteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[112]
+	mi := &file_rpc_iam_proto_msgTypes[113]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7160,7 +7228,7 @@ func (x *NotificationDeleteRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NotificationDeleteRequest.ProtoReflect.Descriptor instead.
 func (*NotificationDeleteRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{112}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{113}
 }
 
 func (x *NotificationDeleteRequest) GetUserId() uint64 {
@@ -7199,7 +7267,7 @@ type OperationLogItem struct {
 
 func (x *OperationLogItem) Reset() {
 	*x = OperationLogItem{}
-	mi := &file_rpc_iam_proto_msgTypes[113]
+	mi := &file_rpc_iam_proto_msgTypes[114]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7211,7 +7279,7 @@ func (x *OperationLogItem) String() string {
 func (*OperationLogItem) ProtoMessage() {}
 
 func (x *OperationLogItem) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[113]
+	mi := &file_rpc_iam_proto_msgTypes[114]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7224,7 +7292,7 @@ func (x *OperationLogItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use OperationLogItem.ProtoReflect.Descriptor instead.
 func (*OperationLogItem) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{113}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{114}
 }
 
 func (x *OperationLogItem) GetId() uint64 {
@@ -7342,7 +7410,7 @@ type OperationLogListRequest struct {
 
 func (x *OperationLogListRequest) Reset() {
 	*x = OperationLogListRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[114]
+	mi := &file_rpc_iam_proto_msgTypes[115]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7354,7 +7422,7 @@ func (x *OperationLogListRequest) String() string {
 func (*OperationLogListRequest) ProtoMessage() {}
 
 func (x *OperationLogListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[114]
+	mi := &file_rpc_iam_proto_msgTypes[115]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7367,7 +7435,7 @@ func (x *OperationLogListRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use OperationLogListRequest.ProtoReflect.Descriptor instead.
 func (*OperationLogListRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{114}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{115}
 }
 
 func (x *OperationLogListRequest) GetPage() int64 {
@@ -7443,7 +7511,7 @@ type OperationLogListResponse struct {
 
 func (x *OperationLogListResponse) Reset() {
 	*x = OperationLogListResponse{}
-	mi := &file_rpc_iam_proto_msgTypes[115]
+	mi := &file_rpc_iam_proto_msgTypes[116]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7455,7 +7523,7 @@ func (x *OperationLogListResponse) String() string {
 func (*OperationLogListResponse) ProtoMessage() {}
 
 func (x *OperationLogListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[115]
+	mi := &file_rpc_iam_proto_msgTypes[116]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7468,7 +7536,7 @@ func (x *OperationLogListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use OperationLogListResponse.ProtoReflect.Descriptor instead.
 func (*OperationLogListResponse) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{115}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{116}
 }
 
 func (x *OperationLogListResponse) GetTotal() int64 {
@@ -7494,7 +7562,7 @@ type OperationLogDetailRequest struct {
 
 func (x *OperationLogDetailRequest) Reset() {
 	*x = OperationLogDetailRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[116]
+	mi := &file_rpc_iam_proto_msgTypes[117]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7506,7 +7574,7 @@ func (x *OperationLogDetailRequest) String() string {
 func (*OperationLogDetailRequest) ProtoMessage() {}
 
 func (x *OperationLogDetailRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[116]
+	mi := &file_rpc_iam_proto_msgTypes[117]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7519,7 +7587,7 @@ func (x *OperationLogDetailRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use OperationLogDetailRequest.ProtoReflect.Descriptor instead.
 func (*OperationLogDetailRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{116}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{117}
 }
 
 func (x *OperationLogDetailRequest) GetId() uint64 {
@@ -7550,7 +7618,7 @@ type LoginLogItem struct {
 
 func (x *LoginLogItem) Reset() {
 	*x = LoginLogItem{}
-	mi := &file_rpc_iam_proto_msgTypes[117]
+	mi := &file_rpc_iam_proto_msgTypes[118]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7562,7 +7630,7 @@ func (x *LoginLogItem) String() string {
 func (*LoginLogItem) ProtoMessage() {}
 
 func (x *LoginLogItem) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[117]
+	mi := &file_rpc_iam_proto_msgTypes[118]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7575,7 +7643,7 @@ func (x *LoginLogItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginLogItem.ProtoReflect.Descriptor instead.
 func (*LoginLogItem) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{117}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{118}
 }
 
 func (x *LoginLogItem) GetId() uint64 {
@@ -7684,7 +7752,7 @@ type LoginLogListRequest struct {
 
 func (x *LoginLogListRequest) Reset() {
 	*x = LoginLogListRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[118]
+	mi := &file_rpc_iam_proto_msgTypes[119]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7696,7 +7764,7 @@ func (x *LoginLogListRequest) String() string {
 func (*LoginLogListRequest) ProtoMessage() {}
 
 func (x *LoginLogListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[118]
+	mi := &file_rpc_iam_proto_msgTypes[119]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7709,7 +7777,7 @@ func (x *LoginLogListRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginLogListRequest.ProtoReflect.Descriptor instead.
 func (*LoginLogListRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{118}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{119}
 }
 
 func (x *LoginLogListRequest) GetPage() int64 {
@@ -7771,7 +7839,7 @@ type LoginLogListResponse struct {
 
 func (x *LoginLogListResponse) Reset() {
 	*x = LoginLogListResponse{}
-	mi := &file_rpc_iam_proto_msgTypes[119]
+	mi := &file_rpc_iam_proto_msgTypes[120]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7783,7 +7851,7 @@ func (x *LoginLogListResponse) String() string {
 func (*LoginLogListResponse) ProtoMessage() {}
 
 func (x *LoginLogListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[119]
+	mi := &file_rpc_iam_proto_msgTypes[120]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7796,7 +7864,7 @@ func (x *LoginLogListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginLogListResponse.ProtoReflect.Descriptor instead.
 func (*LoginLogListResponse) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{119}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{120}
 }
 
 func (x *LoginLogListResponse) GetTotal() int64 {
@@ -7822,7 +7890,7 @@ type LoginLogDetailRequest struct {
 
 func (x *LoginLogDetailRequest) Reset() {
 	*x = LoginLogDetailRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[120]
+	mi := &file_rpc_iam_proto_msgTypes[121]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7834,7 +7902,7 @@ func (x *LoginLogDetailRequest) String() string {
 func (*LoginLogDetailRequest) ProtoMessage() {}
 
 func (x *LoginLogDetailRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[120]
+	mi := &file_rpc_iam_proto_msgTypes[121]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7847,7 +7915,7 @@ func (x *LoginLogDetailRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginLogDetailRequest.ProtoReflect.Descriptor instead.
 func (*LoginLogDetailRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{120}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{121}
 }
 
 func (x *LoginLogDetailRequest) GetId() uint64 {
@@ -7872,7 +7940,7 @@ type LoginLogStatsResponse struct {
 
 func (x *LoginLogStatsResponse) Reset() {
 	*x = LoginLogStatsResponse{}
-	mi := &file_rpc_iam_proto_msgTypes[121]
+	mi := &file_rpc_iam_proto_msgTypes[122]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7884,7 +7952,7 @@ func (x *LoginLogStatsResponse) String() string {
 func (*LoginLogStatsResponse) ProtoMessage() {}
 
 func (x *LoginLogStatsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[121]
+	mi := &file_rpc_iam_proto_msgTypes[122]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7897,7 +7965,7 @@ func (x *LoginLogStatsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginLogStatsResponse.ProtoReflect.Descriptor instead.
 func (*LoginLogStatsResponse) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{121}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{122}
 }
 
 func (x *LoginLogStatsResponse) GetTotalCount() int64 {
@@ -7970,7 +8038,7 @@ type PerformanceLogItem struct {
 
 func (x *PerformanceLogItem) Reset() {
 	*x = PerformanceLogItem{}
-	mi := &file_rpc_iam_proto_msgTypes[122]
+	mi := &file_rpc_iam_proto_msgTypes[123]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7982,7 +8050,7 @@ func (x *PerformanceLogItem) String() string {
 func (*PerformanceLogItem) ProtoMessage() {}
 
 func (x *PerformanceLogItem) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[122]
+	mi := &file_rpc_iam_proto_msgTypes[123]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7995,7 +8063,7 @@ func (x *PerformanceLogItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PerformanceLogItem.ProtoReflect.Descriptor instead.
 func (*PerformanceLogItem) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{122}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{123}
 }
 
 func (x *PerformanceLogItem) GetId() uint64 {
@@ -8105,7 +8173,7 @@ type PerformanceLogListRequest struct {
 
 func (x *PerformanceLogListRequest) Reset() {
 	*x = PerformanceLogListRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[123]
+	mi := &file_rpc_iam_proto_msgTypes[124]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8117,7 +8185,7 @@ func (x *PerformanceLogListRequest) String() string {
 func (*PerformanceLogListRequest) ProtoMessage() {}
 
 func (x *PerformanceLogListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[123]
+	mi := &file_rpc_iam_proto_msgTypes[124]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8130,7 +8198,7 @@ func (x *PerformanceLogListRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PerformanceLogListRequest.ProtoReflect.Descriptor instead.
 func (*PerformanceLogListRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{123}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{124}
 }
 
 func (x *PerformanceLogListRequest) GetPage() int64 {
@@ -8199,7 +8267,7 @@ type PerformanceLogListResponse struct {
 
 func (x *PerformanceLogListResponse) Reset() {
 	*x = PerformanceLogListResponse{}
-	mi := &file_rpc_iam_proto_msgTypes[124]
+	mi := &file_rpc_iam_proto_msgTypes[125]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8211,7 +8279,7 @@ func (x *PerformanceLogListResponse) String() string {
 func (*PerformanceLogListResponse) ProtoMessage() {}
 
 func (x *PerformanceLogListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[124]
+	mi := &file_rpc_iam_proto_msgTypes[125]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8224,7 +8292,7 @@ func (x *PerformanceLogListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PerformanceLogListResponse.ProtoReflect.Descriptor instead.
 func (*PerformanceLogListResponse) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{124}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{125}
 }
 
 func (x *PerformanceLogListResponse) GetTotal() int64 {
@@ -8258,7 +8326,7 @@ type AuditLogItem struct {
 
 func (x *AuditLogItem) Reset() {
 	*x = AuditLogItem{}
-	mi := &file_rpc_iam_proto_msgTypes[125]
+	mi := &file_rpc_iam_proto_msgTypes[126]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8270,7 +8338,7 @@ func (x *AuditLogItem) String() string {
 func (*AuditLogItem) ProtoMessage() {}
 
 func (x *AuditLogItem) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[125]
+	mi := &file_rpc_iam_proto_msgTypes[126]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8283,7 +8351,7 @@ func (x *AuditLogItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AuditLogItem.ProtoReflect.Descriptor instead.
 func (*AuditLogItem) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{125}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{126}
 }
 
 func (x *AuditLogItem) GetId() uint64 {
@@ -8365,7 +8433,7 @@ type AuditLogListRequest struct {
 
 func (x *AuditLogListRequest) Reset() {
 	*x = AuditLogListRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[126]
+	mi := &file_rpc_iam_proto_msgTypes[127]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8377,7 +8445,7 @@ func (x *AuditLogListRequest) String() string {
 func (*AuditLogListRequest) ProtoMessage() {}
 
 func (x *AuditLogListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[126]
+	mi := &file_rpc_iam_proto_msgTypes[127]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8390,7 +8458,7 @@ func (x *AuditLogListRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AuditLogListRequest.ProtoReflect.Descriptor instead.
 func (*AuditLogListRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{126}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{127}
 }
 
 func (x *AuditLogListRequest) GetPage() int64 {
@@ -8459,7 +8527,7 @@ type AuditLogListResponse struct {
 
 func (x *AuditLogListResponse) Reset() {
 	*x = AuditLogListResponse{}
-	mi := &file_rpc_iam_proto_msgTypes[127]
+	mi := &file_rpc_iam_proto_msgTypes[128]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8471,7 +8539,7 @@ func (x *AuditLogListResponse) String() string {
 func (*AuditLogListResponse) ProtoMessage() {}
 
 func (x *AuditLogListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[127]
+	mi := &file_rpc_iam_proto_msgTypes[128]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8484,7 +8552,7 @@ func (x *AuditLogListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AuditLogListResponse.ProtoReflect.Descriptor instead.
 func (*AuditLogListResponse) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{127}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{128}
 }
 
 func (x *AuditLogListResponse) GetTotal() int64 {
@@ -8510,7 +8578,7 @@ type AuditLogDetailRequest struct {
 
 func (x *AuditLogDetailRequest) Reset() {
 	*x = AuditLogDetailRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[128]
+	mi := &file_rpc_iam_proto_msgTypes[129]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8522,7 +8590,7 @@ func (x *AuditLogDetailRequest) String() string {
 func (*AuditLogDetailRequest) ProtoMessage() {}
 
 func (x *AuditLogDetailRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[128]
+	mi := &file_rpc_iam_proto_msgTypes[129]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8535,7 +8603,7 @@ func (x *AuditLogDetailRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AuditLogDetailRequest.ProtoReflect.Descriptor instead.
 func (*AuditLogDetailRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{128}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{129}
 }
 
 func (x *AuditLogDetailRequest) GetId() uint64 {
@@ -8559,7 +8627,7 @@ type MetricReportRequest struct {
 
 func (x *MetricReportRequest) Reset() {
 	*x = MetricReportRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[129]
+	mi := &file_rpc_iam_proto_msgTypes[130]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8571,7 +8639,7 @@ func (x *MetricReportRequest) String() string {
 func (*MetricReportRequest) ProtoMessage() {}
 
 func (x *MetricReportRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[129]
+	mi := &file_rpc_iam_proto_msgTypes[130]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8584,7 +8652,7 @@ func (x *MetricReportRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MetricReportRequest.ProtoReflect.Descriptor instead.
 func (*MetricReportRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{129}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{130}
 }
 
 func (x *MetricReportRequest) GetModule() string {
@@ -8640,7 +8708,7 @@ type MetricStatsRequest struct {
 
 func (x *MetricStatsRequest) Reset() {
 	*x = MetricStatsRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[130]
+	mi := &file_rpc_iam_proto_msgTypes[131]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8652,7 +8720,7 @@ func (x *MetricStatsRequest) String() string {
 func (*MetricStatsRequest) ProtoMessage() {}
 
 func (x *MetricStatsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[130]
+	mi := &file_rpc_iam_proto_msgTypes[131]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8665,7 +8733,7 @@ func (x *MetricStatsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MetricStatsRequest.ProtoReflect.Descriptor instead.
 func (*MetricStatsRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{130}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{131}
 }
 
 func (x *MetricStatsRequest) GetModule() string {
@@ -8704,7 +8772,7 @@ type MetricStatsResponse struct {
 
 func (x *MetricStatsResponse) Reset() {
 	*x = MetricStatsResponse{}
-	mi := &file_rpc_iam_proto_msgTypes[131]
+	mi := &file_rpc_iam_proto_msgTypes[132]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8716,7 +8784,7 @@ func (x *MetricStatsResponse) String() string {
 func (*MetricStatsResponse) ProtoMessage() {}
 
 func (x *MetricStatsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[131]
+	mi := &file_rpc_iam_proto_msgTypes[132]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8729,7 +8797,7 @@ func (x *MetricStatsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MetricStatsResponse.ProtoReflect.Descriptor instead.
 func (*MetricStatsResponse) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{131}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{132}
 }
 
 func (x *MetricStatsResponse) GetModule() string {
@@ -8796,7 +8864,7 @@ type MonitorStatsResponse struct {
 
 func (x *MonitorStatsResponse) Reset() {
 	*x = MonitorStatsResponse{}
-	mi := &file_rpc_iam_proto_msgTypes[132]
+	mi := &file_rpc_iam_proto_msgTypes[133]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8808,7 +8876,7 @@ func (x *MonitorStatsResponse) String() string {
 func (*MonitorStatsResponse) ProtoMessage() {}
 
 func (x *MonitorStatsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[132]
+	mi := &file_rpc_iam_proto_msgTypes[133]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8821,7 +8889,7 @@ func (x *MonitorStatsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MonitorStatsResponse.ProtoReflect.Descriptor instead.
 func (*MonitorStatsResponse) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{132}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{133}
 }
 
 func (x *MonitorStatsResponse) GetUserCount() int64 {
@@ -8898,7 +8966,7 @@ type MonitorStatusResponse struct {
 
 func (x *MonitorStatusResponse) Reset() {
 	*x = MonitorStatusResponse{}
-	mi := &file_rpc_iam_proto_msgTypes[133]
+	mi := &file_rpc_iam_proto_msgTypes[134]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8910,7 +8978,7 @@ func (x *MonitorStatusResponse) String() string {
 func (*MonitorStatusResponse) ProtoMessage() {}
 
 func (x *MonitorStatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[133]
+	mi := &file_rpc_iam_proto_msgTypes[134]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8923,7 +8991,7 @@ func (x *MonitorStatusResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MonitorStatusResponse.ProtoReflect.Descriptor instead.
 func (*MonitorStatusResponse) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{133}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{134}
 }
 
 func (x *MonitorStatusResponse) GetCpuUsage() float64 {
@@ -9036,7 +9104,7 @@ type DemoItem struct {
 
 func (x *DemoItem) Reset() {
 	*x = DemoItem{}
-	mi := &file_rpc_iam_proto_msgTypes[134]
+	mi := &file_rpc_iam_proto_msgTypes[135]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9048,7 +9116,7 @@ func (x *DemoItem) String() string {
 func (*DemoItem) ProtoMessage() {}
 
 func (x *DemoItem) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[134]
+	mi := &file_rpc_iam_proto_msgTypes[135]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9061,7 +9129,7 @@ func (x *DemoItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DemoItem.ProtoReflect.Descriptor instead.
 func (*DemoItem) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{134}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{135}
 }
 
 func (x *DemoItem) GetId() uint64 {
@@ -9102,7 +9170,7 @@ type DemoCreateRequest struct {
 
 func (x *DemoCreateRequest) Reset() {
 	*x = DemoCreateRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[135]
+	mi := &file_rpc_iam_proto_msgTypes[136]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9114,7 +9182,7 @@ func (x *DemoCreateRequest) String() string {
 func (*DemoCreateRequest) ProtoMessage() {}
 
 func (x *DemoCreateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[135]
+	mi := &file_rpc_iam_proto_msgTypes[136]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9127,7 +9195,7 @@ func (x *DemoCreateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DemoCreateRequest.ProtoReflect.Descriptor instead.
 func (*DemoCreateRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{135}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{136}
 }
 
 func (x *DemoCreateRequest) GetName() string {
@@ -9155,7 +9223,7 @@ type DemoUpdateRequest struct {
 
 func (x *DemoUpdateRequest) Reset() {
 	*x = DemoUpdateRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[136]
+	mi := &file_rpc_iam_proto_msgTypes[137]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9167,7 +9235,7 @@ func (x *DemoUpdateRequest) String() string {
 func (*DemoUpdateRequest) ProtoMessage() {}
 
 func (x *DemoUpdateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[136]
+	mi := &file_rpc_iam_proto_msgTypes[137]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9180,7 +9248,7 @@ func (x *DemoUpdateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DemoUpdateRequest.ProtoReflect.Descriptor instead.
 func (*DemoUpdateRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{136}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{137}
 }
 
 func (x *DemoUpdateRequest) GetId() uint64 {
@@ -9213,7 +9281,7 @@ type DemoDeleteRequest struct {
 
 func (x *DemoDeleteRequest) Reset() {
 	*x = DemoDeleteRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[137]
+	mi := &file_rpc_iam_proto_msgTypes[138]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9225,7 +9293,7 @@ func (x *DemoDeleteRequest) String() string {
 func (*DemoDeleteRequest) ProtoMessage() {}
 
 func (x *DemoDeleteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[137]
+	mi := &file_rpc_iam_proto_msgTypes[138]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9238,7 +9306,7 @@ func (x *DemoDeleteRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DemoDeleteRequest.ProtoReflect.Descriptor instead.
 func (*DemoDeleteRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{137}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{138}
 }
 
 func (x *DemoDeleteRequest) GetId() uint64 {
@@ -9259,7 +9327,7 @@ type DemoListRequest struct {
 
 func (x *DemoListRequest) Reset() {
 	*x = DemoListRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[138]
+	mi := &file_rpc_iam_proto_msgTypes[139]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9271,7 +9339,7 @@ func (x *DemoListRequest) String() string {
 func (*DemoListRequest) ProtoMessage() {}
 
 func (x *DemoListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[138]
+	mi := &file_rpc_iam_proto_msgTypes[139]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9284,7 +9352,7 @@ func (x *DemoListRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DemoListRequest.ProtoReflect.Descriptor instead.
 func (*DemoListRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{138}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{139}
 }
 
 func (x *DemoListRequest) GetPage() int64 {
@@ -9318,7 +9386,7 @@ type DemoListResponse struct {
 
 func (x *DemoListResponse) Reset() {
 	*x = DemoListResponse{}
-	mi := &file_rpc_iam_proto_msgTypes[139]
+	mi := &file_rpc_iam_proto_msgTypes[140]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9330,7 +9398,7 @@ func (x *DemoListResponse) String() string {
 func (*DemoListResponse) ProtoMessage() {}
 
 func (x *DemoListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[139]
+	mi := &file_rpc_iam_proto_msgTypes[140]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9343,7 +9411,7 @@ func (x *DemoListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DemoListResponse.ProtoReflect.Descriptor instead.
 func (*DemoListResponse) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{139}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{140}
 }
 
 func (x *DemoListResponse) GetTotal() int64 {
@@ -9376,7 +9444,7 @@ type DailyShortSentenceItem struct {
 
 func (x *DailyShortSentenceItem) Reset() {
 	*x = DailyShortSentenceItem{}
-	mi := &file_rpc_iam_proto_msgTypes[140]
+	mi := &file_rpc_iam_proto_msgTypes[141]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9388,7 +9456,7 @@ func (x *DailyShortSentenceItem) String() string {
 func (*DailyShortSentenceItem) ProtoMessage() {}
 
 func (x *DailyShortSentenceItem) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[140]
+	mi := &file_rpc_iam_proto_msgTypes[141]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9401,7 +9469,7 @@ func (x *DailyShortSentenceItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DailyShortSentenceItem.ProtoReflect.Descriptor instead.
 func (*DailyShortSentenceItem) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{140}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{141}
 }
 
 func (x *DailyShortSentenceItem) GetId() uint64 {
@@ -9473,7 +9541,7 @@ type DailyShortSentenceCreateRequest struct {
 
 func (x *DailyShortSentenceCreateRequest) Reset() {
 	*x = DailyShortSentenceCreateRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[141]
+	mi := &file_rpc_iam_proto_msgTypes[142]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9485,7 +9553,7 @@ func (x *DailyShortSentenceCreateRequest) String() string {
 func (*DailyShortSentenceCreateRequest) ProtoMessage() {}
 
 func (x *DailyShortSentenceCreateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[141]
+	mi := &file_rpc_iam_proto_msgTypes[142]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9498,7 +9566,7 @@ func (x *DailyShortSentenceCreateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DailyShortSentenceCreateRequest.ProtoReflect.Descriptor instead.
 func (*DailyShortSentenceCreateRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{141}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{142}
 }
 
 func (x *DailyShortSentenceCreateRequest) GetSentenceType() int64 {
@@ -9550,7 +9618,7 @@ type DailyShortSentenceUpdateRequest struct {
 
 func (x *DailyShortSentenceUpdateRequest) Reset() {
 	*x = DailyShortSentenceUpdateRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[142]
+	mi := &file_rpc_iam_proto_msgTypes[143]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9562,7 +9630,7 @@ func (x *DailyShortSentenceUpdateRequest) String() string {
 func (*DailyShortSentenceUpdateRequest) ProtoMessage() {}
 
 func (x *DailyShortSentenceUpdateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[142]
+	mi := &file_rpc_iam_proto_msgTypes[143]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9575,7 +9643,7 @@ func (x *DailyShortSentenceUpdateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DailyShortSentenceUpdateRequest.ProtoReflect.Descriptor instead.
 func (*DailyShortSentenceUpdateRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{142}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{143}
 }
 
 func (x *DailyShortSentenceUpdateRequest) GetId() uint64 {
@@ -9629,7 +9697,7 @@ type DailyShortSentenceDeleteRequest struct {
 
 func (x *DailyShortSentenceDeleteRequest) Reset() {
 	*x = DailyShortSentenceDeleteRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[143]
+	mi := &file_rpc_iam_proto_msgTypes[144]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9641,7 +9709,7 @@ func (x *DailyShortSentenceDeleteRequest) String() string {
 func (*DailyShortSentenceDeleteRequest) ProtoMessage() {}
 
 func (x *DailyShortSentenceDeleteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[143]
+	mi := &file_rpc_iam_proto_msgTypes[144]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9654,7 +9722,7 @@ func (x *DailyShortSentenceDeleteRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DailyShortSentenceDeleteRequest.ProtoReflect.Descriptor instead.
 func (*DailyShortSentenceDeleteRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{143}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{144}
 }
 
 func (x *DailyShortSentenceDeleteRequest) GetId() uint64 {
@@ -9676,7 +9744,7 @@ type DailyShortSentenceListRequest struct {
 
 func (x *DailyShortSentenceListRequest) Reset() {
 	*x = DailyShortSentenceListRequest{}
-	mi := &file_rpc_iam_proto_msgTypes[144]
+	mi := &file_rpc_iam_proto_msgTypes[145]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9688,7 +9756,7 @@ func (x *DailyShortSentenceListRequest) String() string {
 func (*DailyShortSentenceListRequest) ProtoMessage() {}
 
 func (x *DailyShortSentenceListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[144]
+	mi := &file_rpc_iam_proto_msgTypes[145]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9701,7 +9769,7 @@ func (x *DailyShortSentenceListRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DailyShortSentenceListRequest.ProtoReflect.Descriptor instead.
 func (*DailyShortSentenceListRequest) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{144}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{145}
 }
 
 func (x *DailyShortSentenceListRequest) GetPage() int64 {
@@ -9742,7 +9810,7 @@ type DailyShortSentenceListResponse struct {
 
 func (x *DailyShortSentenceListResponse) Reset() {
 	*x = DailyShortSentenceListResponse{}
-	mi := &file_rpc_iam_proto_msgTypes[145]
+	mi := &file_rpc_iam_proto_msgTypes[146]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9754,7 +9822,7 @@ func (x *DailyShortSentenceListResponse) String() string {
 func (*DailyShortSentenceListResponse) ProtoMessage() {}
 
 func (x *DailyShortSentenceListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_iam_proto_msgTypes[145]
+	mi := &file_rpc_iam_proto_msgTypes[146]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9767,7 +9835,7 @@ func (x *DailyShortSentenceListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DailyShortSentenceListResponse.ProtoReflect.Descriptor instead.
 func (*DailyShortSentenceListResponse) Descriptor() ([]byte, []int) {
-	return file_rpc_iam_proto_rawDescGZIP(), []int{145}
+	return file_rpc_iam_proto_rawDescGZIP(), []int{146}
 }
 
 func (x *DailyShortSentenceListResponse) GetTotal() int64 {
@@ -9879,7 +9947,13 @@ const file_rpc_iam_proto_rawDesc = "" +
 	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\x12#\n" +
 	"\rrefresh_token\x18\x02 \x01(\tR\frefreshToken\"5\n" +
 	"\x0eRefreshRequest\x12#\n" +
-	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken\"W\n" +
+	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken\"z\n" +
+	"\x12LoginFeishuRequest\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\tR\x04code\x12\x14\n" +
+	"\x05state\x18\x02 \x01(\tR\x05state\x12\x1b\n" +
+	"\tclient_ip\x18\x03 \x01(\tR\bclientIp\x12\x1d\n" +
+	"\n" +
+	"user_agent\x18\x04 \x01(\tR\tuserAgent\"W\n" +
 	"\rLogoutRequest\x12!\n" +
 	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\x12#\n" +
 	"\rrefresh_token\x18\x02 \x01(\tR\frefreshToken\")\n" +
@@ -10573,7 +10647,7 @@ const file_rpc_iam_proto_rawDesc = "" +
 	"\rsentence_type\x18\x04 \x01(\x03R\fsentenceType\"g\n" +
 	"\x1eDailyShortSentenceListResponse\x12\x14\n" +
 	"\x05total\x18\x01 \x01(\x03R\x05total\x12/\n" +
-	"\x04list\x18\x02 \x03(\v2\x1b.iam.DailyShortSentenceItemR\x04list2\xc1-\n" +
+	"\x04list\x18\x02 \x03(\v2\x1b.iam.DailyShortSentenceItemR\x04list2\xf9-\n" +
 	"\x03Iam\x12L\n" +
 	"\x0fCheckPermission\x12\x1b.iam.CheckPermissionRequest\x1a\x1c.iam.CheckPermissionResponse\x12L\n" +
 	"\x0fCheckApiEnabled\x12\x1b.iam.CheckApiEnabledRequest\x1a\x1c.iam.CheckApiEnabledResponse\x126\n" +
@@ -10587,7 +10661,8 @@ const file_rpc_iam_proto_rawDesc = "" +
 	"\vFileGetMeta\x12\x17.iam.FileGetMetaRequest\x1a\x18.iam.FileGetMetaResponse\x12%\n" +
 	"\x04Ping\x12\n" +
 	".iam.Empty\x1a\x11.iam.PingResponse\x12*\n" +
-	"\x05Login\x12\x11.iam.LoginRequest\x1a\x0e.iam.TokenPair\x12.\n" +
+	"\x05Login\x12\x11.iam.LoginRequest\x1a\x0e.iam.TokenPair\x126\n" +
+	"\vLoginFeishu\x12\x17.iam.LoginFeishuRequest\x1a\x0e.iam.TokenPair\x12.\n" +
 	"\aRefresh\x12\x13.iam.RefreshRequest\x1a\x0e.iam.TokenPair\x12(\n" +
 	"\x06Logout\x12\x12.iam.LogoutRequest\x1a\n" +
 	".iam.Empty\x124\n" +
@@ -10761,7 +10836,7 @@ func file_rpc_iam_proto_rawDescGZIP() []byte {
 	return file_rpc_iam_proto_rawDescData
 }
 
-var file_rpc_iam_proto_msgTypes = make([]protoimpl.MessageInfo, 147)
+var file_rpc_iam_proto_msgTypes = make([]protoimpl.MessageInfo, 148)
 var file_rpc_iam_proto_goTypes = []any{
 	(*Empty)(nil),                           // 0: iam.Empty
 	(*CheckPermissionRequest)(nil),          // 1: iam.CheckPermissionRequest
@@ -10781,162 +10856,163 @@ var file_rpc_iam_proto_goTypes = []any{
 	(*LoginRequest)(nil),                    // 15: iam.LoginRequest
 	(*TokenPair)(nil),                       // 16: iam.TokenPair
 	(*RefreshRequest)(nil),                  // 17: iam.RefreshRequest
-	(*LogoutRequest)(nil),                   // 18: iam.LogoutRequest
-	(*ProfileRequest)(nil),                  // 19: iam.ProfileRequest
-	(*ProfileResponse)(nil),                 // 20: iam.ProfileResponse
-	(*ProfileUpdateRequest)(nil),            // 21: iam.ProfileUpdateRequest
-	(*PasswordChangeRequest)(nil),           // 22: iam.PasswordChangeRequest
-	(*UserItem)(nil),                        // 23: iam.UserItem
-	(*UserCreateRequest)(nil),               // 24: iam.UserCreateRequest
-	(*UserUpdateRequest)(nil),               // 25: iam.UserUpdateRequest
-	(*UserDeleteRequest)(nil),               // 26: iam.UserDeleteRequest
-	(*UserListRequest)(nil),                 // 27: iam.UserListRequest
-	(*UserListResponse)(nil),                // 28: iam.UserListResponse
-	(*RoleItem)(nil),                        // 29: iam.RoleItem
-	(*RoleCreateRequest)(nil),               // 30: iam.RoleCreateRequest
-	(*RoleUpdateRequest)(nil),               // 31: iam.RoleUpdateRequest
-	(*RoleDeleteRequest)(nil),               // 32: iam.RoleDeleteRequest
-	(*RoleListRequest)(nil),                 // 33: iam.RoleListRequest
-	(*RoleListResponse)(nil),                // 34: iam.RoleListResponse
-	(*PermissionItem)(nil),                  // 35: iam.PermissionItem
-	(*PermissionCreateRequest)(nil),         // 36: iam.PermissionCreateRequest
-	(*PermissionUpdateRequest)(nil),         // 37: iam.PermissionUpdateRequest
-	(*PermissionDeleteRequest)(nil),         // 38: iam.PermissionDeleteRequest
-	(*PermissionListRequest)(nil),           // 39: iam.PermissionListRequest
-	(*PermissionListResponse)(nil),          // 40: iam.PermissionListResponse
-	(*MenuItem)(nil),                        // 41: iam.MenuItem
-	(*MenuCreateRequest)(nil),               // 42: iam.MenuCreateRequest
-	(*MenuUpdateRequest)(nil),               // 43: iam.MenuUpdateRequest
-	(*MenuDeleteRequest)(nil),               // 44: iam.MenuDeleteRequest
-	(*MenuTreeResponse)(nil),                // 45: iam.MenuTreeResponse
-	(*MenuMyTreeRequest)(nil),               // 46: iam.MenuMyTreeRequest
-	(*DepartmentItem)(nil),                  // 47: iam.DepartmentItem
-	(*DepartmentCreateRequest)(nil),         // 48: iam.DepartmentCreateRequest
-	(*DepartmentUpdateRequest)(nil),         // 49: iam.DepartmentUpdateRequest
-	(*DepartmentDeleteRequest)(nil),         // 50: iam.DepartmentDeleteRequest
-	(*DepartmentTreeResponse)(nil),          // 51: iam.DepartmentTreeResponse
-	(*ApiItem)(nil),                         // 52: iam.ApiItem
-	(*ApiCreateRequest)(nil),                // 53: iam.ApiCreateRequest
-	(*ApiUpdateRequest)(nil),                // 54: iam.ApiUpdateRequest
-	(*ApiDeleteRequest)(nil),                // 55: iam.ApiDeleteRequest
-	(*ApiListRequest)(nil),                  // 56: iam.ApiListRequest
-	(*ApiListResponse)(nil),                 // 57: iam.ApiListResponse
-	(*PermissionMenuListRequest)(nil),       // 58: iam.PermissionMenuListRequest
-	(*PermissionMenuListResponse)(nil),      // 59: iam.PermissionMenuListResponse
-	(*PermissionMenuUpdateRequest)(nil),     // 60: iam.PermissionMenuUpdateRequest
-	(*PermissionApiListRequest)(nil),        // 61: iam.PermissionApiListRequest
-	(*PermissionApiListResponse)(nil),       // 62: iam.PermissionApiListResponse
-	(*PermissionApiUpdateRequest)(nil),      // 63: iam.PermissionApiUpdateRequest
-	(*UserRoleListRequest)(nil),             // 64: iam.UserRoleListRequest
-	(*UserRoleListResponse)(nil),            // 65: iam.UserRoleListResponse
-	(*UserRoleUpdateRequest)(nil),           // 66: iam.UserRoleUpdateRequest
-	(*RolePermissionListRequest)(nil),       // 67: iam.RolePermissionListRequest
-	(*RolePermissionListResponse)(nil),      // 68: iam.RolePermissionListResponse
-	(*RolePermissionUpdateRequest)(nil),     // 69: iam.RolePermissionUpdateRequest
-	(*ConfigItem)(nil),                      // 70: iam.ConfigItem
-	(*ConfigCreateRequest)(nil),             // 71: iam.ConfigCreateRequest
-	(*ConfigUpdateRequest)(nil),             // 72: iam.ConfigUpdateRequest
-	(*ConfigDeleteRequest)(nil),             // 73: iam.ConfigDeleteRequest
-	(*ConfigListRequest)(nil),               // 74: iam.ConfigListRequest
-	(*ConfigListResponse)(nil),              // 75: iam.ConfigListResponse
-	(*ConfigGetRequest)(nil),                // 76: iam.ConfigGetRequest
-	(*ConfigGetResponse)(nil),               // 77: iam.ConfigGetResponse
-	(*DictTypeItem)(nil),                    // 78: iam.DictTypeItem
-	(*DictTypeCreateRequest)(nil),           // 79: iam.DictTypeCreateRequest
-	(*DictTypeUpdateRequest)(nil),           // 80: iam.DictTypeUpdateRequest
-	(*DictTypeDeleteRequest)(nil),           // 81: iam.DictTypeDeleteRequest
-	(*DictTypeListRequest)(nil),             // 82: iam.DictTypeListRequest
-	(*DictTypeListResponse)(nil),            // 83: iam.DictTypeListResponse
-	(*DictItemItem)(nil),                    // 84: iam.DictItemItem
-	(*DictItemCreateRequest)(nil),           // 85: iam.DictItemCreateRequest
-	(*DictItemUpdateRequest)(nil),           // 86: iam.DictItemUpdateRequest
-	(*DictItemDeleteRequest)(nil),           // 87: iam.DictItemDeleteRequest
-	(*DictItemListRequest)(nil),             // 88: iam.DictItemListRequest
-	(*DictItemListResponse)(nil),            // 89: iam.DictItemListResponse
-	(*DictGetRequest)(nil),                  // 90: iam.DictGetRequest
-	(*DictGetResponse)(nil),                 // 91: iam.DictGetResponse
-	(*DictBatchGetRequest)(nil),             // 92: iam.DictBatchGetRequest
-	(*DictBatchGetResponse)(nil),            // 93: iam.DictBatchGetResponse
-	(*FileItem)(nil),                        // 94: iam.FileItem
-	(*FileCreateRequest)(nil),               // 95: iam.FileCreateRequest
-	(*FileUpdateRequest)(nil),               // 96: iam.FileUpdateRequest
-	(*FileDeleteRequest)(nil),               // 97: iam.FileDeleteRequest
-	(*FileListRequest)(nil),                 // 98: iam.FileListRequest
-	(*FileListResponse)(nil),                // 99: iam.FileListResponse
-	(*NoticeItem)(nil),                      // 100: iam.NoticeItem
-	(*NoticeCreateRequest)(nil),             // 101: iam.NoticeCreateRequest
-	(*NoticeUpdateRequest)(nil),             // 102: iam.NoticeUpdateRequest
-	(*NoticeDeleteRequest)(nil),             // 103: iam.NoticeDeleteRequest
-	(*NoticeListRequest)(nil),               // 104: iam.NoticeListRequest
-	(*NoticeListResponse)(nil),              // 105: iam.NoticeListResponse
-	(*NotificationItem)(nil),                // 106: iam.NotificationItem
-	(*NotificationListRequest)(nil),         // 107: iam.NotificationListRequest
-	(*NotificationListResponse)(nil),        // 108: iam.NotificationListResponse
-	(*NotificationReadRequest)(nil),         // 109: iam.NotificationReadRequest
-	(*NotificationReadAllRequest)(nil),      // 110: iam.NotificationReadAllRequest
-	(*NotificationClearReadRequest)(nil),    // 111: iam.NotificationClearReadRequest
-	(*NotificationDeleteRequest)(nil),       // 112: iam.NotificationDeleteRequest
-	(*OperationLogItem)(nil),                // 113: iam.OperationLogItem
-	(*OperationLogListRequest)(nil),         // 114: iam.OperationLogListRequest
-	(*OperationLogListResponse)(nil),        // 115: iam.OperationLogListResponse
-	(*OperationLogDetailRequest)(nil),       // 116: iam.OperationLogDetailRequest
-	(*LoginLogItem)(nil),                    // 117: iam.LoginLogItem
-	(*LoginLogListRequest)(nil),             // 118: iam.LoginLogListRequest
-	(*LoginLogListResponse)(nil),            // 119: iam.LoginLogListResponse
-	(*LoginLogDetailRequest)(nil),           // 120: iam.LoginLogDetailRequest
-	(*LoginLogStatsResponse)(nil),           // 121: iam.LoginLogStatsResponse
-	(*PerformanceLogItem)(nil),              // 122: iam.PerformanceLogItem
-	(*PerformanceLogListRequest)(nil),       // 123: iam.PerformanceLogListRequest
-	(*PerformanceLogListResponse)(nil),      // 124: iam.PerformanceLogListResponse
-	(*AuditLogItem)(nil),                    // 125: iam.AuditLogItem
-	(*AuditLogListRequest)(nil),             // 126: iam.AuditLogListRequest
-	(*AuditLogListResponse)(nil),            // 127: iam.AuditLogListResponse
-	(*AuditLogDetailRequest)(nil),           // 128: iam.AuditLogDetailRequest
-	(*MetricReportRequest)(nil),             // 129: iam.MetricReportRequest
-	(*MetricStatsRequest)(nil),              // 130: iam.MetricStatsRequest
-	(*MetricStatsResponse)(nil),             // 131: iam.MetricStatsResponse
-	(*MonitorStatsResponse)(nil),            // 132: iam.MonitorStatsResponse
-	(*MonitorStatusResponse)(nil),           // 133: iam.MonitorStatusResponse
-	(*DemoItem)(nil),                        // 134: iam.DemoItem
-	(*DemoCreateRequest)(nil),               // 135: iam.DemoCreateRequest
-	(*DemoUpdateRequest)(nil),               // 136: iam.DemoUpdateRequest
-	(*DemoDeleteRequest)(nil),               // 137: iam.DemoDeleteRequest
-	(*DemoListRequest)(nil),                 // 138: iam.DemoListRequest
-	(*DemoListResponse)(nil),                // 139: iam.DemoListResponse
-	(*DailyShortSentenceItem)(nil),          // 140: iam.DailyShortSentenceItem
-	(*DailyShortSentenceCreateRequest)(nil), // 141: iam.DailyShortSentenceCreateRequest
-	(*DailyShortSentenceUpdateRequest)(nil), // 142: iam.DailyShortSentenceUpdateRequest
-	(*DailyShortSentenceDeleteRequest)(nil), // 143: iam.DailyShortSentenceDeleteRequest
-	(*DailyShortSentenceListRequest)(nil),   // 144: iam.DailyShortSentenceListRequest
-	(*DailyShortSentenceListResponse)(nil),  // 145: iam.DailyShortSentenceListResponse
-	nil,                                     // 146: iam.DictBatchGetResponse.DictsEntry
+	(*LoginFeishuRequest)(nil),              // 18: iam.LoginFeishuRequest
+	(*LogoutRequest)(nil),                   // 19: iam.LogoutRequest
+	(*ProfileRequest)(nil),                  // 20: iam.ProfileRequest
+	(*ProfileResponse)(nil),                 // 21: iam.ProfileResponse
+	(*ProfileUpdateRequest)(nil),            // 22: iam.ProfileUpdateRequest
+	(*PasswordChangeRequest)(nil),           // 23: iam.PasswordChangeRequest
+	(*UserItem)(nil),                        // 24: iam.UserItem
+	(*UserCreateRequest)(nil),               // 25: iam.UserCreateRequest
+	(*UserUpdateRequest)(nil),               // 26: iam.UserUpdateRequest
+	(*UserDeleteRequest)(nil),               // 27: iam.UserDeleteRequest
+	(*UserListRequest)(nil),                 // 28: iam.UserListRequest
+	(*UserListResponse)(nil),                // 29: iam.UserListResponse
+	(*RoleItem)(nil),                        // 30: iam.RoleItem
+	(*RoleCreateRequest)(nil),               // 31: iam.RoleCreateRequest
+	(*RoleUpdateRequest)(nil),               // 32: iam.RoleUpdateRequest
+	(*RoleDeleteRequest)(nil),               // 33: iam.RoleDeleteRequest
+	(*RoleListRequest)(nil),                 // 34: iam.RoleListRequest
+	(*RoleListResponse)(nil),                // 35: iam.RoleListResponse
+	(*PermissionItem)(nil),                  // 36: iam.PermissionItem
+	(*PermissionCreateRequest)(nil),         // 37: iam.PermissionCreateRequest
+	(*PermissionUpdateRequest)(nil),         // 38: iam.PermissionUpdateRequest
+	(*PermissionDeleteRequest)(nil),         // 39: iam.PermissionDeleteRequest
+	(*PermissionListRequest)(nil),           // 40: iam.PermissionListRequest
+	(*PermissionListResponse)(nil),          // 41: iam.PermissionListResponse
+	(*MenuItem)(nil),                        // 42: iam.MenuItem
+	(*MenuCreateRequest)(nil),               // 43: iam.MenuCreateRequest
+	(*MenuUpdateRequest)(nil),               // 44: iam.MenuUpdateRequest
+	(*MenuDeleteRequest)(nil),               // 45: iam.MenuDeleteRequest
+	(*MenuTreeResponse)(nil),                // 46: iam.MenuTreeResponse
+	(*MenuMyTreeRequest)(nil),               // 47: iam.MenuMyTreeRequest
+	(*DepartmentItem)(nil),                  // 48: iam.DepartmentItem
+	(*DepartmentCreateRequest)(nil),         // 49: iam.DepartmentCreateRequest
+	(*DepartmentUpdateRequest)(nil),         // 50: iam.DepartmentUpdateRequest
+	(*DepartmentDeleteRequest)(nil),         // 51: iam.DepartmentDeleteRequest
+	(*DepartmentTreeResponse)(nil),          // 52: iam.DepartmentTreeResponse
+	(*ApiItem)(nil),                         // 53: iam.ApiItem
+	(*ApiCreateRequest)(nil),                // 54: iam.ApiCreateRequest
+	(*ApiUpdateRequest)(nil),                // 55: iam.ApiUpdateRequest
+	(*ApiDeleteRequest)(nil),                // 56: iam.ApiDeleteRequest
+	(*ApiListRequest)(nil),                  // 57: iam.ApiListRequest
+	(*ApiListResponse)(nil),                 // 58: iam.ApiListResponse
+	(*PermissionMenuListRequest)(nil),       // 59: iam.PermissionMenuListRequest
+	(*PermissionMenuListResponse)(nil),      // 60: iam.PermissionMenuListResponse
+	(*PermissionMenuUpdateRequest)(nil),     // 61: iam.PermissionMenuUpdateRequest
+	(*PermissionApiListRequest)(nil),        // 62: iam.PermissionApiListRequest
+	(*PermissionApiListResponse)(nil),       // 63: iam.PermissionApiListResponse
+	(*PermissionApiUpdateRequest)(nil),      // 64: iam.PermissionApiUpdateRequest
+	(*UserRoleListRequest)(nil),             // 65: iam.UserRoleListRequest
+	(*UserRoleListResponse)(nil),            // 66: iam.UserRoleListResponse
+	(*UserRoleUpdateRequest)(nil),           // 67: iam.UserRoleUpdateRequest
+	(*RolePermissionListRequest)(nil),       // 68: iam.RolePermissionListRequest
+	(*RolePermissionListResponse)(nil),      // 69: iam.RolePermissionListResponse
+	(*RolePermissionUpdateRequest)(nil),     // 70: iam.RolePermissionUpdateRequest
+	(*ConfigItem)(nil),                      // 71: iam.ConfigItem
+	(*ConfigCreateRequest)(nil),             // 72: iam.ConfigCreateRequest
+	(*ConfigUpdateRequest)(nil),             // 73: iam.ConfigUpdateRequest
+	(*ConfigDeleteRequest)(nil),             // 74: iam.ConfigDeleteRequest
+	(*ConfigListRequest)(nil),               // 75: iam.ConfigListRequest
+	(*ConfigListResponse)(nil),              // 76: iam.ConfigListResponse
+	(*ConfigGetRequest)(nil),                // 77: iam.ConfigGetRequest
+	(*ConfigGetResponse)(nil),               // 78: iam.ConfigGetResponse
+	(*DictTypeItem)(nil),                    // 79: iam.DictTypeItem
+	(*DictTypeCreateRequest)(nil),           // 80: iam.DictTypeCreateRequest
+	(*DictTypeUpdateRequest)(nil),           // 81: iam.DictTypeUpdateRequest
+	(*DictTypeDeleteRequest)(nil),           // 82: iam.DictTypeDeleteRequest
+	(*DictTypeListRequest)(nil),             // 83: iam.DictTypeListRequest
+	(*DictTypeListResponse)(nil),            // 84: iam.DictTypeListResponse
+	(*DictItemItem)(nil),                    // 85: iam.DictItemItem
+	(*DictItemCreateRequest)(nil),           // 86: iam.DictItemCreateRequest
+	(*DictItemUpdateRequest)(nil),           // 87: iam.DictItemUpdateRequest
+	(*DictItemDeleteRequest)(nil),           // 88: iam.DictItemDeleteRequest
+	(*DictItemListRequest)(nil),             // 89: iam.DictItemListRequest
+	(*DictItemListResponse)(nil),            // 90: iam.DictItemListResponse
+	(*DictGetRequest)(nil),                  // 91: iam.DictGetRequest
+	(*DictGetResponse)(nil),                 // 92: iam.DictGetResponse
+	(*DictBatchGetRequest)(nil),             // 93: iam.DictBatchGetRequest
+	(*DictBatchGetResponse)(nil),            // 94: iam.DictBatchGetResponse
+	(*FileItem)(nil),                        // 95: iam.FileItem
+	(*FileCreateRequest)(nil),               // 96: iam.FileCreateRequest
+	(*FileUpdateRequest)(nil),               // 97: iam.FileUpdateRequest
+	(*FileDeleteRequest)(nil),               // 98: iam.FileDeleteRequest
+	(*FileListRequest)(nil),                 // 99: iam.FileListRequest
+	(*FileListResponse)(nil),                // 100: iam.FileListResponse
+	(*NoticeItem)(nil),                      // 101: iam.NoticeItem
+	(*NoticeCreateRequest)(nil),             // 102: iam.NoticeCreateRequest
+	(*NoticeUpdateRequest)(nil),             // 103: iam.NoticeUpdateRequest
+	(*NoticeDeleteRequest)(nil),             // 104: iam.NoticeDeleteRequest
+	(*NoticeListRequest)(nil),               // 105: iam.NoticeListRequest
+	(*NoticeListResponse)(nil),              // 106: iam.NoticeListResponse
+	(*NotificationItem)(nil),                // 107: iam.NotificationItem
+	(*NotificationListRequest)(nil),         // 108: iam.NotificationListRequest
+	(*NotificationListResponse)(nil),        // 109: iam.NotificationListResponse
+	(*NotificationReadRequest)(nil),         // 110: iam.NotificationReadRequest
+	(*NotificationReadAllRequest)(nil),      // 111: iam.NotificationReadAllRequest
+	(*NotificationClearReadRequest)(nil),    // 112: iam.NotificationClearReadRequest
+	(*NotificationDeleteRequest)(nil),       // 113: iam.NotificationDeleteRequest
+	(*OperationLogItem)(nil),                // 114: iam.OperationLogItem
+	(*OperationLogListRequest)(nil),         // 115: iam.OperationLogListRequest
+	(*OperationLogListResponse)(nil),        // 116: iam.OperationLogListResponse
+	(*OperationLogDetailRequest)(nil),       // 117: iam.OperationLogDetailRequest
+	(*LoginLogItem)(nil),                    // 118: iam.LoginLogItem
+	(*LoginLogListRequest)(nil),             // 119: iam.LoginLogListRequest
+	(*LoginLogListResponse)(nil),            // 120: iam.LoginLogListResponse
+	(*LoginLogDetailRequest)(nil),           // 121: iam.LoginLogDetailRequest
+	(*LoginLogStatsResponse)(nil),           // 122: iam.LoginLogStatsResponse
+	(*PerformanceLogItem)(nil),              // 123: iam.PerformanceLogItem
+	(*PerformanceLogListRequest)(nil),       // 124: iam.PerformanceLogListRequest
+	(*PerformanceLogListResponse)(nil),      // 125: iam.PerformanceLogListResponse
+	(*AuditLogItem)(nil),                    // 126: iam.AuditLogItem
+	(*AuditLogListRequest)(nil),             // 127: iam.AuditLogListRequest
+	(*AuditLogListResponse)(nil),            // 128: iam.AuditLogListResponse
+	(*AuditLogDetailRequest)(nil),           // 129: iam.AuditLogDetailRequest
+	(*MetricReportRequest)(nil),             // 130: iam.MetricReportRequest
+	(*MetricStatsRequest)(nil),              // 131: iam.MetricStatsRequest
+	(*MetricStatsResponse)(nil),             // 132: iam.MetricStatsResponse
+	(*MonitorStatsResponse)(nil),            // 133: iam.MonitorStatsResponse
+	(*MonitorStatusResponse)(nil),           // 134: iam.MonitorStatusResponse
+	(*DemoItem)(nil),                        // 135: iam.DemoItem
+	(*DemoCreateRequest)(nil),               // 136: iam.DemoCreateRequest
+	(*DemoUpdateRequest)(nil),               // 137: iam.DemoUpdateRequest
+	(*DemoDeleteRequest)(nil),               // 138: iam.DemoDeleteRequest
+	(*DemoListRequest)(nil),                 // 139: iam.DemoListRequest
+	(*DemoListResponse)(nil),                // 140: iam.DemoListResponse
+	(*DailyShortSentenceItem)(nil),          // 141: iam.DailyShortSentenceItem
+	(*DailyShortSentenceCreateRequest)(nil), // 142: iam.DailyShortSentenceCreateRequest
+	(*DailyShortSentenceUpdateRequest)(nil), // 143: iam.DailyShortSentenceUpdateRequest
+	(*DailyShortSentenceDeleteRequest)(nil), // 144: iam.DailyShortSentenceDeleteRequest
+	(*DailyShortSentenceListRequest)(nil),   // 145: iam.DailyShortSentenceListRequest
+	(*DailyShortSentenceListResponse)(nil),  // 146: iam.DailyShortSentenceListResponse
+	nil,                                     // 147: iam.DictBatchGetResponse.DictsEntry
 }
 var file_rpc_iam_proto_depIdxs = []int32{
 	5,   // 0: iam.SyncApiRoutesRequest.routes:type_name -> iam.ApiRouteRef
 	7,   // 1: iam.BatchRecordOperationLogRequest.logs:type_name -> iam.OperationLogEntry
-	23,  // 2: iam.UserListResponse.list:type_name -> iam.UserItem
-	29,  // 3: iam.RoleListResponse.list:type_name -> iam.RoleItem
-	35,  // 4: iam.PermissionListResponse.list:type_name -> iam.PermissionItem
-	41,  // 5: iam.MenuItem.children:type_name -> iam.MenuItem
-	41,  // 6: iam.MenuTreeResponse.list:type_name -> iam.MenuItem
-	47,  // 7: iam.DepartmentItem.children:type_name -> iam.DepartmentItem
-	47,  // 8: iam.DepartmentTreeResponse.list:type_name -> iam.DepartmentItem
-	52,  // 9: iam.ApiListResponse.list:type_name -> iam.ApiItem
-	70,  // 10: iam.ConfigListResponse.list:type_name -> iam.ConfigItem
-	78,  // 11: iam.DictTypeListResponse.list:type_name -> iam.DictTypeItem
-	84,  // 12: iam.DictItemListResponse.list:type_name -> iam.DictItemItem
-	84,  // 13: iam.DictGetResponse.items:type_name -> iam.DictItemItem
-	146, // 14: iam.DictBatchGetResponse.dicts:type_name -> iam.DictBatchGetResponse.DictsEntry
-	94,  // 15: iam.FileListResponse.list:type_name -> iam.FileItem
-	100, // 16: iam.NoticeListResponse.list:type_name -> iam.NoticeItem
-	106, // 17: iam.NotificationListResponse.list:type_name -> iam.NotificationItem
-	113, // 18: iam.OperationLogListResponse.list:type_name -> iam.OperationLogItem
-	117, // 19: iam.LoginLogListResponse.list:type_name -> iam.LoginLogItem
-	122, // 20: iam.PerformanceLogListResponse.list:type_name -> iam.PerformanceLogItem
-	125, // 21: iam.AuditLogListResponse.list:type_name -> iam.AuditLogItem
-	134, // 22: iam.DemoListResponse.list:type_name -> iam.DemoItem
-	140, // 23: iam.DailyShortSentenceListResponse.list:type_name -> iam.DailyShortSentenceItem
-	91,  // 24: iam.DictBatchGetResponse.DictsEntry.value:type_name -> iam.DictGetResponse
+	24,  // 2: iam.UserListResponse.list:type_name -> iam.UserItem
+	30,  // 3: iam.RoleListResponse.list:type_name -> iam.RoleItem
+	36,  // 4: iam.PermissionListResponse.list:type_name -> iam.PermissionItem
+	42,  // 5: iam.MenuItem.children:type_name -> iam.MenuItem
+	42,  // 6: iam.MenuTreeResponse.list:type_name -> iam.MenuItem
+	48,  // 7: iam.DepartmentItem.children:type_name -> iam.DepartmentItem
+	48,  // 8: iam.DepartmentTreeResponse.list:type_name -> iam.DepartmentItem
+	53,  // 9: iam.ApiListResponse.list:type_name -> iam.ApiItem
+	71,  // 10: iam.ConfigListResponse.list:type_name -> iam.ConfigItem
+	79,  // 11: iam.DictTypeListResponse.list:type_name -> iam.DictTypeItem
+	85,  // 12: iam.DictItemListResponse.list:type_name -> iam.DictItemItem
+	85,  // 13: iam.DictGetResponse.items:type_name -> iam.DictItemItem
+	147, // 14: iam.DictBatchGetResponse.dicts:type_name -> iam.DictBatchGetResponse.DictsEntry
+	95,  // 15: iam.FileListResponse.list:type_name -> iam.FileItem
+	101, // 16: iam.NoticeListResponse.list:type_name -> iam.NoticeItem
+	107, // 17: iam.NotificationListResponse.list:type_name -> iam.NotificationItem
+	114, // 18: iam.OperationLogListResponse.list:type_name -> iam.OperationLogItem
+	118, // 19: iam.LoginLogListResponse.list:type_name -> iam.LoginLogItem
+	123, // 20: iam.PerformanceLogListResponse.list:type_name -> iam.PerformanceLogItem
+	126, // 21: iam.AuditLogListResponse.list:type_name -> iam.AuditLogItem
+	135, // 22: iam.DemoListResponse.list:type_name -> iam.DemoItem
+	141, // 23: iam.DailyShortSentenceListResponse.list:type_name -> iam.DailyShortSentenceItem
+	92,  // 24: iam.DictBatchGetResponse.DictsEntry.value:type_name -> iam.DictGetResponse
 	1,   // 25: iam.Iam.CheckPermission:input_type -> iam.CheckPermissionRequest
 	3,   // 26: iam.Iam.CheckApiEnabled:input_type -> iam.CheckApiEnabledRequest
 	6,   // 27: iam.Iam.SyncApiRoutes:input_type -> iam.SyncApiRoutesRequest
@@ -10946,189 +11022,191 @@ var file_rpc_iam_proto_depIdxs = []int32{
 	12,  // 31: iam.Iam.FileGetMeta:input_type -> iam.FileGetMetaRequest
 	0,   // 32: iam.Iam.Ping:input_type -> iam.Empty
 	15,  // 33: iam.Iam.Login:input_type -> iam.LoginRequest
-	17,  // 34: iam.Iam.Refresh:input_type -> iam.RefreshRequest
-	18,  // 35: iam.Iam.Logout:input_type -> iam.LogoutRequest
-	19,  // 36: iam.Iam.Profile:input_type -> iam.ProfileRequest
-	21,  // 37: iam.Iam.ProfileUpdate:input_type -> iam.ProfileUpdateRequest
-	22,  // 38: iam.Iam.PasswordChange:input_type -> iam.PasswordChangeRequest
-	24,  // 39: iam.Iam.UserCreate:input_type -> iam.UserCreateRequest
-	25,  // 40: iam.Iam.UserUpdate:input_type -> iam.UserUpdateRequest
-	26,  // 41: iam.Iam.UserDelete:input_type -> iam.UserDeleteRequest
-	27,  // 42: iam.Iam.UserList:input_type -> iam.UserListRequest
-	30,  // 43: iam.Iam.RoleCreate:input_type -> iam.RoleCreateRequest
-	31,  // 44: iam.Iam.RoleUpdate:input_type -> iam.RoleUpdateRequest
-	32,  // 45: iam.Iam.RoleDelete:input_type -> iam.RoleDeleteRequest
-	33,  // 46: iam.Iam.RoleList:input_type -> iam.RoleListRequest
-	36,  // 47: iam.Iam.PermissionCreate:input_type -> iam.PermissionCreateRequest
-	37,  // 48: iam.Iam.PermissionUpdate:input_type -> iam.PermissionUpdateRequest
-	38,  // 49: iam.Iam.PermissionDelete:input_type -> iam.PermissionDeleteRequest
-	39,  // 50: iam.Iam.PermissionList:input_type -> iam.PermissionListRequest
-	42,  // 51: iam.Iam.MenuCreate:input_type -> iam.MenuCreateRequest
-	43,  // 52: iam.Iam.MenuUpdate:input_type -> iam.MenuUpdateRequest
-	44,  // 53: iam.Iam.MenuDelete:input_type -> iam.MenuDeleteRequest
-	0,   // 54: iam.Iam.MenuTree:input_type -> iam.Empty
-	46,  // 55: iam.Iam.MenuMyTree:input_type -> iam.MenuMyTreeRequest
-	48,  // 56: iam.Iam.DepartmentCreate:input_type -> iam.DepartmentCreateRequest
-	49,  // 57: iam.Iam.DepartmentUpdate:input_type -> iam.DepartmentUpdateRequest
-	50,  // 58: iam.Iam.DepartmentDelete:input_type -> iam.DepartmentDeleteRequest
-	0,   // 59: iam.Iam.DepartmentTree:input_type -> iam.Empty
-	53,  // 60: iam.Iam.ApiCreate:input_type -> iam.ApiCreateRequest
-	54,  // 61: iam.Iam.ApiUpdate:input_type -> iam.ApiUpdateRequest
-	55,  // 62: iam.Iam.ApiDelete:input_type -> iam.ApiDeleteRequest
-	56,  // 63: iam.Iam.ApiList:input_type -> iam.ApiListRequest
-	58,  // 64: iam.Iam.PermissionMenuList:input_type -> iam.PermissionMenuListRequest
-	60,  // 65: iam.Iam.PermissionMenuUpdate:input_type -> iam.PermissionMenuUpdateRequest
-	61,  // 66: iam.Iam.PermissionApiList:input_type -> iam.PermissionApiListRequest
-	63,  // 67: iam.Iam.PermissionApiUpdate:input_type -> iam.PermissionApiUpdateRequest
-	64,  // 68: iam.Iam.UserRoleList:input_type -> iam.UserRoleListRequest
-	66,  // 69: iam.Iam.UserRoleUpdate:input_type -> iam.UserRoleUpdateRequest
-	67,  // 70: iam.Iam.RolePermissionList:input_type -> iam.RolePermissionListRequest
-	69,  // 71: iam.Iam.RolePermissionUpdate:input_type -> iam.RolePermissionUpdateRequest
-	71,  // 72: iam.Iam.ConfigCreate:input_type -> iam.ConfigCreateRequest
-	72,  // 73: iam.Iam.ConfigUpdate:input_type -> iam.ConfigUpdateRequest
-	73,  // 74: iam.Iam.ConfigDelete:input_type -> iam.ConfigDeleteRequest
-	74,  // 75: iam.Iam.ConfigList:input_type -> iam.ConfigListRequest
-	76,  // 76: iam.Iam.ConfigGet:input_type -> iam.ConfigGetRequest
-	79,  // 77: iam.Iam.DictTypeCreate:input_type -> iam.DictTypeCreateRequest
-	80,  // 78: iam.Iam.DictTypeUpdate:input_type -> iam.DictTypeUpdateRequest
-	81,  // 79: iam.Iam.DictTypeDelete:input_type -> iam.DictTypeDeleteRequest
-	82,  // 80: iam.Iam.DictTypeList:input_type -> iam.DictTypeListRequest
-	85,  // 81: iam.Iam.DictItemCreate:input_type -> iam.DictItemCreateRequest
-	86,  // 82: iam.Iam.DictItemUpdate:input_type -> iam.DictItemUpdateRequest
-	87,  // 83: iam.Iam.DictItemDelete:input_type -> iam.DictItemDeleteRequest
-	88,  // 84: iam.Iam.DictItemList:input_type -> iam.DictItemListRequest
-	90,  // 85: iam.Iam.DictGet:input_type -> iam.DictGetRequest
-	92,  // 86: iam.Iam.DictBatchGet:input_type -> iam.DictBatchGetRequest
-	95,  // 87: iam.Iam.FileCreate:input_type -> iam.FileCreateRequest
-	96,  // 88: iam.Iam.FileUpdate:input_type -> iam.FileUpdateRequest
-	97,  // 89: iam.Iam.FileDelete:input_type -> iam.FileDeleteRequest
-	98,  // 90: iam.Iam.FileList:input_type -> iam.FileListRequest
-	101, // 91: iam.Iam.NoticeCreate:input_type -> iam.NoticeCreateRequest
-	102, // 92: iam.Iam.NoticeUpdate:input_type -> iam.NoticeUpdateRequest
-	103, // 93: iam.Iam.NoticeDelete:input_type -> iam.NoticeDeleteRequest
-	104, // 94: iam.Iam.NoticeList:input_type -> iam.NoticeListRequest
-	107, // 95: iam.Iam.NotificationList:input_type -> iam.NotificationListRequest
-	109, // 96: iam.Iam.NotificationRead:input_type -> iam.NotificationReadRequest
-	110, // 97: iam.Iam.NotificationReadAll:input_type -> iam.NotificationReadAllRequest
-	111, // 98: iam.Iam.NotificationClearRead:input_type -> iam.NotificationClearReadRequest
-	112, // 99: iam.Iam.NotificationDelete:input_type -> iam.NotificationDeleteRequest
-	114, // 100: iam.Iam.OperationLogList:input_type -> iam.OperationLogListRequest
-	116, // 101: iam.Iam.OperationLogDetail:input_type -> iam.OperationLogDetailRequest
-	118, // 102: iam.Iam.LoginLogList:input_type -> iam.LoginLogListRequest
-	120, // 103: iam.Iam.LoginLogDetail:input_type -> iam.LoginLogDetailRequest
-	0,   // 104: iam.Iam.LoginLogStats:input_type -> iam.Empty
-	123, // 105: iam.Iam.PerformanceLogList:input_type -> iam.PerformanceLogListRequest
-	126, // 106: iam.Iam.AuditLogList:input_type -> iam.AuditLogListRequest
-	128, // 107: iam.Iam.AuditLogDetail:input_type -> iam.AuditLogDetailRequest
-	129, // 108: iam.Iam.MetricReport:input_type -> iam.MetricReportRequest
-	130, // 109: iam.Iam.MetricStats:input_type -> iam.MetricStatsRequest
-	0,   // 110: iam.Iam.MonitorStats:input_type -> iam.Empty
-	0,   // 111: iam.Iam.MonitorStatus:input_type -> iam.Empty
-	135, // 112: iam.Iam.DemoCreate:input_type -> iam.DemoCreateRequest
-	136, // 113: iam.Iam.DemoUpdate:input_type -> iam.DemoUpdateRequest
-	137, // 114: iam.Iam.DemoDelete:input_type -> iam.DemoDeleteRequest
-	138, // 115: iam.Iam.DemoList:input_type -> iam.DemoListRequest
-	141, // 116: iam.Iam.DailyShortSentenceCreate:input_type -> iam.DailyShortSentenceCreateRequest
-	142, // 117: iam.Iam.DailyShortSentenceUpdate:input_type -> iam.DailyShortSentenceUpdateRequest
-	143, // 118: iam.Iam.DailyShortSentenceDelete:input_type -> iam.DailyShortSentenceDeleteRequest
-	144, // 119: iam.Iam.DailyShortSentenceList:input_type -> iam.DailyShortSentenceListRequest
-	2,   // 120: iam.Iam.CheckPermission:output_type -> iam.CheckPermissionResponse
-	4,   // 121: iam.Iam.CheckApiEnabled:output_type -> iam.CheckApiEnabledResponse
-	0,   // 122: iam.Iam.SyncApiRoutes:output_type -> iam.Empty
-	0,   // 123: iam.Iam.BatchRecordOperationLog:output_type -> iam.Empty
-	0,   // 124: iam.Iam.RecordPerformanceLog:output_type -> iam.Empty
-	11,  // 125: iam.Iam.FileRegister:output_type -> iam.FileRegisterResponse
-	13,  // 126: iam.Iam.FileGetMeta:output_type -> iam.FileGetMetaResponse
-	14,  // 127: iam.Iam.Ping:output_type -> iam.PingResponse
-	16,  // 128: iam.Iam.Login:output_type -> iam.TokenPair
-	16,  // 129: iam.Iam.Refresh:output_type -> iam.TokenPair
-	0,   // 130: iam.Iam.Logout:output_type -> iam.Empty
-	20,  // 131: iam.Iam.Profile:output_type -> iam.ProfileResponse
-	0,   // 132: iam.Iam.ProfileUpdate:output_type -> iam.Empty
-	0,   // 133: iam.Iam.PasswordChange:output_type -> iam.Empty
-	0,   // 134: iam.Iam.UserCreate:output_type -> iam.Empty
-	0,   // 135: iam.Iam.UserUpdate:output_type -> iam.Empty
-	0,   // 136: iam.Iam.UserDelete:output_type -> iam.Empty
-	28,  // 137: iam.Iam.UserList:output_type -> iam.UserListResponse
-	0,   // 138: iam.Iam.RoleCreate:output_type -> iam.Empty
-	0,   // 139: iam.Iam.RoleUpdate:output_type -> iam.Empty
-	0,   // 140: iam.Iam.RoleDelete:output_type -> iam.Empty
-	34,  // 141: iam.Iam.RoleList:output_type -> iam.RoleListResponse
-	0,   // 142: iam.Iam.PermissionCreate:output_type -> iam.Empty
-	0,   // 143: iam.Iam.PermissionUpdate:output_type -> iam.Empty
-	0,   // 144: iam.Iam.PermissionDelete:output_type -> iam.Empty
-	40,  // 145: iam.Iam.PermissionList:output_type -> iam.PermissionListResponse
-	0,   // 146: iam.Iam.MenuCreate:output_type -> iam.Empty
-	0,   // 147: iam.Iam.MenuUpdate:output_type -> iam.Empty
-	0,   // 148: iam.Iam.MenuDelete:output_type -> iam.Empty
-	45,  // 149: iam.Iam.MenuTree:output_type -> iam.MenuTreeResponse
-	45,  // 150: iam.Iam.MenuMyTree:output_type -> iam.MenuTreeResponse
-	0,   // 151: iam.Iam.DepartmentCreate:output_type -> iam.Empty
-	0,   // 152: iam.Iam.DepartmentUpdate:output_type -> iam.Empty
-	0,   // 153: iam.Iam.DepartmentDelete:output_type -> iam.Empty
-	51,  // 154: iam.Iam.DepartmentTree:output_type -> iam.DepartmentTreeResponse
-	0,   // 155: iam.Iam.ApiCreate:output_type -> iam.Empty
-	0,   // 156: iam.Iam.ApiUpdate:output_type -> iam.Empty
-	0,   // 157: iam.Iam.ApiDelete:output_type -> iam.Empty
-	57,  // 158: iam.Iam.ApiList:output_type -> iam.ApiListResponse
-	59,  // 159: iam.Iam.PermissionMenuList:output_type -> iam.PermissionMenuListResponse
-	0,   // 160: iam.Iam.PermissionMenuUpdate:output_type -> iam.Empty
-	62,  // 161: iam.Iam.PermissionApiList:output_type -> iam.PermissionApiListResponse
-	0,   // 162: iam.Iam.PermissionApiUpdate:output_type -> iam.Empty
-	65,  // 163: iam.Iam.UserRoleList:output_type -> iam.UserRoleListResponse
-	0,   // 164: iam.Iam.UserRoleUpdate:output_type -> iam.Empty
-	68,  // 165: iam.Iam.RolePermissionList:output_type -> iam.RolePermissionListResponse
-	0,   // 166: iam.Iam.RolePermissionUpdate:output_type -> iam.Empty
-	0,   // 167: iam.Iam.ConfigCreate:output_type -> iam.Empty
-	0,   // 168: iam.Iam.ConfigUpdate:output_type -> iam.Empty
-	0,   // 169: iam.Iam.ConfigDelete:output_type -> iam.Empty
-	75,  // 170: iam.Iam.ConfigList:output_type -> iam.ConfigListResponse
-	77,  // 171: iam.Iam.ConfigGet:output_type -> iam.ConfigGetResponse
-	0,   // 172: iam.Iam.DictTypeCreate:output_type -> iam.Empty
-	0,   // 173: iam.Iam.DictTypeUpdate:output_type -> iam.Empty
-	0,   // 174: iam.Iam.DictTypeDelete:output_type -> iam.Empty
-	83,  // 175: iam.Iam.DictTypeList:output_type -> iam.DictTypeListResponse
-	0,   // 176: iam.Iam.DictItemCreate:output_type -> iam.Empty
-	0,   // 177: iam.Iam.DictItemUpdate:output_type -> iam.Empty
-	0,   // 178: iam.Iam.DictItemDelete:output_type -> iam.Empty
-	89,  // 179: iam.Iam.DictItemList:output_type -> iam.DictItemListResponse
-	91,  // 180: iam.Iam.DictGet:output_type -> iam.DictGetResponse
-	93,  // 181: iam.Iam.DictBatchGet:output_type -> iam.DictBatchGetResponse
-	0,   // 182: iam.Iam.FileCreate:output_type -> iam.Empty
-	0,   // 183: iam.Iam.FileUpdate:output_type -> iam.Empty
-	0,   // 184: iam.Iam.FileDelete:output_type -> iam.Empty
-	99,  // 185: iam.Iam.FileList:output_type -> iam.FileListResponse
-	0,   // 186: iam.Iam.NoticeCreate:output_type -> iam.Empty
-	0,   // 187: iam.Iam.NoticeUpdate:output_type -> iam.Empty
-	0,   // 188: iam.Iam.NoticeDelete:output_type -> iam.Empty
-	105, // 189: iam.Iam.NoticeList:output_type -> iam.NoticeListResponse
-	108, // 190: iam.Iam.NotificationList:output_type -> iam.NotificationListResponse
-	0,   // 191: iam.Iam.NotificationRead:output_type -> iam.Empty
-	0,   // 192: iam.Iam.NotificationReadAll:output_type -> iam.Empty
-	0,   // 193: iam.Iam.NotificationClearRead:output_type -> iam.Empty
-	0,   // 194: iam.Iam.NotificationDelete:output_type -> iam.Empty
-	115, // 195: iam.Iam.OperationLogList:output_type -> iam.OperationLogListResponse
-	113, // 196: iam.Iam.OperationLogDetail:output_type -> iam.OperationLogItem
-	119, // 197: iam.Iam.LoginLogList:output_type -> iam.LoginLogListResponse
-	117, // 198: iam.Iam.LoginLogDetail:output_type -> iam.LoginLogItem
-	121, // 199: iam.Iam.LoginLogStats:output_type -> iam.LoginLogStatsResponse
-	124, // 200: iam.Iam.PerformanceLogList:output_type -> iam.PerformanceLogListResponse
-	127, // 201: iam.Iam.AuditLogList:output_type -> iam.AuditLogListResponse
-	125, // 202: iam.Iam.AuditLogDetail:output_type -> iam.AuditLogItem
-	0,   // 203: iam.Iam.MetricReport:output_type -> iam.Empty
-	131, // 204: iam.Iam.MetricStats:output_type -> iam.MetricStatsResponse
-	132, // 205: iam.Iam.MonitorStats:output_type -> iam.MonitorStatsResponse
-	133, // 206: iam.Iam.MonitorStatus:output_type -> iam.MonitorStatusResponse
-	0,   // 207: iam.Iam.DemoCreate:output_type -> iam.Empty
-	0,   // 208: iam.Iam.DemoUpdate:output_type -> iam.Empty
-	0,   // 209: iam.Iam.DemoDelete:output_type -> iam.Empty
-	139, // 210: iam.Iam.DemoList:output_type -> iam.DemoListResponse
-	0,   // 211: iam.Iam.DailyShortSentenceCreate:output_type -> iam.Empty
-	0,   // 212: iam.Iam.DailyShortSentenceUpdate:output_type -> iam.Empty
-	0,   // 213: iam.Iam.DailyShortSentenceDelete:output_type -> iam.Empty
-	145, // 214: iam.Iam.DailyShortSentenceList:output_type -> iam.DailyShortSentenceListResponse
-	120, // [120:215] is the sub-list for method output_type
-	25,  // [25:120] is the sub-list for method input_type
+	18,  // 34: iam.Iam.LoginFeishu:input_type -> iam.LoginFeishuRequest
+	17,  // 35: iam.Iam.Refresh:input_type -> iam.RefreshRequest
+	19,  // 36: iam.Iam.Logout:input_type -> iam.LogoutRequest
+	20,  // 37: iam.Iam.Profile:input_type -> iam.ProfileRequest
+	22,  // 38: iam.Iam.ProfileUpdate:input_type -> iam.ProfileUpdateRequest
+	23,  // 39: iam.Iam.PasswordChange:input_type -> iam.PasswordChangeRequest
+	25,  // 40: iam.Iam.UserCreate:input_type -> iam.UserCreateRequest
+	26,  // 41: iam.Iam.UserUpdate:input_type -> iam.UserUpdateRequest
+	27,  // 42: iam.Iam.UserDelete:input_type -> iam.UserDeleteRequest
+	28,  // 43: iam.Iam.UserList:input_type -> iam.UserListRequest
+	31,  // 44: iam.Iam.RoleCreate:input_type -> iam.RoleCreateRequest
+	32,  // 45: iam.Iam.RoleUpdate:input_type -> iam.RoleUpdateRequest
+	33,  // 46: iam.Iam.RoleDelete:input_type -> iam.RoleDeleteRequest
+	34,  // 47: iam.Iam.RoleList:input_type -> iam.RoleListRequest
+	37,  // 48: iam.Iam.PermissionCreate:input_type -> iam.PermissionCreateRequest
+	38,  // 49: iam.Iam.PermissionUpdate:input_type -> iam.PermissionUpdateRequest
+	39,  // 50: iam.Iam.PermissionDelete:input_type -> iam.PermissionDeleteRequest
+	40,  // 51: iam.Iam.PermissionList:input_type -> iam.PermissionListRequest
+	43,  // 52: iam.Iam.MenuCreate:input_type -> iam.MenuCreateRequest
+	44,  // 53: iam.Iam.MenuUpdate:input_type -> iam.MenuUpdateRequest
+	45,  // 54: iam.Iam.MenuDelete:input_type -> iam.MenuDeleteRequest
+	0,   // 55: iam.Iam.MenuTree:input_type -> iam.Empty
+	47,  // 56: iam.Iam.MenuMyTree:input_type -> iam.MenuMyTreeRequest
+	49,  // 57: iam.Iam.DepartmentCreate:input_type -> iam.DepartmentCreateRequest
+	50,  // 58: iam.Iam.DepartmentUpdate:input_type -> iam.DepartmentUpdateRequest
+	51,  // 59: iam.Iam.DepartmentDelete:input_type -> iam.DepartmentDeleteRequest
+	0,   // 60: iam.Iam.DepartmentTree:input_type -> iam.Empty
+	54,  // 61: iam.Iam.ApiCreate:input_type -> iam.ApiCreateRequest
+	55,  // 62: iam.Iam.ApiUpdate:input_type -> iam.ApiUpdateRequest
+	56,  // 63: iam.Iam.ApiDelete:input_type -> iam.ApiDeleteRequest
+	57,  // 64: iam.Iam.ApiList:input_type -> iam.ApiListRequest
+	59,  // 65: iam.Iam.PermissionMenuList:input_type -> iam.PermissionMenuListRequest
+	61,  // 66: iam.Iam.PermissionMenuUpdate:input_type -> iam.PermissionMenuUpdateRequest
+	62,  // 67: iam.Iam.PermissionApiList:input_type -> iam.PermissionApiListRequest
+	64,  // 68: iam.Iam.PermissionApiUpdate:input_type -> iam.PermissionApiUpdateRequest
+	65,  // 69: iam.Iam.UserRoleList:input_type -> iam.UserRoleListRequest
+	67,  // 70: iam.Iam.UserRoleUpdate:input_type -> iam.UserRoleUpdateRequest
+	68,  // 71: iam.Iam.RolePermissionList:input_type -> iam.RolePermissionListRequest
+	70,  // 72: iam.Iam.RolePermissionUpdate:input_type -> iam.RolePermissionUpdateRequest
+	72,  // 73: iam.Iam.ConfigCreate:input_type -> iam.ConfigCreateRequest
+	73,  // 74: iam.Iam.ConfigUpdate:input_type -> iam.ConfigUpdateRequest
+	74,  // 75: iam.Iam.ConfigDelete:input_type -> iam.ConfigDeleteRequest
+	75,  // 76: iam.Iam.ConfigList:input_type -> iam.ConfigListRequest
+	77,  // 77: iam.Iam.ConfigGet:input_type -> iam.ConfigGetRequest
+	80,  // 78: iam.Iam.DictTypeCreate:input_type -> iam.DictTypeCreateRequest
+	81,  // 79: iam.Iam.DictTypeUpdate:input_type -> iam.DictTypeUpdateRequest
+	82,  // 80: iam.Iam.DictTypeDelete:input_type -> iam.DictTypeDeleteRequest
+	83,  // 81: iam.Iam.DictTypeList:input_type -> iam.DictTypeListRequest
+	86,  // 82: iam.Iam.DictItemCreate:input_type -> iam.DictItemCreateRequest
+	87,  // 83: iam.Iam.DictItemUpdate:input_type -> iam.DictItemUpdateRequest
+	88,  // 84: iam.Iam.DictItemDelete:input_type -> iam.DictItemDeleteRequest
+	89,  // 85: iam.Iam.DictItemList:input_type -> iam.DictItemListRequest
+	91,  // 86: iam.Iam.DictGet:input_type -> iam.DictGetRequest
+	93,  // 87: iam.Iam.DictBatchGet:input_type -> iam.DictBatchGetRequest
+	96,  // 88: iam.Iam.FileCreate:input_type -> iam.FileCreateRequest
+	97,  // 89: iam.Iam.FileUpdate:input_type -> iam.FileUpdateRequest
+	98,  // 90: iam.Iam.FileDelete:input_type -> iam.FileDeleteRequest
+	99,  // 91: iam.Iam.FileList:input_type -> iam.FileListRequest
+	102, // 92: iam.Iam.NoticeCreate:input_type -> iam.NoticeCreateRequest
+	103, // 93: iam.Iam.NoticeUpdate:input_type -> iam.NoticeUpdateRequest
+	104, // 94: iam.Iam.NoticeDelete:input_type -> iam.NoticeDeleteRequest
+	105, // 95: iam.Iam.NoticeList:input_type -> iam.NoticeListRequest
+	108, // 96: iam.Iam.NotificationList:input_type -> iam.NotificationListRequest
+	110, // 97: iam.Iam.NotificationRead:input_type -> iam.NotificationReadRequest
+	111, // 98: iam.Iam.NotificationReadAll:input_type -> iam.NotificationReadAllRequest
+	112, // 99: iam.Iam.NotificationClearRead:input_type -> iam.NotificationClearReadRequest
+	113, // 100: iam.Iam.NotificationDelete:input_type -> iam.NotificationDeleteRequest
+	115, // 101: iam.Iam.OperationLogList:input_type -> iam.OperationLogListRequest
+	117, // 102: iam.Iam.OperationLogDetail:input_type -> iam.OperationLogDetailRequest
+	119, // 103: iam.Iam.LoginLogList:input_type -> iam.LoginLogListRequest
+	121, // 104: iam.Iam.LoginLogDetail:input_type -> iam.LoginLogDetailRequest
+	0,   // 105: iam.Iam.LoginLogStats:input_type -> iam.Empty
+	124, // 106: iam.Iam.PerformanceLogList:input_type -> iam.PerformanceLogListRequest
+	127, // 107: iam.Iam.AuditLogList:input_type -> iam.AuditLogListRequest
+	129, // 108: iam.Iam.AuditLogDetail:input_type -> iam.AuditLogDetailRequest
+	130, // 109: iam.Iam.MetricReport:input_type -> iam.MetricReportRequest
+	131, // 110: iam.Iam.MetricStats:input_type -> iam.MetricStatsRequest
+	0,   // 111: iam.Iam.MonitorStats:input_type -> iam.Empty
+	0,   // 112: iam.Iam.MonitorStatus:input_type -> iam.Empty
+	136, // 113: iam.Iam.DemoCreate:input_type -> iam.DemoCreateRequest
+	137, // 114: iam.Iam.DemoUpdate:input_type -> iam.DemoUpdateRequest
+	138, // 115: iam.Iam.DemoDelete:input_type -> iam.DemoDeleteRequest
+	139, // 116: iam.Iam.DemoList:input_type -> iam.DemoListRequest
+	142, // 117: iam.Iam.DailyShortSentenceCreate:input_type -> iam.DailyShortSentenceCreateRequest
+	143, // 118: iam.Iam.DailyShortSentenceUpdate:input_type -> iam.DailyShortSentenceUpdateRequest
+	144, // 119: iam.Iam.DailyShortSentenceDelete:input_type -> iam.DailyShortSentenceDeleteRequest
+	145, // 120: iam.Iam.DailyShortSentenceList:input_type -> iam.DailyShortSentenceListRequest
+	2,   // 121: iam.Iam.CheckPermission:output_type -> iam.CheckPermissionResponse
+	4,   // 122: iam.Iam.CheckApiEnabled:output_type -> iam.CheckApiEnabledResponse
+	0,   // 123: iam.Iam.SyncApiRoutes:output_type -> iam.Empty
+	0,   // 124: iam.Iam.BatchRecordOperationLog:output_type -> iam.Empty
+	0,   // 125: iam.Iam.RecordPerformanceLog:output_type -> iam.Empty
+	11,  // 126: iam.Iam.FileRegister:output_type -> iam.FileRegisterResponse
+	13,  // 127: iam.Iam.FileGetMeta:output_type -> iam.FileGetMetaResponse
+	14,  // 128: iam.Iam.Ping:output_type -> iam.PingResponse
+	16,  // 129: iam.Iam.Login:output_type -> iam.TokenPair
+	16,  // 130: iam.Iam.LoginFeishu:output_type -> iam.TokenPair
+	16,  // 131: iam.Iam.Refresh:output_type -> iam.TokenPair
+	0,   // 132: iam.Iam.Logout:output_type -> iam.Empty
+	21,  // 133: iam.Iam.Profile:output_type -> iam.ProfileResponse
+	0,   // 134: iam.Iam.ProfileUpdate:output_type -> iam.Empty
+	0,   // 135: iam.Iam.PasswordChange:output_type -> iam.Empty
+	0,   // 136: iam.Iam.UserCreate:output_type -> iam.Empty
+	0,   // 137: iam.Iam.UserUpdate:output_type -> iam.Empty
+	0,   // 138: iam.Iam.UserDelete:output_type -> iam.Empty
+	29,  // 139: iam.Iam.UserList:output_type -> iam.UserListResponse
+	0,   // 140: iam.Iam.RoleCreate:output_type -> iam.Empty
+	0,   // 141: iam.Iam.RoleUpdate:output_type -> iam.Empty
+	0,   // 142: iam.Iam.RoleDelete:output_type -> iam.Empty
+	35,  // 143: iam.Iam.RoleList:output_type -> iam.RoleListResponse
+	0,   // 144: iam.Iam.PermissionCreate:output_type -> iam.Empty
+	0,   // 145: iam.Iam.PermissionUpdate:output_type -> iam.Empty
+	0,   // 146: iam.Iam.PermissionDelete:output_type -> iam.Empty
+	41,  // 147: iam.Iam.PermissionList:output_type -> iam.PermissionListResponse
+	0,   // 148: iam.Iam.MenuCreate:output_type -> iam.Empty
+	0,   // 149: iam.Iam.MenuUpdate:output_type -> iam.Empty
+	0,   // 150: iam.Iam.MenuDelete:output_type -> iam.Empty
+	46,  // 151: iam.Iam.MenuTree:output_type -> iam.MenuTreeResponse
+	46,  // 152: iam.Iam.MenuMyTree:output_type -> iam.MenuTreeResponse
+	0,   // 153: iam.Iam.DepartmentCreate:output_type -> iam.Empty
+	0,   // 154: iam.Iam.DepartmentUpdate:output_type -> iam.Empty
+	0,   // 155: iam.Iam.DepartmentDelete:output_type -> iam.Empty
+	52,  // 156: iam.Iam.DepartmentTree:output_type -> iam.DepartmentTreeResponse
+	0,   // 157: iam.Iam.ApiCreate:output_type -> iam.Empty
+	0,   // 158: iam.Iam.ApiUpdate:output_type -> iam.Empty
+	0,   // 159: iam.Iam.ApiDelete:output_type -> iam.Empty
+	58,  // 160: iam.Iam.ApiList:output_type -> iam.ApiListResponse
+	60,  // 161: iam.Iam.PermissionMenuList:output_type -> iam.PermissionMenuListResponse
+	0,   // 162: iam.Iam.PermissionMenuUpdate:output_type -> iam.Empty
+	63,  // 163: iam.Iam.PermissionApiList:output_type -> iam.PermissionApiListResponse
+	0,   // 164: iam.Iam.PermissionApiUpdate:output_type -> iam.Empty
+	66,  // 165: iam.Iam.UserRoleList:output_type -> iam.UserRoleListResponse
+	0,   // 166: iam.Iam.UserRoleUpdate:output_type -> iam.Empty
+	69,  // 167: iam.Iam.RolePermissionList:output_type -> iam.RolePermissionListResponse
+	0,   // 168: iam.Iam.RolePermissionUpdate:output_type -> iam.Empty
+	0,   // 169: iam.Iam.ConfigCreate:output_type -> iam.Empty
+	0,   // 170: iam.Iam.ConfigUpdate:output_type -> iam.Empty
+	0,   // 171: iam.Iam.ConfigDelete:output_type -> iam.Empty
+	76,  // 172: iam.Iam.ConfigList:output_type -> iam.ConfigListResponse
+	78,  // 173: iam.Iam.ConfigGet:output_type -> iam.ConfigGetResponse
+	0,   // 174: iam.Iam.DictTypeCreate:output_type -> iam.Empty
+	0,   // 175: iam.Iam.DictTypeUpdate:output_type -> iam.Empty
+	0,   // 176: iam.Iam.DictTypeDelete:output_type -> iam.Empty
+	84,  // 177: iam.Iam.DictTypeList:output_type -> iam.DictTypeListResponse
+	0,   // 178: iam.Iam.DictItemCreate:output_type -> iam.Empty
+	0,   // 179: iam.Iam.DictItemUpdate:output_type -> iam.Empty
+	0,   // 180: iam.Iam.DictItemDelete:output_type -> iam.Empty
+	90,  // 181: iam.Iam.DictItemList:output_type -> iam.DictItemListResponse
+	92,  // 182: iam.Iam.DictGet:output_type -> iam.DictGetResponse
+	94,  // 183: iam.Iam.DictBatchGet:output_type -> iam.DictBatchGetResponse
+	0,   // 184: iam.Iam.FileCreate:output_type -> iam.Empty
+	0,   // 185: iam.Iam.FileUpdate:output_type -> iam.Empty
+	0,   // 186: iam.Iam.FileDelete:output_type -> iam.Empty
+	100, // 187: iam.Iam.FileList:output_type -> iam.FileListResponse
+	0,   // 188: iam.Iam.NoticeCreate:output_type -> iam.Empty
+	0,   // 189: iam.Iam.NoticeUpdate:output_type -> iam.Empty
+	0,   // 190: iam.Iam.NoticeDelete:output_type -> iam.Empty
+	106, // 191: iam.Iam.NoticeList:output_type -> iam.NoticeListResponse
+	109, // 192: iam.Iam.NotificationList:output_type -> iam.NotificationListResponse
+	0,   // 193: iam.Iam.NotificationRead:output_type -> iam.Empty
+	0,   // 194: iam.Iam.NotificationReadAll:output_type -> iam.Empty
+	0,   // 195: iam.Iam.NotificationClearRead:output_type -> iam.Empty
+	0,   // 196: iam.Iam.NotificationDelete:output_type -> iam.Empty
+	116, // 197: iam.Iam.OperationLogList:output_type -> iam.OperationLogListResponse
+	114, // 198: iam.Iam.OperationLogDetail:output_type -> iam.OperationLogItem
+	120, // 199: iam.Iam.LoginLogList:output_type -> iam.LoginLogListResponse
+	118, // 200: iam.Iam.LoginLogDetail:output_type -> iam.LoginLogItem
+	122, // 201: iam.Iam.LoginLogStats:output_type -> iam.LoginLogStatsResponse
+	125, // 202: iam.Iam.PerformanceLogList:output_type -> iam.PerformanceLogListResponse
+	128, // 203: iam.Iam.AuditLogList:output_type -> iam.AuditLogListResponse
+	126, // 204: iam.Iam.AuditLogDetail:output_type -> iam.AuditLogItem
+	0,   // 205: iam.Iam.MetricReport:output_type -> iam.Empty
+	132, // 206: iam.Iam.MetricStats:output_type -> iam.MetricStatsResponse
+	133, // 207: iam.Iam.MonitorStats:output_type -> iam.MonitorStatsResponse
+	134, // 208: iam.Iam.MonitorStatus:output_type -> iam.MonitorStatusResponse
+	0,   // 209: iam.Iam.DemoCreate:output_type -> iam.Empty
+	0,   // 210: iam.Iam.DemoUpdate:output_type -> iam.Empty
+	0,   // 211: iam.Iam.DemoDelete:output_type -> iam.Empty
+	140, // 212: iam.Iam.DemoList:output_type -> iam.DemoListResponse
+	0,   // 213: iam.Iam.DailyShortSentenceCreate:output_type -> iam.Empty
+	0,   // 214: iam.Iam.DailyShortSentenceUpdate:output_type -> iam.Empty
+	0,   // 215: iam.Iam.DailyShortSentenceDelete:output_type -> iam.Empty
+	146, // 216: iam.Iam.DailyShortSentenceList:output_type -> iam.DailyShortSentenceListResponse
+	121, // [121:217] is the sub-list for method output_type
+	25,  // [25:121] is the sub-list for method input_type
 	25,  // [25:25] is the sub-list for extension type_name
 	25,  // [25:25] is the sub-list for extension extendee
 	0,   // [0:25] is the sub-list for field type_name
@@ -11145,7 +11223,7 @@ func file_rpc_iam_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_rpc_iam_proto_rawDesc), len(file_rpc_iam_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   147,
+			NumMessages:   148,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -815,6 +815,11 @@ type FileUploadResp struct {
 	Ext          string `json:"ext"`
 }
 
+type LoginFeishuReq struct {
+	Code  string `json:"code"`
+	State string `json:"state,optional"`
+}
+
 type LoginLogDetailReq struct {
 	Id uint64 `json:"id,optional" form:"id,optional"`
 }
@@ -1728,8 +1733,8 @@ type UserItem struct {
 	Signature    string   `json:"signature,optional"`
 	DepartmentId uint64   `json:"departmentId"`
 	Status       int64    `json:"status"`
-	CreatedAt    int64    `json:"createdAt"` // 创建时间(秒级时间戳)
-	RoleNames    []string `json:"roleNames,optional"`
+	CreatedAt    int64    `json:"createdAt"`          // 创建时间(秒级时间戳)
+	RoleNames    []string `json:"roleNames,optional"` // 角色名称列表（一次 JOIN 批量查询得出，供选人类场景直接展示，不需要再调 /users/roles 逐个查）
 }
 
 type UserListReq struct {

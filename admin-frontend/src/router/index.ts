@@ -46,6 +46,11 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/Login.vue')
   },
   {
+    path: '/admin/login/feishu/callback',
+    name: 'FeishuLoginCallback',
+    component: () => import('@/views/iam/FeishuLoginCallback.vue')
+  },
+  {
     path: '/layout',
     name: 'Root',
     component: () => import('@/layouts/DefaultLayout.vue'),
@@ -261,8 +266,10 @@ router.beforeEach(async (to, _from, next) => {
     // 公共页面不需要登录：路由方案里公共页统一收在 /front 分支下，
     // 和后台 /admin 分支不共享任何路径前缀段，两者永不冲突
     const isPublicPath = to.path.startsWith('/front')
+    // 飞书扫码登录回调页在拿到 token 前也不能要求已登录，和 /admin/login 一样放行
+    const isLoginFlowPath = to.path === '/admin/login' || to.path === '/admin/login/feishu/callback'
 
-    if (!isPublicPath && to.path !== '/admin/login' && !userStore.token) {
+    if (!isPublicPath && !isLoginFlowPath && !userStore.token) {
       next('/admin/login')
       return
     }

@@ -28,6 +28,7 @@ const (
 	Iam_FileGetMeta_FullMethodName              = "/iam.Iam/FileGetMeta"
 	Iam_Ping_FullMethodName                     = "/iam.Iam/Ping"
 	Iam_Login_FullMethodName                    = "/iam.Iam/Login"
+	Iam_LoginFeishu_FullMethodName              = "/iam.Iam/LoginFeishu"
 	Iam_Refresh_FullMethodName                  = "/iam.Iam/Refresh"
 	Iam_Logout_FullMethodName                   = "/iam.Iam/Logout"
 	Iam_Profile_FullMethodName                  = "/iam.Iam/Profile"
@@ -132,6 +133,7 @@ type IamClient interface {
 	Ping(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*PingResponse, error)
 	// Auth
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*TokenPair, error)
+	LoginFeishu(ctx context.Context, in *LoginFeishuRequest, opts ...grpc.CallOption) (*TokenPair, error)
 	Refresh(ctx context.Context, in *RefreshRequest, opts ...grpc.CallOption) (*TokenPair, error)
 	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*Empty, error)
 	Profile(ctx context.Context, in *ProfileRequest, opts ...grpc.CallOption) (*ProfileResponse, error)
@@ -321,6 +323,16 @@ func (c *iamClient) Login(ctx context.Context, in *LoginRequest, opts ...grpc.Ca
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(TokenPair)
 	err := c.cc.Invoke(ctx, Iam_Login_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamClient) LoginFeishu(ctx context.Context, in *LoginFeishuRequest, opts ...grpc.CallOption) (*TokenPair, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TokenPair)
+	err := c.cc.Invoke(ctx, Iam_LoginFeishu_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1203,6 +1215,7 @@ type IamServer interface {
 	Ping(context.Context, *Empty) (*PingResponse, error)
 	// Auth
 	Login(context.Context, *LoginRequest) (*TokenPair, error)
+	LoginFeishu(context.Context, *LoginFeishuRequest) (*TokenPair, error)
 	Refresh(context.Context, *RefreshRequest) (*TokenPair, error)
 	Logout(context.Context, *LogoutRequest) (*Empty, error)
 	Profile(context.Context, *ProfileRequest) (*ProfileResponse, error)
@@ -1334,6 +1347,9 @@ func (UnimplementedIamServer) Ping(context.Context, *Empty) (*PingResponse, erro
 }
 func (UnimplementedIamServer) Login(context.Context, *LoginRequest) (*TokenPair, error) {
 	return nil, status.Error(codes.Unimplemented, "method Login not implemented")
+}
+func (UnimplementedIamServer) LoginFeishu(context.Context, *LoginFeishuRequest) (*TokenPair, error) {
+	return nil, status.Error(codes.Unimplemented, "method LoginFeishu not implemented")
 }
 func (UnimplementedIamServer) Refresh(context.Context, *RefreshRequest) (*TokenPair, error) {
 	return nil, status.Error(codes.Unimplemented, "method Refresh not implemented")
@@ -1772,6 +1788,24 @@ func _Iam_Login_Handler(srv interface{}, ctx context.Context, dec func(interface
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(IamServer).Login(ctx, req.(*LoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Iam_LoginFeishu_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LoginFeishuRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServer).LoginFeishu(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Iam_LoginFeishu_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServer).LoginFeishu(ctx, req.(*LoginFeishuRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -3366,6 +3400,10 @@ var Iam_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Login",
 			Handler:    _Iam_Login_Handler,
+		},
+		{
+			MethodName: "LoginFeishu",
+			Handler:    _Iam_LoginFeishu_Handler,
 		},
 		{
 			MethodName: "Refresh",

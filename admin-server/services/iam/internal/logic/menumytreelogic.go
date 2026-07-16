@@ -120,6 +120,12 @@ func (l *MenuMyTreeLogic) MenuMyTree(in *iam.MenuMyTreeRequest) (*iam.MenuTreeRe
 			}
 		}
 
+		// 目录节点本身不是可访问页面，只是子菜单的容器；子菜单全部被过滤掉后
+		// 目录不能再保留在树里——否则会渲染成一个指向空路由的死链接（点击 404）。
+		if item.MenuType == 1 && len(filtered.Children) == 0 {
+			return nil
+		}
+
 		if item.MenuType == 3 {
 			if codes, hasPerms := menuPermissionMap[item.Id]; hasPerms && len(codes) > 0 {
 				hasAccess := false

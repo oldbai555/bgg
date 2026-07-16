@@ -5,44 +5,51 @@
         <div class="logo">Admin System</div>
         <div class="subtitle">{{ t('common.welcome') }}</div>
       </div>
-      <el-form
-        ref="formRef"
-        :model="form"
-        :rules="rules"
-        label-position="top"
-        class="login-form"
-      >
-        <el-form-item :label="t('auth.username')" prop="username">
-          <el-input
-            v-model="form.username"
-            size="large"
-            placeholder="admin"
-            autocomplete="username"
-            clearable
-          />
-        </el-form-item>
-        <el-form-item :label="t('auth.password')" prop="password">
-          <el-input
-            v-model="form.password"
-            size="large"
-            type="password"
-            placeholder="••••••"
-            show-password
-            autocomplete="current-password"
-          />
-        </el-form-item>
-        <el-form-item class="login-actions">
-          <el-button
-            type="primary"
-            size="large"
-            :loading="loading"
-            class="full-btn"
-            @click="handleSubmit"
+      <el-tabs v-model="activeTab" class="login-tabs" stretch>
+        <el-tab-pane :label="t('auth.loginByPassword')" name="password">
+          <el-form
+            ref="formRef"
+            :model="form"
+            :rules="rules"
+            label-position="top"
+            class="login-form"
           >
-            {{ t('common.login') }}
-          </el-button>
-        </el-form-item>
-      </el-form>
+            <el-form-item :label="t('auth.username')" prop="username">
+              <el-input
+                v-model="form.username"
+                size="large"
+                placeholder="admin"
+                autocomplete="username"
+                clearable
+              />
+            </el-form-item>
+            <el-form-item :label="t('auth.password')" prop="password">
+              <el-input
+                v-model="form.password"
+                size="large"
+                type="password"
+                placeholder="••••••"
+                show-password
+                autocomplete="current-password"
+              />
+            </el-form-item>
+            <el-form-item class="login-actions">
+              <el-button
+                type="primary"
+                size="large"
+                :loading="loading"
+                class="full-btn"
+                @click="handleSubmit"
+              >
+                {{ t('common.login') }}
+              </el-button>
+            </el-form-item>
+          </el-form>
+        </el-tab-pane>
+        <el-tab-pane :label="t('auth.loginByFeishu')" name="feishu">
+          <FeishuQrLogin />
+        </el-tab-pane>
+      </el-tabs>
     </div>
 
     <IcpFooter class="login-page__footer" />
@@ -56,10 +63,13 @@ import {useRouter} from 'vue-router'
 import {useUserStore} from '@/stores/user'
 import {useI18n} from 'vue-i18n'
 import IcpFooter from '@/components/common/IcpFooter.vue'
+import FeishuQrLogin from '@/components/iam/FeishuQrLogin.vue'
 
 const router = useRouter()
 const userStore = useUserStore()
 const {t} = useI18n()
+
+const activeTab = ref<'password' | 'feishu'>('password')
 
 const form = reactive({
   username: '',

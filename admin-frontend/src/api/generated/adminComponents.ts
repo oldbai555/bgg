@@ -825,6 +825,11 @@ export interface FileUploadResp {
 	ext: string
 }
 
+export interface LoginFeishuReq {
+	code: string
+	state?: string
+}
+
 export interface LoginLogDetailReq {
 	// 必填，但作为 Query 参数必须标记 optional，必填校验在 Logic 做
 	id?: number
@@ -1075,7 +1080,7 @@ export interface NotificationItem {
 	sourceId: number // 来源ID（如公告ID、聊天消息ID等）
 	title: string
 	content: string
-	readStatus: number // 已读状态：1 已读，0 未读
+	readStatus: number // 已读状态（字典 read_status）：1 未读，2 已读
 	readAt: number // 已读时间(秒级时间戳)
 	createdAt: number // 创建时间(秒级时间戳)
 	updatedAt: number // 更新时间(秒级时间戳)

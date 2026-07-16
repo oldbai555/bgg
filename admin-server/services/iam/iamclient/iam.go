@@ -82,6 +82,7 @@ type (
 	FileRegisterRequest             = iam.FileRegisterRequest
 	FileRegisterResponse            = iam.FileRegisterResponse
 	FileUpdateRequest               = iam.FileUpdateRequest
+	LoginFeishuRequest              = iam.LoginFeishuRequest
 	LoginLogDetailRequest           = iam.LoginLogDetailRequest
 	LoginLogItem                    = iam.LoginLogItem
 	LoginLogListRequest             = iam.LoginLogListRequest
@@ -174,6 +175,7 @@ type (
 		Ping(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*PingResponse, error)
 		// Auth
 		Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*TokenPair, error)
+		LoginFeishu(ctx context.Context, in *LoginFeishuRequest, opts ...grpc.CallOption) (*TokenPair, error)
 		Refresh(ctx context.Context, in *RefreshRequest, opts ...grpc.CallOption) (*TokenPair, error)
 		Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*Empty, error)
 		Profile(ctx context.Context, in *ProfileRequest, opts ...grpc.CallOption) (*ProfileResponse, error)
@@ -327,6 +329,11 @@ func (m *defaultIam) Ping(ctx context.Context, in *Empty, opts ...grpc.CallOptio
 func (m *defaultIam) Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*TokenPair, error) {
 	client := iam.NewIamClient(m.cli.Conn())
 	return client.Login(ctx, in, opts...)
+}
+
+func (m *defaultIam) LoginFeishu(ctx context.Context, in *LoginFeishuRequest, opts ...grpc.CallOption) (*TokenPair, error) {
+	client := iam.NewIamClient(m.cli.Conn())
+	return client.LoginFeishu(ctx, in, opts...)
 }
 
 func (m *defaultIam) Refresh(ctx context.Context, in *RefreshRequest, opts ...grpc.CallOption) (*TokenPair, error) {

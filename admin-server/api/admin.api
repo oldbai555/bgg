@@ -65,6 +65,10 @@ type (
 		username string `json:"username"`
 		password string `json:"password"`
 	}
+	LoginFeishuReq {
+		code  string `json:"code"`
+		state string `json:"state,optional"`
+	}
 	TokenPair {
 		accessToken  string `json:"accessToken"`
 		refreshToken string `json:"refreshToken"`
@@ -618,6 +622,9 @@ service admin-api {
 service admin-api {
 	@handler Login
 	post /login (LoginReq) returns (TokenPair)
+
+	@handler LoginFeishu
+	post /login/feishu (LoginFeishuReq) returns (TokenPair)
 
 	@handler Refresh
 	post /refresh (RefreshReq) returns (TokenPair)

@@ -25,6 +25,7 @@ type Repository struct {
 	BusinessCache *businesscache.BusinessCache // 业务层缓存工具
 
 	AdminUserModel           iam.AdminUserModel
+	AdminUserThirdPartyModel iam.AdminUserThirdPartyModel
 	AdminRoleModel           iam.AdminRoleModel
 	AdminPermissionModel     iam.AdminPermissionModel
 	AdminMenuModel           iam.AdminMenuModel
@@ -61,6 +62,7 @@ func NewRepository(conn sqlx.SqlConn, cacheConf cache.CacheConf, rdb *redis.Redi
 		Redis:                    rdb,
 		BusinessCache:            businesscache.NewBusinessCache(rdb),
 		AdminUserModel:           iam.NewAdminUserModel(conn, cacheConf),
+		AdminUserThirdPartyModel: iam.NewAdminUserThirdPartyModel(conn, cacheConf),
 		AdminRoleModel:           iam.NewAdminRoleModel(conn, cacheConf),
 		AdminPermissionModel:     iam.NewAdminPermissionModel(conn, cacheConf),
 		AdminMenuModel:           iam.NewAdminMenuModel(conn, cacheConf),
@@ -130,6 +132,7 @@ func (r *Repository) withSession(session sqlx.Session) *Repository {
 		BusinessCache: r.BusinessCache,
 
 		AdminUserModel:           r.AdminUserModel.WithSession(session),
+		AdminUserThirdPartyModel: r.AdminUserThirdPartyModel.WithSession(session),
 		AdminRoleModel:           r.AdminRoleModel.WithSession(session),
 		AdminPermissionModel:     r.AdminPermissionModel.WithSession(session),
 		AdminMenuModel:           r.AdminMenuModel.WithSession(session),

@@ -30,8 +30,17 @@ export const useUserStore = defineStore('user', {
   actions: {
     async login(payload: LoginReq) {
       const data = await iamApi.login(payload)
-      this.token = data.accessToken
-      this.refreshToken = data.refreshToken
+      await this.afterLoginSuccess(data.accessToken, data.refreshToken)
+    },
+    async loginByFeishu(code: string, state: string) {
+      const data = await iamApi.loginFeishu({code, state})
+      await this.afterLoginSuccess(data.accessToken, data.refreshToken)
+    },
+    // afterLoginSuccess 拿到 token 后的公共收尾：存 token、拉 profile/menus/字典、连 WebSocket。
+    // 密码登录和飞书登录殊途同归，都走这一段，避免重复维护两套初始化逻辑。
+    async afterLoginSuccess(accessToken: string, refreshToken: string) {
+      this.token = accessToken
+      this.refreshToken = refreshToken
       localStorage.setItem(tokenKey, this.token)
       localStorage.setItem(refreshKey, this.refreshToken)
       await this.fetchProfile(true)

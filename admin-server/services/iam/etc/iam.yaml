@@ -40,6 +40,13 @@ JWT:
 Bcrypt:
   Cost: 10
 
+# 飞书自建应用扫码登录：App ID/Secret 来自飞书开放平台，RedirectUri 必须与应用后台
+# 「安全设置 - 重定向URL」白名单及前端 QRLoginObj 使用的 redirect_uri 完全一致。
+Feishu:
+  AppId: "${FEISHU_APP_ID}"
+  AppSecret: "${FEISHU_APP_SECRET}"
+  RedirectUri: "${FEISHU_REDIRECT_URI}"
+
 # SdkRpc 连到 sdk-rpc 的 zrpc client 配置：原单体内嵌 TaskCallback server 的
 # fetchSdkCallLog 分支回调 sdk-rpc.SdkCallLogExport，这里原样保留（见
 # internal/rpcserver/taskcallback/server.go 搬迁前的实现）。SDK_RPC_ENDPOINT 必须显式

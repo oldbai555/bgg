@@ -71,6 +71,11 @@ func (s *IamServer) Login(ctx context.Context, in *iam.LoginRequest) (*iam.Token
 	return l.Login(in)
 }
 
+func (s *IamServer) LoginFeishu(ctx context.Context, in *iam.LoginFeishuRequest) (*iam.TokenPair, error) {
+	l := logic.NewLoginFeishuLogic(ctx, s.svcCtx)
+	return l.LoginFeishu(in)
+}
+
 func (s *IamServer) Refresh(ctx context.Context, in *iam.RefreshRequest) (*iam.TokenPair, error) {
 	l := logic.NewRefreshLogic(ctx, s.svcCtx)
 	return l.Refresh(in)

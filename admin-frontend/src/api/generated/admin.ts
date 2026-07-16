@@ -416,6 +416,14 @@ export function login(req: components.LoginReq) {
  * @description 
  * @param req
  */
+export function loginFeishu(req: components.LoginFeishuReq) {
+	return webapi.post<components.TokenPair>(`/api/v1/login/feishu`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
 export function refresh(req: components.RefreshReq) {
 	return webapi.post<components.TokenPair>(`/api/v1/refresh`, req)
 }

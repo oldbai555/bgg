@@ -26,6 +26,11 @@ type Config struct {
 	Bcrypt struct {
 		Cost int
 	}
+	Feishu struct {
+		AppId       string
+		AppSecret   string
+		RedirectUri string
+	}
 	// SdkRpc 连到 sdk-rpc 的 zrpc client 配置：原单体内嵌 TaskCallback server 的
 	// fetchSdkCallLog 分支回调 sdk-rpc.SdkCallLogExport，这里原样保留（见
 	// internal/rpcserver/taskcallback/server.go 搬迁前的实现）。

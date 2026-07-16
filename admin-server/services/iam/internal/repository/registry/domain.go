@@ -25,6 +25,7 @@ type Domain struct {
 
 type IAMDomain struct {
 	User               iamrepo.UserRepository
+	UserThirdParty     iamrepo.UserThirdPartyRepository
 	Role               iamrepo.RoleRepository
 	Permission         iamrepo.PermissionRepository
 	Menu               iamrepo.MenuRepository
@@ -71,6 +72,7 @@ func NewDomain(repo *repository.Repository) *Domain {
 	return &Domain{
 		IAM: IAMDomain{
 			User:               iamrepo.NewUserRepository(repo),
+			UserThirdParty:     iamrepo.NewUserThirdPartyRepository(repo),
 			Role:               iamrepo.NewRoleRepository(repo),
 			Permission:         iamrepo.NewPermissionRepository(repo),
 			Menu:               iamrepo.NewMenuRepository(repo),

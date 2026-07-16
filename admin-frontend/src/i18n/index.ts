@@ -76,7 +76,8 @@ const messages = {
       timeRange: '时间范围',
       startTime: '开始时间',
       endTime: '结束时间',
-      all: '全部'
+      all: '全部',
+      backToLogin: '返回登录'
     },
     menu: {
       type: {
@@ -99,7 +100,14 @@ const messages = {
       username: '用户名',
       password: '密码',
       loginSuccess: '登录成功',
-      loginFail: '登录失败'
+      loginFail: '登录失败',
+      loginByPassword: '账号密码登录',
+      loginByFeishu: '飞书登录',
+      feishuLoginDesc: '点击下方按钮跳转飞书完成扫码或免扫码授权',
+      feishuMissingAppId: '未配置飞书 App ID（VITE_FEISHU_APP_ID）',
+      feishuLoggingIn: '正在完成飞书登录…',
+      feishuMissingCode: '飞书授权信息缺失，请重新登录',
+      feishuStateMismatch: '登录状态校验失败，请重新扫码登录'
     },
     status: {
       enabled: '启用',
@@ -194,7 +202,8 @@ const messages = {
       timeRange: 'Time Range',
       startTime: 'Start Time',
       endTime: 'End Time',
-      all: 'All'
+      all: 'All',
+      backToLogin: 'Back to login'
     },
     menu: {
       type: {
@@ -217,7 +226,14 @@ const messages = {
       username: 'Username',
       password: 'Password',
       loginSuccess: 'Login success',
-      loginFail: 'Login failed'
+      loginFail: 'Login failed',
+      loginByPassword: 'Password login',
+      loginByFeishu: 'Feishu login',
+      feishuLoginDesc: 'Click the button below to authorize via Feishu (scan or one-click)',
+      feishuMissingAppId: 'Feishu App ID not configured (VITE_FEISHU_APP_ID)',
+      feishuLoggingIn: 'Completing Feishu login…',
+      feishuMissingCode: 'Missing Feishu authorization info, please log in again',
+      feishuStateMismatch: 'Login state verification failed, please scan again'
     },
     status: {
       enabled: 'Enabled',

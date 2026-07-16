@@ -414,6 +414,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				},
 				{
 					Method:  http.MethodPost,
+					Path:    "/login/feishu",
+					Handler: iamauth.LoginFeishuHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
 					Path:    "/refresh",
 					Handler: iamauth.RefreshHandler(serverCtx),
 				},
@@ -1336,7 +1341,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 
 	server.AddRoutes(
 		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.PerformanceMiddleware, serverCtx.CorsMiddleware, serverCtx.ApiEnabledMiddleware, serverCtx.OperationLogMiddleware},
+			[]rest.Middleware{serverCtx.PerformanceMiddleware, serverCtx.CorsMiddleware, serverCtx.ApiEnabledMiddleware, serverCtx.PublicOperationLogMiddleware},
 			[]rest.Route{
 				{
 					Method:  http.MethodPost,

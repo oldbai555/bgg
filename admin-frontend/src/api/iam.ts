@@ -1,6 +1,7 @@
 import {
   // 认证
   login,
+  loginFeishu,
   refresh,
   logout,
   profile,
@@ -53,6 +54,7 @@ import {
 export const iamApi = {
   // ========== 认证 ==========
   login,
+  loginFeishu,
   refresh,
   logout,
   profile,

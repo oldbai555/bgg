@@ -38,6 +38,9 @@ admin-server/*.exe
 /config/redis.json
 /admin-server/etc/local-mysql.json
 /admin-server/etc/local-redis.json
+
+# 前端本地环境变量（如飞书 App ID 等第三方凭据），Vite 约定 *.local 为本机私有覆盖
+/admin-frontend/.env*.local
 # Local AI runtime state
 .atl/
 __debug_bin*

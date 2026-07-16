@@ -286,6 +286,15 @@ const ProxyRequestTimeout = 10 * time.Second
 // 代理资源缓存大小限制（5MB，超过此大小的文件不缓存，避免内存和 Redis 压力）
 const ProxyCacheMaxSize = 5 * 1024 * 1024 // 5MB
 
+// 飞书扫码登录相关常量
+const (
+	// FeishuProvider admin_user_third_party.provider 取值，标识第三方登录渠道
+	FeishuProvider = "feishu"
+	// FeishuDefaultRoleCode 飞书首次登录自动建号时默认分配的角色 code，
+	// 角色本身及其权限见 db/services/iam/role/migrations/add_feishu_role_20260716.sql
+	FeishuDefaultRoleCode = "feishu"
+)
+
 // Metric 上报模块常量（原 internal/consts/blog.go，MetricReport/MetricStats 需要）
 const (
 	MetricModuleBlogArticleList   = "blog_article_list"
