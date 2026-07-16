@@ -12,6 +12,7 @@
 | `admin.sh` | 统一管理脚本 | 开发、构建、打包、Supervisor管理 |
 | `admin-completion.bash` | Bash 自动补全 | 启用后支持 Tab 键自动补全命令 |
 | `utils.sh` | 工具函数库 | 通用函数（日志、路径、检查等），被 admin.sh 引用 |
+| `ssh-setup.sh` | 一键配置 SSH 免密登录 | `./script/ssh-setup.sh <user> <ip> [alias] [port]`，生成密钥（如不存在）+ `ssh-copy-id` + 写入 `~/.ssh/config` 别名，用于快速接入部署服务器 |
 
 ## 🚀 快速开始
 
