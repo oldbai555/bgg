@@ -1,0 +1,131 @@
+# bgg-dev（8.138.33.161）专用拓扑：sqlpub 免费版托管 MySQL 只支持 1 个库，
+# 六个服务（gateway 除外，gateway 不直连 MySQL）全部共用外部 mysql4.sqlpub.com 的
+# oldbai 库，不引入本地 MySQL 容器；task/sdk/chat/content 各自的表都建在 oldbai 里，
+# 见 db/init-tables-into-oldbai.sql。
+# 六个服务全部本地源码 build（feature 分支未合并 main，ghcr 还没有对应镜像，
+# 与 docker-compose.prod.yml「六个服务全部拉取 ghcr.io 镜像」的假设不同）。
+# Redis 继续用宿主机现有的本地 Redis（host.docker.internal，见 extra_hosts；
+# 宿主机 /etc/redis/redis.conf 需要在 bind 里加上 docker 网桥地址，例如
+# `bind 127.0.0.1 172.17.0.1`，否则容器连不上，见 docs/changelog/）。
+# 所有敏感值（JWT 密钥、外部 MySQL DSN、Redis 密码、飞书 App Secret）都走 .env 文件提供，
+# 不写死在本文件里；.env 参考 .env.dev-mixed.example，真实值不提交仓库。
+services:
+  gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      iam:
+        condition: service_started
+    ports:
+      - "20000:20000"
+    volumes:
+      - ./etc/dev-redis-host.json:/app/etc/dev-redis-host.json:ro
+      - uploads:/app/uploads
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      IAM_RPC_ENDPOINT: iam:8081
+      IAM_CALLBACK_RPC_ENDPOINT: iam:8081
+      TASK_RPC_ENDPOINT: task:8090
+      SDK_RPC_ENDPOINT: sdk:8091
+      CHAT_RPC_ENDPOINT: chat:8092
+      CONTENT_RPC_ENDPOINT: content:8093
+    command: ["./admin", "-f", "etc/admin-api.yaml", "-redis-config", "etc/dev-redis-host.json"]
+    restart: unless-stopped
+
+  iam:
+    build:
+      context: .
+      dockerfile: services/iam/Dockerfile
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      IAM_MYSQL_DSN: ${IAM_MYSQL_DSN}
+      IAM_REDIS_ADDRESS: host.docker.internal:6379
+      IAM_REDIS_PASSWORD: ${HOST_REDIS_PASSWORD}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      SDK_RPC_ENDPOINT: sdk:8091
+      CHAT_RPC_ENDPOINT: chat:8092
+      FEISHU_APP_ID: ${FEISHU_APP_ID}
+      FEISHU_APP_SECRET: ${FEISHU_APP_SECRET}
+      FEISHU_REDIRECT_URI: ${FEISHU_REDIRECT_URI}
+    ports:
+      - "8081:8081"
+    restart: unless-stopped
+
+  task:
+    build:
+      context: .
+      dockerfile: services/task/Dockerfile
+    depends_on:
+      iam:
+        condition: service_started
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      TASK_MYSQL_DSN: ${IAM_MYSQL_DSN}
+      TASK_REDIS_ADDRESS: host.docker.internal:6379
+      TASK_REDIS_PASSWORD: ${HOST_REDIS_PASSWORD}
+      TASK_CALLBACK_ENDPOINT: iam:8081
+    ports:
+      - "8090:8090"
+    volumes:
+      - uploads:/app/uploads
+    restart: unless-stopped
+
+  sdk:
+    build:
+      context: .
+      dockerfile: services/sdk/Dockerfile
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      SDK_MYSQL_DSN: ${IAM_MYSQL_DSN}
+      SDK_REDIS_ADDRESS: host.docker.internal:6379
+      SDK_REDIS_PASSWORD: ${HOST_REDIS_PASSWORD}
+    ports:
+      - "8091:8091"
+    restart: unless-stopped
+
+  chat:
+    build:
+      context: .
+      dockerfile: services/chat/Dockerfile
+    depends_on:
+      iam:
+        condition: service_started
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      CHAT_MYSQL_DSN: ${IAM_MYSQL_DSN}
+      CHAT_REDIS_ADDRESS: host.docker.internal:6379
+      CHAT_REDIS_PASSWORD: ${HOST_REDIS_PASSWORD}
+      IAM_CALLBACK_ENDPOINT: iam:8081
+    ports:
+      - "8092:8092"
+    restart: unless-stopped
+
+  content:
+    build:
+      context: .
+      dockerfile: services/content/Dockerfile
+    depends_on:
+      iam:
+        condition: service_started
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      CONTENT_MYSQL_DSN: ${IAM_MYSQL_DSN}
+      CONTENT_REDIS_ADDRESS: host.docker.internal:6379
+      CONTENT_REDIS_PASSWORD: ${HOST_REDIS_PASSWORD}
+      IAM_CALLBACK_ENDPOINT: iam:8081
+    ports:
+      - "8093:8093"
+    restart: unless-stopped
+
+volumes:
+  uploads:

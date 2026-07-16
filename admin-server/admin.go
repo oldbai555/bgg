@@ -24,6 +24,7 @@ import (
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/rest"
+	"github.com/zeromicro/go-zero/zrpc"
 )
 
 var (
@@ -133,11 +134,11 @@ func syncRoutesToAdminAPI(ctx *svc.ServiceContext, server *rest.Server) {
 	}
 
 	// 外部托管 MySQL 场景下单条 SQL 往返延迟可能到几百毫秒，~150 条路由逐条查询容易超过 zrpc
-	// client 默认的 2s 超时，这里单独给这次一次性启动同步放宽超时，不影响 IamRpc 共享 client
-	// 用于常规请求（Auth/Permission 等中间件）时的默认超时。
-	syncCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-	if _, err := ctx.IamRPC.SyncApiRoutes(syncCtx, &iamclient.SyncApiRoutesRequest{Routes: routeRefs}); err != nil {
+	// client 默认的 2s 超时。zrpc 的超时拦截器以 client 自身配置的 Timeout 为准，会覆盖调用方
+	// context 的 deadline，所以必须用 WithCallTimeout 这个 grpc.CallOption 才能真正生效，
+	// 只放宽这一次性启动同步的超时，不影响 IamRpc 共享 client 用于常规请求（Auth/Permission
+	// 等中间件）时的默认超时。
+	if _, err := ctx.IamRPC.SyncApiRoutes(context.Background(), &iamclient.SyncApiRoutesRequest{Routes: routeRefs}, zrpc.WithCallTimeout(30*time.Second)); err != nil {
 		logx.Errorf("同步路由到 admin_api 表失败: %v", err)
 	}
 	logx.Infof("====== 同步路由到 admin_api 表结束 ======")

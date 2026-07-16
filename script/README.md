@@ -13,6 +13,8 @@
 | `admin-completion.bash` | Bash 自动补全 | 启用后支持 Tab 键自动补全命令 |
 | `utils.sh` | 工具函数库 | 通用函数（日志、路径、检查等），被 admin.sh 引用 |
 | `ssh-setup.sh` | 一键配置 SSH 免密登录 | `./script/ssh-setup.sh <user> <ip> [alias] [port]`，生成密钥（如不存在）+ `ssh-copy-id` + 写入 `~/.ssh/config` 别名，用于快速接入部署服务器 |
+| `deploy-dev.sh` | bgg-dev 后端一键部署 | **在服务器上**执行：`bash script/deploy-dev.sh [service...]`，git pull + docker compose build/up，见 `docs/changelog/` |
+| `deploy-frontend.sh` | bgg-dev 前端一键部署 | **在本机**执行：`bash script/deploy-frontend.sh [ssh-host]`，本机构建打包 + 上传 + 远端解压替换 dist |
 
 ## 🚀 快速开始
 

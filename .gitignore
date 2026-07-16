@@ -41,6 +41,12 @@ admin-server/*.exe
 
 # 前端本地环境变量（如飞书 App ID 等第三方凭据），Vite 约定 *.local 为本机私有覆盖
 /admin-frontend/.env*.local
+
+# docker-compose.dev-mixed.yml 的真实密钥（JWT/DSN/飞书 Secret），参考
+# admin-server/.env.dev-mixed.example 自行创建，只放在部署目标机器本地
+/admin-server/.env
+/admin-server/.env.*
+!/admin-server/.env.*.example
 # Local AI runtime state
 .atl/
 __debug_bin*
