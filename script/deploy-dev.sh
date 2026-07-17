@@ -1,16 +1,22 @@
 #!/bin/bash
-# bgg-dev（8.138.33.161）一键部署脚本：拉最新代码 → 重新构建改动的服务镜像 → 重启容器。
+# bgg-dev 一键部署脚本：拉最新代码（仅同步 compose/配置文件，不再编译源码）
+# → 拉取 ghcr.io 镜像 → 重启容器。
 # 只负责 admin-server 的 6 个 docker 服务（gateway/iam/task/sdk/chat/content）。
 # 前端（admin-frontend）走独立的构建+上传流程，见 script/deploy-frontend.sh。
 #
 # 用法（在服务器上，仓库 clone 目录内执行，即 /home/work/src-bgg）：
-#   bash script/deploy-dev.sh              # 全量重新 build + up 六个服务
-#   bash script/deploy-dev.sh gateway iam  # 只重新 build + up 指定服务
+#   TAG=<git-sha> bash script/deploy-dev.sh              # 全量 pull + up 六个服务
+#   TAG=<git-sha> bash script/deploy-dev.sh gateway iam  # 只 pull + up 指定服务
+#   不传 TAG 时默认取 main 分支 pull 之后的最新 commit sha（见下方逻辑），
+#   前提是该 sha 对应的 CI build-images 已经跑成功、镜像已推送到 ghcr.io
+#   （可以去 https://github.com/oldbai555?tab=packages 确认 tag 是否存在）。
 #
 # 前置条件：
 #   - /home/work/src-bgg/admin-server/.env 已按 .env.dev-mixed.example 配好真实值
 #   - Docker 已安装，且 /etc/docker/daemon.json 配置了国内镜像加速（见 docs/changelog/）
 #   - 宿主机 /etc/redis/redis.conf 的 bind 已加上 docker 网桥地址（172.17.0.1）
+#   - ghcr.io 六个 package 可见性为 public（当前已确认），pull 不需要 docker login；
+#     若之后改成 private，需要在这里补一步 `docker login ghcr.io`
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -25,8 +31,18 @@ if [ ! -f "$ADMIN_SERVER_DIR/.env" ]; then
   exit 1
 fi
 
-log "拉取最新代码（当前分支: $(git -C "$REPO_ROOT" branch --show-current)）"
-git -C "$REPO_ROOT" pull
+CURRENT_BRANCH="$(git -C "$REPO_ROOT" branch --show-current)"
+if [ "$CURRENT_BRANCH" != "main" ]; then
+  echo "当前分支是 $CURRENT_BRANCH，不是 main——ghcr 镜像只在 push 到 main 时由 CI 构建，"
+  echo "该分支的 commit sha 在 ghcr 上不会有对应 tag。请先 git checkout main。"
+  exit 1
+fi
+
+log "拉取最新代码（main 分支）"
+git -C "$REPO_ROOT" pull origin main
+
+export TAG="${TAG:-$(git -C "$REPO_ROOT" rev-parse HEAD)}"
+log "使用镜像 tag: $TAG（可去 https://github.com/oldbai555?tab=packages 确认该 tag 已推送）"
 
 cd "$ADMIN_SERVER_DIR"
 
@@ -37,11 +53,11 @@ mkdir -p "$DOCKER_CONFIG"
 
 SERVICES="$*"
 if [ -z "$SERVICES" ]; then
-  log "构建全部六个服务镜像"
+  log "拉取全部六个服务镜像"
 else
-  log "构建指定服务镜像: $SERVICES"
+  log "拉取指定服务镜像: $SERVICES"
 fi
-docker compose -f "$COMPOSE_FILE" --env-file .env build $SERVICES
+docker compose -f "$COMPOSE_FILE" --env-file .env pull $SERVICES
 
 log "重启服务"
 docker compose -f "$COMPOSE_FILE" --env-file .env up -d $SERVICES
