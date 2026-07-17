@@ -107,7 +107,7 @@ Phase 2 服务拆分完成后，`admin-server` 从单体变成 gateway + 5 个 R
 |---|---|---|
 | Supervisor 单二进制 | 重构前的老环境，尚未切到拆分架构 | `script/admin.sh supervisor ...` |
 | `docker-compose.prod.yml` | 生产环境，六服务全部拉 `ghcr.io` 远程镜像（只有 push 到 `main` 才会构建镜像） | `script/admin.sh compose ...` |
-| `docker-compose.dev-mixed.yml` | 开发/测试环境部署未合并 `main` 的分支（`ghcr.io` 还没有对应镜像），六服务本地源码 build；MySQL 外部托管账号若只有 1 个库（如 sqlpub 免费版），多个 RPC 服务可以共用同一个库，不强求每服务独立 schema | `script/deploy-dev.sh`（服务器上 git pull + build/up）、`script/deploy-frontend.sh`（本机构建前端 + 上传部署）、`script/ssh-setup.sh`（一键配置目标机 SSH 免密） |
+| `docker-compose.dev-mixed.yml` | 开发/测试环境（bgg-dev），六服务全部拉取 `ghcr.io` 镜像；直接 `docker compose` 操作时 `TAG` 必须显式指定为具体 commit sha，经 `script/deploy-dev.sh` 部署时可省略（脚本 git pull main 后自动取 HEAD sha 兜底），脚本强制要求分支必须是 `main`，否则该 sha 在 ghcr 上没有对应 tag；MySQL 外部托管账号若只有 1 个库（如 sqlpub 免费版），多个 RPC 服务可以共用同一个库，不强求每服务独立 schema | `script/deploy-dev.sh`（服务器上 git pull main + pull 镜像/up）、`script/deploy-frontend.sh`（本机构建前端 + 上传部署）、`script/ssh-setup.sh`（一键配置目标机 SSH 免密） |
 
 三条路径不互相替代，不要因为熟悉某一条就把另一条的部署对象强行套过去。
 

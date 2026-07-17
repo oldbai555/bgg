@@ -2,8 +2,12 @@
 # 六个服务（gateway 除外，gateway 不直连 MySQL）全部共用外部 mysql4.sqlpub.com 的
 # oldbai 库，不引入本地 MySQL 容器；task/sdk/chat/content 各自的表都建在 oldbai 里，
 # 见 db/init-tables-into-oldbai.sql。
-# 六个服务全部本地源码 build（feature 分支未合并 main，ghcr 还没有对应镜像，
-# 与 docker-compose.prod.yml「六个服务全部拉取 ghcr.io 镜像」的假设不同）。
+# 六个服务全部拉取 ghcr.io 镜像（main 分支 push 触发 CI 构建，见
+# .github/workflows/ci.yml 的 build-images job），服务器不再本地 build 源码。
+# 直接用 docker compose 操作时 TAG 必须显式指定为具体 commit sha
+# （`TAG=<sha> docker compose ... up -d`）——CI 只打 sha tag，不打 latest，留空会直接
+# 报错。经 script/deploy-dev.sh 部署时可以省略：脚本会在 git pull main 之后自动取
+# HEAD 的 sha 兜底（前提是该 sha 对应的 CI build-images 已经跑成功）。
 # Redis 继续用宿主机现有的本地 Redis（host.docker.internal，见 extra_hosts；
 # 宿主机 /etc/redis/redis.conf 需要在 bind 里加上 docker 网桥地址，例如
 # `bind 127.0.0.1 172.17.0.1`，否则容器连不上，见 docs/changelog/）。
@@ -11,9 +15,7 @@
 # 不写死在本文件里；.env 参考 .env.dev-mixed.example，真实值不提交仓库。
 services:
   gateway:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/${GHCR_NAMESPACE:-oldbai555}/admin-gateway:${TAG:?请指定镜像 tag，例如 TAG=<git-sha> docker compose ... up -d}
     depends_on:
       iam:
         condition: service_started
@@ -37,9 +39,7 @@ services:
     restart: unless-stopped
 
   iam:
-    build:
-      context: .
-      dockerfile: services/iam/Dockerfile
+    image: ghcr.io/${GHCR_NAMESPACE:-oldbai555}/admin-iam:${TAG:?请指定镜像 tag，例如 TAG=<git-sha> docker compose ... up -d}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
@@ -58,9 +58,7 @@ services:
     restart: unless-stopped
 
   task:
-    build:
-      context: .
-      dockerfile: services/task/Dockerfile
+    image: ghcr.io/${GHCR_NAMESPACE:-oldbai555}/admin-task:${TAG:?请指定镜像 tag，例如 TAG=<git-sha> docker compose ... up -d}
     depends_on:
       iam:
         condition: service_started
@@ -78,9 +76,7 @@ services:
     restart: unless-stopped
 
   sdk:
-    build:
-      context: .
-      dockerfile: services/sdk/Dockerfile
+    image: ghcr.io/${GHCR_NAMESPACE:-oldbai555}/admin-sdk:${TAG:?请指定镜像 tag，例如 TAG=<git-sha> docker compose ... up -d}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
@@ -92,9 +88,7 @@ services:
     restart: unless-stopped
 
   chat:
-    build:
-      context: .
-      dockerfile: services/chat/Dockerfile
+    image: ghcr.io/${GHCR_NAMESPACE:-oldbai555}/admin-chat:${TAG:?请指定镜像 tag，例如 TAG=<git-sha> docker compose ... up -d}
     depends_on:
       iam:
         condition: service_started
@@ -110,9 +104,7 @@ services:
     restart: unless-stopped
 
   content:
-    build:
-      context: .
-      dockerfile: services/content/Dockerfile
+    image: ghcr.io/${GHCR_NAMESPACE:-oldbai555}/admin-content:${TAG:?请指定镜像 tag，例如 TAG=<git-sha> docker compose ... up -d}
     depends_on:
       iam:
         condition: service_started
