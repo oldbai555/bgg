@@ -1,5 +1,5 @@
 #!/bin/bash
-# bgg-dev（8.138.33.161）一键部署脚本：拉最新代码（仅同步 compose/配置文件，不再编译源码）
+# bgg-dev 一键部署脚本：拉最新代码（仅同步 compose/配置文件，不再编译源码）
 # → 拉取 ghcr.io 镜像 → 重启容器。
 # 只负责 admin-server 的 6 个 docker 服务（gateway/iam/task/sdk/chat/content）。
 # 前端（admin-frontend）走独立的构建+上传流程，见 script/deploy-frontend.sh。

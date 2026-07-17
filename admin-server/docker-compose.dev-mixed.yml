@@ -1,4 +1,4 @@
-# bgg-dev（8.138.33.161）专用拓扑：sqlpub 免费版托管 MySQL 只支持 1 个库，
+# bgg-dev 专用拓扑：sqlpub 免费版托管 MySQL 只支持 1 个库，
 # 六个服务（gateway 除外，gateway 不直连 MySQL）全部共用外部 mysql4.sqlpub.com 的
 # oldbai 库，不引入本地 MySQL 容器；task/sdk/chat/content 各自的表都建在 oldbai 里，
 # 见 db/init-tables-into-oldbai.sql。
