@@ -43,7 +43,7 @@ alwaysApply: true
 | `codegraph_explore` 替代大范围 grep+Read | `admin-server/scripts/generate-*.sh`（**必须用户执行**） |
 | `query_docs` / `mcp-zero` 查 go-zero 文档 | 直接 `goctl api go` 覆盖 `internal/handler`、`internal/model` |
 | `mcp-zero` `analyze_project` 分析结构 | 用 mcp-zero 生成并提交与本仓库脚手架冲突的代码 |
-| engram 记决策与约定 | 用 engram 代替更新 `docs/后端开发进度.md` |
+| engram 记决策与约定 | 用 engram 代替补 `docs/changelog/` 交接记录 |
 
 新增标准 CRUD 模块仍走 `00-workflow.mdc` 的 `generate-sql.sh` 脚手架；mcp-zero 仅作**查阅与校验**，不绕过项目生成脚本。
 
@@ -67,7 +67,7 @@ alwaysApply: true
 1. 告知用户哪个 server 未连接（`make sync-claude-mcp-check`）
 2. **codegraph** 不可用 → `Grep` + `Read`（范围尽量小）
 3. **context7** 不可用 → 查项目内 `docs/` 与 `.ai-context/zero-skills/`
-4. **engram** 不可用 → 读 `docs/后端开发进度.md` 历史决策
+4. **engram** 不可用 → 读 `docs/changelog/` 历史决策（含早期归档 `archive-backend.md`/`archive-frontend.md`）
 5. **mysql**/**redis** 不可用 → 不查库/不查缓存，改让用户确认或启动本地服务（`mongodb` 本项目未启用，见上）
 
 ## 维护者

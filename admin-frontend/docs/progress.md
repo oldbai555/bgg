@@ -1,6 +1,6 @@
 # admin-frontend 重构过程记录（Phase 1-3）
 
-> 本文档是本轮 `admin-frontend` 重构 Phase 1-3 期间的唯一过程记录（阶段/周次/关键决策），只追加不重写。与仓库根目录 `docs/前端开发进度.md`（跨越整个项目生命周期的功能级进度索引）是两份不同的记录，不要互相替代——分工原则见 `00-refactor-overview.md` 第 4 节。
+> 本文档是本轮 `admin-frontend` 重构 Phase 1-3 期间的唯一过程记录（阶段/周次/关键决策），只追加不重写。仓库根目录曾有一份跨项目生命周期的功能级进度索引 `docs/前端开发进度.md`，2026-07-17 起已退场归档为 `docs/changelog/archive-frontend.md`（见 `.cursor/rules/00-workflow.mdc`「文档分层与生命周期」）；以下历史条目中提到的"同步更新 `docs/前端开发进度.md`"均为撰写时点的真实操作记录，不做回溯改写。
 
 ---
 

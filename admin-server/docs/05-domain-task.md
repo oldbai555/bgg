@@ -16,7 +16,7 @@
 
 ### 2.1 `internal/domain/task/scheduler.go`
 
-- `scanAsyncTasks`/`scanScheduledTasks` 直接用 `s.repo.DB` + squirrel 查询 `admin_task` 表（第 132-158、161-190 行），**读操作绕开了传进来的 `taskRepo` 参数**——`scanAndExecute` 里构造了 `taskRepo := taskrepo.NewTaskRepository(s.repo)`（第 98 行）并作为参数传给这两个方法，但方法体内根本没用这个参数，是上一轮重构遗留的"接口留着、实现没跟上"。这属于"squirrel 直连改造为通过 repository 调用"的范畴，**上一轮 DDD-lite 任务书（`docs/admin-server-ddd-refactor-prompt.md` 第 5 节）已经明确写了"不要顺带把 scheduler 内部直连 squirrel 的 SQL 改成走 repository 接口——这是可选的后续优化"，本轮同样不强制修**。如果顺手做，改动范围是：`scanAsyncTasks`/`scanScheduledTasks` 删掉未使用的 `taskRepo` 参数，或者真的通过 `taskRepo` 暴露的方法查询（需要先给 `TaskRepository` 接口加对应的条件查询方法）。**这是可选项，不是本文档的必做任务**，做与不做都不影响"完成的定义"。
+- `scanAsyncTasks`/`scanScheduledTasks` 直接用 `s.repo.DB` + squirrel 查询 `admin_task` 表（第 132-158、161-190 行），**读操作绕开了传进来的 `taskRepo` 参数**——`scanAndExecute` 里构造了 `taskRepo := taskrepo.NewTaskRepository(s.repo)`（第 98 行）并作为参数传给这两个方法，但方法体内根本没用这个参数，是上一轮重构遗留的"接口留着、实现没跟上"。这属于"squirrel 直连改造为通过 repository 调用"的范畴，**上一轮 DDD-lite 任务书（原文档已删除，内容已被本轮重构文档集取代）已经明确写了"不要顺带把 scheduler 内部直连 squirrel 的 SQL 改成走 repository 接口——这是可选的后续优化"，本轮同样不强制修**。如果顺手做，改动范围是：`scanAsyncTasks`/`scanScheduledTasks` 删掉未使用的 `taskRepo` 参数，或者真的通过 `taskRepo` 暴露的方法查询（需要先给 `TaskRepository` 接口加对应的条件查询方法）。**这是可选项，不是本文档的必做任务**，做与不做都不影响"完成的定义"。
 - `executeTask` 里的写操作：`taskRepo.UpdateStatus(...)`（置为运行中）→ 执行 → `taskRepo.UpdateResult(...)`（置为完成/失败）。这两次写各自只操作 `admin_task` 单表的单行，且是任务生命周期里两个先后发生、语义上独立的状态迁移（不是同一个逻辑操作被拆成两次写），**不需要 Transact**——把它们包在一个事务里没有意义，中间还隔着可能耗时很久的 `executor.Execute(...)` 调用，事务不应该跨越这么长的执行窗口。
 - `handleTaskError` 同理，单表单行写，不需要 Transact。
 - `acquireLock`/`releaseLock` 是 Redis 操作，不涉及 MySQL 事务，不在本文档范围内（Redis 分布式锁的正确性已经由 `SETEX` 的原子性保证，计划文档 B.1 也确认"调度器现有的 Redis 锁已经是多副本安全的，不需要重新设计并发模型"）。

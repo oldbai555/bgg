@@ -13,7 +13,7 @@ Cursor 用户请注意：本文件内容与 `.cursor/rules/*.mdc` 同源，`.cur
 - `admin-frontend`：Vite 5 + Vue 3.4 + TypeScript + Element Plus，同时承载后台管理页面（`/bgg/admin/*`，需登录）和公共展示页面（`/bgg/front/*`，无需登录）——两个分支不共享任何路径前缀段（见 `admin-frontend/docs/10-route-namespace-migration.md`）
 - `script/`：生产环境构建/部署/Supervisor 管理脚本（`admin.sh`）+ 开发环境一键部署脚本（`deploy-dev.sh`/`deploy-frontend.sh`/`ssh-setup.sh`）+ Git 分支/PR 脚手架（`branch_from_main.sh`/`branch_<type>.sh`，见 1.5 节），开发环境建议直接用 IDE 运行
 - `config/`：Nginx / MySQL / Redis 参考配置
-- `docs/`：历史记录类文档（已完成功能、技术决策、关键代码位置索引），**不是规则文件**，规则统一在下面第 2 条的文件里
+- `docs/`：历史记录（`docs/changelog/`）与现状参考文档（如 `docs/admin-server-维护导航.md`），**不是规则文件**，规则统一在下面第 2 条的文件里；文档分层与生命周期规则见 `.cursor/rules/00-workflow.mdc`
 
 **规则文件地图**：
 
@@ -27,8 +27,8 @@ Cursor 用户请注意：本文件内容与 `.cursor/rules/*.mdc` 同源，`.cur
 | `.cursor/rules/10-go-code-style.mdc` / 本文件第 3 节 | `admin-server/**` 后端规范 | 编辑后端代码时 |
 | `.cursor/rules/20-frontend.mdc` / 本文件第 4 节 | `admin-frontend/**` 前端规范 | 编辑前端代码时 |
 | `.cursor/rules/21-public-pages.mdc` | 公共展示页样式/交互契约 | 编辑 `views/public/*`、`components/blog/*` 时 |
-| `docs/后端开发进度.md` / `docs/前端开发进度.md` | 已完成功能、技术决策记录、关键代码位置 | 需要了解历史背景时查阅，完成新功能后更新 |
-| `docs/changelog/` / 本文件第 7.1 节 | admin-server + admin-frontend 共用的开发交接记录（强制） | 全局——会话开始先读最新条目，会话结束必须补一篇 |
+| `docs/admin-server-维护导航.md` | admin-server 现状参考（架构导航，不是历史记录） | 需要了解后端现状/找代码入口时查阅 |
+| `docs/changelog/` / 本文件第 7.1 节 | admin-server + admin-frontend 共用的开发交接记录（强制），历史存量见 `archive-backend.md`/`archive-frontend.md` | 全局——会话开始先读最新条目，会话结束必须补一篇 |
 | `docs/AI工具链上手.md` | Gentle-AI、CodeGraph、MCP、Engram 换设备/第三人上手 | 新维护者、换设备、改 MCP 清单时 |
 
 **关键目录**（后端）：`admin-server/api/admin.api`（唯一 .api 文件）、`internal/{handler,logic}/<domain>/<module>/`（9 业务域，全部薄胶水，不直连数据库）、`internal/middleware`、`internal/redisconn`（gateway 唯一保留的存储直连：共享 Redis）、`pkg/errs`、`scripts/generate-*.sh`；`services/iam/`（iam-rpc，iam+system+monitoring+misc 四个域）、`services/task/`（task-rpc）、`services/sdk/`（sdk-rpc）、`services/chat/`（chat-rpc）、`services/content/`（content-rpc，blog+video 域）——Phase 2 五个服务全部拆分完成，独立部署单元，见 `admin-server/docs/15-service-boundaries.md`；gateway 的 `internal/repository/`、`internal/model/`、`internal/domain/` 三个目录已整体删除，RBAC 领域服务（`PermissionResolver`/`RBACService`/`UserService`）搬到 `services/iam/internal/domain/iam/`。维护导航见 [`docs/admin-server-维护导航.md`](docs/admin-server-维护导航.md)。
@@ -63,7 +63,7 @@ Cursor 用户请注意：本文件内容与 `.cursor/rules/*.mdc` 同源，`.cur
 11. **用户**执行 `generate-ts.sh`
 12. 完善前端页面（基于生成的 `.vue` 骨架）
 13. 前后端联调测试通过
-14. 更新进度文档（`docs/后端开发进度.md` / `docs/前端开发进度.md`）
+14. 补一篇 `docs/changelog/` 交接记录（见第 7.1 节）
 
 即：先把 admin-server 一侧（步骤 1-10）做完、验证通过，再推进 admin-frontend 一侧（步骤 11-13）。
 
@@ -176,7 +176,7 @@ Phase 2 服务拆分完成后部署方式演进出三条平行路径，不互相
 
 一个功能只有同时满足以下条件才算完成，不要仅凭代码写完就声称任务结束：
 1. 前后端联调测试通过
-2. `docs/后端开发进度.md` / `docs/前端开发进度.md` 已更新（已完成功能、关键代码位置、技术决策记录）
+2. `docs/changelog/` 已补一篇交接记录（做了什么、关键决策、关键代码位置，见第 7.1 节）
 
 ### 7.1 会话交接文档（`docs/changelog/`，强制，前后端都适用）
 
@@ -186,6 +186,16 @@ Phase 2 服务拆分完成后部署方式演进出三条平行路径，不互相
 - **会话结束**：只要这次会话对 admin-server 或 admin-frontend 有实质性改动（新增需求、代码重构、bug 修复、方案调整、部署都算），必须在 `docs/changelog/` 新增一篇（同一天多条用 `-2`/`-3` 后缀，前后端不分文件夹，混在一起按时间排列即可），且**必须包含「交接摘要」小节**（模板见 `docs/changelog/TEMPLATE.md` 顶部），如实写清楚：这次在做什么/为什么、已完成什么、当前卡在哪、下一步计划、踩过的坑（现象 → 根因 → 正确做法三段式，不要只写"注意 xxx"）
 - 「交接摘要」之外的「上线需求/技术优化/线上缺陷」等表格化章节，只在涉及实际上线/部署时才需要认真填；纯代码/方案调整的会话可以把这些表格留空或写"无"，但「交接摘要」不能省
 - 与 `engram` 跨会话记忆是互补关系，不是替代：engram 存细粒度、可检索的决策点，changelog 存面向人也面向 AI、可读性优先的**整段会话叙事**，两者都要维护
+
+### 7.2 文档分层与生命周期（新建 `docs/**` 文档前必读）
+
+本仓库的 Markdown 文档只分三层，新建文档前先判断属于哪一层，不要凭感觉再开一份"进度记录"：
+
+1. **历史（`docs/changelog/`）**：唯一的、只追加的时间线，规则见第 7.1 节。**不允许再建第二个与它平行的历史记录**（例如按功能倒序罗列"已完成/待实现"的进度文档），否则两处记录迟早互相漂移（2026-07-17 之前 `docs/后端开发进度.md` 与 changelog 已经出现过同一天两份重复记录）。
+2. **现状参考**（如 `docs/admin-server-维护导航.md`、`docs/AI工具链上手.md`、各 `README.md`、规则文件本身）：描述系统**现在**是什么样，随代码/架构变化原地编辑更新，不记录变化过程、不无限增长。
+3. **阶段性规划文档**（如曾经的 `admin-server/docs/00~22*.md`、`admin-frontend/docs/00~10*.md` 系列）：服务于一个有始有终的专项，只在专项进行期间维护。**专项结束后必须退场**：内容已被 changelog + 现状参考文档覆盖的直接删除（git 历史仍可查）；个别有必要保留完整论证过程的整篇搬进 `docs/changelog/` 归档。不允许放着不管变成僵尸文档。
+
+2026-07-17 起，`docs/后端开发进度.md`、`docs/前端开发进度.md` 以及 `docs/admin-server-ddd-refactor-prompt.md`/`admin-server-ddd-smoke-test.md`/`admin-server-phase0-goctl-spike.md`（DDD-lite 重构专项已完成）按本节标准退场：前两者 2026-07-10 前的历史内容归档进 `docs/changelog/archive-backend.md`/`archive-frontend.md`，之后的内容与 changelog 重复直接删除；后三者内容已被现有重构文档集取代，直接删除。
 
 ---
 

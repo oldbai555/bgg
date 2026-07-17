@@ -1,6 +1,8 @@
-# 前端开发进度与实现方案
+# 归档：admin-frontend 历史开发记录（2025-12 ~ 2026-07-07，changelog 起点之前）
 
-> 本文档是前端开发的历史/参考日志：记录已完成什么、还差什么、关键决策为什么这么定，以及代码索引。开发规范类内容已迁移至 Cursor 规则文件，不在本文档重复。
+> **本文件是历史归档，不再维护，不要往这里追加新内容。** 原文件 `docs/前端开发进度.md` 已于 2026-07-17 按「文档分层与生命周期」规则（见 `.cursor/rules/00-workflow.mdc`）退场：2026-07-10（`docs/changelog/` 起点）之前的内容与 changelog 没有重复，整篇原样搬到这里；2026-07-10 之后的内容（2026-07-16 飞书登录联调等）与 `docs/changelog/` 对应日期文件完全重复，直接删除未保留。新的前端变更一律写进 `docs/changelog/`。
+>
+> 以下正文原样保留（含内部编号、"见第 X 节"式交叉引用），**不做重新整理**；原文中指向 `docs/admin-server-ddd-smoke-test.md` 的链接已随该文档删除一并失效处理为纯文本。原文档第 8 节（2026-07-16 飞书登录）已删除，不在本文件中。
 
 ---
 
@@ -65,7 +67,7 @@
 
 ---
 
-## 3. 待实现 / 待完善功能
+## 3. 待实现 / 待完善功能（归档时点的存量，不代表当前状态）
 
 - [ ] 菜单组件路径与后端约定的自动映射策略（当前手工 map）。
 - [ ] 主题更多维度（色板、字体），国际化文案进一步细化。
@@ -88,7 +90,7 @@
 
 ---
 
-## 5. 关键代码位置
+## 5. 关键代码位置（归档时点的现状，不代表当前状态）
 
 > 2026-07 Phase 1 域目录重组后，以下路径均为重组后的现状；重组过程与逐文件迁移清单见 `admin-frontend/docs/progress.md`、`admin-frontend/docs/02-domain-reorg-and-api-layer.md`。
 
@@ -147,7 +149,7 @@
 
 后端 DDD-lite 重构**未改变 HTTP 路径**，现有 `src/api/generated/` 与各域二次封装层（`src/api/{iam,system,monitoring,misc,content,chat,sdk,task}.ts`，2026-07 Phase 1 起 `blog.ts`/`video.ts` 已合并进 `content.ts`）可继续用。
 
-**联调步骤**（详见 [`docs/admin-server-ddd-smoke-test.md`](admin-server-ddd-smoke-test.md) 第三节）：
+**联调步骤**（原详见已删除的 `docs/admin-server-ddd-smoke-test.md` 第三节，摘要如下）：
 
 1. 后端 `go build ./...` + 本地启动验证接口
 2. **用户执行** `admin-server/scripts/generate-ts.sh`（仅当 `admin.api` 有变更时需要；当前对比结论：169 函数名 / 168 路径与现网一致，可不重生成）
@@ -156,14 +158,4 @@
 
 ---
 
-## 8. 新增飞书扫码/免扫码登录（2026-07-16）
-
-`views/Login.vue` 加了「账号密码登录」/「飞书登录」两个 tab；新建 `components/iam/FeishuQrLogin.vue`，走标准 OAuth 授权码流程（点击按钮整页跳转飞书授权页，飞书自行按设备展示扫码/免扫码 UI，不依赖任何第三方 JS SDK/iframe/postMessage），跳转地址需要拼上 Vite `base: '/bgg/'` 子路径（用 `import.meta.env.BASE_URL`，不能只用 `window.location.origin`，飞书重定向 URL 要求逐字符精确匹配控制台白名单，见 `FeishuQrLogin.vue` 内注释）。
-
-新增路由 `/admin/login/feishu/callback` → `views/iam/FeishuLoginCallback.vue`，读 URL 上的 `code`/`state`（`state` 存 `sessionStorage` 做 CSRF 校验），调用 `iamApi.loginFeishu` 后复用 `stores/user.ts` 新抽取的 `afterLoginSuccess` 完成后续初始化（存 token → 拉 profile/menus → 字典 → WebSocket），与密码登录共用同一段收尾逻辑不重复维护。路由守卫 `router/index.ts` 的 `isLoginFlowPath` 判断需要同时放行 `/admin/login` 和这条回调路径。
-
-飞书 App ID 走本机 `.env.local`（`VITE_FEISHU_APP_ID`，已加进 `.gitignore` 的 `/admin-frontend/.env*.local`，不提交），App Secret 只在后端配置，前端不接触。
-
-关键代码位置：`src/components/iam/FeishuQrLogin.vue`、`src/views/iam/FeishuLoginCallback.vue`、`src/views/Login.vue`、`src/stores/user.ts`（`afterLoginSuccess`）、`src/router/index.ts`（`isLoginFlowPath`）、`src/api/iam.ts`（`loginFeishu`）。
-
-**注意**：`package.json` 的 `api:gen` 脚本已失效并于 2026-07 Phase 1 删除，唯一生成入口是 `generate-ts.sh`。
+> 本文档到此结束（对应原文档第 7 节）。2026-07-10 起的后续内容（含 2026-07-16 飞书登录联调）见 `docs/changelog/` 对应日期文件，索引见 `docs/changelog/README.md`。

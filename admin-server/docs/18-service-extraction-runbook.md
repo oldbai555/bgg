@@ -19,7 +19,7 @@
 ### 1.2 领域代码搬迁
 
 - [ ] 把 `internal/domain/<domain>`（Phase 1 已经按 5 服务分组组织好的领域服务包）整体移动到 `services/<name>/internal/domain/`，import 路径更新。
-- [ ] 把 `internal/logic/<domain>/**/*.go` 的手写方法体，按 goctl 生成的新骨架（`services/<name>/internal/logic/`）逐个搬迁——这一步是"复制方法体 + 删旧目录"，不是原地改名，要文件级 diff 核对不要漏搬（同 `admin-server-ddd-refactor-prompt.md` 第 7 节 Phase 3 的搬迁方式，经验证过一次）。
+- [ ] 把 `internal/logic/<domain>/**/*.go` 的手写方法体，按 goctl 生成的新骨架（`services/<name>/internal/logic/`）逐个搬迁——这一步是"复制方法体 + 删旧目录"，不是原地改名，要文件级 diff 核对不要漏搬（同上一轮 DDD-lite 任务书 Phase 3 的搬迁方式，原文档已删除，经验证过一次）。
 - [ ] 把 `internal/repository/<domain>/*.go`、`internal/model/<domain>/*.go` 整体移动到 `services/<name>/internal/repository/`、`services/<name>/internal/model/`，包名不变（域名本身已经是包名，不需要再改）。
 - [ ] 编译该服务自己的 `go build ./services/<name>/...` 通过。
 

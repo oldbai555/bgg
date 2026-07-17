@@ -1,6 +1,6 @@
 # admin-frontend
 
-基于 Vue 3 + Vite 的前端项目，承担双重角色：`/admin/*` 后台管理界面（需登录）+ `/blog/*`、`/videos/*` 公共展示页面（免登录）。统一调用 `admin-server` 提供的接口。
+基于 Vue 3 + Vite 的前端项目，承担双重角色：`/bgg/admin/*` 后台管理界面（需登录）+ `/bgg/front/*` 公共展示页面（免登录，博客/视频等）——两个分支不共享任何路径前缀段。统一调用 `admin-server` 提供的接口。
 
 ## 技术栈
 
@@ -16,7 +16,7 @@ src/
 ├── components/common/ # 通用组件（D2Table 等，见 components/common/README.md）
 ├── composables/        # useDictOptions、usePermission、useAppConfig 等
 ├── directives/permission.ts # v-permission 指令
-├── stores/            # Pinia：app/dict/user/websocket
+├── stores/            # Pinia：app/dict/user/websocket（连接生命周期）/notification（未读消息，订阅 websocket）
 ├── styles/             # 含公共页样式模板 public-list.scss / public-detail.scss
 └── views/               # 按后端域分目录：iam/system/monitoring/misc/content/chat/sdk/task 后台页面 + public/ 公共页面
 ```
@@ -35,7 +35,7 @@ pnpm install
 pnpm dev
 ```
 
-开发服务器需要 `admin-server` 已在 `localhost:20000` 运行（Vite 会把 `/api` 代理过去）。访问路径固定为 `/admin/`（见 `vite.config.ts` 的 `base` 配置）。
+开发服务器需要 `admin-server` 已在 `localhost:20000` 运行（Vite 会把 `/api` 代理过去）。访问路径固定为 `/bgg/`（见 `vite.config.ts` 的 `base` 配置），内部再分 `/bgg/admin/*`（后台）与 `/bgg/front/*`（公共）两个命名空间。
 
 ## 常用脚本
 
@@ -62,7 +62,7 @@ pnpm build                              # 产出 dist/
 bash script/admin.sh package frontend   # 或走统一打包脚本
 ```
 
-生产环境部署在 Nginx 的 `/admin/` 路径下（参考 [`config/nginxconfig.txt`](../config/nginxconfig.txt)）；静态资源的 tmpfs 缓存技巧见 [`docs/使用tmpfs（内存文件系统）缓存静态文件.md`](../docs/使用tmpfs（内存文件系统）缓存静态文件.md)。
+生产环境部署在 Nginx 的 `/bgg/` 路径下（参考 [`config/nginxconfig.txt`](../config/nginxconfig.txt)）；静态资源的 tmpfs 缓存技巧见 [`docs/使用tmpfs（内存文件系统）缓存静态文件.md`](../docs/使用tmpfs（内存文件系统）缓存静态文件.md)。
 
 ## AI / MCP
 
@@ -86,4 +86,4 @@ make sync-claude-mcp-check      # 在仓库根目录验证 MCP 连接
 ## 更多文档
 
 - 根目录 [`AGENTS.md`](../AGENTS.md)、[`.cursor/rules/20-frontend.mdc`](../.cursor/rules/20-frontend.mdc)、[`.cursor/rules/21-public-pages.mdc`](../.cursor/rules/21-public-pages.mdc)：开发规范
-- [`docs/前端开发进度.md`](../docs/前端开发进度.md)：已完成功能、技术决策记录、关键代码位置索引
+- [`docs/changelog/`](../docs/changelog/README.md)：开发交接记录（历史/背景）；早期历史存档于 `docs/changelog/archive-frontend.md`

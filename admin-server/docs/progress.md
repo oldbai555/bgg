@@ -1,6 +1,6 @@
 # admin-server 重构进度记录
 
-> 本文档是 `admin-server` 单体加固 → 微服务拆分 → 可观测性/CD 三阶段重构的**唯一进度记录**，贯穿 Phase 1-3，不分叉。风格与仓库根目录 `docs/后端开发进度.md` 一致：按时间顺序追加条目，记录做了什么、关键决策、关键文件位置。
+> 本文档是 `admin-server` 单体加固 → 微服务拆分 → 可观测性/CD 三阶段重构的**唯一进度记录**，贯穿 Phase 1-3，不分叉。按时间顺序追加条目，记录做了什么、关键决策、关键文件位置（仓库根目录曾有一份风格相近的 `docs/后端开发进度.md`，2026-07-17 起已退场归档为 `docs/changelog/archive-backend.md`，见 `.cursor/rules/00-workflow.mdc`「文档分层与生命周期」）。
 
 > **维护方式（2026-07-16 起调整）**：本文件只保留**最近的少量条目**（当前保留最后一条），更早的历史条目已按日期拆分归档到仓库根目录 [`docs/changelog/`](../../docs/changelog/README.md)（含完整索引，2026-07-17 起前后端共用同一个 changelog 目录，详见其 README）。`22-admin-mcp-tool.md` 描述的 `query_progress` MCP 工具解析对象仍然是本文件——工具本身和文中几十处"见 `docs/progress.md` 对应条目"的历史交叉引用都不改，只是本文件不再无限增长；查早期条目去 `docs/changelog/` 目录。**新条目继续追加在本文件末尾**，只追加不重写；等条目积累到一定数量（建议 5-10 条）再批量归档一次到 `docs/changelog/`（归档时把条目原样搬过去，同步补一行 `docs/changelog/README.md` 索引，不改写内容）。
 >

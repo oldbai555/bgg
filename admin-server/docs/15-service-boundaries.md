@@ -5,7 +5,7 @@
 ## 0. 前置依赖
 
 - Part A（`01`~`14`）已经落地：`internal/domain/<domain>` 的包边界已经按本文档第 1 节的 5 服务分组组织（不是按 9 个业务域各自一个包），`registry.Transact`/`Wire` 组合根/密钥管理已经就绪。
-- 读者已读过 `docs/admin-server-ddd-refactor-prompt.md`（DDD-lite 分层的历史背景）——本文档假定 9 个业务域（iam/blog/video/chat/sdk/task/monitoring/system/misc）在代码里已经是 `internal/{handler,logic,repository,model}/<domain>/` 的既成事实。
+- 读者已了解 DDD-lite 分层的历史背景（原任务书已删除，决策摘要见 `docs/changelog/archive-backend.md` §15）——本文档假定 9 个业务域（iam/blog/video/chat/sdk/task/monitoring/system/misc）在代码里已经是 `internal/{handler,logic,repository,model}/<domain>/` 的既成事实。
 - `AGENTS.md` 里对 `admin-server/**` 的后端规范（squirrel-only SQL、`deleted_at` 软删除、snake_case 命名、Group 格式 `<domain>/<module>`、错误处理走 `pkg/errs`、中间件声明顺序等）在拆分成微服务之后**继续对每一个新 RPC 服务生效**——这些规范描述的是"如何写 Go 代码/如何设计表结构"，与代码运行在单体进程还是独立进程无关。拆分只改变部署单元和数据库边界，不改变编码规范，这一点在每个服务的 `services/<name>/README` 或包注释里都要复述一次，避免执行 Phase 2 的人误以为拆分服务是"重新设计"的机会。
 
 ## 1. 服务边界：6 个独立部署单元，不是机械的 9 个

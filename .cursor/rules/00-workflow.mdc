@@ -19,8 +19,8 @@ alwaysApply: true
 - `21-public-pages.mdc`：公共展示页专属样式/交互契约
 - 根目录 `AGENTS.md`：面向任意 AI 工具的整合版操作手册
 - `docs/AI工具链上手.md`：Gentle-AI / CodeGraph / MCP / Engram 换设备与第三人上手（**新维护者必读**）
-- `docs/后端开发进度.md` / `docs/前端开发进度.md`：已完成功能、技术决策记录、关键代码位置索引（历史/背景，不是规则）
-- `docs/changelog/`：admin-server + admin-frontend **共用**的开发交接记录（2026-07-17 前叫 `admin-server/docs/changelog/`，只记后端；迁到根目录后前后端共用），**同时是写给下一个没有上下文的新会话的交接文档**（历史/背景 + 强制格式，规则见下方「会话交接文档」一节），`admin-server/docs/progress.md` 只保留最近条目，索引见 `changelog/README.md`；新增条目必须复制 `changelog/TEMPLATE.md` 填内容，不要自由发挥格式，实际用例见 `changelog/2026-07-16.md`
+- `docs/admin-server-维护导航.md`：admin-server 现状参考（架构导航，不是历史记录，见下方「文档分层与生命周期」）
+- `docs/changelog/`：admin-server + admin-frontend **共用**的开发交接记录（2026-07-17 前叫 `admin-server/docs/changelog/`，只记后端；迁到根目录后前后端共用），**同时是写给下一个没有上下文的新会话的交接文档**（历史/背景 + 强制格式，规则见下方「会话交接文档」一节），`admin-server/docs/progress.md` 只保留最近条目，索引见 `changelog/README.md`；新增条目必须复制 `changelog/TEMPLATE.md` 填内容，不要自由发挥格式，实际用例见 `changelog/2026-07-16.md`；2026-07-17 前的项目级历史（原 `docs/后端开发进度.md`/`docs/前端开发进度.md`）已整篇归档为 `changelog/archive-backend.md`/`archive-frontend.md`
 
 # AI 工具链（新设备 / 新维护者）
 
@@ -75,9 +75,9 @@ alwaysApply: true
 
 步骤13：前后端联调测试通过
 
-步骤14：更新进度文档（`docs/后端开发进度.md` / `docs/前端开发进度.md`：已完成功能、关键代码位置、技术决策记录）
+步骤14：补一篇 `docs/changelog/` 交接记录（见下方「会话交接文档」一节），写清楚做了什么、关键决策、关键代码位置
 
-**完成的定义**：一个功能只有同时满足「联调测试通过」+「进度文档已更新」才算完成，不要仅凭代码写完就声称任务结束。
+**完成的定义**：一个功能只有同时满足「联调测试通过」+「`docs/changelog/` 已补交接记录」才算完成，不要仅凭代码写完就声称任务结束。
 
 # 会话交接文档（docs/changelog，强制，前后端都适用）
 
@@ -87,6 +87,18 @@ alwaysApply: true
 - **会话结束**：只要这次会话对 admin-server 或 admin-frontend 有实质性改动（新增需求、代码重构、bug 修复、方案调整、部署都算），必须在 `docs/changelog/` 新增一篇（同一天多条用 `-2`/`-3` 后缀，前后端不分文件夹，混在一起按时间排列即可），且**必须包含「交接摘要」小节**（模板见 `docs/changelog/TEMPLATE.md` 顶部），如实写清楚：这次在做什么/为什么、已完成什么、当前卡在哪、下一步计划、踩过的坑（现象 → 根因 → 正确做法三段式，不要只写"注意 xxx"）
 - 「交接摘要」之外的「上线需求/技术优化/线上缺陷」等表格化章节，只在涉及实际上线/部署时才需要认真填；纯代码/方案调整的会话可以把这些表格留空或写"无"，但「交接摘要」不能省
 - 与 `engram` 跨会话记忆是互补关系，不是替代：engram 存细粒度、可检索的决策点，changelog 存面向人也面向 AI、可读性优先的**整段会话叙事**，两者都要维护
+
+# 文档分层与生命周期（新建 `docs/**` 文档前必读）
+
+本仓库的 Markdown 文档只分三层，新建文档前先判断属于哪一层，不要凭感觉再开一份"进度记录"：
+
+1. **历史（`docs/changelog/`）**：唯一的、只追加的时间线，记录"发生了什么、为什么这么决定"，规则见上一节「会话交接文档」。**不允许再建第二个与它平行的历史记录**（例如按功能倒序罗列"已完成/待实现"的进度文档）——这类内容本质是历史，应该写进 changelog，不要另开文件，否则两处记录迟早互相漂移（2026-07-17 之前 `docs/后端开发进度.md` 与 changelog 已经出现过同一天两份重复记录）。
+2. **现状参考**（如 `docs/admin-server-维护导航.md`、`docs/AI工具链上手.md`、各 `README.md`、规则文件本身）：描述系统**现在**是什么样，随代码/架构变化原地编辑更新，不记录变化过程、不无限增长。代码变了就同步改这类文档，而不是在文末追加一条"XXXX-XX-XX 变更说明"。
+3. **阶段性规划文档**（如曾经的 `admin-server/docs/00~22*.md`、`admin-frontend/docs/00~10*.md` 系列）：服务于一个有始有终的专项（如某次大重构），只在专项进行期间维护。**专项结束后必须退场**：内容已被 changelog + 现状参考文档覆盖的直接删除（git 历史仍可查）；个别有必要保留完整论证过程的，整篇搬进 `docs/changelog/` 归档（作为一次性归档文件并入现有历史时间线，不是新开一个平行目录）。不允许放着不管，变成没人更新也没人敢删的僵尸文档。
+
+**新内容该写进哪一层的判断标准**：这段话是"刚发生的事/刚做的决定" → changelog；是"系统现在的样子" → 现状参考文档；是"某个有明确终点的专项计划" → 阶段性规划文档，专项结束就归档退场。拿不准就先问用户，不要默认新建文件。
+
+2026-07-17 起，`docs/后端开发进度.md`、`docs/前端开发进度.md`（与 changelog 重复记录历史）以及 `docs/admin-server-ddd-refactor-prompt.md`/`admin-server-ddd-smoke-test.md`/`admin-server-phase0-goctl-spike.md`（DDD-lite 重构专项已完成）按本节标准退场：前两者 2026-07-10（changelog 起点）之前的历史内容整篇归档进 `docs/changelog/archive-backend.md`/`archive-frontend.md`，之后的内容与 changelog 完全重复直接删除；后三者内容已被现有重构文档集（`admin-server/docs/00-refactor-overview.md` 起）取代，直接删除。
 
 # 新增模块脚手架（工程化能力，新模块默认走这条路）
 

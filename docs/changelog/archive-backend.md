@@ -1,6 +1,8 @@
-# 后端开发进度与实现方案
+# 归档：admin-server 历史开发记录（2025-01 ~ 2026-07-07，changelog 起点之前）
 
-> 本文档是后端开发的历史/参考记录：记录做了什么、还差什么、关键决策原因、代码索引。**开发规范与工作流程已迁移至 `.cursor/rules/00-workflow.mdc` 与 `.cursor/rules/10-go-code-style.mdc`，请查阅规则文件**，本文档不再重复维护规范内容。
+> **本文件是历史归档，不再维护，不要往这里追加新内容。** 原文件 `docs/后端开发进度.md` 已于 2026-07-17 按「文档分层与生命周期」规则（见 `.cursor/rules/00-workflow.mdc`）退场：2026-07-10（`docs/changelog/` 起点）之前的内容与 changelog 没有重复，整篇原样搬到这里；2026-07-10 之后的内容（Phase 1-3 重构记录）与 `docs/changelog/2026-07-10.md` 起的各篇日期文件完全重复，直接删除未保留。新的后端变更一律写进 `docs/changelog/`，日常"系统现在是什么样"的参考见 `docs/admin-server-维护导航.md`。
+>
+> 以下正文原样保留（含内部编号、"见第 X 节"式交叉引用），**不做重新整理**；部分引用指向的原文档（`docs/admin-server-ddd-refactor-prompt.md`/`admin-server-ddd-smoke-test.md`/`admin-server-phase0-goctl-spike.md`）已随 DDD-lite 重构专项结束一并删除，相关链接已在下方就地失效处理为纯文本。原文档第 16-22、24 节（2026-07-10 起的 Phase 1-3 记录）与 `docs/changelog/` 重复，已删除不在本文件中；**唯一例外是第 23 节**（一处未被任何 changelog 日期文件覆盖、且仍被多处代码注释引用的 SQL bug 修复记录），原样保留在本文件末尾。
 
 ---
 
@@ -15,7 +17,7 @@
 - go-zero logx 日志，gopsutil 系统监控
 - gorilla/websocket（聊天/任务通知）
 
-**目录结构（`admin-server/`，Phase 2 五个服务拆分全部完成后的现状，见第 17-21 节）：**
+**目录结构（`admin-server/`，本节描述的是归档时点的现状，最新现状见 `docs/admin-server-维护导航.md`）：**
 ```
 api/            # admin.api —— 统一 API 定义（路由真源）
 cmd/adminseed/  # 管理员初始化工具，现纯 gRPC 客户端调 IamRPC.UserCreate，不再直连数据库
@@ -94,7 +96,7 @@ services/iam/, services/task/, services/sdk/, services/chat/, services/content/
 
 ---
 
-## 5. 待实现 / 待完善功能
+## 5. 待实现 / 待完善功能（归档时点的存量，不代表当前状态）
 
 - **内部代码清理（2026-01-19 审查结论，仍是开放项）**：
   - [x] ~~`performance_log_repository.go`、`chat_repository.go` 尚未改用 squirrel 构建 SQL~~——**订正（2026-07-12，sdk-rpc 拆分会话核实）**：`internal/repository/monitoring/performance_log_repository.go`（DDD-lite 域重组后的真实路径）已经完整迁移到 squirrel，不再是遗留项；`internal/repository/chat/chat_repository.go` 仍有部分方法用参数化的静态多行 SQL（无拼接风险，但不是 squirrel），继续是开放项，`10-go-code-style.mdc` 已同步更正例外清单。**再订正（2026-07-12，chat-rpc 拆分会话）**：chat 域已拆分成独立服务，这个文件的真实路径变成 `services/chat/internal/repository/chat/chat_repository.go`，问题本身（部分方法未用 squirrel）仍未解决，继续是开放项。
@@ -138,12 +140,12 @@ services/iam/, services/task/, services/sdk/, services/chat/, services/content/
 
 ---
 
-## 8. 关键代码位置
+## 8. 关键代码位置（归档时点的现状，最新现状见 `docs/admin-server-维护导航.md`）
 
 - 入口与路由：`admin-server/admin.go`、`internal/handler/routes.go`
 - API 定义：`admin-server/api/admin.api`
 - 配置：`internal/config/config.go`、`etc/admin-api.yaml`
-- **RBAC（用户/角色/权限/部门/菜单/接口 + 关联关系，2026-07-13 起随 iam+system+monitoring+misc 四个域整体拆分为独立服务 iam-rpc，见第 21 节）**：
+- **RBAC（用户/角色/权限/部门/菜单/接口 + 关联关系，2026-07-13 起随 iam+system+monitoring+misc 四个域整体拆分为独立服务 iam-rpc）**：
   - gateway 侧薄胶水：`internal/handler/iam/{user,role,permission,department,menu,api,user_role,role_permission,permission_menu,permission_api,auth}/`（goctl 生成）+ `internal/logic/iam/{user,role,permission,department,menu,api,user_role,role_permission,permission_menu,permission_api,auth}/`（解析 HTTP 请求 → 调 `svcCtx.IamRPC` → 映射响应）
   - iam-rpc 本体：`admin-server/services/iam/`（`internal/domain/iam/{permission_resolver,rbac_service,user_service}.go`、`internal/repository/iam/`、`internal/model/iam/`、`internal/logic/`（约 90 个文件，`Xxx*Logic` 命名，未按域再分子目录）、`internal/server/iamserver.go`）
   - 权限中间件：`internal/middleware/permissionmiddleware.go`（本身仍在 gateway，内部实现已改调 `IamRPC.CheckPermission`，不再直连数据库）；`internal/middleware/authmiddleware.go` 的 JWT 黑名单校验改成直连共享 Redis（`internal/redisconn/`），不走 RPC
@@ -159,25 +161,25 @@ services/iam/, services/task/, services/sdk/, services/chat/, services/content/
   - 原 `internal/repository/sql_conn.go`（反射设置 MaxOpen/MaxIdle）随 gateway `internal/repository/` 整体删除，未在 iam-rpc 侧找到等价文件，连接池调优现状待确认（不确定是否需要在 `services/iam/internal/repository/` 补一份，还是现在依赖 go-zero sqlx 默认值，标记为待核实项，不是本次编造）
   - 业务层缓存工具 `pkg/cache/business_cache.go` 使用位置随对应 logic 一起搬到了 iam-rpc：`services/iam/internal/logic/profilelogic.go`（权限）、`menumytreelogic.go`/`menutreelogic.go`（菜单树）、`dictgetlogic.go`（字典）、`configgetlogic.go`（配置）
 - **demo 示例**（开发流程参考，随 misc 域拆到 iam-rpc）：gateway 侧 `internal/handler/misc/demo/` + `internal/logic/misc/demo/`；iam-rpc 本体 `services/iam/internal/repository/misc/demo_repository.go`、`services/iam/internal/model/misc/demomodel*.go`；`db/services/iam/demo/create_table_demo.sql`、`init_demo.sql`
-- **聊天模块（2026-07-12 起拆分为独立服务 chat-rpc，见第 19 节）**：
+- **聊天模块（2026-07-12 起拆分为独立服务 chat-rpc）**：
   - gateway 侧薄胶水：`admin-server/internal/logic/chat/{chat,group,message}/`（解析 HTTP 请求→调 ChatRPC→映射响应）；WS↔gRPC 桥接：`admin-server/internal/handler/chat/chatwshandler.go`
   - chat-rpc 本体：`admin-server/services/chat/`（`internal/domain/chat/onboarding.go`、`internal/repository/chat/`（`chat_repository.go` 部分方法未使用 squirrel，见第 5 节）、`internal/hub/chathub.go`（连接表）、`internal/consumer/chat_user_created_consumer.go`（消费 `stream:chat.user.created`）、`internal/model/chat/`、`internal/logic/`）
-  - 跨服务契约：`admin-server/pkg/iamcallback/`（`FindActiveUserChunk`/`GetUserProfile`，服务端实现现为 `services/iam/internal/server/iamcallbackserver.go`；原单体内嵌在 `internal/rpcserver/iamcallback/`，2026-07-13 起随 iam-rpc 拆分搬迁，见第 21 节）
+  - 跨服务契约：`admin-server/pkg/iamcallback/`（`FindActiveUserChunk`/`GetUserProfile`，服务端实现现为 `services/iam/internal/server/iamcallbackserver.go`；原单体内嵌在 `internal/rpcserver/iamcallback/`，2026-07-13 起随 iam-rpc 拆分搬迁）
 - **公告与通知（随 system 域一起拆到 iam-rpc）**：gateway 侧薄胶水 `internal/handler/system/{notice,notification}/` + `internal/logic/system/{notice,notification}/`；iam-rpc 本体 `services/iam/internal/repository/system/{notice,notification}_repository.go`
 - **性能日志（随 monitoring 域一起拆到 iam-rpc）**：gateway 侧薄胶水 `internal/handler/monitoring/performance_log/` + `internal/logic/monitoring/performance_log/`；iam-rpc 本体 `services/iam/internal/repository/monitoring/performance_log_repository.go`（已使用 squirrel）
-- **视频管理（2026-07-12 起 CRUD/采集/公开列表拆分为独立服务 content-rpc，见第 20 节；M3U8 代理与 CORS 预检不涉及域数据，继续留在 gateway）**：
+- **视频管理（2026-07-12 起 CRUD/采集/公开列表拆分为独立服务 content-rpc；M3U8 代理与 CORS 预检不涉及域数据，继续留在 gateway）**：
   - gateway 侧薄胶水：`admin-server/internal/logic/video/{video,video_collect,public}/`（`M3u8ProxyLogic`、`VideoCollectOptionsLogic` 例外，原样留在 gateway 不变）
   - content-rpc 本体：`admin-server/services/content/`（`internal/repository/video/video_repository.go`、`internal/model/video/`）
-- **异步任务（2026-07-11 起拆分为独立服务 task-rpc，见第 17 节）**：
+- **异步任务（2026-07-11 起拆分为独立服务 task-rpc）**：
   - gateway 侧薄胶水：`admin-server/internal/logic/task/{task,public}/`（解析 HTTP 请求→调 TaskRPC→映射响应，不再持有业务逻辑）
   - task-rpc 本体：`admin-server/services/task/`（`internal/domain/task/{scheduler.go,notifier.go,executors/}`、`internal/repository/task_repository.go`、`internal/model/task/`、`internal/logic/`、`internal/consts/`）
-  - 跨服务契约：`admin-server/pkg/taskcallback/`（`FetchExportData`/`RegisterExportFile`，服务端实现现为 `services/iam/internal/server/taskcallbackserver.go`；原单体内嵌在 `internal/rpcserver/taskcallback/`）、`services/iam/internal/consumer/task_notification_consumer.go`（消费 `stream:task.notification`；原 `admin-server/internal/consumer/`，均于 2026-07-13 随 iam-rpc 拆分搬迁，见第 21 节）
+  - 跨服务契约：`admin-server/pkg/taskcallback/`（`FetchExportData`/`RegisterExportFile`，服务端实现现为 `services/iam/internal/server/taskcallbackserver.go`；原单体内嵌在 `internal/rpcserver/taskcallback/`）、`services/iam/internal/consumer/task_notification_consumer.go`（消费 `stream:task.notification`；原 `admin-server/internal/consumer/`，均于 2026-07-13 随 iam-rpc 拆分搬迁）
 - **SDK 管理**（Phase 2 已拆分成独立服务 sdk-rpc，gateway 侧只剩薄胶水）：
   - gateway 侧：Handler：`internal/handler/sdk/`（goctl 生成）；Logic：`internal/logic/sdk/sdk/`（薄胶水，调 `svcCtx.SdkRPC`）、`internal/logic/sdk/public/sdk_file_upload_logic.go`（委托 `internal/logic/system/file`，不经过 sdk-rpc）；中间件：`internal/middleware/sdkauthmiddleware.go`、`sdkratelimitmiddleware.go`、`sdkcalllogmiddleware.go`（本身仍在 gateway，内部实现调 `svcCtx.SdkRPC` 的 `VerifyApiKey`/`GetEffectiveRateLimit`/`RecordCallLog`）
   - sdk-rpc 本体：`admin-server/services/sdk/`（`internal/domain/sdk/sdk_service.go`、`internal/repository/{store.go,sdk/}`、`internal/model/sdk/`、`internal/logic/`、`internal/consts/`）
-  - 跨服务契约：sdk-rpc 新增的 `SdkCallLogExport` 方法（`services/sdk/rpc/sdk.proto`）供 `services/iam/internal/server/taskcallbackserver.go`（原单体内嵌的 `internal/rpcserver/taskcallback/server.go`，2026-07-13 起随 iam-rpc 拆分搬迁，见第 21 节）回调取 SDK 调用日志导出数据
-- **M3U8 代理与公共接口**：`internal/handler/video/m3u8/m3u8_proxy_handler.go`、`internal/logic/video/m3u8/m3u8_proxy_logic.go`（不涉及域数据，content-rpc 拆分时原样留在 gateway，见第 20 节）、`internal/handler/misc/public/public_dict_get_handler.go`（公共字典查询，调 `IamRPC.DictGet`）、`internal/handler/video/video_collect/`；Nginx 配置：`config/nginxconfig.txt`
-- **博客模块（含扩展，2026-07-12 起拆分为独立服务 content-rpc，见第 20 节）**：
+  - 跨服务契约：sdk-rpc 新增的 `SdkCallLogExport` 方法（`services/sdk/rpc/sdk.proto`）供 `services/iam/internal/server/taskcallbackserver.go`（原单体内嵌的 `internal/rpcserver/taskcallback/server.go`，2026-07-13 起随 iam-rpc 拆分搬迁）回调取 SDK 调用日志导出数据
+- **M3U8 代理与公共接口**：`internal/handler/video/m3u8/m3u8_proxy_handler.go`、`internal/logic/video/m3u8/m3u8_proxy_logic.go`（不涉及域数据，content-rpc 拆分时原样留在 gateway）、`internal/handler/misc/public/public_dict_get_handler.go`（公共字典查询，调 `IamRPC.DictGet`）、`internal/handler/video/video_collect/`；Nginx 配置：`config/nginxconfig.txt`
+- **博客模块（含扩展，2026-07-12 起拆分为独立服务 content-rpc）**：
   - gateway 侧薄胶水：`admin-server/internal/logic/blog/{tag,article,article_audit,friend_link,social_info,public}/`（解析 HTTP 请求→调 ContentRPC→映射响应）
   - content-rpc 本体：`admin-server/services/content/`（`internal/domain/content/blog_service.go`、`internal/repository/blog/`、`internal/model/blog/`、`internal/consts/`、`internal/logic/`）
   - 跨服务契约：`admin-server/pkg/iamcallback/`（`GetUserProfile` 新增 `signature` 字段供 `PublicBlogAuthorInfo` 用、新增 `RecordAuditLog` 供 `BlogArticleAudit`/`BlogArticleAuditUnpublish` 写审计日志）
@@ -240,7 +242,7 @@ services/iam/, services/task/, services/sdk/, services/chat/, services/content/
 
 单元测试与接口联调（12.7.9）尚未完成，见第 5 节。
 
-> 以上「代码位置」是拆分前（Phase 2 之前）的原始单体实现路径。2026-07-12 起博客域整体拆分为独立服务 content-rpc，现状见第 8 节「博客模块」条目与第 20 节。
+> 以上「代码位置」是拆分前（Phase 2 之前）的原始单体实现路径。2026-07-12 起博客域整体拆分为独立服务 content-rpc，现状见第 8 节「博客模块」条目。
 
 ---
 
@@ -258,20 +260,20 @@ services/iam/, services/task/, services/sdk/, services/chat/, services/content/
 
 社交信息管理 Logic/Handler 细节（13.6.5）与联调测试（13.6.8）尚未完全完成，见第 5 节。
 
-> 以上「代码位置」是拆分前（Phase 2 之前）的原始单体实现路径，现状见第 8 节「博客模块」条目与第 20 节。
+> 以上「代码位置」是拆分前（Phase 2 之前）的原始单体实现路径，现状见第 8 节「博客模块」条目。
 
 ---
 
-## 14. 博客页面改造后端接口补充（待实现）
+## 14. 博客页面改造后端接口补充（待实现，归档时已完成，见下方订正）
 
-配合前端博客页面改造（详见 `docs/前端开发进度.md`），需在 `public_blog` 分组下补充三个只读接口：
+配合前端博客页面改造（详见 `archive-frontend.md`），需在 `public_blog` 分组下补充三个只读接口：
 - `GET /api/v1/public/blog/author-info`：超级管理员（`admin_user.id=1`）公开信息（昵称/头像/签名）。
 - `GET /api/v1/public/blog/article-stats`：已发布文章总数统计。
 - `GET /api/v1/public/blog/articles/prev` / `.../next`：按 `publish_time` 查询相邻已发布文章，供详情页翻页导航。
 
 以上接口的 API 定义、Repository 扩展（`FindPrevArticle`/`FindNextArticle`/`CountPublishedArticles`）、Logic/Handler 实现均尚未完成，落地位置计划为 `internal/logic/blog/public/` 下对应 logic 文件，详见第 5 节待办。
 
-> **本节描述的三个接口已实现**（作者信息/文章统计/上一篇下一篇），随博客域一起拆分进了 content-rpc，2026-07-12 起真实环境验证通过，见第 20 节；现状位置为 `services/content/internal/logic/`（`PublicBlogAuthorInfoLogic` 等）与 gateway 薄胶水 `internal/logic/blog/public/`，本节按"只追加"原则保留原始待办记录不重写。
+> **本节描述的三个接口已实现**（作者信息/文章统计/上一篇下一篇），随博客域一起拆分进了 content-rpc，2026-07-12 起真实环境验证通过；现状位置为 `services/content/internal/logic/`（`PublicBlogAuthorInfoLogic` 等）与 gateway 薄胶水 `internal/logic/blog/public/`，本节按"只追加"原则保留原始待办记录不重写。
 
 ---
 
@@ -282,103 +284,19 @@ services/iam/, services/task/, services/sdk/, services/chat/, services/content/
 **为什么**：个人维护 5 万行代码需要领域边界；找代码、改权限、加模块时有明确路径。
 
 **关键决策**：
-- goctl 嵌套 group `<domain>/<module>` 经验证可行（见 `docs/admin-server-phase0-goctl-spike.md`）
+- goctl 嵌套 group `<domain>/<module>` 经验证可行（Spike 结论：可行，验证方法/过程原记录于已删除的 `docs/admin-server-phase0-goctl-spike.md`，本节保留结论）
 - repository 包与 model 包同名时用 `xxxrepo` 别名（如 `iamrepo`）避免冲突
 - 仅 IAM/Task 引入 `internal/domain/`，其余域保持 repository+logic
 
-**维护入口**：[`docs/admin-server-维护导航.md`](admin-server-维护导航.md)
+**维护入口**：[`docs/admin-server-维护导航.md`](../admin-server-维护导航.md)
 
-**冒烟测试与前端联调**：[`docs/admin-server-ddd-smoke-test.md`](admin-server-ddd-smoke-test.md)
-
----
-
-## 16. Phase 1 单体加固（Week 1-5，2026-07-10 ~ 2026-07-11，行为有实质变化的部分）
-
-本节只记录本轮加固中**对外行为发生实质变化**的部分（响应字段从恒错变正确、安全漏洞修复、筛选语义修复）；纯内部重构（事务包裹、`registry.Domain` 迁移、测试/CI 补齐等）的完整过程记录见 `admin-server/docs/progress.md`（本轮重构的唯一过程记录，按周次追加），本节不重复。
-
-**1. 群聊创建此前实际不可用**：`internal/repository/chat/chat_repository.go` 的 `Create` 丢弃了 `LastInsertId`，导致新建群组的 `chat.Id` 恒为 0，创建人和初始成员全部被错误关联到 `chat_id=0`。现已修复，群聊创建功能恢复正常；同时把"建群 + 拉创建人入群"两步写补上了事务保护（`internal/logic/chat/group/chat_group_create_logic.go`），避免部分失败留下孤儿群组。
-
-**2. 多处接口响应 ID 恒为 0，现已修复**：同一个 `LastInsertId` 丢弃的 bug 还出现在聊天消息（`chat_message_send_logic.go` 的 WebSocket 广播和 HTTP 响应）、文件上传（`file_upload_logic.go` 响应）、公告→通知关联（`notice_create_logic.go` 触发的全员通知，`notice_id` 之前恒为 0）、视频采集（`video_collect_logic.go` 响应）。全仓库系统性排查并修复了 24 处同类问题，其中这 5 处是已确认的活跃故障，其余是预防性修复。
-
-**3. Refresh Token 未校验黑名单（安全修复）**：`internal/logic/iam/auth/refresh_logic.go` 此前只校验 JWT 签名/过期时间，不查黑名单，导致退出登录（`logout_logic.go` 会拉黑 token）后原 refresh token 在自然过期前仍能不断换发新 access token，退出登录形同虚设。已补上和 `authmiddleware.go` 一致的黑名单校验。
-
-**4. 通知已读状态 / 登录日志状态筛选此前实际失效（数据语义修复）**：`admin_notification.read_status` 和 `admin_login_log.status` 两个字段存在两套冲突的取值约定——建表 DDL 注释和写入代码用的是"布尔式"取值（0/1），但字典种子数据（`read_status`/`login_status`）按项目"字典枚举 value 从 1 开始"的约定写成了另一套（1/2），列表筛选走的是字典这套。两套并存导致：标记单条通知已读、"全部标记已读"、"清除已读消息"、登录日志按成功/失败筛选和统计，实际全部得到错误结果（例如"清除已读"实际删除的是未读消息）。已统一到字典取值（1/2 方案），改动覆盖 `login_logic.go`/`notice_create_logic.go`/`notice_update_logic.go`/`notification_read_logic.go`/`notification_repository.go`/`login_log_stats_logic.go`、建表 DDL 注释与默认值、种子数据（当时还在 `db/tables.sql`/`db/data.sql`，Phase 2 已拆分到 `db/services/iam/notification/`，见第 17 节）；已有真实数据的库需要额外执行一次性迁移 `db/services/iam/notification/migrations/fix_status_semantics_20260711.sql`（幂等性说明见文件头注释，全新部署不需要跑）。
-
-**关键代码位置**：
-- 事务/领域服务：`internal/domain/content/blog_service.go`（新增 `SetArticleTop`）、`internal/logic/chat/group/chat_group_create_logic.go`
-- LastInsertId 修复：`internal/repository/{chat,system,video}/*.go` 等 24 个文件，完整清单见 `admin-server/docs/progress.md` 2026-07-11 Week4-5 条目
-- Refresh 黑名单：`internal/logic/iam/auth/refresh_logic.go`
-- 状态语义修复：`internal/logic/system/notification/`、`internal/logic/system/notice/`、`internal/logic/monitoring/login_log/`、`internal/repository/system/notification_repository.go`、`db/services/iam/notification/migrations/fix_status_semantics_20260711.sql`
-
-**已知遗留（不在本节"行为变化"范围内，见 `admin-server/docs/progress.md`/`11-descoped.md`）**：`blog_article_publish/submit/unpublish_logic.go` 三处直连 Model 技术债；集成测试套件尚未在真实 MySQL/Redis 上跑过，只验证了编译通过。
-
-## 17. Phase 2 第一个服务拆分：task-rpc（2026-07-11，行为有实质变化的部分）
-
-完整过程记录见 `admin-server/docs/progress.md`（2026-07-11 续五/续六两条目）。本节只记录**对外行为发生实质变化**的部分。
-
-**架构变化（不算行为变化，但影响后续开发方式）**：`admin-server` 从单一二进制拆成两个可独立部署的 Go 程序——`admin.go`（gateway，仍是唯一 HTTP 入口）和 `services/task/task.go`（task-rpc，独立 zrpc 服务，自己的 `admin_task` 表）。`/api/v1/tasks*` 系列 HTTP 接口的路径、请求、响应结构**都没有变**，前端不需要改任何代码；变的是这些接口内部从直接查 `internal/domain/task` 改成调 task-rpc。
-
-**1. SDK 调用日志导出此前一直报错，现已修复**：`POST /api/v1/sdk/call/log/export` 之前会命中"不支持的导出模块"错误直接失败——`consts.TaskModuleSdkCallLog` 常量和 `SdkAdminRepository.ExportCallLogs` 方法早就写好了，但任务执行器的 `switch` 分支从来没接上。现已修复，SDK 调用日志导出功能实际可用。
-
-**2. 任务调度器分布式锁竞态修复（多副本部署时才会暴露，当前单副本无感知）**：原实现是 `Exists`+`Setex` 两步式，存在同一个任务被并发执行两次的理论窗口；`releaseLock` 也不校验锁的持有者，可能误删其他实例刚获取的锁。已改成原子 `SET NX EX` + 持锁 token + Lua script 安全释放。当前只部署单副本 task-rpc，不会立刻观察到行为差异，但为未来多副本部署提前修好了。
-
-**3. 任务失败结果的 JSON 现在总是合法 JSON**：原来 `handleTaskError` 用 `fmt.Sprintf` 手工拼错误信息进 JSON 字符串，如果错误信息本身包含引号/反斜杠/换行会生成不合法的 JSON，前端解析任务失败详情时可能出错。已改成 `json.Marshal`。
-
-**4. 取消任务/查任务的错误响应码更准确**：gateway 侧调 task-rpc 后统一把 gRPC status code 映射成项目的 `pkg/errs` 业务码（`PermissionDenied→CodeForbidden`、`FailedPrecondition/InvalidArgument→CodeBadRequest`、`NotFound→CodeNotFound` 等），之前是不管什么错误一律 `CodeInternalError`，前端拿到的错误提示更准确了。
-
-**5. "最近任务"数量上限的来源变了（正常情况下用户感知不到差异）**：原来是"业务缓存优先、查字典兜底、硬编码 10 兜底"三层链路，现在是 task-rpc 自己的静态配置（`services/task/etc/task.yaml` 的 `RecentTaskLimit`，当前也是 10）。如果生产环境之前通过后台修改过 `task_config` 字典把这个值改成了非 10 的数字，拆分后需要改 `RecentTaskLimit` 配置项同步，否则显示条数会变回默认的 10。
-
-**关键代码位置**：`admin-server/services/task/`（task-rpc 本体）、`admin-server/pkg/taskcallback/`（跨服务契约）、`admin-server/services/iam/internal/server/taskcallbackserver.go`（server 实现，原单体内嵌 `internal/rpcserver/taskcallback/`）、`admin-server/services/iam/internal/consumer/task_notification_consumer.go`（Streams 消费者，原 `admin-server/internal/consumer/`；均于 2026-07-13 随 iam-rpc 拆分搬迁，见第 21 节）、`admin-server/internal/logic/task/`（gateway 薄胶水）、`admin-server/pkg/errs/errors.go`（新增 `WrapGRPCError`）。
-
-## 18. Phase 2 第二个服务拆分：sdk-rpc（2026-07-12，行为有实质变化的部分）
-
-完整过程记录见 `admin-server/docs/progress.md`（2026-07-12 条目）。本节只记录**对外行为发生实质变化**的部分——这一轮没有像 task-rpc 拆分那样顺带修复真实 bug，纯架构迁移，行为部分留空，只记架构变化本身。
-
-**架构变化（不算行为变化，但影响后续开发方式）**：`admin-server` 新增第三个可独立部署的 Go 程序——`services/sdk/sdk.go`（sdk-rpc，独立 zrpc 服务，自己的 `admin_sdk` 表：`sdk_key`/`sdk_interface`/`sdk_key_api`/`sdk_call_log`）。`/api/v1/sdk/*` 系列后台管理接口和 `/sdk/*` 对外 SDK 调用接口的路径、请求、响应结构、错误文案**都没有变**（`VerifyApiKey` 特意保留了原 7 种鉴权失败文案，不走 task-rpc 那种"每个调用点一句通用错误"的收敛写法），前端和外部 SDK 调用方都不需要改任何代码；变的是这些接口内部从直接查 `internal/domain/sdk`/`internal/repository/sdk` 改成调 sdk-rpc。gateway 侧 `SDKAuthMiddleware`/`SDKRateLimitMiddleware`/`SDKCallLogMiddleware` 三个中间件本身仍留在 gateway，只是内部实现改成调 RPC。
-
-**已知遗留（不算本轮引入,发现但未修复,见 `admin-server/docs/14-production-deployment-checklist.md` 条目 6）**：`sdk_key_api` 表的唯一索引不含 `deleted_at`，重复给同一个 API Key 绑定同一个接口（跨越一次软删除）会报 `Duplicate entry`，是拆分前就存在的原始代码行为，本轮原样搬迁未修改。
-
-**关键代码位置**：`admin-server/services/sdk/`（sdk-rpc 本体）、`admin-server/internal/middleware/sdk{auth,ratelimit,calllog}middleware.go`（gateway 侧三个中间件）、`admin-server/internal/logic/sdk/sdk/`（gateway 薄胶水）、`admin-server/services/iam/internal/server/taskcallbackserver.go`（`fetchSdkCallLog` 分支改回调 sdk-rpc 新增的 `SdkCallLogExport`；原单体内嵌 `internal/rpcserver/taskcallback/server.go`，2026-07-13 起随 iam-rpc 拆分搬迁，见第 21 节）。
-
-## 19. Phase 2 第三个服务拆分：chat-rpc（2026-07-12，行为有实质变化的部分）
-
-完整过程记录见 `admin-server/docs/progress.md`（2026-07-12 续条目）。这一轮是 Phase 2 五个服务里第一个用到 WS↔gRPC 双向流桥接、也是 `stream:chat.user.created`（Redis Streams）第一次真正投入生产路径的服务，纯架构迁移，没有顺带修复真实 bug。
-
-**架构变化（不算行为变化，但影响后续开发方式）**：`admin-server` 新增第四个可独立部署的 Go 程序——`services/chat/chat.go`（chat-rpc，独立 zrpc 服务，自己的 `admin_chat` 表：`chat`/`chat_user`/`chat_message`）。`/api/v1/chats*` 系列接口和 WebSocket 端点 `/api/v1/chats/ws` 的路径、请求、响应结构、WS wire 格式（JSON 消息体）**都没有变**，前端不需要改任何代码；变的是网关不再直接持有 `Domain.Chat`/`ChatHub`，改成调 chat-rpc（CRUD）+ 一条 WS↔gRPC 桥接流（`internal/handler/chat/chatwshandler.go` 从终结连接改成转发帧）。新用户建群聊/私聊初始化（onboarding）的触发机制从"IAM 建用户成功后进程内 goroutine 直调"改成"IAM 发布 `stream:chat.user.created` 事件 → chat-rpc 消费者异步处理"，两种机制都是"失败只记日志、不影响建用户请求"的尽力而为语义，用户可感知的行为（新用户几秒内出现在默认群组和存量用户的私聊列表里）不变。chat-rpc 需要的用户展示信息（用户名/昵称/头像/部门名/角色名）和存量用户枚举，通过回调单体内嵌的新 zrpc server `IamCallback`（`internal/rpcserver/iamcallback/`，和已有的 `TaskCallback` 同一个"iam-rpc 真正拆分前的临时方案"模式；该 server 已于 2026-07-13 随 iam-rpc 拆分搬迁到 `services/iam/internal/server/iamcallbackserver.go`，成为永久归宿，见第 21 节）。
-
-**关键代码位置**：`admin-server/services/chat/`（chat-rpc 本体，含 `internal/hub/chathub.go` 连接表、`internal/domain/chat/onboarding.go`、`internal/consumer/chat_user_created_consumer.go`）、`admin-server/pkg/iamcallback/`（新增跨服务契约）、`admin-server/services/iam/internal/server/iamcallbackserver.go`（server 实现，原单体内嵌 `internal/rpcserver/iamcallback/server.go`）、`admin-server/internal/handler/chat/chatwshandler.go`（WS↔gRPC 桥接）、`admin-server/internal/logic/chat/{chat,group,message}/`（gateway 薄胶水）、`admin-server/services/iam/internal/domain/iam/user_service.go`（`publishChatUserCreated`，Streams 生产者；原 `admin-server/internal/domain/iam/`；均于 2026-07-13 随 iam-rpc 拆分搬迁，见第 21 节）。
+**冒烟测试与前端联调**：原记录于已删除的 `docs/admin-server-ddd-smoke-test.md`（内容是构建/启动/联调步骤清单，随重构完成失去时效性，未保留）。
 
 ---
-
-## 20. Phase 2 第四个服务拆分：content-rpc（2026-07-12，行为有实质变化的部分）
-
-完整过程记录见 `admin-server/docs/progress.md`（2026-07-12 续三条目）。这一轮把 blog（标签/文章/审核/友情链接/社交信息/公共展示）+ video（管理/采集/公共展示）合并拆成一个服务，`18-service-extraction-runbook.md` 2.4 节把这次拆分定性为"文件数最多但架构最简单——机械，不是有风险"，实测过程中确实没有遇到需要现场设计新机制的点，但真实环境验证发现了一个**预先存在、和本轮拆分无关**的生产 bug。
-
-**架构变化（不算行为变化，但影响后续开发方式）**：`admin-server` 新增第五个可独立部署的 Go 程序——`services/content/content.go`（content-rpc，独立 zrpc 服务，自己的 `admin_content` 表：`blog_tag`/`blog_article`/`blog_article_tag`/`blog_article_audit`/`blog_friend_link`/`blog_social_info`/`video` 共 7 张）。`/api/v1/blog/*`、`/api/v1/public/blog/*`、`/api/v1/videos*`、`/api/v1/public/videos/*` 系列接口的路径、请求、响应结构**都没有变**，前端不需要改任何代码；`M3u8Proxy`（纯 HTTP 代理，不访问域数据）和 `VideoCollectOptions`（CORS 预检占位）两个端点不涉及域数据，继续留在 gateway 不接入 content-rpc。原来读字典决定的 10 处长度/数量上限（标题最大长度、摘要截断长度、置顶数量、友情链接/社交信息的名称/URL/备注长度）改成 content-rpc 自己的静态配置（`services/content/etc/content.yaml` 的 `Limits` 段），默认值全部对齐原字典种子数据，生产环境如果之前通过字典改过这些值需要手动同步改配置。`public_blog_author_info_logic.go` 原来的跨域直读 `Domain.IAM.User.FindByID(ctx,1)`（标注了 `TODO(phase2-content-rpc)`）和 `BlogArticleAudit`/`BlogArticleAuditUnpublish` 原来的 `pkg/audit.RecordAuditLog` 审计日志写入，都改成回调单体内嵌的 `IamCallback`（`pkg/iamcallback` 新增 `signature` 字段和 `RecordAuditLog` 方法），用户可感知的行为不变。
-
-**1. 发现一个预先存在的 VideoUpdate 真实 bug，本轮不修复（记录留档，见 `14-production-deployment-checklist.md`）**：`internal/model/video/videomodel_gen.go`（现 `services/content/internal/model/video/`）的自定义 `Update` 方法手写了 SQL 参数绑定列表，只传了 `Name/Cover/Duration/PlayUrl/Description/DeletedAt` 六个字段的值，但 SET 子句是按 `Video` 结构体全部字段（含 `Uuid`/`GodNum`/`XlzzUrls`/`Type`）动态生成的——参数个数和占位符数量对不上，导致 `PUT /api/v1/videos`（视频编辑）从这行代码写下的那一刻起就没有真正生效过。`git log -S` 定位到引入提交是 `9580866`（"实现视频播放器功能"），远早于本轮 Phase 1-2 重构，和 content-rpc 拆分本身无关，本轮真实环境验证时用管理员账号操作真实数据触发确认。修复需要改一个标了"goctl 生成/DO NOT EDIT"的文件，按项目规则应该走"改模板 → `generate-model.sh` 重新生成"的路径而不是手改生成文件，本轮不在 content-rpc 拆分范围内展开，留给后续专门会话处理。**已于 2026-07-13 修复，见第 22 节。**
-
-**关键代码位置**：`admin-server/services/content/`（content-rpc 本体，含 `internal/domain/content/blog_service.go`、`internal/repository/{blog,video}/`、`internal/model/{blog,video}/`、`internal/logic/`）、`admin-server/pkg/iamcallback/`（`GetUserProfile.signature` 字段、新增 `RecordAuditLog` 方法）、`admin-server/services/iam/internal/server/iamcallbackserver.go`（对应实现，原单体内嵌 `internal/rpcserver/iamcallback/server.go`，2026-07-13 起随 iam-rpc 拆分搬迁，见第 21 节）、`admin-server/internal/logic/blog/`、`admin-server/internal/logic/video/`（gateway 薄胶水，`m3u8`/`video_collect` 的 Options 处理例外未接入）。
-
-## 21. Phase 2 第五个、也是最后一个服务拆分：iam-rpc（2026-07-13，行为有实质变化的部分，Phase 2 五个服务至此全部完成）
-
-完整过程记录见 `admin-server/docs/progress.md`（2026-07-13 条目）。这是 Phase 2 体量最大、安全敏感度最高的一次拆分：iam+system+monitoring+misc 四个域（约 94 个 RPC 方法）整体搬出单体，`AuthMiddleware`/`PermissionMiddleware`/`ApiEnabledMiddleware`/`OperationLogMiddleware`/`PerformanceMiddleware` 五个中间件第一次真正从直连数据库切换成调 zrpc client。上一轮（19、20 两节）里提到的 `internal/rpcserver/{taskcallback,iamcallback}/`（单体内嵌的过渡方案）本轮整体搬进 iam-rpc 进程（改名 `services/iam/internal/server/{taskcallbackserver,iamcallbackserver}.go`），成为它们的永久归宿；`internal/consumer/task_notification_consumer.go` 同样搬到 `services/iam/internal/consumer/`。
-
-**架构变化（不算行为变化，但影响后续开发方式）**：`admin-server` 新增第六个可独立部署的 Go 程序——`services/iam/iam.go`（iam-rpc，独立 zrpc 服务，同一进程内注册 3 个 gRPC service：`Iam`、`TaskCallback`、`IamCallback`）。全部 `/api/v1/{iam,system,monitoring,misc}/*` 系列接口的路径、请求、响应结构**都没有变**，前端不需要改任何代码；变的是 gateway 从直接持有 `Repository`/`Domain` 两个聚合根（约 40 个 Model 字段）改成只持有 `Redis`（共享 Redis 直连）+ 5 个 `XxxRPC` client 字段，`internal/repository/`、`internal/model/`、`internal/domain/` 三个目录**整体删除**——这是 Phase 2 五次拆分里唯一一次让 gateway 完全不直连任何 MySQL 的一次。MySQL schema 决策：iam-rpc 复用现有的 `"admin"` schema（用户明确选择，不是新建 `admin_iam`），因为这个库本来就是 iam+system+monitoring+misc 专属库，task/sdk/chat/content 早就各自独立成 `admin_task`/`admin_sdk`/`admin_chat`/`admin_content`，零数据迁移风险。`cmd/adminseed/main.go` 从直连数据库改成纯 gRPC 客户端调 `IamRPC.UserCreate`。
-
-**关键代码位置**：`admin-server/services/iam/`（iam-rpc 本体，含 `internal/domain/iam/{permission_resolver,rbac_service,user_service}.go`、`internal/repository/`、`internal/model/{iam,system,monitoring,misc}/`、`internal/server/{iamserver,taskcallbackserver,iamcallbackserver}.go`、`internal/consumer/task_notification_consumer.go`）、`admin-server/internal/middleware/`（5 个中间件改调 `IamRPC`/共享 Redis 直连）、`admin-server/internal/redisconn/`（gateway 新增的共享 Redis 构造）、`admin-server/pkg/audit/audit.go`（改调 `IamCallbackRPC.RecordAuditLog`）、`admin-server/internal/logic/{iam,system,monitoring,misc}/`（gateway 薄胶水，约 90 个文件）。
-
-## 22. Phase 2 收尾遗留问题处理：`VideoUpdate` 字段绑定 bug 修复 + `Login`/`Refresh`/`FileUpload`/`FileDownload`/`Notice` 真实环境端到端验证补充（2026-07-13）
-
-完整过程记录见 `admin-server/docs/progress.md`（2026-07-13 第二条条目）。这是 Phase 2 五个服务拆分全部落地后，处理此前记录在 `14-production-deployment-checklist.md` 里的两项已知遗留问题，不涉及新的架构改动。
-
-**1. `VideoUpdate` bug（第 20 节记录的遗留项）已修复**：根因是 `video` 表 DDL 后来加了 `uuid`/`god_num`/`xlzz_urls`/`type` 四个字段，但 `services/content/internal/model/video/videomodel_gen.go` 从未跟着重新生成，`Insert`/`Update` 一直只绑定旧的 6 个字段，导致 `PUT /api/v1/videos` 从引入那次提交起就没有真正生效过。按项目规则重新执行 `generate-model.sh` 生成正确代码，并顺手处理了 regenerate 带来的连带 break（新模板给唯一索引 `uk_uuid` 生成了 index-cache 模式，移除了旧版本残留的 `FindPage`/`FindChunk`，`video_repository.go` 里对 `model.FindPage` 的调用改成统一走已有的 `findPageWithFilter`）。
-
-**2. `Login`/`Refresh`/`FileUpload`/`FileDownload`/`Notice` 真实环境端到端验证（第 21 节记录的遗留项）已补齐**：借用户远程库 `oldbai` + 本机 Redis，起真实 iam-rpc + gateway 进程，新建一次性测试账号+角色（不触碰真实管理员账号）验证了全部 5 类此前未覆盖的写路径，验证后精确清理，8 张相关表行数核对回到验证前基线。
-
-**未处理**：`docker compose up` 容器化实测按用户要求本轮不做，留到真实上线时再处理。
 
 ## 23. 本机新装 MySQL 全新初始化时发现并修复两处 SQL bug（2026-07-13）
+
+> **例外说明**：本节原属于原文档第 16 节起的 Phase 1-3 记录（本文件其余部分已略去，见上方说明），按理不该出现在这里；但复核时发现这处 SQL bug 修复**没有被任何 `docs/changelog/` 日期文件覆盖**，而 `admin-server/services/iam/internal/repository/iam/department_repository.go`、`db/services/content/blog/init_blog.sql`、`db/services/content/blog_extension/init_blog_extension.sql`、`db/services/iam/department/migrations/add_feishu_pending_department_20260716.sql` 四处代码注释仍指向"docs/后端开发进度.md 第 23 节"，所以整节原样保留在此，编号维持原文档的"23"不变，代码注释里的路径改指向本文件即可，节号不用改。
 
 **背景**：本机通过 Homebrew 新装 `mysql@8.0` 用于本地开发，第一次在完全空库上从头跑一遍 `db/services/init-dev-db.sh`（此前所有 dev/CI 库都是逐步演进积累出来的，从未有人真正从零重放过全部初始化 SQL），暴露了两处此前从未触发过的 SQL bug。
 
@@ -410,26 +328,6 @@ services/iam/, services/task/, services/sdk/, services/chat/, services/content/
 
 **遗留提醒（新增）**：`init_task.sql`/`init_video.sql`/`init_chat.sql` 里同样存在这个"`admin_menu` 用 `ON DUPLICATE KEY UPDATE` 但实际不生效"的问题，本次未修改这三个文件（超出本次任务范围，且这三个模块的菜单结构此前从未被验证过重复执行的实际效果），如果后续这些模块的库需要重新初始化或有人真的重复跑过这些脚本，需要单独核查是否已产生重复菜单行。
 
-## 24. 新增飞书扫码/免扫码登录（2026-07-16）
+---
 
-**背景**：登录页新增飞书登录入口，用户可选择账号密码登录或飞书扫码/免扫码授权登录。技术方案与用户确认：使用标准 OAuth 授权码流程（不依赖飞书旧版 `LarkSSOSDKWebQRCode` JS SDK，端点/字段核实自飞书开放平台官方文档 2026-07：`https://open.feishu.cn/document/sso/web-application-sso/login-overview`）；首次登录自动建号（不要求管理员预先建账号）；企业自建应用类型。
-
-**新增数据表**：`admin_user_third_party`（`db/services/iam/user_third_party/create_table_user_third_party.sql`）——第三方登录账号绑定表，不在 `admin_user` 上加字段，通过 `user_id` 关联，唯一键 `(provider, open_id)`，为后续接入企业微信/钉钉等其它第三方登录留出扩展空间。
-
-**新增角色**：`admin_role.code='feishu'`（`db/services/iam/role/migrations/add_feishu_role_20260716.sql`），飞书用户首次登录自动分配，默认权限仅 `daily_short_sentence:list` + `file:list`（刻意收得很窄，不含任何后台管理 CRUD/审计权限）。
-
-**RPC/接口**：`services/iam/rpc/iam.proto` 新增 `LoginFeishu(LoginFeishuRequest) returns (TokenPair)`；`admin.api` 新增 `POST /login/feishu`，同 `/login` 一样只挂 `PerformanceMiddleware`；新建 `pkg/feishu/client.go` 封装飞书 OpenAPI（code 换 `user access_token` 走 `POST /open-apis/authen/v2/oauth/token`，再查用户信息走 `GET /open-apis/authen/v1/user_info`）。
-
-**关键实现细节**：
-- `services/iam/internal/logic/loginfeishulogic.go` 的 `findOrCreateUser`：按 `open_id` 查绑定 → 未绑定则复用 `UserDomainService.CreateUser`（不绕过用户名唯一性校验/密码加密/事务落库这套统一路径）建号，用户名固定生成为 `feishu_<open_id>`（确定性、可重放）→ 建号成功才 `assignDefaultRole`（避免覆盖已存在账号的角色）→ 写 `admin_user_third_party` 绑定。**建号/绑定阶段做了自愈**：并发首次登录竞态或"建号成功但绑定写入失败"留下的孤儿账号，都会按确定性用户名/`open_id`重新查一次并接上，不会把这类偶发冲突直接判定为登录失败（本仓库 pre-commit AI 审查 GGA 指出后修复，未采用跨 domain 的大事务包裹，延续本仓库 Chat 初始化"尽力而为、不强行原子"的既有先例）。
-- 飞书相关常量（`FeishuProvider`/`FeishuDefaultRoleCode`/`FeishuDefaultDepartmentName`）收进 `services/iam/internal/consts/consts.go`，不写在 logic 文件里（GGA 审查指出后修复）。
-- **部门归属**：首次提交时遗漏了部门分配（`admin_user.department_id` 默认 0，用户管理列表显示"-"），联调后用户确认补上：新建`db/services/iam/department/migrations/add_feishu_pending_department_20260716.sql`（沿用 `init_department.sql` 已有的"显式指定 id + `ON DUPLICATE KEY UPDATE`"写法，`admin_department` 没有 `name` 唯一键，不能直接按 `name` 判重幂等），飞书用户建号时自动分配到"飞书待分配"部门（id=2），方便 HR/管理员一眼看出哪些人还没被分到正式部门再手动改派。`DepartmentRepository` 新增 `FindByName` 方法。已执行迁移 SQL，并把此前建号时遗漏部门的存量飞书用户（id=3）手动补齐 `department_id=2`（通过原生 SQL UPDATE，绕过了 go-zero 缓存模型，已同步清理 `cache:adminUser:id:3` 对应 Redis 缓存，避免再现同类僵尸缓存问题）。
-
-**顺带修复的两个存量 bug**（联调飞书角色这种"极少权限"账号时才会暴露，此前所有测试都用超管账号绕过了这两条代码路径）：
-1. `services/iam/internal/logic/menumytreelogic.go` 的 `filterMenu`：目录类菜单（`MenuType==1`）子节点全部被权限过滤后，目录节点自身（若未绑定权限）仍会残留在树里，前端渲染成一个指向空路由的死链接，点击直接 404。修复为空目录直接从树里剪掉。
-2. 本地 dev Redis 里 `admin_api` 表相关缓存（`cache:adminApi:*`）存在因表数据重新播种导致自增 ID 漂移的僵尸缓存（如 `GET /api/v1/daily-short-sentences` 缓存指向的 `api_id` 实际已变成另一个不相关的接口），导致低权限角色第一次触发 `PermissionMiddleware`/`ApiEnabledMiddleware` 的完整查询路径时被误判拒绝。此问题不涉及代码改动，清理僵尸缓存 key 解决；如果其它环境的 `admin_api`/`admin_menu` 等表也经历过"重新播种但未清缓存"，可能有同类隐患。
-
-**待办**：
-- 生产环境部署前：`FEISHU_APP_ID`/`FEISHU_APP_SECRET`/`FEISHU_REDIRECT_URI` 需要走生产环境变量注入（`docker-compose.prod.yml`/Supervisor），不要复用本机测试凭据；飞书开放平台后台需要单独把生产域名对应的重定向 URL 加入白名单
-
-**关键代码位置**：`admin-server/pkg/feishu/client.go`、`admin-server/services/iam/internal/logic/loginfeishulogic.go`、`admin-server/services/iam/internal/repository/iam/user_third_party_repository.go`、`admin-server/services/iam/internal/repository/iam/department_repository.go`（`FindByName`）、`admin-server/services/iam/internal/model/iam/adminuserthirdpartymodel.go`、`admin-server/internal/logic/iam/auth/login_feishu_logic.go`（gateway 薄胶水）、`admin-server/db/services/iam/user_third_party/`、`admin-server/db/services/iam/role/migrations/add_feishu_role_20260716.sql`、`admin-server/db/services/iam/department/migrations/add_feishu_pending_department_20260716.sql`。
+> 本文档到此结束（对应原文档第 15、23 节，中间第 16-22、24 节与 `docs/changelog/` 重复已删除）。2026-07-10 起的后续内容（Phase 1-3 重构记录）见 `docs/changelog/2026-07-10.md` 起的各篇日期文件，索引见 `docs/changelog/README.md`。

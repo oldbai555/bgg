@@ -1,10 +1,12 @@
 # bgg 开发交接记录（changelog）
 
-本目录是 `admin-server` + `admin-frontend` **共用**的开发交接记录，覆盖每一次实质性工作会话——起点是 admin-server 单体加固 → 微服务拆分 → 可观测性/CD 三阶段重构（Phase 1-3），但早已不止于此：不管改的是后端还是前端，日常修 bug、做新需求、方案调整都要往里追加条目，不要因为"不是重构任务"或"这次只改前端"就跳过。风格与仓库根目录 `docs/后端开发进度.md` / `docs/前端开发进度.md` 一致：按时间顺序追加条目，记录做了什么、关键决策、关键文件位置。
+本目录是 `admin-server` + `admin-frontend` **共用**的开发交接记录，覆盖每一次实质性工作会话——起点是 admin-server 单体加固 → 微服务拆分 → 可观测性/CD 三阶段重构（Phase 1-3），但早已不止于此：不管改的是后端还是前端，日常修 bug、做新需求、方案调整都要往里追加条目，不要因为"不是重构任务"或"这次只改前端"就跳过。按时间顺序追加条目，记录做了什么、关键决策、关键文件位置（早年风格对齐的 `docs/后端开发进度.md`/`docs/前端开发进度.md` 已于 2026-07-17 退场归档，见下方 `archive-backend.md`/`archive-frontend.md` 说明）。
 
 **本目录 2026-07-17 前叫 `admin-server/docs/changelog/`，只记 admin-server**：此前的条目（2026-07-10 ~ 2026-07-16）全部是 admin-server 专属内容，历史事实不改写。2026-07-17 起迁到仓库根目录，前后端共用同一份交接记录，同一天多个模块用文件名 `-2`/`-3` 后缀区分，不需要按前后端分文件夹。
 
 原来单文件 `admin-server/docs/progress.md`（20 条日期条目，200KB+）已按日期拆分成本目录下的独立文件，方便按需查阅、避免单文件无限增长。`admin-server/docs/progress.md` 仍然保留（`22-admin-mcp-tool.md` 的 `query_progress` 工具硬编码解析这个文件名，且有几十处历史文档交叉引用它），但只保留最近少量条目，新条目积累到一定数量后批量归档到本目录；`admin-frontend/docs/progress.md` 是前端独立维护的长文档，与本目录不冲突、不合并。
+
+**`archive-backend.md` / `archive-frontend.md` 是一次性批量归档文件，不是常规的按日期条目**：2026-07-17 按「文档分层与生命周期」规则（见 `.cursor/rules/00-workflow.mdc`）退场的 `docs/后端开发进度.md`/`docs/前端开发进度.md`，把 2026-07-10（本目录起点）之前、changelog 未覆盖的历史内容整篇原样搬了过来；2026-07-10 之后与 changelog 重复的部分已删除未保留。这两个文件同样不再维护，只是历史存档，不要往里追加新内容。
 
 **维护方式：只追加，不重写。** 每次实际工作会话结束后，在本目录新增一个日期文件（同一天多条用 `-2`/`-3` 后缀区分），不要回头改写已有条目（除非是修正明确的事实错误）。历史决策即使后来被推翻，也保留原条目 + 新增一条说明推翻原因，不做静默删除。
 
@@ -17,6 +19,11 @@
 **隐私规范：不写服务器真实公网 IP**。本目录进 git 历史后很难彻底清除，本仓库又是公开仓库，记录部署/服务器相关内容时一律用服务器别名（如 `bgg-dev`，对应本地 `~/.ssh/config` 的 `Host` 别名），真实 IP 不写进任何 changelog 条目；域名（如 `oldbai.top`）不算敏感信息，可以正常写。这条同步写进了 `AGENTS.md`/`.cursor/rules/00-workflow.mdc`/`.claude/rules/00-workflow.md` 的「绝对禁止事项」表。
 
 ## 索引
+
+| 文件 | 内容 |
+|------|------|
+| [archive-backend.md](archive-backend.md) | **批量归档**：admin-server 2025-01 ~ 2026-07-07（本目录起点之前）的历史开发记录，原 `docs/后端开发进度.md` |
+| [archive-frontend.md](archive-frontend.md) | **批量归档**：admin-frontend 2025-12 ~ 2026-07-07（本目录起点之前）的历史开发记录，原 `docs/前端开发进度.md` |
 
 以下 2026-07-10 ~ 2026-07-16 的条目均为迁移前的 admin-server 专属记录：
 
@@ -50,3 +57,4 @@
 |------|------|
 | [2026-07-17.md](2026-07-17.md) | changelog 目录从 `admin-server/docs/changelog/` 迁到仓库根 `docs/changelog/`，正式确立为前后端共用的强制交接文档，`TEMPLATE.md`/规则文件同步更新 |
 | [2026-07-17-2.md](2026-07-17-2.md) | bgg-dev 切到 ghcr.io 镜像部署（`docker-compose.dev-mixed.yml`/`deploy-dev.sh`）+ 新增 `script/branch_from_main.sh` 系列 Git 分支/PR 工作流脚本；踩坑记录：squash merge 断祖先导致 GitHub PR 比较页失效及 `rebase --onto` 修复方法 |
+| [2026-07-17-3.md](2026-07-17-3.md) | 文档治理：建立「文档分层与生命周期」规则，退役 `docs/后端开发进度.md`/`docs/前端开发进度.md`/3 份 DDD-lite 草稿，历史内容归档进 `archive-backend.md`/`archive-frontend.md` |

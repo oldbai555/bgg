@@ -282,5 +282,4 @@ ls -l /c/work/redis.json
 
 ## 📚 相关文档
 
-- [后端开发进度](../docs/后端开发进度.md)（已整合 go-zero 实现方案内容）
-- [前端开发进度](../docs/前端开发进度.md)（已整合 Vue3 实现方案内容）
+- [开发交接记录（changelog）](../docs/changelog/README.md)（早期历史存档于 `archive-backend.md`/`archive-frontend.md`）

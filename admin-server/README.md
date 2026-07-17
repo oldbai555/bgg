@@ -15,14 +15,16 @@
 admin-server/
 ├── api/admin.api      # 唯一 .api 定义文件，group 格式 <domain>/<module>
 ├── internal/
-│   ├── handler/<domain>/<module>/  # goctl 生成
-│   ├── logic/<domain>/<module>/    # goctl 骨架 + 手写业务
-│   ├── repository/<domain>/        # 手写数据访问（squirrel）
-│   ├── model/<domain>/             # goctl 生成
-│   ├── domain/iam/                 # 领域服务（RBAC）
-│   ├── middleware/ svc/ types/ ...
+│   ├── handler/<domain>/<module>/  # goctl 生成骨架
+│   ├── logic/<domain>/<module>/    # goctl 骨架 + 薄胶水（解析请求 -> 调对应 XxxRPC -> 映射响应）
+│   ├── middleware/                 # 全部通过 zrpc client 调用各服务，不再直连数据库
+│   ├── redisconn/                  # gateway 唯一保留的存储直连：共享 Redis（token 黑名单、限流滑动窗口）
+│   ├── consts/ config/ types/ svc/ # svc.ServiceContext 只持有 Redis + 各服务 XxxRPC client 字段
 ├── pkg/ scripts/ .template/ db/
-└── services/task/      # Phase 2 拆出的 task-rpc 独立服务（任务调度域已搬出单体）
+└── services/iam/, services/task/, services/sdk/, services/chat/, services/content/
+    # Phase 2 拆出的 iam-rpc/task-rpc/sdk-rpc/chat-rpc/content-rpc 五个独立服务，全部领域代码/
+    # repository/model/domain 都已搬出单体；gateway 的 internal/repository/、internal/model/、
+    # internal/domain/ 三个目录已整体删除，不再直连任何 MySQL
 ```
 
 详细维护导航见 [`docs/admin-server-维护导航.md`](../docs/admin-server-维护导航.md)。
@@ -87,4 +89,4 @@ Supervisor 部署、生产配置细节见 [`script/README.md`](../script/README.
 
 - 根目录 [`AGENTS.md`](../AGENTS.md)、[`.cursor/rules/*.mdc`](../.cursor/rules/)：开发规范与工作流
 - [`scripts/README.md`](scripts/README.md)：代码生成脚本详细说明
-- [`docs/后端开发进度.md`](../docs/后端开发进度.md)：已完成功能、技术决策记录、关键代码位置索引
+- [`docs/changelog/`](../docs/changelog/README.md)：开发交接记录（历史/背景）；早期历史存档于 `docs/changelog/archive-backend.md`
