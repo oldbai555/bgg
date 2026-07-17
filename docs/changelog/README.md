@@ -47,3 +47,4 @@
 | 文件 | 内容 |
 |------|------|
 | [2026-07-17.md](2026-07-17.md) | changelog 目录从 `admin-server/docs/changelog/` 迁到仓库根 `docs/changelog/`，正式确立为前后端共用的强制交接文档，`TEMPLATE.md`/规则文件同步更新 |
+| [2026-07-17-2.md](2026-07-17-2.md) | bgg-dev 切到 ghcr.io 镜像部署（`docker-compose.dev-mixed.yml`/`deploy-dev.sh`）+ 新增 `script/branch_from_main.sh` 系列 Git 分支/PR 工作流脚本；踩坑记录：squash merge 断祖先导致 GitHub PR 比较页失效及 `rebase --onto` 修复方法 |
