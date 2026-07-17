@@ -8,24 +8,24 @@
 -- INSERT ... SELECT ... WHERE NOT EXISTS（按 path 或 parent_id+name 判重），
 -- 不使用对它不生效的 ON DUPLICATE KEY UPDATE；权限/接口/关联表本身有唯一键，
 -- 继续用 ON DUPLICATE KEY UPDATE。也不再用 LAST_INSERT_ID() 偏移量推算 ID，
--- 详见 docs/后端开发进度.md 第 23 节。
+-- 详见 docs/changelog/archive-backend.md 第 23 节。
 -- ============================================
 
 -- ============================================
--- 1. 获取博客管理主菜单 ID（path = '/blog'）
+-- 1. 获取博客管理主菜单 ID（path = '/admin/blog'）
 -- ============================================
 SET @blog_root_menu_id = (
   SELECT `id` FROM `admin_menu`
-  WHERE `path` = '/blog' AND `deleted_at` = 0
+  WHERE `path` = '/admin/blog' AND `deleted_at` = 0
   LIMIT 1
 );
 
 -- ============================================
--- 2. 获取文章管理菜单 ID（path = '/blog/article'）
+-- 2. 获取文章管理菜单 ID（path = '/admin/blog/article'）
 -- ============================================
 SET @blog_article_menu_id = (
   SELECT `id` FROM `admin_menu`
-  WHERE `path` = '/blog/article' AND `deleted_at` = 0
+  WHERE `path` = '/admin/blog/article' AND `deleted_at` = 0
   LIMIT 1
 );
 
@@ -35,19 +35,19 @@ SET @blog_article_menu_id = (
 
 -- 3.1 友情链接管理菜单
 INSERT INTO `admin_menu` (`parent_id`, `name`, `path`, `component`, `icon`, `type`, `order_num`, `visible`, `status`, `created_at`, `updated_at`, `deleted_at`)
-SELECT @blog_root_menu_id, '友情链接管理', '/blog/friend-link', 'blog/BlogFriendLinkList', 'ele-Link', 2, 4, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0
+SELECT @blog_root_menu_id, '友情链接管理', '/admin/blog/friend-link', 'content/BlogFriendLinkList', 'ele-Link', 2, 4, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0
 FROM DUAL
-WHERE NOT EXISTS (SELECT 1 FROM `admin_menu` WHERE `path` = '/blog/friend-link' AND `deleted_at` = 0);
+WHERE NOT EXISTS (SELECT 1 FROM `admin_menu` WHERE `path` = '/admin/blog/friend-link' AND `deleted_at` = 0);
 
-SET @blog_friend_link_menu_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/blog/friend-link' AND `deleted_at` = 0 LIMIT 1);
+SET @blog_friend_link_menu_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/admin/blog/friend-link' AND `deleted_at` = 0 LIMIT 1);
 
 -- 3.2 社交信息管理菜单
 INSERT INTO `admin_menu` (`parent_id`, `name`, `path`, `component`, `icon`, `type`, `order_num`, `visible`, `status`, `created_at`, `updated_at`, `deleted_at`)
-SELECT @blog_root_menu_id, '社交信息管理', '/blog/social-info', 'blog/BlogSocialInfoList', 'ele-Share', 2, 5, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0
+SELECT @blog_root_menu_id, '社交信息管理', '/admin/blog/social-info', 'content/BlogSocialInfoList', 'ele-Share', 2, 5, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0
 FROM DUAL
-WHERE NOT EXISTS (SELECT 1 FROM `admin_menu` WHERE `path` = '/blog/social-info' AND `deleted_at` = 0);
+WHERE NOT EXISTS (SELECT 1 FROM `admin_menu` WHERE `path` = '/admin/blog/social-info' AND `deleted_at` = 0);
 
-SET @blog_social_info_menu_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/blog/social-info' AND `deleted_at` = 0 LIMIT 1);
+SET @blog_social_info_menu_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/admin/blog/social-info' AND `deleted_at` = 0 LIMIT 1);
 
 -- 3.3 友情链接管理按钮菜单（新增/编辑/删除，无 path，按 parent_id+name 判重）
 INSERT INTO `admin_menu` (`parent_id`, `name`, `path`, `component`, `icon`, `type`, `order_num`, `visible`, `status`, `created_at`, `updated_at`, `deleted_at`)

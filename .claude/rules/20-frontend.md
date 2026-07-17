@@ -9,7 +9,7 @@ paths: admin-frontend/**
 
 # 技术栈与目录结构
 
-Vite 5 + Vue 3.4（Composition API）+ TypeScript 5.3 + Element Plus + Pinia + Axios。不是 Nuxt（曾有一次 Nuxt SSR 迁移实验，已完全回滚，参见 `docs/前端开发进度.md` 决策记录，不要重复尝试）。
+Vite 5 + Vue 3.4（Composition API）+ TypeScript 5.9 + Element Plus + Pinia + Axios。不是 Nuxt（曾有一次 Nuxt SSR 迁移实验，已完全回滚，参见 `docs/changelog/archive-frontend.md` §4 决策记录，不要重复尝试）。
 
 2026-07 起 admin-frontend 完成了 Phase 1-2 架构重构（过程记录见 `admin-frontend/docs/progress.md`，规划见 `admin-frontend/docs/00-refactor-overview.md`），目录按后端 9 业务域重组，替代了旧的 `system/blog/sdk/video/chatroom/public` 分组：
 
@@ -28,7 +28,7 @@ admin-frontend/src/
 ├── directives/permission.ts # v-permission 指令
 ├── stores/                 # Pinia：app.ts / dict.ts / user.ts / websocket.ts（连接生命周期）
 │                             # / notification.ts（未读消息列表，订阅 websocket.ts 的 lastMessage）
-├── styles/                 # variables.scss / theme.scss / public-list.scss / public-detail.scss / blog.scss
+├── styles/                 # variables.scss / theme.scss / layout.scss / responsive.scss / public-list.scss / public-detail.scss
 ├── utils/request.ts         # Axios 实例，统一处理 token、错误码、响应解包
 └── views/                   # iam/ system/ monitoring/ misc/ content/ chat/ sdk/ task/ public/
                               # 按后端业务域分目录，与 admin.api 的 group: <domain>/<module> 一一对应

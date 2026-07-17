@@ -8,7 +8,7 @@
 |---|---|---|
 | `views/temp/BlogList.vue` | 未接入路由，与 `views/content/BlogList.vue`（原 `views/blog/`，见 `02` 号文档）功能重复的早期脚手架产物 | 删除 |
 | `views/temp/DailyShortSentenceList.vue` | 未接入路由 | 执行时确认 `daily_short_sentence` 功能是否还有产品需求；若无人在用，删除；若仍需要，从 `temp/` 移入正式域目录（`misc/` 或就近放 `content/`，视后端归属而定）而不是继续留在 `temp/` |
-| `views/temp/DemoList.vue` | 明确是开发流程示例脚手架 | 删除，`docs/前端开发进度.md` §2 提到它"作为开发流程示例"的描述同步更新（见 `09` 号文档） |
+| `views/temp/DemoList.vue` | 明确是开发流程示例脚手架 | 删除，`docs/changelog/archive-frontend.md` §2 提到它"作为开发流程示例"的描述同步更新（见 `09` 号文档） |
 | `views/temp/MetricList.vue` | 未接入路由，功能已被 `views/monitoring/MetricStats.vue`（原 `system/MetricStats.vue`）取代 | 删除前 diff 一下两个文件确认没有 `MetricStats.vue` 遗漏的独有功能，确认后删除 |
 | `package.json` 的 `api:gen` script | 引用的 `scripts/api-gen.mjs` 不存在，已确认失效 | 删除该 script 条目；真正的生成入口是 `admin-server/scripts/generate-ts.sh`，`.claude/rules/20-frontend.md` 已经写清楚，不需要在前端仓库保留误导性的死脚本 |
 | `.eslintrc.js` 里 "Vue 文件用 Prettier 格式化" 的注释及相关 `overrides`（`indent: 'off'` 等） | 死配置，`devDependencies` 未装 Prettier | 二选一，执行时定案：(a) 删除死配置注释和相关 `overrides`，明确本项目现状就是"ESLint 管一切，没有 Prettier"；(b) 补装 Prettier 让配置名副其实。**建议选 (a)**——现有 ESLint 规则（单引号/无分号/2 空格缩进）已经覆盖了 Prettier 通常负责的格式化职责，引入 Prettier 反而要处理两者规则冲突，价值不大，属于不必要的新增依赖 |

@@ -10,7 +10,7 @@
 --   菜单）或 parent_id+name（按钮）判重，才是真正可重复执行的写法。
 -- - admin_permission_menu / admin_permission_api（联合唯一键）：用 INSERT ... ON DUPLICATE KEY UPDATE。
 -- - 不再用 LAST_INSERT_ID() 偏移量推算各行 ID（曾因多行 INSERT 后 LAST_INSERT_ID() 返回第一行而非最后一行
---   导致 ID 错位，详见 docs/后端开发进度.md 第 23 节），统一按自然键 SELECT 回查。
+--   导致 ID 错位，详见 docs/changelog/archive-backend.md 第 23 节），统一按自然键 SELECT 回查。
 
 -- ============================================
 -- 2. 插入菜单数据
@@ -18,35 +18,35 @@
 
 -- 2.1 博客管理主菜单
 INSERT INTO `admin_menu` (`parent_id`, `name`, `path`, `component`, `icon`, `type`, `order_num`, `visible`, `status`, `created_at`, `updated_at`, `deleted_at`)
-SELECT 0, '博客管理', '/blog', 'blog/BlogLayout', 'ele-Document', 1, 20, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0
+SELECT 0, '博客管理', '/admin/blog', 'content/BlogLayout', 'ele-Document', 1, 20, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0
 FROM DUAL
-WHERE NOT EXISTS (SELECT 1 FROM `admin_menu` WHERE `path` = '/blog' AND `deleted_at` = 0);
+WHERE NOT EXISTS (SELECT 1 FROM `admin_menu` WHERE `path` = '/admin/blog' AND `deleted_at` = 0);
 
-SET @blog_root_menu_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/blog' AND `deleted_at` = 0 LIMIT 1);
+SET @blog_root_menu_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/admin/blog' AND `deleted_at` = 0 LIMIT 1);
 
 -- 2.2 标签管理菜单
 INSERT INTO `admin_menu` (`parent_id`, `name`, `path`, `component`, `icon`, `type`, `order_num`, `visible`, `status`, `created_at`, `updated_at`, `deleted_at`)
-SELECT @blog_root_menu_id, '标签管理', '/blog/tag', 'blog/BlogTagList', 'ele-PriceTag', 2, 1, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0
+SELECT @blog_root_menu_id, '标签管理', '/admin/blog/tag', 'content/BlogTagList', 'ele-PriceTag', 2, 1, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0
 FROM DUAL
-WHERE NOT EXISTS (SELECT 1 FROM `admin_menu` WHERE `path` = '/blog/tag' AND `deleted_at` = 0);
+WHERE NOT EXISTS (SELECT 1 FROM `admin_menu` WHERE `path` = '/admin/blog/tag' AND `deleted_at` = 0);
 
-SET @blog_tag_menu_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/blog/tag' AND `deleted_at` = 0 LIMIT 1);
+SET @blog_tag_menu_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/admin/blog/tag' AND `deleted_at` = 0 LIMIT 1);
 
 -- 2.3 文章管理菜单
 INSERT INTO `admin_menu` (`parent_id`, `name`, `path`, `component`, `icon`, `type`, `order_num`, `visible`, `status`, `created_at`, `updated_at`, `deleted_at`)
-SELECT @blog_root_menu_id, '文章管理', '/blog/article', 'blog/BlogArticleList', 'ele-DocumentCopy', 2, 2, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0
+SELECT @blog_root_menu_id, '文章管理', '/admin/blog/article', 'content/BlogArticleList', 'ele-DocumentCopy', 2, 2, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0
 FROM DUAL
-WHERE NOT EXISTS (SELECT 1 FROM `admin_menu` WHERE `path` = '/blog/article' AND `deleted_at` = 0);
+WHERE NOT EXISTS (SELECT 1 FROM `admin_menu` WHERE `path` = '/admin/blog/article' AND `deleted_at` = 0);
 
-SET @blog_article_menu_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/blog/article' AND `deleted_at` = 0 LIMIT 1);
+SET @blog_article_menu_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/admin/blog/article' AND `deleted_at` = 0 LIMIT 1);
 
 -- 2.4 文章审核菜单（可选，如不单独展示可仅用于权限控制）
 INSERT INTO `admin_menu` (`parent_id`, `name`, `path`, `component`, `icon`, `type`, `order_num`, `visible`, `status`, `created_at`, `updated_at`, `deleted_at`)
-SELECT @blog_root_menu_id, '文章审核', '/blog/article-audit', 'blog/BlogArticleAuditList', 'ele-Finished', 2, 3, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0
+SELECT @blog_root_menu_id, '文章审核', '/admin/blog/article-audit', 'content/BlogArticleAuditList', 'ele-Finished', 2, 3, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0
 FROM DUAL
-WHERE NOT EXISTS (SELECT 1 FROM `admin_menu` WHERE `path` = '/blog/article-audit' AND `deleted_at` = 0);
+WHERE NOT EXISTS (SELECT 1 FROM `admin_menu` WHERE `path` = '/admin/blog/article-audit' AND `deleted_at` = 0);
 
-SET @blog_article_audit_menu_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/blog/article-audit' AND `deleted_at` = 0 LIMIT 1);
+SET @blog_article_audit_menu_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/admin/blog/article-audit' AND `deleted_at` = 0 LIMIT 1);
 
 -- 2.5 标签管理按钮菜单（新增/编辑/删除，无 path，按 parent_id+name 判重）
 INSERT INTO `admin_menu` (`parent_id`, `name`, `path`, `component`, `icon`, `type`, `order_num`, `visible`, `status`, `created_at`, `updated_at`, `deleted_at`)

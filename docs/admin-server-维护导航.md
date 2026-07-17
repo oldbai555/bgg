@@ -140,6 +140,5 @@ Handler/Logic 仍通过 `*svc.ServiceContext` 访问依赖；gateway 的 `Servic
 
 ## 相关文档
 
-- Spike 结论：[`admin-server-phase0-goctl-spike.md`](admin-server-phase0-goctl-spike.md)
-- 重构任务书：[`admin-server-ddd-refactor-prompt.md`](admin-server-ddd-refactor-prompt.md)
+- DDD-lite 分层重构历史背景（Spike 结论 + 重构任务书，原两篇文档已归档删除）：[`docs/changelog/archive-backend.md`](changelog/archive-backend.md) §15
 - Phase 2 服务拆分完整过程：`admin-server/docs/progress.md`（按时间顺序的唯一进度记录）

@@ -480,7 +480,6 @@ engram projects consolidate
 ## 相关文档
 
 - [后端维护导航](admin-server-维护导航.md)
-- [后端开发进度](后端开发进度.md)
-- [前端开发进度](前端开发进度.md)
+- [开发交接记录（changelog）](changelog/README.md)
 - [Gentle-AI 官方文档](https://github.com/Gentleman-Programming/gentle-ai)
 - [CodeGraph 官方文档](https://github.com/colbymchenry/codegraph)

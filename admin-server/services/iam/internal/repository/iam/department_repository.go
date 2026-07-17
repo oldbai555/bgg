@@ -2,10 +2,12 @@ package iam
 
 import (
 	"context"
+	"postapocgame/admin-server/pkg/errs"
 	"postapocgame/admin-server/services/iam/internal/repository"
 
 	iammodel "postapocgame/admin-server/services/iam/internal/model/iam"
 
+	sq "github.com/Masterminds/squirrel"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 )
 
@@ -33,12 +35,17 @@ func (r *departmentRepository) FindByID(ctx context.Context, id uint64) (*iammod
 }
 
 // FindByName 按名称查部门。admin_department 没有 name 唯一键（历史遗留，见
-// docs/后端开发进度.md 第 23 节同类问题记录），同名重复只取 id 最小的一条。
+// docs/changelog/archive-backend.md 第 23 节同类问题记录），同名重复只取 id 最小的一条。
 func (r *departmentRepository) FindByName(ctx context.Context, name string) (*iammodel.AdminDepartment, error) {
 	var list []iammodel.AdminDepartment
-	query := "select * from admin_department where deleted_at = 0 and name = ? order by id asc limit 1"
-	if err := r.conn.QueryRowsCtx(ctx, &list, query, name); err != nil {
-		return nil, err
+	sqlStr, args, err := sq.Select("*").From("`admin_department`").
+		Where(sq.Eq{"deleted_at": 0, "name": name}).
+		OrderBy("id ASC").Limit(1).ToSql()
+	if err != nil {
+		return nil, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+	}
+	if err := r.conn.QueryRowsCtx(ctx, &list, sqlStr, args...); err != nil {
+		return nil, errs.Wrap(errs.CodeBadDB, "sql执行有误", err)
 	}
 	if len(list) == 0 {
 		return nil, iammodel.ErrNotFound
@@ -53,9 +60,16 @@ func (r *departmentRepository) ListAll(ctx context.Context) ([]iammodel.AdminDep
 
 func (r *departmentRepository) ListChildren(ctx context.Context, parentID uint64) ([]iammodel.AdminDepartment, error) {
 	var list []iammodel.AdminDepartment
-	query := "select * from admin_department where deleted_at = 0 and parent_id = ? order by order_num asc, id asc"
-	err := r.conn.QueryRowsCtx(ctx, &list, query, parentID)
-	return list, err
+	sqlStr, args, err := sq.Select("*").From("`admin_department`").
+		Where(sq.Eq{"deleted_at": 0, "parent_id": parentID}).
+		OrderBy("order_num ASC", "id ASC").ToSql()
+	if err != nil {
+		return nil, errs.Wrap(errs.CodeBadDB, "sql生成有误", err)
+	}
+	if err := r.conn.QueryRowsCtx(ctx, &list, sqlStr, args...); err != nil {
+		return nil, errs.Wrap(errs.CodeBadDB, "sql执行有误", err)
+	}
+	return list, nil
 }
 
 func (r *departmentRepository) Create(ctx context.Context, dept *iammodel.AdminDepartment) error {
