@@ -2590,3 +2590,36 @@ service admin-api {
 	post /file/upload returns (SdkFileUploadResp)
 }
 
+// AI 知识库问答（Phase 1，详见 docs/ai-knowledge-qa-spec.md）
+type (
+	// 重建博客知识库索引请求
+	KnowledgeQaReindexReq  {}
+	// 重建博客知识库索引响应
+	KnowledgeQaReindexResp {
+		articleCount int64 `json:"articleCount"` // 处理的文章篇数
+		chunkCount   int64 `json:"chunkCount"` // 写入的向量片段数
+	}
+	// 知识库问答请求
+	KnowledgeQaAskReq {
+		question string `json:"question,optional"` // 用户问题，必填校验在 Logic 层
+	}
+	// 知识库问答响应
+	KnowledgeQaAskResp {
+		answer  string   `json:"answer"`
+		sources []string `json:"sources"` // 命中并参与生成回答的文章标题（去重）
+	}
+)
+
+@server (
+	group:      ai/knowledge_qa
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler KnowledgeQaReindex
+	post /ai/knowledge-qa/reindex (KnowledgeQaReindexReq) returns (KnowledgeQaReindexResp)
+
+	@handler KnowledgeQaAsk
+	post /ai/knowledge-qa/ask (KnowledgeQaAskReq) returns (KnowledgeQaAskResp)
+}
+

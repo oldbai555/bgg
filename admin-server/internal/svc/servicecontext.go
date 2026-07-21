@@ -2,6 +2,7 @@ package svc
 
 import (
 	"postapocgame/admin-server/internal/config"
+	"postapocgame/admin-server/internal/ollama"
 	"postapocgame/admin-server/pkg/iamcallback"
 	"postapocgame/admin-server/services/chat/chatclient"
 	"postapocgame/admin-server/services/content/contentclient"
@@ -44,7 +45,10 @@ type ServiceContext struct {
 	// Domain.Blog/Domain.Video——blog+video 域已经拆分成独立服务，34 个 Blog*/PublicBlog*
 	// logic + 6 个 Video*/PublicVideo* logic 都通过这个 client 调用（M3u8Proxy 纯 HTTP 代理
 	// + VideoCollectOptions CORS 预检占位，不访问域数据，继续留在 gateway 不接入）。
-	ContentRPC                   contentclient.Content
+	ContentRPC contentclient.Content
+	// OllamaClient 连本机 Ollama REST API，供 ai/knowledge_qa 的 Reindex/Ask 两个 Logic
+	// 做 embedding + 生成，详见 docs/ai-knowledge-qa-spec.md。
+	OllamaClient                 *ollama.Client
 	AuthMiddleware               rest.Middleware
 	ApiEnabledMiddleware         rest.Middleware
 	PermissionMiddleware         rest.Middleware

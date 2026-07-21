@@ -6,6 +6,7 @@ package handler
 import (
 	"net/http"
 
+	aiknowledge_qa "postapocgame/admin-server/internal/handler/ai/knowledge_qa"
 	blogarticle "postapocgame/admin-server/internal/handler/blog/article"
 	blogarticle_audit "postapocgame/admin-server/internal/handler/blog/article_audit"
 	blogfriend_link "postapocgame/admin-server/internal/handler/blog/friend_link"
@@ -58,6 +59,25 @@ import (
 )
 
 func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.PerformanceMiddleware, serverCtx.RateLimitMiddleware, serverCtx.AuthMiddleware, serverCtx.PermissionMiddleware, serverCtx.OperationLogMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodPost,
+					Path:    "/ai/knowledge-qa/ask",
+					Handler: aiknowledge_qa.KnowledgeQaAskHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/ai/knowledge-qa/reindex",
+					Handler: aiknowledge_qa.KnowledgeQaReindexHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1"),
+	)
+
 	server.AddRoutes(
 		rest.WithMiddlewares(
 			[]rest.Middleware{serverCtx.PerformanceMiddleware, serverCtx.RateLimitMiddleware, serverCtx.AuthMiddleware, serverCtx.PermissionMiddleware, serverCtx.OperationLogMiddleware},

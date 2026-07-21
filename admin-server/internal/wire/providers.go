@@ -4,9 +4,12 @@ import (
 	"os"
 	"path/filepath"
 
+	"time"
+
 	"postapocgame/admin-server/internal/config"
 	"postapocgame/admin-server/internal/consts"
 	"postapocgame/admin-server/internal/middleware"
+	"postapocgame/admin-server/internal/ollama"
 	"postapocgame/admin-server/internal/redisconn"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/pkg/iamcallback"
@@ -35,6 +38,7 @@ var ProviderSet = wire.NewSet(
 	provideSdkRPC,
 	provideChatRPC,
 	provideContentRPC,
+	provideOllamaClient,
 
 	middleware.NewAuthMiddleware,
 	middleware.NewApiEnabledMiddleware,
@@ -107,6 +111,12 @@ func provideContentRPC(c config.Config) contentclient.Content {
 	return contentclient.NewContent(zrpc.MustNewClient(c.ContentRPCConf))
 }
 
+// provideOllamaClient 连本机 Ollama REST API，供 ai/knowledge_qa 用（详见
+// docs/ai-knowledge-qa-spec.md）。Phase 1 原型，全部走本地模型。
+func provideOllamaClient(c config.Config) *ollama.Client {
+	return ollama.NewClient(c.Ollama.BaseURL, c.Ollama.EmbedModel, c.Ollama.ChatModel, time.Duration(c.Ollama.TimeoutSecs)*time.Second)
+}
+
 // provideMiddlewareBundle 是唯一还需要手写的 assembler：MiddlewareBundle 的 11 个字段
 // 类型全部是 rest.Middleware（同一个具名类型），Wire 无法自动区分该把哪个 provider
 // 的结果填进哪个字段，所以仍然需要一个手写函数。
@@ -147,6 +157,7 @@ func provideServiceContext(
 	sdkRPC sdkclient.Sdk,
 	chatRPC chatclient.Chat,
 	contentRPC contentclient.Content,
+	ollamaClient *ollama.Client,
 	mw *MiddlewareBundle,
 ) (*svc.ServiceContext, func()) {
 	svcCtx := &svc.ServiceContext{
@@ -158,6 +169,7 @@ func provideServiceContext(
 		SdkRPC:                       sdkRPC,
 		ChatRPC:                      chatRPC,
 		ContentRPC:                   contentRPC,
+		OllamaClient:                 ollamaClient,
 		AuthMiddleware:               mw.Auth,
 		ApiEnabledMiddleware:         mw.ApiEnabled,
 		PermissionMiddleware:         mw.Permission,

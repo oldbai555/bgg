@@ -21,7 +21,7 @@ func InitializeApp(c config.Config) (*svc.ServiceContext, func(), error) {
 		return nil, nil, err
 	}
 	iam := provideIamRPC(c)
-	iamCallbackClient, err := provideIamCallbackRPC(c)
+	v, err := provideIamCallbackRPC(c)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -29,6 +29,7 @@ func InitializeApp(c config.Config) (*svc.ServiceContext, func(), error) {
 	sdk := provideSdkRPC(c)
 	chat := provideChatRPC(c)
 	content := provideContentRPC(c)
+	client := provideOllamaClient(c)
 	authMiddleware := middleware.NewAuthMiddleware(c, redis)
 	apiEnabledMiddleware := middleware.NewApiEnabledMiddleware(iam)
 	permissionMiddleware := middleware.NewPermissionMiddleware(iam)
@@ -41,7 +42,7 @@ func InitializeApp(c config.Config) (*svc.ServiceContext, func(), error) {
 	sdkRateLimitMiddleware := middleware.NewSDKRateLimitMiddleware(redis, sdk)
 	sdkCallLogMiddleware := middleware.NewSDKCallLogMiddleware(sdk)
 	middlewareBundle := provideMiddlewareBundle(authMiddleware, apiEnabledMiddleware, permissionMiddleware, operationLogMiddleware, publicOperationLogMiddleware, rateLimitMiddleware, performanceMiddleware, corsMiddleware, sdkAuthMiddleware, sdkRateLimitMiddleware, sdkCallLogMiddleware)
-	serviceContext, cleanup := provideServiceContext(c, redis, iam, iamCallbackClient, task, sdk, chat, content, middlewareBundle)
+	serviceContext, cleanup := provideServiceContext(c, redis, iam, v, task, sdk, chat, content, client, middlewareBundle)
 	return serviceContext, func() {
 		cleanup()
 	}, nil
