@@ -118,6 +118,7 @@ jobs:
   deploy-dev:
     # 镜像推送 ghcr 成功后，SSH 到 bgg-dev 执行 script/deploy-dev.sh（pull + up 六个服务）。
     # 连接信息存 GitHub Secrets：DEPLOY_SSH_HOST / DEPLOY_SSH_USER / DEPLOY_SSH_KEY。
+    # bgg-dev 在国内直连 ghcr.io 拉六个镜像可能较慢，command_timeout 留足余量（默认 10m 不够）。
     if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: [build-images]
     runs-on: ubuntu-latest
@@ -128,6 +129,7 @@ jobs:
           host: ${{ secrets.DEPLOY_SSH_HOST }}
           username: ${{ secrets.DEPLOY_SSH_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
+          command_timeout: 45m
           script: |
             cd /home/work/src-bgg
             git checkout main
