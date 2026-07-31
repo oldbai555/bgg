@@ -1,7 +1,11 @@
 Name: admin-api
 Host: 0.0.0.0
 Port: 20000
-Timeout: 30000  # 30秒超时（毫秒），避免 m3u8 代理请求超时
+Timeout: 120000  # 120秒超时（毫秒）。原 30 秒是为 m3u8 代理留的余量；ai/knowledge_qa 的
+                 # Ask 调本地 Ollama 生成一次回答可能超过 30 秒，这里顺带调大。这是网关级
+                 # 全局超时，Reindex 全量重建大量文章时仍可能超出 120 秒——Phase 1 原型
+                 # 阶段测试请控制在少量文章，超出后应该把 Reindex 迁到已有的 task-rpc
+                 # 异步任务体系，而不是继续加大这个全局超时（会影响所有路由）。
 
 # Telemetry：go-zero 原生能力，rest.MustNewServer 检测到该配置非空时自动挂载 HTTP
 # traceparent 传播（本服务是入口，负责生成 trace-id）+ span 创建。本轮不部署 OTLP
@@ -68,6 +72,14 @@ ContentRpc:
   Endpoints:
     - "${CONTENT_RPC_ENDPOINT}"
   NonBlock: true
+
+# Ollama 配置（AI 知识库问答 ai/knowledge_qa 用，详见 docs/ai-knowledge-qa-spec.md）。
+# Phase 1 原型，本机跑 Ollama（brew services start ollama），全部走本地模型，不涉及云端 API Key。
+Ollama:
+  BaseUrl: "http://127.0.0.1:11434"
+  EmbedModel: "bge-m3"
+  ChatModel: "qwen2.5:7b"
+  TimeoutSecs: 60
 
 # JWT 配置
 JWT:

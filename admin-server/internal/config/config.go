@@ -47,6 +47,9 @@ type Config struct {
 	// logic 都通过这个 client 调用，不再直接持有 Domain.Blog/Domain.Video。见
 	// 18-service-extraction-runbook.md 2.4 节。
 	ContentRPCConf zrpc.RpcClientConf `json:"contentRpc,optional" yaml:"contentRpc" mapstructure:"contentRpc"`
+	// Ollama 连到本机 Ollama REST API（AI 知识库问答 ai/knowledge_qa 用），详见
+	// docs/ai-knowledge-qa-spec.md。Phase 1 原型，全部走本地模型，不涉及任何云端 API Key。
+	Ollama OllamaConf `json:"ollama,optional" yaml:"ollama" mapstructure:"ollama"`
 }
 
 type RedisConf struct {
@@ -67,6 +70,13 @@ type JWTConf struct {
 
 type BcryptConf struct {
 	Cost int `json:"cost" yaml:"cost" mapstructure:"cost"`
+}
+
+type OllamaConf struct {
+	BaseURL     string `json:"baseUrl" yaml:"baseUrl" mapstructure:"baseUrl"`
+	EmbedModel  string `json:"embedModel" yaml:"embedModel" mapstructure:"embedModel"`
+	ChatModel   string `json:"chatModel" yaml:"chatModel" mapstructure:"chatModel"`
+	TimeoutSecs int    `json:"timeoutSecs" yaml:"timeoutSecs" mapstructure:"timeoutSecs"` // 请求超时（秒），本地 7B 模型生成较慢，默认建议 60
 }
 
 type RateLimitConf struct {

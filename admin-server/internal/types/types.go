@@ -815,6 +815,23 @@ type FileUploadResp struct {
 	Ext          string `json:"ext"`
 }
 
+type KnowledgeQaAskReq struct {
+	Question string `json:"question,optional"` // 用户问题，必填校验在 Logic 层
+}
+
+type KnowledgeQaAskResp struct {
+	Answer  string   `json:"answer"`
+	Sources []string `json:"sources"` // 命中并参与生成回答的文章标题（去重）
+}
+
+type KnowledgeQaReindexReq struct {
+}
+
+type KnowledgeQaReindexResp struct {
+	ArticleCount int64 `json:"articleCount"` // 处理的文章篇数
+	ChunkCount   int64 `json:"chunkCount"`   // 写入的向量片段数
+}
+
 type LoginFeishuReq struct {
 	Code  string `json:"code"`
 	State string `json:"state,optional"`

@@ -3,7 +3,7 @@
 
 -- 9.1 每日短句模块初始化（菜单、权限、接口）
 SET @parent_menu_id = COALESCE(
-  (SELECT `id` FROM `admin_menu` WHERE `path` = '/temp' AND `deleted_at` = 0 LIMIT 1),
+  (SELECT `id` FROM `admin_menu` WHERE `path` = '/admin/temp' AND `deleted_at` = 0 LIMIT 1),
   (SELECT `id` FROM `admin_menu` WHERE `id` = 9 AND `deleted_at` = 0 LIMIT 1)
 );
 
@@ -11,8 +11,8 @@ INSERT INTO `admin_menu` (`parent_id`, `name`, `path`, `component`, `icon`, `typ
 VALUES (
     @parent_menu_id,
     '每日短句',
-    '/temp/daily_short_sentence',
-    'temp/DailyShortSentenceList',
+    '/admin/temp/daily_short_sentence',
+    'misc/DailyShortSentenceList',
     'ele-Document',
     2,
     0,
@@ -23,7 +23,7 @@ VALUES (
     0
 ) ON DUPLICATE KEY UPDATE `updated_at`=UNIX_TIMESTAMP(), `deleted_at`=0;
 
-SET @main_menu_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/temp/daily_short_sentence' AND `deleted_at` = 0 LIMIT 1);
+SET @main_menu_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/admin/temp/daily_short_sentence' AND `deleted_at` = 0 LIMIT 1);
 
 INSERT INTO `admin_menu` (`parent_id`, `name`, `path`, `component`, `icon`, `type`, `order_num`, `visible`, `status`, `created_at`, `updated_at`, `deleted_at`)
 VALUES
@@ -121,4 +121,19 @@ ON DUPLICATE KEY UPDATE
   `convert_img`=VALUES(`convert_img`),
   `updated_at`=UNIX_TIMESTAMP(),
   `deleted_at`=0;
+
+-- 9.3 飞书用户角色默认权限：daily_short_sentence 是 init-dev-db.sh 里 iam 域按依赖顺序
+-- 排列的最后一个模块，只有到这里 daily_short_sentence:list（本文件）和 file:list
+-- （iam/permission）才都已经存在，飞书角色（iam/role）赋权只能放在这里，不能放在
+-- role 模块自己的初始化文件里。
+SET @feishu_role_id = (SELECT `id` FROM `admin_role` WHERE `code` = 'feishu' AND `deleted_at` = 0 LIMIT 1);
+
+INSERT INTO `admin_role_permission` (`role_id`, `permission_id`, `created_at`, `updated_at`)
+SELECT @feishu_role_id, p.`id`, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()
+FROM `admin_permission` p
+WHERE p.`code` IN ('daily_short_sentence:list', 'file:list')
+  AND NOT EXISTS (
+    SELECT 1 FROM `admin_role_permission` rp
+    WHERE rp.`role_id` = @feishu_role_id AND rp.`permission_id` = p.`id`
+  );
 

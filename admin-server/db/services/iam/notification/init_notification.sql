@@ -37,12 +37,12 @@ WHERE NOT EXISTS (
   WHERE `user_id` = 2 AND `source_type` = 'notice' AND `source_id` = 1 AND `deleted_at` = 0
 );
 
--- 依赖 iam/menu 模块已初始化（/system 目录菜单已存在）
-SET @system_menu_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/system' AND `deleted_at` = 0 LIMIT 1);
+-- 依赖 iam/menu 模块已初始化（/admin/system 目录菜单已存在）
+SET @system_menu_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/admin/system' AND `deleted_at` = 0 LIMIT 1);
 
 -- 消息通知管理菜单
 INSERT INTO `admin_menu` (`parent_id`, `name`, `path`, `component`, `icon`, `type`, `order_num`, `visible`, `status`, `created_at`, `updated_at`, `deleted_at`)
-VALUES (@system_menu_id, '消息通知管理', '/system/notification', 'system/NotificationList', 'ele-Bell', 2, 22, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
+VALUES (@system_menu_id, '消息通知管理', '/admin/system/notification', 'system/NotificationList', 'ele-Bell', 2, 22, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
 ON DUPLICATE KEY UPDATE `parent_id`=VALUES(`parent_id`), `name`=VALUES(`name`), `path`=VALUES(`path`), `component`=VALUES(`component`), `icon`=VALUES(`icon`), `type`=VALUES(`type`), `order_num`=VALUES(`order_num`), `visible`=VALUES(`visible`), `status`=VALUES(`status`), `updated_at`=UNIX_TIMESTAMP(), `deleted_at`=0;
 
 -- 消息通知管理接口（只需要AuthMiddleware，不需要PermissionMiddleware）

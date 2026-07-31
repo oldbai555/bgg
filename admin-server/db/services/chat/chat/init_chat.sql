@@ -59,20 +59,20 @@ ON DUPLICATE KEY UPDATE
 
 -- 聊天室目录
 INSERT INTO `admin_menu` (`parent_id`, `name`, `path`, `component`, `icon`, `type`, `order_num`, `visible`, `status`, `created_at`, `updated_at`, `deleted_at`)
-VALUES (0, '聊天室', '/chatroom', '', 'ele-ChatDotRound', 1, 20, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
+VALUES (0, '聊天室', '/admin/chatroom', '', 'ele-ChatDotRound', 1, 20, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
 ON DUPLICATE KEY UPDATE `name`=VALUES(`name`), `icon`=VALUES(`icon`), `type`=VALUES(`type`), `order_num`=VALUES(`order_num`), `visible`=VALUES(`visible`), `status`=VALUES(`status`), `updated_at`=UNIX_TIMESTAMP(), `deleted_at`=0;
-SET @chatroom_dir_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/chatroom' AND `deleted_at` = 0 LIMIT 1);
+SET @chatroom_dir_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/admin/chatroom' AND `deleted_at` = 0 LIMIT 1);
 
 -- 在线聊天菜单（无需权限，只要登录就可以访问）
 INSERT INTO `admin_menu` (`parent_id`, `name`, `path`, `component`, `icon`, `type`, `order_num`, `visible`, `status`, `created_at`, `updated_at`, `deleted_at`)
-VALUES (@chatroom_dir_id, '在线聊天', '/chatroom/chat', 'chatroom/ChatList', 'ele-ChatLineRound', 2, 1, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
+VALUES (@chatroom_dir_id, '在线聊天', '/admin/chatroom/chat', 'chat/ChatList', 'ele-ChatLineRound', 2, 1, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
 ON DUPLICATE KEY UPDATE `parent_id`=VALUES(`parent_id`), `name`=VALUES(`name`), `path`=VALUES(`path`), `component`=VALUES(`component`), `icon`=VALUES(`icon`), `type`=VALUES(`type`), `order_num`=VALUES(`order_num`), `visible`=VALUES(`visible`), `status`=VALUES(`status`), `updated_at`=UNIX_TIMESTAMP(), `deleted_at`=0;
 
 -- 聊天记录管理菜单
 INSERT INTO `admin_menu` (`parent_id`, `name`, `path`, `component`, `icon`, `type`, `order_num`, `visible`, `status`, `created_at`, `updated_at`, `deleted_at`)
-VALUES (@chatroom_dir_id, '聊天记录管理', '/chatroom/chat-message', 'chatroom/ChatMessageList', 'ele-Document', 2, 2, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
+VALUES (@chatroom_dir_id, '聊天记录管理', '/admin/chatroom/chat-message', 'chat/ChatMessageList', 'ele-Document', 2, 2, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
 ON DUPLICATE KEY UPDATE `parent_id`=VALUES(`parent_id`), `name`=VALUES(`name`), `path`=VALUES(`path`), `component`=VALUES(`component`), `icon`=VALUES(`icon`), `type`=VALUES(`type`), `order_num`=VALUES(`order_num`), `visible`=VALUES(`visible`), `status`=VALUES(`status`), `updated_at`=UNIX_TIMESTAMP(), `deleted_at`=0;
-SET @chat_message_menu_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/chatroom/chat-message' AND `deleted_at` = 0 LIMIT 1);
+SET @chat_message_menu_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/admin/chatroom/chat-message' AND `deleted_at` = 0 LIMIT 1);
 
 -- 聊天记录管理删除按钮
 INSERT INTO `admin_menu` (`parent_id`, `name`, `path`, `component`, `icon`, `type`, `order_num`, `visible`, `status`, `created_at`, `updated_at`, `deleted_at`)
@@ -114,9 +114,9 @@ ON DUPLICATE KEY UPDATE `updated_at` = UNIX_TIMESTAMP();
 
 -- 群组管理菜单（在聊天室目录下）
 INSERT INTO `admin_menu` (`parent_id`, `name`, `path`, `component`, `icon`, `type`, `order_num`, `visible`, `status`, `created_at`, `updated_at`, `deleted_at`)
-VALUES (@chatroom_dir_id, '群组管理', '/chatroom/chat-group', 'chatroom/ChatGroupList', 'ele-ChatDotRound', 2, 3, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
+VALUES (@chatroom_dir_id, '群组管理', '/admin/chatroom/chat-group', 'chat/ChatGroupList', 'ele-ChatDotRound', 2, 3, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
 ON DUPLICATE KEY UPDATE `parent_id`=VALUES(`parent_id`), `name`=VALUES(`name`), `path`=VALUES(`path`), `component`=VALUES(`component`), `icon`=VALUES(`icon`), `type`=VALUES(`type`), `order_num`=VALUES(`order_num`), `visible`=VALUES(`visible`), `status`=VALUES(`status`), `updated_at`=UNIX_TIMESTAMP(), `deleted_at`=0;
-SET @chat_group_menu_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/chatroom/chat-group' AND `deleted_at` = 0 LIMIT 1);
+SET @chat_group_menu_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/admin/chatroom/chat-group' AND `deleted_at` = 0 LIMIT 1);
 
 -- 群组管理按钮
 INSERT INTO `admin_menu` (`parent_id`, `name`, `path`, `component`, `icon`, `type`, `order_num`, `visible`, `status`, `created_at`, `updated_at`, `deleted_at`)

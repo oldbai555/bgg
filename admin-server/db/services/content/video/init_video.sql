@@ -5,7 +5,7 @@ INSERT INTO `admin_menu` (`parent_id`, `name`, `path`, `component`, `icon`, `typ
 VALUES (
     0,
     '影视资源',
-    '/video',
+    '/admin/video',
     '',
     'ele-VideoPlay',
     1,
@@ -24,17 +24,17 @@ ON DUPLICATE KEY UPDATE
   `updated_at`=UNIX_TIMESTAMP(),
   `deleted_at`=0;
 
-SET @parent_menu_id = COALESCE(
-  (SELECT `id` FROM `admin_menu` WHERE `path` = '/video' AND `deleted_at` = 0 LIMIT 1),
-  (SELECT `id` FROM `admin_menu` WHERE `id` = 9 AND `deleted_at` = 0 LIMIT 1)
-);
+-- 父菜单固定是本文件上面刚 UPSERT 的「影视资源」根目录，不像 daily_short_sentence/
+-- metric 那类脚手架模块需要回退到临时目录（id=9）——回退到 9 是复制脚手架模板遗留的
+-- 错误写法，一旦 /admin/video 查找意外落空会把视频子菜单错挂到临时目录下。
+SET @parent_menu_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/admin/video' AND `deleted_at` = 0 LIMIT 1);
 
 INSERT INTO `admin_menu` (`parent_id`, `name`, `path`, `component`, `icon`, `type`, `order_num`, `visible`, `status`, `created_at`, `updated_at`, `deleted_at`)
 VALUES (
     @parent_menu_id,
     '视频列表管理',
-    '/video/list',
-    'video/VideoList',
+    '/admin/video/list',
+    'content/VideoList',
     'ele-Document',
     2,
     0,
@@ -45,7 +45,7 @@ VALUES (
     0
 ) ON DUPLICATE KEY UPDATE `updated_at`=UNIX_TIMESTAMP(), `deleted_at`=0;
 
-SET @main_menu_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/video/list' AND `deleted_at` = 0 LIMIT 1);
+SET @main_menu_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/admin/video/list' AND `deleted_at` = 0 LIMIT 1);
 
 INSERT INTO `admin_menu` (`parent_id`, `name`, `path`, `component`, `icon`, `type`, `order_num`, `visible`, `status`, `created_at`, `updated_at`, `deleted_at`)
 VALUES
@@ -109,8 +109,8 @@ INSERT INTO `admin_menu` (`parent_id`, `name`, `path`, `component`, `icon`, `typ
 VALUES (
     @parent_menu_id,
     '视频播放器',
-    '/video/player',
-    'video/VideoPlayer',
+    '/admin/video/player',
+    'content/VideoPlayer',
     'ele-VideoPlay',
     2,
     1,

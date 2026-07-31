@@ -31,7 +31,7 @@ VALUES
   (10, 4, 'S3存储', 's3', 3, 1, 'AWS S3存储', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   -- 聊天配置字典项
   (11, 5, '聊天窗口消息数量', '30', 1, 1, '每个聊天窗口显示的最新消息数量', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
-  (12, 5, '在线聊天页面路径', '/chatroom/chat', 2, 1, '在线聊天页面的前端路由路径，用于消息通知跳转', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
+  (12, 5, '在线聊天页面路径', '/admin/chatroom/chat', 2, 1, '在线聊天页面的前端路由路径，用于消息通知跳转', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   (16, 5, 'Emoji每行显示数量', '8', 3, 1, 'Emoji表情选择器每行显示的表情数量（x）', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   (17, 5, 'Emoji显示行数', '3', 4, 1, 'Emoji表情选择器显示的行数（y）', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
   -- 消息来源类型字典项

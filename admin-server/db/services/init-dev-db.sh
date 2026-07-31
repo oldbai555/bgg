@@ -14,11 +14,16 @@
 # 都通过 SELECT 反查这些表里已存在的行，必须等 iam 初始化跑完。
 #
 # 各服务/模块内部固定 create_table → init → migrations/dict_*.sql（字典增量脚本，
-# 幂等、全新库上跑没有副作用）的顺序自动执行。migrations/ 下面文件名不是 dict_ 前缀的，
-# 是一次性存量数据迁移脚本（如 iam/notification/migrations/fix_status_semantics_20260711.sql、
-# iam/api/migrations/fix_chat_group_api_paths_20260711.sql），只对已经跑过旧版种子数据、
-# 积累了真实业务数据的库有意义，全新库不需要、部分甚至不是幂等的（见各脚本文件头部说明），
-# 因此故意不被下面的 glob 匹配到，必须手动执行。
+# 幂等、全新库上跑没有副作用）的顺序自动执行，一键跑完即为最终正确状态，不需要
+# 再手动执行任何别的脚本。历史上 migrations/ 下出现过的一次性存量数据修复脚本
+# （非 dict_ 前缀，如曾经的 fix_status_semantics_20260711.sql、
+# fix_chat_group_api_paths_20260711.sql、add_admin_prefix_to_menu_path_20260714.sql 等）
+# 只对已经跑过旧版种子数据、积累了真实业务数据的库（如 bgg-dev 的 oldbai）有意义；
+# 它们修正的内容已经在 2026-07-17 那次 SQL 整理中直接改写进对应模块的 create_table_*.sql/
+# init_*.sql 源头，全新库不再需要这些脚本，故已删除，历史记录见
+# docs/changelog/2026-07-16.md 与 2026-07-17.md。后续如果线上库又需要不适用于全新库的
+# 一次性修复/增量，同样先在 migrations/ 下按 fix_*/add_* 命名新增、执行后随会话记入
+# docs/changelog/，不要让这类脚本在 db/ 里无限堆积。
 set -e
 
 # 用法：init-dev-db.sh [-h<host>]
@@ -50,7 +55,7 @@ run_module() {
 }
 
 echo "==> [1/4] iam 建表 + 初始化数据（内部依赖顺序）"
-for m in user department role permission menu api rbac config dict file \
+for m in user user_third_party department role permission menu api rbac config dict file \
          notice notification operation_log login_log audit_log performance_log \
          monitor metric demo daily_short_sentence; do
     run_module "iam/${m}"

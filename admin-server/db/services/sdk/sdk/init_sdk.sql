@@ -2,7 +2,7 @@
 -- 从 admin-server/db/data.sql 拆分而来，见 docs/15-service-boundaries.md 第 4 节
 
 SET @parent_menu_id = COALESCE(
-  (SELECT `id` FROM `admin_menu` WHERE `path` = '/sdk' AND `type` = 1 AND `deleted_at` = 0 LIMIT 1),
+  (SELECT `id` FROM `admin_menu` WHERE `path` = '/admin/sdk' AND `type` = 1 AND `deleted_at` = 0 LIMIT 1),
   0
 );
 
@@ -10,7 +10,7 @@ INSERT INTO `admin_menu` (`parent_id`, `name`, `path`, `component`, `icon`, `typ
 VALUES (
     @parent_menu_id,
     'SDK管理',
-    '/sdk',
+    '/admin/sdk',
     '',
     'ele-Key',
     1,
@@ -22,18 +22,18 @@ VALUES (
     0
 ) ON DUPLICATE KEY UPDATE `updated_at`=UNIX_TIMESTAMP(), `deleted_at`=0;
 
-SET @sdk_root_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/sdk' AND `type` = 1 AND `deleted_at` = 0 LIMIT 1);
+SET @sdk_root_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/admin/sdk' AND `type` = 1 AND `deleted_at` = 0 LIMIT 1);
 
 INSERT INTO `admin_menu` (`parent_id`, `name`, `path`, `component`, `icon`, `type`, `order_num`, `visible`, `status`, `created_at`, `updated_at`, `deleted_at`)
 VALUES
-  (@sdk_root_id, 'API管理', '/sdk/api-key', 'sdk/ApiKeyList', 'ele-List', 2, 1, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
-  (@sdk_root_id, '调用记录', '/sdk/call-log', 'sdk/SdkCallLogList', 'ele-DocumentChecked', 2, 2, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
-  (@sdk_root_id, 'SDK接口管理', '/sdk/interface', 'sdk/SdkInterfaceList', 'ele-Setting', 2, 3, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
+  (@sdk_root_id, 'API管理', '/admin/sdk/api-key', 'sdk/ApiKeyList', 'ele-List', 2, 1, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
+  (@sdk_root_id, '调用记录', '/admin/sdk/call-log', 'sdk/SdkCallLogList', 'ele-DocumentChecked', 2, 2, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0),
+  (@sdk_root_id, 'SDK接口管理', '/admin/sdk/interface', 'sdk/SdkInterfaceList', 'ele-Setting', 2, 3, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
 ON DUPLICATE KEY UPDATE `updated_at`=UNIX_TIMESTAMP(), `deleted_at`=0;
 
-SET @sdk_api_key_menu_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/sdk/api-key' AND `deleted_at` = 0 LIMIT 1);
-SET @sdk_call_log_menu_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/sdk/call-log' AND `deleted_at` = 0 LIMIT 1);
-SET @sdk_interface_menu_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/sdk/interface' AND `deleted_at` = 0 LIMIT 1);
+SET @sdk_api_key_menu_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/admin/sdk/api-key' AND `deleted_at` = 0 LIMIT 1);
+SET @sdk_call_log_menu_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/admin/sdk/call-log' AND `deleted_at` = 0 LIMIT 1);
+SET @sdk_interface_menu_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/admin/sdk/interface' AND `deleted_at` = 0 LIMIT 1);
 
 INSERT INTO `admin_menu` (`parent_id`, `name`, `path`, `component`, `icon`, `type`, `order_num`, `visible`, `status`, `created_at`, `updated_at`, `deleted_at`)
 VALUES

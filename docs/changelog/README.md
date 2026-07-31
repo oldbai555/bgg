@@ -58,3 +58,4 @@
 | [2026-07-17.md](2026-07-17.md) | changelog 目录从 `admin-server/docs/changelog/` 迁到仓库根 `docs/changelog/`，正式确立为前后端共用的强制交接文档，`TEMPLATE.md`/规则文件同步更新 |
 | [2026-07-17-2.md](2026-07-17-2.md) | bgg-dev 切到 ghcr.io 镜像部署（`docker-compose.dev-mixed.yml`/`deploy-dev.sh`）+ 新增 `script/branch_from_main.sh` 系列 Git 分支/PR 工作流脚本；踩坑记录：squash merge 断祖先导致 GitHub PR 比较页失效及 `rebase --onto` 修复方法 |
 | [2026-07-17-3.md](2026-07-17-3.md) | 文档治理：建立「文档分层与生命周期」规则，退役 `docs/后端开发进度.md`/`docs/前端开发进度.md`/3 份 DDD-lite 草稿，历史内容归档进 `archive-backend.md`/`archive-frontend.md` |
+| [2026-07-17-4.md](2026-07-17-4.md) | `admin-server/db` SQL 整理：全部模块的 `admin_menu.path`/`component` 补齐 `/admin` 前缀与域重组新值、飞书部门角色种子数据并入 init 源头、`user_third_party` 补进初始化循环，退役 10 份历史 fix/增量脚本，一键 `init-dev-db.sh` 不再需要额外手动执行任何脚本 |

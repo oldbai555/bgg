@@ -1,16 +1,16 @@
 -- iam/monitor 初始化数据
 -- 从 admin-server/db/data.sql 拆分而来，见 docs/15-service-boundaries.md 第 4 节
 
--- 依赖 iam/menu 模块已初始化（/system 目录菜单已存在）
-SET @system_menu_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/system' AND `deleted_at` = 0 LIMIT 1);
+-- 依赖 iam/menu 模块已初始化（/admin/system 目录菜单已存在）
+SET @system_menu_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/admin/system' AND `deleted_at` = 0 LIMIT 1);
 
 -- 系统监控主菜单（系统管理下）
 INSERT INTO `admin_menu` (`parent_id`, `name`, `path`, `component`, `icon`, `type`, `order_num`, `visible`, `status`, `created_at`, `updated_at`, `deleted_at`)
 VALUES (
     @system_menu_id,
     '系统监控',
-    '/system/monitor',
-    'system/MonitorList',
+    '/admin/system/monitor',
+    'monitoring/MonitorList',
     'ele-Monitor',
     2, -- 类型：2 菜单
     34, -- 排序值
@@ -32,7 +32,7 @@ ON DUPLICATE KEY UPDATE
     `deleted_at`=0;
 SET @monitor_menu_id = (
   SELECT `id` FROM `admin_menu`
-  WHERE `path` = '/system/monitor' AND `deleted_at` = 0
+  WHERE `path` = '/admin/system/monitor' AND `deleted_at` = 0
   LIMIT 1
 );
 

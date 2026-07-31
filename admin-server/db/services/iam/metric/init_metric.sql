@@ -1,251 +1,56 @@
--- metric_daily_stats模块初始化 SQL
+-- iam/metric 初始化数据
 -- 功能组: metric
--- 功能名称: metric_daily_stats
 
 -- ============================================
--- 1. 获取父目录 ID（可配置）
+-- 1. metric_daily_stats 没有独立菜单，也没有对应的真实接口
 -- ============================================
--- 如果提供了 ParentID，则直接使用该 ID 作为父菜单；
--- 否则根据 ParentPath 从 admin_menu 中查找父目录；
--- 如果仍未找到，默认回退到临时目录（id = 9）。
-SET @parent_menu_id = COALESCE(
-  (SELECT `id` FROM `admin_menu` WHERE `path` = '/temp' AND `deleted_at` = 0 LIMIT 1),
-  (SELECT `id` FROM `admin_menu` WHERE `id` = 9 AND `deleted_at` = 0 LIMIT 1)
-);
+-- 本文件历史上曾为一个名为 metric_daily_stats 的脚手架示例（views/temp/MetricList.vue，
+-- 已在 admin-frontend Phase 1 Week 2 死代码清理中删除，见
+-- admin-frontend/docs/07-cleanup-and-tooling.md §1）种过 metric:list/create/update/delete
+-- 权限 + /api/v1/metrics[/:id] 接口数据，但 admin-server/api/admin.api 里从未真正存在过
+-- 这套 CRUD 路由（metric 模块实际只有 /metrics/report、/metrics/stats 两个接口，
+-- 见 MetricReport/MetricStats 服务块），代码库里也找不到任何 MetricCreate/MetricUpdate/
+-- MetricDelete 的 Go 符号引用——这是纯粹的孤儿种子数据，本次连同孤儿菜单一起删除，
+-- 不再保留。
 
 -- ============================================
--- 2. 插入菜单数据
+-- 2. 数据统计（PV/UV/VV/IP）菜单 + 权限 + 接口
 -- ============================================
--- metric_daily_stats主菜单
+-- 原本单独放在 init_metric_stats.sql，但 db/services/init-dev-db.sh 的 run_module()
+-- 只按 init_<module>.sql 命名约定自动执行（本模块目录名是 metric，不是
+-- metric_stats），导致 init_metric_stats.sql 从未被自动执行过、「数据统计」菜单在
+-- 全新库里根本不会出现，本次并入本文件修复这个遗漏。
+
+SET @system_dir_id = (SELECT `id` FROM `admin_menu` WHERE `id` = 2 AND `deleted_at` = 0 LIMIT 1);
+
+-- 数据统计主菜单（放在系统管理下）；admin_menu 没有唯一键，ON DUPLICATE KEY UPDATE 对它
+-- 不会触发，改用 INSERT ... SELECT ... WHERE NOT EXISTS 保证幂等（同 content/blog/init_blog.sql）
 INSERT INTO `admin_menu` (`parent_id`, `name`, `path`, `component`, `icon`, `type`, `order_num`, `visible`, `status`, `created_at`, `updated_at`, `deleted_at`)
-VALUES (
-    @parent_menu_id,
-    'metric_daily_stats',
-    '/temp/metric',
-    'temp/MetricList',
-    'ele-Document',
-    2, -- 类型：2 菜单
-    0, -- 排序值（可根据需要调整）
-    1, -- 是否可见：1 是
-    1, -- 状态：1 启用（可根据需要设置为 0 禁用）
-    UNIX_TIMESTAMP(),
-    UNIX_TIMESTAMP(),
-    0
-);
+SELECT @system_dir_id, '数据统计', '/admin/system/metric-stats', 'monitoring/MetricStats', 'ele-DataAnalysis', 2, 21, 1, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0
+WHERE NOT EXISTS (SELECT 1 FROM `admin_menu` WHERE `path` = '/admin/system/metric-stats' AND `deleted_at` = 0);
 
--- 获取主菜单 ID
-SET @main_menu_id = LAST_INSERT_ID();
+SET @main_menu_id = (SELECT `id` FROM `admin_menu` WHERE `path` = '/admin/system/metric-stats' AND `deleted_at` = 0 LIMIT 1);
 
--- metric_daily_stats新增按钮
-INSERT INTO `admin_menu` (`parent_id`, `name`, `path`, `component`, `icon`, `type`, `order_num`, `visible`, `status`, `created_at`, `updated_at`, `deleted_at`)
-VALUES (
-    @main_menu_id,
-    'metric_daily_stats 新增按钮',
-    '',
-    '',
-    '',
-    3, -- 类型：3 按钮
-    1, -- 排序值
-    0, -- 是否可见：0 否（按钮不显示在菜单中）
-    1, -- 状态：1 启用（可根据需要设置为 0 禁用）
-    UNIX_TIMESTAMP(),
-    UNIX_TIMESTAMP(),
-    0
-);
-
-SET @create_button_id = LAST_INSERT_ID();
-
--- metric_daily_stats编辑按钮
-INSERT INTO `admin_menu` (`parent_id`, `name`, `path`, `component`, `icon`, `type`, `order_num`, `visible`, `status`, `created_at`, `updated_at`, `deleted_at`)
-VALUES (
-    @main_menu_id,
-    'metric_daily_stats 编辑按钮',
-    '',
-    '',
-    '',
-    3, -- 类型：3 按钮
-    2, -- 排序值
-    0, -- 是否可见：0 否
-    1, -- 状态：1 启用（可根据需要设置为 0 禁用）
-    UNIX_TIMESTAMP(),
-    UNIX_TIMESTAMP(),
-    0
-);
-
-SET @update_button_id = LAST_INSERT_ID();
-
--- metric_daily_stats删除按钮
-INSERT INTO `admin_menu` (`parent_id`, `name`, `path`, `component`, `icon`, `type`, `order_num`, `visible`, `status`, `created_at`, `updated_at`, `deleted_at`)
-VALUES (
-    @main_menu_id,
-    'metric_daily_stats 删除按钮',
-    '',
-    '',
-    '',
-    3, -- 类型：3 按钮
-    3, -- 排序值
-    0, -- 是否可见：0 否
-    1, -- 状态：1 启用（可根据需要设置为 0 禁用）
-    UNIX_TIMESTAMP(),
-    UNIX_TIMESTAMP(),
-    0
-);
-
-SET @delete_button_id = LAST_INSERT_ID();
-
--- ============================================
--- 3. 插入权限数据
--- ============================================
--- metric_daily_stats列表权限
+-- 数据统计查询权限
 INSERT INTO `admin_permission` (`name`, `code`, `description`, `created_at`, `updated_at`, `deleted_at`)
-VALUES (
-    'metric_daily_stats列表',
-    'metric:list',
-    '查看metric_daily_stats列表',
-    UNIX_TIMESTAMP(),
-    UNIX_TIMESTAMP(),
-    0
-);
+VALUES ('数据统计', 'metric:stats', '查看PV/UV/VV/IP统计数据', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
+ON DUPLICATE KEY UPDATE `name`=VALUES(`name`), `description`=VALUES(`description`), `updated_at`=UNIX_TIMESTAMP(), `deleted_at`=0;
 
-SET @list_permission_id = LAST_INSERT_ID();
+SET @stats_permission_id = (SELECT `id` FROM `admin_permission` WHERE `code` = 'metric:stats' AND `deleted_at` = 0 LIMIT 1);
 
--- metric_daily_stats新增权限
-INSERT INTO `admin_permission` (`name`, `code`, `description`, `created_at`, `updated_at`, `deleted_at`)
-VALUES (
-    'metric_daily_stats新增',
-    'metric:create',
-    '新增metric_daily_stats',
-    UNIX_TIMESTAMP(),
-    UNIX_TIMESTAMP(),
-    0
-);
-
-SET @create_permission_id = LAST_INSERT_ID();
-
--- metric_daily_stats编辑权限
-INSERT INTO `admin_permission` (`name`, `code`, `description`, `created_at`, `updated_at`, `deleted_at`)
-VALUES (
-    'metric_daily_stats编辑',
-    'metric:update',
-    '编辑metric_daily_stats',
-    UNIX_TIMESTAMP(),
-    UNIX_TIMESTAMP(),
-    0
-);
-
-SET @update_permission_id = LAST_INSERT_ID();
-
--- metric_daily_stats删除权限
-INSERT INTO `admin_permission` (`name`, `code`, `description`, `created_at`, `updated_at`, `deleted_at`)
-VALUES (
-    'metric_daily_stats删除',
-    'metric:delete',
-    '删除metric_daily_stats',
-    UNIX_TIMESTAMP(),
-    UNIX_TIMESTAMP(),
-    0
-);
-
-SET @delete_permission_id = LAST_INSERT_ID();
-
--- ============================================
--- 4. 插入接口数据
--- ============================================
--- metric_daily_stats列表接口
+-- 数据统计接口（接口可能已通过路由同步自动创建，这里使用 ON DUPLICATE KEY UPDATE）
 INSERT INTO `admin_api` (`name`, `method`, `path`, `description`, `status`, `created_at`, `updated_at`, `deleted_at`)
-VALUES (
-    'metric_daily_stats列表',
-    'GET',
-    '/api/v1/metrics',
-    '获取metric_daily_stats列表',
-    1, -- 状态：1 启用（可根据需要设置为 0 禁用）
-    UNIX_TIMESTAMP(),
-    UNIX_TIMESTAMP(),
-    0
-);
+VALUES ('数据统计', 'GET', '/api/v1/metrics/stats', '获取PV/UV/VV/IP统计数据', 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0)
+ON DUPLICATE KEY UPDATE `name`=VALUES(`name`), `description`=VALUES(`description`), `updated_at`=UNIX_TIMESTAMP(), `deleted_at`=0;
 
-SET @list_api_id = LAST_INSERT_ID();
+SET @stats_api_id = (SELECT `id` FROM `admin_api` WHERE `method` = 'GET' AND `path` = '/api/v1/metrics/stats' AND `deleted_at` = 0 LIMIT 1);
 
--- metric_daily_stats新增接口
-INSERT INTO `admin_api` (`name`, `method`, `path`, `description`, `status`, `created_at`, `updated_at`, `deleted_at`)
-VALUES (
-    'metric_daily_stats新增',
-    'POST',
-    '/api/v1/metrics',
-    '新增metric_daily_stats',
-    1, -- 状态：1 启用（可根据需要设置为 0 禁用）
-    UNIX_TIMESTAMP(),
-    UNIX_TIMESTAMP(),
-    0
-);
-
-SET @create_api_id = LAST_INSERT_ID();
-
--- metric_daily_stats编辑接口
-INSERT INTO `admin_api` (`name`, `method`, `path`, `description`, `status`, `created_at`, `updated_at`, `deleted_at`)
-VALUES (
-    'metric_daily_stats编辑',
-    'PUT',
-    '/api/v1/metrics/:id',
-    '编辑metric_daily_stats',
-    1, -- 状态：1 启用（可根据需要设置为 0 禁用）
-    UNIX_TIMESTAMP(),
-    UNIX_TIMESTAMP(),
-    0
-);
-
-SET @update_api_id = LAST_INSERT_ID();
-
--- metric_daily_stats删除接口
-INSERT INTO `admin_api` (`name`, `method`, `path`, `description`, `status`, `created_at`, `updated_at`, `deleted_at`)
-VALUES (
-    'metric_daily_stats删除',
-    'DELETE',
-    '/api/v1/metrics/:id',
-    '删除metric_daily_stats',
-    1, -- 状态：1 启用（可根据需要设置为 0 禁用）
-    UNIX_TIMESTAMP(),
-    UNIX_TIMESTAMP(),
-    0
-);
-
-SET @delete_api_id = LAST_INSERT_ID();
-
--- ============================================
--- 5. 插入权限-菜单关联数据
--- ============================================
--- metric_daily_stats列表权限 -> metric_daily_stats主菜单
+-- 数据统计权限 -> 数据统计主菜单
 INSERT INTO `admin_permission_menu` (`permission_id`, `menu_id`, `created_at`, `updated_at`)
-VALUES (@list_permission_id, @main_menu_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
+VALUES (@stats_permission_id, @main_menu_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP())
+ON DUPLICATE KEY UPDATE `updated_at`=UNIX_TIMESTAMP();
 
--- metric_daily_stats新增权限 -> metric_daily_stats新增按钮
-INSERT INTO `admin_permission_menu` (`permission_id`, `menu_id`, `created_at`, `updated_at`)
-VALUES (@create_permission_id, @create_button_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
-
--- metric_daily_stats编辑权限 -> metric_daily_stats编辑按钮
-INSERT INTO `admin_permission_menu` (`permission_id`, `menu_id`, `created_at`, `updated_at`)
-VALUES (@update_permission_id, @update_button_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
-
--- metric_daily_stats删除权限 -> metric_daily_stats删除按钮
-INSERT INTO `admin_permission_menu` (`permission_id`, `menu_id`, `created_at`, `updated_at`)
-VALUES (@delete_permission_id, @delete_button_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
-
--- ============================================
--- 6. 插入权限-接口关联数据
--- ============================================
--- metric_daily_stats列表权限 -> GET /api/v1/metrics接口
+-- 数据统计权限 -> GET /api/v1/metrics/stats接口
 INSERT INTO `admin_permission_api` (`permission_id`, `api_id`, `created_at`, `updated_at`)
-VALUES (@list_permission_id, @list_api_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
-
--- metric_daily_stats新增权限 -> POST /api/v1/metrics接口
-INSERT INTO `admin_permission_api` (`permission_id`, `api_id`, `created_at`, `updated_at`)
-VALUES (@create_permission_id, @create_api_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
-
--- metric_daily_stats编辑权限 -> PUT /api/v1/metrics/:id接口
-INSERT INTO `admin_permission_api` (`permission_id`, `api_id`, `created_at`, `updated_at`)
-VALUES (@update_permission_id, @update_api_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
-
--- metric_daily_stats删除权限 -> DELETE /api/v1/metrics/:id接口
-INSERT INTO `admin_permission_api` (`permission_id`, `api_id`, `created_at`, `updated_at`)
-VALUES (@delete_permission_id, @delete_api_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
-
+VALUES (@stats_permission_id, @stats_api_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP())
+ON DUPLICATE KEY UPDATE `updated_at`=UNIX_TIMESTAMP();

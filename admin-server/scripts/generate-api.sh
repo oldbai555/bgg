@@ -141,7 +141,7 @@ fi
 echo -e "${GREEN}正在生成 Handler 代码...${NC}"
 cd "$ADMIN_SERVER_DIR"
 
-"$GOCTL_BIN" api go -api "$API_FILE_PATH" -dir .
+"$GOCTL_BIN" api go -api "$API_FILE_PATH" -dir . -style go_zero
 
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}✓ Handler 代码生成成功!${NC}"
