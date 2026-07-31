@@ -114,3 +114,89 @@ jobs:
           # 六个独立镜像仓库，tag 用完整 git sha（不用 latest），保证每次部署可追溯到
           # 具体提交，见 21-cd-and-deployment.md 第 4 节镜像命名规则。
           tags: ghcr.io/${{ github.repository_owner }}/admin-${{ matrix.service }}:${{ github.sha }}
+
+  notify-feishu:
+    # 六个镜像 matrix 全部跑完后发一条汇总通知；Webhook 存 GitHub Secret FEISHU_WEBHOOK_URL。
+    if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [build-images]
+    runs-on: ubuntu-latest
+    steps:
+      - name: 推送飞书通知
+        env:
+          FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
+          BUILD_RESULT: ${{ needs.build-images.result }}
+        run: |
+          if [ -z "$FEISHU_WEBHOOK_URL" ]; then
+            echo "未配置 FEISHU_WEBHOOK_URL，跳过通知"
+            exit 0
+          fi
+
+          if [ "$BUILD_RESULT" = "success" ]; then
+            STATUS="✅ 构建成功"
+            COLOR="green"
+          else
+            STATUS="❌ 构建失败"
+            COLOR="red"
+          fi
+
+          SHORT_SHA="${GITHUB_SHA:0:7}"
+          COMMIT_MSG=$(printf '%s' "${{ github.event.head_commit.message }}" | head -1)
+          OWNER="${{ github.repository_owner }}"
+          TAG="${{ github.sha }}"
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          COMMIT_URL="${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"
+
+          jq -n \
+            --arg status "$STATUS" \
+            --arg color "$COLOR" \
+            --arg ref "${{ github.ref_name }}" \
+            --arg short_sha "$SHORT_SHA" \
+            --arg commit_url "$COMMIT_URL" \
+            --arg msg "$COMMIT_MSG" \
+            --arg tag "$TAG" \
+            --arg owner "$OWNER" \
+            --arg run_url "$RUN_URL" \
+            '{
+              msg_type: "interactive",
+              card: {
+                header: {
+                  title: { tag: "plain_text", content: "CI 镜像构建通知" },
+                  template: $color
+                },
+                elements: [
+                  {
+                    tag: "div",
+                    text: {
+                      tag: "lark_md",
+                      content: (
+                        "**状态**: " + $status + "\n" +
+                        "**分支**: " + $ref + "\n" +
+                        "**提交**: [" + $short_sha + "](" + $commit_url + ")\n" +
+                        "**说明**: " + $msg + "\n" +
+                        "**镜像 tag**: `" + $tag + "`\n" +
+                        "**镜像**:\n" +
+                        "- ghcr.io/" + $owner + "/admin-gateway:" + $tag + "\n" +
+                        "- ghcr.io/" + $owner + "/admin-iam:" + $tag + "\n" +
+                        "- ghcr.io/" + $owner + "/admin-content:" + $tag + "\n" +
+                        "- ghcr.io/" + $owner + "/admin-chat:" + $tag + "\n" +
+                        "- ghcr.io/" + $owner + "/admin-task:" + $tag + "\n" +
+                        "- ghcr.io/" + $owner + "/admin-sdk:" + $tag
+                      )
+                    }
+                  },
+                  {
+                    tag: "action",
+                    actions: [
+                      {
+                        tag: "button",
+                        text: { tag: "plain_text", content: "查看 Actions" },
+                        url: $run_url,
+                        type: "primary"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }' | curl -sfS -X POST "$FEISHU_WEBHOOK_URL" \
+              -H 'Content-Type: application/json' \
+              -d @-
