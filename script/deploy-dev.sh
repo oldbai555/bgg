@@ -13,7 +13,9 @@
 #
 # 前置条件：
 #   - /home/work/src-bgg/admin-server/.env 已按 .env.dev-mixed.example 配好真实值
-#   - Docker 已安装，且 /etc/docker/daemon.json 配置了国内镜像加速（见 docs/changelog/）
+#   - Docker 已安装；/etc/docker/daemon.json 可配 Docker Hub 等镜像加速（见 docs/changelog/2026-07-16.md），
+#     但 ghcr.io 不走这些加速源，国内服务器直连 GitHub Container Registry 可能较慢——
+#     deploy-dev.sh 已用并行 pull + 失败重试；CI deploy-dev job 的 SSH command_timeout 设为 45m。
 #   - 宿主机 /etc/redis/redis.conf 的 bind 已加上 docker 网桥地址（172.17.0.1）
 #   - ghcr.io 六个 package 可见性为 public（当前已确认），pull 不需要 docker login；
 #     若之后改成 private，需要在这里补一步 `docker login ghcr.io`
@@ -53,11 +55,27 @@ mkdir -p "$DOCKER_CONFIG"
 
 SERVICES="$*"
 if [ -z "$SERVICES" ]; then
-  log "拉取全部六个服务镜像"
+  log "拉取全部六个服务镜像（并行，国内直连 ghcr.io 可能需数分钟）"
 else
   log "拉取指定服务镜像: $SERVICES"
 fi
-docker compose -f "$COMPOSE_FILE" --env-file .env pull $SERVICES
+
+PULL_ATTEMPTS="${PULL_ATTEMPTS:-3}"
+PULL_RETRY_WAIT="${PULL_RETRY_WAIT:-30}"
+attempt=1
+while [ "$attempt" -le "$PULL_ATTEMPTS" ]; do
+  log "docker compose pull --parallel（第 ${attempt}/${PULL_ATTEMPTS} 次）"
+  if docker compose -f "$COMPOSE_FILE" --env-file .env pull --parallel $SERVICES; then
+    break
+  fi
+  if [ "$attempt" -eq "$PULL_ATTEMPTS" ]; then
+    echo "镜像拉取失败，已重试 ${PULL_ATTEMPTS} 次"
+    exit 1
+  fi
+  log "拉取失败，${PULL_RETRY_WAIT}s 后重试..."
+  sleep "$PULL_RETRY_WAIT"
+  attempt=$((attempt + 1))
+done
 
 log "重启服务"
 docker compose -f "$COMPOSE_FILE" --env-file .env up -d $SERVICES
