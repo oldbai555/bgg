@@ -115,16 +115,36 @@ jobs:
           # 具体提交，见 21-cd-and-deployment.md 第 4 节镜像命名规则。
           tags: ghcr.io/${{ github.repository_owner }}/admin-${{ matrix.service }}:${{ github.sha }}
 
-  notify-feishu:
-    # 六个镜像 matrix 全部跑完后发一条汇总通知；Webhook 存 GitHub Secret FEISHU_WEBHOOK_URL。
-    if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+  deploy-dev:
+    # 镜像推送 ghcr 成功后，SSH 到 bgg-dev 执行 script/deploy-dev.sh（pull + up 六个服务）。
+    # 连接信息存 GitHub Secrets：DEPLOY_SSH_HOST / DEPLOY_SSH_USER / DEPLOY_SSH_KEY。
+    if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: [build-images]
+    runs-on: ubuntu-latest
+    steps:
+      - name: 部署到 bgg-dev
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_SSH_HOST }}
+          username: ${{ secrets.DEPLOY_SSH_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            cd /home/work/src-bgg
+            git checkout main
+            git pull origin main
+            TAG=${{ github.sha }} bash script/deploy-dev.sh
+
+  notify-feishu:
+    # 镜像构建 + bgg-dev 部署全部跑完后发一条汇总通知；Webhook 存 GitHub Secret FEISHU_WEBHOOK_URL。
+    if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [build-images, deploy-dev]
     runs-on: ubuntu-latest
     steps:
       - name: 推送飞书通知
         env:
           FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
           BUILD_RESULT: ${{ needs.build-images.result }}
+          DEPLOY_RESULT: ${{ needs.deploy-dev.result }}
         run: |
           if [ -z "$FEISHU_WEBHOOK_URL" ]; then
             echo "未配置 FEISHU_WEBHOOK_URL，跳过通知"
@@ -132,10 +152,31 @@ jobs:
           fi
 
           if [ "$BUILD_RESULT" = "success" ]; then
-            STATUS="✅ 构建成功"
+            BUILD_STATUS="✅ 成功"
+          else
+            BUILD_STATUS="❌ 失败"
+          fi
+
+          case "$DEPLOY_RESULT" in
+            success)
+              DEPLOY_STATUS="✅ 成功（bgg-dev 六服务镜像已更新）"
+              ;;
+            failure)
+              DEPLOY_STATUS="❌ 失败"
+              ;;
+            skipped)
+              DEPLOY_STATUS="⏭️ 跳过（镜像构建未成功或未触发）"
+              ;;
+            *)
+              DEPLOY_STATUS="⚠️ ${DEPLOY_RESULT:-未知}"
+              ;;
+          esac
+
+          if [ "$BUILD_RESULT" = "success" ] && [ "$DEPLOY_RESULT" = "success" ]; then
+            SUMMARY="✅ 镜像构建与 bgg-dev 部署均成功"
             COLOR="green"
           else
-            STATUS="❌ 构建失败"
+            SUMMARY="❌ CI/CD 未全部成功"
             COLOR="red"
           fi
 
@@ -147,8 +188,10 @@ jobs:
           COMMIT_URL="${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"
 
           jq -n \
-            --arg status "$STATUS" \
+            --arg summary "$SUMMARY" \
             --arg color "$COLOR" \
+            --arg build_status "$BUILD_STATUS" \
+            --arg deploy_status "$DEPLOY_STATUS" \
             --arg ref "${{ github.ref_name }}" \
             --arg short_sha "$SHORT_SHA" \
             --arg commit_url "$COMMIT_URL" \
@@ -160,7 +203,7 @@ jobs:
               msg_type: "interactive",
               card: {
                 header: {
-                  title: { tag: "plain_text", content: "CI 镜像构建通知" },
+                  title: { tag: "plain_text", content: "CI 构建与 bgg-dev 部署通知" },
                   template: $color
                 },
                 elements: [
@@ -169,7 +212,9 @@ jobs:
                     text: {
                       tag: "lark_md",
                       content: (
-                        "**状态**: " + $status + "\n" +
+                        "**总览**: " + $summary + "\n" +
+                        "**镜像构建**: " + $build_status + "\n" +
+                        "**bgg-dev 部署**: " + $deploy_status + "\n" +
                         "**分支**: " + $ref + "\n" +
                         "**提交**: [" + $short_sha + "](" + $commit_url + ")\n" +
                         "**说明**: " + $msg + "\n" +
