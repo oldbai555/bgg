@@ -6,6 +6,7 @@
   ></div>
   <aside :class="['app-sidebar', {'app-sidebar--collapsed': collapsed, 'app-sidebar--mobile-open': mobileOpen}]">
     <el-menu
+      :key="activePath"
       :default-active="activePath"
       :collapse="collapsed"
       :unique-opened="true"
@@ -54,6 +55,7 @@ import {useRoute, useRouter} from 'vue-router'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import {useUserStore} from '@/stores/user'
 import type {MenuItem} from '@/api/generated/admin'
+import {resolveActiveMenuPath} from '@/utils/menuActive'
 
 interface Props {
   collapsed?: boolean;
@@ -74,7 +76,8 @@ defineEmits<{
 const route = useRoute()
 const router = useRouter()
 
-const activePath = computed(() => route.path)
+// 子路由（如 /admin/blog/article/edit/:id）对齐到最近的菜单 path，保证侧栏高亮
+const activePath = computed(() => resolveActiveMenuPath(route.path, props.menus))
 
 // 处理菜单选择（作为 router 属性的备用方案）
 const handleMenuSelect = async (path: string) => {

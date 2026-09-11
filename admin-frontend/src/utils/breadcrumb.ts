@@ -1,6 +1,7 @@
 import {RouteLocationNormalized} from 'vue-router'
 import type {MenuItem} from '@/api/generated/admin'
 import type {BreadcrumbItem} from '@/components/layout/Breadcrumb.vue'
+import {findMenuPathChain, resolveActiveMenuPath} from '@/utils/menuActive'
 
 /**
  * 从菜单数据生成面包屑
@@ -17,24 +18,8 @@ export function generateBreadcrumb(
     path: '/admin/dashboard'
   })
 
-  // 查找菜单路径链
-  const findMenuPath = (targetPath: string, items: MenuItem[], path: MenuItem[] = []): MenuItem[] | null => {
-    for (const item of items) {
-      const currentPath = [...path, item]
-      if (item.path === targetPath) {
-        return currentPath
-      }
-      if (item.children?.length) {
-        const found = findMenuPath(targetPath, item.children, currentPath)
-        if (found) {
-          return found
-        }
-      }
-    }
-    return null
-  }
-
-  const menuPath = findMenuPath(route.path, menus)
+  const activePath = resolveActiveMenuPath(route.path, menus)
+  const menuPath = findMenuPathChain(activePath, menus)
   if (menuPath) {
     menuPath.forEach((menu) => {
       if (menu.path && menu.type === 2) {
@@ -58,4 +43,3 @@ export function generateBreadcrumb(
 
   return breadcrumbs
 }
-
