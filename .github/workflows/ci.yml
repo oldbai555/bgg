@@ -173,6 +173,8 @@ jobs:
           source: admin-frontend_${{ github.sha }}.tar.gz
           target: /tmp/
           tar_tmp_path: /tmp/
+      # bgg-dev 上 ubuntu 的 login shell 是 /bin/sh（dash），不支持 set -o pipefail。
+      # ssh-action 按 login shell 执行 script，必须显式交给 bash。
       - name: 远端替换 dist
         uses: appleboy/ssh-action@v1.2.0
         with:
@@ -180,6 +182,7 @@ jobs:
           username: ${{ secrets.DEPLOY_SSH_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
+            bash <<'EOF'
             set -euo pipefail
             REMOTE_FRONTEND_DIR=/home/work/service/admin-frontend
             REMOTE_TAR=/tmp/admin-frontend_${{ github.sha }}.tar.gz
@@ -197,6 +200,7 @@ jobs:
             rm -f "$REMOTE_TAR"
             echo "前端部署完成: $REMOTE_FRONTEND_DIR/dist"
             curl -sk -o /dev/null -w "GET /bgg/ -> %{http_code}\n" https://oldbai.top/bgg/
+            EOF
 
   notify-feishu:
     # 镜像构建 + 后端部署 + 前端部署全部跑完后发一条汇总通知；Webhook 存 GitHub Secret FEISHU_WEBHOOK_URL。
