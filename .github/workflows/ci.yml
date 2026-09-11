@@ -161,6 +161,9 @@ jobs:
           pnpm build
       - name: 打包 dist
         run: tar -czf admin-frontend_${{ github.sha }}.tar.gz -C admin-frontend/dist .
+      # drone-scp 默认把中间 tar 落到远端 $HOME；bgg-dev 上 ubuntu 的 HOME=/home/work
+      # 属主是 root、不可写，会报 error copy file to dest / Process exited with status 1。
+      # 必须指定 tar_tmp_path 到可写目录（与 target 同用 /tmp/）。
       - name: 上传到 bgg-dev
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -169,6 +172,7 @@ jobs:
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           source: admin-frontend_${{ github.sha }}.tar.gz
           target: /tmp/
+          tar_tmp_path: /tmp/
       - name: 远端替换 dist
         uses: appleboy/ssh-action@v1.2.0
         with:
