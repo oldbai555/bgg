@@ -136,10 +136,67 @@ jobs:
             git pull origin main
             TAG=${{ github.sha }} bash script/deploy-dev.sh
 
+  deploy-frontend:
+    # Runner 上 pnpm build 后 scp + SSH 替换 bgg-dev 静态 dist（服务器无 Node）。
+    # 与后端镜像无关，lint-build 通过即可并行；远端目录须属主为 DEPLOY_SSH_USER（ubuntu），
+    # 一次性：sudo chown -R ubuntu:ubuntu /home/work/service/admin-frontend
+    if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [lint-build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+          cache-dependency-path: admin-frontend/pnpm-lock.yaml
+      - name: 构建前端
+        run: |
+          cd admin-frontend
+          pnpm install --frozen-lockfile
+          pnpm build
+      - name: 打包 dist
+        run: tar -czf admin-frontend_${{ github.sha }}.tar.gz -C admin-frontend/dist .
+      - name: 上传到 bgg-dev
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.DEPLOY_SSH_HOST }}
+          username: ${{ secrets.DEPLOY_SSH_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          source: admin-frontend_${{ github.sha }}.tar.gz
+          target: /tmp/
+      - name: 远端替换 dist
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_SSH_HOST }}
+          username: ${{ secrets.DEPLOY_SSH_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            set -euo pipefail
+            REMOTE_FRONTEND_DIR=/home/work/service/admin-frontend
+            REMOTE_TAR=/tmp/admin-frontend_${{ github.sha }}.tar.gz
+            if [ ! -w "$REMOTE_FRONTEND_DIR" ]; then
+              echo "远端目录不可写: $REMOTE_FRONTEND_DIR"
+              echo "请先执行: sudo chown -R ubuntu:ubuntu $REMOTE_FRONTEND_DIR"
+              exit 1
+            fi
+            cd "$REMOTE_FRONTEND_DIR"
+            if [ -d dist ]; then
+              mv dist dist_$(date +%Y%m%d%H%M%S).bak
+            fi
+            mkdir -p dist
+            tar -xzf "$REMOTE_TAR" -C dist
+            rm -f "$REMOTE_TAR"
+            echo "前端部署完成: $REMOTE_FRONTEND_DIR/dist"
+            curl -sk -o /dev/null -w "GET /bgg/ -> %{http_code}\n" https://oldbai.top/bgg/
+
   notify-feishu:
-    # 镜像构建 + bgg-dev 部署全部跑完后发一条汇总通知；Webhook 存 GitHub Secret FEISHU_WEBHOOK_URL。
+    # 镜像构建 + 后端部署 + 前端部署全部跑完后发一条汇总通知；Webhook 存 GitHub Secret FEISHU_WEBHOOK_URL。
     if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [build-images, deploy-dev]
+    needs: [build-images, deploy-dev, deploy-frontend]
     runs-on: ubuntu-latest
     steps:
       - name: 推送飞书通知
@@ -147,6 +204,7 @@ jobs:
           FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
           BUILD_RESULT: ${{ needs.build-images.result }}
           DEPLOY_RESULT: ${{ needs.deploy-dev.result }}
+          FRONTEND_RESULT: ${{ needs.deploy-frontend.result }}
         run: |
           if [ -z "$FEISHU_WEBHOOK_URL" ]; then
             echo "未配置 FEISHU_WEBHOOK_URL，跳过通知"
@@ -174,8 +232,23 @@ jobs:
               ;;
           esac
 
-          if [ "$BUILD_RESULT" = "success" ] && [ "$DEPLOY_RESULT" = "success" ]; then
-            SUMMARY="✅ 镜像构建与 bgg-dev 部署均成功"
+          case "$FRONTEND_RESULT" in
+            success)
+              FRONTEND_STATUS="✅ 成功（admin-frontend dist 已更新）"
+              ;;
+            failure)
+              FRONTEND_STATUS="❌ 失败"
+              ;;
+            skipped)
+              FRONTEND_STATUS="⏭️ 跳过（lint-build 未成功或未触发）"
+              ;;
+            *)
+              FRONTEND_STATUS="⚠️ ${FRONTEND_RESULT:-未知}"
+              ;;
+          esac
+
+          if [ "$BUILD_RESULT" = "success" ] && [ "$DEPLOY_RESULT" = "success" ] && [ "$FRONTEND_RESULT" = "success" ]; then
+            SUMMARY="✅ 镜像构建与 bgg-dev 前后端部署均成功"
             COLOR="green"
           else
             SUMMARY="❌ CI/CD 未全部成功"
@@ -194,6 +267,7 @@ jobs:
             --arg color "$COLOR" \
             --arg build_status "$BUILD_STATUS" \
             --arg deploy_status "$DEPLOY_STATUS" \
+            --arg frontend_status "$FRONTEND_STATUS" \
             --arg ref "${{ github.ref_name }}" \
             --arg short_sha "$SHORT_SHA" \
             --arg commit_url "$COMMIT_URL" \
@@ -216,7 +290,8 @@ jobs:
                       content: (
                         "**总览**: " + $summary + "\n" +
                         "**镜像构建**: " + $build_status + "\n" +
-                        "**bgg-dev 部署**: " + $deploy_status + "\n" +
+                        "**后端部署**: " + $deploy_status + "\n" +
+                        "**前端部署**: " + $frontend_status + "\n" +
                         "**分支**: " + $ref + "\n" +
                         "**提交**: [" + $short_sha + "](" + $commit_url + ")\n" +
                         "**说明**: " + $msg + "\n" +
