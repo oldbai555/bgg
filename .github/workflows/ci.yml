@@ -148,9 +148,10 @@ jobs:
       - uses: pnpm/action-setup@v4
         with:
           version: 11
+      # pnpm 11 要求 Node >= 22.13；GitHub Actions 也在弃用 Node 20，改用 22 LTS
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: pnpm
           cache-dependency-path: admin-frontend/pnpm-lock.yaml
       - name: 构建前端
