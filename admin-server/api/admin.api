@@ -2623,3 +2623,516 @@ service admin-api {
 	post /ai/knowledge-qa/ask (KnowledgeQaAskReq) returns (KnowledgeQaAskResp)
 }
 
+// 身材管理（fitness 域，数据在 iam-rpc）：手机端 /fitness/login/*、/fitness/my/*（只操作本人数据），
+// 后台 /fitness/templates|template-days|tips|members|stats/*（走权限链）。日期统一 Asia/Shanghai 的 YYYY-MM-DD。
+type (
+	FitnessExercise {
+		name     string `json:"name"`
+		sets     int64  `json:"sets,optional"`
+		reps     string `json:"reps,optional"`
+		duration string `json:"duration,optional"`
+		note     string `json:"note,optional"`
+	}
+	FitnessMeal {
+		slot         string   `json:"slot"` // breakfast/lunch/snack/dinner/after_home
+		time         string   `json:"time,optional"`
+		place        string   `json:"place,optional"`
+		food         string   `json:"food,optional"`
+		portion      string   `json:"portion,optional"`
+		kcal         int64    `json:"kcal,optional"`
+		protein      int64    `json:"protein,optional"`
+		howToOrder   string   `json:"howToOrder,optional"`
+		alternatives []string `json:"alternatives,optional"`
+	}
+	FitnessDayContent {
+		trainingType int64             `json:"trainingType"` // 1力量 2有氧 3休息
+		trainingTime string            `json:"trainingTime,optional"`
+		stepGoal     int64             `json:"stepGoal,optional"`
+		warmup       string            `json:"warmup,optional"`
+		exercises    []FitnessExercise `json:"exercises,optional"`
+		stretch      string            `json:"stretch,optional"`
+		trainingNote string            `json:"trainingNote,optional"`
+		meals        []FitnessMeal     `json:"meals,optional"`
+		tip          string            `json:"tip,optional"`
+	}
+	FitnessTipItem {
+		id        uint64 `json:"id"`
+		code      string `json:"code"`
+		title     string `json:"title"`
+		content   string `json:"content"`
+		sort      int64  `json:"sort"`
+		status    int64  `json:"status"`
+		createdAt int64  `json:"createdAt"`
+		updatedAt int64  `json:"updatedAt"`
+	}
+	FitnessMealCheck {
+		slot   string `json:"slot"`
+		status int64  `json:"status"` // 1按计划吃了 2吃了别的 3没吃
+		note   string `json:"note,optional"`
+	}
+	FitnessCheckinItem {
+		date           string             `json:"date"`
+		templateId     uint64             `json:"templateId"`
+		trainingType   int64              `json:"trainingType"`
+		trainingStatus int64              `json:"trainingStatus"` // 0未打卡 1完成 2部分完成 3跳过
+		exerciseDone   []int64            `json:"exerciseDone"`
+		exerciseTotal  int64              `json:"exerciseTotal"`
+		meals          []FitnessMealCheck `json:"meals"`
+		steps          int64              `json:"steps"`
+		stepGoal       int64              `json:"stepGoal"`
+		waterCups      int64              `json:"waterCups"`
+		updatedAt      int64              `json:"updatedAt"`
+	}
+	FitnessSuggestionItem {
+		id               uint64 `json:"id"`
+		weekStart        string `json:"weekStart"`
+		ruleCode         string `json:"ruleCode"`
+		fromTemplateId   uint64 `json:"fromTemplateId"`
+		fromTemplateName string `json:"fromTemplateName"`
+		toTemplateId     uint64 `json:"toTemplateId"`
+		toTemplateName   string `json:"toTemplateName"`
+		reason           string `json:"reason"`
+		status           int64  `json:"status"`
+	}
+	FitnessBodyRecordItem {
+		date       string  `json:"date"`
+		weightKg   float64 `json:"weightKg"`
+		waistCm    float64 `json:"waistCm"`
+		weightAvg7 float64 `json:"weightAvg7"` // 7 日移动平均
+	}
+	FitnessTemplateBrief {
+		id      uint64 `json:"id"`
+		code    string `json:"code"`
+		name    string `json:"name"`
+		stage   string `json:"stage"`
+		summary string `json:"summary"`
+	}
+	FitnessPendingSwitch {
+		templateId    uint64 `json:"templateId"`
+		templateName  string `json:"templateName"`
+		effectiveDate string `json:"effectiveDate"`
+	}
+	// 手机端登录
+	FitnessLoginFeishuReq {
+		code  string `json:"code,optional"`
+		state string `json:"state,optional"`
+		mode  string `json:"mode,optional"` // h5=飞书客户端内免登，oauth=普通浏览器跳转授权
+	}
+	FitnessLoginConfigResp {
+		appId string `json:"appId"`
+	}
+	// 手机端：今日计划
+	FitnessMyDayReq {
+		date string `json:"date,optional" form:"date,optional"` // 默认今天
+	}
+	FitnessMyDayResp {
+		date         string                 `json:"date"`
+		today        string                 `json:"today"`
+		weekday      int64                  `json:"weekday"` // 1周一~7周日
+		canCheckin   bool                   `json:"canCheckin"`
+		hasPlan      bool                   `json:"hasPlan"`
+		templateId   uint64                 `json:"templateId"`
+		templateName string                 `json:"templateName"`
+		isOverride   bool                   `json:"isOverride"`
+		content      *FitnessDayContent     `json:"content,optional"`
+		tips         []FitnessTipItem       `json:"tips"`
+		checkin      *FitnessCheckinItem    `json:"checkin,optional"`
+		suggestion   *FitnessSuggestionItem `json:"suggestion,optional"`
+	}
+	FitnessMyCheckinSaveReq {
+		date           string             `json:"date,optional"`
+		trainingStatus int64              `json:"trainingStatus,optional"`
+		exerciseDone   []int64            `json:"exerciseDone,optional"`
+		meals          []FitnessMealCheck `json:"meals,optional"`
+		steps          int64              `json:"steps,optional"`
+		waterCups      int64              `json:"waterCups,optional"`
+	}
+	FitnessMyBodyRecordListReq {
+		days int64 `json:"days,optional" form:"days,optional"` // 默认 90，最多 365
+	}
+	FitnessBodyRecordListResp {
+		list []FitnessBodyRecordItem `json:"list"`
+	}
+	FitnessMyBodyRecordSaveReq {
+		date     string  `json:"date,optional"`
+		weightKg float64 `json:"weightKg,optional"`
+		waistCm  float64 `json:"waistCm,optional"`
+	}
+	FitnessMyProfileResp {
+		today              string                 `json:"today"`
+		nickname           string                 `json:"nickname"`
+		avatar             string                 `json:"avatar"`
+		heightCm           float64                `json:"heightCm"`
+		targetWeightKg     float64                `json:"targetWeightKg"`
+		trainingPreference int64                  `json:"trainingPreference"` // 1早练 2晚练
+		latestWeightKg     float64                `json:"latestWeightKg"`
+		streakDays         int64                  `json:"streakDays"`
+		weekRate           float64                `json:"weekRate"` // 本周训练完成率 0~1
+		currentTemplate    *FitnessTemplateBrief  `json:"currentTemplate,optional"`
+		pendingSwitch      *FitnessPendingSwitch  `json:"pendingSwitch,optional"`
+		suggestion         *FitnessSuggestionItem `json:"suggestion,optional"`
+		templates          []FitnessTemplateBrief `json:"templates"`
+	}
+	FitnessMyProfileUpdateReq {
+		heightCm           float64 `json:"heightCm,optional"`
+		targetWeightKg     float64 `json:"targetWeightKg,optional"`
+		trainingPreference int64   `json:"trainingPreference,optional"`
+	}
+	FitnessMyTemplateSwitchReq {
+		templateId uint64 `json:"templateId,optional"`
+	}
+	FitnessTemplateSwitchResp {
+		effectiveDate string `json:"effectiveDate"`
+	}
+	FitnessMySuggestionDecideReq {
+		id     uint64 `json:"id,optional"`
+		accept bool   `json:"accept,optional"`
+	}
+	// 后台：计划模板
+	FitnessTemplateItem {
+		id           uint64 `json:"id"`
+		code         string `json:"code"`
+		name         string `json:"name"`
+		level        int64  `json:"level"`
+		stage        string `json:"stage"`
+		summary      string `json:"summary"`
+		dailyKcal    int64  `json:"dailyKcal"`
+		dailyProtein int64  `json:"dailyProtein"`
+		sort         int64  `json:"sort"`
+		status       int64  `json:"status"`
+		createdAt    int64  `json:"createdAt"`
+		updatedAt    int64  `json:"updatedAt"`
+	}
+	FitnessTemplateListReq {
+		page     int64  `json:"page,optional" form:"page,optional"`
+		pageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		keyword  string `json:"keyword,optional" form:"keyword,optional"`
+	}
+	FitnessTemplateListResp {
+		total int64                 `json:"total"`
+		list  []FitnessTemplateItem `json:"list"`
+	}
+	FitnessTemplateCreateReq {
+		code         string `json:"code,optional"`
+		name         string `json:"name,optional"`
+		level        int64  `json:"level,optional"`
+		stage        string `json:"stage,optional"`
+		summary      string `json:"summary,optional"`
+		dailyKcal    int64  `json:"dailyKcal,optional"`
+		dailyProtein int64  `json:"dailyProtein,optional"`
+		sort         int64  `json:"sort,optional"`
+		status       int64  `json:"status,optional"`
+	}
+	FitnessTemplateUpdateReq {
+		id           uint64 `json:"id,optional"`
+		name         string `json:"name,optional"`
+		level        int64  `json:"level,optional"`
+		stage        string `json:"stage,optional"`
+		summary      string `json:"summary,optional"`
+		dailyKcal    int64  `json:"dailyKcal,optional"`
+		dailyProtein int64  `json:"dailyProtein,optional"`
+		sort         int64  `json:"sort,optional"`
+		status       int64  `json:"status,optional"`
+	}
+	FitnessIdReq {
+		id uint64 `json:"id,optional" form:"id,optional"`
+	}
+	FitnessTemplateDayItem {
+		id         uint64             `json:"id"`
+		templateId uint64             `json:"templateId"`
+		weekday    int64              `json:"weekday"` // 1~7；0 表示按日期调整
+		planDate   string             `json:"planDate"`
+		content    *FitnessDayContent `json:"content"`
+		updatedAt  int64              `json:"updatedAt"`
+	}
+	FitnessTemplateDaysReq {
+		templateId uint64 `json:"templateId,optional" form:"templateId,optional"`
+	}
+	FitnessTemplateDaysResp {
+		weekly    []FitnessTemplateDayItem `json:"weekly"`
+		overrides []FitnessTemplateDayItem `json:"overrides"`
+	}
+	FitnessTemplateDaySaveReq {
+		templateId uint64             `json:"templateId,optional"`
+		weekday    int64              `json:"weekday,optional"`
+		planDate   string             `json:"planDate,optional"`
+		content    *FitnessDayContent `json:"content,optional"`
+	}
+	// 后台：通用提示
+	FitnessTipListReq {
+		page     int64  `json:"page,optional" form:"page,optional"`
+		pageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		keyword  string `json:"keyword,optional" form:"keyword,optional"`
+	}
+	FitnessTipListResp {
+		total int64            `json:"total"`
+		list  []FitnessTipItem `json:"list"`
+	}
+	FitnessTipSaveReq {
+		id      uint64 `json:"id,optional"`
+		code    string `json:"code,optional"`
+		title   string `json:"title,optional"`
+		content string `json:"content,optional"`
+		sort    int64  `json:"sort,optional"`
+		status  int64  `json:"status,optional"`
+	}
+	// 后台：使用者
+	FitnessMemberItem {
+		userId          uint64  `json:"userId"`
+		username        string  `json:"username"`
+		nickname        string  `json:"nickname"`
+		avatar          string  `json:"avatar"`
+		templateId      uint64  `json:"templateId"`
+		templateName    string  `json:"templateName"`
+		heightCm        float64 `json:"heightCm"`
+		targetWeightKg  float64 `json:"targetWeightKg"`
+		latestWeightKg  float64 `json:"latestWeightKg"`
+		streakDays      int64   `json:"streakDays"`
+		weekRate        float64 `json:"weekRate"`
+		lastCheckinDate string  `json:"lastCheckinDate"`
+		createdAt       int64   `json:"createdAt"`
+	}
+	FitnessMemberListReq {
+		page     int64  `json:"page,optional" form:"page,optional"`
+		pageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		keyword  string `json:"keyword,optional" form:"keyword,optional"` // 昵称/用户名
+	}
+	FitnessMemberListResp {
+		total int64               `json:"total"`
+		list  []FitnessMemberItem `json:"list"`
+	}
+	FitnessMemberAssignReq {
+		userId     uint64 `json:"userId,optional"`
+		templateId uint64 `json:"templateId,optional"`
+		reason     string `json:"reason,optional"`
+	}
+	FitnessSwitchItem {
+		id               uint64 `json:"id"`
+		userId           uint64 `json:"userId"`
+		nickname         string `json:"nickname"`
+		fromTemplateId   uint64 `json:"fromTemplateId"`
+		fromTemplateName string `json:"fromTemplateName"`
+		toTemplateId     uint64 `json:"toTemplateId"`
+		toTemplateName   string `json:"toTemplateName"`
+		effectiveDate    string `json:"effectiveDate"`
+		source           int64  `json:"source"` // 1手动 2采纳建议 3管理员指定 4首次登录默认
+		reason           string `json:"reason"`
+		operatorId       uint64 `json:"operatorId"`
+		operatorName     string `json:"operatorName"`
+		createdAt        int64  `json:"createdAt"`
+	}
+	FitnessSwitchListReq {
+		userId   uint64 `json:"userId,optional" form:"userId,optional"`
+		page     int64  `json:"page,optional" form:"page,optional"`
+		pageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
+	}
+	FitnessSwitchListResp {
+		total int64               `json:"total"`
+		list  []FitnessSwitchItem `json:"list"`
+	}
+	// 后台：打卡统计
+	FitnessStatsOverviewReq {
+		date string `json:"date,optional" form:"date,optional"` // 默认今天
+	}
+	FitnessRankItem {
+		userId     uint64  `json:"userId"`
+		nickname   string  `json:"nickname"`
+		avatar     string  `json:"avatar"`
+		streakDays int64   `json:"streakDays"`
+		weekRate   float64 `json:"weekRate"`
+	}
+	FitnessDailyCount {
+		date  string `json:"date"`
+		count int64  `json:"count"`
+	}
+	FitnessStatsOverviewResp {
+		date              string              `json:"date"`
+		memberCount       int64               `json:"memberCount"`
+		todayCheckinCount int64               `json:"todayCheckinCount"`
+		weekAvgRate       float64             `json:"weekAvgRate"`
+		streakRanking     []FitnessRankItem   `json:"streakRanking"`
+		dailyCounts       []FitnessDailyCount `json:"dailyCounts"`
+	}
+	FitnessCheckinRow {
+		id             uint64  `json:"id"`
+		date           string  `json:"date"`
+		userId         uint64  `json:"userId"`
+		nickname       string  `json:"nickname"`
+		templateName   string  `json:"templateName"`
+		trainingType   int64   `json:"trainingType"`
+		trainingStatus int64   `json:"trainingStatus"`
+		exerciseDone   int64   `json:"exerciseDone"`
+		exerciseTotal  int64   `json:"exerciseTotal"`
+		mealOnPlan     int64   `json:"mealOnPlan"`
+		mealOther      int64   `json:"mealOther"`
+		mealSkipped    int64   `json:"mealSkipped"`
+		steps          int64   `json:"steps"`
+		stepGoal       int64   `json:"stepGoal"`
+		waterCups      int64   `json:"waterCups"`
+		score          float64 `json:"score"` // 训练完成度 0~1，-1 表示休息日不计入
+		updatedAt      int64   `json:"updatedAt"`
+	}
+	FitnessCheckinListReq {
+		page      int64  `json:"page,optional" form:"page,optional"`
+		pageSize  int64  `json:"pageSize,optional" form:"pageSize,optional"`
+		userId    uint64 `json:"userId,optional" form:"userId,optional"`
+		startDate string `json:"startDate,optional" form:"startDate,optional"`
+		endDate   string `json:"endDate,optional" form:"endDate,optional"`
+	}
+	FitnessCheckinListResp {
+		total int64               `json:"total"`
+		list  []FitnessCheckinRow `json:"list"`
+	}
+	FitnessCheckinExportReq {
+		userId    uint64 `json:"userId,optional" form:"userId,optional"`
+		startDate string `json:"startDate,optional" form:"startDate,optional"`
+		endDate   string `json:"endDate,optional" form:"endDate,optional"`
+	}
+	FitnessMemberDetailReq {
+		userId    uint64 `json:"userId,optional" form:"userId,optional"`
+		startDate string `json:"startDate,optional" form:"startDate,optional"` // 默认结束日期往前 90 天
+		endDate   string `json:"endDate,optional" form:"endDate,optional"` // 默认今天
+	}
+	FitnessCalendarDay {
+		date         string  `json:"date"`
+		counted      bool    `json:"counted"` // 是否计入完成率（训练日）
+		checked      bool    `json:"checked"` // 当天有任意打卡
+		score        float64 `json:"score"`
+		trainingType int64   `json:"trainingType"`
+	}
+	FitnessMemberDetailResp {
+		member      FitnessMemberItem       `json:"member"`
+		rangeRate   float64                 `json:"rangeRate"`
+		calendar    []FitnessCalendarDay    `json:"calendar"`
+		bodyRecords []FitnessBodyRecordItem `json:"bodyRecords"`
+		switches    []FitnessSwitchItem     `json:"switches"`
+	}
+)
+
+@server (
+	group:      fitness/auth
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware
+)
+service admin-api {
+	@handler FitnessLoginConfig
+	get /fitness/login/config returns (FitnessLoginConfigResp)
+
+	@handler FitnessLoginFeishu
+	post /fitness/login/feishu (FitnessLoginFeishuReq) returns (TokenPair)
+}
+
+// 手机端：登录即可访问、只操作本人数据，不走 PermissionMiddleware（普通使用者没有任何后台角色）
+@server (
+	group:      fitness/my
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,ApiEnabledMiddleware
+)
+service admin-api {
+	@handler FitnessMyDay
+	get /fitness/my/day (FitnessMyDayReq) returns (FitnessMyDayResp)
+
+	@handler FitnessMyCheckinSave
+	put /fitness/my/checkin (FitnessMyCheckinSaveReq) returns (FitnessCheckinItem)
+
+	@handler FitnessMyBodyRecordList
+	get /fitness/my/body-records (FitnessMyBodyRecordListReq) returns (FitnessBodyRecordListResp)
+
+	@handler FitnessMyBodyRecordSave
+	put /fitness/my/body-records (FitnessMyBodyRecordSaveReq)
+
+	@handler FitnessMyProfile
+	get /fitness/my/profile returns (FitnessMyProfileResp)
+
+	@handler FitnessMyProfileUpdate
+	put /fitness/my/profile (FitnessMyProfileUpdateReq)
+
+	@handler FitnessMyTemplateSwitch
+	post /fitness/my/template-switch (FitnessMyTemplateSwitchReq) returns (FitnessTemplateSwitchResp)
+
+	@handler FitnessMySuggestionDecide
+	post /fitness/my/suggestion-decision (FitnessMySuggestionDecideReq)
+}
+
+@server (
+	group:      fitness/template
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler FitnessTemplateList
+	get /fitness/templates (FitnessTemplateListReq) returns (FitnessTemplateListResp)
+
+	@handler FitnessTemplateCreate
+	post /fitness/templates (FitnessTemplateCreateReq)
+
+	@handler FitnessTemplateUpdate
+	put /fitness/templates (FitnessTemplateUpdateReq)
+
+	@handler FitnessTemplateDelete
+	delete /fitness/templates (FitnessIdReq)
+
+	@handler FitnessTemplateDays
+	get /fitness/template-days (FitnessTemplateDaysReq) returns (FitnessTemplateDaysResp)
+
+	@handler FitnessTemplateDaySave
+	put /fitness/template-days (FitnessTemplateDaySaveReq)
+
+	@handler FitnessTemplateDayDelete
+	delete /fitness/template-days (FitnessIdReq)
+}
+
+@server (
+	group:      fitness/tip
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler FitnessTipList
+	get /fitness/tips (FitnessTipListReq) returns (FitnessTipListResp)
+
+	@handler FitnessTipCreate
+	post /fitness/tips (FitnessTipSaveReq)
+
+	@handler FitnessTipUpdate
+	put /fitness/tips (FitnessTipSaveReq)
+
+	@handler FitnessTipDelete
+	delete /fitness/tips (FitnessIdReq)
+}
+
+@server (
+	group:      fitness/member
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler FitnessMemberList
+	get /fitness/members (FitnessMemberListReq) returns (FitnessMemberListResp)
+
+	@handler FitnessMemberAssign
+	post /fitness/members/template (FitnessMemberAssignReq) returns (FitnessTemplateSwitchResp)
+
+	@handler FitnessSwitchList
+	get /fitness/members/switches (FitnessSwitchListReq) returns (FitnessSwitchListResp)
+}
+
+@server (
+	group:      fitness/stats
+	prefix:     /api/v1
+	middleware: PerformanceMiddleware,RateLimitMiddleware,AuthMiddleware,PermissionMiddleware,OperationLogMiddleware
+)
+service admin-api {
+	@handler FitnessStatsOverview
+	get /fitness/stats/overview (FitnessStatsOverviewReq) returns (FitnessStatsOverviewResp)
+
+	@handler FitnessCheckinList
+	get /fitness/stats/checkins (FitnessCheckinListReq) returns (FitnessCheckinListResp)
+
+	@handler FitnessMemberDetail
+	get /fitness/stats/member (FitnessMemberDetailReq) returns (FitnessMemberDetailResp)
+
+	@handler FitnessCheckinExport
+	get /fitness/stats/checkins/export (FitnessCheckinExportReq) returns (Response)
+}
+

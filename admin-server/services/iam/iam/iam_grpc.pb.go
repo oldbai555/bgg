@@ -19,102 +19,128 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Iam_CheckPermission_FullMethodName          = "/iam.Iam/CheckPermission"
-	Iam_CheckApiEnabled_FullMethodName          = "/iam.Iam/CheckApiEnabled"
-	Iam_SyncApiRoutes_FullMethodName            = "/iam.Iam/SyncApiRoutes"
-	Iam_BatchRecordOperationLog_FullMethodName  = "/iam.Iam/BatchRecordOperationLog"
-	Iam_RecordPerformanceLog_FullMethodName     = "/iam.Iam/RecordPerformanceLog"
-	Iam_FileRegister_FullMethodName             = "/iam.Iam/FileRegister"
-	Iam_FileGetMeta_FullMethodName              = "/iam.Iam/FileGetMeta"
-	Iam_Ping_FullMethodName                     = "/iam.Iam/Ping"
-	Iam_Login_FullMethodName                    = "/iam.Iam/Login"
-	Iam_LoginFeishu_FullMethodName              = "/iam.Iam/LoginFeishu"
-	Iam_Refresh_FullMethodName                  = "/iam.Iam/Refresh"
-	Iam_Logout_FullMethodName                   = "/iam.Iam/Logout"
-	Iam_Profile_FullMethodName                  = "/iam.Iam/Profile"
-	Iam_ProfileUpdate_FullMethodName            = "/iam.Iam/ProfileUpdate"
-	Iam_PasswordChange_FullMethodName           = "/iam.Iam/PasswordChange"
-	Iam_UserCreate_FullMethodName               = "/iam.Iam/UserCreate"
-	Iam_UserUpdate_FullMethodName               = "/iam.Iam/UserUpdate"
-	Iam_UserDelete_FullMethodName               = "/iam.Iam/UserDelete"
-	Iam_UserList_FullMethodName                 = "/iam.Iam/UserList"
-	Iam_RoleCreate_FullMethodName               = "/iam.Iam/RoleCreate"
-	Iam_RoleUpdate_FullMethodName               = "/iam.Iam/RoleUpdate"
-	Iam_RoleDelete_FullMethodName               = "/iam.Iam/RoleDelete"
-	Iam_RoleList_FullMethodName                 = "/iam.Iam/RoleList"
-	Iam_PermissionCreate_FullMethodName         = "/iam.Iam/PermissionCreate"
-	Iam_PermissionUpdate_FullMethodName         = "/iam.Iam/PermissionUpdate"
-	Iam_PermissionDelete_FullMethodName         = "/iam.Iam/PermissionDelete"
-	Iam_PermissionList_FullMethodName           = "/iam.Iam/PermissionList"
-	Iam_MenuCreate_FullMethodName               = "/iam.Iam/MenuCreate"
-	Iam_MenuUpdate_FullMethodName               = "/iam.Iam/MenuUpdate"
-	Iam_MenuDelete_FullMethodName               = "/iam.Iam/MenuDelete"
-	Iam_MenuTree_FullMethodName                 = "/iam.Iam/MenuTree"
-	Iam_MenuMyTree_FullMethodName               = "/iam.Iam/MenuMyTree"
-	Iam_DepartmentCreate_FullMethodName         = "/iam.Iam/DepartmentCreate"
-	Iam_DepartmentUpdate_FullMethodName         = "/iam.Iam/DepartmentUpdate"
-	Iam_DepartmentDelete_FullMethodName         = "/iam.Iam/DepartmentDelete"
-	Iam_DepartmentTree_FullMethodName           = "/iam.Iam/DepartmentTree"
-	Iam_ApiCreate_FullMethodName                = "/iam.Iam/ApiCreate"
-	Iam_ApiUpdate_FullMethodName                = "/iam.Iam/ApiUpdate"
-	Iam_ApiDelete_FullMethodName                = "/iam.Iam/ApiDelete"
-	Iam_ApiList_FullMethodName                  = "/iam.Iam/ApiList"
-	Iam_PermissionMenuList_FullMethodName       = "/iam.Iam/PermissionMenuList"
-	Iam_PermissionMenuUpdate_FullMethodName     = "/iam.Iam/PermissionMenuUpdate"
-	Iam_PermissionApiList_FullMethodName        = "/iam.Iam/PermissionApiList"
-	Iam_PermissionApiUpdate_FullMethodName      = "/iam.Iam/PermissionApiUpdate"
-	Iam_UserRoleList_FullMethodName             = "/iam.Iam/UserRoleList"
-	Iam_UserRoleUpdate_FullMethodName           = "/iam.Iam/UserRoleUpdate"
-	Iam_RolePermissionList_FullMethodName       = "/iam.Iam/RolePermissionList"
-	Iam_RolePermissionUpdate_FullMethodName     = "/iam.Iam/RolePermissionUpdate"
-	Iam_ConfigCreate_FullMethodName             = "/iam.Iam/ConfigCreate"
-	Iam_ConfigUpdate_FullMethodName             = "/iam.Iam/ConfigUpdate"
-	Iam_ConfigDelete_FullMethodName             = "/iam.Iam/ConfigDelete"
-	Iam_ConfigList_FullMethodName               = "/iam.Iam/ConfigList"
-	Iam_ConfigGet_FullMethodName                = "/iam.Iam/ConfigGet"
-	Iam_DictTypeCreate_FullMethodName           = "/iam.Iam/DictTypeCreate"
-	Iam_DictTypeUpdate_FullMethodName           = "/iam.Iam/DictTypeUpdate"
-	Iam_DictTypeDelete_FullMethodName           = "/iam.Iam/DictTypeDelete"
-	Iam_DictTypeList_FullMethodName             = "/iam.Iam/DictTypeList"
-	Iam_DictItemCreate_FullMethodName           = "/iam.Iam/DictItemCreate"
-	Iam_DictItemUpdate_FullMethodName           = "/iam.Iam/DictItemUpdate"
-	Iam_DictItemDelete_FullMethodName           = "/iam.Iam/DictItemDelete"
-	Iam_DictItemList_FullMethodName             = "/iam.Iam/DictItemList"
-	Iam_DictGet_FullMethodName                  = "/iam.Iam/DictGet"
-	Iam_DictBatchGet_FullMethodName             = "/iam.Iam/DictBatchGet"
-	Iam_FileCreate_FullMethodName               = "/iam.Iam/FileCreate"
-	Iam_FileUpdate_FullMethodName               = "/iam.Iam/FileUpdate"
-	Iam_FileDelete_FullMethodName               = "/iam.Iam/FileDelete"
-	Iam_FileList_FullMethodName                 = "/iam.Iam/FileList"
-	Iam_NoticeCreate_FullMethodName             = "/iam.Iam/NoticeCreate"
-	Iam_NoticeUpdate_FullMethodName             = "/iam.Iam/NoticeUpdate"
-	Iam_NoticeDelete_FullMethodName             = "/iam.Iam/NoticeDelete"
-	Iam_NoticeList_FullMethodName               = "/iam.Iam/NoticeList"
-	Iam_NotificationList_FullMethodName         = "/iam.Iam/NotificationList"
-	Iam_NotificationRead_FullMethodName         = "/iam.Iam/NotificationRead"
-	Iam_NotificationReadAll_FullMethodName      = "/iam.Iam/NotificationReadAll"
-	Iam_NotificationClearRead_FullMethodName    = "/iam.Iam/NotificationClearRead"
-	Iam_NotificationDelete_FullMethodName       = "/iam.Iam/NotificationDelete"
-	Iam_OperationLogList_FullMethodName         = "/iam.Iam/OperationLogList"
-	Iam_OperationLogDetail_FullMethodName       = "/iam.Iam/OperationLogDetail"
-	Iam_LoginLogList_FullMethodName             = "/iam.Iam/LoginLogList"
-	Iam_LoginLogDetail_FullMethodName           = "/iam.Iam/LoginLogDetail"
-	Iam_LoginLogStats_FullMethodName            = "/iam.Iam/LoginLogStats"
-	Iam_PerformanceLogList_FullMethodName       = "/iam.Iam/PerformanceLogList"
-	Iam_AuditLogList_FullMethodName             = "/iam.Iam/AuditLogList"
-	Iam_AuditLogDetail_FullMethodName           = "/iam.Iam/AuditLogDetail"
-	Iam_MetricReport_FullMethodName             = "/iam.Iam/MetricReport"
-	Iam_MetricStats_FullMethodName              = "/iam.Iam/MetricStats"
-	Iam_MonitorStats_FullMethodName             = "/iam.Iam/MonitorStats"
-	Iam_MonitorStatus_FullMethodName            = "/iam.Iam/MonitorStatus"
-	Iam_DemoCreate_FullMethodName               = "/iam.Iam/DemoCreate"
-	Iam_DemoUpdate_FullMethodName               = "/iam.Iam/DemoUpdate"
-	Iam_DemoDelete_FullMethodName               = "/iam.Iam/DemoDelete"
-	Iam_DemoList_FullMethodName                 = "/iam.Iam/DemoList"
-	Iam_DailyShortSentenceCreate_FullMethodName = "/iam.Iam/DailyShortSentenceCreate"
-	Iam_DailyShortSentenceUpdate_FullMethodName = "/iam.Iam/DailyShortSentenceUpdate"
-	Iam_DailyShortSentenceDelete_FullMethodName = "/iam.Iam/DailyShortSentenceDelete"
-	Iam_DailyShortSentenceList_FullMethodName   = "/iam.Iam/DailyShortSentenceList"
+	Iam_CheckPermission_FullMethodName           = "/iam.Iam/CheckPermission"
+	Iam_CheckApiEnabled_FullMethodName           = "/iam.Iam/CheckApiEnabled"
+	Iam_SyncApiRoutes_FullMethodName             = "/iam.Iam/SyncApiRoutes"
+	Iam_BatchRecordOperationLog_FullMethodName   = "/iam.Iam/BatchRecordOperationLog"
+	Iam_RecordPerformanceLog_FullMethodName      = "/iam.Iam/RecordPerformanceLog"
+	Iam_FileRegister_FullMethodName              = "/iam.Iam/FileRegister"
+	Iam_FileGetMeta_FullMethodName               = "/iam.Iam/FileGetMeta"
+	Iam_Ping_FullMethodName                      = "/iam.Iam/Ping"
+	Iam_Login_FullMethodName                     = "/iam.Iam/Login"
+	Iam_LoginFeishu_FullMethodName               = "/iam.Iam/LoginFeishu"
+	Iam_Refresh_FullMethodName                   = "/iam.Iam/Refresh"
+	Iam_Logout_FullMethodName                    = "/iam.Iam/Logout"
+	Iam_Profile_FullMethodName                   = "/iam.Iam/Profile"
+	Iam_ProfileUpdate_FullMethodName             = "/iam.Iam/ProfileUpdate"
+	Iam_PasswordChange_FullMethodName            = "/iam.Iam/PasswordChange"
+	Iam_UserCreate_FullMethodName                = "/iam.Iam/UserCreate"
+	Iam_UserUpdate_FullMethodName                = "/iam.Iam/UserUpdate"
+	Iam_UserDelete_FullMethodName                = "/iam.Iam/UserDelete"
+	Iam_UserList_FullMethodName                  = "/iam.Iam/UserList"
+	Iam_RoleCreate_FullMethodName                = "/iam.Iam/RoleCreate"
+	Iam_RoleUpdate_FullMethodName                = "/iam.Iam/RoleUpdate"
+	Iam_RoleDelete_FullMethodName                = "/iam.Iam/RoleDelete"
+	Iam_RoleList_FullMethodName                  = "/iam.Iam/RoleList"
+	Iam_PermissionCreate_FullMethodName          = "/iam.Iam/PermissionCreate"
+	Iam_PermissionUpdate_FullMethodName          = "/iam.Iam/PermissionUpdate"
+	Iam_PermissionDelete_FullMethodName          = "/iam.Iam/PermissionDelete"
+	Iam_PermissionList_FullMethodName            = "/iam.Iam/PermissionList"
+	Iam_MenuCreate_FullMethodName                = "/iam.Iam/MenuCreate"
+	Iam_MenuUpdate_FullMethodName                = "/iam.Iam/MenuUpdate"
+	Iam_MenuDelete_FullMethodName                = "/iam.Iam/MenuDelete"
+	Iam_MenuTree_FullMethodName                  = "/iam.Iam/MenuTree"
+	Iam_MenuMyTree_FullMethodName                = "/iam.Iam/MenuMyTree"
+	Iam_DepartmentCreate_FullMethodName          = "/iam.Iam/DepartmentCreate"
+	Iam_DepartmentUpdate_FullMethodName          = "/iam.Iam/DepartmentUpdate"
+	Iam_DepartmentDelete_FullMethodName          = "/iam.Iam/DepartmentDelete"
+	Iam_DepartmentTree_FullMethodName            = "/iam.Iam/DepartmentTree"
+	Iam_ApiCreate_FullMethodName                 = "/iam.Iam/ApiCreate"
+	Iam_ApiUpdate_FullMethodName                 = "/iam.Iam/ApiUpdate"
+	Iam_ApiDelete_FullMethodName                 = "/iam.Iam/ApiDelete"
+	Iam_ApiList_FullMethodName                   = "/iam.Iam/ApiList"
+	Iam_PermissionMenuList_FullMethodName        = "/iam.Iam/PermissionMenuList"
+	Iam_PermissionMenuUpdate_FullMethodName      = "/iam.Iam/PermissionMenuUpdate"
+	Iam_PermissionApiList_FullMethodName         = "/iam.Iam/PermissionApiList"
+	Iam_PermissionApiUpdate_FullMethodName       = "/iam.Iam/PermissionApiUpdate"
+	Iam_UserRoleList_FullMethodName              = "/iam.Iam/UserRoleList"
+	Iam_UserRoleUpdate_FullMethodName            = "/iam.Iam/UserRoleUpdate"
+	Iam_RolePermissionList_FullMethodName        = "/iam.Iam/RolePermissionList"
+	Iam_RolePermissionUpdate_FullMethodName      = "/iam.Iam/RolePermissionUpdate"
+	Iam_ConfigCreate_FullMethodName              = "/iam.Iam/ConfigCreate"
+	Iam_ConfigUpdate_FullMethodName              = "/iam.Iam/ConfigUpdate"
+	Iam_ConfigDelete_FullMethodName              = "/iam.Iam/ConfigDelete"
+	Iam_ConfigList_FullMethodName                = "/iam.Iam/ConfigList"
+	Iam_ConfigGet_FullMethodName                 = "/iam.Iam/ConfigGet"
+	Iam_DictTypeCreate_FullMethodName            = "/iam.Iam/DictTypeCreate"
+	Iam_DictTypeUpdate_FullMethodName            = "/iam.Iam/DictTypeUpdate"
+	Iam_DictTypeDelete_FullMethodName            = "/iam.Iam/DictTypeDelete"
+	Iam_DictTypeList_FullMethodName              = "/iam.Iam/DictTypeList"
+	Iam_DictItemCreate_FullMethodName            = "/iam.Iam/DictItemCreate"
+	Iam_DictItemUpdate_FullMethodName            = "/iam.Iam/DictItemUpdate"
+	Iam_DictItemDelete_FullMethodName            = "/iam.Iam/DictItemDelete"
+	Iam_DictItemList_FullMethodName              = "/iam.Iam/DictItemList"
+	Iam_DictGet_FullMethodName                   = "/iam.Iam/DictGet"
+	Iam_DictBatchGet_FullMethodName              = "/iam.Iam/DictBatchGet"
+	Iam_FileCreate_FullMethodName                = "/iam.Iam/FileCreate"
+	Iam_FileUpdate_FullMethodName                = "/iam.Iam/FileUpdate"
+	Iam_FileDelete_FullMethodName                = "/iam.Iam/FileDelete"
+	Iam_FileList_FullMethodName                  = "/iam.Iam/FileList"
+	Iam_NoticeCreate_FullMethodName              = "/iam.Iam/NoticeCreate"
+	Iam_NoticeUpdate_FullMethodName              = "/iam.Iam/NoticeUpdate"
+	Iam_NoticeDelete_FullMethodName              = "/iam.Iam/NoticeDelete"
+	Iam_NoticeList_FullMethodName                = "/iam.Iam/NoticeList"
+	Iam_NotificationList_FullMethodName          = "/iam.Iam/NotificationList"
+	Iam_NotificationRead_FullMethodName          = "/iam.Iam/NotificationRead"
+	Iam_NotificationReadAll_FullMethodName       = "/iam.Iam/NotificationReadAll"
+	Iam_NotificationClearRead_FullMethodName     = "/iam.Iam/NotificationClearRead"
+	Iam_NotificationDelete_FullMethodName        = "/iam.Iam/NotificationDelete"
+	Iam_OperationLogList_FullMethodName          = "/iam.Iam/OperationLogList"
+	Iam_OperationLogDetail_FullMethodName        = "/iam.Iam/OperationLogDetail"
+	Iam_LoginLogList_FullMethodName              = "/iam.Iam/LoginLogList"
+	Iam_LoginLogDetail_FullMethodName            = "/iam.Iam/LoginLogDetail"
+	Iam_LoginLogStats_FullMethodName             = "/iam.Iam/LoginLogStats"
+	Iam_PerformanceLogList_FullMethodName        = "/iam.Iam/PerformanceLogList"
+	Iam_AuditLogList_FullMethodName              = "/iam.Iam/AuditLogList"
+	Iam_AuditLogDetail_FullMethodName            = "/iam.Iam/AuditLogDetail"
+	Iam_MetricReport_FullMethodName              = "/iam.Iam/MetricReport"
+	Iam_MetricStats_FullMethodName               = "/iam.Iam/MetricStats"
+	Iam_MonitorStats_FullMethodName              = "/iam.Iam/MonitorStats"
+	Iam_MonitorStatus_FullMethodName             = "/iam.Iam/MonitorStatus"
+	Iam_DemoCreate_FullMethodName                = "/iam.Iam/DemoCreate"
+	Iam_DemoUpdate_FullMethodName                = "/iam.Iam/DemoUpdate"
+	Iam_DemoDelete_FullMethodName                = "/iam.Iam/DemoDelete"
+	Iam_DemoList_FullMethodName                  = "/iam.Iam/DemoList"
+	Iam_DailyShortSentenceCreate_FullMethodName  = "/iam.Iam/DailyShortSentenceCreate"
+	Iam_DailyShortSentenceUpdate_FullMethodName  = "/iam.Iam/DailyShortSentenceUpdate"
+	Iam_DailyShortSentenceDelete_FullMethodName  = "/iam.Iam/DailyShortSentenceDelete"
+	Iam_DailyShortSentenceList_FullMethodName    = "/iam.Iam/DailyShortSentenceList"
+	Iam_FitnessTemplateList_FullMethodName       = "/iam.Iam/FitnessTemplateList"
+	Iam_FitnessTemplateCreate_FullMethodName     = "/iam.Iam/FitnessTemplateCreate"
+	Iam_FitnessTemplateUpdate_FullMethodName     = "/iam.Iam/FitnessTemplateUpdate"
+	Iam_FitnessTemplateDelete_FullMethodName     = "/iam.Iam/FitnessTemplateDelete"
+	Iam_FitnessTemplateDays_FullMethodName       = "/iam.Iam/FitnessTemplateDays"
+	Iam_FitnessTemplateDaySave_FullMethodName    = "/iam.Iam/FitnessTemplateDaySave"
+	Iam_FitnessTemplateDayDelete_FullMethodName  = "/iam.Iam/FitnessTemplateDayDelete"
+	Iam_FitnessTipList_FullMethodName            = "/iam.Iam/FitnessTipList"
+	Iam_FitnessTipCreate_FullMethodName          = "/iam.Iam/FitnessTipCreate"
+	Iam_FitnessTipUpdate_FullMethodName          = "/iam.Iam/FitnessTipUpdate"
+	Iam_FitnessTipDelete_FullMethodName          = "/iam.Iam/FitnessTipDelete"
+	Iam_FitnessMemberList_FullMethodName         = "/iam.Iam/FitnessMemberList"
+	Iam_FitnessMemberAssign_FullMethodName       = "/iam.Iam/FitnessMemberAssign"
+	Iam_FitnessSwitchList_FullMethodName         = "/iam.Iam/FitnessSwitchList"
+	Iam_FitnessStatsOverview_FullMethodName      = "/iam.Iam/FitnessStatsOverview"
+	Iam_FitnessCheckinList_FullMethodName        = "/iam.Iam/FitnessCheckinList"
+	Iam_FitnessMemberDetail_FullMethodName       = "/iam.Iam/FitnessMemberDetail"
+	Iam_FitnessLoginConfig_FullMethodName        = "/iam.Iam/FitnessLoginConfig"
+	Iam_FitnessMyDay_FullMethodName              = "/iam.Iam/FitnessMyDay"
+	Iam_FitnessMyCheckinSave_FullMethodName      = "/iam.Iam/FitnessMyCheckinSave"
+	Iam_FitnessMyBodyRecordList_FullMethodName   = "/iam.Iam/FitnessMyBodyRecordList"
+	Iam_FitnessMyBodyRecordSave_FullMethodName   = "/iam.Iam/FitnessMyBodyRecordSave"
+	Iam_FitnessMyProfile_FullMethodName          = "/iam.Iam/FitnessMyProfile"
+	Iam_FitnessMyProfileUpdate_FullMethodName    = "/iam.Iam/FitnessMyProfileUpdate"
+	Iam_FitnessMyTemplateSwitch_FullMethodName   = "/iam.Iam/FitnessMyTemplateSwitch"
+	Iam_FitnessMySuggestionDecide_FullMethodName = "/iam.Iam/FitnessMySuggestionDecide"
 )
 
 // IamClient is the client API for Iam service.
@@ -229,6 +255,34 @@ type IamClient interface {
 	DailyShortSentenceUpdate(ctx context.Context, in *DailyShortSentenceUpdateRequest, opts ...grpc.CallOption) (*Empty, error)
 	DailyShortSentenceDelete(ctx context.Context, in *DailyShortSentenceDeleteRequest, opts ...grpc.CallOption) (*Empty, error)
 	DailyShortSentenceList(ctx context.Context, in *DailyShortSentenceListRequest, opts ...grpc.CallOption) (*DailyShortSentenceListResponse, error)
+	// Fitness 后台：计划模板 / 通用提示 / 使用者 / 打卡统计（导出走 task-rpc → TaskCallback.FetchExportData）
+	FitnessTemplateList(ctx context.Context, in *FitnessTemplateListRequest, opts ...grpc.CallOption) (*FitnessTemplateListResponse, error)
+	FitnessTemplateCreate(ctx context.Context, in *FitnessTemplateSaveRequest, opts ...grpc.CallOption) (*Empty, error)
+	FitnessTemplateUpdate(ctx context.Context, in *FitnessTemplateSaveRequest, opts ...grpc.CallOption) (*Empty, error)
+	FitnessTemplateDelete(ctx context.Context, in *FitnessIdRequest, opts ...grpc.CallOption) (*Empty, error)
+	FitnessTemplateDays(ctx context.Context, in *FitnessTemplateDaysRequest, opts ...grpc.CallOption) (*FitnessTemplateDaysResponse, error)
+	FitnessTemplateDaySave(ctx context.Context, in *FitnessTemplateDaySaveRequest, opts ...grpc.CallOption) (*Empty, error)
+	FitnessTemplateDayDelete(ctx context.Context, in *FitnessIdRequest, opts ...grpc.CallOption) (*Empty, error)
+	FitnessTipList(ctx context.Context, in *FitnessTipListRequest, opts ...grpc.CallOption) (*FitnessTipListResponse, error)
+	FitnessTipCreate(ctx context.Context, in *FitnessTipSaveRequest, opts ...grpc.CallOption) (*Empty, error)
+	FitnessTipUpdate(ctx context.Context, in *FitnessTipSaveRequest, opts ...grpc.CallOption) (*Empty, error)
+	FitnessTipDelete(ctx context.Context, in *FitnessIdRequest, opts ...grpc.CallOption) (*Empty, error)
+	FitnessMemberList(ctx context.Context, in *FitnessMemberListRequest, opts ...grpc.CallOption) (*FitnessMemberListResponse, error)
+	FitnessMemberAssign(ctx context.Context, in *FitnessMemberAssignRequest, opts ...grpc.CallOption) (*FitnessTemplateSwitchResponse, error)
+	FitnessSwitchList(ctx context.Context, in *FitnessSwitchListRequest, opts ...grpc.CallOption) (*FitnessSwitchListResponse, error)
+	FitnessStatsOverview(ctx context.Context, in *FitnessStatsOverviewRequest, opts ...grpc.CallOption) (*FitnessStatsOverviewResponse, error)
+	FitnessCheckinList(ctx context.Context, in *FitnessCheckinListRequest, opts ...grpc.CallOption) (*FitnessCheckinListResponse, error)
+	FitnessMemberDetail(ctx context.Context, in *FitnessMemberDetailRequest, opts ...grpc.CallOption) (*FitnessMemberDetailResponse, error)
+	// Fitness 手机端：只操作 user_id 本人的数据
+	FitnessLoginConfig(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*FitnessLoginConfigResponse, error)
+	FitnessMyDay(ctx context.Context, in *FitnessMyDayRequest, opts ...grpc.CallOption) (*FitnessMyDayResponse, error)
+	FitnessMyCheckinSave(ctx context.Context, in *FitnessMyCheckinSaveRequest, opts ...grpc.CallOption) (*FitnessCheckinItem, error)
+	FitnessMyBodyRecordList(ctx context.Context, in *FitnessMyBodyRecordListRequest, opts ...grpc.CallOption) (*FitnessBodyRecordListResponse, error)
+	FitnessMyBodyRecordSave(ctx context.Context, in *FitnessMyBodyRecordSaveRequest, opts ...grpc.CallOption) (*Empty, error)
+	FitnessMyProfile(ctx context.Context, in *FitnessMyProfileRequest, opts ...grpc.CallOption) (*FitnessMyProfileResponse, error)
+	FitnessMyProfileUpdate(ctx context.Context, in *FitnessMyProfileUpdateRequest, opts ...grpc.CallOption) (*Empty, error)
+	FitnessMyTemplateSwitch(ctx context.Context, in *FitnessMyTemplateSwitchRequest, opts ...grpc.CallOption) (*FitnessTemplateSwitchResponse, error)
+	FitnessMySuggestionDecide(ctx context.Context, in *FitnessMySuggestionDecideRequest, opts ...grpc.CallOption) (*Empty, error)
 }
 
 type iamClient struct {
@@ -1199,6 +1253,266 @@ func (c *iamClient) DailyShortSentenceList(ctx context.Context, in *DailyShortSe
 	return out, nil
 }
 
+func (c *iamClient) FitnessTemplateList(ctx context.Context, in *FitnessTemplateListRequest, opts ...grpc.CallOption) (*FitnessTemplateListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(FitnessTemplateListResponse)
+	err := c.cc.Invoke(ctx, Iam_FitnessTemplateList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamClient) FitnessTemplateCreate(ctx context.Context, in *FitnessTemplateSaveRequest, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, Iam_FitnessTemplateCreate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamClient) FitnessTemplateUpdate(ctx context.Context, in *FitnessTemplateSaveRequest, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, Iam_FitnessTemplateUpdate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamClient) FitnessTemplateDelete(ctx context.Context, in *FitnessIdRequest, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, Iam_FitnessTemplateDelete_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamClient) FitnessTemplateDays(ctx context.Context, in *FitnessTemplateDaysRequest, opts ...grpc.CallOption) (*FitnessTemplateDaysResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(FitnessTemplateDaysResponse)
+	err := c.cc.Invoke(ctx, Iam_FitnessTemplateDays_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamClient) FitnessTemplateDaySave(ctx context.Context, in *FitnessTemplateDaySaveRequest, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, Iam_FitnessTemplateDaySave_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamClient) FitnessTemplateDayDelete(ctx context.Context, in *FitnessIdRequest, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, Iam_FitnessTemplateDayDelete_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamClient) FitnessTipList(ctx context.Context, in *FitnessTipListRequest, opts ...grpc.CallOption) (*FitnessTipListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(FitnessTipListResponse)
+	err := c.cc.Invoke(ctx, Iam_FitnessTipList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamClient) FitnessTipCreate(ctx context.Context, in *FitnessTipSaveRequest, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, Iam_FitnessTipCreate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamClient) FitnessTipUpdate(ctx context.Context, in *FitnessTipSaveRequest, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, Iam_FitnessTipUpdate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamClient) FitnessTipDelete(ctx context.Context, in *FitnessIdRequest, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, Iam_FitnessTipDelete_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamClient) FitnessMemberList(ctx context.Context, in *FitnessMemberListRequest, opts ...grpc.CallOption) (*FitnessMemberListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(FitnessMemberListResponse)
+	err := c.cc.Invoke(ctx, Iam_FitnessMemberList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamClient) FitnessMemberAssign(ctx context.Context, in *FitnessMemberAssignRequest, opts ...grpc.CallOption) (*FitnessTemplateSwitchResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(FitnessTemplateSwitchResponse)
+	err := c.cc.Invoke(ctx, Iam_FitnessMemberAssign_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamClient) FitnessSwitchList(ctx context.Context, in *FitnessSwitchListRequest, opts ...grpc.CallOption) (*FitnessSwitchListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(FitnessSwitchListResponse)
+	err := c.cc.Invoke(ctx, Iam_FitnessSwitchList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamClient) FitnessStatsOverview(ctx context.Context, in *FitnessStatsOverviewRequest, opts ...grpc.CallOption) (*FitnessStatsOverviewResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(FitnessStatsOverviewResponse)
+	err := c.cc.Invoke(ctx, Iam_FitnessStatsOverview_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamClient) FitnessCheckinList(ctx context.Context, in *FitnessCheckinListRequest, opts ...grpc.CallOption) (*FitnessCheckinListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(FitnessCheckinListResponse)
+	err := c.cc.Invoke(ctx, Iam_FitnessCheckinList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamClient) FitnessMemberDetail(ctx context.Context, in *FitnessMemberDetailRequest, opts ...grpc.CallOption) (*FitnessMemberDetailResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(FitnessMemberDetailResponse)
+	err := c.cc.Invoke(ctx, Iam_FitnessMemberDetail_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamClient) FitnessLoginConfig(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*FitnessLoginConfigResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(FitnessLoginConfigResponse)
+	err := c.cc.Invoke(ctx, Iam_FitnessLoginConfig_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamClient) FitnessMyDay(ctx context.Context, in *FitnessMyDayRequest, opts ...grpc.CallOption) (*FitnessMyDayResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(FitnessMyDayResponse)
+	err := c.cc.Invoke(ctx, Iam_FitnessMyDay_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamClient) FitnessMyCheckinSave(ctx context.Context, in *FitnessMyCheckinSaveRequest, opts ...grpc.CallOption) (*FitnessCheckinItem, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(FitnessCheckinItem)
+	err := c.cc.Invoke(ctx, Iam_FitnessMyCheckinSave_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamClient) FitnessMyBodyRecordList(ctx context.Context, in *FitnessMyBodyRecordListRequest, opts ...grpc.CallOption) (*FitnessBodyRecordListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(FitnessBodyRecordListResponse)
+	err := c.cc.Invoke(ctx, Iam_FitnessMyBodyRecordList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamClient) FitnessMyBodyRecordSave(ctx context.Context, in *FitnessMyBodyRecordSaveRequest, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, Iam_FitnessMyBodyRecordSave_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamClient) FitnessMyProfile(ctx context.Context, in *FitnessMyProfileRequest, opts ...grpc.CallOption) (*FitnessMyProfileResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(FitnessMyProfileResponse)
+	err := c.cc.Invoke(ctx, Iam_FitnessMyProfile_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamClient) FitnessMyProfileUpdate(ctx context.Context, in *FitnessMyProfileUpdateRequest, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, Iam_FitnessMyProfileUpdate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamClient) FitnessMyTemplateSwitch(ctx context.Context, in *FitnessMyTemplateSwitchRequest, opts ...grpc.CallOption) (*FitnessTemplateSwitchResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(FitnessTemplateSwitchResponse)
+	err := c.cc.Invoke(ctx, Iam_FitnessMyTemplateSwitch_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamClient) FitnessMySuggestionDecide(ctx context.Context, in *FitnessMySuggestionDecideRequest, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, Iam_FitnessMySuggestionDecide_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // IamServer is the server API for Iam service.
 // All implementations must embed UnimplementedIamServer
 // for forward compatibility.
@@ -1311,6 +1625,34 @@ type IamServer interface {
 	DailyShortSentenceUpdate(context.Context, *DailyShortSentenceUpdateRequest) (*Empty, error)
 	DailyShortSentenceDelete(context.Context, *DailyShortSentenceDeleteRequest) (*Empty, error)
 	DailyShortSentenceList(context.Context, *DailyShortSentenceListRequest) (*DailyShortSentenceListResponse, error)
+	// Fitness 后台：计划模板 / 通用提示 / 使用者 / 打卡统计（导出走 task-rpc → TaskCallback.FetchExportData）
+	FitnessTemplateList(context.Context, *FitnessTemplateListRequest) (*FitnessTemplateListResponse, error)
+	FitnessTemplateCreate(context.Context, *FitnessTemplateSaveRequest) (*Empty, error)
+	FitnessTemplateUpdate(context.Context, *FitnessTemplateSaveRequest) (*Empty, error)
+	FitnessTemplateDelete(context.Context, *FitnessIdRequest) (*Empty, error)
+	FitnessTemplateDays(context.Context, *FitnessTemplateDaysRequest) (*FitnessTemplateDaysResponse, error)
+	FitnessTemplateDaySave(context.Context, *FitnessTemplateDaySaveRequest) (*Empty, error)
+	FitnessTemplateDayDelete(context.Context, *FitnessIdRequest) (*Empty, error)
+	FitnessTipList(context.Context, *FitnessTipListRequest) (*FitnessTipListResponse, error)
+	FitnessTipCreate(context.Context, *FitnessTipSaveRequest) (*Empty, error)
+	FitnessTipUpdate(context.Context, *FitnessTipSaveRequest) (*Empty, error)
+	FitnessTipDelete(context.Context, *FitnessIdRequest) (*Empty, error)
+	FitnessMemberList(context.Context, *FitnessMemberListRequest) (*FitnessMemberListResponse, error)
+	FitnessMemberAssign(context.Context, *FitnessMemberAssignRequest) (*FitnessTemplateSwitchResponse, error)
+	FitnessSwitchList(context.Context, *FitnessSwitchListRequest) (*FitnessSwitchListResponse, error)
+	FitnessStatsOverview(context.Context, *FitnessStatsOverviewRequest) (*FitnessStatsOverviewResponse, error)
+	FitnessCheckinList(context.Context, *FitnessCheckinListRequest) (*FitnessCheckinListResponse, error)
+	FitnessMemberDetail(context.Context, *FitnessMemberDetailRequest) (*FitnessMemberDetailResponse, error)
+	// Fitness 手机端：只操作 user_id 本人的数据
+	FitnessLoginConfig(context.Context, *Empty) (*FitnessLoginConfigResponse, error)
+	FitnessMyDay(context.Context, *FitnessMyDayRequest) (*FitnessMyDayResponse, error)
+	FitnessMyCheckinSave(context.Context, *FitnessMyCheckinSaveRequest) (*FitnessCheckinItem, error)
+	FitnessMyBodyRecordList(context.Context, *FitnessMyBodyRecordListRequest) (*FitnessBodyRecordListResponse, error)
+	FitnessMyBodyRecordSave(context.Context, *FitnessMyBodyRecordSaveRequest) (*Empty, error)
+	FitnessMyProfile(context.Context, *FitnessMyProfileRequest) (*FitnessMyProfileResponse, error)
+	FitnessMyProfileUpdate(context.Context, *FitnessMyProfileUpdateRequest) (*Empty, error)
+	FitnessMyTemplateSwitch(context.Context, *FitnessMyTemplateSwitchRequest) (*FitnessTemplateSwitchResponse, error)
+	FitnessMySuggestionDecide(context.Context, *FitnessMySuggestionDecideRequest) (*Empty, error)
 	mustEmbedUnimplementedIamServer()
 }
 
@@ -1608,6 +1950,84 @@ func (UnimplementedIamServer) DailyShortSentenceDelete(context.Context, *DailySh
 }
 func (UnimplementedIamServer) DailyShortSentenceList(context.Context, *DailyShortSentenceListRequest) (*DailyShortSentenceListResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DailyShortSentenceList not implemented")
+}
+func (UnimplementedIamServer) FitnessTemplateList(context.Context, *FitnessTemplateListRequest) (*FitnessTemplateListResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method FitnessTemplateList not implemented")
+}
+func (UnimplementedIamServer) FitnessTemplateCreate(context.Context, *FitnessTemplateSaveRequest) (*Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method FitnessTemplateCreate not implemented")
+}
+func (UnimplementedIamServer) FitnessTemplateUpdate(context.Context, *FitnessTemplateSaveRequest) (*Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method FitnessTemplateUpdate not implemented")
+}
+func (UnimplementedIamServer) FitnessTemplateDelete(context.Context, *FitnessIdRequest) (*Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method FitnessTemplateDelete not implemented")
+}
+func (UnimplementedIamServer) FitnessTemplateDays(context.Context, *FitnessTemplateDaysRequest) (*FitnessTemplateDaysResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method FitnessTemplateDays not implemented")
+}
+func (UnimplementedIamServer) FitnessTemplateDaySave(context.Context, *FitnessTemplateDaySaveRequest) (*Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method FitnessTemplateDaySave not implemented")
+}
+func (UnimplementedIamServer) FitnessTemplateDayDelete(context.Context, *FitnessIdRequest) (*Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method FitnessTemplateDayDelete not implemented")
+}
+func (UnimplementedIamServer) FitnessTipList(context.Context, *FitnessTipListRequest) (*FitnessTipListResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method FitnessTipList not implemented")
+}
+func (UnimplementedIamServer) FitnessTipCreate(context.Context, *FitnessTipSaveRequest) (*Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method FitnessTipCreate not implemented")
+}
+func (UnimplementedIamServer) FitnessTipUpdate(context.Context, *FitnessTipSaveRequest) (*Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method FitnessTipUpdate not implemented")
+}
+func (UnimplementedIamServer) FitnessTipDelete(context.Context, *FitnessIdRequest) (*Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method FitnessTipDelete not implemented")
+}
+func (UnimplementedIamServer) FitnessMemberList(context.Context, *FitnessMemberListRequest) (*FitnessMemberListResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method FitnessMemberList not implemented")
+}
+func (UnimplementedIamServer) FitnessMemberAssign(context.Context, *FitnessMemberAssignRequest) (*FitnessTemplateSwitchResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method FitnessMemberAssign not implemented")
+}
+func (UnimplementedIamServer) FitnessSwitchList(context.Context, *FitnessSwitchListRequest) (*FitnessSwitchListResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method FitnessSwitchList not implemented")
+}
+func (UnimplementedIamServer) FitnessStatsOverview(context.Context, *FitnessStatsOverviewRequest) (*FitnessStatsOverviewResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method FitnessStatsOverview not implemented")
+}
+func (UnimplementedIamServer) FitnessCheckinList(context.Context, *FitnessCheckinListRequest) (*FitnessCheckinListResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method FitnessCheckinList not implemented")
+}
+func (UnimplementedIamServer) FitnessMemberDetail(context.Context, *FitnessMemberDetailRequest) (*FitnessMemberDetailResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method FitnessMemberDetail not implemented")
+}
+func (UnimplementedIamServer) FitnessLoginConfig(context.Context, *Empty) (*FitnessLoginConfigResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method FitnessLoginConfig not implemented")
+}
+func (UnimplementedIamServer) FitnessMyDay(context.Context, *FitnessMyDayRequest) (*FitnessMyDayResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method FitnessMyDay not implemented")
+}
+func (UnimplementedIamServer) FitnessMyCheckinSave(context.Context, *FitnessMyCheckinSaveRequest) (*FitnessCheckinItem, error) {
+	return nil, status.Error(codes.Unimplemented, "method FitnessMyCheckinSave not implemented")
+}
+func (UnimplementedIamServer) FitnessMyBodyRecordList(context.Context, *FitnessMyBodyRecordListRequest) (*FitnessBodyRecordListResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method FitnessMyBodyRecordList not implemented")
+}
+func (UnimplementedIamServer) FitnessMyBodyRecordSave(context.Context, *FitnessMyBodyRecordSaveRequest) (*Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method FitnessMyBodyRecordSave not implemented")
+}
+func (UnimplementedIamServer) FitnessMyProfile(context.Context, *FitnessMyProfileRequest) (*FitnessMyProfileResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method FitnessMyProfile not implemented")
+}
+func (UnimplementedIamServer) FitnessMyProfileUpdate(context.Context, *FitnessMyProfileUpdateRequest) (*Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method FitnessMyProfileUpdate not implemented")
+}
+func (UnimplementedIamServer) FitnessMyTemplateSwitch(context.Context, *FitnessMyTemplateSwitchRequest) (*FitnessTemplateSwitchResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method FitnessMyTemplateSwitch not implemented")
+}
+func (UnimplementedIamServer) FitnessMySuggestionDecide(context.Context, *FitnessMySuggestionDecideRequest) (*Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method FitnessMySuggestionDecide not implemented")
 }
 func (UnimplementedIamServer) mustEmbedUnimplementedIamServer() {}
 func (UnimplementedIamServer) testEmbeddedByValue()             {}
@@ -3358,6 +3778,474 @@ func _Iam_DailyShortSentenceList_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Iam_FitnessTemplateList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FitnessTemplateListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServer).FitnessTemplateList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Iam_FitnessTemplateList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServer).FitnessTemplateList(ctx, req.(*FitnessTemplateListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Iam_FitnessTemplateCreate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FitnessTemplateSaveRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServer).FitnessTemplateCreate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Iam_FitnessTemplateCreate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServer).FitnessTemplateCreate(ctx, req.(*FitnessTemplateSaveRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Iam_FitnessTemplateUpdate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FitnessTemplateSaveRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServer).FitnessTemplateUpdate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Iam_FitnessTemplateUpdate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServer).FitnessTemplateUpdate(ctx, req.(*FitnessTemplateSaveRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Iam_FitnessTemplateDelete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FitnessIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServer).FitnessTemplateDelete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Iam_FitnessTemplateDelete_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServer).FitnessTemplateDelete(ctx, req.(*FitnessIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Iam_FitnessTemplateDays_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FitnessTemplateDaysRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServer).FitnessTemplateDays(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Iam_FitnessTemplateDays_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServer).FitnessTemplateDays(ctx, req.(*FitnessTemplateDaysRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Iam_FitnessTemplateDaySave_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FitnessTemplateDaySaveRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServer).FitnessTemplateDaySave(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Iam_FitnessTemplateDaySave_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServer).FitnessTemplateDaySave(ctx, req.(*FitnessTemplateDaySaveRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Iam_FitnessTemplateDayDelete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FitnessIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServer).FitnessTemplateDayDelete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Iam_FitnessTemplateDayDelete_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServer).FitnessTemplateDayDelete(ctx, req.(*FitnessIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Iam_FitnessTipList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FitnessTipListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServer).FitnessTipList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Iam_FitnessTipList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServer).FitnessTipList(ctx, req.(*FitnessTipListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Iam_FitnessTipCreate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FitnessTipSaveRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServer).FitnessTipCreate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Iam_FitnessTipCreate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServer).FitnessTipCreate(ctx, req.(*FitnessTipSaveRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Iam_FitnessTipUpdate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FitnessTipSaveRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServer).FitnessTipUpdate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Iam_FitnessTipUpdate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServer).FitnessTipUpdate(ctx, req.(*FitnessTipSaveRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Iam_FitnessTipDelete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FitnessIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServer).FitnessTipDelete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Iam_FitnessTipDelete_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServer).FitnessTipDelete(ctx, req.(*FitnessIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Iam_FitnessMemberList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FitnessMemberListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServer).FitnessMemberList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Iam_FitnessMemberList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServer).FitnessMemberList(ctx, req.(*FitnessMemberListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Iam_FitnessMemberAssign_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FitnessMemberAssignRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServer).FitnessMemberAssign(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Iam_FitnessMemberAssign_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServer).FitnessMemberAssign(ctx, req.(*FitnessMemberAssignRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Iam_FitnessSwitchList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FitnessSwitchListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServer).FitnessSwitchList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Iam_FitnessSwitchList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServer).FitnessSwitchList(ctx, req.(*FitnessSwitchListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Iam_FitnessStatsOverview_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FitnessStatsOverviewRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServer).FitnessStatsOverview(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Iam_FitnessStatsOverview_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServer).FitnessStatsOverview(ctx, req.(*FitnessStatsOverviewRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Iam_FitnessCheckinList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FitnessCheckinListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServer).FitnessCheckinList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Iam_FitnessCheckinList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServer).FitnessCheckinList(ctx, req.(*FitnessCheckinListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Iam_FitnessMemberDetail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FitnessMemberDetailRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServer).FitnessMemberDetail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Iam_FitnessMemberDetail_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServer).FitnessMemberDetail(ctx, req.(*FitnessMemberDetailRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Iam_FitnessLoginConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServer).FitnessLoginConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Iam_FitnessLoginConfig_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServer).FitnessLoginConfig(ctx, req.(*Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Iam_FitnessMyDay_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FitnessMyDayRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServer).FitnessMyDay(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Iam_FitnessMyDay_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServer).FitnessMyDay(ctx, req.(*FitnessMyDayRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Iam_FitnessMyCheckinSave_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FitnessMyCheckinSaveRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServer).FitnessMyCheckinSave(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Iam_FitnessMyCheckinSave_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServer).FitnessMyCheckinSave(ctx, req.(*FitnessMyCheckinSaveRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Iam_FitnessMyBodyRecordList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FitnessMyBodyRecordListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServer).FitnessMyBodyRecordList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Iam_FitnessMyBodyRecordList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServer).FitnessMyBodyRecordList(ctx, req.(*FitnessMyBodyRecordListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Iam_FitnessMyBodyRecordSave_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FitnessMyBodyRecordSaveRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServer).FitnessMyBodyRecordSave(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Iam_FitnessMyBodyRecordSave_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServer).FitnessMyBodyRecordSave(ctx, req.(*FitnessMyBodyRecordSaveRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Iam_FitnessMyProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FitnessMyProfileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServer).FitnessMyProfile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Iam_FitnessMyProfile_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServer).FitnessMyProfile(ctx, req.(*FitnessMyProfileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Iam_FitnessMyProfileUpdate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FitnessMyProfileUpdateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServer).FitnessMyProfileUpdate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Iam_FitnessMyProfileUpdate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServer).FitnessMyProfileUpdate(ctx, req.(*FitnessMyProfileUpdateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Iam_FitnessMyTemplateSwitch_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FitnessMyTemplateSwitchRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServer).FitnessMyTemplateSwitch(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Iam_FitnessMyTemplateSwitch_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServer).FitnessMyTemplateSwitch(ctx, req.(*FitnessMyTemplateSwitchRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Iam_FitnessMySuggestionDecide_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FitnessMySuggestionDecideRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServer).FitnessMySuggestionDecide(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Iam_FitnessMySuggestionDecide_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServer).FitnessMySuggestionDecide(ctx, req.(*FitnessMySuggestionDecideRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Iam_ServiceDesc is the grpc.ServiceDesc for Iam service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -3748,6 +4636,110 @@ var Iam_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DailyShortSentenceList",
 			Handler:    _Iam_DailyShortSentenceList_Handler,
+		},
+		{
+			MethodName: "FitnessTemplateList",
+			Handler:    _Iam_FitnessTemplateList_Handler,
+		},
+		{
+			MethodName: "FitnessTemplateCreate",
+			Handler:    _Iam_FitnessTemplateCreate_Handler,
+		},
+		{
+			MethodName: "FitnessTemplateUpdate",
+			Handler:    _Iam_FitnessTemplateUpdate_Handler,
+		},
+		{
+			MethodName: "FitnessTemplateDelete",
+			Handler:    _Iam_FitnessTemplateDelete_Handler,
+		},
+		{
+			MethodName: "FitnessTemplateDays",
+			Handler:    _Iam_FitnessTemplateDays_Handler,
+		},
+		{
+			MethodName: "FitnessTemplateDaySave",
+			Handler:    _Iam_FitnessTemplateDaySave_Handler,
+		},
+		{
+			MethodName: "FitnessTemplateDayDelete",
+			Handler:    _Iam_FitnessTemplateDayDelete_Handler,
+		},
+		{
+			MethodName: "FitnessTipList",
+			Handler:    _Iam_FitnessTipList_Handler,
+		},
+		{
+			MethodName: "FitnessTipCreate",
+			Handler:    _Iam_FitnessTipCreate_Handler,
+		},
+		{
+			MethodName: "FitnessTipUpdate",
+			Handler:    _Iam_FitnessTipUpdate_Handler,
+		},
+		{
+			MethodName: "FitnessTipDelete",
+			Handler:    _Iam_FitnessTipDelete_Handler,
+		},
+		{
+			MethodName: "FitnessMemberList",
+			Handler:    _Iam_FitnessMemberList_Handler,
+		},
+		{
+			MethodName: "FitnessMemberAssign",
+			Handler:    _Iam_FitnessMemberAssign_Handler,
+		},
+		{
+			MethodName: "FitnessSwitchList",
+			Handler:    _Iam_FitnessSwitchList_Handler,
+		},
+		{
+			MethodName: "FitnessStatsOverview",
+			Handler:    _Iam_FitnessStatsOverview_Handler,
+		},
+		{
+			MethodName: "FitnessCheckinList",
+			Handler:    _Iam_FitnessCheckinList_Handler,
+		},
+		{
+			MethodName: "FitnessMemberDetail",
+			Handler:    _Iam_FitnessMemberDetail_Handler,
+		},
+		{
+			MethodName: "FitnessLoginConfig",
+			Handler:    _Iam_FitnessLoginConfig_Handler,
+		},
+		{
+			MethodName: "FitnessMyDay",
+			Handler:    _Iam_FitnessMyDay_Handler,
+		},
+		{
+			MethodName: "FitnessMyCheckinSave",
+			Handler:    _Iam_FitnessMyCheckinSave_Handler,
+		},
+		{
+			MethodName: "FitnessMyBodyRecordList",
+			Handler:    _Iam_FitnessMyBodyRecordList_Handler,
+		},
+		{
+			MethodName: "FitnessMyBodyRecordSave",
+			Handler:    _Iam_FitnessMyBodyRecordSave_Handler,
+		},
+		{
+			MethodName: "FitnessMyProfile",
+			Handler:    _Iam_FitnessMyProfile_Handler,
+		},
+		{
+			MethodName: "FitnessMyProfileUpdate",
+			Handler:    _Iam_FitnessMyProfileUpdate_Handler,
+		},
+		{
+			MethodName: "FitnessMyTemplateSwitch",
+			Handler:    _Iam_FitnessMyTemplateSwitch_Handler,
+		},
+		{
+			MethodName: "FitnessMySuggestionDecide",
+			Handler:    _Iam_FitnessMySuggestionDecide_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

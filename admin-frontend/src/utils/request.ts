@@ -2,6 +2,7 @@ import axios, {type AxiosResponse, type AxiosError} from 'axios'
 import {useUserStore} from '@/stores/user'
 import router from '@/router'
 import {isEnvelope} from '@/types/envelope'
+import {FITNESS_LOGIN_PATH, isFitnessPath} from '@/constants/fitness'
 
 // API 请求基础地址（仅用于 HTTP API 请求）：
 // - 开发环境：通过 Vite dev server 代理到 http://localhost:20000（baseURL 为 /api）
@@ -47,6 +48,14 @@ export const handleTokenExpired = (): void => {
   localStorage.removeItem('admin_menus')
   localStorage.removeItem('admin_cache_at')
 
+  const current = router.currentRoute.value
+  // 身材管理手机端虽在 /front 下但要求登录，token 失效回手机端飞书登录页（飞书内会自动免登回来）
+  if (isFitnessPath(current.path)) {
+    if (current.path !== FITNESS_LOGIN_PATH) {
+      router.push({path: FITNESS_LOGIN_PATH, query: {redirect: current.fullPath}})
+    }
+    return
+  }
   if (!isPublicPath()) {
     router.push('/admin/login')
   }
@@ -75,11 +84,20 @@ export const handleResponse = (resp: {data: unknown}) => {
   return res
 }
 
+// 网关 logic 返回的业务错误走 go-zero 默认 httpx.ErrorCtx：HTTP 400 + text/plain，
+// 内容形如「保存打卡失败: rpc error: code = InvalidArgument desc = 只能打今天和最近 7 天的卡」，取 desc 之后给用户看
+export const plainErrorMessage = (text: string): string => {
+  const trimmed = text.trim()
+  const idx = trimmed.lastIndexOf('desc = ')
+  return idx >= 0 ? trimmed.slice(idx + 'desc = '.length).trim() : trimmed
+}
+
 export const handleResponseError = (error: {
-  response?: {data?: {code?: number; msg?: string; message?: string}};
+  response?: {data?: {code?: number; msg?: string; message?: string} | string};
   message?: string;
 }) => {
-  const data = error?.response?.data
+  const raw = error?.response?.data
+  const data = typeof raw === 'object' ? raw : undefined
   const code = data?.code
 
   // 处理 10003 错误码（可能在 error.response.data 中）
@@ -89,6 +107,7 @@ export const handleResponseError = (error: {
 
   const msg =
     (data && (data.msg || data.message)) ||
+    (typeof raw === 'string' && raw.trim() ? plainErrorMessage(raw) : '') ||
     error.message ||
     '请求失败'
   return Promise.reject(new Error(msg))

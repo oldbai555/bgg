@@ -21,11 +21,11 @@ SQLGEN_DIR="${PROJECT_ROOT}/scripts/sqlgen"
 OUTPUT_DIR=""
 
 # 域→服务映射（15-service-boundaries.md 第 4 节 SSOT）：
-# iam/system/monitoring/misc 四个域合并进 iam-rpc；blog/video 合并进 content-rpc；
+# iam/system/monitoring/misc/fitness 五个域合并进 iam-rpc；blog/video 合并进 content-rpc；
 # chat/task/sdk 各自独立成服务。domain 也接受直接写服务名（iam/content/chat/task/sdk）。
 domain_to_service() {
     case "$1" in
-        iam|system|monitoring|misc) echo "iam" ;;
+        iam|system|monitoring|misc|fitness) echo "iam" ;;
         blog|blog_extension|video|content) echo "content" ;;
         chat) echo "chat" ;;
         task) echo "task" ;;
@@ -35,7 +35,7 @@ domain_to_service() {
 }
 
 # 域→前端 API wrapper 映射（admin-frontend/docs/02-domain-reorg-and-api-layer.md SSOT）：
-# 前端按 8 个域分 wrapper（iam/system/monitoring/misc/content/chat/sdk/task），blog/video
+# 前端按 9 个域分 wrapper（iam/system/monitoring/misc/content/chat/sdk/task/fitness），blog/video
 # 合并进同一个 content.ts，其余域名与后端 domain 一致。用于生成的 list_page.vue.tpl
 # import '@/api/<前端 Domain>'，不是 import '@/api/generated/admin'。
 domain_to_frontend_api() {
@@ -55,7 +55,7 @@ usage() {
     echo "参数:"
     echo "  -group <domain>/<module>  功能组名（必需，如 iam/user、blog/article、chat/chat）"
     echo "                            <domain> 决定落进哪个服务的 db/services/<service>/ 目录，"
-    echo "                            取值：iam/system/monitoring/misc → iam；blog/video → content；"
+    echo "                            取值：iam/system/monitoring/misc/fitness → iam；blog/video → content；"
     echo "                            chat/task/sdk 各自独立；也可以直接写服务名 iam/content/chat/task/sdk"
     echo "  -name <name>          功能名称（必需，如 用户管理, 文件管理）"
     echo ""
@@ -142,7 +142,7 @@ if [[ -z "$DOMAIN" || -z "$MODULE" || "$MODULE" == */* ]]; then
 fi
 SERVICE="$(domain_to_service "$DOMAIN")"
 if [ -z "$SERVICE" ]; then
-    echo -e "${RED}错误: 未知 domain: ${DOMAIN}（有效值: iam, system, monitoring, misc, blog, video, chat, task, sdk，或直接写服务名 iam/content/chat/task/sdk）${NC}"
+    echo -e "${RED}错误: 未知 domain: ${DOMAIN}（有效值: iam, system, monitoring, misc, fitness, blog, video, chat, task, sdk，或直接写服务名 iam/content/chat/task/sdk）${NC}"
     exit 1
 fi
 FRONTEND_DOMAIN="$(domain_to_frontend_api "$DOMAIN")"

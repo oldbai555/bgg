@@ -5,6 +5,7 @@
 import {defineStore} from 'pinia'
 import {systemApi} from '@/api/system'
 import type {DictItemItem} from '@/api/generated/admin'
+import {FITNESS_DICT_CODES} from '@/constants/fitness'
 
 interface DictState {
   // 字典数据，key为字典类型编码，value为字典项列表
@@ -44,7 +45,8 @@ export const REQUIRED_DICT_CODES = [
   'blog_friend_link_status', // 友情链接状态
   'blog_social_info_status', // 社交信息状态
   'video_source_type', // 视频来源类型
-  'metric_module' // 性能日志-业务模块
+  'metric_module', // 性能日志-业务模块
+  ...FITNESS_DICT_CODES // 身材管理（手机端不走后台初始化，由 composables/useFitnessDicts.ts 按需加载这一组）
 ] as const
 
 export const useDictStore = defineStore('dict', {

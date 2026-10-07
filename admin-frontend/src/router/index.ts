@@ -3,6 +3,14 @@ import {ElMessage} from 'element-plus'
 import {useUserStore} from '@/stores/user'
 import {usePermission} from '@/composables/usePermission'
 import type {MenuItem} from '@/api/generated/admin'
+import {
+  FITNESS_BODY_PATH,
+  FITNESS_CHECKIN_PATH,
+  FITNESS_HOME_PATH,
+  FITNESS_LOGIN_PATH,
+  FITNESS_ME_PATH,
+  isFitnessPath
+} from '@/constants/fitness'
 
 const viewModules = import.meta.glob('../views/**/*.vue')
 const knownViewKeys = new Set(
@@ -39,6 +47,32 @@ const routes: RouteRecordRaw[] = [
     path: '/front/videos/:id',
     name: 'VideoDetail',
     component: () => import('@/views/public/VideoDetail.vue')
+  },
+  // 身材管理手机端：挂在 /front 下走公共页外壳，但除登录页外都要求飞书登录（守卫里单独判断）
+  {
+    path: FITNESS_HOME_PATH,
+    name: 'FitnessToday',
+    component: () => import('@/views/public/fitness/FitnessToday.vue')
+  },
+  {
+    path: FITNESS_CHECKIN_PATH,
+    name: 'FitnessCheckin',
+    component: () => import('@/views/public/fitness/FitnessCheckin.vue')
+  },
+  {
+    path: FITNESS_BODY_PATH,
+    name: 'FitnessBody',
+    component: () => import('@/views/public/fitness/FitnessBody.vue')
+  },
+  {
+    path: FITNESS_ME_PATH,
+    name: 'FitnessMe',
+    component: () => import('@/views/public/fitness/FitnessMe.vue')
+  },
+  {
+    path: FITNESS_LOGIN_PATH,
+    name: 'FitnessLogin',
+    component: () => import('@/views/public/fitness/FitnessLogin.vue')
   },
   {
     path: '/admin/login',
@@ -274,7 +308,15 @@ router.beforeEach(async (to, _from, next) => {
       return
     }
 
-    if (userStore.token) {
+    // 身材管理手机端是 /front 下唯一要求登录的分支，未登录统一去手机端飞书登录页（不是后台登录页）
+    const onFitness = isFitnessPath(to.path)
+    if (onFitness && to.path !== FITNESS_LOGIN_PATH && !userStore.token) {
+      next({path: FITNESS_LOGIN_PATH, query: {redirect: to.fullPath}})
+      return
+    }
+
+    // 手机端用户没有后台菜单，跳过 profile/menus 初始化，否则菜单为空会导致每次切页都重新请求
+    if (userStore.token && !onFitness) {
       // 如果未初始化或菜单数据为空，重新获取
       if (!initialized || !userStore.menus || userStore.menus.length === 0) {
         initialized = true

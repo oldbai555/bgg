@@ -6,8 +6,8 @@ package auth
 import (
 	"context"
 	"net/http"
-	"strings"
 
+	"postapocgame/admin-server/internal/logic/logicutil"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
@@ -41,7 +41,7 @@ func (l *LoginLogic) Login(req *types.LoginReq, httpReq *http.Request) (resp *ty
 	clientIP := ""
 	userAgent := ""
 	if httpReq != nil {
-		clientIP = getClientIPFromRequest(httpReq)
+		clientIP = logicutil.ClientIP(httpReq)
 		userAgent = httpReq.UserAgent()
 	}
 
@@ -59,24 +59,4 @@ func (l *LoginLogic) Login(req *types.LoginReq, httpReq *http.Request) (resp *ty
 		AccessToken:  rpcResp.AccessToken,
 		RefreshToken: rpcResp.RefreshToken,
 	}, nil
-}
-
-// getClientIPFromRequest 获取客户端 IP 地址
-func getClientIPFromRequest(r *http.Request) string {
-	ip := r.Header.Get("X-Forwarded-For")
-	if ip != "" {
-		parts := strings.Split(ip, ",")
-		return strings.TrimSpace(parts[0])
-	}
-
-	ip = r.Header.Get("X-Real-IP")
-	if ip != "" {
-		return ip
-	}
-
-	ip = r.RemoteAddr
-	if idx := strings.LastIndex(ip, ":"); idx != -1 {
-		ip = ip[:idx]
-	}
-	return ip
 }

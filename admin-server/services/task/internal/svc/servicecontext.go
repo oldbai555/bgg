@@ -57,6 +57,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		consts.TaskModuleLoginLog:       callbackClient,
 		consts.TaskModulePerformanceLog: callbackClient,
 		consts.TaskModuleSdkCallLog:     callbackClient,
+		consts.TaskModuleFitnessCheckin: callbackClient,
 	}
 	exportExecutor := executors.NewGenericExportExecutor(moduleRoutes, callbackClient)
 

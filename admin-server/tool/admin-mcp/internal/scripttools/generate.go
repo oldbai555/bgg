@@ -18,7 +18,7 @@ func Register(s *server.MCPServer, repoRoot string) {
 	s.AddTool(mcp.NewTool("generate_sql",
 		mcp.WithDescription("封装 scripts/generate-sql.sh：一次性生成表结构 SQL、RBAC 初始化数据 SQL、.api 草稿、前端列表页骨架"),
 		mcp.WithString("group", mcp.Required(), mcp.Description("功能组名，格式 <domain>/<module>（如 iam/user、blog/article），与 .api 文件 "+
-			"@server(group:...) 的格式一致。<domain> 决定落进哪个服务的 db/services/<service>/ 目录（iam/system/monitoring/misc→iam，"+
+			"@server(group:...) 的格式一致。<domain> 决定落进哪个服务的 db/services/<service>/ 目录（iam/system/monitoring/misc/fitness→iam，"+
 			"blog/video→content，chat/task/sdk 各自独立），module 为 snake_case")),
 		mcp.WithString("name", mcp.Required(), mcp.Description("功能中文名称，如 用户管理")),
 		mcp.WithString("parent_id", mcp.Description("父菜单 ID，可选，优先级最高")),

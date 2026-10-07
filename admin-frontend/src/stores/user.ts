@@ -1,5 +1,6 @@
 import {defineStore} from 'pinia'
 import {iamApi} from '@/api/iam'
+import {fitnessApi} from '@/api/fitness'
 import type {LoginReq, ProfileResp, MenuItem} from '@/api/generated/admin'
 
 interface UserState {
@@ -36,13 +37,22 @@ export const useUserStore = defineStore('user', {
       const data = await iamApi.loginFeishu({code, state})
       await this.afterLoginSuccess(data.accessToken, data.refreshToken)
     },
-    // afterLoginSuccess 拿到 token 后的公共收尾：存 token、拉 profile/menus/字典、连 WebSocket。
-    // 密码登录和飞书登录殊途同归，都走这一段，避免重复维护两套初始化逻辑。
-    async afterLoginSuccess(accessToken: string, refreshToken: string) {
+    // 身材管理手机端登录：手机端用户没有后台菜单/权限，只存 token，不拉 profile/menus、不连 WebSocket，
+    // 字典由手机端页面按需加载（composables/useFitnessDicts.ts）
+    async loginByFeishuMobile(code: string, state: string, mode: string) {
+      const data = await fitnessApi.loginFeishu({code, state, mode})
+      this.saveTokens(data.accessToken, data.refreshToken)
+    },
+    saveTokens(accessToken: string, refreshToken: string) {
       this.token = accessToken
       this.refreshToken = refreshToken
       localStorage.setItem(tokenKey, this.token)
       localStorage.setItem(refreshKey, this.refreshToken)
+    },
+    // afterLoginSuccess 拿到 token 后的公共收尾：存 token、拉 profile/menus/字典、连 WebSocket。
+    // 密码登录和飞书登录殊途同归，都走这一段，避免重复维护两套初始化逻辑。
+    async afterLoginSuccess(accessToken: string, refreshToken: string) {
+      this.saveTokens(accessToken, refreshToken)
       await this.fetchProfile(true)
       await this.fetchMenus(true)
 

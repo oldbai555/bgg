@@ -12,16 +12,16 @@
 
 ```
 gateway        HTTP 唯一入口，无状态，不持有自己的数据库
-iam-rpc        承载：iam + system + monitoring + misc  → DB: admin_platform
+iam-rpc        承载：iam + system + monitoring + misc + fitness → DB: admin_platform
 content-rpc    承载：blog + video                       → DB: admin_content
 chat-rpc       承载：chat（含 hub）                       → DB: admin_chat
 task-rpc       承载：task（通用异步任务/队列基础设施）        → DB: admin_task
 sdk-rpc        承载：sdk（admin+public+调用日志）           → DB: admin_sdk
 ```
 
-9 个业务域 → 5 个数据服务 + 1 个无状态网关，一共 6 个独立部署单元。**拆分粒度按"是否有独立扩缩容/独立生命周期/独立信任边界的真实理由"决定，不是"一个业务域一个服务"的机械映射**——9 个服务对一个独立维护者是不必要的运维负担（要多盯 9 套日志、9 套健康检查、9 个 docker-compose 条目），这与用户明确要求的"做简单"直接冲突；反过来把所有域塞进一个单体又放弃了微服务拆分本该带来的独立部署/独立扩缩容收益。下面逐条给出每个合并/拆分决定的具体理由，理由本身来自对现有代码行为的观察，不是预先设定好答案再找理由。
+9 个业务域 → 5 个数据服务 + 1 个无状态网关，一共 6 个独立部署单元（Phase 2 时是 9 个域；2026-10-07 新增 `fitness` 后为 10 个域，并入 iam-rpc，部署单元数不变）。**拆分粒度按"是否有独立扩缩容/独立生命周期/独立信任边界的真实理由"决定，不是"一个业务域一个服务"的机械映射**——9 个服务对一个独立维护者是不必要的运维负担（要多盯 9 套日志、9 套健康检查、9 个 docker-compose 条目），这与用户明确要求的"做简单"直接冲突；反过来把所有域塞进一个单体又放弃了微服务拆分本该带来的独立部署/独立扩缩容收益。下面逐条给出每个合并/拆分决定的具体理由，理由本身来自对现有代码行为的观察，不是预先设定好答案再找理由。
 
-### 1.1 iam + system + monitoring + misc → iam-rpc
+### 1.1 iam + system + monitoring + misc + fitness → iam-rpc
 
 **核心理由：monitoring 的写入路径和请求路径是同构的，拆开只会制造无意义的同步 RPC。**
 
@@ -30,6 +30,8 @@ sdk-rpc        承载：sdk（admin+public+调用日志）           → DB: adm
 `system`、`monitoring` 体量也支持这个决定：`system` 域约 30 个 logic 文件、`monitoring` 域约 20 个 logic 文件（本文档第 2 节有精确的表清单），都是低频后台配置/日志查询场景，QPS 特征和 iam 高度一致（都是登录态管理员的后台管理操作），没有独立扩缩容的理由。而且 `system/notice` 的通知创建逻辑（`internal/logic/system/notice/notice_create_logic.go` 的 `createNotificationsForAllUsers`）本来就直接 `import "postapocgame/admin-server/internal/repository/iam"` 去分页拉取全量用户 ID 来批量建通知——这是一处真实存在的跨域直接耦合（详见第 3 节的核查结果），拆进同一个服务之后，这类耦合从"跨进程 RPC"降级为"进程内函数调用"，不需要重新设计。
 
 `misc`（`demo`、`daily_short_sentence`，共 2 张表、约 8 个 logic 文件）本身没有明确的领域归属，体量太小不值得单独占用一个部署单元，并入 iam-rpc 作为兜底工具端点。
+
+`fitness`（身材管理，8 张表）同样并入 iam-rpc：使用者就是 `admin_user` 里的飞书登录用户，首登建档/分配默认模板、统计里的昵称头像都要读 iam 用户数据；公司内部几十到几百人的低频读写，没有独立扩缩容理由，单开服务只会多一套部署和一次跨服务用户查询。
 
 ### 1.2 blog + video → content-rpc
 
@@ -67,6 +69,8 @@ sdk 是理由最充分的一个拆分：
 | misc | 2 | **2**（核实无误） | daily_short_sentence, demo | `demo` 表的建表/初始化 SQL 单独放在 `db/demo/`（不在 `db/migrations/` 下），是脚手架自带的演示模块，拆分时按普通表处理即可 |
 
 **结论**：全库真实表数是 **38 张**（10+6+5+3+4+1+6+1+2），比草案统计的 37 张多 1 张（`metric_daily_stats` 漏计）。`db/tables.sql` 本身只收录了 29 张核心表（iam 全部 10 张、system 6 张、monitoring 的 4 张日志表、chat 3 张、misc 的 `daily_short_sentence`、sdk 4 张、video 1 张），blog 的 6 张、`metric_daily_stats`、`admin_task`、`demo` 分别放在 `db/migrations/*.sql` 和 `db/demo/*.sql` 里——这是历史遗留的文件组织方式（先有 `tables.sql` 做的首批建表，后续新增域改成了增量迁移文件），第 4 节的 `db/services/` 目录重组会把这些分散的建表文件统一收拢，届时不再有"核心表在 tables.sql、新表在 migrations/"这种区分。
+
+> 本节是 Phase 2 拆分时的核查快照：2026-10-07 新增的 `fitness` 域 8 张表（`fitness_template` 等，建表 SQL 在 `db/services/iam/fitness/`）不在 38 张之内。
 
 再次确认：仓库里没有任何 `FOREIGN KEY` 约束（`db/tables.sql` + `db/migrations/*.sql` + `db/demo/*.sql` 全零），"拆库后外键失效"这个问题在 schema 层面不存在。
 
@@ -117,7 +121,8 @@ db/
     │   ├── audit_log/
     │   ├── performance_log/
     │   ├── demo/
-    │   └── daily_short_sentence/
+    │   ├── daily_short_sentence/
+    │   └── fitness/                   # 2026-10-07 新增（身材管理）
     ├── content/
     │   ├── blog/         (tag/article/article_tag/article_audit/friend_link/social_info 各自子目录或合并，按现有表粒度定)
     │   └── video/
@@ -129,9 +134,9 @@ db/
         └── sdk/           (sdk_key/sdk_interface/sdk_key_api/sdk_call_log)
 ```
 
-对照第 2 节的实测表清单，`db/services/iam/` 下要补一个第 2 节新发现的模块目录 `metric/`（对应 `metric_daily_stats`，随 monitoring 一起进 `admin_platform`）——这是本文档相对计划草案原始目录树的唯一必要补充,其余目录逐字照抄计划草案，不再调整。
+对照第 2 节的实测表清单，`db/services/iam/` 下要补一个第 2 节新发现的模块目录 `metric/`（对应 `metric_daily_stats`，随 monitoring 一起进 `admin_platform`）——这是本文档相对计划草案原始目录树的唯一必要补充,其余目录逐字照抄计划草案，不再调整。2026-10-07 新增的 `fitness` 域按同一结构落在 `db/services/iam/fitness/`（`create_table_fitness.sql`、`init_fitness.sql`、`migrations/dict_fitness_20261007.sql`）。
 
-`scripts/generate-sql.sh` 加一张固定的 域→服务 映射表（6 条：iam/system/monitoring/misc → iam，content 对应 blog/video，chat/task/sdk 各自对应自己），让新表按 `-group <domain>/<module>` 的 `<domain>` 自动落进 `db/services/<service>/<module>/`，服务归属只在这一张映射表里维护一次，不散落在别处。
+`scripts/generate-sql.sh` 加一张固定的 域→服务 映射表（iam/system/monitoring/misc/fitness → iam，content 对应 blog/video，chat/task/sdk 各自对应自己），让新表按 `-group <domain>/<module>` 的 `<domain>` 自动落进 `db/services/<service>/<module>/`，服务归属只在这一张映射表里维护一次，不散落在别处。
 
 **这一层目录拆分在 Phase 1 就可以先做**（不用等 Phase 2 才动），因为它只是把现有 SQL 文件重新归档，不影响单体运行——单体阶段所有服务的库仍然连的是同一个 MySQL 实例/同一套连接配置，只是 SQL 源文件已经按未来的服务边界分好目录，Phase 2 拆库时直接对应搬迁，不用重新梳理归属。
 
@@ -151,12 +156,12 @@ db/
 
 - 不做物理隔离（独立数据库主机/独立 MySQL 实例）——5 个 schema 初期共用一台 MySQL，Phase 2 只做逻辑隔离。
 - 不引入分布式事务/Saga——跨服务一致性统一走本文档第 5 节的三种模式，不引入 2PC/TCC 之类的重量级方案。
-- 不为了拆分而拆出第 6、7 个数据服务——9 个业务域到此为止收敛为 5 个数据服务 + 1 个网关，没有找到独立扩缩容/独立生命周期/独立信任边界理由的域不再继续细分。
+- 不为了拆分而拆出第 6、7 个数据服务——业务域（Phase 2 时 9 个，现 10 个）到此为止收敛为 5 个数据服务 + 1 个网关，没有找到独立扩缩容/独立生命周期/独立信任边界理由的域不再继续细分。
 - 不在本轮改变任何表结构本身（字段、索引）——本文档只处理"表归哪个服务"，不重新设计 schema。
 
 ## 7. 完成的定义
 
-- `db/services/` 目录树按第 4 节结构建好（含 `iam/metric/` 补充目录），`db/tables.sql`/`db/migrations/*.sql`/`db/demo/*.sql` 里的每张表的建表+初始化 SQL 都能在新目录树里找到对应文件，一一核对不遗漏（38 张表，逐张勾选）。
+- `db/services/` 目录树按第 4 节结构建好（含 `iam/metric/` 补充目录），`db/tables.sql`/`db/migrations/*.sql`/`db/demo/*.sql` 里的每张表的建表+初始化 SQL 都能在新目录树里找到对应文件，一一核对不遗漏（38 张表，逐张勾选；Phase 2 验收口径，不含后来新增的 fitness 8 张）。
 - `scripts/generate-sql.sh` 的 域→服务 映射表已经加上，新建一个模块跑一次 `-group iam/xxx` 能验证落进 `db/services/iam/xxx/`。
 - 第 3 节列出的每一处跨域越界 import，在 `16-rpc-conventions.md`/`17-async-eventing.md` 里都能找到对应的处理方式（RPC/Streams/TaskCallback/进程内合并），没有遗漏项。
 - 团队（即用户本人）过一遍第 1 节的 5 条合并/拆分理由，确认认可，再进入 `18-service-extraction-runbook.md` 的实际执行阶段。

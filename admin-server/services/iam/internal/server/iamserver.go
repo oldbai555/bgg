@@ -513,3 +513,135 @@ func (s *IamServer) DailyShortSentenceList(ctx context.Context, in *iam.DailySho
 	l := logic.NewDailyShortSentenceListLogic(ctx, s.svcCtx)
 	return l.DailyShortSentenceList(in)
 }
+
+// Fitness 后台：计划模板 / 通用提示 / 使用者 / 打卡统计（导出走 task-rpc → TaskCallback.FetchExportData）
+func (s *IamServer) FitnessTemplateList(ctx context.Context, in *iam.FitnessTemplateListRequest) (*iam.FitnessTemplateListResponse, error) {
+	l := logic.NewFitnessTemplateListLogic(ctx, s.svcCtx)
+	return l.FitnessTemplateList(in)
+}
+
+func (s *IamServer) FitnessTemplateCreate(ctx context.Context, in *iam.FitnessTemplateSaveRequest) (*iam.Empty, error) {
+	l := logic.NewFitnessTemplateCreateLogic(ctx, s.svcCtx)
+	return l.FitnessTemplateCreate(in)
+}
+
+func (s *IamServer) FitnessTemplateUpdate(ctx context.Context, in *iam.FitnessTemplateSaveRequest) (*iam.Empty, error) {
+	l := logic.NewFitnessTemplateUpdateLogic(ctx, s.svcCtx)
+	return l.FitnessTemplateUpdate(in)
+}
+
+func (s *IamServer) FitnessTemplateDelete(ctx context.Context, in *iam.FitnessIdRequest) (*iam.Empty, error) {
+	l := logic.NewFitnessTemplateDeleteLogic(ctx, s.svcCtx)
+	return l.FitnessTemplateDelete(in)
+}
+
+func (s *IamServer) FitnessTemplateDays(ctx context.Context, in *iam.FitnessTemplateDaysRequest) (*iam.FitnessTemplateDaysResponse, error) {
+	l := logic.NewFitnessTemplateDaysLogic(ctx, s.svcCtx)
+	return l.FitnessTemplateDays(in)
+}
+
+func (s *IamServer) FitnessTemplateDaySave(ctx context.Context, in *iam.FitnessTemplateDaySaveRequest) (*iam.Empty, error) {
+	l := logic.NewFitnessTemplateDaySaveLogic(ctx, s.svcCtx)
+	return l.FitnessTemplateDaySave(in)
+}
+
+func (s *IamServer) FitnessTemplateDayDelete(ctx context.Context, in *iam.FitnessIdRequest) (*iam.Empty, error) {
+	l := logic.NewFitnessTemplateDayDeleteLogic(ctx, s.svcCtx)
+	return l.FitnessTemplateDayDelete(in)
+}
+
+func (s *IamServer) FitnessTipList(ctx context.Context, in *iam.FitnessTipListRequest) (*iam.FitnessTipListResponse, error) {
+	l := logic.NewFitnessTipListLogic(ctx, s.svcCtx)
+	return l.FitnessTipList(in)
+}
+
+func (s *IamServer) FitnessTipCreate(ctx context.Context, in *iam.FitnessTipSaveRequest) (*iam.Empty, error) {
+	l := logic.NewFitnessTipCreateLogic(ctx, s.svcCtx)
+	return l.FitnessTipCreate(in)
+}
+
+func (s *IamServer) FitnessTipUpdate(ctx context.Context, in *iam.FitnessTipSaveRequest) (*iam.Empty, error) {
+	l := logic.NewFitnessTipUpdateLogic(ctx, s.svcCtx)
+	return l.FitnessTipUpdate(in)
+}
+
+func (s *IamServer) FitnessTipDelete(ctx context.Context, in *iam.FitnessIdRequest) (*iam.Empty, error) {
+	l := logic.NewFitnessTipDeleteLogic(ctx, s.svcCtx)
+	return l.FitnessTipDelete(in)
+}
+
+func (s *IamServer) FitnessMemberList(ctx context.Context, in *iam.FitnessMemberListRequest) (*iam.FitnessMemberListResponse, error) {
+	l := logic.NewFitnessMemberListLogic(ctx, s.svcCtx)
+	return l.FitnessMemberList(in)
+}
+
+func (s *IamServer) FitnessMemberAssign(ctx context.Context, in *iam.FitnessMemberAssignRequest) (*iam.FitnessTemplateSwitchResponse, error) {
+	l := logic.NewFitnessMemberAssignLogic(ctx, s.svcCtx)
+	return l.FitnessMemberAssign(in)
+}
+
+func (s *IamServer) FitnessSwitchList(ctx context.Context, in *iam.FitnessSwitchListRequest) (*iam.FitnessSwitchListResponse, error) {
+	l := logic.NewFitnessSwitchListLogic(ctx, s.svcCtx)
+	return l.FitnessSwitchList(in)
+}
+
+func (s *IamServer) FitnessStatsOverview(ctx context.Context, in *iam.FitnessStatsOverviewRequest) (*iam.FitnessStatsOverviewResponse, error) {
+	l := logic.NewFitnessStatsOverviewLogic(ctx, s.svcCtx)
+	return l.FitnessStatsOverview(in)
+}
+
+func (s *IamServer) FitnessCheckinList(ctx context.Context, in *iam.FitnessCheckinListRequest) (*iam.FitnessCheckinListResponse, error) {
+	l := logic.NewFitnessCheckinListLogic(ctx, s.svcCtx)
+	return l.FitnessCheckinList(in)
+}
+
+func (s *IamServer) FitnessMemberDetail(ctx context.Context, in *iam.FitnessMemberDetailRequest) (*iam.FitnessMemberDetailResponse, error) {
+	l := logic.NewFitnessMemberDetailLogic(ctx, s.svcCtx)
+	return l.FitnessMemberDetail(in)
+}
+
+// Fitness 手机端：只操作 user_id 本人的数据
+func (s *IamServer) FitnessLoginConfig(ctx context.Context, in *iam.Empty) (*iam.FitnessLoginConfigResponse, error) {
+	l := logic.NewFitnessLoginConfigLogic(ctx, s.svcCtx)
+	return l.FitnessLoginConfig(in)
+}
+
+func (s *IamServer) FitnessMyDay(ctx context.Context, in *iam.FitnessMyDayRequest) (*iam.FitnessMyDayResponse, error) {
+	l := logic.NewFitnessMyDayLogic(ctx, s.svcCtx)
+	return l.FitnessMyDay(in)
+}
+
+func (s *IamServer) FitnessMyCheckinSave(ctx context.Context, in *iam.FitnessMyCheckinSaveRequest) (*iam.FitnessCheckinItem, error) {
+	l := logic.NewFitnessMyCheckinSaveLogic(ctx, s.svcCtx)
+	return l.FitnessMyCheckinSave(in)
+}
+
+func (s *IamServer) FitnessMyBodyRecordList(ctx context.Context, in *iam.FitnessMyBodyRecordListRequest) (*iam.FitnessBodyRecordListResponse, error) {
+	l := logic.NewFitnessMyBodyRecordListLogic(ctx, s.svcCtx)
+	return l.FitnessMyBodyRecordList(in)
+}
+
+func (s *IamServer) FitnessMyBodyRecordSave(ctx context.Context, in *iam.FitnessMyBodyRecordSaveRequest) (*iam.Empty, error) {
+	l := logic.NewFitnessMyBodyRecordSaveLogic(ctx, s.svcCtx)
+	return l.FitnessMyBodyRecordSave(in)
+}
+
+func (s *IamServer) FitnessMyProfile(ctx context.Context, in *iam.FitnessMyProfileRequest) (*iam.FitnessMyProfileResponse, error) {
+	l := logic.NewFitnessMyProfileLogic(ctx, s.svcCtx)
+	return l.FitnessMyProfile(in)
+}
+
+func (s *IamServer) FitnessMyProfileUpdate(ctx context.Context, in *iam.FitnessMyProfileUpdateRequest) (*iam.Empty, error) {
+	l := logic.NewFitnessMyProfileUpdateLogic(ctx, s.svcCtx)
+	return l.FitnessMyProfileUpdate(in)
+}
+
+func (s *IamServer) FitnessMyTemplateSwitch(ctx context.Context, in *iam.FitnessMyTemplateSwitchRequest) (*iam.FitnessTemplateSwitchResponse, error) {
+	l := logic.NewFitnessMyTemplateSwitchLogic(ctx, s.svcCtx)
+	return l.FitnessMyTemplateSwitch(in)
+}
+
+func (s *IamServer) FitnessMySuggestionDecide(ctx context.Context, in *iam.FitnessMySuggestionDecideRequest) (*iam.Empty, error) {
+	l := logic.NewFitnessMySuggestionDecideLogic(ctx, s.svcCtx)
+	return l.FitnessMySuggestionDecide(in)
+}

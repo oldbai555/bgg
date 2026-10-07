@@ -18,17 +18,20 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/zeromicro/go-zero/core/logx"
 
+	pb "postapocgame/admin-server/pkg/taskcallback/pb"
 	"postapocgame/admin-server/services/iam/internal/consts"
+	fitnessdomain "postapocgame/admin-server/services/iam/internal/domain/fitness"
 	systemmodel "postapocgame/admin-server/services/iam/internal/model/system"
 	"postapocgame/admin-server/services/iam/internal/repository"
+	fitnessrepo "postapocgame/admin-server/services/iam/internal/repository/fitness"
 	monitoringrepo "postapocgame/admin-server/services/iam/internal/repository/monitoring"
 	systemrepo "postapocgame/admin-server/services/iam/internal/repository/system"
-	pb "postapocgame/admin-server/pkg/taskcallback/pb"
 	"postapocgame/admin-server/services/sdk/sdkclient"
 )
 
@@ -68,6 +71,8 @@ func (s *TaskCallbackServer) FetchExportData(ctx context.Context, req *pb.FetchE
 		headers, rows, err = s.fetchPerformanceLog(ctx, filters)
 	case consts.TaskModuleSdkCallLog:
 		headers, rows, err = s.fetchSdkCallLog(ctx, filters)
+	case consts.TaskModuleFitnessCheckin:
+		headers, rows, err = s.fetchFitnessCheckin(ctx, filters)
 	default:
 		return nil, fmt.Errorf("不支持的导出模块: %s", req.Module)
 	}
@@ -120,6 +125,82 @@ func filterInt64(filters map[string]interface{}, key string) int64 {
 
 func filterInt(filters map[string]interface{}, key string) int {
 	return int(filterInt64(filters, key))
+}
+
+// fetchFitnessCheckin 身材管理打卡明细导出，口径与后台「打卡统计 - 明细」列表完全一致（同一个 CheckinRows）。
+func (s *TaskCallbackServer) fetchFitnessCheckin(ctx context.Context, filters map[string]interface{}) ([]string, [][]string, error) {
+	svc := fitnessdomain.NewService(s.repo)
+	list, _, err := svc.CheckinRows(ctx, fitnessrepo.CheckinFilter{
+		UserID:    filterUint64(filters, consts.TaskFilterUserId),
+		StartDate: filterString(filters, consts.TaskFilterStartDate),
+		EndDate:   filterString(filters, consts.TaskFilterEndDate),
+	}, 1, 10000)
+	if err != nil {
+		return nil, nil, fmt.Errorf("查询打卡明细失败: %w", err)
+	}
+
+	trainingType := s.dictLabels(ctx, consts.DictCodeFitnessTrainingType)
+	trainingStatus := s.dictLabels(ctx, consts.DictCodeFitnessTrainingStatus)
+	headers := []string{"日期", "用户ID", "昵称", "模板", "训练类型", "训练状态", "已完成动作", "动作总数", "按计划吃", "吃了别的", "没吃", "步数", "步数目标", "喝水(杯)", "训练完成度", "更新时间"}
+	rows := make([][]string, 0, len(list))
+	for _, r := range list {
+		c := r.Checkin
+		score := "不计入"
+		if r.Score >= 0 {
+			score = fmt.Sprintf("%.0f%%", r.Score*100)
+		}
+		rows = append(rows, []string{
+			c.CheckinDate,
+			fmt.Sprintf("%d", c.UserId),
+			r.Nickname,
+			r.TemplateName,
+			labelOf(trainingType, c.TrainingType),
+			labelOf(trainingStatus, c.TrainingStatus),
+			fmt.Sprintf("%d", r.ExerciseDone),
+			fmt.Sprintf("%d", c.ExerciseTotal),
+			fmt.Sprintf("%d", r.MealOnPlan),
+			fmt.Sprintf("%d", r.MealOther),
+			fmt.Sprintf("%d", r.MealSkipped),
+			fmt.Sprintf("%d", c.Steps),
+			fmt.Sprintf("%d", c.StepGoal),
+			fmt.Sprintf("%d", c.WaterCups),
+			score,
+			time.Unix(c.UpdatedAt, 0).In(fitnessdomain.Shanghai).Format("2006-01-02 15:04:05"),
+		})
+	}
+	return headers, rows, nil
+}
+
+// dictLabels 字典 value → label。字典缺失只记日志、返回空 map，导出列回退成数值，不让整个导出失败。
+func (s *TaskCallbackServer) dictLabels(ctx context.Context, code string) map[int64]string {
+	labels := map[int64]string{}
+	dictType, err := systemrepo.NewDictTypeRepository(s.repo).FindByCode(ctx, code)
+	if err != nil {
+		logx.WithContext(ctx).Errorf("获取字典类型 %s 失败: %v", code, err)
+		return labels
+	}
+	items, err := systemrepo.NewDictItemRepository(s.repo).FindByTypeID(ctx, dictType.Id)
+	if err != nil {
+		logx.WithContext(ctx).Errorf("获取字典项 %s 失败: %v", code, err)
+		return labels
+	}
+	for _, item := range items {
+		if v, err := strconv.ParseInt(item.Value, 10, 64); err == nil {
+			labels[v] = item.Label
+		}
+	}
+	return labels
+}
+
+// labelOf 字典 value 从 1 开始，0 表示未填，导出成 "-"。
+func labelOf(labels map[int64]string, value int64) string {
+	if label, ok := labels[value]; ok {
+		return label
+	}
+	if value == 0 {
+		return "-"
+	}
+	return strconv.FormatInt(value, 10)
 }
 
 func (s *TaskCallbackServer) fetchOperationLog(ctx context.Context, filters map[string]interface{}) ([]string, [][]string, error) {

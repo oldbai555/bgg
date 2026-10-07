@@ -30,6 +30,10 @@ type Config struct {
 		AppId       string
 		AppSecret   string
 		RedirectUri string
+		// MobileRedirectUri 身材管理手机端（普通浏览器）OAuth 回调地址，必须在飞书应用「重定向URL」白名单里
+		MobileRedirectUri string `json:",optional"`
+		// TenantKey 只允许该飞书租户的用户登录；为空不校验（自建应用本身只对本企业可用）
+		TenantKey string `json:",optional"`
 	}
 	// SdkRpc 连到 sdk-rpc 的 zrpc client 配置：原单体内嵌 TaskCallback server 的
 	// fetchSdkCallLog 分支回调 sdk-rpc.SdkCallLogExport，这里原样保留（见

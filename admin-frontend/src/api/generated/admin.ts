@@ -6,6 +6,21 @@ export * from "./adminComponents"
  * @description 
  * @param req
  */
+export function knowledgeQaAsk(req: components.KnowledgeQaAskReq) {
+	return webapi.post<components.KnowledgeQaAskResp>(`/api/v1/ai/knowledge-qa/ask`, req)
+}
+
+/**
+ * @description 
+ */
+export function knowledgeQaReindex() {
+	return webapi.post<components.KnowledgeQaReindexResp>(`/api/v1/ai/knowledge-qa/reindex`)
+}
+
+/**
+ * @description 
+ * @param req
+ */
 export function blogArticleList(req: components.BlogArticleListReq) {
 	return webapi.get<components.BlogArticleListResp>(`/api/v1/blog/articles`, req)
 }
@@ -370,6 +385,228 @@ export function chatMessageListAdmin(req: components.ChatMessageListReq) {
  */
 export function chatMessageDelete(req: components.ChatMessageDeleteReq) {
 	return webapi.delete<components.Response>(`/api/v1/chats/messages`, req)
+}
+
+/**
+ * @description 
+ */
+export function fitnessLoginConfig() {
+	return webapi.get<components.FitnessLoginConfigResp>(`/api/v1/fitness/login/config`)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function fitnessLoginFeishu(req: components.FitnessLoginFeishuReq) {
+	return webapi.post<components.TokenPair>(`/api/v1/fitness/login/feishu`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function fitnessMemberList(req: components.FitnessMemberListReq) {
+	return webapi.get<components.FitnessMemberListResp>(`/api/v1/fitness/members`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function fitnessSwitchList(req: components.FitnessSwitchListReq) {
+	return webapi.get<components.FitnessSwitchListResp>(`/api/v1/fitness/members/switches`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function fitnessMemberAssign(req: components.FitnessMemberAssignReq) {
+	return webapi.post<components.FitnessTemplateSwitchResp>(`/api/v1/fitness/members/template`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function fitnessMyBodyRecordList(req: components.FitnessMyBodyRecordListReq) {
+	return webapi.get<components.FitnessBodyRecordListResp>(`/api/v1/fitness/my/body-records`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function fitnessMyBodyRecordSave(req: components.FitnessMyBodyRecordSaveReq) {
+	return webapi.put<null>(`/api/v1/fitness/my/body-records`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function fitnessMyCheckinSave(req: components.FitnessMyCheckinSaveReq) {
+	return webapi.put<components.FitnessCheckinItem>(`/api/v1/fitness/my/checkin`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function fitnessMyDay(req: components.FitnessMyDayReq) {
+	return webapi.get<components.FitnessMyDayResp>(`/api/v1/fitness/my/day`, req)
+}
+
+/**
+ * @description 
+ */
+export function fitnessMyProfile() {
+	return webapi.get<components.FitnessMyProfileResp>(`/api/v1/fitness/my/profile`)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function fitnessMyProfileUpdate(req: components.FitnessMyProfileUpdateReq) {
+	return webapi.put<null>(`/api/v1/fitness/my/profile`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function fitnessMySuggestionDecide(req: components.FitnessMySuggestionDecideReq) {
+	return webapi.post<null>(`/api/v1/fitness/my/suggestion-decision`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function fitnessMyTemplateSwitch(req: components.FitnessMyTemplateSwitchReq) {
+	return webapi.post<components.FitnessTemplateSwitchResp>(`/api/v1/fitness/my/template-switch`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function fitnessCheckinList(req: components.FitnessCheckinListReq) {
+	return webapi.get<components.FitnessCheckinListResp>(`/api/v1/fitness/stats/checkins`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function fitnessCheckinExport(req: components.FitnessCheckinExportReq) {
+	return webapi.get<components.Response>(`/api/v1/fitness/stats/checkins/export`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function fitnessMemberDetail(req: components.FitnessMemberDetailReq) {
+	return webapi.get<components.FitnessMemberDetailResp>(`/api/v1/fitness/stats/member`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function fitnessStatsOverview(req: components.FitnessStatsOverviewReq) {
+	return webapi.get<components.FitnessStatsOverviewResp>(`/api/v1/fitness/stats/overview`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function fitnessTemplateDays(req: components.FitnessTemplateDaysReq) {
+	return webapi.get<components.FitnessTemplateDaysResp>(`/api/v1/fitness/template-days`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function fitnessTemplateDaySave(req: components.FitnessTemplateDaySaveReq) {
+	return webapi.put<null>(`/api/v1/fitness/template-days`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function fitnessTemplateDayDelete(req: components.FitnessIdReq) {
+	return webapi.delete<null>(`/api/v1/fitness/template-days`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function fitnessTemplateList(req: components.FitnessTemplateListReq) {
+	return webapi.get<components.FitnessTemplateListResp>(`/api/v1/fitness/templates`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function fitnessTemplateCreate(req: components.FitnessTemplateCreateReq) {
+	return webapi.post<null>(`/api/v1/fitness/templates`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function fitnessTemplateUpdate(req: components.FitnessTemplateUpdateReq) {
+	return webapi.put<null>(`/api/v1/fitness/templates`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function fitnessTemplateDelete(req: components.FitnessIdReq) {
+	return webapi.delete<null>(`/api/v1/fitness/templates`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function fitnessTipList(req: components.FitnessTipListReq) {
+	return webapi.get<components.FitnessTipListResp>(`/api/v1/fitness/tips`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function fitnessTipCreate(req: components.FitnessTipSaveReq) {
+	return webapi.post<null>(`/api/v1/fitness/tips`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function fitnessTipUpdate(req: components.FitnessTipSaveReq) {
+	return webapi.put<null>(`/api/v1/fitness/tips`, req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function fitnessTipDelete(req: components.FitnessIdReq) {
+	return webapi.delete<null>(`/api/v1/fitness/tips`, req)
 }
 
 /**

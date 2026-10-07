@@ -60,3 +60,4 @@
 | [2026-07-17-3.md](2026-07-17-3.md) | 文档治理：建立「文档分层与生命周期」规则，退役 `docs/后端开发进度.md`/`docs/前端开发进度.md`/3 份 DDD-lite 草稿，历史内容归档进 `archive-backend.md`/`archive-frontend.md` |
 | [2026-07-17-4.md](2026-07-17-4.md) | `admin-server/db` SQL 整理：全部模块的 `admin_menu.path`/`component` 补齐 `/admin` 前缀与域重组新值、飞书部门角色种子数据并入 init 源头、`user_third_party` 补进初始化循环，退役 10 份历史 fix/增量脚本，一键 `init-dev-db.sh` 不再需要额外手动执行任何脚本 |
 | [2026-07-31.md](2026-07-31.md) | CI 飞书通知（#7）+ bgg-dev 自动部署（`deploy-dev` job）+ 部署专用 SSH 密钥配置与踩坑记录 |
+| [2026-10-07.md](2026-10-07.md) | 身材管理（fitness）第一期：手机端飞书登录/今日计划/打卡/身体数据 + 后台模板周编辑/使用者/打卡统计，fitness 域并入 iam-rpc |

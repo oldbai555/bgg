@@ -2,7 +2,7 @@ import {describe, it, expect, beforeEach, vi} from 'vitest'
 import {createPinia, setActivePinia} from 'pinia'
 
 const {currentRoute} = vi.hoisted(() => ({
-  currentRoute: {value: {path: '/admin/dashboard'}}
+  currentRoute: {value: {path: '/admin/dashboard', fullPath: '/admin/dashboard'}}
 }))
 
 vi.mock('@/router', () => ({
@@ -15,6 +15,7 @@ import {useUserStore} from '@/stores/user'
 
 const setPath = (path: string) => {
   currentRoute.value.path = path
+  currentRoute.value.fullPath = path
 }
 
 describe('isPublicPath', () => {
@@ -125,5 +126,29 @@ describe('handleResponseError', () => {
 
     expect(userStore.token).toBe('')
     expect(router.push).toHaveBeenCalledWith('/admin/login')
+  })
+
+  it('网关 text/plain 业务错误取 rpc desc 之后的文案', async () => {
+    await expect(
+      handleResponseError({
+        response: {data: '保存打卡失败: rpc error: code = InvalidArgument desc = 只能打今天和最近 7 天的卡'},
+        message: 'Request failed with status code 400'
+      })
+    ).rejects.toThrow(/^只能打今天和最近 7 天的卡$/)
+    await expect(
+      handleResponseError({response: {data: '参数错误\n'}, message: 'Request failed with status code 400'})
+    ).rejects.toThrow(/^参数错误$/)
+  })
+
+  it('身材管理手机端 10003 跳手机端飞书登录页并带回跳地址', async () => {
+    setPath('/front/fitness/checkin')
+    await expect(handleResponseError({response: {data: {code: 10003, msg: '登录已过期'}}})).rejects.toThrow()
+    expect(router.push).toHaveBeenCalledWith({path: '/front/fitness/login', query: {redirect: '/front/fitness/checkin'}})
+  })
+
+  it('普通公共页 10003 不跳登录', async () => {
+    setPath('/front/blog')
+    await expect(handleResponseError({response: {data: {code: 10003, msg: '登录已过期'}}})).rejects.toThrow()
+    expect(router.push).not.toHaveBeenCalled()
   })
 })

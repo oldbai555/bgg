@@ -175,6 +175,8 @@ const (
 	TaskModuleSdkCallLog = "sdk_call_log"
 	// TaskModulePerformanceLog 性能监控日志导出模块
 	TaskModulePerformanceLog = "performance_log"
+	// TaskModuleFitnessCheckin 身材管理打卡明细导出模块
+	TaskModuleFitnessCheckin = "fitness_checkin"
 )
 
 // 任务导出筛选字段 key 常量（ExcelExportParams.Filters 使用）
@@ -196,6 +198,8 @@ const (
 	TaskFilterApiCode       = "apiCode"
 	TaskFilterRespCode      = "respCode"
 	TaskFilterIP            = "ip"
+	TaskFilterStartDate     = "startDate"
+	TaskFilterEndDate       = "endDate"
 )
 
 // M3U8 代理相关常量
@@ -305,4 +309,9 @@ const (
 	MetricModuleBlogArticleDetail = "blog_article_detail"
 	MetricModuleVideoList         = "video_list"
 	MetricModuleVideoDetail       = "video_detail"
+	MetricModuleFitnessToday      = "fitness_today"
+	MetricModuleFitnessCheckin    = "fitness_checkin"
+	MetricModuleFitnessBody       = "fitness_body"
+	MetricModuleFitnessMe         = "fitness_me"
+	MetricModuleFitnessLogin      = "fitness_login"
 )

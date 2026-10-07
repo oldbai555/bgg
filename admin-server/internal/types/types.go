@@ -815,6 +815,435 @@ type FileUploadResp struct {
 	Ext          string `json:"ext"`
 }
 
+type FitnessBodyRecordItem struct {
+	Date       string  `json:"date"`
+	WeightKg   float64 `json:"weightKg"`
+	WaistCm    float64 `json:"waistCm"`
+	WeightAvg7 float64 `json:"weightAvg7"` // 7 日移动平均
+}
+
+type FitnessBodyRecordListResp struct {
+	List []FitnessBodyRecordItem `json:"list"`
+}
+
+type FitnessCalendarDay struct {
+	Date         string  `json:"date"`
+	Counted      bool    `json:"counted"` // 是否计入完成率（训练日）
+	Checked      bool    `json:"checked"` // 当天有任意打卡
+	Score        float64 `json:"score"`
+	TrainingType int64   `json:"trainingType"`
+}
+
+type FitnessCheckinExportReq struct {
+	UserId    uint64 `json:"userId,optional" form:"userId,optional"`
+	StartDate string `json:"startDate,optional" form:"startDate,optional"`
+	EndDate   string `json:"endDate,optional" form:"endDate,optional"`
+}
+
+type FitnessCheckinItem struct {
+	Date           string             `json:"date"`
+	TemplateId     uint64             `json:"templateId"`
+	TrainingType   int64              `json:"trainingType"`
+	TrainingStatus int64              `json:"trainingStatus"` // 0未打卡 1完成 2部分完成 3跳过
+	ExerciseDone   []int64            `json:"exerciseDone"`
+	ExerciseTotal  int64              `json:"exerciseTotal"`
+	Meals          []FitnessMealCheck `json:"meals"`
+	Steps          int64              `json:"steps"`
+	StepGoal       int64              `json:"stepGoal"`
+	WaterCups      int64              `json:"waterCups"`
+	UpdatedAt      int64              `json:"updatedAt"`
+}
+
+type FitnessCheckinListReq struct {
+	Page      int64  `json:"page,optional" form:"page,optional"`
+	PageSize  int64  `json:"pageSize,optional" form:"pageSize,optional"`
+	UserId    uint64 `json:"userId,optional" form:"userId,optional"`
+	StartDate string `json:"startDate,optional" form:"startDate,optional"`
+	EndDate   string `json:"endDate,optional" form:"endDate,optional"`
+}
+
+type FitnessCheckinListResp struct {
+	Total int64               `json:"total"`
+	List  []FitnessCheckinRow `json:"list"`
+}
+
+type FitnessCheckinRow struct {
+	Id             uint64  `json:"id"`
+	Date           string  `json:"date"`
+	UserId         uint64  `json:"userId"`
+	Nickname       string  `json:"nickname"`
+	TemplateName   string  `json:"templateName"`
+	TrainingType   int64   `json:"trainingType"`
+	TrainingStatus int64   `json:"trainingStatus"`
+	ExerciseDone   int64   `json:"exerciseDone"`
+	ExerciseTotal  int64   `json:"exerciseTotal"`
+	MealOnPlan     int64   `json:"mealOnPlan"`
+	MealOther      int64   `json:"mealOther"`
+	MealSkipped    int64   `json:"mealSkipped"`
+	Steps          int64   `json:"steps"`
+	StepGoal       int64   `json:"stepGoal"`
+	WaterCups      int64   `json:"waterCups"`
+	Score          float64 `json:"score"` // 训练完成度 0~1，-1 表示休息日不计入
+	UpdatedAt      int64   `json:"updatedAt"`
+}
+
+type FitnessDailyCount struct {
+	Date  string `json:"date"`
+	Count int64  `json:"count"`
+}
+
+type FitnessDayContent struct {
+	TrainingType int64             `json:"trainingType"` // 1力量 2有氧 3休息
+	TrainingTime string            `json:"trainingTime,optional"`
+	StepGoal     int64             `json:"stepGoal,optional"`
+	Warmup       string            `json:"warmup,optional"`
+	Exercises    []FitnessExercise `json:"exercises,optional"`
+	Stretch      string            `json:"stretch,optional"`
+	TrainingNote string            `json:"trainingNote,optional"`
+	Meals        []FitnessMeal     `json:"meals,optional"`
+	Tip          string            `json:"tip,optional"`
+}
+
+type FitnessExercise struct {
+	Name     string `json:"name"`
+	Sets     int64  `json:"sets,optional"`
+	Reps     string `json:"reps,optional"`
+	Duration string `json:"duration,optional"`
+	Note     string `json:"note,optional"`
+}
+
+type FitnessIdReq struct {
+	Id uint64 `json:"id,optional" form:"id,optional"`
+}
+
+type FitnessLoginConfigResp struct {
+	AppId string `json:"appId"`
+}
+
+type FitnessLoginFeishuReq struct {
+	Code  string `json:"code,optional"`
+	State string `json:"state,optional"`
+	Mode  string `json:"mode,optional"` // h5=飞书客户端内免登，oauth=普通浏览器跳转授权
+}
+
+type FitnessMeal struct {
+	Slot         string   `json:"slot"` // breakfast/lunch/snack/dinner/after_home
+	Time         string   `json:"time,optional"`
+	Place        string   `json:"place,optional"`
+	Food         string   `json:"food,optional"`
+	Portion      string   `json:"portion,optional"`
+	Kcal         int64    `json:"kcal,optional"`
+	Protein      int64    `json:"protein,optional"`
+	HowToOrder   string   `json:"howToOrder,optional"`
+	Alternatives []string `json:"alternatives,optional"`
+}
+
+type FitnessMealCheck struct {
+	Slot   string `json:"slot"`
+	Status int64  `json:"status"` // 1按计划吃了 2吃了别的 3没吃
+	Note   string `json:"note,optional"`
+}
+
+type FitnessMemberAssignReq struct {
+	UserId     uint64 `json:"userId,optional"`
+	TemplateId uint64 `json:"templateId,optional"`
+	Reason     string `json:"reason,optional"`
+}
+
+type FitnessMemberDetailReq struct {
+	UserId    uint64 `json:"userId,optional" form:"userId,optional"`
+	StartDate string `json:"startDate,optional" form:"startDate,optional"` // 默认结束日期往前 90 天
+	EndDate   string `json:"endDate,optional" form:"endDate,optional"`     // 默认今天
+}
+
+type FitnessMemberDetailResp struct {
+	Member      FitnessMemberItem       `json:"member"`
+	RangeRate   float64                 `json:"rangeRate"`
+	Calendar    []FitnessCalendarDay    `json:"calendar"`
+	BodyRecords []FitnessBodyRecordItem `json:"bodyRecords"`
+	Switches    []FitnessSwitchItem     `json:"switches"`
+}
+
+type FitnessMemberItem struct {
+	UserId          uint64  `json:"userId"`
+	Username        string  `json:"username"`
+	Nickname        string  `json:"nickname"`
+	Avatar          string  `json:"avatar"`
+	TemplateId      uint64  `json:"templateId"`
+	TemplateName    string  `json:"templateName"`
+	HeightCm        float64 `json:"heightCm"`
+	TargetWeightKg  float64 `json:"targetWeightKg"`
+	LatestWeightKg  float64 `json:"latestWeightKg"`
+	StreakDays      int64   `json:"streakDays"`
+	WeekRate        float64 `json:"weekRate"`
+	LastCheckinDate string  `json:"lastCheckinDate"`
+	CreatedAt       int64   `json:"createdAt"`
+}
+
+type FitnessMemberListReq struct {
+	Page     int64  `json:"page,optional" form:"page,optional"`
+	PageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
+	Keyword  string `json:"keyword,optional" form:"keyword,optional"` // 昵称/用户名
+}
+
+type FitnessMemberListResp struct {
+	Total int64               `json:"total"`
+	List  []FitnessMemberItem `json:"list"`
+}
+
+type FitnessMyBodyRecordListReq struct {
+	Days int64 `json:"days,optional" form:"days,optional"` // 默认 90，最多 365
+}
+
+type FitnessMyBodyRecordSaveReq struct {
+	Date     string  `json:"date,optional"`
+	WeightKg float64 `json:"weightKg,optional"`
+	WaistCm  float64 `json:"waistCm,optional"`
+}
+
+type FitnessMyCheckinSaveReq struct {
+	Date           string             `json:"date,optional"`
+	TrainingStatus int64              `json:"trainingStatus,optional"`
+	ExerciseDone   []int64            `json:"exerciseDone,optional"`
+	Meals          []FitnessMealCheck `json:"meals,optional"`
+	Steps          int64              `json:"steps,optional"`
+	WaterCups      int64              `json:"waterCups,optional"`
+}
+
+type FitnessMyDayReq struct {
+	Date string `json:"date,optional" form:"date,optional"` // 默认今天
+}
+
+type FitnessMyDayResp struct {
+	Date         string                 `json:"date"`
+	Today        string                 `json:"today"`
+	Weekday      int64                  `json:"weekday"` // 1周一~7周日
+	CanCheckin   bool                   `json:"canCheckin"`
+	HasPlan      bool                   `json:"hasPlan"`
+	TemplateId   uint64                 `json:"templateId"`
+	TemplateName string                 `json:"templateName"`
+	IsOverride   bool                   `json:"isOverride"`
+	Content      *FitnessDayContent     `json:"content,optional"`
+	Tips         []FitnessTipItem       `json:"tips"`
+	Checkin      *FitnessCheckinItem    `json:"checkin,optional"`
+	Suggestion   *FitnessSuggestionItem `json:"suggestion,optional"`
+}
+
+type FitnessMyProfileResp struct {
+	Today              string                 `json:"today"`
+	Nickname           string                 `json:"nickname"`
+	Avatar             string                 `json:"avatar"`
+	HeightCm           float64                `json:"heightCm"`
+	TargetWeightKg     float64                `json:"targetWeightKg"`
+	TrainingPreference int64                  `json:"trainingPreference"` // 1早练 2晚练
+	LatestWeightKg     float64                `json:"latestWeightKg"`
+	StreakDays         int64                  `json:"streakDays"`
+	WeekRate           float64                `json:"weekRate"` // 本周训练完成率 0~1
+	CurrentTemplate    *FitnessTemplateBrief  `json:"currentTemplate,optional"`
+	PendingSwitch      *FitnessPendingSwitch  `json:"pendingSwitch,optional"`
+	Suggestion         *FitnessSuggestionItem `json:"suggestion,optional"`
+	Templates          []FitnessTemplateBrief `json:"templates"`
+}
+
+type FitnessMyProfileUpdateReq struct {
+	HeightCm           float64 `json:"heightCm,optional"`
+	TargetWeightKg     float64 `json:"targetWeightKg,optional"`
+	TrainingPreference int64   `json:"trainingPreference,optional"`
+}
+
+type FitnessMySuggestionDecideReq struct {
+	Id     uint64 `json:"id,optional"`
+	Accept bool   `json:"accept,optional"`
+}
+
+type FitnessMyTemplateSwitchReq struct {
+	TemplateId uint64 `json:"templateId,optional"`
+}
+
+type FitnessPendingSwitch struct {
+	TemplateId    uint64 `json:"templateId"`
+	TemplateName  string `json:"templateName"`
+	EffectiveDate string `json:"effectiveDate"`
+}
+
+type FitnessRankItem struct {
+	UserId     uint64  `json:"userId"`
+	Nickname   string  `json:"nickname"`
+	Avatar     string  `json:"avatar"`
+	StreakDays int64   `json:"streakDays"`
+	WeekRate   float64 `json:"weekRate"`
+}
+
+type FitnessStatsOverviewReq struct {
+	Date string `json:"date,optional" form:"date,optional"` // 默认今天
+}
+
+type FitnessStatsOverviewResp struct {
+	Date              string              `json:"date"`
+	MemberCount       int64               `json:"memberCount"`
+	TodayCheckinCount int64               `json:"todayCheckinCount"`
+	WeekAvgRate       float64             `json:"weekAvgRate"`
+	StreakRanking     []FitnessRankItem   `json:"streakRanking"`
+	DailyCounts       []FitnessDailyCount `json:"dailyCounts"`
+}
+
+type FitnessSuggestionItem struct {
+	Id               uint64 `json:"id"`
+	WeekStart        string `json:"weekStart"`
+	RuleCode         string `json:"ruleCode"`
+	FromTemplateId   uint64 `json:"fromTemplateId"`
+	FromTemplateName string `json:"fromTemplateName"`
+	ToTemplateId     uint64 `json:"toTemplateId"`
+	ToTemplateName   string `json:"toTemplateName"`
+	Reason           string `json:"reason"`
+	Status           int64  `json:"status"`
+}
+
+type FitnessSwitchItem struct {
+	Id               uint64 `json:"id"`
+	UserId           uint64 `json:"userId"`
+	Nickname         string `json:"nickname"`
+	FromTemplateId   uint64 `json:"fromTemplateId"`
+	FromTemplateName string `json:"fromTemplateName"`
+	ToTemplateId     uint64 `json:"toTemplateId"`
+	ToTemplateName   string `json:"toTemplateName"`
+	EffectiveDate    string `json:"effectiveDate"`
+	Source           int64  `json:"source"` // 1手动 2采纳建议 3管理员指定 4首次登录默认
+	Reason           string `json:"reason"`
+	OperatorId       uint64 `json:"operatorId"`
+	OperatorName     string `json:"operatorName"`
+	CreatedAt        int64  `json:"createdAt"`
+}
+
+type FitnessSwitchListReq struct {
+	UserId   uint64 `json:"userId,optional" form:"userId,optional"`
+	Page     int64  `json:"page,optional" form:"page,optional"`
+	PageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
+}
+
+type FitnessSwitchListResp struct {
+	Total int64               `json:"total"`
+	List  []FitnessSwitchItem `json:"list"`
+}
+
+type FitnessTemplateBrief struct {
+	Id      uint64 `json:"id"`
+	Code    string `json:"code"`
+	Name    string `json:"name"`
+	Stage   string `json:"stage"`
+	Summary string `json:"summary"`
+}
+
+type FitnessTemplateCreateReq struct {
+	Code         string `json:"code,optional"`
+	Name         string `json:"name,optional"`
+	Level        int64  `json:"level,optional"`
+	Stage        string `json:"stage,optional"`
+	Summary      string `json:"summary,optional"`
+	DailyKcal    int64  `json:"dailyKcal,optional"`
+	DailyProtein int64  `json:"dailyProtein,optional"`
+	Sort         int64  `json:"sort,optional"`
+	Status       int64  `json:"status,optional"`
+}
+
+type FitnessTemplateDayItem struct {
+	Id         uint64             `json:"id"`
+	TemplateId uint64             `json:"templateId"`
+	Weekday    int64              `json:"weekday"` // 1~7；0 表示按日期调整
+	PlanDate   string             `json:"planDate"`
+	Content    *FitnessDayContent `json:"content"`
+	UpdatedAt  int64              `json:"updatedAt"`
+}
+
+type FitnessTemplateDaySaveReq struct {
+	TemplateId uint64             `json:"templateId,optional"`
+	Weekday    int64              `json:"weekday,optional"`
+	PlanDate   string             `json:"planDate,optional"`
+	Content    *FitnessDayContent `json:"content,optional"`
+}
+
+type FitnessTemplateDaysReq struct {
+	TemplateId uint64 `json:"templateId,optional" form:"templateId,optional"`
+}
+
+type FitnessTemplateDaysResp struct {
+	Weekly    []FitnessTemplateDayItem `json:"weekly"`
+	Overrides []FitnessTemplateDayItem `json:"overrides"`
+}
+
+type FitnessTemplateItem struct {
+	Id           uint64 `json:"id"`
+	Code         string `json:"code"`
+	Name         string `json:"name"`
+	Level        int64  `json:"level"`
+	Stage        string `json:"stage"`
+	Summary      string `json:"summary"`
+	DailyKcal    int64  `json:"dailyKcal"`
+	DailyProtein int64  `json:"dailyProtein"`
+	Sort         int64  `json:"sort"`
+	Status       int64  `json:"status"`
+	CreatedAt    int64  `json:"createdAt"`
+	UpdatedAt    int64  `json:"updatedAt"`
+}
+
+type FitnessTemplateListReq struct {
+	Page     int64  `json:"page,optional" form:"page,optional"`
+	PageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
+	Keyword  string `json:"keyword,optional" form:"keyword,optional"`
+}
+
+type FitnessTemplateListResp struct {
+	Total int64                 `json:"total"`
+	List  []FitnessTemplateItem `json:"list"`
+}
+
+type FitnessTemplateSwitchResp struct {
+	EffectiveDate string `json:"effectiveDate"`
+}
+
+type FitnessTemplateUpdateReq struct {
+	Id           uint64 `json:"id,optional"`
+	Name         string `json:"name,optional"`
+	Level        int64  `json:"level,optional"`
+	Stage        string `json:"stage,optional"`
+	Summary      string `json:"summary,optional"`
+	DailyKcal    int64  `json:"dailyKcal,optional"`
+	DailyProtein int64  `json:"dailyProtein,optional"`
+	Sort         int64  `json:"sort,optional"`
+	Status       int64  `json:"status,optional"`
+}
+
+type FitnessTipItem struct {
+	Id        uint64 `json:"id"`
+	Code      string `json:"code"`
+	Title     string `json:"title"`
+	Content   string `json:"content"`
+	Sort      int64  `json:"sort"`
+	Status    int64  `json:"status"`
+	CreatedAt int64  `json:"createdAt"`
+	UpdatedAt int64  `json:"updatedAt"`
+}
+
+type FitnessTipListReq struct {
+	Page     int64  `json:"page,optional" form:"page,optional"`
+	PageSize int64  `json:"pageSize,optional" form:"pageSize,optional"`
+	Keyword  string `json:"keyword,optional" form:"keyword,optional"`
+}
+
+type FitnessTipListResp struct {
+	Total int64            `json:"total"`
+	List  []FitnessTipItem `json:"list"`
+}
+
+type FitnessTipSaveReq struct {
+	Id      uint64 `json:"id,optional"`
+	Code    string `json:"code,optional"`
+	Title   string `json:"title,optional"`
+	Content string `json:"content,optional"`
+	Sort    int64  `json:"sort,optional"`
+	Status  int64  `json:"status,optional"`
+}
+
 type KnowledgeQaAskReq struct {
 	Question string `json:"question,optional"` // 用户问题，必填校验在 Logic 层
 }

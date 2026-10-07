@@ -2,7 +2,7 @@
 
 > 配合 DDD-lite 重构 + Phase 2 微服务拆分后的目录结构。找代码时先确定**业务域**，再判断这个域是否已经拆分成独立服务；Phase 2 五个服务（iam/task/sdk/chat/content）已经全部拆分完成，**gateway 不再持有任何 repository/model/domain，也不直连任何 MySQL**，只剩 `internal/{handler,logic}/<domain>/<module>/` 薄胶水 + 共享 Redis 直连。
 
-## 9 个业务域速查
+## 10 个业务域速查
 
 | 域 | 路径前缀 | 典型功能 |
 |----|----------|----------|
@@ -10,6 +10,7 @@
 | **system** | gateway 薄胶水 `internal/{handler,logic}/system/` + `services/iam/`（system 域并入 iam-rpc） | 配置、字典、文件、公告、通知 |
 | **monitoring** | gateway 薄胶水 `internal/{handler,logic}/monitoring/` + `services/iam/`（monitoring 域并入 iam-rpc） | 监控、指标、操作/登录/审计/性能日志 |
 | **misc** | gateway 薄胶水 `internal/{handler,logic}/misc/` + `services/iam/`（misc 域并入 iam-rpc） | ping、demo、每日一句、公共字典 |
+| **fitness** | gateway 薄胶水 `internal/{handler,logic}/fitness/` + `services/iam/`（fitness 域并入 iam-rpc，2026-10-07 新增） | 身材管理：手机端飞书登录、今日计划、打卡、身体数据、模板切换/建议；后台模板周编辑、使用者、打卡统计/导出。计划解析/统计/建议规则在 `services/iam/internal/domain/fitness/`，阈值常量在 `services/iam/internal/consts/fitness.go` |
 | **blog** | gateway 薄胶水 `internal/{handler,logic}/blog/` + `services/content/`（content-rpc，2026-07-12 拆分） | 文章、标签、审核、友链、社交信息、公开博客页 API |
 | **video** | gateway 薄胶水 `internal/{handler,logic}/video/` + `services/content/`（video 域并入 content-rpc） | 视频 CRUD、M3U8、采集、公开视频页 |
 | **chat** | gateway 薄胶水 `internal/{handler,logic}/chat/` + `services/chat/`（chat-rpc，2026-07-12 拆分） | 聊天、群组、消息、WebSocket↔gRPC 桥接（`internal/handler/chat/chatwshandler.go`），Hub/领域服务/消费者在 `services/chat/internal/{hub,domain,consumer}/` |
@@ -33,6 +34,10 @@
 
 改健康检查/demo/每日一句？
   → misc 域已并入 services/iam/（iam-rpc）；gateway 只剩薄胶水 internal/logic/misc/
+
+改身材管理（计划模板/打卡/身体数据/切换建议/打卡统计）？
+  → fitness 域并入 services/iam/（iam-rpc）；规则在 services/iam/internal/domain/fitness/，
+    gateway 只剩薄胶水 internal/logic/fitness/；手机端飞书登录复用 LoginFeishu（scene=fitness_h5/fitness_oauth）
 
 改博客文章/标签/友链/社交信息？
   → blog 域已拆分成独立服务 services/content/（content-rpc）；gateway 只剩薄胶水 internal/logic/blog/
