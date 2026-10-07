@@ -57,7 +57,7 @@ run_module() {
 echo "==> [1/4] iam 建表 + 初始化数据（内部依赖顺序）"
 for m in user user_third_party department role permission menu api rbac config dict file \
          notice notification operation_log login_log audit_log performance_log \
-         monitor metric demo daily_short_sentence; do
+         monitor metric demo daily_short_sentence fitness; do
     run_module "iam/${m}"
 done
 

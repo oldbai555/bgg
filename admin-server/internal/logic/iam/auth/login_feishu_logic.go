@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	"postapocgame/admin-server/internal/logic/logicutil"
 	"postapocgame/admin-server/internal/svc"
 	"postapocgame/admin-server/internal/types"
 	"postapocgame/admin-server/pkg/errs"
@@ -36,7 +37,7 @@ func (l *LoginFeishuLogic) LoginFeishu(req *types.LoginFeishuReq, httpReq *http.
 	clientIP := ""
 	userAgent := ""
 	if httpReq != nil {
-		clientIP = getClientIPFromRequest(httpReq)
+		clientIP = logicutil.ClientIP(httpReq)
 		userAgent = httpReq.UserAgent()
 	}
 

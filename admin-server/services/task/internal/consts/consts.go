@@ -89,6 +89,7 @@ const (
 	TaskModuleLoginLog       = "login_log"
 	TaskModuleSdkCallLog     = "sdk_call_log"
 	TaskModulePerformanceLog = "performance_log"
+	TaskModuleFitnessCheckin = "fitness_checkin"
 )
 
 // 导出任务筛选条件的 key（ExcelExportParams.Filters 的 key），透传进 filters_json。

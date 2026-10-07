@@ -107,7 +107,12 @@ func isValidMetricModule(module string) bool {
 	case consts.MetricModuleBlogArticleList,
 		consts.MetricModuleBlogArticleDetail,
 		consts.MetricModuleVideoList,
-		consts.MetricModuleVideoDetail:
+		consts.MetricModuleVideoDetail,
+		consts.MetricModuleFitnessToday,
+		consts.MetricModuleFitnessCheckin,
+		consts.MetricModuleFitnessBody,
+		consts.MetricModuleFitnessMe,
+		consts.MetricModuleFitnessLogin:
 		return true
 	default:
 		return false

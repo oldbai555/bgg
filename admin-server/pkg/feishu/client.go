@@ -48,6 +48,8 @@ type UserInfo struct {
 	AvatarUrl string
 	Mobile    string
 	Email     string
+	// TenantKey 用户所属企业租户，用于「只允许本企业登录」校验
+	TenantKey string
 }
 
 type userAccessTokenResp struct {
@@ -66,6 +68,7 @@ type userInfoResp struct {
 		AvatarUrl string `json:"avatar_url"`
 		Mobile    string `json:"mobile"`
 		Email     string `json:"email"`
+		TenantKey string `json:"tenant_key"`
 	} `json:"data"`
 }
 
@@ -104,17 +107,22 @@ func (c *Client) ExchangeUserInfo(ctx context.Context, code string) (*UserInfo, 
 		AvatarUrl: result.Data.AvatarUrl,
 		Mobile:    result.Data.Mobile,
 		Email:     result.Data.Email,
+		TenantKey: result.Data.TenantKey,
 	}, nil
 }
 
 func (c *Client) fetchUserAccessToken(ctx context.Context, code string) (string, error) {
-	body, err := json.Marshal(map[string]string{
+	params := map[string]string{
 		"grant_type":    "authorization_code",
 		"client_id":     c.AppId,
 		"client_secret": c.AppSecret,
 		"code":          code,
-		"redirect_uri":  c.RedirectUri,
-	})
+	}
+	// redirect_uri 只在授权链接里带过时才需要且必须一致；飞书客户端内 tt.requestAccess 拿到的 code 不带
+	if c.RedirectUri != "" {
+		params["redirect_uri"] = c.RedirectUri
+	}
+	body, err := json.Marshal(params)
 	if err != nil {
 		return "", errs.Wrap(errs.CodeInternalError, "构造飞书 access_token 请求失败", err)
 	}

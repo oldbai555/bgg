@@ -168,6 +168,9 @@ message LoginFeishuRequest {
   string state = 2;
   string client_ip = 3;
   string user_agent = 4;
+  // 登录场景：空/admin 后台扫码；fitness_oauth 手机浏览器 OAuth 跳转；fitness_h5 飞书客户端内 H5 免登。
+  // fitness_* 场景新建的账号不分配后台角色，只初始化身材管理档案。
+  string scene = 5;
 }
 
 message LogoutRequest {
@@ -1093,6 +1096,427 @@ message DailyShortSentenceListResponse {
   repeated DailyShortSentenceItem list = 2;
 }
 
+// ---------- Fitness（身材管理：计划模板 / 打卡 / 身体数据 / 模板切换与建议） ----------
+// 日期一律是 Asia/Shanghai 的 'YYYY-MM-DD' 字符串；user_id 由 gateway 从 JWT 取，手机端接口不接受前端传入。
+
+message FitnessIdRequest {
+  uint64 id = 1;
+}
+
+message FitnessExercise {
+  string name = 1;
+  int64 sets = 2;
+  string reps = 3;
+  string duration = 4;
+  string note = 5;
+}
+
+message FitnessMeal {
+  string slot = 1;
+  string time = 2;
+  string place = 3;
+  string food = 4;
+  string portion = 5;
+  int64 kcal = 6;
+  int64 protein = 7;
+  string how_to_order = 8;
+  repeated string alternatives = 9;
+}
+
+message FitnessDayContent {
+  int64 training_type = 1;
+  string training_time = 2;
+  int64 step_goal = 3;
+  string warmup = 4;
+  repeated FitnessExercise exercises = 5;
+  string stretch = 6;
+  string training_note = 7;
+  repeated FitnessMeal meals = 8;
+  string tip = 9;
+}
+
+message FitnessTemplateItem {
+  uint64 id = 1;
+  string code = 2;
+  string name = 3;
+  int64 level = 4;
+  string stage = 5;
+  string summary = 6;
+  int64 daily_kcal = 7;
+  int64 daily_protein = 8;
+  int64 sort = 9;
+  int64 status = 10;
+  int64 created_at = 11;
+  int64 updated_at = 12;
+}
+
+message FitnessTemplateListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  string keyword = 3;
+}
+
+message FitnessTemplateListResponse {
+  int64 total = 1;
+  repeated FitnessTemplateItem list = 2;
+}
+
+message FitnessTemplateSaveRequest {
+  uint64 id = 1;
+  string code = 2;
+  string name = 3;
+  int64 level = 4;
+  string stage = 5;
+  string summary = 6;
+  int64 daily_kcal = 7;
+  int64 daily_protein = 8;
+  int64 sort = 9;
+  int64 status = 10;
+}
+
+message FitnessTemplateDayItem {
+  uint64 id = 1;
+  uint64 template_id = 2;
+  int64 weekday = 3;
+  string plan_date = 4;
+  FitnessDayContent content = 5;
+  int64 updated_at = 6;
+}
+
+message FitnessTemplateDaysRequest {
+  uint64 template_id = 1;
+}
+
+message FitnessTemplateDaysResponse {
+  repeated FitnessTemplateDayItem weekly = 1;
+  repeated FitnessTemplateDayItem overrides = 2;
+}
+
+message FitnessTemplateDaySaveRequest {
+  uint64 template_id = 1;
+  int64 weekday = 2;
+  string plan_date = 3;
+  FitnessDayContent content = 4;
+}
+
+message FitnessTipItem {
+  uint64 id = 1;
+  string code = 2;
+  string title = 3;
+  string content = 4;
+  int64 sort = 5;
+  int64 status = 6;
+  int64 created_at = 7;
+  int64 updated_at = 8;
+}
+
+message FitnessTipListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  string keyword = 3;
+}
+
+message FitnessTipListResponse {
+  int64 total = 1;
+  repeated FitnessTipItem list = 2;
+}
+
+message FitnessTipSaveRequest {
+  uint64 id = 1;
+  string code = 2;
+  string title = 3;
+  string content = 4;
+  int64 sort = 5;
+  int64 status = 6;
+}
+
+message FitnessMealCheck {
+  string slot = 1;
+  int64 status = 2;
+  string note = 3;
+}
+
+message FitnessCheckinItem {
+  string date = 1;
+  uint64 template_id = 2;
+  int64 training_type = 3;
+  int64 training_status = 4;
+  repeated int64 exercise_done = 5;
+  int64 exercise_total = 6;
+  repeated FitnessMealCheck meals = 7;
+  int64 steps = 8;
+  int64 step_goal = 9;
+  int64 water_cups = 10;
+  int64 updated_at = 11;
+}
+
+message FitnessMyDayRequest {
+  uint64 user_id = 1;
+  string date = 2;
+}
+
+message FitnessMyDayResponse {
+  string date = 1;
+  string today = 2;
+  int64 weekday = 3;
+  bool can_checkin = 4;
+  bool has_plan = 5;
+  uint64 template_id = 6;
+  string template_name = 7;
+  bool is_override = 8;
+  FitnessDayContent content = 9;
+  repeated FitnessTipItem tips = 10;
+  FitnessCheckinItem checkin = 11;
+  FitnessSuggestionItem suggestion = 12;
+}
+
+message FitnessMyCheckinSaveRequest {
+  uint64 user_id = 1;
+  string date = 2;
+  int64 training_status = 3;
+  repeated int64 exercise_done = 4;
+  repeated FitnessMealCheck meals = 5;
+  int64 steps = 6;
+  int64 water_cups = 7;
+}
+
+message FitnessBodyRecordItem {
+  string date = 1;
+  double weight_kg = 2;
+  double waist_cm = 3;
+  double weight_avg7 = 4;
+}
+
+message FitnessMyBodyRecordListRequest {
+  uint64 user_id = 1;
+  int64 days = 2;
+}
+
+message FitnessBodyRecordListResponse {
+  repeated FitnessBodyRecordItem list = 1;
+}
+
+message FitnessMyBodyRecordSaveRequest {
+  uint64 user_id = 1;
+  string date = 2;
+  double weight_kg = 3;
+  double waist_cm = 4;
+}
+
+message FitnessTemplateBrief {
+  uint64 id = 1;
+  string code = 2;
+  string name = 3;
+  string stage = 4;
+  string summary = 5;
+}
+
+message FitnessPendingSwitch {
+  uint64 template_id = 1;
+  string template_name = 2;
+  string effective_date = 3;
+}
+
+message FitnessSuggestionItem {
+  uint64 id = 1;
+  string week_start = 2;
+  string rule_code = 3;
+  uint64 from_template_id = 4;
+  string from_template_name = 5;
+  uint64 to_template_id = 6;
+  string to_template_name = 7;
+  string reason = 8;
+  int64 status = 9;
+}
+
+message FitnessMyProfileRequest {
+  uint64 user_id = 1;
+}
+
+message FitnessMyProfileResponse {
+  string today = 1;
+  string nickname = 2;
+  string avatar = 3;
+  double height_cm = 4;
+  double target_weight_kg = 5;
+  int64 training_preference = 6;
+  double latest_weight_kg = 7;
+  int64 streak_days = 8;
+  double week_rate = 9;
+  FitnessTemplateBrief current_template = 10;
+  FitnessPendingSwitch pending_switch = 11;
+  FitnessSuggestionItem suggestion = 12;
+  repeated FitnessTemplateBrief templates = 13;
+}
+
+message FitnessMyProfileUpdateRequest {
+  uint64 user_id = 1;
+  double height_cm = 2;
+  double target_weight_kg = 3;
+  int64 training_preference = 4;
+}
+
+message FitnessMyTemplateSwitchRequest {
+  uint64 user_id = 1;
+  uint64 template_id = 2;
+}
+
+message FitnessTemplateSwitchResponse {
+  string effective_date = 1;
+}
+
+message FitnessMySuggestionDecideRequest {
+  uint64 user_id = 1;
+  uint64 id = 2;
+  bool accept = 3;
+}
+
+message FitnessMemberItem {
+  uint64 user_id = 1;
+  string username = 2;
+  string nickname = 3;
+  string avatar = 4;
+  uint64 template_id = 5;
+  string template_name = 6;
+  double height_cm = 7;
+  double target_weight_kg = 8;
+  double latest_weight_kg = 9;
+  int64 streak_days = 10;
+  double week_rate = 11;
+  string last_checkin_date = 12;
+  int64 created_at = 13;
+}
+
+message FitnessMemberListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  string keyword = 3;
+}
+
+message FitnessMemberListResponse {
+  int64 total = 1;
+  repeated FitnessMemberItem list = 2;
+}
+
+message FitnessMemberAssignRequest {
+  uint64 user_id = 1;
+  uint64 template_id = 2;
+  string reason = 3;
+  uint64 operator_id = 4;
+}
+
+message FitnessSwitchItem {
+  uint64 id = 1;
+  uint64 user_id = 2;
+  string nickname = 3;
+  uint64 from_template_id = 4;
+  string from_template_name = 5;
+  uint64 to_template_id = 6;
+  string to_template_name = 7;
+  string effective_date = 8;
+  int64 source = 9;
+  string reason = 10;
+  uint64 operator_id = 11;
+  string operator_name = 12;
+  int64 created_at = 13;
+}
+
+message FitnessSwitchListRequest {
+  uint64 user_id = 1;
+  int64 page = 2;
+  int64 page_size = 3;
+}
+
+message FitnessSwitchListResponse {
+  int64 total = 1;
+  repeated FitnessSwitchItem list = 2;
+}
+
+message FitnessStatsOverviewRequest {
+  string date = 1;
+}
+
+message FitnessRankItem {
+  uint64 user_id = 1;
+  string nickname = 2;
+  string avatar = 3;
+  int64 streak_days = 4;
+  double week_rate = 5;
+}
+
+message FitnessDailyCount {
+  string date = 1;
+  int64 count = 2;
+}
+
+message FitnessStatsOverviewResponse {
+  string date = 1;
+  int64 member_count = 2;
+  int64 today_checkin_count = 3;
+  double week_avg_rate = 4;
+  repeated FitnessRankItem streak_ranking = 5;
+  repeated FitnessDailyCount daily_counts = 6;
+}
+
+message FitnessCheckinRow {
+  uint64 id = 1;
+  string date = 2;
+  uint64 user_id = 3;
+  string nickname = 4;
+  string template_name = 5;
+  int64 training_type = 6;
+  int64 training_status = 7;
+  int64 exercise_done = 8;
+  int64 exercise_total = 9;
+  int64 meal_on_plan = 10;
+  int64 meal_other = 11;
+  int64 meal_skipped = 12;
+  int64 steps = 13;
+  int64 step_goal = 14;
+  int64 water_cups = 15;
+  double score = 16;
+  int64 updated_at = 17;
+}
+
+message FitnessCheckinListRequest {
+  int64 page = 1;
+  int64 page_size = 2;
+  uint64 user_id = 3;
+  string start_date = 4;
+  string end_date = 5;
+}
+
+message FitnessCheckinListResponse {
+  int64 total = 1;
+  repeated FitnessCheckinRow list = 2;
+}
+
+message FitnessMemberDetailRequest {
+  uint64 user_id = 1;
+  string start_date = 2;
+  string end_date = 3;
+}
+
+message FitnessCalendarDay {
+  string date = 1;
+  bool counted = 2;
+  bool checked = 3;
+  double score = 4;
+  int64 training_type = 5;
+}
+
+message FitnessMemberDetailResponse {
+  FitnessMemberItem member = 1;
+  double range_rate = 2;
+  repeated FitnessCalendarDay calendar = 3;
+  repeated FitnessBodyRecordItem body_records = 4;
+  repeated FitnessSwitchItem switches = 5;
+}
+
+message FitnessLoginConfigResponse {
+  string app_id = 1;
+}
+
 service Iam {
   // 权限校验（GetUserProfile 等见 pkg/iamcallback.IamCallback，同一进程内另注册）
   rpc CheckPermission(CheckPermissionRequest) returns (CheckPermissionResponse);
@@ -1225,4 +1649,37 @@ service Iam {
   rpc DailyShortSentenceUpdate(DailyShortSentenceUpdateRequest) returns (Empty);
   rpc DailyShortSentenceDelete(DailyShortSentenceDeleteRequest) returns (Empty);
   rpc DailyShortSentenceList(DailyShortSentenceListRequest) returns (DailyShortSentenceListResponse);
+
+  // Fitness 后台：计划模板 / 通用提示 / 使用者 / 打卡统计（导出走 task-rpc → TaskCallback.FetchExportData）
+  rpc FitnessTemplateList(FitnessTemplateListRequest) returns (FitnessTemplateListResponse);
+  rpc FitnessTemplateCreate(FitnessTemplateSaveRequest) returns (Empty);
+  rpc FitnessTemplateUpdate(FitnessTemplateSaveRequest) returns (Empty);
+  rpc FitnessTemplateDelete(FitnessIdRequest) returns (Empty);
+  rpc FitnessTemplateDays(FitnessTemplateDaysRequest) returns (FitnessTemplateDaysResponse);
+  rpc FitnessTemplateDaySave(FitnessTemplateDaySaveRequest) returns (Empty);
+  rpc FitnessTemplateDayDelete(FitnessIdRequest) returns (Empty);
+
+  rpc FitnessTipList(FitnessTipListRequest) returns (FitnessTipListResponse);
+  rpc FitnessTipCreate(FitnessTipSaveRequest) returns (Empty);
+  rpc FitnessTipUpdate(FitnessTipSaveRequest) returns (Empty);
+  rpc FitnessTipDelete(FitnessIdRequest) returns (Empty);
+
+  rpc FitnessMemberList(FitnessMemberListRequest) returns (FitnessMemberListResponse);
+  rpc FitnessMemberAssign(FitnessMemberAssignRequest) returns (FitnessTemplateSwitchResponse);
+  rpc FitnessSwitchList(FitnessSwitchListRequest) returns (FitnessSwitchListResponse);
+
+  rpc FitnessStatsOverview(FitnessStatsOverviewRequest) returns (FitnessStatsOverviewResponse);
+  rpc FitnessCheckinList(FitnessCheckinListRequest) returns (FitnessCheckinListResponse);
+  rpc FitnessMemberDetail(FitnessMemberDetailRequest) returns (FitnessMemberDetailResponse);
+
+  // Fitness 手机端：只操作 user_id 本人的数据
+  rpc FitnessLoginConfig(Empty) returns (FitnessLoginConfigResponse);
+  rpc FitnessMyDay(FitnessMyDayRequest) returns (FitnessMyDayResponse);
+  rpc FitnessMyCheckinSave(FitnessMyCheckinSaveRequest) returns (FitnessCheckinItem);
+  rpc FitnessMyBodyRecordList(FitnessMyBodyRecordListRequest) returns (FitnessBodyRecordListResponse);
+  rpc FitnessMyBodyRecordSave(FitnessMyBodyRecordSaveRequest) returns (Empty);
+  rpc FitnessMyProfile(FitnessMyProfileRequest) returns (FitnessMyProfileResponse);
+  rpc FitnessMyProfileUpdate(FitnessMyProfileUpdateRequest) returns (Empty);
+  rpc FitnessMyTemplateSwitch(FitnessMyTemplateSwitchRequest) returns (FitnessTemplateSwitchResponse);
+  rpc FitnessMySuggestionDecide(FitnessMySuggestionDecideRequest) returns (Empty);
 }

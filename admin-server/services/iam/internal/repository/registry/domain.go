@@ -7,6 +7,7 @@ import (
 	monitoringrepo "postapocgame/admin-server/services/iam/internal/repository/monitoring"
 	systemrepo "postapocgame/admin-server/services/iam/internal/repository/system"
 
+	fitnessdomain "postapocgame/admin-server/services/iam/internal/domain/fitness"
 	iamdomain "postapocgame/admin-server/services/iam/internal/domain/iam"
 )
 
@@ -21,6 +22,8 @@ type Domain struct {
 	Monitoring MonitoringDomain
 	System     SystemDomain
 	Misc       MiscDomain
+	// Fitness 身材管理领域服务（内含 fitness 各表 Repository），业务规则集中在 domain/fitness
+	Fitness *fitnessdomain.Service
 }
 
 type IAMDomain struct {
@@ -106,5 +109,6 @@ func NewDomain(repo *repository.Repository) *Domain {
 			Demo:               miscrepo.NewDemoRepository(repo),
 			DailyShortSentence: miscrepo.NewDailyShortSentenceRepository(repo),
 		},
+		Fitness: fitnessdomain.NewService(repo),
 	}
 }

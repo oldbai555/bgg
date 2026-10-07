@@ -184,6 +184,8 @@ const (
 	TaskModuleSdkCallLog = "sdk_call_log"
 	// TaskModulePerformanceLog 性能监控日志导出模块
 	TaskModulePerformanceLog = "performance_log"
+	// TaskModuleFitnessCheckin 身材管理打卡明细导出模块
+	TaskModuleFitnessCheckin = "fitness_checkin"
 )
 
 // 任务导出筛选字段 key 常量（ExcelExportParams.Filters 使用）
@@ -205,6 +207,8 @@ const (
 	TaskFilterApiCode       = "apiCode"
 	TaskFilterRespCode      = "respCode"
 	TaskFilterIP            = "ip"
+	TaskFilterStartDate     = "startDate"
+	TaskFilterEndDate       = "endDate"
 )
 
 // M3U8 代理相关常量
@@ -302,3 +306,12 @@ const ProxyRequestTimeout = 10 * time.Second
 
 // 代理资源缓存大小限制（5MB，超过此大小的文件不缓存，避免内存和 Redis 压力）
 const ProxyCacheMaxSize = 5 * 1024 * 1024 // 5MB
+
+// 身材管理手机端登录：mode 由前端按运行环境传，映射成 iam-rpc LoginFeishuRequest.scene
+const (
+	FitnessLoginModeH5    = "h5"    // 飞书客户端内 H5 免登（tt.requestAccess 拿 code）
+	FitnessLoginModeOAuth = "oauth" // 普通浏览器 OAuth 跳转
+
+	FeishuSceneFitnessOAuth = "fitness_oauth"
+	FeishuSceneFitnessH5    = "fitness_h5"
+)

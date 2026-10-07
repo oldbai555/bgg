@@ -6,6 +6,7 @@ import (
 	businesscache "postapocgame/admin-server/pkg/cache"
 
 	"postapocgame/admin-server/services/iam/internal/config"
+	"postapocgame/admin-server/services/iam/internal/model/fitness"
 	"postapocgame/admin-server/services/iam/internal/model/iam"
 	"postapocgame/admin-server/services/iam/internal/model/misc"
 	"postapocgame/admin-server/services/iam/internal/model/monitoring"
@@ -24,29 +25,37 @@ type Repository struct {
 	Redis         *redis.Redis                 // go-zero stores/redis 客户端
 	BusinessCache *businesscache.BusinessCache // 业务层缓存工具
 
-	AdminUserModel           iam.AdminUserModel
-	AdminUserThirdPartyModel iam.AdminUserThirdPartyModel
-	AdminRoleModel           iam.AdminRoleModel
-	AdminPermissionModel     iam.AdminPermissionModel
-	AdminMenuModel           iam.AdminMenuModel
-	AdminDepartmentModel     iam.AdminDepartmentModel
-	AdminUserRoleModel       iam.AdminUserRoleModel
-	AdminRolePermissionModel iam.AdminRolePermissionModel
-	AdminApiModel            iam.AdminApiModel
-	AdminPermissionMenuModel iam.AdminPermissionMenuModel
-	AdminPermissionApiModel  iam.AdminPermissionApiModel
-	AdminConfigModel         system.AdminConfigModel
-	AdminDictTypeModel       system.AdminDictTypeModel
-	AdminDictItemModel       system.AdminDictItemModel
-	AdminFileModel           system.AdminFileModel
-	DemoModel                misc.DemoModel
-	AdminOperationLogModel   monitoring.AdminOperationLogModel
-	AdminLoginLogModel       monitoring.AdminLoginLogModel
-	AuditLogModel            monitoring.AuditLogModel
-	AdminPerformanceLogModel monitoring.AdminPerformanceLogModel
-	AdminNoticeModel         system.AdminNoticeModel
-	AdminNotificationModel   system.AdminNotificationModel
-	DailyShortSentenceModel  misc.DailyShortSentenceModel
+	AdminUserModel             iam.AdminUserModel
+	AdminUserThirdPartyModel   iam.AdminUserThirdPartyModel
+	AdminRoleModel             iam.AdminRoleModel
+	AdminPermissionModel       iam.AdminPermissionModel
+	AdminMenuModel             iam.AdminMenuModel
+	AdminDepartmentModel       iam.AdminDepartmentModel
+	AdminUserRoleModel         iam.AdminUserRoleModel
+	AdminRolePermissionModel   iam.AdminRolePermissionModel
+	AdminApiModel              iam.AdminApiModel
+	AdminPermissionMenuModel   iam.AdminPermissionMenuModel
+	AdminPermissionApiModel    iam.AdminPermissionApiModel
+	AdminConfigModel           system.AdminConfigModel
+	AdminDictTypeModel         system.AdminDictTypeModel
+	AdminDictItemModel         system.AdminDictItemModel
+	AdminFileModel             system.AdminFileModel
+	DemoModel                  misc.DemoModel
+	AdminOperationLogModel     monitoring.AdminOperationLogModel
+	AdminLoginLogModel         monitoring.AdminLoginLogModel
+	AuditLogModel              monitoring.AuditLogModel
+	AdminPerformanceLogModel   monitoring.AdminPerformanceLogModel
+	AdminNoticeModel           system.AdminNoticeModel
+	AdminNotificationModel     system.AdminNotificationModel
+	DailyShortSentenceModel    misc.DailyShortSentenceModel
+	FitnessTemplateModel       fitness.FitnessTemplateModel
+	FitnessTemplateDayModel    fitness.FitnessTemplateDayModel
+	FitnessTipModel            fitness.FitnessTipModel
+	FitnessProfileModel        fitness.FitnessProfileModel
+	FitnessTemplateSwitchModel fitness.FitnessTemplateSwitchModel
+	FitnessCheckinModel        fitness.FitnessCheckinModel
+	FitnessBodyRecordModel     fitness.FitnessBodyRecordModel
+	FitnessSuggestionModel     fitness.FitnessSuggestionModel
 }
 
 func NewRepository(conn sqlx.SqlConn, cacheConf cache.CacheConf, rdb *redis.Redis) (*Repository, error) {
@@ -57,33 +66,41 @@ func NewRepository(conn sqlx.SqlConn, cacheConf cache.CacheConf, rdb *redis.Redi
 		return nil, errors.New("repository requires redis")
 	}
 	return &Repository{
-		DB:                       conn,
-		CacheConf:                cacheConf,
-		Redis:                    rdb,
-		BusinessCache:            businesscache.NewBusinessCache(rdb),
-		AdminUserModel:           iam.NewAdminUserModel(conn, cacheConf),
-		AdminUserThirdPartyModel: iam.NewAdminUserThirdPartyModel(conn, cacheConf),
-		AdminRoleModel:           iam.NewAdminRoleModel(conn, cacheConf),
-		AdminPermissionModel:     iam.NewAdminPermissionModel(conn, cacheConf),
-		AdminMenuModel:           iam.NewAdminMenuModel(conn, cacheConf),
-		AdminDepartmentModel:     iam.NewAdminDepartmentModel(conn, cacheConf),
-		AdminUserRoleModel:       iam.NewAdminUserRoleModel(conn, cacheConf),
-		AdminRolePermissionModel: iam.NewAdminRolePermissionModel(conn, cacheConf),
-		AdminApiModel:            iam.NewAdminApiModel(conn, cacheConf),
-		AdminPermissionMenuModel: iam.NewAdminPermissionMenuModel(conn, cacheConf),
-		AdminPermissionApiModel:  iam.NewAdminPermissionApiModel(conn, cacheConf),
-		AdminConfigModel:         system.NewAdminConfigModel(conn, cacheConf),
-		AdminDictTypeModel:       system.NewAdminDictTypeModel(conn, cacheConf),
-		AdminDictItemModel:       system.NewAdminDictItemModel(conn, cacheConf),
-		AdminFileModel:           system.NewAdminFileModel(conn, cacheConf),
-		DemoModel:                misc.NewDemoModel(conn, cacheConf),
-		AdminOperationLogModel:   monitoring.NewAdminOperationLogModel(conn, cacheConf),
-		AdminLoginLogModel:       monitoring.NewAdminLoginLogModel(conn, cacheConf),
-		AuditLogModel:            monitoring.NewAuditLogModel(conn, cacheConf),
-		AdminPerformanceLogModel: monitoring.NewAdminPerformanceLogModel(conn, cacheConf),
-		AdminNoticeModel:         system.NewAdminNoticeModel(conn, cacheConf),
-		AdminNotificationModel:   system.NewAdminNotificationModel(conn, cacheConf),
-		DailyShortSentenceModel:  misc.NewDailyShortSentenceModel(conn, cacheConf),
+		DB:                         conn,
+		CacheConf:                  cacheConf,
+		Redis:                      rdb,
+		BusinessCache:              businesscache.NewBusinessCache(rdb),
+		AdminUserModel:             iam.NewAdminUserModel(conn, cacheConf),
+		AdminUserThirdPartyModel:   iam.NewAdminUserThirdPartyModel(conn, cacheConf),
+		AdminRoleModel:             iam.NewAdminRoleModel(conn, cacheConf),
+		AdminPermissionModel:       iam.NewAdminPermissionModel(conn, cacheConf),
+		AdminMenuModel:             iam.NewAdminMenuModel(conn, cacheConf),
+		AdminDepartmentModel:       iam.NewAdminDepartmentModel(conn, cacheConf),
+		AdminUserRoleModel:         iam.NewAdminUserRoleModel(conn, cacheConf),
+		AdminRolePermissionModel:   iam.NewAdminRolePermissionModel(conn, cacheConf),
+		AdminApiModel:              iam.NewAdminApiModel(conn, cacheConf),
+		AdminPermissionMenuModel:   iam.NewAdminPermissionMenuModel(conn, cacheConf),
+		AdminPermissionApiModel:    iam.NewAdminPermissionApiModel(conn, cacheConf),
+		AdminConfigModel:           system.NewAdminConfigModel(conn, cacheConf),
+		AdminDictTypeModel:         system.NewAdminDictTypeModel(conn, cacheConf),
+		AdminDictItemModel:         system.NewAdminDictItemModel(conn, cacheConf),
+		AdminFileModel:             system.NewAdminFileModel(conn, cacheConf),
+		DemoModel:                  misc.NewDemoModel(conn, cacheConf),
+		AdminOperationLogModel:     monitoring.NewAdminOperationLogModel(conn, cacheConf),
+		AdminLoginLogModel:         monitoring.NewAdminLoginLogModel(conn, cacheConf),
+		AuditLogModel:              monitoring.NewAuditLogModel(conn, cacheConf),
+		AdminPerformanceLogModel:   monitoring.NewAdminPerformanceLogModel(conn, cacheConf),
+		AdminNoticeModel:           system.NewAdminNoticeModel(conn, cacheConf),
+		AdminNotificationModel:     system.NewAdminNotificationModel(conn, cacheConf),
+		DailyShortSentenceModel:    misc.NewDailyShortSentenceModel(conn, cacheConf),
+		FitnessTemplateModel:       fitness.NewFitnessTemplateModel(conn, cacheConf),
+		FitnessTemplateDayModel:    fitness.NewFitnessTemplateDayModel(conn, cacheConf),
+		FitnessTipModel:            fitness.NewFitnessTipModel(conn, cacheConf),
+		FitnessProfileModel:        fitness.NewFitnessProfileModel(conn, cacheConf),
+		FitnessTemplateSwitchModel: fitness.NewFitnessTemplateSwitchModel(conn, cacheConf),
+		FitnessCheckinModel:        fitness.NewFitnessCheckinModel(conn, cacheConf),
+		FitnessBodyRecordModel:     fitness.NewFitnessBodyRecordModel(conn, cacheConf),
+		FitnessSuggestionModel:     fitness.NewFitnessSuggestionModel(conn, cacheConf),
 	}, nil
 }
 
@@ -131,28 +148,36 @@ func (r *Repository) withSession(session sqlx.Session) *Repository {
 		Redis:         r.Redis,
 		BusinessCache: r.BusinessCache,
 
-		AdminUserModel:           r.AdminUserModel.WithSession(session),
-		AdminUserThirdPartyModel: r.AdminUserThirdPartyModel.WithSession(session),
-		AdminRoleModel:           r.AdminRoleModel.WithSession(session),
-		AdminPermissionModel:     r.AdminPermissionModel.WithSession(session),
-		AdminMenuModel:           r.AdminMenuModel.WithSession(session),
-		AdminDepartmentModel:     r.AdminDepartmentModel.WithSession(session),
-		AdminUserRoleModel:       r.AdminUserRoleModel.WithSession(session),
-		AdminRolePermissionModel: r.AdminRolePermissionModel.WithSession(session),
-		AdminApiModel:            r.AdminApiModel.WithSession(session),
-		AdminPermissionMenuModel: r.AdminPermissionMenuModel.WithSession(session),
-		AdminPermissionApiModel:  r.AdminPermissionApiModel.WithSession(session),
-		AdminConfigModel:         r.AdminConfigModel.WithSession(session),
-		AdminDictTypeModel:       r.AdminDictTypeModel.WithSession(session),
-		AdminDictItemModel:       r.AdminDictItemModel.WithSession(session),
-		AdminFileModel:           r.AdminFileModel.WithSession(session),
-		DemoModel:                r.DemoModel.WithSession(session),
-		AdminOperationLogModel:   r.AdminOperationLogModel.WithSession(session),
-		AdminLoginLogModel:       r.AdminLoginLogModel.WithSession(session),
-		AuditLogModel:            r.AuditLogModel.WithSession(session),
-		AdminPerformanceLogModel: r.AdminPerformanceLogModel.WithSession(session),
-		AdminNoticeModel:         r.AdminNoticeModel.WithSession(session),
-		AdminNotificationModel:   r.AdminNotificationModel.WithSession(session),
-		DailyShortSentenceModel:  r.DailyShortSentenceModel.WithSession(session),
+		AdminUserModel:             r.AdminUserModel.WithSession(session),
+		AdminUserThirdPartyModel:   r.AdminUserThirdPartyModel.WithSession(session),
+		AdminRoleModel:             r.AdminRoleModel.WithSession(session),
+		AdminPermissionModel:       r.AdminPermissionModel.WithSession(session),
+		AdminMenuModel:             r.AdminMenuModel.WithSession(session),
+		AdminDepartmentModel:       r.AdminDepartmentModel.WithSession(session),
+		AdminUserRoleModel:         r.AdminUserRoleModel.WithSession(session),
+		AdminRolePermissionModel:   r.AdminRolePermissionModel.WithSession(session),
+		AdminApiModel:              r.AdminApiModel.WithSession(session),
+		AdminPermissionMenuModel:   r.AdminPermissionMenuModel.WithSession(session),
+		AdminPermissionApiModel:    r.AdminPermissionApiModel.WithSession(session),
+		AdminConfigModel:           r.AdminConfigModel.WithSession(session),
+		AdminDictTypeModel:         r.AdminDictTypeModel.WithSession(session),
+		AdminDictItemModel:         r.AdminDictItemModel.WithSession(session),
+		AdminFileModel:             r.AdminFileModel.WithSession(session),
+		DemoModel:                  r.DemoModel.WithSession(session),
+		AdminOperationLogModel:     r.AdminOperationLogModel.WithSession(session),
+		AdminLoginLogModel:         r.AdminLoginLogModel.WithSession(session),
+		AuditLogModel:              r.AuditLogModel.WithSession(session),
+		AdminPerformanceLogModel:   r.AdminPerformanceLogModel.WithSession(session),
+		AdminNoticeModel:           r.AdminNoticeModel.WithSession(session),
+		AdminNotificationModel:     r.AdminNotificationModel.WithSession(session),
+		DailyShortSentenceModel:    r.DailyShortSentenceModel.WithSession(session),
+		FitnessTemplateModel:       r.FitnessTemplateModel.WithSession(session),
+		FitnessTemplateDayModel:    r.FitnessTemplateDayModel.WithSession(session),
+		FitnessTipModel:            r.FitnessTipModel.WithSession(session),
+		FitnessProfileModel:        r.FitnessProfileModel.WithSession(session),
+		FitnessTemplateSwitchModel: r.FitnessTemplateSwitchModel.WithSession(session),
+		FitnessCheckinModel:        r.FitnessCheckinModel.WithSession(session),
+		FitnessBodyRecordModel:     r.FitnessBodyRecordModel.WithSession(session),
+		FitnessSuggestionModel:     r.FitnessSuggestionModel.WithSession(session),
 	}
 }

@@ -36,14 +36,22 @@ func (l *LoginFeishuLogic) LoginFeishu(in *iam.LoginFeishuRequest) (*iam.TokenPa
 		return nil, toGRPCStatus(errs.New(errs.CodeBadRequest, "缺少飞书授权 code"))
 	}
 
-	client := feishu.NewClient(l.svcCtx.Config.Feishu.AppId, l.svcCtx.Config.Feishu.AppSecret, l.svcCtx.Config.Feishu.RedirectUri)
+	redirectUri, isFitness, err := l.redirectUriForScene(in.Scene)
+	if err != nil {
+		return nil, toGRPCStatus(err)
+	}
+	client := feishu.NewClient(l.svcCtx.Config.Feishu.AppId, l.svcCtx.Config.Feishu.AppSecret, redirectUri)
 	userInfo, err := client.ExchangeUserInfo(l.ctx, in.Code)
 	if err != nil {
 		recordLoginLog(l.svcCtx, 0, "", in.ClientIp, in.UserAgent, "飞书授权失败", false)
 		return nil, toGRPCStatus(errs.Wrap(errs.CodeUnauthorized, "飞书授权失败", err))
 	}
+	if tenant := l.svcCtx.Config.Feishu.TenantKey; tenant != "" && userInfo.TenantKey != tenant {
+		recordLoginLog(l.svcCtx, 0, userInfo.Name, in.ClientIp, in.UserAgent, "非本企业飞书账号", false)
+		return nil, toGRPCStatus(errs.New(errs.CodeForbidden, "仅限本企业飞书账号登录"))
+	}
 
-	user, err := l.findOrCreateUser(userInfo)
+	user, err := l.findOrCreateUser(userInfo, !isFitness)
 	if err != nil {
 		recordLoginLog(l.svcCtx, 0, userInfo.Name, in.ClientIp, in.UserAgent, "飞书账号建号/绑定失败", false)
 		return nil, toGRPCStatus(err)
@@ -80,6 +88,13 @@ func (l *LoginFeishuLogic) LoginFeishu(in *iam.LoginFeishuRequest) (*iam.TokenPa
 		return nil, toGRPCStatus(errs.Wrap(errs.CodeInternalError, "生成刷新令牌失败", err))
 	}
 
+	if isFitness {
+		if _, err := l.svcCtx.Domain.Fitness.EnsureMember(l.ctx, user.Id); err != nil {
+			recordLoginLog(l.svcCtx, user.Id, user.Username, in.ClientIp, in.UserAgent, "初始化身材管理档案失败", false)
+			return nil, toGRPCStatus(err)
+		}
+	}
+
 	recordLoginLog(l.svcCtx, user.Id, user.Username, in.ClientIp, in.UserAgent, "飞书登录成功", true)
 
 	go createUnreadNoticeNotifications(l.svcCtx, user.Id)
@@ -90,9 +105,30 @@ func (l *LoginFeishuLogic) LoginFeishu(in *iam.LoginFeishuRequest) (*iam.TokenPa
 	}, nil
 }
 
+// redirectUriForScene 不同登录场景换 token 时带的 redirect_uri 必须和发起授权时一致：
+// 后台扫码用 RedirectUri，手机浏览器 OAuth 用 MobileRedirectUri，飞书客户端内 H5 免登不带。
+func (l *LoginFeishuLogic) redirectUriForScene(scene string) (string, bool, error) {
+	cfg := l.svcCtx.Config.Feishu
+	switch scene {
+	case "", consts.FeishuSceneAdmin:
+		return cfg.RedirectUri, false, nil
+	case consts.FeishuSceneFitnessOAuth:
+		if cfg.MobileRedirectUri == "" {
+			return "", true, errs.New(errs.CodeInternalError, "未配置飞书手机端回调地址（Feishu.MobileRedirectUri）")
+		}
+		return cfg.MobileRedirectUri, true, nil
+	case consts.FeishuSceneFitnessH5:
+		return "", true, nil
+	default:
+		return "", false, errs.New(errs.CodeBadRequest, "不支持的登录场景")
+	}
+}
+
 // findOrCreateUser 按 open_id 查绑定关系；未绑定则复用 UserDomainService.CreateUser
 // 建新号（不绕过用户名唯一性校验/密码加密/事务落库这套统一路径），再写绑定记录。
-func (l *LoginFeishuLogic) findOrCreateUser(userInfo *feishu.UserInfo) (*iammodel.AdminUser, error) {
+// withAdminRole=false（身材管理手机端首次登录）时不分配后台默认角色：普通使用者没有任何后台菜单/权限，
+// 以后需要进后台由管理员在用户管理里单独授权。
+func (l *LoginFeishuLogic) findOrCreateUser(userInfo *feishu.UserInfo, withAdminRole bool) (*iammodel.AdminUser, error) {
 	bind, err := l.svcCtx.Domain.IAM.UserThirdParty.FindByOpenID(l.ctx, consts.FeishuProvider, userInfo.OpenId)
 	if err != nil {
 		return nil, errs.Wrap(errs.CodeInternalError, "查询第三方账号绑定失败", err)
@@ -129,7 +165,7 @@ func (l *LoginFeishuLogic) findOrCreateUser(userInfo *feishu.UserInfo) (*iammode
 			return nil, errs.Wrap(errs.CodeInternalError, "自动创建飞书用户失败", err)
 		}
 		user = existing
-	} else {
+	} else if withAdminRole {
 		l.assignDefaultRole(user.Id)
 	}
 

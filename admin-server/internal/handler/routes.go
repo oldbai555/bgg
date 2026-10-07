@@ -16,6 +16,12 @@ import (
 	chatchat "postapocgame/admin-server/internal/handler/chat/chat"
 	chatgroup "postapocgame/admin-server/internal/handler/chat/group"
 	chatmessage "postapocgame/admin-server/internal/handler/chat/message"
+	fitnessauth "postapocgame/admin-server/internal/handler/fitness/auth"
+	fitnessmember "postapocgame/admin-server/internal/handler/fitness/member"
+	fitnessmy "postapocgame/admin-server/internal/handler/fitness/my"
+	fitnessstats "postapocgame/admin-server/internal/handler/fitness/stats"
+	fitnesstemplate "postapocgame/admin-server/internal/handler/fitness/template"
+	fitnesstip "postapocgame/admin-server/internal/handler/fitness/tip"
 	iamapi "postapocgame/admin-server/internal/handler/iam/api"
 	iamauth "postapocgame/admin-server/internal/handler/iam/auth"
 	iamdepartment "postapocgame/admin-server/internal/handler/iam/department"
@@ -388,6 +394,200 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodDelete,
 					Path:    "/chats/messages",
 					Handler: chatmessage.ChatMessageDeleteHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.PerformanceMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/fitness/login/config",
+					Handler: fitnessauth.FitnessLoginConfigHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/fitness/login/feishu",
+					Handler: fitnessauth.FitnessLoginFeishuHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.PerformanceMiddleware, serverCtx.RateLimitMiddleware, serverCtx.AuthMiddleware, serverCtx.PermissionMiddleware, serverCtx.OperationLogMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/fitness/members",
+					Handler: fitnessmember.FitnessMemberListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/fitness/members/switches",
+					Handler: fitnessmember.FitnessSwitchListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/fitness/members/template",
+					Handler: fitnessmember.FitnessMemberAssignHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.PerformanceMiddleware, serverCtx.RateLimitMiddleware, serverCtx.AuthMiddleware, serverCtx.ApiEnabledMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/fitness/my/body-records",
+					Handler: fitnessmy.FitnessMyBodyRecordListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/fitness/my/body-records",
+					Handler: fitnessmy.FitnessMyBodyRecordSaveHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/fitness/my/checkin",
+					Handler: fitnessmy.FitnessMyCheckinSaveHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/fitness/my/day",
+					Handler: fitnessmy.FitnessMyDayHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/fitness/my/profile",
+					Handler: fitnessmy.FitnessMyProfileHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/fitness/my/profile",
+					Handler: fitnessmy.FitnessMyProfileUpdateHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/fitness/my/suggestion-decision",
+					Handler: fitnessmy.FitnessMySuggestionDecideHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/fitness/my/template-switch",
+					Handler: fitnessmy.FitnessMyTemplateSwitchHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.PerformanceMiddleware, serverCtx.RateLimitMiddleware, serverCtx.AuthMiddleware, serverCtx.PermissionMiddleware, serverCtx.OperationLogMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/fitness/stats/checkins",
+					Handler: fitnessstats.FitnessCheckinListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/fitness/stats/checkins/export",
+					Handler: fitnessstats.FitnessCheckinExportHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/fitness/stats/member",
+					Handler: fitnessstats.FitnessMemberDetailHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/fitness/stats/overview",
+					Handler: fitnessstats.FitnessStatsOverviewHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.PerformanceMiddleware, serverCtx.RateLimitMiddleware, serverCtx.AuthMiddleware, serverCtx.PermissionMiddleware, serverCtx.OperationLogMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/fitness/template-days",
+					Handler: fitnesstemplate.FitnessTemplateDaysHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/fitness/template-days",
+					Handler: fitnesstemplate.FitnessTemplateDaySaveHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodDelete,
+					Path:    "/fitness/template-days",
+					Handler: fitnesstemplate.FitnessTemplateDayDeleteHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/fitness/templates",
+					Handler: fitnesstemplate.FitnessTemplateListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/fitness/templates",
+					Handler: fitnesstemplate.FitnessTemplateCreateHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/fitness/templates",
+					Handler: fitnesstemplate.FitnessTemplateUpdateHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodDelete,
+					Path:    "/fitness/templates",
+					Handler: fitnesstemplate.FitnessTemplateDeleteHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.PerformanceMiddleware, serverCtx.RateLimitMiddleware, serverCtx.AuthMiddleware, serverCtx.PermissionMiddleware, serverCtx.OperationLogMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/fitness/tips",
+					Handler: fitnesstip.FitnessTipListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/fitness/tips",
+					Handler: fitnesstip.FitnessTipCreateHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/fitness/tips",
+					Handler: fitnesstip.FitnessTipUpdateHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodDelete,
+					Path:    "/fitness/tips",
+					Handler: fitnesstip.FitnessTipDeleteHandler(serverCtx),
 				},
 			}...,
 		),

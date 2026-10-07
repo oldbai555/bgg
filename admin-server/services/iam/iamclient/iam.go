@@ -14,153 +14,205 @@ import (
 )
 
 type (
-	ApiCreateRequest                = iam.ApiCreateRequest
-	ApiDeleteRequest                = iam.ApiDeleteRequest
-	ApiItem                         = iam.ApiItem
-	ApiListRequest                  = iam.ApiListRequest
-	ApiListResponse                 = iam.ApiListResponse
-	ApiRouteRef                     = iam.ApiRouteRef
-	ApiUpdateRequest                = iam.ApiUpdateRequest
-	AuditLogDetailRequest           = iam.AuditLogDetailRequest
-	AuditLogItem                    = iam.AuditLogItem
-	AuditLogListRequest             = iam.AuditLogListRequest
-	AuditLogListResponse            = iam.AuditLogListResponse
-	BatchRecordOperationLogRequest  = iam.BatchRecordOperationLogRequest
-	CheckApiEnabledRequest          = iam.CheckApiEnabledRequest
-	CheckApiEnabledResponse         = iam.CheckApiEnabledResponse
-	CheckPermissionRequest          = iam.CheckPermissionRequest
-	CheckPermissionResponse         = iam.CheckPermissionResponse
-	ConfigCreateRequest             = iam.ConfigCreateRequest
-	ConfigDeleteRequest             = iam.ConfigDeleteRequest
-	ConfigGetRequest                = iam.ConfigGetRequest
-	ConfigGetResponse               = iam.ConfigGetResponse
-	ConfigItem                      = iam.ConfigItem
-	ConfigListRequest               = iam.ConfigListRequest
-	ConfigListResponse              = iam.ConfigListResponse
-	ConfigUpdateRequest             = iam.ConfigUpdateRequest
-	DailyShortSentenceCreateRequest = iam.DailyShortSentenceCreateRequest
-	DailyShortSentenceDeleteRequest = iam.DailyShortSentenceDeleteRequest
-	DailyShortSentenceItem          = iam.DailyShortSentenceItem
-	DailyShortSentenceListRequest   = iam.DailyShortSentenceListRequest
-	DailyShortSentenceListResponse  = iam.DailyShortSentenceListResponse
-	DailyShortSentenceUpdateRequest = iam.DailyShortSentenceUpdateRequest
-	DemoCreateRequest               = iam.DemoCreateRequest
-	DemoDeleteRequest               = iam.DemoDeleteRequest
-	DemoItem                        = iam.DemoItem
-	DemoListRequest                 = iam.DemoListRequest
-	DemoListResponse                = iam.DemoListResponse
-	DemoUpdateRequest               = iam.DemoUpdateRequest
-	DepartmentCreateRequest         = iam.DepartmentCreateRequest
-	DepartmentDeleteRequest         = iam.DepartmentDeleteRequest
-	DepartmentItem                  = iam.DepartmentItem
-	DepartmentTreeResponse          = iam.DepartmentTreeResponse
-	DepartmentUpdateRequest         = iam.DepartmentUpdateRequest
-	DictBatchGetRequest             = iam.DictBatchGetRequest
-	DictBatchGetResponse            = iam.DictBatchGetResponse
-	DictGetRequest                  = iam.DictGetRequest
-	DictGetResponse                 = iam.DictGetResponse
-	DictItemCreateRequest           = iam.DictItemCreateRequest
-	DictItemDeleteRequest           = iam.DictItemDeleteRequest
-	DictItemItem                    = iam.DictItemItem
-	DictItemListRequest             = iam.DictItemListRequest
-	DictItemListResponse            = iam.DictItemListResponse
-	DictItemUpdateRequest           = iam.DictItemUpdateRequest
-	DictTypeCreateRequest           = iam.DictTypeCreateRequest
-	DictTypeDeleteRequest           = iam.DictTypeDeleteRequest
-	DictTypeItem                    = iam.DictTypeItem
-	DictTypeListRequest             = iam.DictTypeListRequest
-	DictTypeListResponse            = iam.DictTypeListResponse
-	DictTypeUpdateRequest           = iam.DictTypeUpdateRequest
-	Empty                           = iam.Empty
-	FileCreateRequest               = iam.FileCreateRequest
-	FileDeleteRequest               = iam.FileDeleteRequest
-	FileGetMetaRequest              = iam.FileGetMetaRequest
-	FileGetMetaResponse             = iam.FileGetMetaResponse
-	FileItem                        = iam.FileItem
-	FileListRequest                 = iam.FileListRequest
-	FileListResponse                = iam.FileListResponse
-	FileRegisterRequest             = iam.FileRegisterRequest
-	FileRegisterResponse            = iam.FileRegisterResponse
-	FileUpdateRequest               = iam.FileUpdateRequest
-	LoginFeishuRequest              = iam.LoginFeishuRequest
-	LoginLogDetailRequest           = iam.LoginLogDetailRequest
-	LoginLogItem                    = iam.LoginLogItem
-	LoginLogListRequest             = iam.LoginLogListRequest
-	LoginLogListResponse            = iam.LoginLogListResponse
-	LoginLogStatsResponse           = iam.LoginLogStatsResponse
-	LoginRequest                    = iam.LoginRequest
-	LogoutRequest                   = iam.LogoutRequest
-	MenuCreateRequest               = iam.MenuCreateRequest
-	MenuDeleteRequest               = iam.MenuDeleteRequest
-	MenuItem                        = iam.MenuItem
-	MenuMyTreeRequest               = iam.MenuMyTreeRequest
-	MenuTreeResponse                = iam.MenuTreeResponse
-	MenuUpdateRequest               = iam.MenuUpdateRequest
-	MetricReportRequest             = iam.MetricReportRequest
-	MetricStatsRequest              = iam.MetricStatsRequest
-	MetricStatsResponse             = iam.MetricStatsResponse
-	MonitorStatsResponse            = iam.MonitorStatsResponse
-	MonitorStatusResponse           = iam.MonitorStatusResponse
-	NoticeCreateRequest             = iam.NoticeCreateRequest
-	NoticeDeleteRequest             = iam.NoticeDeleteRequest
-	NoticeItem                      = iam.NoticeItem
-	NoticeListRequest               = iam.NoticeListRequest
-	NoticeListResponse              = iam.NoticeListResponse
-	NoticeUpdateRequest             = iam.NoticeUpdateRequest
-	NotificationClearReadRequest    = iam.NotificationClearReadRequest
-	NotificationDeleteRequest       = iam.NotificationDeleteRequest
-	NotificationItem                = iam.NotificationItem
-	NotificationListRequest         = iam.NotificationListRequest
-	NotificationListResponse        = iam.NotificationListResponse
-	NotificationReadAllRequest      = iam.NotificationReadAllRequest
-	NotificationReadRequest         = iam.NotificationReadRequest
-	OperationLogDetailRequest       = iam.OperationLogDetailRequest
-	OperationLogEntry               = iam.OperationLogEntry
-	OperationLogItem                = iam.OperationLogItem
-	OperationLogListRequest         = iam.OperationLogListRequest
-	OperationLogListResponse        = iam.OperationLogListResponse
-	PasswordChangeRequest           = iam.PasswordChangeRequest
-	PerformanceLogItem              = iam.PerformanceLogItem
-	PerformanceLogListRequest       = iam.PerformanceLogListRequest
-	PerformanceLogListResponse      = iam.PerformanceLogListResponse
-	PermissionApiListRequest        = iam.PermissionApiListRequest
-	PermissionApiListResponse       = iam.PermissionApiListResponse
-	PermissionApiUpdateRequest      = iam.PermissionApiUpdateRequest
-	PermissionCreateRequest         = iam.PermissionCreateRequest
-	PermissionDeleteRequest         = iam.PermissionDeleteRequest
-	PermissionItem                  = iam.PermissionItem
-	PermissionListRequest           = iam.PermissionListRequest
-	PermissionListResponse          = iam.PermissionListResponse
-	PermissionMenuListRequest       = iam.PermissionMenuListRequest
-	PermissionMenuListResponse      = iam.PermissionMenuListResponse
-	PermissionMenuUpdateRequest     = iam.PermissionMenuUpdateRequest
-	PermissionUpdateRequest         = iam.PermissionUpdateRequest
-	PingResponse                    = iam.PingResponse
-	ProfileRequest                  = iam.ProfileRequest
-	ProfileResponse                 = iam.ProfileResponse
-	ProfileUpdateRequest            = iam.ProfileUpdateRequest
-	RecordPerformanceLogRequest     = iam.RecordPerformanceLogRequest
-	RefreshRequest                  = iam.RefreshRequest
-	RoleCreateRequest               = iam.RoleCreateRequest
-	RoleDeleteRequest               = iam.RoleDeleteRequest
-	RoleItem                        = iam.RoleItem
-	RoleListRequest                 = iam.RoleListRequest
-	RoleListResponse                = iam.RoleListResponse
-	RolePermissionListRequest       = iam.RolePermissionListRequest
-	RolePermissionListResponse      = iam.RolePermissionListResponse
-	RolePermissionUpdateRequest     = iam.RolePermissionUpdateRequest
-	RoleUpdateRequest               = iam.RoleUpdateRequest
-	SyncApiRoutesRequest            = iam.SyncApiRoutesRequest
-	TokenPair                       = iam.TokenPair
-	UserCreateRequest               = iam.UserCreateRequest
-	UserDeleteRequest               = iam.UserDeleteRequest
-	UserItem                        = iam.UserItem
-	UserListRequest                 = iam.UserListRequest
-	UserListResponse                = iam.UserListResponse
-	UserRoleListRequest             = iam.UserRoleListRequest
-	UserRoleListResponse            = iam.UserRoleListResponse
-	UserRoleUpdateRequest           = iam.UserRoleUpdateRequest
-	UserUpdateRequest               = iam.UserUpdateRequest
+	ApiCreateRequest                 = iam.ApiCreateRequest
+	ApiDeleteRequest                 = iam.ApiDeleteRequest
+	ApiItem                          = iam.ApiItem
+	ApiListRequest                   = iam.ApiListRequest
+	ApiListResponse                  = iam.ApiListResponse
+	ApiRouteRef                      = iam.ApiRouteRef
+	ApiUpdateRequest                 = iam.ApiUpdateRequest
+	AuditLogDetailRequest            = iam.AuditLogDetailRequest
+	AuditLogItem                     = iam.AuditLogItem
+	AuditLogListRequest              = iam.AuditLogListRequest
+	AuditLogListResponse             = iam.AuditLogListResponse
+	BatchRecordOperationLogRequest   = iam.BatchRecordOperationLogRequest
+	CheckApiEnabledRequest           = iam.CheckApiEnabledRequest
+	CheckApiEnabledResponse          = iam.CheckApiEnabledResponse
+	CheckPermissionRequest           = iam.CheckPermissionRequest
+	CheckPermissionResponse          = iam.CheckPermissionResponse
+	ConfigCreateRequest              = iam.ConfigCreateRequest
+	ConfigDeleteRequest              = iam.ConfigDeleteRequest
+	ConfigGetRequest                 = iam.ConfigGetRequest
+	ConfigGetResponse                = iam.ConfigGetResponse
+	ConfigItem                       = iam.ConfigItem
+	ConfigListRequest                = iam.ConfigListRequest
+	ConfigListResponse               = iam.ConfigListResponse
+	ConfigUpdateRequest              = iam.ConfigUpdateRequest
+	DailyShortSentenceCreateRequest  = iam.DailyShortSentenceCreateRequest
+	DailyShortSentenceDeleteRequest  = iam.DailyShortSentenceDeleteRequest
+	DailyShortSentenceItem           = iam.DailyShortSentenceItem
+	DailyShortSentenceListRequest    = iam.DailyShortSentenceListRequest
+	DailyShortSentenceListResponse   = iam.DailyShortSentenceListResponse
+	DailyShortSentenceUpdateRequest  = iam.DailyShortSentenceUpdateRequest
+	DemoCreateRequest                = iam.DemoCreateRequest
+	DemoDeleteRequest                = iam.DemoDeleteRequest
+	DemoItem                         = iam.DemoItem
+	DemoListRequest                  = iam.DemoListRequest
+	DemoListResponse                 = iam.DemoListResponse
+	DemoUpdateRequest                = iam.DemoUpdateRequest
+	DepartmentCreateRequest          = iam.DepartmentCreateRequest
+	DepartmentDeleteRequest          = iam.DepartmentDeleteRequest
+	DepartmentItem                   = iam.DepartmentItem
+	DepartmentTreeResponse           = iam.DepartmentTreeResponse
+	DepartmentUpdateRequest          = iam.DepartmentUpdateRequest
+	DictBatchGetRequest              = iam.DictBatchGetRequest
+	DictBatchGetResponse             = iam.DictBatchGetResponse
+	DictGetRequest                   = iam.DictGetRequest
+	DictGetResponse                  = iam.DictGetResponse
+	DictItemCreateRequest            = iam.DictItemCreateRequest
+	DictItemDeleteRequest            = iam.DictItemDeleteRequest
+	DictItemItem                     = iam.DictItemItem
+	DictItemListRequest              = iam.DictItemListRequest
+	DictItemListResponse             = iam.DictItemListResponse
+	DictItemUpdateRequest            = iam.DictItemUpdateRequest
+	DictTypeCreateRequest            = iam.DictTypeCreateRequest
+	DictTypeDeleteRequest            = iam.DictTypeDeleteRequest
+	DictTypeItem                     = iam.DictTypeItem
+	DictTypeListRequest              = iam.DictTypeListRequest
+	DictTypeListResponse             = iam.DictTypeListResponse
+	DictTypeUpdateRequest            = iam.DictTypeUpdateRequest
+	Empty                            = iam.Empty
+	FileCreateRequest                = iam.FileCreateRequest
+	FileDeleteRequest                = iam.FileDeleteRequest
+	FileGetMetaRequest               = iam.FileGetMetaRequest
+	FileGetMetaResponse              = iam.FileGetMetaResponse
+	FileItem                         = iam.FileItem
+	FileListRequest                  = iam.FileListRequest
+	FileListResponse                 = iam.FileListResponse
+	FileRegisterRequest              = iam.FileRegisterRequest
+	FileRegisterResponse             = iam.FileRegisterResponse
+	FileUpdateRequest                = iam.FileUpdateRequest
+	FitnessBodyRecordItem            = iam.FitnessBodyRecordItem
+	FitnessBodyRecordListResponse    = iam.FitnessBodyRecordListResponse
+	FitnessCalendarDay               = iam.FitnessCalendarDay
+	FitnessCheckinItem               = iam.FitnessCheckinItem
+	FitnessCheckinListRequest        = iam.FitnessCheckinListRequest
+	FitnessCheckinListResponse       = iam.FitnessCheckinListResponse
+	FitnessCheckinRow                = iam.FitnessCheckinRow
+	FitnessDailyCount                = iam.FitnessDailyCount
+	FitnessDayContent                = iam.FitnessDayContent
+	FitnessExercise                  = iam.FitnessExercise
+	FitnessIdRequest                 = iam.FitnessIdRequest
+	FitnessLoginConfigResponse       = iam.FitnessLoginConfigResponse
+	FitnessMeal                      = iam.FitnessMeal
+	FitnessMealCheck                 = iam.FitnessMealCheck
+	FitnessMemberAssignRequest       = iam.FitnessMemberAssignRequest
+	FitnessMemberDetailRequest       = iam.FitnessMemberDetailRequest
+	FitnessMemberDetailResponse      = iam.FitnessMemberDetailResponse
+	FitnessMemberItem                = iam.FitnessMemberItem
+	FitnessMemberListRequest         = iam.FitnessMemberListRequest
+	FitnessMemberListResponse        = iam.FitnessMemberListResponse
+	FitnessMyBodyRecordListRequest   = iam.FitnessMyBodyRecordListRequest
+	FitnessMyBodyRecordSaveRequest   = iam.FitnessMyBodyRecordSaveRequest
+	FitnessMyCheckinSaveRequest      = iam.FitnessMyCheckinSaveRequest
+	FitnessMyDayRequest              = iam.FitnessMyDayRequest
+	FitnessMyDayResponse             = iam.FitnessMyDayResponse
+	FitnessMyProfileRequest          = iam.FitnessMyProfileRequest
+	FitnessMyProfileResponse         = iam.FitnessMyProfileResponse
+	FitnessMyProfileUpdateRequest    = iam.FitnessMyProfileUpdateRequest
+	FitnessMySuggestionDecideRequest = iam.FitnessMySuggestionDecideRequest
+	FitnessMyTemplateSwitchRequest   = iam.FitnessMyTemplateSwitchRequest
+	FitnessPendingSwitch             = iam.FitnessPendingSwitch
+	FitnessRankItem                  = iam.FitnessRankItem
+	FitnessStatsOverviewRequest      = iam.FitnessStatsOverviewRequest
+	FitnessStatsOverviewResponse     = iam.FitnessStatsOverviewResponse
+	FitnessSuggestionItem            = iam.FitnessSuggestionItem
+	FitnessSwitchItem                = iam.FitnessSwitchItem
+	FitnessSwitchListRequest         = iam.FitnessSwitchListRequest
+	FitnessSwitchListResponse        = iam.FitnessSwitchListResponse
+	FitnessTemplateBrief             = iam.FitnessTemplateBrief
+	FitnessTemplateDayItem           = iam.FitnessTemplateDayItem
+	FitnessTemplateDaySaveRequest    = iam.FitnessTemplateDaySaveRequest
+	FitnessTemplateDaysRequest       = iam.FitnessTemplateDaysRequest
+	FitnessTemplateDaysResponse      = iam.FitnessTemplateDaysResponse
+	FitnessTemplateItem              = iam.FitnessTemplateItem
+	FitnessTemplateListRequest       = iam.FitnessTemplateListRequest
+	FitnessTemplateListResponse      = iam.FitnessTemplateListResponse
+	FitnessTemplateSaveRequest       = iam.FitnessTemplateSaveRequest
+	FitnessTemplateSwitchResponse    = iam.FitnessTemplateSwitchResponse
+	FitnessTipItem                   = iam.FitnessTipItem
+	FitnessTipListRequest            = iam.FitnessTipListRequest
+	FitnessTipListResponse           = iam.FitnessTipListResponse
+	FitnessTipSaveRequest            = iam.FitnessTipSaveRequest
+	LoginFeishuRequest               = iam.LoginFeishuRequest
+	LoginLogDetailRequest            = iam.LoginLogDetailRequest
+	LoginLogItem                     = iam.LoginLogItem
+	LoginLogListRequest              = iam.LoginLogListRequest
+	LoginLogListResponse             = iam.LoginLogListResponse
+	LoginLogStatsResponse            = iam.LoginLogStatsResponse
+	LoginRequest                     = iam.LoginRequest
+	LogoutRequest                    = iam.LogoutRequest
+	MenuCreateRequest                = iam.MenuCreateRequest
+	MenuDeleteRequest                = iam.MenuDeleteRequest
+	MenuItem                         = iam.MenuItem
+	MenuMyTreeRequest                = iam.MenuMyTreeRequest
+	MenuTreeResponse                 = iam.MenuTreeResponse
+	MenuUpdateRequest                = iam.MenuUpdateRequest
+	MetricReportRequest              = iam.MetricReportRequest
+	MetricStatsRequest               = iam.MetricStatsRequest
+	MetricStatsResponse              = iam.MetricStatsResponse
+	MonitorStatsResponse             = iam.MonitorStatsResponse
+	MonitorStatusResponse            = iam.MonitorStatusResponse
+	NoticeCreateRequest              = iam.NoticeCreateRequest
+	NoticeDeleteRequest              = iam.NoticeDeleteRequest
+	NoticeItem                       = iam.NoticeItem
+	NoticeListRequest                = iam.NoticeListRequest
+	NoticeListResponse               = iam.NoticeListResponse
+	NoticeUpdateRequest              = iam.NoticeUpdateRequest
+	NotificationClearReadRequest     = iam.NotificationClearReadRequest
+	NotificationDeleteRequest        = iam.NotificationDeleteRequest
+	NotificationItem                 = iam.NotificationItem
+	NotificationListRequest          = iam.NotificationListRequest
+	NotificationListResponse         = iam.NotificationListResponse
+	NotificationReadAllRequest       = iam.NotificationReadAllRequest
+	NotificationReadRequest          = iam.NotificationReadRequest
+	OperationLogDetailRequest        = iam.OperationLogDetailRequest
+	OperationLogEntry                = iam.OperationLogEntry
+	OperationLogItem                 = iam.OperationLogItem
+	OperationLogListRequest          = iam.OperationLogListRequest
+	OperationLogListResponse         = iam.OperationLogListResponse
+	PasswordChangeRequest            = iam.PasswordChangeRequest
+	PerformanceLogItem               = iam.PerformanceLogItem
+	PerformanceLogListRequest        = iam.PerformanceLogListRequest
+	PerformanceLogListResponse       = iam.PerformanceLogListResponse
+	PermissionApiListRequest         = iam.PermissionApiListRequest
+	PermissionApiListResponse        = iam.PermissionApiListResponse
+	PermissionApiUpdateRequest       = iam.PermissionApiUpdateRequest
+	PermissionCreateRequest          = iam.PermissionCreateRequest
+	PermissionDeleteRequest          = iam.PermissionDeleteRequest
+	PermissionItem                   = iam.PermissionItem
+	PermissionListRequest            = iam.PermissionListRequest
+	PermissionListResponse           = iam.PermissionListResponse
+	PermissionMenuListRequest        = iam.PermissionMenuListRequest
+	PermissionMenuListResponse       = iam.PermissionMenuListResponse
+	PermissionMenuUpdateRequest      = iam.PermissionMenuUpdateRequest
+	PermissionUpdateRequest          = iam.PermissionUpdateRequest
+	PingResponse                     = iam.PingResponse
+	ProfileRequest                   = iam.ProfileRequest
+	ProfileResponse                  = iam.ProfileResponse
+	ProfileUpdateRequest             = iam.ProfileUpdateRequest
+	RecordPerformanceLogRequest      = iam.RecordPerformanceLogRequest
+	RefreshRequest                   = iam.RefreshRequest
+	RoleCreateRequest                = iam.RoleCreateRequest
+	RoleDeleteRequest                = iam.RoleDeleteRequest
+	RoleItem                         = iam.RoleItem
+	RoleListRequest                  = iam.RoleListRequest
+	RoleListResponse                 = iam.RoleListResponse
+	RolePermissionListRequest        = iam.RolePermissionListRequest
+	RolePermissionListResponse       = iam.RolePermissionListResponse
+	RolePermissionUpdateRequest      = iam.RolePermissionUpdateRequest
+	RoleUpdateRequest                = iam.RoleUpdateRequest
+	SyncApiRoutesRequest             = iam.SyncApiRoutesRequest
+	TokenPair                        = iam.TokenPair
+	UserCreateRequest                = iam.UserCreateRequest
+	UserDeleteRequest                = iam.UserDeleteRequest
+	UserItem                         = iam.UserItem
+	UserListRequest                  = iam.UserListRequest
+	UserListResponse                 = iam.UserListResponse
+	UserRoleListRequest              = iam.UserRoleListRequest
+	UserRoleListResponse             = iam.UserRoleListResponse
+	UserRoleUpdateRequest            = iam.UserRoleUpdateRequest
+	UserUpdateRequest                = iam.UserUpdateRequest
 
 	Iam interface {
 		// 权限校验（GetUserProfile 等见 pkg/iamcallback.IamCallback，同一进程内另注册）
@@ -270,6 +322,34 @@ type (
 		DailyShortSentenceUpdate(ctx context.Context, in *DailyShortSentenceUpdateRequest, opts ...grpc.CallOption) (*Empty, error)
 		DailyShortSentenceDelete(ctx context.Context, in *DailyShortSentenceDeleteRequest, opts ...grpc.CallOption) (*Empty, error)
 		DailyShortSentenceList(ctx context.Context, in *DailyShortSentenceListRequest, opts ...grpc.CallOption) (*DailyShortSentenceListResponse, error)
+		// Fitness 后台：计划模板 / 通用提示 / 使用者 / 打卡统计（导出走 task-rpc → TaskCallback.FetchExportData）
+		FitnessTemplateList(ctx context.Context, in *FitnessTemplateListRequest, opts ...grpc.CallOption) (*FitnessTemplateListResponse, error)
+		FitnessTemplateCreate(ctx context.Context, in *FitnessTemplateSaveRequest, opts ...grpc.CallOption) (*Empty, error)
+		FitnessTemplateUpdate(ctx context.Context, in *FitnessTemplateSaveRequest, opts ...grpc.CallOption) (*Empty, error)
+		FitnessTemplateDelete(ctx context.Context, in *FitnessIdRequest, opts ...grpc.CallOption) (*Empty, error)
+		FitnessTemplateDays(ctx context.Context, in *FitnessTemplateDaysRequest, opts ...grpc.CallOption) (*FitnessTemplateDaysResponse, error)
+		FitnessTemplateDaySave(ctx context.Context, in *FitnessTemplateDaySaveRequest, opts ...grpc.CallOption) (*Empty, error)
+		FitnessTemplateDayDelete(ctx context.Context, in *FitnessIdRequest, opts ...grpc.CallOption) (*Empty, error)
+		FitnessTipList(ctx context.Context, in *FitnessTipListRequest, opts ...grpc.CallOption) (*FitnessTipListResponse, error)
+		FitnessTipCreate(ctx context.Context, in *FitnessTipSaveRequest, opts ...grpc.CallOption) (*Empty, error)
+		FitnessTipUpdate(ctx context.Context, in *FitnessTipSaveRequest, opts ...grpc.CallOption) (*Empty, error)
+		FitnessTipDelete(ctx context.Context, in *FitnessIdRequest, opts ...grpc.CallOption) (*Empty, error)
+		FitnessMemberList(ctx context.Context, in *FitnessMemberListRequest, opts ...grpc.CallOption) (*FitnessMemberListResponse, error)
+		FitnessMemberAssign(ctx context.Context, in *FitnessMemberAssignRequest, opts ...grpc.CallOption) (*FitnessTemplateSwitchResponse, error)
+		FitnessSwitchList(ctx context.Context, in *FitnessSwitchListRequest, opts ...grpc.CallOption) (*FitnessSwitchListResponse, error)
+		FitnessStatsOverview(ctx context.Context, in *FitnessStatsOverviewRequest, opts ...grpc.CallOption) (*FitnessStatsOverviewResponse, error)
+		FitnessCheckinList(ctx context.Context, in *FitnessCheckinListRequest, opts ...grpc.CallOption) (*FitnessCheckinListResponse, error)
+		FitnessMemberDetail(ctx context.Context, in *FitnessMemberDetailRequest, opts ...grpc.CallOption) (*FitnessMemberDetailResponse, error)
+		// Fitness 手机端：只操作 user_id 本人的数据
+		FitnessLoginConfig(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*FitnessLoginConfigResponse, error)
+		FitnessMyDay(ctx context.Context, in *FitnessMyDayRequest, opts ...grpc.CallOption) (*FitnessMyDayResponse, error)
+		FitnessMyCheckinSave(ctx context.Context, in *FitnessMyCheckinSaveRequest, opts ...grpc.CallOption) (*FitnessCheckinItem, error)
+		FitnessMyBodyRecordList(ctx context.Context, in *FitnessMyBodyRecordListRequest, opts ...grpc.CallOption) (*FitnessBodyRecordListResponse, error)
+		FitnessMyBodyRecordSave(ctx context.Context, in *FitnessMyBodyRecordSaveRequest, opts ...grpc.CallOption) (*Empty, error)
+		FitnessMyProfile(ctx context.Context, in *FitnessMyProfileRequest, opts ...grpc.CallOption) (*FitnessMyProfileResponse, error)
+		FitnessMyProfileUpdate(ctx context.Context, in *FitnessMyProfileUpdateRequest, opts ...grpc.CallOption) (*Empty, error)
+		FitnessMyTemplateSwitch(ctx context.Context, in *FitnessMyTemplateSwitchRequest, opts ...grpc.CallOption) (*FitnessTemplateSwitchResponse, error)
+		FitnessMySuggestionDecide(ctx context.Context, in *FitnessMySuggestionDecideRequest, opts ...grpc.CallOption) (*Empty, error)
 	}
 
 	defaultIam struct {
@@ -772,4 +852,136 @@ func (m *defaultIam) DailyShortSentenceDelete(ctx context.Context, in *DailyShor
 func (m *defaultIam) DailyShortSentenceList(ctx context.Context, in *DailyShortSentenceListRequest, opts ...grpc.CallOption) (*DailyShortSentenceListResponse, error) {
 	client := iam.NewIamClient(m.cli.Conn())
 	return client.DailyShortSentenceList(ctx, in, opts...)
+}
+
+// Fitness 后台：计划模板 / 通用提示 / 使用者 / 打卡统计（导出走 task-rpc → TaskCallback.FetchExportData）
+func (m *defaultIam) FitnessTemplateList(ctx context.Context, in *FitnessTemplateListRequest, opts ...grpc.CallOption) (*FitnessTemplateListResponse, error) {
+	client := iam.NewIamClient(m.cli.Conn())
+	return client.FitnessTemplateList(ctx, in, opts...)
+}
+
+func (m *defaultIam) FitnessTemplateCreate(ctx context.Context, in *FitnessTemplateSaveRequest, opts ...grpc.CallOption) (*Empty, error) {
+	client := iam.NewIamClient(m.cli.Conn())
+	return client.FitnessTemplateCreate(ctx, in, opts...)
+}
+
+func (m *defaultIam) FitnessTemplateUpdate(ctx context.Context, in *FitnessTemplateSaveRequest, opts ...grpc.CallOption) (*Empty, error) {
+	client := iam.NewIamClient(m.cli.Conn())
+	return client.FitnessTemplateUpdate(ctx, in, opts...)
+}
+
+func (m *defaultIam) FitnessTemplateDelete(ctx context.Context, in *FitnessIdRequest, opts ...grpc.CallOption) (*Empty, error) {
+	client := iam.NewIamClient(m.cli.Conn())
+	return client.FitnessTemplateDelete(ctx, in, opts...)
+}
+
+func (m *defaultIam) FitnessTemplateDays(ctx context.Context, in *FitnessTemplateDaysRequest, opts ...grpc.CallOption) (*FitnessTemplateDaysResponse, error) {
+	client := iam.NewIamClient(m.cli.Conn())
+	return client.FitnessTemplateDays(ctx, in, opts...)
+}
+
+func (m *defaultIam) FitnessTemplateDaySave(ctx context.Context, in *FitnessTemplateDaySaveRequest, opts ...grpc.CallOption) (*Empty, error) {
+	client := iam.NewIamClient(m.cli.Conn())
+	return client.FitnessTemplateDaySave(ctx, in, opts...)
+}
+
+func (m *defaultIam) FitnessTemplateDayDelete(ctx context.Context, in *FitnessIdRequest, opts ...grpc.CallOption) (*Empty, error) {
+	client := iam.NewIamClient(m.cli.Conn())
+	return client.FitnessTemplateDayDelete(ctx, in, opts...)
+}
+
+func (m *defaultIam) FitnessTipList(ctx context.Context, in *FitnessTipListRequest, opts ...grpc.CallOption) (*FitnessTipListResponse, error) {
+	client := iam.NewIamClient(m.cli.Conn())
+	return client.FitnessTipList(ctx, in, opts...)
+}
+
+func (m *defaultIam) FitnessTipCreate(ctx context.Context, in *FitnessTipSaveRequest, opts ...grpc.CallOption) (*Empty, error) {
+	client := iam.NewIamClient(m.cli.Conn())
+	return client.FitnessTipCreate(ctx, in, opts...)
+}
+
+func (m *defaultIam) FitnessTipUpdate(ctx context.Context, in *FitnessTipSaveRequest, opts ...grpc.CallOption) (*Empty, error) {
+	client := iam.NewIamClient(m.cli.Conn())
+	return client.FitnessTipUpdate(ctx, in, opts...)
+}
+
+func (m *defaultIam) FitnessTipDelete(ctx context.Context, in *FitnessIdRequest, opts ...grpc.CallOption) (*Empty, error) {
+	client := iam.NewIamClient(m.cli.Conn())
+	return client.FitnessTipDelete(ctx, in, opts...)
+}
+
+func (m *defaultIam) FitnessMemberList(ctx context.Context, in *FitnessMemberListRequest, opts ...grpc.CallOption) (*FitnessMemberListResponse, error) {
+	client := iam.NewIamClient(m.cli.Conn())
+	return client.FitnessMemberList(ctx, in, opts...)
+}
+
+func (m *defaultIam) FitnessMemberAssign(ctx context.Context, in *FitnessMemberAssignRequest, opts ...grpc.CallOption) (*FitnessTemplateSwitchResponse, error) {
+	client := iam.NewIamClient(m.cli.Conn())
+	return client.FitnessMemberAssign(ctx, in, opts...)
+}
+
+func (m *defaultIam) FitnessSwitchList(ctx context.Context, in *FitnessSwitchListRequest, opts ...grpc.CallOption) (*FitnessSwitchListResponse, error) {
+	client := iam.NewIamClient(m.cli.Conn())
+	return client.FitnessSwitchList(ctx, in, opts...)
+}
+
+func (m *defaultIam) FitnessStatsOverview(ctx context.Context, in *FitnessStatsOverviewRequest, opts ...grpc.CallOption) (*FitnessStatsOverviewResponse, error) {
+	client := iam.NewIamClient(m.cli.Conn())
+	return client.FitnessStatsOverview(ctx, in, opts...)
+}
+
+func (m *defaultIam) FitnessCheckinList(ctx context.Context, in *FitnessCheckinListRequest, opts ...grpc.CallOption) (*FitnessCheckinListResponse, error) {
+	client := iam.NewIamClient(m.cli.Conn())
+	return client.FitnessCheckinList(ctx, in, opts...)
+}
+
+func (m *defaultIam) FitnessMemberDetail(ctx context.Context, in *FitnessMemberDetailRequest, opts ...grpc.CallOption) (*FitnessMemberDetailResponse, error) {
+	client := iam.NewIamClient(m.cli.Conn())
+	return client.FitnessMemberDetail(ctx, in, opts...)
+}
+
+// Fitness 手机端：只操作 user_id 本人的数据
+func (m *defaultIam) FitnessLoginConfig(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*FitnessLoginConfigResponse, error) {
+	client := iam.NewIamClient(m.cli.Conn())
+	return client.FitnessLoginConfig(ctx, in, opts...)
+}
+
+func (m *defaultIam) FitnessMyDay(ctx context.Context, in *FitnessMyDayRequest, opts ...grpc.CallOption) (*FitnessMyDayResponse, error) {
+	client := iam.NewIamClient(m.cli.Conn())
+	return client.FitnessMyDay(ctx, in, opts...)
+}
+
+func (m *defaultIam) FitnessMyCheckinSave(ctx context.Context, in *FitnessMyCheckinSaveRequest, opts ...grpc.CallOption) (*FitnessCheckinItem, error) {
+	client := iam.NewIamClient(m.cli.Conn())
+	return client.FitnessMyCheckinSave(ctx, in, opts...)
+}
+
+func (m *defaultIam) FitnessMyBodyRecordList(ctx context.Context, in *FitnessMyBodyRecordListRequest, opts ...grpc.CallOption) (*FitnessBodyRecordListResponse, error) {
+	client := iam.NewIamClient(m.cli.Conn())
+	return client.FitnessMyBodyRecordList(ctx, in, opts...)
+}
+
+func (m *defaultIam) FitnessMyBodyRecordSave(ctx context.Context, in *FitnessMyBodyRecordSaveRequest, opts ...grpc.CallOption) (*Empty, error) {
+	client := iam.NewIamClient(m.cli.Conn())
+	return client.FitnessMyBodyRecordSave(ctx, in, opts...)
+}
+
+func (m *defaultIam) FitnessMyProfile(ctx context.Context, in *FitnessMyProfileRequest, opts ...grpc.CallOption) (*FitnessMyProfileResponse, error) {
+	client := iam.NewIamClient(m.cli.Conn())
+	return client.FitnessMyProfile(ctx, in, opts...)
+}
+
+func (m *defaultIam) FitnessMyProfileUpdate(ctx context.Context, in *FitnessMyProfileUpdateRequest, opts ...grpc.CallOption) (*Empty, error) {
+	client := iam.NewIamClient(m.cli.Conn())
+	return client.FitnessMyProfileUpdate(ctx, in, opts...)
+}
+
+func (m *defaultIam) FitnessMyTemplateSwitch(ctx context.Context, in *FitnessMyTemplateSwitchRequest, opts ...grpc.CallOption) (*FitnessTemplateSwitchResponse, error) {
+	client := iam.NewIamClient(m.cli.Conn())
+	return client.FitnessMyTemplateSwitch(ctx, in, opts...)
+}
+
+func (m *defaultIam) FitnessMySuggestionDecide(ctx context.Context, in *FitnessMySuggestionDecideRequest, opts ...grpc.CallOption) (*Empty, error) {
+	client := iam.NewIamClient(m.cli.Conn())
+	return client.FitnessMySuggestionDecide(ctx, in, opts...)
 }

@@ -1204,11 +1204,14 @@ func (x *RefreshRequest) GetRefreshToken() string {
 }
 
 type LoginFeishuRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Code          string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`
-	State         string                 `protobuf:"bytes,2,opt,name=state,proto3" json:"state,omitempty"`
-	ClientIp      string                 `protobuf:"bytes,3,opt,name=client_ip,json=clientIp,proto3" json:"client_ip,omitempty"`
-	UserAgent     string                 `protobuf:"bytes,4,opt,name=user_agent,json=userAgent,proto3" json:"user_agent,omitempty"`
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	Code      string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`
+	State     string                 `protobuf:"bytes,2,opt,name=state,proto3" json:"state,omitempty"`
+	ClientIp  string                 `protobuf:"bytes,3,opt,name=client_ip,json=clientIp,proto3" json:"client_ip,omitempty"`
+	UserAgent string                 `protobuf:"bytes,4,opt,name=user_agent,json=userAgent,proto3" json:"user_agent,omitempty"`
+	// 登录场景：空/admin 后台扫码；fitness_oauth 手机浏览器 OAuth 跳转；fitness_h5 飞书客户端内 H5 免登。
+	// fitness_* 场景新建的账号不分配后台角色，只初始化身材管理档案。
+	Scene         string `protobuf:"bytes,5,opt,name=scene,proto3" json:"scene,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1267,6 +1270,13 @@ func (x *LoginFeishuRequest) GetClientIp() string {
 func (x *LoginFeishuRequest) GetUserAgent() string {
 	if x != nil {
 		return x.UserAgent
+	}
+	return ""
+}
+
+func (x *LoginFeishuRequest) GetScene() string {
+	if x != nil {
+		return x.Scene
 	}
 	return ""
 }
@@ -9852,6 +9862,3974 @@ func (x *DailyShortSentenceListResponse) GetList() []*DailyShortSentenceItem {
 	return nil
 }
 
+type FitnessIdRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessIdRequest) Reset() {
+	*x = FitnessIdRequest{}
+	mi := &file_rpc_iam_proto_msgTypes[147]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessIdRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessIdRequest) ProtoMessage() {}
+
+func (x *FitnessIdRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[147]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessIdRequest.ProtoReflect.Descriptor instead.
+func (*FitnessIdRequest) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{147}
+}
+
+func (x *FitnessIdRequest) GetId() uint64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+type FitnessExercise struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Sets          int64                  `protobuf:"varint,2,opt,name=sets,proto3" json:"sets,omitempty"`
+	Reps          string                 `protobuf:"bytes,3,opt,name=reps,proto3" json:"reps,omitempty"`
+	Duration      string                 `protobuf:"bytes,4,opt,name=duration,proto3" json:"duration,omitempty"`
+	Note          string                 `protobuf:"bytes,5,opt,name=note,proto3" json:"note,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessExercise) Reset() {
+	*x = FitnessExercise{}
+	mi := &file_rpc_iam_proto_msgTypes[148]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessExercise) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessExercise) ProtoMessage() {}
+
+func (x *FitnessExercise) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[148]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessExercise.ProtoReflect.Descriptor instead.
+func (*FitnessExercise) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{148}
+}
+
+func (x *FitnessExercise) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *FitnessExercise) GetSets() int64 {
+	if x != nil {
+		return x.Sets
+	}
+	return 0
+}
+
+func (x *FitnessExercise) GetReps() string {
+	if x != nil {
+		return x.Reps
+	}
+	return ""
+}
+
+func (x *FitnessExercise) GetDuration() string {
+	if x != nil {
+		return x.Duration
+	}
+	return ""
+}
+
+func (x *FitnessExercise) GetNote() string {
+	if x != nil {
+		return x.Note
+	}
+	return ""
+}
+
+type FitnessMeal struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Slot          string                 `protobuf:"bytes,1,opt,name=slot,proto3" json:"slot,omitempty"`
+	Time          string                 `protobuf:"bytes,2,opt,name=time,proto3" json:"time,omitempty"`
+	Place         string                 `protobuf:"bytes,3,opt,name=place,proto3" json:"place,omitempty"`
+	Food          string                 `protobuf:"bytes,4,opt,name=food,proto3" json:"food,omitempty"`
+	Portion       string                 `protobuf:"bytes,5,opt,name=portion,proto3" json:"portion,omitempty"`
+	Kcal          int64                  `protobuf:"varint,6,opt,name=kcal,proto3" json:"kcal,omitempty"`
+	Protein       int64                  `protobuf:"varint,7,opt,name=protein,proto3" json:"protein,omitempty"`
+	HowToOrder    string                 `protobuf:"bytes,8,opt,name=how_to_order,json=howToOrder,proto3" json:"how_to_order,omitempty"`
+	Alternatives  []string               `protobuf:"bytes,9,rep,name=alternatives,proto3" json:"alternatives,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessMeal) Reset() {
+	*x = FitnessMeal{}
+	mi := &file_rpc_iam_proto_msgTypes[149]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessMeal) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessMeal) ProtoMessage() {}
+
+func (x *FitnessMeal) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[149]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessMeal.ProtoReflect.Descriptor instead.
+func (*FitnessMeal) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{149}
+}
+
+func (x *FitnessMeal) GetSlot() string {
+	if x != nil {
+		return x.Slot
+	}
+	return ""
+}
+
+func (x *FitnessMeal) GetTime() string {
+	if x != nil {
+		return x.Time
+	}
+	return ""
+}
+
+func (x *FitnessMeal) GetPlace() string {
+	if x != nil {
+		return x.Place
+	}
+	return ""
+}
+
+func (x *FitnessMeal) GetFood() string {
+	if x != nil {
+		return x.Food
+	}
+	return ""
+}
+
+func (x *FitnessMeal) GetPortion() string {
+	if x != nil {
+		return x.Portion
+	}
+	return ""
+}
+
+func (x *FitnessMeal) GetKcal() int64 {
+	if x != nil {
+		return x.Kcal
+	}
+	return 0
+}
+
+func (x *FitnessMeal) GetProtein() int64 {
+	if x != nil {
+		return x.Protein
+	}
+	return 0
+}
+
+func (x *FitnessMeal) GetHowToOrder() string {
+	if x != nil {
+		return x.HowToOrder
+	}
+	return ""
+}
+
+func (x *FitnessMeal) GetAlternatives() []string {
+	if x != nil {
+		return x.Alternatives
+	}
+	return nil
+}
+
+type FitnessDayContent struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TrainingType  int64                  `protobuf:"varint,1,opt,name=training_type,json=trainingType,proto3" json:"training_type,omitempty"`
+	TrainingTime  string                 `protobuf:"bytes,2,opt,name=training_time,json=trainingTime,proto3" json:"training_time,omitempty"`
+	StepGoal      int64                  `protobuf:"varint,3,opt,name=step_goal,json=stepGoal,proto3" json:"step_goal,omitempty"`
+	Warmup        string                 `protobuf:"bytes,4,opt,name=warmup,proto3" json:"warmup,omitempty"`
+	Exercises     []*FitnessExercise     `protobuf:"bytes,5,rep,name=exercises,proto3" json:"exercises,omitempty"`
+	Stretch       string                 `protobuf:"bytes,6,opt,name=stretch,proto3" json:"stretch,omitempty"`
+	TrainingNote  string                 `protobuf:"bytes,7,opt,name=training_note,json=trainingNote,proto3" json:"training_note,omitempty"`
+	Meals         []*FitnessMeal         `protobuf:"bytes,8,rep,name=meals,proto3" json:"meals,omitempty"`
+	Tip           string                 `protobuf:"bytes,9,opt,name=tip,proto3" json:"tip,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessDayContent) Reset() {
+	*x = FitnessDayContent{}
+	mi := &file_rpc_iam_proto_msgTypes[150]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessDayContent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessDayContent) ProtoMessage() {}
+
+func (x *FitnessDayContent) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[150]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessDayContent.ProtoReflect.Descriptor instead.
+func (*FitnessDayContent) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{150}
+}
+
+func (x *FitnessDayContent) GetTrainingType() int64 {
+	if x != nil {
+		return x.TrainingType
+	}
+	return 0
+}
+
+func (x *FitnessDayContent) GetTrainingTime() string {
+	if x != nil {
+		return x.TrainingTime
+	}
+	return ""
+}
+
+func (x *FitnessDayContent) GetStepGoal() int64 {
+	if x != nil {
+		return x.StepGoal
+	}
+	return 0
+}
+
+func (x *FitnessDayContent) GetWarmup() string {
+	if x != nil {
+		return x.Warmup
+	}
+	return ""
+}
+
+func (x *FitnessDayContent) GetExercises() []*FitnessExercise {
+	if x != nil {
+		return x.Exercises
+	}
+	return nil
+}
+
+func (x *FitnessDayContent) GetStretch() string {
+	if x != nil {
+		return x.Stretch
+	}
+	return ""
+}
+
+func (x *FitnessDayContent) GetTrainingNote() string {
+	if x != nil {
+		return x.TrainingNote
+	}
+	return ""
+}
+
+func (x *FitnessDayContent) GetMeals() []*FitnessMeal {
+	if x != nil {
+		return x.Meals
+	}
+	return nil
+}
+
+func (x *FitnessDayContent) GetTip() string {
+	if x != nil {
+		return x.Tip
+	}
+	return ""
+}
+
+type FitnessTemplateItem struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Code          string                 `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
+	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Level         int64                  `protobuf:"varint,4,opt,name=level,proto3" json:"level,omitempty"`
+	Stage         string                 `protobuf:"bytes,5,opt,name=stage,proto3" json:"stage,omitempty"`
+	Summary       string                 `protobuf:"bytes,6,opt,name=summary,proto3" json:"summary,omitempty"`
+	DailyKcal     int64                  `protobuf:"varint,7,opt,name=daily_kcal,json=dailyKcal,proto3" json:"daily_kcal,omitempty"`
+	DailyProtein  int64                  `protobuf:"varint,8,opt,name=daily_protein,json=dailyProtein,proto3" json:"daily_protein,omitempty"`
+	Sort          int64                  `protobuf:"varint,9,opt,name=sort,proto3" json:"sort,omitempty"`
+	Status        int64                  `protobuf:"varint,10,opt,name=status,proto3" json:"status,omitempty"`
+	CreatedAt     int64                  `protobuf:"varint,11,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt     int64                  `protobuf:"varint,12,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessTemplateItem) Reset() {
+	*x = FitnessTemplateItem{}
+	mi := &file_rpc_iam_proto_msgTypes[151]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessTemplateItem) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessTemplateItem) ProtoMessage() {}
+
+func (x *FitnessTemplateItem) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[151]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessTemplateItem.ProtoReflect.Descriptor instead.
+func (*FitnessTemplateItem) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{151}
+}
+
+func (x *FitnessTemplateItem) GetId() uint64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *FitnessTemplateItem) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+func (x *FitnessTemplateItem) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *FitnessTemplateItem) GetLevel() int64 {
+	if x != nil {
+		return x.Level
+	}
+	return 0
+}
+
+func (x *FitnessTemplateItem) GetStage() string {
+	if x != nil {
+		return x.Stage
+	}
+	return ""
+}
+
+func (x *FitnessTemplateItem) GetSummary() string {
+	if x != nil {
+		return x.Summary
+	}
+	return ""
+}
+
+func (x *FitnessTemplateItem) GetDailyKcal() int64 {
+	if x != nil {
+		return x.DailyKcal
+	}
+	return 0
+}
+
+func (x *FitnessTemplateItem) GetDailyProtein() int64 {
+	if x != nil {
+		return x.DailyProtein
+	}
+	return 0
+}
+
+func (x *FitnessTemplateItem) GetSort() int64 {
+	if x != nil {
+		return x.Sort
+	}
+	return 0
+}
+
+func (x *FitnessTemplateItem) GetStatus() int64 {
+	if x != nil {
+		return x.Status
+	}
+	return 0
+}
+
+func (x *FitnessTemplateItem) GetCreatedAt() int64 {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return 0
+}
+
+func (x *FitnessTemplateItem) GetUpdatedAt() int64 {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return 0
+}
+
+type FitnessTemplateListRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Page          int64                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
+	PageSize      int64                  `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	Keyword       string                 `protobuf:"bytes,3,opt,name=keyword,proto3" json:"keyword,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessTemplateListRequest) Reset() {
+	*x = FitnessTemplateListRequest{}
+	mi := &file_rpc_iam_proto_msgTypes[152]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessTemplateListRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessTemplateListRequest) ProtoMessage() {}
+
+func (x *FitnessTemplateListRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[152]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessTemplateListRequest.ProtoReflect.Descriptor instead.
+func (*FitnessTemplateListRequest) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{152}
+}
+
+func (x *FitnessTemplateListRequest) GetPage() int64 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *FitnessTemplateListRequest) GetPageSize() int64 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+func (x *FitnessTemplateListRequest) GetKeyword() string {
+	if x != nil {
+		return x.Keyword
+	}
+	return ""
+}
+
+type FitnessTemplateListResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Total         int64                  `protobuf:"varint,1,opt,name=total,proto3" json:"total,omitempty"`
+	List          []*FitnessTemplateItem `protobuf:"bytes,2,rep,name=list,proto3" json:"list,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessTemplateListResponse) Reset() {
+	*x = FitnessTemplateListResponse{}
+	mi := &file_rpc_iam_proto_msgTypes[153]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessTemplateListResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessTemplateListResponse) ProtoMessage() {}
+
+func (x *FitnessTemplateListResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[153]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessTemplateListResponse.ProtoReflect.Descriptor instead.
+func (*FitnessTemplateListResponse) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{153}
+}
+
+func (x *FitnessTemplateListResponse) GetTotal() int64 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+func (x *FitnessTemplateListResponse) GetList() []*FitnessTemplateItem {
+	if x != nil {
+		return x.List
+	}
+	return nil
+}
+
+type FitnessTemplateSaveRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Code          string                 `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
+	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Level         int64                  `protobuf:"varint,4,opt,name=level,proto3" json:"level,omitempty"`
+	Stage         string                 `protobuf:"bytes,5,opt,name=stage,proto3" json:"stage,omitempty"`
+	Summary       string                 `protobuf:"bytes,6,opt,name=summary,proto3" json:"summary,omitempty"`
+	DailyKcal     int64                  `protobuf:"varint,7,opt,name=daily_kcal,json=dailyKcal,proto3" json:"daily_kcal,omitempty"`
+	DailyProtein  int64                  `protobuf:"varint,8,opt,name=daily_protein,json=dailyProtein,proto3" json:"daily_protein,omitempty"`
+	Sort          int64                  `protobuf:"varint,9,opt,name=sort,proto3" json:"sort,omitempty"`
+	Status        int64                  `protobuf:"varint,10,opt,name=status,proto3" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessTemplateSaveRequest) Reset() {
+	*x = FitnessTemplateSaveRequest{}
+	mi := &file_rpc_iam_proto_msgTypes[154]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessTemplateSaveRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessTemplateSaveRequest) ProtoMessage() {}
+
+func (x *FitnessTemplateSaveRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[154]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessTemplateSaveRequest.ProtoReflect.Descriptor instead.
+func (*FitnessTemplateSaveRequest) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{154}
+}
+
+func (x *FitnessTemplateSaveRequest) GetId() uint64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *FitnessTemplateSaveRequest) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+func (x *FitnessTemplateSaveRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *FitnessTemplateSaveRequest) GetLevel() int64 {
+	if x != nil {
+		return x.Level
+	}
+	return 0
+}
+
+func (x *FitnessTemplateSaveRequest) GetStage() string {
+	if x != nil {
+		return x.Stage
+	}
+	return ""
+}
+
+func (x *FitnessTemplateSaveRequest) GetSummary() string {
+	if x != nil {
+		return x.Summary
+	}
+	return ""
+}
+
+func (x *FitnessTemplateSaveRequest) GetDailyKcal() int64 {
+	if x != nil {
+		return x.DailyKcal
+	}
+	return 0
+}
+
+func (x *FitnessTemplateSaveRequest) GetDailyProtein() int64 {
+	if x != nil {
+		return x.DailyProtein
+	}
+	return 0
+}
+
+func (x *FitnessTemplateSaveRequest) GetSort() int64 {
+	if x != nil {
+		return x.Sort
+	}
+	return 0
+}
+
+func (x *FitnessTemplateSaveRequest) GetStatus() int64 {
+	if x != nil {
+		return x.Status
+	}
+	return 0
+}
+
+type FitnessTemplateDayItem struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	TemplateId    uint64                 `protobuf:"varint,2,opt,name=template_id,json=templateId,proto3" json:"template_id,omitempty"`
+	Weekday       int64                  `protobuf:"varint,3,opt,name=weekday,proto3" json:"weekday,omitempty"`
+	PlanDate      string                 `protobuf:"bytes,4,opt,name=plan_date,json=planDate,proto3" json:"plan_date,omitempty"`
+	Content       *FitnessDayContent     `protobuf:"bytes,5,opt,name=content,proto3" json:"content,omitempty"`
+	UpdatedAt     int64                  `protobuf:"varint,6,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessTemplateDayItem) Reset() {
+	*x = FitnessTemplateDayItem{}
+	mi := &file_rpc_iam_proto_msgTypes[155]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessTemplateDayItem) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessTemplateDayItem) ProtoMessage() {}
+
+func (x *FitnessTemplateDayItem) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[155]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessTemplateDayItem.ProtoReflect.Descriptor instead.
+func (*FitnessTemplateDayItem) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{155}
+}
+
+func (x *FitnessTemplateDayItem) GetId() uint64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *FitnessTemplateDayItem) GetTemplateId() uint64 {
+	if x != nil {
+		return x.TemplateId
+	}
+	return 0
+}
+
+func (x *FitnessTemplateDayItem) GetWeekday() int64 {
+	if x != nil {
+		return x.Weekday
+	}
+	return 0
+}
+
+func (x *FitnessTemplateDayItem) GetPlanDate() string {
+	if x != nil {
+		return x.PlanDate
+	}
+	return ""
+}
+
+func (x *FitnessTemplateDayItem) GetContent() *FitnessDayContent {
+	if x != nil {
+		return x.Content
+	}
+	return nil
+}
+
+func (x *FitnessTemplateDayItem) GetUpdatedAt() int64 {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return 0
+}
+
+type FitnessTemplateDaysRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TemplateId    uint64                 `protobuf:"varint,1,opt,name=template_id,json=templateId,proto3" json:"template_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessTemplateDaysRequest) Reset() {
+	*x = FitnessTemplateDaysRequest{}
+	mi := &file_rpc_iam_proto_msgTypes[156]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessTemplateDaysRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessTemplateDaysRequest) ProtoMessage() {}
+
+func (x *FitnessTemplateDaysRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[156]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessTemplateDaysRequest.ProtoReflect.Descriptor instead.
+func (*FitnessTemplateDaysRequest) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{156}
+}
+
+func (x *FitnessTemplateDaysRequest) GetTemplateId() uint64 {
+	if x != nil {
+		return x.TemplateId
+	}
+	return 0
+}
+
+type FitnessTemplateDaysResponse struct {
+	state         protoimpl.MessageState    `protogen:"open.v1"`
+	Weekly        []*FitnessTemplateDayItem `protobuf:"bytes,1,rep,name=weekly,proto3" json:"weekly,omitempty"`
+	Overrides     []*FitnessTemplateDayItem `protobuf:"bytes,2,rep,name=overrides,proto3" json:"overrides,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessTemplateDaysResponse) Reset() {
+	*x = FitnessTemplateDaysResponse{}
+	mi := &file_rpc_iam_proto_msgTypes[157]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessTemplateDaysResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessTemplateDaysResponse) ProtoMessage() {}
+
+func (x *FitnessTemplateDaysResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[157]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessTemplateDaysResponse.ProtoReflect.Descriptor instead.
+func (*FitnessTemplateDaysResponse) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{157}
+}
+
+func (x *FitnessTemplateDaysResponse) GetWeekly() []*FitnessTemplateDayItem {
+	if x != nil {
+		return x.Weekly
+	}
+	return nil
+}
+
+func (x *FitnessTemplateDaysResponse) GetOverrides() []*FitnessTemplateDayItem {
+	if x != nil {
+		return x.Overrides
+	}
+	return nil
+}
+
+type FitnessTemplateDaySaveRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TemplateId    uint64                 `protobuf:"varint,1,opt,name=template_id,json=templateId,proto3" json:"template_id,omitempty"`
+	Weekday       int64                  `protobuf:"varint,2,opt,name=weekday,proto3" json:"weekday,omitempty"`
+	PlanDate      string                 `protobuf:"bytes,3,opt,name=plan_date,json=planDate,proto3" json:"plan_date,omitempty"`
+	Content       *FitnessDayContent     `protobuf:"bytes,4,opt,name=content,proto3" json:"content,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessTemplateDaySaveRequest) Reset() {
+	*x = FitnessTemplateDaySaveRequest{}
+	mi := &file_rpc_iam_proto_msgTypes[158]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessTemplateDaySaveRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessTemplateDaySaveRequest) ProtoMessage() {}
+
+func (x *FitnessTemplateDaySaveRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[158]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessTemplateDaySaveRequest.ProtoReflect.Descriptor instead.
+func (*FitnessTemplateDaySaveRequest) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{158}
+}
+
+func (x *FitnessTemplateDaySaveRequest) GetTemplateId() uint64 {
+	if x != nil {
+		return x.TemplateId
+	}
+	return 0
+}
+
+func (x *FitnessTemplateDaySaveRequest) GetWeekday() int64 {
+	if x != nil {
+		return x.Weekday
+	}
+	return 0
+}
+
+func (x *FitnessTemplateDaySaveRequest) GetPlanDate() string {
+	if x != nil {
+		return x.PlanDate
+	}
+	return ""
+}
+
+func (x *FitnessTemplateDaySaveRequest) GetContent() *FitnessDayContent {
+	if x != nil {
+		return x.Content
+	}
+	return nil
+}
+
+type FitnessTipItem struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Code          string                 `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
+	Title         string                 `protobuf:"bytes,3,opt,name=title,proto3" json:"title,omitempty"`
+	Content       string                 `protobuf:"bytes,4,opt,name=content,proto3" json:"content,omitempty"`
+	Sort          int64                  `protobuf:"varint,5,opt,name=sort,proto3" json:"sort,omitempty"`
+	Status        int64                  `protobuf:"varint,6,opt,name=status,proto3" json:"status,omitempty"`
+	CreatedAt     int64                  `protobuf:"varint,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt     int64                  `protobuf:"varint,8,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessTipItem) Reset() {
+	*x = FitnessTipItem{}
+	mi := &file_rpc_iam_proto_msgTypes[159]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessTipItem) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessTipItem) ProtoMessage() {}
+
+func (x *FitnessTipItem) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[159]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessTipItem.ProtoReflect.Descriptor instead.
+func (*FitnessTipItem) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{159}
+}
+
+func (x *FitnessTipItem) GetId() uint64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *FitnessTipItem) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+func (x *FitnessTipItem) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *FitnessTipItem) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
+}
+
+func (x *FitnessTipItem) GetSort() int64 {
+	if x != nil {
+		return x.Sort
+	}
+	return 0
+}
+
+func (x *FitnessTipItem) GetStatus() int64 {
+	if x != nil {
+		return x.Status
+	}
+	return 0
+}
+
+func (x *FitnessTipItem) GetCreatedAt() int64 {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return 0
+}
+
+func (x *FitnessTipItem) GetUpdatedAt() int64 {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return 0
+}
+
+type FitnessTipListRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Page          int64                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
+	PageSize      int64                  `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	Keyword       string                 `protobuf:"bytes,3,opt,name=keyword,proto3" json:"keyword,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessTipListRequest) Reset() {
+	*x = FitnessTipListRequest{}
+	mi := &file_rpc_iam_proto_msgTypes[160]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessTipListRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessTipListRequest) ProtoMessage() {}
+
+func (x *FitnessTipListRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[160]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessTipListRequest.ProtoReflect.Descriptor instead.
+func (*FitnessTipListRequest) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{160}
+}
+
+func (x *FitnessTipListRequest) GetPage() int64 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *FitnessTipListRequest) GetPageSize() int64 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+func (x *FitnessTipListRequest) GetKeyword() string {
+	if x != nil {
+		return x.Keyword
+	}
+	return ""
+}
+
+type FitnessTipListResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Total         int64                  `protobuf:"varint,1,opt,name=total,proto3" json:"total,omitempty"`
+	List          []*FitnessTipItem      `protobuf:"bytes,2,rep,name=list,proto3" json:"list,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessTipListResponse) Reset() {
+	*x = FitnessTipListResponse{}
+	mi := &file_rpc_iam_proto_msgTypes[161]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessTipListResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessTipListResponse) ProtoMessage() {}
+
+func (x *FitnessTipListResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[161]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessTipListResponse.ProtoReflect.Descriptor instead.
+func (*FitnessTipListResponse) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{161}
+}
+
+func (x *FitnessTipListResponse) GetTotal() int64 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+func (x *FitnessTipListResponse) GetList() []*FitnessTipItem {
+	if x != nil {
+		return x.List
+	}
+	return nil
+}
+
+type FitnessTipSaveRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Code          string                 `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
+	Title         string                 `protobuf:"bytes,3,opt,name=title,proto3" json:"title,omitempty"`
+	Content       string                 `protobuf:"bytes,4,opt,name=content,proto3" json:"content,omitempty"`
+	Sort          int64                  `protobuf:"varint,5,opt,name=sort,proto3" json:"sort,omitempty"`
+	Status        int64                  `protobuf:"varint,6,opt,name=status,proto3" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessTipSaveRequest) Reset() {
+	*x = FitnessTipSaveRequest{}
+	mi := &file_rpc_iam_proto_msgTypes[162]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessTipSaveRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessTipSaveRequest) ProtoMessage() {}
+
+func (x *FitnessTipSaveRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[162]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessTipSaveRequest.ProtoReflect.Descriptor instead.
+func (*FitnessTipSaveRequest) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{162}
+}
+
+func (x *FitnessTipSaveRequest) GetId() uint64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *FitnessTipSaveRequest) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+func (x *FitnessTipSaveRequest) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *FitnessTipSaveRequest) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
+}
+
+func (x *FitnessTipSaveRequest) GetSort() int64 {
+	if x != nil {
+		return x.Sort
+	}
+	return 0
+}
+
+func (x *FitnessTipSaveRequest) GetStatus() int64 {
+	if x != nil {
+		return x.Status
+	}
+	return 0
+}
+
+type FitnessMealCheck struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Slot          string                 `protobuf:"bytes,1,opt,name=slot,proto3" json:"slot,omitempty"`
+	Status        int64                  `protobuf:"varint,2,opt,name=status,proto3" json:"status,omitempty"`
+	Note          string                 `protobuf:"bytes,3,opt,name=note,proto3" json:"note,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessMealCheck) Reset() {
+	*x = FitnessMealCheck{}
+	mi := &file_rpc_iam_proto_msgTypes[163]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessMealCheck) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessMealCheck) ProtoMessage() {}
+
+func (x *FitnessMealCheck) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[163]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessMealCheck.ProtoReflect.Descriptor instead.
+func (*FitnessMealCheck) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{163}
+}
+
+func (x *FitnessMealCheck) GetSlot() string {
+	if x != nil {
+		return x.Slot
+	}
+	return ""
+}
+
+func (x *FitnessMealCheck) GetStatus() int64 {
+	if x != nil {
+		return x.Status
+	}
+	return 0
+}
+
+func (x *FitnessMealCheck) GetNote() string {
+	if x != nil {
+		return x.Note
+	}
+	return ""
+}
+
+type FitnessCheckinItem struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Date           string                 `protobuf:"bytes,1,opt,name=date,proto3" json:"date,omitempty"`
+	TemplateId     uint64                 `protobuf:"varint,2,opt,name=template_id,json=templateId,proto3" json:"template_id,omitempty"`
+	TrainingType   int64                  `protobuf:"varint,3,opt,name=training_type,json=trainingType,proto3" json:"training_type,omitempty"`
+	TrainingStatus int64                  `protobuf:"varint,4,opt,name=training_status,json=trainingStatus,proto3" json:"training_status,omitempty"`
+	ExerciseDone   []int64                `protobuf:"varint,5,rep,packed,name=exercise_done,json=exerciseDone,proto3" json:"exercise_done,omitempty"`
+	ExerciseTotal  int64                  `protobuf:"varint,6,opt,name=exercise_total,json=exerciseTotal,proto3" json:"exercise_total,omitempty"`
+	Meals          []*FitnessMealCheck    `protobuf:"bytes,7,rep,name=meals,proto3" json:"meals,omitempty"`
+	Steps          int64                  `protobuf:"varint,8,opt,name=steps,proto3" json:"steps,omitempty"`
+	StepGoal       int64                  `protobuf:"varint,9,opt,name=step_goal,json=stepGoal,proto3" json:"step_goal,omitempty"`
+	WaterCups      int64                  `protobuf:"varint,10,opt,name=water_cups,json=waterCups,proto3" json:"water_cups,omitempty"`
+	UpdatedAt      int64                  `protobuf:"varint,11,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *FitnessCheckinItem) Reset() {
+	*x = FitnessCheckinItem{}
+	mi := &file_rpc_iam_proto_msgTypes[164]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessCheckinItem) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessCheckinItem) ProtoMessage() {}
+
+func (x *FitnessCheckinItem) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[164]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessCheckinItem.ProtoReflect.Descriptor instead.
+func (*FitnessCheckinItem) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{164}
+}
+
+func (x *FitnessCheckinItem) GetDate() string {
+	if x != nil {
+		return x.Date
+	}
+	return ""
+}
+
+func (x *FitnessCheckinItem) GetTemplateId() uint64 {
+	if x != nil {
+		return x.TemplateId
+	}
+	return 0
+}
+
+func (x *FitnessCheckinItem) GetTrainingType() int64 {
+	if x != nil {
+		return x.TrainingType
+	}
+	return 0
+}
+
+func (x *FitnessCheckinItem) GetTrainingStatus() int64 {
+	if x != nil {
+		return x.TrainingStatus
+	}
+	return 0
+}
+
+func (x *FitnessCheckinItem) GetExerciseDone() []int64 {
+	if x != nil {
+		return x.ExerciseDone
+	}
+	return nil
+}
+
+func (x *FitnessCheckinItem) GetExerciseTotal() int64 {
+	if x != nil {
+		return x.ExerciseTotal
+	}
+	return 0
+}
+
+func (x *FitnessCheckinItem) GetMeals() []*FitnessMealCheck {
+	if x != nil {
+		return x.Meals
+	}
+	return nil
+}
+
+func (x *FitnessCheckinItem) GetSteps() int64 {
+	if x != nil {
+		return x.Steps
+	}
+	return 0
+}
+
+func (x *FitnessCheckinItem) GetStepGoal() int64 {
+	if x != nil {
+		return x.StepGoal
+	}
+	return 0
+}
+
+func (x *FitnessCheckinItem) GetWaterCups() int64 {
+	if x != nil {
+		return x.WaterCups
+	}
+	return 0
+}
+
+func (x *FitnessCheckinItem) GetUpdatedAt() int64 {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return 0
+}
+
+type FitnessMyDayRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Date          string                 `protobuf:"bytes,2,opt,name=date,proto3" json:"date,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessMyDayRequest) Reset() {
+	*x = FitnessMyDayRequest{}
+	mi := &file_rpc_iam_proto_msgTypes[165]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessMyDayRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessMyDayRequest) ProtoMessage() {}
+
+func (x *FitnessMyDayRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[165]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessMyDayRequest.ProtoReflect.Descriptor instead.
+func (*FitnessMyDayRequest) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{165}
+}
+
+func (x *FitnessMyDayRequest) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *FitnessMyDayRequest) GetDate() string {
+	if x != nil {
+		return x.Date
+	}
+	return ""
+}
+
+type FitnessMyDayResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Date          string                 `protobuf:"bytes,1,opt,name=date,proto3" json:"date,omitempty"`
+	Today         string                 `protobuf:"bytes,2,opt,name=today,proto3" json:"today,omitempty"`
+	Weekday       int64                  `protobuf:"varint,3,opt,name=weekday,proto3" json:"weekday,omitempty"`
+	CanCheckin    bool                   `protobuf:"varint,4,opt,name=can_checkin,json=canCheckin,proto3" json:"can_checkin,omitempty"`
+	HasPlan       bool                   `protobuf:"varint,5,opt,name=has_plan,json=hasPlan,proto3" json:"has_plan,omitempty"`
+	TemplateId    uint64                 `protobuf:"varint,6,opt,name=template_id,json=templateId,proto3" json:"template_id,omitempty"`
+	TemplateName  string                 `protobuf:"bytes,7,opt,name=template_name,json=templateName,proto3" json:"template_name,omitempty"`
+	IsOverride    bool                   `protobuf:"varint,8,opt,name=is_override,json=isOverride,proto3" json:"is_override,omitempty"`
+	Content       *FitnessDayContent     `protobuf:"bytes,9,opt,name=content,proto3" json:"content,omitempty"`
+	Tips          []*FitnessTipItem      `protobuf:"bytes,10,rep,name=tips,proto3" json:"tips,omitempty"`
+	Checkin       *FitnessCheckinItem    `protobuf:"bytes,11,opt,name=checkin,proto3" json:"checkin,omitempty"`
+	Suggestion    *FitnessSuggestionItem `protobuf:"bytes,12,opt,name=suggestion,proto3" json:"suggestion,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessMyDayResponse) Reset() {
+	*x = FitnessMyDayResponse{}
+	mi := &file_rpc_iam_proto_msgTypes[166]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessMyDayResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessMyDayResponse) ProtoMessage() {}
+
+func (x *FitnessMyDayResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[166]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessMyDayResponse.ProtoReflect.Descriptor instead.
+func (*FitnessMyDayResponse) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{166}
+}
+
+func (x *FitnessMyDayResponse) GetDate() string {
+	if x != nil {
+		return x.Date
+	}
+	return ""
+}
+
+func (x *FitnessMyDayResponse) GetToday() string {
+	if x != nil {
+		return x.Today
+	}
+	return ""
+}
+
+func (x *FitnessMyDayResponse) GetWeekday() int64 {
+	if x != nil {
+		return x.Weekday
+	}
+	return 0
+}
+
+func (x *FitnessMyDayResponse) GetCanCheckin() bool {
+	if x != nil {
+		return x.CanCheckin
+	}
+	return false
+}
+
+func (x *FitnessMyDayResponse) GetHasPlan() bool {
+	if x != nil {
+		return x.HasPlan
+	}
+	return false
+}
+
+func (x *FitnessMyDayResponse) GetTemplateId() uint64 {
+	if x != nil {
+		return x.TemplateId
+	}
+	return 0
+}
+
+func (x *FitnessMyDayResponse) GetTemplateName() string {
+	if x != nil {
+		return x.TemplateName
+	}
+	return ""
+}
+
+func (x *FitnessMyDayResponse) GetIsOverride() bool {
+	if x != nil {
+		return x.IsOverride
+	}
+	return false
+}
+
+func (x *FitnessMyDayResponse) GetContent() *FitnessDayContent {
+	if x != nil {
+		return x.Content
+	}
+	return nil
+}
+
+func (x *FitnessMyDayResponse) GetTips() []*FitnessTipItem {
+	if x != nil {
+		return x.Tips
+	}
+	return nil
+}
+
+func (x *FitnessMyDayResponse) GetCheckin() *FitnessCheckinItem {
+	if x != nil {
+		return x.Checkin
+	}
+	return nil
+}
+
+func (x *FitnessMyDayResponse) GetSuggestion() *FitnessSuggestionItem {
+	if x != nil {
+		return x.Suggestion
+	}
+	return nil
+}
+
+type FitnessMyCheckinSaveRequest struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	UserId         uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Date           string                 `protobuf:"bytes,2,opt,name=date,proto3" json:"date,omitempty"`
+	TrainingStatus int64                  `protobuf:"varint,3,opt,name=training_status,json=trainingStatus,proto3" json:"training_status,omitempty"`
+	ExerciseDone   []int64                `protobuf:"varint,4,rep,packed,name=exercise_done,json=exerciseDone,proto3" json:"exercise_done,omitempty"`
+	Meals          []*FitnessMealCheck    `protobuf:"bytes,5,rep,name=meals,proto3" json:"meals,omitempty"`
+	Steps          int64                  `protobuf:"varint,6,opt,name=steps,proto3" json:"steps,omitempty"`
+	WaterCups      int64                  `protobuf:"varint,7,opt,name=water_cups,json=waterCups,proto3" json:"water_cups,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *FitnessMyCheckinSaveRequest) Reset() {
+	*x = FitnessMyCheckinSaveRequest{}
+	mi := &file_rpc_iam_proto_msgTypes[167]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessMyCheckinSaveRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessMyCheckinSaveRequest) ProtoMessage() {}
+
+func (x *FitnessMyCheckinSaveRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[167]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessMyCheckinSaveRequest.ProtoReflect.Descriptor instead.
+func (*FitnessMyCheckinSaveRequest) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{167}
+}
+
+func (x *FitnessMyCheckinSaveRequest) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *FitnessMyCheckinSaveRequest) GetDate() string {
+	if x != nil {
+		return x.Date
+	}
+	return ""
+}
+
+func (x *FitnessMyCheckinSaveRequest) GetTrainingStatus() int64 {
+	if x != nil {
+		return x.TrainingStatus
+	}
+	return 0
+}
+
+func (x *FitnessMyCheckinSaveRequest) GetExerciseDone() []int64 {
+	if x != nil {
+		return x.ExerciseDone
+	}
+	return nil
+}
+
+func (x *FitnessMyCheckinSaveRequest) GetMeals() []*FitnessMealCheck {
+	if x != nil {
+		return x.Meals
+	}
+	return nil
+}
+
+func (x *FitnessMyCheckinSaveRequest) GetSteps() int64 {
+	if x != nil {
+		return x.Steps
+	}
+	return 0
+}
+
+func (x *FitnessMyCheckinSaveRequest) GetWaterCups() int64 {
+	if x != nil {
+		return x.WaterCups
+	}
+	return 0
+}
+
+type FitnessBodyRecordItem struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Date          string                 `protobuf:"bytes,1,opt,name=date,proto3" json:"date,omitempty"`
+	WeightKg      float64                `protobuf:"fixed64,2,opt,name=weight_kg,json=weightKg,proto3" json:"weight_kg,omitempty"`
+	WaistCm       float64                `protobuf:"fixed64,3,opt,name=waist_cm,json=waistCm,proto3" json:"waist_cm,omitempty"`
+	WeightAvg7    float64                `protobuf:"fixed64,4,opt,name=weight_avg7,json=weightAvg7,proto3" json:"weight_avg7,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessBodyRecordItem) Reset() {
+	*x = FitnessBodyRecordItem{}
+	mi := &file_rpc_iam_proto_msgTypes[168]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessBodyRecordItem) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessBodyRecordItem) ProtoMessage() {}
+
+func (x *FitnessBodyRecordItem) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[168]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessBodyRecordItem.ProtoReflect.Descriptor instead.
+func (*FitnessBodyRecordItem) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{168}
+}
+
+func (x *FitnessBodyRecordItem) GetDate() string {
+	if x != nil {
+		return x.Date
+	}
+	return ""
+}
+
+func (x *FitnessBodyRecordItem) GetWeightKg() float64 {
+	if x != nil {
+		return x.WeightKg
+	}
+	return 0
+}
+
+func (x *FitnessBodyRecordItem) GetWaistCm() float64 {
+	if x != nil {
+		return x.WaistCm
+	}
+	return 0
+}
+
+func (x *FitnessBodyRecordItem) GetWeightAvg7() float64 {
+	if x != nil {
+		return x.WeightAvg7
+	}
+	return 0
+}
+
+type FitnessMyBodyRecordListRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Days          int64                  `protobuf:"varint,2,opt,name=days,proto3" json:"days,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessMyBodyRecordListRequest) Reset() {
+	*x = FitnessMyBodyRecordListRequest{}
+	mi := &file_rpc_iam_proto_msgTypes[169]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessMyBodyRecordListRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessMyBodyRecordListRequest) ProtoMessage() {}
+
+func (x *FitnessMyBodyRecordListRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[169]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessMyBodyRecordListRequest.ProtoReflect.Descriptor instead.
+func (*FitnessMyBodyRecordListRequest) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{169}
+}
+
+func (x *FitnessMyBodyRecordListRequest) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *FitnessMyBodyRecordListRequest) GetDays() int64 {
+	if x != nil {
+		return x.Days
+	}
+	return 0
+}
+
+type FitnessBodyRecordListResponse struct {
+	state         protoimpl.MessageState   `protogen:"open.v1"`
+	List          []*FitnessBodyRecordItem `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessBodyRecordListResponse) Reset() {
+	*x = FitnessBodyRecordListResponse{}
+	mi := &file_rpc_iam_proto_msgTypes[170]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessBodyRecordListResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessBodyRecordListResponse) ProtoMessage() {}
+
+func (x *FitnessBodyRecordListResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[170]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessBodyRecordListResponse.ProtoReflect.Descriptor instead.
+func (*FitnessBodyRecordListResponse) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{170}
+}
+
+func (x *FitnessBodyRecordListResponse) GetList() []*FitnessBodyRecordItem {
+	if x != nil {
+		return x.List
+	}
+	return nil
+}
+
+type FitnessMyBodyRecordSaveRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Date          string                 `protobuf:"bytes,2,opt,name=date,proto3" json:"date,omitempty"`
+	WeightKg      float64                `protobuf:"fixed64,3,opt,name=weight_kg,json=weightKg,proto3" json:"weight_kg,omitempty"`
+	WaistCm       float64                `protobuf:"fixed64,4,opt,name=waist_cm,json=waistCm,proto3" json:"waist_cm,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessMyBodyRecordSaveRequest) Reset() {
+	*x = FitnessMyBodyRecordSaveRequest{}
+	mi := &file_rpc_iam_proto_msgTypes[171]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessMyBodyRecordSaveRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessMyBodyRecordSaveRequest) ProtoMessage() {}
+
+func (x *FitnessMyBodyRecordSaveRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[171]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessMyBodyRecordSaveRequest.ProtoReflect.Descriptor instead.
+func (*FitnessMyBodyRecordSaveRequest) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{171}
+}
+
+func (x *FitnessMyBodyRecordSaveRequest) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *FitnessMyBodyRecordSaveRequest) GetDate() string {
+	if x != nil {
+		return x.Date
+	}
+	return ""
+}
+
+func (x *FitnessMyBodyRecordSaveRequest) GetWeightKg() float64 {
+	if x != nil {
+		return x.WeightKg
+	}
+	return 0
+}
+
+func (x *FitnessMyBodyRecordSaveRequest) GetWaistCm() float64 {
+	if x != nil {
+		return x.WaistCm
+	}
+	return 0
+}
+
+type FitnessTemplateBrief struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Code          string                 `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
+	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Stage         string                 `protobuf:"bytes,4,opt,name=stage,proto3" json:"stage,omitempty"`
+	Summary       string                 `protobuf:"bytes,5,opt,name=summary,proto3" json:"summary,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessTemplateBrief) Reset() {
+	*x = FitnessTemplateBrief{}
+	mi := &file_rpc_iam_proto_msgTypes[172]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessTemplateBrief) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessTemplateBrief) ProtoMessage() {}
+
+func (x *FitnessTemplateBrief) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[172]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessTemplateBrief.ProtoReflect.Descriptor instead.
+func (*FitnessTemplateBrief) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{172}
+}
+
+func (x *FitnessTemplateBrief) GetId() uint64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *FitnessTemplateBrief) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+func (x *FitnessTemplateBrief) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *FitnessTemplateBrief) GetStage() string {
+	if x != nil {
+		return x.Stage
+	}
+	return ""
+}
+
+func (x *FitnessTemplateBrief) GetSummary() string {
+	if x != nil {
+		return x.Summary
+	}
+	return ""
+}
+
+type FitnessPendingSwitch struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TemplateId    uint64                 `protobuf:"varint,1,opt,name=template_id,json=templateId,proto3" json:"template_id,omitempty"`
+	TemplateName  string                 `protobuf:"bytes,2,opt,name=template_name,json=templateName,proto3" json:"template_name,omitempty"`
+	EffectiveDate string                 `protobuf:"bytes,3,opt,name=effective_date,json=effectiveDate,proto3" json:"effective_date,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessPendingSwitch) Reset() {
+	*x = FitnessPendingSwitch{}
+	mi := &file_rpc_iam_proto_msgTypes[173]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessPendingSwitch) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessPendingSwitch) ProtoMessage() {}
+
+func (x *FitnessPendingSwitch) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[173]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessPendingSwitch.ProtoReflect.Descriptor instead.
+func (*FitnessPendingSwitch) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{173}
+}
+
+func (x *FitnessPendingSwitch) GetTemplateId() uint64 {
+	if x != nil {
+		return x.TemplateId
+	}
+	return 0
+}
+
+func (x *FitnessPendingSwitch) GetTemplateName() string {
+	if x != nil {
+		return x.TemplateName
+	}
+	return ""
+}
+
+func (x *FitnessPendingSwitch) GetEffectiveDate() string {
+	if x != nil {
+		return x.EffectiveDate
+	}
+	return ""
+}
+
+type FitnessSuggestionItem struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Id               uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	WeekStart        string                 `protobuf:"bytes,2,opt,name=week_start,json=weekStart,proto3" json:"week_start,omitempty"`
+	RuleCode         string                 `protobuf:"bytes,3,opt,name=rule_code,json=ruleCode,proto3" json:"rule_code,omitempty"`
+	FromTemplateId   uint64                 `protobuf:"varint,4,opt,name=from_template_id,json=fromTemplateId,proto3" json:"from_template_id,omitempty"`
+	FromTemplateName string                 `protobuf:"bytes,5,opt,name=from_template_name,json=fromTemplateName,proto3" json:"from_template_name,omitempty"`
+	ToTemplateId     uint64                 `protobuf:"varint,6,opt,name=to_template_id,json=toTemplateId,proto3" json:"to_template_id,omitempty"`
+	ToTemplateName   string                 `protobuf:"bytes,7,opt,name=to_template_name,json=toTemplateName,proto3" json:"to_template_name,omitempty"`
+	Reason           string                 `protobuf:"bytes,8,opt,name=reason,proto3" json:"reason,omitempty"`
+	Status           int64                  `protobuf:"varint,9,opt,name=status,proto3" json:"status,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *FitnessSuggestionItem) Reset() {
+	*x = FitnessSuggestionItem{}
+	mi := &file_rpc_iam_proto_msgTypes[174]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessSuggestionItem) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessSuggestionItem) ProtoMessage() {}
+
+func (x *FitnessSuggestionItem) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[174]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessSuggestionItem.ProtoReflect.Descriptor instead.
+func (*FitnessSuggestionItem) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{174}
+}
+
+func (x *FitnessSuggestionItem) GetId() uint64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *FitnessSuggestionItem) GetWeekStart() string {
+	if x != nil {
+		return x.WeekStart
+	}
+	return ""
+}
+
+func (x *FitnessSuggestionItem) GetRuleCode() string {
+	if x != nil {
+		return x.RuleCode
+	}
+	return ""
+}
+
+func (x *FitnessSuggestionItem) GetFromTemplateId() uint64 {
+	if x != nil {
+		return x.FromTemplateId
+	}
+	return 0
+}
+
+func (x *FitnessSuggestionItem) GetFromTemplateName() string {
+	if x != nil {
+		return x.FromTemplateName
+	}
+	return ""
+}
+
+func (x *FitnessSuggestionItem) GetToTemplateId() uint64 {
+	if x != nil {
+		return x.ToTemplateId
+	}
+	return 0
+}
+
+func (x *FitnessSuggestionItem) GetToTemplateName() string {
+	if x != nil {
+		return x.ToTemplateName
+	}
+	return ""
+}
+
+func (x *FitnessSuggestionItem) GetReason() string {
+	if x != nil {
+		return x.Reason
+	}
+	return ""
+}
+
+func (x *FitnessSuggestionItem) GetStatus() int64 {
+	if x != nil {
+		return x.Status
+	}
+	return 0
+}
+
+type FitnessMyProfileRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessMyProfileRequest) Reset() {
+	*x = FitnessMyProfileRequest{}
+	mi := &file_rpc_iam_proto_msgTypes[175]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessMyProfileRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessMyProfileRequest) ProtoMessage() {}
+
+func (x *FitnessMyProfileRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[175]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessMyProfileRequest.ProtoReflect.Descriptor instead.
+func (*FitnessMyProfileRequest) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{175}
+}
+
+func (x *FitnessMyProfileRequest) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+type FitnessMyProfileResponse struct {
+	state              protoimpl.MessageState  `protogen:"open.v1"`
+	Today              string                  `protobuf:"bytes,1,opt,name=today,proto3" json:"today,omitempty"`
+	Nickname           string                  `protobuf:"bytes,2,opt,name=nickname,proto3" json:"nickname,omitempty"`
+	Avatar             string                  `protobuf:"bytes,3,opt,name=avatar,proto3" json:"avatar,omitempty"`
+	HeightCm           float64                 `protobuf:"fixed64,4,opt,name=height_cm,json=heightCm,proto3" json:"height_cm,omitempty"`
+	TargetWeightKg     float64                 `protobuf:"fixed64,5,opt,name=target_weight_kg,json=targetWeightKg,proto3" json:"target_weight_kg,omitempty"`
+	TrainingPreference int64                   `protobuf:"varint,6,opt,name=training_preference,json=trainingPreference,proto3" json:"training_preference,omitempty"`
+	LatestWeightKg     float64                 `protobuf:"fixed64,7,opt,name=latest_weight_kg,json=latestWeightKg,proto3" json:"latest_weight_kg,omitempty"`
+	StreakDays         int64                   `protobuf:"varint,8,opt,name=streak_days,json=streakDays,proto3" json:"streak_days,omitempty"`
+	WeekRate           float64                 `protobuf:"fixed64,9,opt,name=week_rate,json=weekRate,proto3" json:"week_rate,omitempty"`
+	CurrentTemplate    *FitnessTemplateBrief   `protobuf:"bytes,10,opt,name=current_template,json=currentTemplate,proto3" json:"current_template,omitempty"`
+	PendingSwitch      *FitnessPendingSwitch   `protobuf:"bytes,11,opt,name=pending_switch,json=pendingSwitch,proto3" json:"pending_switch,omitempty"`
+	Suggestion         *FitnessSuggestionItem  `protobuf:"bytes,12,opt,name=suggestion,proto3" json:"suggestion,omitempty"`
+	Templates          []*FitnessTemplateBrief `protobuf:"bytes,13,rep,name=templates,proto3" json:"templates,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *FitnessMyProfileResponse) Reset() {
+	*x = FitnessMyProfileResponse{}
+	mi := &file_rpc_iam_proto_msgTypes[176]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessMyProfileResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessMyProfileResponse) ProtoMessage() {}
+
+func (x *FitnessMyProfileResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[176]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessMyProfileResponse.ProtoReflect.Descriptor instead.
+func (*FitnessMyProfileResponse) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{176}
+}
+
+func (x *FitnessMyProfileResponse) GetToday() string {
+	if x != nil {
+		return x.Today
+	}
+	return ""
+}
+
+func (x *FitnessMyProfileResponse) GetNickname() string {
+	if x != nil {
+		return x.Nickname
+	}
+	return ""
+}
+
+func (x *FitnessMyProfileResponse) GetAvatar() string {
+	if x != nil {
+		return x.Avatar
+	}
+	return ""
+}
+
+func (x *FitnessMyProfileResponse) GetHeightCm() float64 {
+	if x != nil {
+		return x.HeightCm
+	}
+	return 0
+}
+
+func (x *FitnessMyProfileResponse) GetTargetWeightKg() float64 {
+	if x != nil {
+		return x.TargetWeightKg
+	}
+	return 0
+}
+
+func (x *FitnessMyProfileResponse) GetTrainingPreference() int64 {
+	if x != nil {
+		return x.TrainingPreference
+	}
+	return 0
+}
+
+func (x *FitnessMyProfileResponse) GetLatestWeightKg() float64 {
+	if x != nil {
+		return x.LatestWeightKg
+	}
+	return 0
+}
+
+func (x *FitnessMyProfileResponse) GetStreakDays() int64 {
+	if x != nil {
+		return x.StreakDays
+	}
+	return 0
+}
+
+func (x *FitnessMyProfileResponse) GetWeekRate() float64 {
+	if x != nil {
+		return x.WeekRate
+	}
+	return 0
+}
+
+func (x *FitnessMyProfileResponse) GetCurrentTemplate() *FitnessTemplateBrief {
+	if x != nil {
+		return x.CurrentTemplate
+	}
+	return nil
+}
+
+func (x *FitnessMyProfileResponse) GetPendingSwitch() *FitnessPendingSwitch {
+	if x != nil {
+		return x.PendingSwitch
+	}
+	return nil
+}
+
+func (x *FitnessMyProfileResponse) GetSuggestion() *FitnessSuggestionItem {
+	if x != nil {
+		return x.Suggestion
+	}
+	return nil
+}
+
+func (x *FitnessMyProfileResponse) GetTemplates() []*FitnessTemplateBrief {
+	if x != nil {
+		return x.Templates
+	}
+	return nil
+}
+
+type FitnessMyProfileUpdateRequest struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	UserId             uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	HeightCm           float64                `protobuf:"fixed64,2,opt,name=height_cm,json=heightCm,proto3" json:"height_cm,omitempty"`
+	TargetWeightKg     float64                `protobuf:"fixed64,3,opt,name=target_weight_kg,json=targetWeightKg,proto3" json:"target_weight_kg,omitempty"`
+	TrainingPreference int64                  `protobuf:"varint,4,opt,name=training_preference,json=trainingPreference,proto3" json:"training_preference,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *FitnessMyProfileUpdateRequest) Reset() {
+	*x = FitnessMyProfileUpdateRequest{}
+	mi := &file_rpc_iam_proto_msgTypes[177]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessMyProfileUpdateRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessMyProfileUpdateRequest) ProtoMessage() {}
+
+func (x *FitnessMyProfileUpdateRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[177]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessMyProfileUpdateRequest.ProtoReflect.Descriptor instead.
+func (*FitnessMyProfileUpdateRequest) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{177}
+}
+
+func (x *FitnessMyProfileUpdateRequest) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *FitnessMyProfileUpdateRequest) GetHeightCm() float64 {
+	if x != nil {
+		return x.HeightCm
+	}
+	return 0
+}
+
+func (x *FitnessMyProfileUpdateRequest) GetTargetWeightKg() float64 {
+	if x != nil {
+		return x.TargetWeightKg
+	}
+	return 0
+}
+
+func (x *FitnessMyProfileUpdateRequest) GetTrainingPreference() int64 {
+	if x != nil {
+		return x.TrainingPreference
+	}
+	return 0
+}
+
+type FitnessMyTemplateSwitchRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	TemplateId    uint64                 `protobuf:"varint,2,opt,name=template_id,json=templateId,proto3" json:"template_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessMyTemplateSwitchRequest) Reset() {
+	*x = FitnessMyTemplateSwitchRequest{}
+	mi := &file_rpc_iam_proto_msgTypes[178]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessMyTemplateSwitchRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessMyTemplateSwitchRequest) ProtoMessage() {}
+
+func (x *FitnessMyTemplateSwitchRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[178]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessMyTemplateSwitchRequest.ProtoReflect.Descriptor instead.
+func (*FitnessMyTemplateSwitchRequest) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{178}
+}
+
+func (x *FitnessMyTemplateSwitchRequest) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *FitnessMyTemplateSwitchRequest) GetTemplateId() uint64 {
+	if x != nil {
+		return x.TemplateId
+	}
+	return 0
+}
+
+type FitnessTemplateSwitchResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	EffectiveDate string                 `protobuf:"bytes,1,opt,name=effective_date,json=effectiveDate,proto3" json:"effective_date,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessTemplateSwitchResponse) Reset() {
+	*x = FitnessTemplateSwitchResponse{}
+	mi := &file_rpc_iam_proto_msgTypes[179]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessTemplateSwitchResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessTemplateSwitchResponse) ProtoMessage() {}
+
+func (x *FitnessTemplateSwitchResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[179]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessTemplateSwitchResponse.ProtoReflect.Descriptor instead.
+func (*FitnessTemplateSwitchResponse) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{179}
+}
+
+func (x *FitnessTemplateSwitchResponse) GetEffectiveDate() string {
+	if x != nil {
+		return x.EffectiveDate
+	}
+	return ""
+}
+
+type FitnessMySuggestionDecideRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Id            uint64                 `protobuf:"varint,2,opt,name=id,proto3" json:"id,omitempty"`
+	Accept        bool                   `protobuf:"varint,3,opt,name=accept,proto3" json:"accept,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessMySuggestionDecideRequest) Reset() {
+	*x = FitnessMySuggestionDecideRequest{}
+	mi := &file_rpc_iam_proto_msgTypes[180]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessMySuggestionDecideRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessMySuggestionDecideRequest) ProtoMessage() {}
+
+func (x *FitnessMySuggestionDecideRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[180]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessMySuggestionDecideRequest.ProtoReflect.Descriptor instead.
+func (*FitnessMySuggestionDecideRequest) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{180}
+}
+
+func (x *FitnessMySuggestionDecideRequest) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *FitnessMySuggestionDecideRequest) GetId() uint64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *FitnessMySuggestionDecideRequest) GetAccept() bool {
+	if x != nil {
+		return x.Accept
+	}
+	return false
+}
+
+type FitnessMemberItem struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	UserId          uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Username        string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+	Nickname        string                 `protobuf:"bytes,3,opt,name=nickname,proto3" json:"nickname,omitempty"`
+	Avatar          string                 `protobuf:"bytes,4,opt,name=avatar,proto3" json:"avatar,omitempty"`
+	TemplateId      uint64                 `protobuf:"varint,5,opt,name=template_id,json=templateId,proto3" json:"template_id,omitempty"`
+	TemplateName    string                 `protobuf:"bytes,6,opt,name=template_name,json=templateName,proto3" json:"template_name,omitempty"`
+	HeightCm        float64                `protobuf:"fixed64,7,opt,name=height_cm,json=heightCm,proto3" json:"height_cm,omitempty"`
+	TargetWeightKg  float64                `protobuf:"fixed64,8,opt,name=target_weight_kg,json=targetWeightKg,proto3" json:"target_weight_kg,omitempty"`
+	LatestWeightKg  float64                `protobuf:"fixed64,9,opt,name=latest_weight_kg,json=latestWeightKg,proto3" json:"latest_weight_kg,omitempty"`
+	StreakDays      int64                  `protobuf:"varint,10,opt,name=streak_days,json=streakDays,proto3" json:"streak_days,omitempty"`
+	WeekRate        float64                `protobuf:"fixed64,11,opt,name=week_rate,json=weekRate,proto3" json:"week_rate,omitempty"`
+	LastCheckinDate string                 `protobuf:"bytes,12,opt,name=last_checkin_date,json=lastCheckinDate,proto3" json:"last_checkin_date,omitempty"`
+	CreatedAt       int64                  `protobuf:"varint,13,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *FitnessMemberItem) Reset() {
+	*x = FitnessMemberItem{}
+	mi := &file_rpc_iam_proto_msgTypes[181]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessMemberItem) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessMemberItem) ProtoMessage() {}
+
+func (x *FitnessMemberItem) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[181]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessMemberItem.ProtoReflect.Descriptor instead.
+func (*FitnessMemberItem) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{181}
+}
+
+func (x *FitnessMemberItem) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *FitnessMemberItem) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *FitnessMemberItem) GetNickname() string {
+	if x != nil {
+		return x.Nickname
+	}
+	return ""
+}
+
+func (x *FitnessMemberItem) GetAvatar() string {
+	if x != nil {
+		return x.Avatar
+	}
+	return ""
+}
+
+func (x *FitnessMemberItem) GetTemplateId() uint64 {
+	if x != nil {
+		return x.TemplateId
+	}
+	return 0
+}
+
+func (x *FitnessMemberItem) GetTemplateName() string {
+	if x != nil {
+		return x.TemplateName
+	}
+	return ""
+}
+
+func (x *FitnessMemberItem) GetHeightCm() float64 {
+	if x != nil {
+		return x.HeightCm
+	}
+	return 0
+}
+
+func (x *FitnessMemberItem) GetTargetWeightKg() float64 {
+	if x != nil {
+		return x.TargetWeightKg
+	}
+	return 0
+}
+
+func (x *FitnessMemberItem) GetLatestWeightKg() float64 {
+	if x != nil {
+		return x.LatestWeightKg
+	}
+	return 0
+}
+
+func (x *FitnessMemberItem) GetStreakDays() int64 {
+	if x != nil {
+		return x.StreakDays
+	}
+	return 0
+}
+
+func (x *FitnessMemberItem) GetWeekRate() float64 {
+	if x != nil {
+		return x.WeekRate
+	}
+	return 0
+}
+
+func (x *FitnessMemberItem) GetLastCheckinDate() string {
+	if x != nil {
+		return x.LastCheckinDate
+	}
+	return ""
+}
+
+func (x *FitnessMemberItem) GetCreatedAt() int64 {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return 0
+}
+
+type FitnessMemberListRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Page          int64                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
+	PageSize      int64                  `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	Keyword       string                 `protobuf:"bytes,3,opt,name=keyword,proto3" json:"keyword,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessMemberListRequest) Reset() {
+	*x = FitnessMemberListRequest{}
+	mi := &file_rpc_iam_proto_msgTypes[182]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessMemberListRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessMemberListRequest) ProtoMessage() {}
+
+func (x *FitnessMemberListRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[182]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessMemberListRequest.ProtoReflect.Descriptor instead.
+func (*FitnessMemberListRequest) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{182}
+}
+
+func (x *FitnessMemberListRequest) GetPage() int64 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *FitnessMemberListRequest) GetPageSize() int64 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+func (x *FitnessMemberListRequest) GetKeyword() string {
+	if x != nil {
+		return x.Keyword
+	}
+	return ""
+}
+
+type FitnessMemberListResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Total         int64                  `protobuf:"varint,1,opt,name=total,proto3" json:"total,omitempty"`
+	List          []*FitnessMemberItem   `protobuf:"bytes,2,rep,name=list,proto3" json:"list,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessMemberListResponse) Reset() {
+	*x = FitnessMemberListResponse{}
+	mi := &file_rpc_iam_proto_msgTypes[183]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessMemberListResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessMemberListResponse) ProtoMessage() {}
+
+func (x *FitnessMemberListResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[183]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessMemberListResponse.ProtoReflect.Descriptor instead.
+func (*FitnessMemberListResponse) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{183}
+}
+
+func (x *FitnessMemberListResponse) GetTotal() int64 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+func (x *FitnessMemberListResponse) GetList() []*FitnessMemberItem {
+	if x != nil {
+		return x.List
+	}
+	return nil
+}
+
+type FitnessMemberAssignRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	TemplateId    uint64                 `protobuf:"varint,2,opt,name=template_id,json=templateId,proto3" json:"template_id,omitempty"`
+	Reason        string                 `protobuf:"bytes,3,opt,name=reason,proto3" json:"reason,omitempty"`
+	OperatorId    uint64                 `protobuf:"varint,4,opt,name=operator_id,json=operatorId,proto3" json:"operator_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessMemberAssignRequest) Reset() {
+	*x = FitnessMemberAssignRequest{}
+	mi := &file_rpc_iam_proto_msgTypes[184]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessMemberAssignRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessMemberAssignRequest) ProtoMessage() {}
+
+func (x *FitnessMemberAssignRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[184]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessMemberAssignRequest.ProtoReflect.Descriptor instead.
+func (*FitnessMemberAssignRequest) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{184}
+}
+
+func (x *FitnessMemberAssignRequest) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *FitnessMemberAssignRequest) GetTemplateId() uint64 {
+	if x != nil {
+		return x.TemplateId
+	}
+	return 0
+}
+
+func (x *FitnessMemberAssignRequest) GetReason() string {
+	if x != nil {
+		return x.Reason
+	}
+	return ""
+}
+
+func (x *FitnessMemberAssignRequest) GetOperatorId() uint64 {
+	if x != nil {
+		return x.OperatorId
+	}
+	return 0
+}
+
+type FitnessSwitchItem struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Id               uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	UserId           uint64                 `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Nickname         string                 `protobuf:"bytes,3,opt,name=nickname,proto3" json:"nickname,omitempty"`
+	FromTemplateId   uint64                 `protobuf:"varint,4,opt,name=from_template_id,json=fromTemplateId,proto3" json:"from_template_id,omitempty"`
+	FromTemplateName string                 `protobuf:"bytes,5,opt,name=from_template_name,json=fromTemplateName,proto3" json:"from_template_name,omitempty"`
+	ToTemplateId     uint64                 `protobuf:"varint,6,opt,name=to_template_id,json=toTemplateId,proto3" json:"to_template_id,omitempty"`
+	ToTemplateName   string                 `protobuf:"bytes,7,opt,name=to_template_name,json=toTemplateName,proto3" json:"to_template_name,omitempty"`
+	EffectiveDate    string                 `protobuf:"bytes,8,opt,name=effective_date,json=effectiveDate,proto3" json:"effective_date,omitempty"`
+	Source           int64                  `protobuf:"varint,9,opt,name=source,proto3" json:"source,omitempty"`
+	Reason           string                 `protobuf:"bytes,10,opt,name=reason,proto3" json:"reason,omitempty"`
+	OperatorId       uint64                 `protobuf:"varint,11,opt,name=operator_id,json=operatorId,proto3" json:"operator_id,omitempty"`
+	OperatorName     string                 `protobuf:"bytes,12,opt,name=operator_name,json=operatorName,proto3" json:"operator_name,omitempty"`
+	CreatedAt        int64                  `protobuf:"varint,13,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *FitnessSwitchItem) Reset() {
+	*x = FitnessSwitchItem{}
+	mi := &file_rpc_iam_proto_msgTypes[185]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessSwitchItem) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessSwitchItem) ProtoMessage() {}
+
+func (x *FitnessSwitchItem) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[185]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessSwitchItem.ProtoReflect.Descriptor instead.
+func (*FitnessSwitchItem) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{185}
+}
+
+func (x *FitnessSwitchItem) GetId() uint64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *FitnessSwitchItem) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *FitnessSwitchItem) GetNickname() string {
+	if x != nil {
+		return x.Nickname
+	}
+	return ""
+}
+
+func (x *FitnessSwitchItem) GetFromTemplateId() uint64 {
+	if x != nil {
+		return x.FromTemplateId
+	}
+	return 0
+}
+
+func (x *FitnessSwitchItem) GetFromTemplateName() string {
+	if x != nil {
+		return x.FromTemplateName
+	}
+	return ""
+}
+
+func (x *FitnessSwitchItem) GetToTemplateId() uint64 {
+	if x != nil {
+		return x.ToTemplateId
+	}
+	return 0
+}
+
+func (x *FitnessSwitchItem) GetToTemplateName() string {
+	if x != nil {
+		return x.ToTemplateName
+	}
+	return ""
+}
+
+func (x *FitnessSwitchItem) GetEffectiveDate() string {
+	if x != nil {
+		return x.EffectiveDate
+	}
+	return ""
+}
+
+func (x *FitnessSwitchItem) GetSource() int64 {
+	if x != nil {
+		return x.Source
+	}
+	return 0
+}
+
+func (x *FitnessSwitchItem) GetReason() string {
+	if x != nil {
+		return x.Reason
+	}
+	return ""
+}
+
+func (x *FitnessSwitchItem) GetOperatorId() uint64 {
+	if x != nil {
+		return x.OperatorId
+	}
+	return 0
+}
+
+func (x *FitnessSwitchItem) GetOperatorName() string {
+	if x != nil {
+		return x.OperatorName
+	}
+	return ""
+}
+
+func (x *FitnessSwitchItem) GetCreatedAt() int64 {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return 0
+}
+
+type FitnessSwitchListRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Page          int64                  `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty"`
+	PageSize      int64                  `protobuf:"varint,3,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessSwitchListRequest) Reset() {
+	*x = FitnessSwitchListRequest{}
+	mi := &file_rpc_iam_proto_msgTypes[186]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessSwitchListRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessSwitchListRequest) ProtoMessage() {}
+
+func (x *FitnessSwitchListRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[186]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessSwitchListRequest.ProtoReflect.Descriptor instead.
+func (*FitnessSwitchListRequest) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{186}
+}
+
+func (x *FitnessSwitchListRequest) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *FitnessSwitchListRequest) GetPage() int64 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *FitnessSwitchListRequest) GetPageSize() int64 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+type FitnessSwitchListResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Total         int64                  `protobuf:"varint,1,opt,name=total,proto3" json:"total,omitempty"`
+	List          []*FitnessSwitchItem   `protobuf:"bytes,2,rep,name=list,proto3" json:"list,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessSwitchListResponse) Reset() {
+	*x = FitnessSwitchListResponse{}
+	mi := &file_rpc_iam_proto_msgTypes[187]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessSwitchListResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessSwitchListResponse) ProtoMessage() {}
+
+func (x *FitnessSwitchListResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[187]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessSwitchListResponse.ProtoReflect.Descriptor instead.
+func (*FitnessSwitchListResponse) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{187}
+}
+
+func (x *FitnessSwitchListResponse) GetTotal() int64 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+func (x *FitnessSwitchListResponse) GetList() []*FitnessSwitchItem {
+	if x != nil {
+		return x.List
+	}
+	return nil
+}
+
+type FitnessStatsOverviewRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Date          string                 `protobuf:"bytes,1,opt,name=date,proto3" json:"date,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessStatsOverviewRequest) Reset() {
+	*x = FitnessStatsOverviewRequest{}
+	mi := &file_rpc_iam_proto_msgTypes[188]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessStatsOverviewRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessStatsOverviewRequest) ProtoMessage() {}
+
+func (x *FitnessStatsOverviewRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[188]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessStatsOverviewRequest.ProtoReflect.Descriptor instead.
+func (*FitnessStatsOverviewRequest) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{188}
+}
+
+func (x *FitnessStatsOverviewRequest) GetDate() string {
+	if x != nil {
+		return x.Date
+	}
+	return ""
+}
+
+type FitnessRankItem struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Nickname      string                 `protobuf:"bytes,2,opt,name=nickname,proto3" json:"nickname,omitempty"`
+	Avatar        string                 `protobuf:"bytes,3,opt,name=avatar,proto3" json:"avatar,omitempty"`
+	StreakDays    int64                  `protobuf:"varint,4,opt,name=streak_days,json=streakDays,proto3" json:"streak_days,omitempty"`
+	WeekRate      float64                `protobuf:"fixed64,5,opt,name=week_rate,json=weekRate,proto3" json:"week_rate,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessRankItem) Reset() {
+	*x = FitnessRankItem{}
+	mi := &file_rpc_iam_proto_msgTypes[189]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessRankItem) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessRankItem) ProtoMessage() {}
+
+func (x *FitnessRankItem) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[189]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessRankItem.ProtoReflect.Descriptor instead.
+func (*FitnessRankItem) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{189}
+}
+
+func (x *FitnessRankItem) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *FitnessRankItem) GetNickname() string {
+	if x != nil {
+		return x.Nickname
+	}
+	return ""
+}
+
+func (x *FitnessRankItem) GetAvatar() string {
+	if x != nil {
+		return x.Avatar
+	}
+	return ""
+}
+
+func (x *FitnessRankItem) GetStreakDays() int64 {
+	if x != nil {
+		return x.StreakDays
+	}
+	return 0
+}
+
+func (x *FitnessRankItem) GetWeekRate() float64 {
+	if x != nil {
+		return x.WeekRate
+	}
+	return 0
+}
+
+type FitnessDailyCount struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Date          string                 `protobuf:"bytes,1,opt,name=date,proto3" json:"date,omitempty"`
+	Count         int64                  `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessDailyCount) Reset() {
+	*x = FitnessDailyCount{}
+	mi := &file_rpc_iam_proto_msgTypes[190]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessDailyCount) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessDailyCount) ProtoMessage() {}
+
+func (x *FitnessDailyCount) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[190]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessDailyCount.ProtoReflect.Descriptor instead.
+func (*FitnessDailyCount) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{190}
+}
+
+func (x *FitnessDailyCount) GetDate() string {
+	if x != nil {
+		return x.Date
+	}
+	return ""
+}
+
+func (x *FitnessDailyCount) GetCount() int64 {
+	if x != nil {
+		return x.Count
+	}
+	return 0
+}
+
+type FitnessStatsOverviewResponse struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Date              string                 `protobuf:"bytes,1,opt,name=date,proto3" json:"date,omitempty"`
+	MemberCount       int64                  `protobuf:"varint,2,opt,name=member_count,json=memberCount,proto3" json:"member_count,omitempty"`
+	TodayCheckinCount int64                  `protobuf:"varint,3,opt,name=today_checkin_count,json=todayCheckinCount,proto3" json:"today_checkin_count,omitempty"`
+	WeekAvgRate       float64                `protobuf:"fixed64,4,opt,name=week_avg_rate,json=weekAvgRate,proto3" json:"week_avg_rate,omitempty"`
+	StreakRanking     []*FitnessRankItem     `protobuf:"bytes,5,rep,name=streak_ranking,json=streakRanking,proto3" json:"streak_ranking,omitempty"`
+	DailyCounts       []*FitnessDailyCount   `protobuf:"bytes,6,rep,name=daily_counts,json=dailyCounts,proto3" json:"daily_counts,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *FitnessStatsOverviewResponse) Reset() {
+	*x = FitnessStatsOverviewResponse{}
+	mi := &file_rpc_iam_proto_msgTypes[191]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessStatsOverviewResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessStatsOverviewResponse) ProtoMessage() {}
+
+func (x *FitnessStatsOverviewResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[191]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessStatsOverviewResponse.ProtoReflect.Descriptor instead.
+func (*FitnessStatsOverviewResponse) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{191}
+}
+
+func (x *FitnessStatsOverviewResponse) GetDate() string {
+	if x != nil {
+		return x.Date
+	}
+	return ""
+}
+
+func (x *FitnessStatsOverviewResponse) GetMemberCount() int64 {
+	if x != nil {
+		return x.MemberCount
+	}
+	return 0
+}
+
+func (x *FitnessStatsOverviewResponse) GetTodayCheckinCount() int64 {
+	if x != nil {
+		return x.TodayCheckinCount
+	}
+	return 0
+}
+
+func (x *FitnessStatsOverviewResponse) GetWeekAvgRate() float64 {
+	if x != nil {
+		return x.WeekAvgRate
+	}
+	return 0
+}
+
+func (x *FitnessStatsOverviewResponse) GetStreakRanking() []*FitnessRankItem {
+	if x != nil {
+		return x.StreakRanking
+	}
+	return nil
+}
+
+func (x *FitnessStatsOverviewResponse) GetDailyCounts() []*FitnessDailyCount {
+	if x != nil {
+		return x.DailyCounts
+	}
+	return nil
+}
+
+type FitnessCheckinRow struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Id             uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Date           string                 `protobuf:"bytes,2,opt,name=date,proto3" json:"date,omitempty"`
+	UserId         uint64                 `protobuf:"varint,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Nickname       string                 `protobuf:"bytes,4,opt,name=nickname,proto3" json:"nickname,omitempty"`
+	TemplateName   string                 `protobuf:"bytes,5,opt,name=template_name,json=templateName,proto3" json:"template_name,omitempty"`
+	TrainingType   int64                  `protobuf:"varint,6,opt,name=training_type,json=trainingType,proto3" json:"training_type,omitempty"`
+	TrainingStatus int64                  `protobuf:"varint,7,opt,name=training_status,json=trainingStatus,proto3" json:"training_status,omitempty"`
+	ExerciseDone   int64                  `protobuf:"varint,8,opt,name=exercise_done,json=exerciseDone,proto3" json:"exercise_done,omitempty"`
+	ExerciseTotal  int64                  `protobuf:"varint,9,opt,name=exercise_total,json=exerciseTotal,proto3" json:"exercise_total,omitempty"`
+	MealOnPlan     int64                  `protobuf:"varint,10,opt,name=meal_on_plan,json=mealOnPlan,proto3" json:"meal_on_plan,omitempty"`
+	MealOther      int64                  `protobuf:"varint,11,opt,name=meal_other,json=mealOther,proto3" json:"meal_other,omitempty"`
+	MealSkipped    int64                  `protobuf:"varint,12,opt,name=meal_skipped,json=mealSkipped,proto3" json:"meal_skipped,omitempty"`
+	Steps          int64                  `protobuf:"varint,13,opt,name=steps,proto3" json:"steps,omitempty"`
+	StepGoal       int64                  `protobuf:"varint,14,opt,name=step_goal,json=stepGoal,proto3" json:"step_goal,omitempty"`
+	WaterCups      int64                  `protobuf:"varint,15,opt,name=water_cups,json=waterCups,proto3" json:"water_cups,omitempty"`
+	Score          float64                `protobuf:"fixed64,16,opt,name=score,proto3" json:"score,omitempty"`
+	UpdatedAt      int64                  `protobuf:"varint,17,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *FitnessCheckinRow) Reset() {
+	*x = FitnessCheckinRow{}
+	mi := &file_rpc_iam_proto_msgTypes[192]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessCheckinRow) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessCheckinRow) ProtoMessage() {}
+
+func (x *FitnessCheckinRow) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[192]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessCheckinRow.ProtoReflect.Descriptor instead.
+func (*FitnessCheckinRow) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{192}
+}
+
+func (x *FitnessCheckinRow) GetId() uint64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *FitnessCheckinRow) GetDate() string {
+	if x != nil {
+		return x.Date
+	}
+	return ""
+}
+
+func (x *FitnessCheckinRow) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *FitnessCheckinRow) GetNickname() string {
+	if x != nil {
+		return x.Nickname
+	}
+	return ""
+}
+
+func (x *FitnessCheckinRow) GetTemplateName() string {
+	if x != nil {
+		return x.TemplateName
+	}
+	return ""
+}
+
+func (x *FitnessCheckinRow) GetTrainingType() int64 {
+	if x != nil {
+		return x.TrainingType
+	}
+	return 0
+}
+
+func (x *FitnessCheckinRow) GetTrainingStatus() int64 {
+	if x != nil {
+		return x.TrainingStatus
+	}
+	return 0
+}
+
+func (x *FitnessCheckinRow) GetExerciseDone() int64 {
+	if x != nil {
+		return x.ExerciseDone
+	}
+	return 0
+}
+
+func (x *FitnessCheckinRow) GetExerciseTotal() int64 {
+	if x != nil {
+		return x.ExerciseTotal
+	}
+	return 0
+}
+
+func (x *FitnessCheckinRow) GetMealOnPlan() int64 {
+	if x != nil {
+		return x.MealOnPlan
+	}
+	return 0
+}
+
+func (x *FitnessCheckinRow) GetMealOther() int64 {
+	if x != nil {
+		return x.MealOther
+	}
+	return 0
+}
+
+func (x *FitnessCheckinRow) GetMealSkipped() int64 {
+	if x != nil {
+		return x.MealSkipped
+	}
+	return 0
+}
+
+func (x *FitnessCheckinRow) GetSteps() int64 {
+	if x != nil {
+		return x.Steps
+	}
+	return 0
+}
+
+func (x *FitnessCheckinRow) GetStepGoal() int64 {
+	if x != nil {
+		return x.StepGoal
+	}
+	return 0
+}
+
+func (x *FitnessCheckinRow) GetWaterCups() int64 {
+	if x != nil {
+		return x.WaterCups
+	}
+	return 0
+}
+
+func (x *FitnessCheckinRow) GetScore() float64 {
+	if x != nil {
+		return x.Score
+	}
+	return 0
+}
+
+func (x *FitnessCheckinRow) GetUpdatedAt() int64 {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return 0
+}
+
+type FitnessCheckinListRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Page          int64                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
+	PageSize      int64                  `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	UserId        uint64                 `protobuf:"varint,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	StartDate     string                 `protobuf:"bytes,4,opt,name=start_date,json=startDate,proto3" json:"start_date,omitempty"`
+	EndDate       string                 `protobuf:"bytes,5,opt,name=end_date,json=endDate,proto3" json:"end_date,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessCheckinListRequest) Reset() {
+	*x = FitnessCheckinListRequest{}
+	mi := &file_rpc_iam_proto_msgTypes[193]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessCheckinListRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessCheckinListRequest) ProtoMessage() {}
+
+func (x *FitnessCheckinListRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[193]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessCheckinListRequest.ProtoReflect.Descriptor instead.
+func (*FitnessCheckinListRequest) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{193}
+}
+
+func (x *FitnessCheckinListRequest) GetPage() int64 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *FitnessCheckinListRequest) GetPageSize() int64 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+func (x *FitnessCheckinListRequest) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *FitnessCheckinListRequest) GetStartDate() string {
+	if x != nil {
+		return x.StartDate
+	}
+	return ""
+}
+
+func (x *FitnessCheckinListRequest) GetEndDate() string {
+	if x != nil {
+		return x.EndDate
+	}
+	return ""
+}
+
+type FitnessCheckinListResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Total         int64                  `protobuf:"varint,1,opt,name=total,proto3" json:"total,omitempty"`
+	List          []*FitnessCheckinRow   `protobuf:"bytes,2,rep,name=list,proto3" json:"list,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessCheckinListResponse) Reset() {
+	*x = FitnessCheckinListResponse{}
+	mi := &file_rpc_iam_proto_msgTypes[194]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessCheckinListResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessCheckinListResponse) ProtoMessage() {}
+
+func (x *FitnessCheckinListResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[194]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessCheckinListResponse.ProtoReflect.Descriptor instead.
+func (*FitnessCheckinListResponse) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{194}
+}
+
+func (x *FitnessCheckinListResponse) GetTotal() int64 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+func (x *FitnessCheckinListResponse) GetList() []*FitnessCheckinRow {
+	if x != nil {
+		return x.List
+	}
+	return nil
+}
+
+type FitnessMemberDetailRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	StartDate     string                 `protobuf:"bytes,2,opt,name=start_date,json=startDate,proto3" json:"start_date,omitempty"`
+	EndDate       string                 `protobuf:"bytes,3,opt,name=end_date,json=endDate,proto3" json:"end_date,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessMemberDetailRequest) Reset() {
+	*x = FitnessMemberDetailRequest{}
+	mi := &file_rpc_iam_proto_msgTypes[195]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessMemberDetailRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessMemberDetailRequest) ProtoMessage() {}
+
+func (x *FitnessMemberDetailRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[195]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessMemberDetailRequest.ProtoReflect.Descriptor instead.
+func (*FitnessMemberDetailRequest) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{195}
+}
+
+func (x *FitnessMemberDetailRequest) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *FitnessMemberDetailRequest) GetStartDate() string {
+	if x != nil {
+		return x.StartDate
+	}
+	return ""
+}
+
+func (x *FitnessMemberDetailRequest) GetEndDate() string {
+	if x != nil {
+		return x.EndDate
+	}
+	return ""
+}
+
+type FitnessCalendarDay struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Date          string                 `protobuf:"bytes,1,opt,name=date,proto3" json:"date,omitempty"`
+	Counted       bool                   `protobuf:"varint,2,opt,name=counted,proto3" json:"counted,omitempty"`
+	Checked       bool                   `protobuf:"varint,3,opt,name=checked,proto3" json:"checked,omitempty"`
+	Score         float64                `protobuf:"fixed64,4,opt,name=score,proto3" json:"score,omitempty"`
+	TrainingType  int64                  `protobuf:"varint,5,opt,name=training_type,json=trainingType,proto3" json:"training_type,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessCalendarDay) Reset() {
+	*x = FitnessCalendarDay{}
+	mi := &file_rpc_iam_proto_msgTypes[196]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessCalendarDay) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessCalendarDay) ProtoMessage() {}
+
+func (x *FitnessCalendarDay) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[196]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessCalendarDay.ProtoReflect.Descriptor instead.
+func (*FitnessCalendarDay) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{196}
+}
+
+func (x *FitnessCalendarDay) GetDate() string {
+	if x != nil {
+		return x.Date
+	}
+	return ""
+}
+
+func (x *FitnessCalendarDay) GetCounted() bool {
+	if x != nil {
+		return x.Counted
+	}
+	return false
+}
+
+func (x *FitnessCalendarDay) GetChecked() bool {
+	if x != nil {
+		return x.Checked
+	}
+	return false
+}
+
+func (x *FitnessCalendarDay) GetScore() float64 {
+	if x != nil {
+		return x.Score
+	}
+	return 0
+}
+
+func (x *FitnessCalendarDay) GetTrainingType() int64 {
+	if x != nil {
+		return x.TrainingType
+	}
+	return 0
+}
+
+type FitnessMemberDetailResponse struct {
+	state         protoimpl.MessageState   `protogen:"open.v1"`
+	Member        *FitnessMemberItem       `protobuf:"bytes,1,opt,name=member,proto3" json:"member,omitempty"`
+	RangeRate     float64                  `protobuf:"fixed64,2,opt,name=range_rate,json=rangeRate,proto3" json:"range_rate,omitempty"`
+	Calendar      []*FitnessCalendarDay    `protobuf:"bytes,3,rep,name=calendar,proto3" json:"calendar,omitempty"`
+	BodyRecords   []*FitnessBodyRecordItem `protobuf:"bytes,4,rep,name=body_records,json=bodyRecords,proto3" json:"body_records,omitempty"`
+	Switches      []*FitnessSwitchItem     `protobuf:"bytes,5,rep,name=switches,proto3" json:"switches,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessMemberDetailResponse) Reset() {
+	*x = FitnessMemberDetailResponse{}
+	mi := &file_rpc_iam_proto_msgTypes[197]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessMemberDetailResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessMemberDetailResponse) ProtoMessage() {}
+
+func (x *FitnessMemberDetailResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[197]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessMemberDetailResponse.ProtoReflect.Descriptor instead.
+func (*FitnessMemberDetailResponse) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{197}
+}
+
+func (x *FitnessMemberDetailResponse) GetMember() *FitnessMemberItem {
+	if x != nil {
+		return x.Member
+	}
+	return nil
+}
+
+func (x *FitnessMemberDetailResponse) GetRangeRate() float64 {
+	if x != nil {
+		return x.RangeRate
+	}
+	return 0
+}
+
+func (x *FitnessMemberDetailResponse) GetCalendar() []*FitnessCalendarDay {
+	if x != nil {
+		return x.Calendar
+	}
+	return nil
+}
+
+func (x *FitnessMemberDetailResponse) GetBodyRecords() []*FitnessBodyRecordItem {
+	if x != nil {
+		return x.BodyRecords
+	}
+	return nil
+}
+
+func (x *FitnessMemberDetailResponse) GetSwitches() []*FitnessSwitchItem {
+	if x != nil {
+		return x.Switches
+	}
+	return nil
+}
+
+type FitnessLoginConfigResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AppId         string                 `protobuf:"bytes,1,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FitnessLoginConfigResponse) Reset() {
+	*x = FitnessLoginConfigResponse{}
+	mi := &file_rpc_iam_proto_msgTypes[198]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FitnessLoginConfigResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FitnessLoginConfigResponse) ProtoMessage() {}
+
+func (x *FitnessLoginConfigResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_iam_proto_msgTypes[198]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FitnessLoginConfigResponse.ProtoReflect.Descriptor instead.
+func (*FitnessLoginConfigResponse) Descriptor() ([]byte, []int) {
+	return file_rpc_iam_proto_rawDescGZIP(), []int{198}
+}
+
+func (x *FitnessLoginConfigResponse) GetAppId() string {
+	if x != nil {
+		return x.AppId
+	}
+	return ""
+}
+
 var File_rpc_iam_proto protoreflect.FileDescriptor
 
 const file_rpc_iam_proto_rawDesc = "" +
@@ -9947,13 +13925,14 @@ const file_rpc_iam_proto_rawDesc = "" +
 	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\x12#\n" +
 	"\rrefresh_token\x18\x02 \x01(\tR\frefreshToken\"5\n" +
 	"\x0eRefreshRequest\x12#\n" +
-	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken\"z\n" +
+	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken\"\x90\x01\n" +
 	"\x12LoginFeishuRequest\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\tR\x04code\x12\x14\n" +
 	"\x05state\x18\x02 \x01(\tR\x05state\x12\x1b\n" +
 	"\tclient_ip\x18\x03 \x01(\tR\bclientIp\x12\x1d\n" +
 	"\n" +
-	"user_agent\x18\x04 \x01(\tR\tuserAgent\"W\n" +
+	"user_agent\x18\x04 \x01(\tR\tuserAgent\x12\x14\n" +
+	"\x05scene\x18\x05 \x01(\tR\x05scene\"W\n" +
 	"\rLogoutRequest\x12!\n" +
 	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\x12#\n" +
 	"\rrefresh_token\x18\x02 \x01(\tR\frefreshToken\")\n" +
@@ -10647,7 +14626,371 @@ const file_rpc_iam_proto_rawDesc = "" +
 	"\rsentence_type\x18\x04 \x01(\x03R\fsentenceType\"g\n" +
 	"\x1eDailyShortSentenceListResponse\x12\x14\n" +
 	"\x05total\x18\x01 \x01(\x03R\x05total\x12/\n" +
-	"\x04list\x18\x02 \x03(\v2\x1b.iam.DailyShortSentenceItemR\x04list2\xf9-\n" +
+	"\x04list\x18\x02 \x03(\v2\x1b.iam.DailyShortSentenceItemR\x04list\"\"\n" +
+	"\x10FitnessIdRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x04R\x02id\"}\n" +
+	"\x0fFitnessExercise\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x12\n" +
+	"\x04sets\x18\x02 \x01(\x03R\x04sets\x12\x12\n" +
+	"\x04reps\x18\x03 \x01(\tR\x04reps\x12\x1a\n" +
+	"\bduration\x18\x04 \x01(\tR\bduration\x12\x12\n" +
+	"\x04note\x18\x05 \x01(\tR\x04note\"\xed\x01\n" +
+	"\vFitnessMeal\x12\x12\n" +
+	"\x04slot\x18\x01 \x01(\tR\x04slot\x12\x12\n" +
+	"\x04time\x18\x02 \x01(\tR\x04time\x12\x14\n" +
+	"\x05place\x18\x03 \x01(\tR\x05place\x12\x12\n" +
+	"\x04food\x18\x04 \x01(\tR\x04food\x12\x18\n" +
+	"\aportion\x18\x05 \x01(\tR\aportion\x12\x12\n" +
+	"\x04kcal\x18\x06 \x01(\x03R\x04kcal\x12\x18\n" +
+	"\aprotein\x18\a \x01(\x03R\aprotein\x12 \n" +
+	"\fhow_to_order\x18\b \x01(\tR\n" +
+	"howToOrder\x12\"\n" +
+	"\falternatives\x18\t \x03(\tR\falternatives\"\xbf\x02\n" +
+	"\x11FitnessDayContent\x12#\n" +
+	"\rtraining_type\x18\x01 \x01(\x03R\ftrainingType\x12#\n" +
+	"\rtraining_time\x18\x02 \x01(\tR\ftrainingTime\x12\x1b\n" +
+	"\tstep_goal\x18\x03 \x01(\x03R\bstepGoal\x12\x16\n" +
+	"\x06warmup\x18\x04 \x01(\tR\x06warmup\x122\n" +
+	"\texercises\x18\x05 \x03(\v2\x14.iam.FitnessExerciseR\texercises\x12\x18\n" +
+	"\astretch\x18\x06 \x01(\tR\astretch\x12#\n" +
+	"\rtraining_note\x18\a \x01(\tR\ftrainingNote\x12&\n" +
+	"\x05meals\x18\b \x03(\v2\x10.iam.FitnessMealR\x05meals\x12\x10\n" +
+	"\x03tip\x18\t \x01(\tR\x03tip\"\xc1\x02\n" +
+	"\x13FitnessTemplateItem\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x12\n" +
+	"\x04code\x18\x02 \x01(\tR\x04code\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12\x14\n" +
+	"\x05level\x18\x04 \x01(\x03R\x05level\x12\x14\n" +
+	"\x05stage\x18\x05 \x01(\tR\x05stage\x12\x18\n" +
+	"\asummary\x18\x06 \x01(\tR\asummary\x12\x1d\n" +
+	"\n" +
+	"daily_kcal\x18\a \x01(\x03R\tdailyKcal\x12#\n" +
+	"\rdaily_protein\x18\b \x01(\x03R\fdailyProtein\x12\x12\n" +
+	"\x04sort\x18\t \x01(\x03R\x04sort\x12\x16\n" +
+	"\x06status\x18\n" +
+	" \x01(\x03R\x06status\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\v \x01(\x03R\tcreatedAt\x12\x1d\n" +
+	"\n" +
+	"updated_at\x18\f \x01(\x03R\tupdatedAt\"g\n" +
+	"\x1aFitnessTemplateListRequest\x12\x12\n" +
+	"\x04page\x18\x01 \x01(\x03R\x04page\x12\x1b\n" +
+	"\tpage_size\x18\x02 \x01(\x03R\bpageSize\x12\x18\n" +
+	"\akeyword\x18\x03 \x01(\tR\akeyword\"a\n" +
+	"\x1bFitnessTemplateListResponse\x12\x14\n" +
+	"\x05total\x18\x01 \x01(\x03R\x05total\x12,\n" +
+	"\x04list\x18\x02 \x03(\v2\x18.iam.FitnessTemplateItemR\x04list\"\x8a\x02\n" +
+	"\x1aFitnessTemplateSaveRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x12\n" +
+	"\x04code\x18\x02 \x01(\tR\x04code\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12\x14\n" +
+	"\x05level\x18\x04 \x01(\x03R\x05level\x12\x14\n" +
+	"\x05stage\x18\x05 \x01(\tR\x05stage\x12\x18\n" +
+	"\asummary\x18\x06 \x01(\tR\asummary\x12\x1d\n" +
+	"\n" +
+	"daily_kcal\x18\a \x01(\x03R\tdailyKcal\x12#\n" +
+	"\rdaily_protein\x18\b \x01(\x03R\fdailyProtein\x12\x12\n" +
+	"\x04sort\x18\t \x01(\x03R\x04sort\x12\x16\n" +
+	"\x06status\x18\n" +
+	" \x01(\x03R\x06status\"\xd1\x01\n" +
+	"\x16FitnessTemplateDayItem\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x1f\n" +
+	"\vtemplate_id\x18\x02 \x01(\x04R\n" +
+	"templateId\x12\x18\n" +
+	"\aweekday\x18\x03 \x01(\x03R\aweekday\x12\x1b\n" +
+	"\tplan_date\x18\x04 \x01(\tR\bplanDate\x120\n" +
+	"\acontent\x18\x05 \x01(\v2\x16.iam.FitnessDayContentR\acontent\x12\x1d\n" +
+	"\n" +
+	"updated_at\x18\x06 \x01(\x03R\tupdatedAt\"=\n" +
+	"\x1aFitnessTemplateDaysRequest\x12\x1f\n" +
+	"\vtemplate_id\x18\x01 \x01(\x04R\n" +
+	"templateId\"\x8d\x01\n" +
+	"\x1bFitnessTemplateDaysResponse\x123\n" +
+	"\x06weekly\x18\x01 \x03(\v2\x1b.iam.FitnessTemplateDayItemR\x06weekly\x129\n" +
+	"\toverrides\x18\x02 \x03(\v2\x1b.iam.FitnessTemplateDayItemR\toverrides\"\xa9\x01\n" +
+	"\x1dFitnessTemplateDaySaveRequest\x12\x1f\n" +
+	"\vtemplate_id\x18\x01 \x01(\x04R\n" +
+	"templateId\x12\x18\n" +
+	"\aweekday\x18\x02 \x01(\x03R\aweekday\x12\x1b\n" +
+	"\tplan_date\x18\x03 \x01(\tR\bplanDate\x120\n" +
+	"\acontent\x18\x04 \x01(\v2\x16.iam.FitnessDayContentR\acontent\"\xce\x01\n" +
+	"\x0eFitnessTipItem\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x12\n" +
+	"\x04code\x18\x02 \x01(\tR\x04code\x12\x14\n" +
+	"\x05title\x18\x03 \x01(\tR\x05title\x12\x18\n" +
+	"\acontent\x18\x04 \x01(\tR\acontent\x12\x12\n" +
+	"\x04sort\x18\x05 \x01(\x03R\x04sort\x12\x16\n" +
+	"\x06status\x18\x06 \x01(\x03R\x06status\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\a \x01(\x03R\tcreatedAt\x12\x1d\n" +
+	"\n" +
+	"updated_at\x18\b \x01(\x03R\tupdatedAt\"b\n" +
+	"\x15FitnessTipListRequest\x12\x12\n" +
+	"\x04page\x18\x01 \x01(\x03R\x04page\x12\x1b\n" +
+	"\tpage_size\x18\x02 \x01(\x03R\bpageSize\x12\x18\n" +
+	"\akeyword\x18\x03 \x01(\tR\akeyword\"W\n" +
+	"\x16FitnessTipListResponse\x12\x14\n" +
+	"\x05total\x18\x01 \x01(\x03R\x05total\x12'\n" +
+	"\x04list\x18\x02 \x03(\v2\x13.iam.FitnessTipItemR\x04list\"\x97\x01\n" +
+	"\x15FitnessTipSaveRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x12\n" +
+	"\x04code\x18\x02 \x01(\tR\x04code\x12\x14\n" +
+	"\x05title\x18\x03 \x01(\tR\x05title\x12\x18\n" +
+	"\acontent\x18\x04 \x01(\tR\acontent\x12\x12\n" +
+	"\x04sort\x18\x05 \x01(\x03R\x04sort\x12\x16\n" +
+	"\x06status\x18\x06 \x01(\x03R\x06status\"R\n" +
+	"\x10FitnessMealCheck\x12\x12\n" +
+	"\x04slot\x18\x01 \x01(\tR\x04slot\x12\x16\n" +
+	"\x06status\x18\x02 \x01(\x03R\x06status\x12\x12\n" +
+	"\x04note\x18\x03 \x01(\tR\x04note\"\x81\x03\n" +
+	"\x12FitnessCheckinItem\x12\x12\n" +
+	"\x04date\x18\x01 \x01(\tR\x04date\x12\x1f\n" +
+	"\vtemplate_id\x18\x02 \x01(\x04R\n" +
+	"templateId\x12#\n" +
+	"\rtraining_type\x18\x03 \x01(\x03R\ftrainingType\x12'\n" +
+	"\x0ftraining_status\x18\x04 \x01(\x03R\x0etrainingStatus\x12#\n" +
+	"\rexercise_done\x18\x05 \x03(\x03R\fexerciseDone\x12%\n" +
+	"\x0eexercise_total\x18\x06 \x01(\x03R\rexerciseTotal\x12+\n" +
+	"\x05meals\x18\a \x03(\v2\x15.iam.FitnessMealCheckR\x05meals\x12\x14\n" +
+	"\x05steps\x18\b \x01(\x03R\x05steps\x12\x1b\n" +
+	"\tstep_goal\x18\t \x01(\x03R\bstepGoal\x12\x1d\n" +
+	"\n" +
+	"water_cups\x18\n" +
+	" \x01(\x03R\twaterCups\x12\x1d\n" +
+	"\n" +
+	"updated_at\x18\v \x01(\x03R\tupdatedAt\"B\n" +
+	"\x13FitnessMyDayRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x12\n" +
+	"\x04date\x18\x02 \x01(\tR\x04date\"\xc7\x03\n" +
+	"\x14FitnessMyDayResponse\x12\x12\n" +
+	"\x04date\x18\x01 \x01(\tR\x04date\x12\x14\n" +
+	"\x05today\x18\x02 \x01(\tR\x05today\x12\x18\n" +
+	"\aweekday\x18\x03 \x01(\x03R\aweekday\x12\x1f\n" +
+	"\vcan_checkin\x18\x04 \x01(\bR\n" +
+	"canCheckin\x12\x19\n" +
+	"\bhas_plan\x18\x05 \x01(\bR\ahasPlan\x12\x1f\n" +
+	"\vtemplate_id\x18\x06 \x01(\x04R\n" +
+	"templateId\x12#\n" +
+	"\rtemplate_name\x18\a \x01(\tR\ftemplateName\x12\x1f\n" +
+	"\vis_override\x18\b \x01(\bR\n" +
+	"isOverride\x120\n" +
+	"\acontent\x18\t \x01(\v2\x16.iam.FitnessDayContentR\acontent\x12'\n" +
+	"\x04tips\x18\n" +
+	" \x03(\v2\x13.iam.FitnessTipItemR\x04tips\x121\n" +
+	"\acheckin\x18\v \x01(\v2\x17.iam.FitnessCheckinItemR\acheckin\x12:\n" +
+	"\n" +
+	"suggestion\x18\f \x01(\v2\x1a.iam.FitnessSuggestionItemR\n" +
+	"suggestion\"\xfa\x01\n" +
+	"\x1bFitnessMyCheckinSaveRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x12\n" +
+	"\x04date\x18\x02 \x01(\tR\x04date\x12'\n" +
+	"\x0ftraining_status\x18\x03 \x01(\x03R\x0etrainingStatus\x12#\n" +
+	"\rexercise_done\x18\x04 \x03(\x03R\fexerciseDone\x12+\n" +
+	"\x05meals\x18\x05 \x03(\v2\x15.iam.FitnessMealCheckR\x05meals\x12\x14\n" +
+	"\x05steps\x18\x06 \x01(\x03R\x05steps\x12\x1d\n" +
+	"\n" +
+	"water_cups\x18\a \x01(\x03R\twaterCups\"\x84\x01\n" +
+	"\x15FitnessBodyRecordItem\x12\x12\n" +
+	"\x04date\x18\x01 \x01(\tR\x04date\x12\x1b\n" +
+	"\tweight_kg\x18\x02 \x01(\x01R\bweightKg\x12\x19\n" +
+	"\bwaist_cm\x18\x03 \x01(\x01R\awaistCm\x12\x1f\n" +
+	"\vweight_avg7\x18\x04 \x01(\x01R\n" +
+	"weightAvg7\"M\n" +
+	"\x1eFitnessMyBodyRecordListRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x12\n" +
+	"\x04days\x18\x02 \x01(\x03R\x04days\"O\n" +
+	"\x1dFitnessBodyRecordListResponse\x12.\n" +
+	"\x04list\x18\x01 \x03(\v2\x1a.iam.FitnessBodyRecordItemR\x04list\"\x85\x01\n" +
+	"\x1eFitnessMyBodyRecordSaveRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x12\n" +
+	"\x04date\x18\x02 \x01(\tR\x04date\x12\x1b\n" +
+	"\tweight_kg\x18\x03 \x01(\x01R\bweightKg\x12\x19\n" +
+	"\bwaist_cm\x18\x04 \x01(\x01R\awaistCm\"~\n" +
+	"\x14FitnessTemplateBrief\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x12\n" +
+	"\x04code\x18\x02 \x01(\tR\x04code\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12\x14\n" +
+	"\x05stage\x18\x04 \x01(\tR\x05stage\x12\x18\n" +
+	"\asummary\x18\x05 \x01(\tR\asummary\"\x83\x01\n" +
+	"\x14FitnessPendingSwitch\x12\x1f\n" +
+	"\vtemplate_id\x18\x01 \x01(\x04R\n" +
+	"templateId\x12#\n" +
+	"\rtemplate_name\x18\x02 \x01(\tR\ftemplateName\x12%\n" +
+	"\x0eeffective_date\x18\x03 \x01(\tR\reffectiveDate\"\xbb\x02\n" +
+	"\x15FitnessSuggestionItem\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x1d\n" +
+	"\n" +
+	"week_start\x18\x02 \x01(\tR\tweekStart\x12\x1b\n" +
+	"\trule_code\x18\x03 \x01(\tR\bruleCode\x12(\n" +
+	"\x10from_template_id\x18\x04 \x01(\x04R\x0efromTemplateId\x12,\n" +
+	"\x12from_template_name\x18\x05 \x01(\tR\x10fromTemplateName\x12$\n" +
+	"\x0eto_template_id\x18\x06 \x01(\x04R\ftoTemplateId\x12(\n" +
+	"\x10to_template_name\x18\a \x01(\tR\x0etoTemplateName\x12\x16\n" +
+	"\x06reason\x18\b \x01(\tR\x06reason\x12\x16\n" +
+	"\x06status\x18\t \x01(\x03R\x06status\"2\n" +
+	"\x17FitnessMyProfileRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\"\xc1\x04\n" +
+	"\x18FitnessMyProfileResponse\x12\x14\n" +
+	"\x05today\x18\x01 \x01(\tR\x05today\x12\x1a\n" +
+	"\bnickname\x18\x02 \x01(\tR\bnickname\x12\x16\n" +
+	"\x06avatar\x18\x03 \x01(\tR\x06avatar\x12\x1b\n" +
+	"\theight_cm\x18\x04 \x01(\x01R\bheightCm\x12(\n" +
+	"\x10target_weight_kg\x18\x05 \x01(\x01R\x0etargetWeightKg\x12/\n" +
+	"\x13training_preference\x18\x06 \x01(\x03R\x12trainingPreference\x12(\n" +
+	"\x10latest_weight_kg\x18\a \x01(\x01R\x0elatestWeightKg\x12\x1f\n" +
+	"\vstreak_days\x18\b \x01(\x03R\n" +
+	"streakDays\x12\x1b\n" +
+	"\tweek_rate\x18\t \x01(\x01R\bweekRate\x12D\n" +
+	"\x10current_template\x18\n" +
+	" \x01(\v2\x19.iam.FitnessTemplateBriefR\x0fcurrentTemplate\x12@\n" +
+	"\x0epending_switch\x18\v \x01(\v2\x19.iam.FitnessPendingSwitchR\rpendingSwitch\x12:\n" +
+	"\n" +
+	"suggestion\x18\f \x01(\v2\x1a.iam.FitnessSuggestionItemR\n" +
+	"suggestion\x127\n" +
+	"\ttemplates\x18\r \x03(\v2\x19.iam.FitnessTemplateBriefR\ttemplates\"\xb0\x01\n" +
+	"\x1dFitnessMyProfileUpdateRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x1b\n" +
+	"\theight_cm\x18\x02 \x01(\x01R\bheightCm\x12(\n" +
+	"\x10target_weight_kg\x18\x03 \x01(\x01R\x0etargetWeightKg\x12/\n" +
+	"\x13training_preference\x18\x04 \x01(\x03R\x12trainingPreference\"Z\n" +
+	"\x1eFitnessMyTemplateSwitchRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x1f\n" +
+	"\vtemplate_id\x18\x02 \x01(\x04R\n" +
+	"templateId\"F\n" +
+	"\x1dFitnessTemplateSwitchResponse\x12%\n" +
+	"\x0eeffective_date\x18\x01 \x01(\tR\reffectiveDate\"c\n" +
+	" FitnessMySuggestionDecideRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\x04R\x02id\x12\x16\n" +
+	"\x06accept\x18\x03 \x01(\bR\x06accept\"\xbc\x03\n" +
+	"\x11FitnessMemberItem\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x1a\n" +
+	"\busername\x18\x02 \x01(\tR\busername\x12\x1a\n" +
+	"\bnickname\x18\x03 \x01(\tR\bnickname\x12\x16\n" +
+	"\x06avatar\x18\x04 \x01(\tR\x06avatar\x12\x1f\n" +
+	"\vtemplate_id\x18\x05 \x01(\x04R\n" +
+	"templateId\x12#\n" +
+	"\rtemplate_name\x18\x06 \x01(\tR\ftemplateName\x12\x1b\n" +
+	"\theight_cm\x18\a \x01(\x01R\bheightCm\x12(\n" +
+	"\x10target_weight_kg\x18\b \x01(\x01R\x0etargetWeightKg\x12(\n" +
+	"\x10latest_weight_kg\x18\t \x01(\x01R\x0elatestWeightKg\x12\x1f\n" +
+	"\vstreak_days\x18\n" +
+	" \x01(\x03R\n" +
+	"streakDays\x12\x1b\n" +
+	"\tweek_rate\x18\v \x01(\x01R\bweekRate\x12*\n" +
+	"\x11last_checkin_date\x18\f \x01(\tR\x0flastCheckinDate\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\r \x01(\x03R\tcreatedAt\"e\n" +
+	"\x18FitnessMemberListRequest\x12\x12\n" +
+	"\x04page\x18\x01 \x01(\x03R\x04page\x12\x1b\n" +
+	"\tpage_size\x18\x02 \x01(\x03R\bpageSize\x12\x18\n" +
+	"\akeyword\x18\x03 \x01(\tR\akeyword\"]\n" +
+	"\x19FitnessMemberListResponse\x12\x14\n" +
+	"\x05total\x18\x01 \x01(\x03R\x05total\x12*\n" +
+	"\x04list\x18\x02 \x03(\v2\x16.iam.FitnessMemberItemR\x04list\"\x8f\x01\n" +
+	"\x1aFitnessMemberAssignRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x1f\n" +
+	"\vtemplate_id\x18\x02 \x01(\x04R\n" +
+	"templateId\x12\x16\n" +
+	"\x06reason\x18\x03 \x01(\tR\x06reason\x12\x1f\n" +
+	"\voperator_id\x18\x04 \x01(\x04R\n" +
+	"operatorId\"\xbc\x03\n" +
+	"\x11FitnessSwitchItem\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\x04R\x06userId\x12\x1a\n" +
+	"\bnickname\x18\x03 \x01(\tR\bnickname\x12(\n" +
+	"\x10from_template_id\x18\x04 \x01(\x04R\x0efromTemplateId\x12,\n" +
+	"\x12from_template_name\x18\x05 \x01(\tR\x10fromTemplateName\x12$\n" +
+	"\x0eto_template_id\x18\x06 \x01(\x04R\ftoTemplateId\x12(\n" +
+	"\x10to_template_name\x18\a \x01(\tR\x0etoTemplateName\x12%\n" +
+	"\x0eeffective_date\x18\b \x01(\tR\reffectiveDate\x12\x16\n" +
+	"\x06source\x18\t \x01(\x03R\x06source\x12\x16\n" +
+	"\x06reason\x18\n" +
+	" \x01(\tR\x06reason\x12\x1f\n" +
+	"\voperator_id\x18\v \x01(\x04R\n" +
+	"operatorId\x12#\n" +
+	"\roperator_name\x18\f \x01(\tR\foperatorName\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\r \x01(\x03R\tcreatedAt\"d\n" +
+	"\x18FitnessSwitchListRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x12\n" +
+	"\x04page\x18\x02 \x01(\x03R\x04page\x12\x1b\n" +
+	"\tpage_size\x18\x03 \x01(\x03R\bpageSize\"]\n" +
+	"\x19FitnessSwitchListResponse\x12\x14\n" +
+	"\x05total\x18\x01 \x01(\x03R\x05total\x12*\n" +
+	"\x04list\x18\x02 \x03(\v2\x16.iam.FitnessSwitchItemR\x04list\"1\n" +
+	"\x1bFitnessStatsOverviewRequest\x12\x12\n" +
+	"\x04date\x18\x01 \x01(\tR\x04date\"\x9c\x01\n" +
+	"\x0fFitnessRankItem\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x1a\n" +
+	"\bnickname\x18\x02 \x01(\tR\bnickname\x12\x16\n" +
+	"\x06avatar\x18\x03 \x01(\tR\x06avatar\x12\x1f\n" +
+	"\vstreak_days\x18\x04 \x01(\x03R\n" +
+	"streakDays\x12\x1b\n" +
+	"\tweek_rate\x18\x05 \x01(\x01R\bweekRate\"=\n" +
+	"\x11FitnessDailyCount\x12\x12\n" +
+	"\x04date\x18\x01 \x01(\tR\x04date\x12\x14\n" +
+	"\x05count\x18\x02 \x01(\x03R\x05count\"\xa1\x02\n" +
+	"\x1cFitnessStatsOverviewResponse\x12\x12\n" +
+	"\x04date\x18\x01 \x01(\tR\x04date\x12!\n" +
+	"\fmember_count\x18\x02 \x01(\x03R\vmemberCount\x12.\n" +
+	"\x13today_checkin_count\x18\x03 \x01(\x03R\x11todayCheckinCount\x12\"\n" +
+	"\rweek_avg_rate\x18\x04 \x01(\x01R\vweekAvgRate\x12;\n" +
+	"\x0estreak_ranking\x18\x05 \x03(\v2\x14.iam.FitnessRankItemR\rstreakRanking\x129\n" +
+	"\fdaily_counts\x18\x06 \x03(\v2\x16.iam.FitnessDailyCountR\vdailyCounts\"\x96\x04\n" +
+	"\x11FitnessCheckinRow\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x12\n" +
+	"\x04date\x18\x02 \x01(\tR\x04date\x12\x17\n" +
+	"\auser_id\x18\x03 \x01(\x04R\x06userId\x12\x1a\n" +
+	"\bnickname\x18\x04 \x01(\tR\bnickname\x12#\n" +
+	"\rtemplate_name\x18\x05 \x01(\tR\ftemplateName\x12#\n" +
+	"\rtraining_type\x18\x06 \x01(\x03R\ftrainingType\x12'\n" +
+	"\x0ftraining_status\x18\a \x01(\x03R\x0etrainingStatus\x12#\n" +
+	"\rexercise_done\x18\b \x01(\x03R\fexerciseDone\x12%\n" +
+	"\x0eexercise_total\x18\t \x01(\x03R\rexerciseTotal\x12 \n" +
+	"\fmeal_on_plan\x18\n" +
+	" \x01(\x03R\n" +
+	"mealOnPlan\x12\x1d\n" +
+	"\n" +
+	"meal_other\x18\v \x01(\x03R\tmealOther\x12!\n" +
+	"\fmeal_skipped\x18\f \x01(\x03R\vmealSkipped\x12\x14\n" +
+	"\x05steps\x18\r \x01(\x03R\x05steps\x12\x1b\n" +
+	"\tstep_goal\x18\x0e \x01(\x03R\bstepGoal\x12\x1d\n" +
+	"\n" +
+	"water_cups\x18\x0f \x01(\x03R\twaterCups\x12\x14\n" +
+	"\x05score\x18\x10 \x01(\x01R\x05score\x12\x1d\n" +
+	"\n" +
+	"updated_at\x18\x11 \x01(\x03R\tupdatedAt\"\x9f\x01\n" +
+	"\x19FitnessCheckinListRequest\x12\x12\n" +
+	"\x04page\x18\x01 \x01(\x03R\x04page\x12\x1b\n" +
+	"\tpage_size\x18\x02 \x01(\x03R\bpageSize\x12\x17\n" +
+	"\auser_id\x18\x03 \x01(\x04R\x06userId\x12\x1d\n" +
+	"\n" +
+	"start_date\x18\x04 \x01(\tR\tstartDate\x12\x19\n" +
+	"\bend_date\x18\x05 \x01(\tR\aendDate\"^\n" +
+	"\x1aFitnessCheckinListResponse\x12\x14\n" +
+	"\x05total\x18\x01 \x01(\x03R\x05total\x12*\n" +
+	"\x04list\x18\x02 \x03(\v2\x16.iam.FitnessCheckinRowR\x04list\"o\n" +
+	"\x1aFitnessMemberDetailRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x1d\n" +
+	"\n" +
+	"start_date\x18\x02 \x01(\tR\tstartDate\x12\x19\n" +
+	"\bend_date\x18\x03 \x01(\tR\aendDate\"\x97\x01\n" +
+	"\x12FitnessCalendarDay\x12\x12\n" +
+	"\x04date\x18\x01 \x01(\tR\x04date\x12\x18\n" +
+	"\acounted\x18\x02 \x01(\bR\acounted\x12\x18\n" +
+	"\achecked\x18\x03 \x01(\bR\achecked\x12\x14\n" +
+	"\x05score\x18\x04 \x01(\x01R\x05score\x12#\n" +
+	"\rtraining_type\x18\x05 \x01(\x03R\ftrainingType\"\x94\x02\n" +
+	"\x1bFitnessMemberDetailResponse\x12.\n" +
+	"\x06member\x18\x01 \x01(\v2\x16.iam.FitnessMemberItemR\x06member\x12\x1d\n" +
+	"\n" +
+	"range_rate\x18\x02 \x01(\x01R\trangeRate\x123\n" +
+	"\bcalendar\x18\x03 \x03(\v2\x17.iam.FitnessCalendarDayR\bcalendar\x12=\n" +
+	"\fbody_records\x18\x04 \x03(\v2\x1a.iam.FitnessBodyRecordItemR\vbodyRecords\x122\n" +
+	"\bswitches\x18\x05 \x03(\v2\x16.iam.FitnessSwitchItemR\bswitches\"3\n" +
+	"\x1aFitnessLoginConfigResponse\x12\x15\n" +
+	"\x06app_id\x18\x01 \x01(\tR\x05appId2\xe4=\n" +
 	"\x03Iam\x12L\n" +
 	"\x0fCheckPermission\x12\x1b.iam.CheckPermissionRequest\x1a\x1c.iam.CheckPermissionResponse\x12L\n" +
 	"\x0fCheckApiEnabled\x12\x1b.iam.CheckApiEnabledRequest\x1a\x1c.iam.CheckApiEnabledResponse\x126\n" +
@@ -10822,7 +15165,45 @@ const file_rpc_iam_proto_rawDesc = "" +
 	".iam.Empty\x12L\n" +
 	"\x18DailyShortSentenceDelete\x12$.iam.DailyShortSentenceDeleteRequest\x1a\n" +
 	".iam.Empty\x12a\n" +
-	"\x16DailyShortSentenceList\x12\".iam.DailyShortSentenceListRequest\x1a#.iam.DailyShortSentenceListResponseB\aZ\x05./iamb\x06proto3"
+	"\x16DailyShortSentenceList\x12\".iam.DailyShortSentenceListRequest\x1a#.iam.DailyShortSentenceListResponse\x12X\n" +
+	"\x13FitnessTemplateList\x12\x1f.iam.FitnessTemplateListRequest\x1a .iam.FitnessTemplateListResponse\x12D\n" +
+	"\x15FitnessTemplateCreate\x12\x1f.iam.FitnessTemplateSaveRequest\x1a\n" +
+	".iam.Empty\x12D\n" +
+	"\x15FitnessTemplateUpdate\x12\x1f.iam.FitnessTemplateSaveRequest\x1a\n" +
+	".iam.Empty\x12:\n" +
+	"\x15FitnessTemplateDelete\x12\x15.iam.FitnessIdRequest\x1a\n" +
+	".iam.Empty\x12X\n" +
+	"\x13FitnessTemplateDays\x12\x1f.iam.FitnessTemplateDaysRequest\x1a .iam.FitnessTemplateDaysResponse\x12H\n" +
+	"\x16FitnessTemplateDaySave\x12\".iam.FitnessTemplateDaySaveRequest\x1a\n" +
+	".iam.Empty\x12=\n" +
+	"\x18FitnessTemplateDayDelete\x12\x15.iam.FitnessIdRequest\x1a\n" +
+	".iam.Empty\x12I\n" +
+	"\x0eFitnessTipList\x12\x1a.iam.FitnessTipListRequest\x1a\x1b.iam.FitnessTipListResponse\x12:\n" +
+	"\x10FitnessTipCreate\x12\x1a.iam.FitnessTipSaveRequest\x1a\n" +
+	".iam.Empty\x12:\n" +
+	"\x10FitnessTipUpdate\x12\x1a.iam.FitnessTipSaveRequest\x1a\n" +
+	".iam.Empty\x125\n" +
+	"\x10FitnessTipDelete\x12\x15.iam.FitnessIdRequest\x1a\n" +
+	".iam.Empty\x12R\n" +
+	"\x11FitnessMemberList\x12\x1d.iam.FitnessMemberListRequest\x1a\x1e.iam.FitnessMemberListResponse\x12Z\n" +
+	"\x13FitnessMemberAssign\x12\x1f.iam.FitnessMemberAssignRequest\x1a\".iam.FitnessTemplateSwitchResponse\x12R\n" +
+	"\x11FitnessSwitchList\x12\x1d.iam.FitnessSwitchListRequest\x1a\x1e.iam.FitnessSwitchListResponse\x12[\n" +
+	"\x14FitnessStatsOverview\x12 .iam.FitnessStatsOverviewRequest\x1a!.iam.FitnessStatsOverviewResponse\x12U\n" +
+	"\x12FitnessCheckinList\x12\x1e.iam.FitnessCheckinListRequest\x1a\x1f.iam.FitnessCheckinListResponse\x12X\n" +
+	"\x13FitnessMemberDetail\x12\x1f.iam.FitnessMemberDetailRequest\x1a .iam.FitnessMemberDetailResponse\x12A\n" +
+	"\x12FitnessLoginConfig\x12\n" +
+	".iam.Empty\x1a\x1f.iam.FitnessLoginConfigResponse\x12C\n" +
+	"\fFitnessMyDay\x12\x18.iam.FitnessMyDayRequest\x1a\x19.iam.FitnessMyDayResponse\x12Q\n" +
+	"\x14FitnessMyCheckinSave\x12 .iam.FitnessMyCheckinSaveRequest\x1a\x17.iam.FitnessCheckinItem\x12b\n" +
+	"\x17FitnessMyBodyRecordList\x12#.iam.FitnessMyBodyRecordListRequest\x1a\".iam.FitnessBodyRecordListResponse\x12J\n" +
+	"\x17FitnessMyBodyRecordSave\x12#.iam.FitnessMyBodyRecordSaveRequest\x1a\n" +
+	".iam.Empty\x12O\n" +
+	"\x10FitnessMyProfile\x12\x1c.iam.FitnessMyProfileRequest\x1a\x1d.iam.FitnessMyProfileResponse\x12H\n" +
+	"\x16FitnessMyProfileUpdate\x12\".iam.FitnessMyProfileUpdateRequest\x1a\n" +
+	".iam.Empty\x12b\n" +
+	"\x17FitnessMyTemplateSwitch\x12#.iam.FitnessMyTemplateSwitchRequest\x1a\".iam.FitnessTemplateSwitchResponse\x12N\n" +
+	"\x19FitnessMySuggestionDecide\x12%.iam.FitnessMySuggestionDecideRequest\x1a\n" +
+	".iam.EmptyB\aZ\x05./iamb\x06proto3"
 
 var (
 	file_rpc_iam_proto_rawDescOnce sync.Once
@@ -10836,156 +15217,208 @@ func file_rpc_iam_proto_rawDescGZIP() []byte {
 	return file_rpc_iam_proto_rawDescData
 }
 
-var file_rpc_iam_proto_msgTypes = make([]protoimpl.MessageInfo, 148)
+var file_rpc_iam_proto_msgTypes = make([]protoimpl.MessageInfo, 200)
 var file_rpc_iam_proto_goTypes = []any{
-	(*Empty)(nil),                           // 0: iam.Empty
-	(*CheckPermissionRequest)(nil),          // 1: iam.CheckPermissionRequest
-	(*CheckPermissionResponse)(nil),         // 2: iam.CheckPermissionResponse
-	(*CheckApiEnabledRequest)(nil),          // 3: iam.CheckApiEnabledRequest
-	(*CheckApiEnabledResponse)(nil),         // 4: iam.CheckApiEnabledResponse
-	(*ApiRouteRef)(nil),                     // 5: iam.ApiRouteRef
-	(*SyncApiRoutesRequest)(nil),            // 6: iam.SyncApiRoutesRequest
-	(*OperationLogEntry)(nil),               // 7: iam.OperationLogEntry
-	(*BatchRecordOperationLogRequest)(nil),  // 8: iam.BatchRecordOperationLogRequest
-	(*RecordPerformanceLogRequest)(nil),     // 9: iam.RecordPerformanceLogRequest
-	(*FileRegisterRequest)(nil),             // 10: iam.FileRegisterRequest
-	(*FileRegisterResponse)(nil),            // 11: iam.FileRegisterResponse
-	(*FileGetMetaRequest)(nil),              // 12: iam.FileGetMetaRequest
-	(*FileGetMetaResponse)(nil),             // 13: iam.FileGetMetaResponse
-	(*PingResponse)(nil),                    // 14: iam.PingResponse
-	(*LoginRequest)(nil),                    // 15: iam.LoginRequest
-	(*TokenPair)(nil),                       // 16: iam.TokenPair
-	(*RefreshRequest)(nil),                  // 17: iam.RefreshRequest
-	(*LoginFeishuRequest)(nil),              // 18: iam.LoginFeishuRequest
-	(*LogoutRequest)(nil),                   // 19: iam.LogoutRequest
-	(*ProfileRequest)(nil),                  // 20: iam.ProfileRequest
-	(*ProfileResponse)(nil),                 // 21: iam.ProfileResponse
-	(*ProfileUpdateRequest)(nil),            // 22: iam.ProfileUpdateRequest
-	(*PasswordChangeRequest)(nil),           // 23: iam.PasswordChangeRequest
-	(*UserItem)(nil),                        // 24: iam.UserItem
-	(*UserCreateRequest)(nil),               // 25: iam.UserCreateRequest
-	(*UserUpdateRequest)(nil),               // 26: iam.UserUpdateRequest
-	(*UserDeleteRequest)(nil),               // 27: iam.UserDeleteRequest
-	(*UserListRequest)(nil),                 // 28: iam.UserListRequest
-	(*UserListResponse)(nil),                // 29: iam.UserListResponse
-	(*RoleItem)(nil),                        // 30: iam.RoleItem
-	(*RoleCreateRequest)(nil),               // 31: iam.RoleCreateRequest
-	(*RoleUpdateRequest)(nil),               // 32: iam.RoleUpdateRequest
-	(*RoleDeleteRequest)(nil),               // 33: iam.RoleDeleteRequest
-	(*RoleListRequest)(nil),                 // 34: iam.RoleListRequest
-	(*RoleListResponse)(nil),                // 35: iam.RoleListResponse
-	(*PermissionItem)(nil),                  // 36: iam.PermissionItem
-	(*PermissionCreateRequest)(nil),         // 37: iam.PermissionCreateRequest
-	(*PermissionUpdateRequest)(nil),         // 38: iam.PermissionUpdateRequest
-	(*PermissionDeleteRequest)(nil),         // 39: iam.PermissionDeleteRequest
-	(*PermissionListRequest)(nil),           // 40: iam.PermissionListRequest
-	(*PermissionListResponse)(nil),          // 41: iam.PermissionListResponse
-	(*MenuItem)(nil),                        // 42: iam.MenuItem
-	(*MenuCreateRequest)(nil),               // 43: iam.MenuCreateRequest
-	(*MenuUpdateRequest)(nil),               // 44: iam.MenuUpdateRequest
-	(*MenuDeleteRequest)(nil),               // 45: iam.MenuDeleteRequest
-	(*MenuTreeResponse)(nil),                // 46: iam.MenuTreeResponse
-	(*MenuMyTreeRequest)(nil),               // 47: iam.MenuMyTreeRequest
-	(*DepartmentItem)(nil),                  // 48: iam.DepartmentItem
-	(*DepartmentCreateRequest)(nil),         // 49: iam.DepartmentCreateRequest
-	(*DepartmentUpdateRequest)(nil),         // 50: iam.DepartmentUpdateRequest
-	(*DepartmentDeleteRequest)(nil),         // 51: iam.DepartmentDeleteRequest
-	(*DepartmentTreeResponse)(nil),          // 52: iam.DepartmentTreeResponse
-	(*ApiItem)(nil),                         // 53: iam.ApiItem
-	(*ApiCreateRequest)(nil),                // 54: iam.ApiCreateRequest
-	(*ApiUpdateRequest)(nil),                // 55: iam.ApiUpdateRequest
-	(*ApiDeleteRequest)(nil),                // 56: iam.ApiDeleteRequest
-	(*ApiListRequest)(nil),                  // 57: iam.ApiListRequest
-	(*ApiListResponse)(nil),                 // 58: iam.ApiListResponse
-	(*PermissionMenuListRequest)(nil),       // 59: iam.PermissionMenuListRequest
-	(*PermissionMenuListResponse)(nil),      // 60: iam.PermissionMenuListResponse
-	(*PermissionMenuUpdateRequest)(nil),     // 61: iam.PermissionMenuUpdateRequest
-	(*PermissionApiListRequest)(nil),        // 62: iam.PermissionApiListRequest
-	(*PermissionApiListResponse)(nil),       // 63: iam.PermissionApiListResponse
-	(*PermissionApiUpdateRequest)(nil),      // 64: iam.PermissionApiUpdateRequest
-	(*UserRoleListRequest)(nil),             // 65: iam.UserRoleListRequest
-	(*UserRoleListResponse)(nil),            // 66: iam.UserRoleListResponse
-	(*UserRoleUpdateRequest)(nil),           // 67: iam.UserRoleUpdateRequest
-	(*RolePermissionListRequest)(nil),       // 68: iam.RolePermissionListRequest
-	(*RolePermissionListResponse)(nil),      // 69: iam.RolePermissionListResponse
-	(*RolePermissionUpdateRequest)(nil),     // 70: iam.RolePermissionUpdateRequest
-	(*ConfigItem)(nil),                      // 71: iam.ConfigItem
-	(*ConfigCreateRequest)(nil),             // 72: iam.ConfigCreateRequest
-	(*ConfigUpdateRequest)(nil),             // 73: iam.ConfigUpdateRequest
-	(*ConfigDeleteRequest)(nil),             // 74: iam.ConfigDeleteRequest
-	(*ConfigListRequest)(nil),               // 75: iam.ConfigListRequest
-	(*ConfigListResponse)(nil),              // 76: iam.ConfigListResponse
-	(*ConfigGetRequest)(nil),                // 77: iam.ConfigGetRequest
-	(*ConfigGetResponse)(nil),               // 78: iam.ConfigGetResponse
-	(*DictTypeItem)(nil),                    // 79: iam.DictTypeItem
-	(*DictTypeCreateRequest)(nil),           // 80: iam.DictTypeCreateRequest
-	(*DictTypeUpdateRequest)(nil),           // 81: iam.DictTypeUpdateRequest
-	(*DictTypeDeleteRequest)(nil),           // 82: iam.DictTypeDeleteRequest
-	(*DictTypeListRequest)(nil),             // 83: iam.DictTypeListRequest
-	(*DictTypeListResponse)(nil),            // 84: iam.DictTypeListResponse
-	(*DictItemItem)(nil),                    // 85: iam.DictItemItem
-	(*DictItemCreateRequest)(nil),           // 86: iam.DictItemCreateRequest
-	(*DictItemUpdateRequest)(nil),           // 87: iam.DictItemUpdateRequest
-	(*DictItemDeleteRequest)(nil),           // 88: iam.DictItemDeleteRequest
-	(*DictItemListRequest)(nil),             // 89: iam.DictItemListRequest
-	(*DictItemListResponse)(nil),            // 90: iam.DictItemListResponse
-	(*DictGetRequest)(nil),                  // 91: iam.DictGetRequest
-	(*DictGetResponse)(nil),                 // 92: iam.DictGetResponse
-	(*DictBatchGetRequest)(nil),             // 93: iam.DictBatchGetRequest
-	(*DictBatchGetResponse)(nil),            // 94: iam.DictBatchGetResponse
-	(*FileItem)(nil),                        // 95: iam.FileItem
-	(*FileCreateRequest)(nil),               // 96: iam.FileCreateRequest
-	(*FileUpdateRequest)(nil),               // 97: iam.FileUpdateRequest
-	(*FileDeleteRequest)(nil),               // 98: iam.FileDeleteRequest
-	(*FileListRequest)(nil),                 // 99: iam.FileListRequest
-	(*FileListResponse)(nil),                // 100: iam.FileListResponse
-	(*NoticeItem)(nil),                      // 101: iam.NoticeItem
-	(*NoticeCreateRequest)(nil),             // 102: iam.NoticeCreateRequest
-	(*NoticeUpdateRequest)(nil),             // 103: iam.NoticeUpdateRequest
-	(*NoticeDeleteRequest)(nil),             // 104: iam.NoticeDeleteRequest
-	(*NoticeListRequest)(nil),               // 105: iam.NoticeListRequest
-	(*NoticeListResponse)(nil),              // 106: iam.NoticeListResponse
-	(*NotificationItem)(nil),                // 107: iam.NotificationItem
-	(*NotificationListRequest)(nil),         // 108: iam.NotificationListRequest
-	(*NotificationListResponse)(nil),        // 109: iam.NotificationListResponse
-	(*NotificationReadRequest)(nil),         // 110: iam.NotificationReadRequest
-	(*NotificationReadAllRequest)(nil),      // 111: iam.NotificationReadAllRequest
-	(*NotificationClearReadRequest)(nil),    // 112: iam.NotificationClearReadRequest
-	(*NotificationDeleteRequest)(nil),       // 113: iam.NotificationDeleteRequest
-	(*OperationLogItem)(nil),                // 114: iam.OperationLogItem
-	(*OperationLogListRequest)(nil),         // 115: iam.OperationLogListRequest
-	(*OperationLogListResponse)(nil),        // 116: iam.OperationLogListResponse
-	(*OperationLogDetailRequest)(nil),       // 117: iam.OperationLogDetailRequest
-	(*LoginLogItem)(nil),                    // 118: iam.LoginLogItem
-	(*LoginLogListRequest)(nil),             // 119: iam.LoginLogListRequest
-	(*LoginLogListResponse)(nil),            // 120: iam.LoginLogListResponse
-	(*LoginLogDetailRequest)(nil),           // 121: iam.LoginLogDetailRequest
-	(*LoginLogStatsResponse)(nil),           // 122: iam.LoginLogStatsResponse
-	(*PerformanceLogItem)(nil),              // 123: iam.PerformanceLogItem
-	(*PerformanceLogListRequest)(nil),       // 124: iam.PerformanceLogListRequest
-	(*PerformanceLogListResponse)(nil),      // 125: iam.PerformanceLogListResponse
-	(*AuditLogItem)(nil),                    // 126: iam.AuditLogItem
-	(*AuditLogListRequest)(nil),             // 127: iam.AuditLogListRequest
-	(*AuditLogListResponse)(nil),            // 128: iam.AuditLogListResponse
-	(*AuditLogDetailRequest)(nil),           // 129: iam.AuditLogDetailRequest
-	(*MetricReportRequest)(nil),             // 130: iam.MetricReportRequest
-	(*MetricStatsRequest)(nil),              // 131: iam.MetricStatsRequest
-	(*MetricStatsResponse)(nil),             // 132: iam.MetricStatsResponse
-	(*MonitorStatsResponse)(nil),            // 133: iam.MonitorStatsResponse
-	(*MonitorStatusResponse)(nil),           // 134: iam.MonitorStatusResponse
-	(*DemoItem)(nil),                        // 135: iam.DemoItem
-	(*DemoCreateRequest)(nil),               // 136: iam.DemoCreateRequest
-	(*DemoUpdateRequest)(nil),               // 137: iam.DemoUpdateRequest
-	(*DemoDeleteRequest)(nil),               // 138: iam.DemoDeleteRequest
-	(*DemoListRequest)(nil),                 // 139: iam.DemoListRequest
-	(*DemoListResponse)(nil),                // 140: iam.DemoListResponse
-	(*DailyShortSentenceItem)(nil),          // 141: iam.DailyShortSentenceItem
-	(*DailyShortSentenceCreateRequest)(nil), // 142: iam.DailyShortSentenceCreateRequest
-	(*DailyShortSentenceUpdateRequest)(nil), // 143: iam.DailyShortSentenceUpdateRequest
-	(*DailyShortSentenceDeleteRequest)(nil), // 144: iam.DailyShortSentenceDeleteRequest
-	(*DailyShortSentenceListRequest)(nil),   // 145: iam.DailyShortSentenceListRequest
-	(*DailyShortSentenceListResponse)(nil),  // 146: iam.DailyShortSentenceListResponse
-	nil,                                     // 147: iam.DictBatchGetResponse.DictsEntry
+	(*Empty)(nil),                            // 0: iam.Empty
+	(*CheckPermissionRequest)(nil),           // 1: iam.CheckPermissionRequest
+	(*CheckPermissionResponse)(nil),          // 2: iam.CheckPermissionResponse
+	(*CheckApiEnabledRequest)(nil),           // 3: iam.CheckApiEnabledRequest
+	(*CheckApiEnabledResponse)(nil),          // 4: iam.CheckApiEnabledResponse
+	(*ApiRouteRef)(nil),                      // 5: iam.ApiRouteRef
+	(*SyncApiRoutesRequest)(nil),             // 6: iam.SyncApiRoutesRequest
+	(*OperationLogEntry)(nil),                // 7: iam.OperationLogEntry
+	(*BatchRecordOperationLogRequest)(nil),   // 8: iam.BatchRecordOperationLogRequest
+	(*RecordPerformanceLogRequest)(nil),      // 9: iam.RecordPerformanceLogRequest
+	(*FileRegisterRequest)(nil),              // 10: iam.FileRegisterRequest
+	(*FileRegisterResponse)(nil),             // 11: iam.FileRegisterResponse
+	(*FileGetMetaRequest)(nil),               // 12: iam.FileGetMetaRequest
+	(*FileGetMetaResponse)(nil),              // 13: iam.FileGetMetaResponse
+	(*PingResponse)(nil),                     // 14: iam.PingResponse
+	(*LoginRequest)(nil),                     // 15: iam.LoginRequest
+	(*TokenPair)(nil),                        // 16: iam.TokenPair
+	(*RefreshRequest)(nil),                   // 17: iam.RefreshRequest
+	(*LoginFeishuRequest)(nil),               // 18: iam.LoginFeishuRequest
+	(*LogoutRequest)(nil),                    // 19: iam.LogoutRequest
+	(*ProfileRequest)(nil),                   // 20: iam.ProfileRequest
+	(*ProfileResponse)(nil),                  // 21: iam.ProfileResponse
+	(*ProfileUpdateRequest)(nil),             // 22: iam.ProfileUpdateRequest
+	(*PasswordChangeRequest)(nil),            // 23: iam.PasswordChangeRequest
+	(*UserItem)(nil),                         // 24: iam.UserItem
+	(*UserCreateRequest)(nil),                // 25: iam.UserCreateRequest
+	(*UserUpdateRequest)(nil),                // 26: iam.UserUpdateRequest
+	(*UserDeleteRequest)(nil),                // 27: iam.UserDeleteRequest
+	(*UserListRequest)(nil),                  // 28: iam.UserListRequest
+	(*UserListResponse)(nil),                 // 29: iam.UserListResponse
+	(*RoleItem)(nil),                         // 30: iam.RoleItem
+	(*RoleCreateRequest)(nil),                // 31: iam.RoleCreateRequest
+	(*RoleUpdateRequest)(nil),                // 32: iam.RoleUpdateRequest
+	(*RoleDeleteRequest)(nil),                // 33: iam.RoleDeleteRequest
+	(*RoleListRequest)(nil),                  // 34: iam.RoleListRequest
+	(*RoleListResponse)(nil),                 // 35: iam.RoleListResponse
+	(*PermissionItem)(nil),                   // 36: iam.PermissionItem
+	(*PermissionCreateRequest)(nil),          // 37: iam.PermissionCreateRequest
+	(*PermissionUpdateRequest)(nil),          // 38: iam.PermissionUpdateRequest
+	(*PermissionDeleteRequest)(nil),          // 39: iam.PermissionDeleteRequest
+	(*PermissionListRequest)(nil),            // 40: iam.PermissionListRequest
+	(*PermissionListResponse)(nil),           // 41: iam.PermissionListResponse
+	(*MenuItem)(nil),                         // 42: iam.MenuItem
+	(*MenuCreateRequest)(nil),                // 43: iam.MenuCreateRequest
+	(*MenuUpdateRequest)(nil),                // 44: iam.MenuUpdateRequest
+	(*MenuDeleteRequest)(nil),                // 45: iam.MenuDeleteRequest
+	(*MenuTreeResponse)(nil),                 // 46: iam.MenuTreeResponse
+	(*MenuMyTreeRequest)(nil),                // 47: iam.MenuMyTreeRequest
+	(*DepartmentItem)(nil),                   // 48: iam.DepartmentItem
+	(*DepartmentCreateRequest)(nil),          // 49: iam.DepartmentCreateRequest
+	(*DepartmentUpdateRequest)(nil),          // 50: iam.DepartmentUpdateRequest
+	(*DepartmentDeleteRequest)(nil),          // 51: iam.DepartmentDeleteRequest
+	(*DepartmentTreeResponse)(nil),           // 52: iam.DepartmentTreeResponse
+	(*ApiItem)(nil),                          // 53: iam.ApiItem
+	(*ApiCreateRequest)(nil),                 // 54: iam.ApiCreateRequest
+	(*ApiUpdateRequest)(nil),                 // 55: iam.ApiUpdateRequest
+	(*ApiDeleteRequest)(nil),                 // 56: iam.ApiDeleteRequest
+	(*ApiListRequest)(nil),                   // 57: iam.ApiListRequest
+	(*ApiListResponse)(nil),                  // 58: iam.ApiListResponse
+	(*PermissionMenuListRequest)(nil),        // 59: iam.PermissionMenuListRequest
+	(*PermissionMenuListResponse)(nil),       // 60: iam.PermissionMenuListResponse
+	(*PermissionMenuUpdateRequest)(nil),      // 61: iam.PermissionMenuUpdateRequest
+	(*PermissionApiListRequest)(nil),         // 62: iam.PermissionApiListRequest
+	(*PermissionApiListResponse)(nil),        // 63: iam.PermissionApiListResponse
+	(*PermissionApiUpdateRequest)(nil),       // 64: iam.PermissionApiUpdateRequest
+	(*UserRoleListRequest)(nil),              // 65: iam.UserRoleListRequest
+	(*UserRoleListResponse)(nil),             // 66: iam.UserRoleListResponse
+	(*UserRoleUpdateRequest)(nil),            // 67: iam.UserRoleUpdateRequest
+	(*RolePermissionListRequest)(nil),        // 68: iam.RolePermissionListRequest
+	(*RolePermissionListResponse)(nil),       // 69: iam.RolePermissionListResponse
+	(*RolePermissionUpdateRequest)(nil),      // 70: iam.RolePermissionUpdateRequest
+	(*ConfigItem)(nil),                       // 71: iam.ConfigItem
+	(*ConfigCreateRequest)(nil),              // 72: iam.ConfigCreateRequest
+	(*ConfigUpdateRequest)(nil),              // 73: iam.ConfigUpdateRequest
+	(*ConfigDeleteRequest)(nil),              // 74: iam.ConfigDeleteRequest
+	(*ConfigListRequest)(nil),                // 75: iam.ConfigListRequest
+	(*ConfigListResponse)(nil),               // 76: iam.ConfigListResponse
+	(*ConfigGetRequest)(nil),                 // 77: iam.ConfigGetRequest
+	(*ConfigGetResponse)(nil),                // 78: iam.ConfigGetResponse
+	(*DictTypeItem)(nil),                     // 79: iam.DictTypeItem
+	(*DictTypeCreateRequest)(nil),            // 80: iam.DictTypeCreateRequest
+	(*DictTypeUpdateRequest)(nil),            // 81: iam.DictTypeUpdateRequest
+	(*DictTypeDeleteRequest)(nil),            // 82: iam.DictTypeDeleteRequest
+	(*DictTypeListRequest)(nil),              // 83: iam.DictTypeListRequest
+	(*DictTypeListResponse)(nil),             // 84: iam.DictTypeListResponse
+	(*DictItemItem)(nil),                     // 85: iam.DictItemItem
+	(*DictItemCreateRequest)(nil),            // 86: iam.DictItemCreateRequest
+	(*DictItemUpdateRequest)(nil),            // 87: iam.DictItemUpdateRequest
+	(*DictItemDeleteRequest)(nil),            // 88: iam.DictItemDeleteRequest
+	(*DictItemListRequest)(nil),              // 89: iam.DictItemListRequest
+	(*DictItemListResponse)(nil),             // 90: iam.DictItemListResponse
+	(*DictGetRequest)(nil),                   // 91: iam.DictGetRequest
+	(*DictGetResponse)(nil),                  // 92: iam.DictGetResponse
+	(*DictBatchGetRequest)(nil),              // 93: iam.DictBatchGetRequest
+	(*DictBatchGetResponse)(nil),             // 94: iam.DictBatchGetResponse
+	(*FileItem)(nil),                         // 95: iam.FileItem
+	(*FileCreateRequest)(nil),                // 96: iam.FileCreateRequest
+	(*FileUpdateRequest)(nil),                // 97: iam.FileUpdateRequest
+	(*FileDeleteRequest)(nil),                // 98: iam.FileDeleteRequest
+	(*FileListRequest)(nil),                  // 99: iam.FileListRequest
+	(*FileListResponse)(nil),                 // 100: iam.FileListResponse
+	(*NoticeItem)(nil),                       // 101: iam.NoticeItem
+	(*NoticeCreateRequest)(nil),              // 102: iam.NoticeCreateRequest
+	(*NoticeUpdateRequest)(nil),              // 103: iam.NoticeUpdateRequest
+	(*NoticeDeleteRequest)(nil),              // 104: iam.NoticeDeleteRequest
+	(*NoticeListRequest)(nil),                // 105: iam.NoticeListRequest
+	(*NoticeListResponse)(nil),               // 106: iam.NoticeListResponse
+	(*NotificationItem)(nil),                 // 107: iam.NotificationItem
+	(*NotificationListRequest)(nil),          // 108: iam.NotificationListRequest
+	(*NotificationListResponse)(nil),         // 109: iam.NotificationListResponse
+	(*NotificationReadRequest)(nil),          // 110: iam.NotificationReadRequest
+	(*NotificationReadAllRequest)(nil),       // 111: iam.NotificationReadAllRequest
+	(*NotificationClearReadRequest)(nil),     // 112: iam.NotificationClearReadRequest
+	(*NotificationDeleteRequest)(nil),        // 113: iam.NotificationDeleteRequest
+	(*OperationLogItem)(nil),                 // 114: iam.OperationLogItem
+	(*OperationLogListRequest)(nil),          // 115: iam.OperationLogListRequest
+	(*OperationLogListResponse)(nil),         // 116: iam.OperationLogListResponse
+	(*OperationLogDetailRequest)(nil),        // 117: iam.OperationLogDetailRequest
+	(*LoginLogItem)(nil),                     // 118: iam.LoginLogItem
+	(*LoginLogListRequest)(nil),              // 119: iam.LoginLogListRequest
+	(*LoginLogListResponse)(nil),             // 120: iam.LoginLogListResponse
+	(*LoginLogDetailRequest)(nil),            // 121: iam.LoginLogDetailRequest
+	(*LoginLogStatsResponse)(nil),            // 122: iam.LoginLogStatsResponse
+	(*PerformanceLogItem)(nil),               // 123: iam.PerformanceLogItem
+	(*PerformanceLogListRequest)(nil),        // 124: iam.PerformanceLogListRequest
+	(*PerformanceLogListResponse)(nil),       // 125: iam.PerformanceLogListResponse
+	(*AuditLogItem)(nil),                     // 126: iam.AuditLogItem
+	(*AuditLogListRequest)(nil),              // 127: iam.AuditLogListRequest
+	(*AuditLogListResponse)(nil),             // 128: iam.AuditLogListResponse
+	(*AuditLogDetailRequest)(nil),            // 129: iam.AuditLogDetailRequest
+	(*MetricReportRequest)(nil),              // 130: iam.MetricReportRequest
+	(*MetricStatsRequest)(nil),               // 131: iam.MetricStatsRequest
+	(*MetricStatsResponse)(nil),              // 132: iam.MetricStatsResponse
+	(*MonitorStatsResponse)(nil),             // 133: iam.MonitorStatsResponse
+	(*MonitorStatusResponse)(nil),            // 134: iam.MonitorStatusResponse
+	(*DemoItem)(nil),                         // 135: iam.DemoItem
+	(*DemoCreateRequest)(nil),                // 136: iam.DemoCreateRequest
+	(*DemoUpdateRequest)(nil),                // 137: iam.DemoUpdateRequest
+	(*DemoDeleteRequest)(nil),                // 138: iam.DemoDeleteRequest
+	(*DemoListRequest)(nil),                  // 139: iam.DemoListRequest
+	(*DemoListResponse)(nil),                 // 140: iam.DemoListResponse
+	(*DailyShortSentenceItem)(nil),           // 141: iam.DailyShortSentenceItem
+	(*DailyShortSentenceCreateRequest)(nil),  // 142: iam.DailyShortSentenceCreateRequest
+	(*DailyShortSentenceUpdateRequest)(nil),  // 143: iam.DailyShortSentenceUpdateRequest
+	(*DailyShortSentenceDeleteRequest)(nil),  // 144: iam.DailyShortSentenceDeleteRequest
+	(*DailyShortSentenceListRequest)(nil),    // 145: iam.DailyShortSentenceListRequest
+	(*DailyShortSentenceListResponse)(nil),   // 146: iam.DailyShortSentenceListResponse
+	(*FitnessIdRequest)(nil),                 // 147: iam.FitnessIdRequest
+	(*FitnessExercise)(nil),                  // 148: iam.FitnessExercise
+	(*FitnessMeal)(nil),                      // 149: iam.FitnessMeal
+	(*FitnessDayContent)(nil),                // 150: iam.FitnessDayContent
+	(*FitnessTemplateItem)(nil),              // 151: iam.FitnessTemplateItem
+	(*FitnessTemplateListRequest)(nil),       // 152: iam.FitnessTemplateListRequest
+	(*FitnessTemplateListResponse)(nil),      // 153: iam.FitnessTemplateListResponse
+	(*FitnessTemplateSaveRequest)(nil),       // 154: iam.FitnessTemplateSaveRequest
+	(*FitnessTemplateDayItem)(nil),           // 155: iam.FitnessTemplateDayItem
+	(*FitnessTemplateDaysRequest)(nil),       // 156: iam.FitnessTemplateDaysRequest
+	(*FitnessTemplateDaysResponse)(nil),      // 157: iam.FitnessTemplateDaysResponse
+	(*FitnessTemplateDaySaveRequest)(nil),    // 158: iam.FitnessTemplateDaySaveRequest
+	(*FitnessTipItem)(nil),                   // 159: iam.FitnessTipItem
+	(*FitnessTipListRequest)(nil),            // 160: iam.FitnessTipListRequest
+	(*FitnessTipListResponse)(nil),           // 161: iam.FitnessTipListResponse
+	(*FitnessTipSaveRequest)(nil),            // 162: iam.FitnessTipSaveRequest
+	(*FitnessMealCheck)(nil),                 // 163: iam.FitnessMealCheck
+	(*FitnessCheckinItem)(nil),               // 164: iam.FitnessCheckinItem
+	(*FitnessMyDayRequest)(nil),              // 165: iam.FitnessMyDayRequest
+	(*FitnessMyDayResponse)(nil),             // 166: iam.FitnessMyDayResponse
+	(*FitnessMyCheckinSaveRequest)(nil),      // 167: iam.FitnessMyCheckinSaveRequest
+	(*FitnessBodyRecordItem)(nil),            // 168: iam.FitnessBodyRecordItem
+	(*FitnessMyBodyRecordListRequest)(nil),   // 169: iam.FitnessMyBodyRecordListRequest
+	(*FitnessBodyRecordListResponse)(nil),    // 170: iam.FitnessBodyRecordListResponse
+	(*FitnessMyBodyRecordSaveRequest)(nil),   // 171: iam.FitnessMyBodyRecordSaveRequest
+	(*FitnessTemplateBrief)(nil),             // 172: iam.FitnessTemplateBrief
+	(*FitnessPendingSwitch)(nil),             // 173: iam.FitnessPendingSwitch
+	(*FitnessSuggestionItem)(nil),            // 174: iam.FitnessSuggestionItem
+	(*FitnessMyProfileRequest)(nil),          // 175: iam.FitnessMyProfileRequest
+	(*FitnessMyProfileResponse)(nil),         // 176: iam.FitnessMyProfileResponse
+	(*FitnessMyProfileUpdateRequest)(nil),    // 177: iam.FitnessMyProfileUpdateRequest
+	(*FitnessMyTemplateSwitchRequest)(nil),   // 178: iam.FitnessMyTemplateSwitchRequest
+	(*FitnessTemplateSwitchResponse)(nil),    // 179: iam.FitnessTemplateSwitchResponse
+	(*FitnessMySuggestionDecideRequest)(nil), // 180: iam.FitnessMySuggestionDecideRequest
+	(*FitnessMemberItem)(nil),                // 181: iam.FitnessMemberItem
+	(*FitnessMemberListRequest)(nil),         // 182: iam.FitnessMemberListRequest
+	(*FitnessMemberListResponse)(nil),        // 183: iam.FitnessMemberListResponse
+	(*FitnessMemberAssignRequest)(nil),       // 184: iam.FitnessMemberAssignRequest
+	(*FitnessSwitchItem)(nil),                // 185: iam.FitnessSwitchItem
+	(*FitnessSwitchListRequest)(nil),         // 186: iam.FitnessSwitchListRequest
+	(*FitnessSwitchListResponse)(nil),        // 187: iam.FitnessSwitchListResponse
+	(*FitnessStatsOverviewRequest)(nil),      // 188: iam.FitnessStatsOverviewRequest
+	(*FitnessRankItem)(nil),                  // 189: iam.FitnessRankItem
+	(*FitnessDailyCount)(nil),                // 190: iam.FitnessDailyCount
+	(*FitnessStatsOverviewResponse)(nil),     // 191: iam.FitnessStatsOverviewResponse
+	(*FitnessCheckinRow)(nil),                // 192: iam.FitnessCheckinRow
+	(*FitnessCheckinListRequest)(nil),        // 193: iam.FitnessCheckinListRequest
+	(*FitnessCheckinListResponse)(nil),       // 194: iam.FitnessCheckinListResponse
+	(*FitnessMemberDetailRequest)(nil),       // 195: iam.FitnessMemberDetailRequest
+	(*FitnessCalendarDay)(nil),               // 196: iam.FitnessCalendarDay
+	(*FitnessMemberDetailResponse)(nil),      // 197: iam.FitnessMemberDetailResponse
+	(*FitnessLoginConfigResponse)(nil),       // 198: iam.FitnessLoginConfigResponse
+	nil,                                      // 199: iam.DictBatchGetResponse.DictsEntry
 }
 var file_rpc_iam_proto_depIdxs = []int32{
 	5,   // 0: iam.SyncApiRoutesRequest.routes:type_name -> iam.ApiRouteRef
@@ -11002,7 +15435,7 @@ var file_rpc_iam_proto_depIdxs = []int32{
 	79,  // 11: iam.DictTypeListResponse.list:type_name -> iam.DictTypeItem
 	85,  // 12: iam.DictItemListResponse.list:type_name -> iam.DictItemItem
 	85,  // 13: iam.DictGetResponse.items:type_name -> iam.DictItemItem
-	147, // 14: iam.DictBatchGetResponse.dicts:type_name -> iam.DictBatchGetResponse.DictsEntry
+	199, // 14: iam.DictBatchGetResponse.dicts:type_name -> iam.DictBatchGetResponse.DictsEntry
 	95,  // 15: iam.FileListResponse.list:type_name -> iam.FileItem
 	101, // 16: iam.NoticeListResponse.list:type_name -> iam.NoticeItem
 	107, // 17: iam.NotificationListResponse.list:type_name -> iam.NotificationItem
@@ -11012,204 +15445,284 @@ var file_rpc_iam_proto_depIdxs = []int32{
 	126, // 21: iam.AuditLogListResponse.list:type_name -> iam.AuditLogItem
 	135, // 22: iam.DemoListResponse.list:type_name -> iam.DemoItem
 	141, // 23: iam.DailyShortSentenceListResponse.list:type_name -> iam.DailyShortSentenceItem
-	92,  // 24: iam.DictBatchGetResponse.DictsEntry.value:type_name -> iam.DictGetResponse
-	1,   // 25: iam.Iam.CheckPermission:input_type -> iam.CheckPermissionRequest
-	3,   // 26: iam.Iam.CheckApiEnabled:input_type -> iam.CheckApiEnabledRequest
-	6,   // 27: iam.Iam.SyncApiRoutes:input_type -> iam.SyncApiRoutesRequest
-	8,   // 28: iam.Iam.BatchRecordOperationLog:input_type -> iam.BatchRecordOperationLogRequest
-	9,   // 29: iam.Iam.RecordPerformanceLog:input_type -> iam.RecordPerformanceLogRequest
-	10,  // 30: iam.Iam.FileRegister:input_type -> iam.FileRegisterRequest
-	12,  // 31: iam.Iam.FileGetMeta:input_type -> iam.FileGetMetaRequest
-	0,   // 32: iam.Iam.Ping:input_type -> iam.Empty
-	15,  // 33: iam.Iam.Login:input_type -> iam.LoginRequest
-	18,  // 34: iam.Iam.LoginFeishu:input_type -> iam.LoginFeishuRequest
-	17,  // 35: iam.Iam.Refresh:input_type -> iam.RefreshRequest
-	19,  // 36: iam.Iam.Logout:input_type -> iam.LogoutRequest
-	20,  // 37: iam.Iam.Profile:input_type -> iam.ProfileRequest
-	22,  // 38: iam.Iam.ProfileUpdate:input_type -> iam.ProfileUpdateRequest
-	23,  // 39: iam.Iam.PasswordChange:input_type -> iam.PasswordChangeRequest
-	25,  // 40: iam.Iam.UserCreate:input_type -> iam.UserCreateRequest
-	26,  // 41: iam.Iam.UserUpdate:input_type -> iam.UserUpdateRequest
-	27,  // 42: iam.Iam.UserDelete:input_type -> iam.UserDeleteRequest
-	28,  // 43: iam.Iam.UserList:input_type -> iam.UserListRequest
-	31,  // 44: iam.Iam.RoleCreate:input_type -> iam.RoleCreateRequest
-	32,  // 45: iam.Iam.RoleUpdate:input_type -> iam.RoleUpdateRequest
-	33,  // 46: iam.Iam.RoleDelete:input_type -> iam.RoleDeleteRequest
-	34,  // 47: iam.Iam.RoleList:input_type -> iam.RoleListRequest
-	37,  // 48: iam.Iam.PermissionCreate:input_type -> iam.PermissionCreateRequest
-	38,  // 49: iam.Iam.PermissionUpdate:input_type -> iam.PermissionUpdateRequest
-	39,  // 50: iam.Iam.PermissionDelete:input_type -> iam.PermissionDeleteRequest
-	40,  // 51: iam.Iam.PermissionList:input_type -> iam.PermissionListRequest
-	43,  // 52: iam.Iam.MenuCreate:input_type -> iam.MenuCreateRequest
-	44,  // 53: iam.Iam.MenuUpdate:input_type -> iam.MenuUpdateRequest
-	45,  // 54: iam.Iam.MenuDelete:input_type -> iam.MenuDeleteRequest
-	0,   // 55: iam.Iam.MenuTree:input_type -> iam.Empty
-	47,  // 56: iam.Iam.MenuMyTree:input_type -> iam.MenuMyTreeRequest
-	49,  // 57: iam.Iam.DepartmentCreate:input_type -> iam.DepartmentCreateRequest
-	50,  // 58: iam.Iam.DepartmentUpdate:input_type -> iam.DepartmentUpdateRequest
-	51,  // 59: iam.Iam.DepartmentDelete:input_type -> iam.DepartmentDeleteRequest
-	0,   // 60: iam.Iam.DepartmentTree:input_type -> iam.Empty
-	54,  // 61: iam.Iam.ApiCreate:input_type -> iam.ApiCreateRequest
-	55,  // 62: iam.Iam.ApiUpdate:input_type -> iam.ApiUpdateRequest
-	56,  // 63: iam.Iam.ApiDelete:input_type -> iam.ApiDeleteRequest
-	57,  // 64: iam.Iam.ApiList:input_type -> iam.ApiListRequest
-	59,  // 65: iam.Iam.PermissionMenuList:input_type -> iam.PermissionMenuListRequest
-	61,  // 66: iam.Iam.PermissionMenuUpdate:input_type -> iam.PermissionMenuUpdateRequest
-	62,  // 67: iam.Iam.PermissionApiList:input_type -> iam.PermissionApiListRequest
-	64,  // 68: iam.Iam.PermissionApiUpdate:input_type -> iam.PermissionApiUpdateRequest
-	65,  // 69: iam.Iam.UserRoleList:input_type -> iam.UserRoleListRequest
-	67,  // 70: iam.Iam.UserRoleUpdate:input_type -> iam.UserRoleUpdateRequest
-	68,  // 71: iam.Iam.RolePermissionList:input_type -> iam.RolePermissionListRequest
-	70,  // 72: iam.Iam.RolePermissionUpdate:input_type -> iam.RolePermissionUpdateRequest
-	72,  // 73: iam.Iam.ConfigCreate:input_type -> iam.ConfigCreateRequest
-	73,  // 74: iam.Iam.ConfigUpdate:input_type -> iam.ConfigUpdateRequest
-	74,  // 75: iam.Iam.ConfigDelete:input_type -> iam.ConfigDeleteRequest
-	75,  // 76: iam.Iam.ConfigList:input_type -> iam.ConfigListRequest
-	77,  // 77: iam.Iam.ConfigGet:input_type -> iam.ConfigGetRequest
-	80,  // 78: iam.Iam.DictTypeCreate:input_type -> iam.DictTypeCreateRequest
-	81,  // 79: iam.Iam.DictTypeUpdate:input_type -> iam.DictTypeUpdateRequest
-	82,  // 80: iam.Iam.DictTypeDelete:input_type -> iam.DictTypeDeleteRequest
-	83,  // 81: iam.Iam.DictTypeList:input_type -> iam.DictTypeListRequest
-	86,  // 82: iam.Iam.DictItemCreate:input_type -> iam.DictItemCreateRequest
-	87,  // 83: iam.Iam.DictItemUpdate:input_type -> iam.DictItemUpdateRequest
-	88,  // 84: iam.Iam.DictItemDelete:input_type -> iam.DictItemDeleteRequest
-	89,  // 85: iam.Iam.DictItemList:input_type -> iam.DictItemListRequest
-	91,  // 86: iam.Iam.DictGet:input_type -> iam.DictGetRequest
-	93,  // 87: iam.Iam.DictBatchGet:input_type -> iam.DictBatchGetRequest
-	96,  // 88: iam.Iam.FileCreate:input_type -> iam.FileCreateRequest
-	97,  // 89: iam.Iam.FileUpdate:input_type -> iam.FileUpdateRequest
-	98,  // 90: iam.Iam.FileDelete:input_type -> iam.FileDeleteRequest
-	99,  // 91: iam.Iam.FileList:input_type -> iam.FileListRequest
-	102, // 92: iam.Iam.NoticeCreate:input_type -> iam.NoticeCreateRequest
-	103, // 93: iam.Iam.NoticeUpdate:input_type -> iam.NoticeUpdateRequest
-	104, // 94: iam.Iam.NoticeDelete:input_type -> iam.NoticeDeleteRequest
-	105, // 95: iam.Iam.NoticeList:input_type -> iam.NoticeListRequest
-	108, // 96: iam.Iam.NotificationList:input_type -> iam.NotificationListRequest
-	110, // 97: iam.Iam.NotificationRead:input_type -> iam.NotificationReadRequest
-	111, // 98: iam.Iam.NotificationReadAll:input_type -> iam.NotificationReadAllRequest
-	112, // 99: iam.Iam.NotificationClearRead:input_type -> iam.NotificationClearReadRequest
-	113, // 100: iam.Iam.NotificationDelete:input_type -> iam.NotificationDeleteRequest
-	115, // 101: iam.Iam.OperationLogList:input_type -> iam.OperationLogListRequest
-	117, // 102: iam.Iam.OperationLogDetail:input_type -> iam.OperationLogDetailRequest
-	119, // 103: iam.Iam.LoginLogList:input_type -> iam.LoginLogListRequest
-	121, // 104: iam.Iam.LoginLogDetail:input_type -> iam.LoginLogDetailRequest
-	0,   // 105: iam.Iam.LoginLogStats:input_type -> iam.Empty
-	124, // 106: iam.Iam.PerformanceLogList:input_type -> iam.PerformanceLogListRequest
-	127, // 107: iam.Iam.AuditLogList:input_type -> iam.AuditLogListRequest
-	129, // 108: iam.Iam.AuditLogDetail:input_type -> iam.AuditLogDetailRequest
-	130, // 109: iam.Iam.MetricReport:input_type -> iam.MetricReportRequest
-	131, // 110: iam.Iam.MetricStats:input_type -> iam.MetricStatsRequest
-	0,   // 111: iam.Iam.MonitorStats:input_type -> iam.Empty
-	0,   // 112: iam.Iam.MonitorStatus:input_type -> iam.Empty
-	136, // 113: iam.Iam.DemoCreate:input_type -> iam.DemoCreateRequest
-	137, // 114: iam.Iam.DemoUpdate:input_type -> iam.DemoUpdateRequest
-	138, // 115: iam.Iam.DemoDelete:input_type -> iam.DemoDeleteRequest
-	139, // 116: iam.Iam.DemoList:input_type -> iam.DemoListRequest
-	142, // 117: iam.Iam.DailyShortSentenceCreate:input_type -> iam.DailyShortSentenceCreateRequest
-	143, // 118: iam.Iam.DailyShortSentenceUpdate:input_type -> iam.DailyShortSentenceUpdateRequest
-	144, // 119: iam.Iam.DailyShortSentenceDelete:input_type -> iam.DailyShortSentenceDeleteRequest
-	145, // 120: iam.Iam.DailyShortSentenceList:input_type -> iam.DailyShortSentenceListRequest
-	2,   // 121: iam.Iam.CheckPermission:output_type -> iam.CheckPermissionResponse
-	4,   // 122: iam.Iam.CheckApiEnabled:output_type -> iam.CheckApiEnabledResponse
-	0,   // 123: iam.Iam.SyncApiRoutes:output_type -> iam.Empty
-	0,   // 124: iam.Iam.BatchRecordOperationLog:output_type -> iam.Empty
-	0,   // 125: iam.Iam.RecordPerformanceLog:output_type -> iam.Empty
-	11,  // 126: iam.Iam.FileRegister:output_type -> iam.FileRegisterResponse
-	13,  // 127: iam.Iam.FileGetMeta:output_type -> iam.FileGetMetaResponse
-	14,  // 128: iam.Iam.Ping:output_type -> iam.PingResponse
-	16,  // 129: iam.Iam.Login:output_type -> iam.TokenPair
-	16,  // 130: iam.Iam.LoginFeishu:output_type -> iam.TokenPair
-	16,  // 131: iam.Iam.Refresh:output_type -> iam.TokenPair
-	0,   // 132: iam.Iam.Logout:output_type -> iam.Empty
-	21,  // 133: iam.Iam.Profile:output_type -> iam.ProfileResponse
-	0,   // 134: iam.Iam.ProfileUpdate:output_type -> iam.Empty
-	0,   // 135: iam.Iam.PasswordChange:output_type -> iam.Empty
-	0,   // 136: iam.Iam.UserCreate:output_type -> iam.Empty
-	0,   // 137: iam.Iam.UserUpdate:output_type -> iam.Empty
-	0,   // 138: iam.Iam.UserDelete:output_type -> iam.Empty
-	29,  // 139: iam.Iam.UserList:output_type -> iam.UserListResponse
-	0,   // 140: iam.Iam.RoleCreate:output_type -> iam.Empty
-	0,   // 141: iam.Iam.RoleUpdate:output_type -> iam.Empty
-	0,   // 142: iam.Iam.RoleDelete:output_type -> iam.Empty
-	35,  // 143: iam.Iam.RoleList:output_type -> iam.RoleListResponse
-	0,   // 144: iam.Iam.PermissionCreate:output_type -> iam.Empty
-	0,   // 145: iam.Iam.PermissionUpdate:output_type -> iam.Empty
-	0,   // 146: iam.Iam.PermissionDelete:output_type -> iam.Empty
-	41,  // 147: iam.Iam.PermissionList:output_type -> iam.PermissionListResponse
-	0,   // 148: iam.Iam.MenuCreate:output_type -> iam.Empty
-	0,   // 149: iam.Iam.MenuUpdate:output_type -> iam.Empty
-	0,   // 150: iam.Iam.MenuDelete:output_type -> iam.Empty
-	46,  // 151: iam.Iam.MenuTree:output_type -> iam.MenuTreeResponse
-	46,  // 152: iam.Iam.MenuMyTree:output_type -> iam.MenuTreeResponse
-	0,   // 153: iam.Iam.DepartmentCreate:output_type -> iam.Empty
-	0,   // 154: iam.Iam.DepartmentUpdate:output_type -> iam.Empty
-	0,   // 155: iam.Iam.DepartmentDelete:output_type -> iam.Empty
-	52,  // 156: iam.Iam.DepartmentTree:output_type -> iam.DepartmentTreeResponse
-	0,   // 157: iam.Iam.ApiCreate:output_type -> iam.Empty
-	0,   // 158: iam.Iam.ApiUpdate:output_type -> iam.Empty
-	0,   // 159: iam.Iam.ApiDelete:output_type -> iam.Empty
-	58,  // 160: iam.Iam.ApiList:output_type -> iam.ApiListResponse
-	60,  // 161: iam.Iam.PermissionMenuList:output_type -> iam.PermissionMenuListResponse
-	0,   // 162: iam.Iam.PermissionMenuUpdate:output_type -> iam.Empty
-	63,  // 163: iam.Iam.PermissionApiList:output_type -> iam.PermissionApiListResponse
-	0,   // 164: iam.Iam.PermissionApiUpdate:output_type -> iam.Empty
-	66,  // 165: iam.Iam.UserRoleList:output_type -> iam.UserRoleListResponse
-	0,   // 166: iam.Iam.UserRoleUpdate:output_type -> iam.Empty
-	69,  // 167: iam.Iam.RolePermissionList:output_type -> iam.RolePermissionListResponse
-	0,   // 168: iam.Iam.RolePermissionUpdate:output_type -> iam.Empty
-	0,   // 169: iam.Iam.ConfigCreate:output_type -> iam.Empty
-	0,   // 170: iam.Iam.ConfigUpdate:output_type -> iam.Empty
-	0,   // 171: iam.Iam.ConfigDelete:output_type -> iam.Empty
-	76,  // 172: iam.Iam.ConfigList:output_type -> iam.ConfigListResponse
-	78,  // 173: iam.Iam.ConfigGet:output_type -> iam.ConfigGetResponse
-	0,   // 174: iam.Iam.DictTypeCreate:output_type -> iam.Empty
-	0,   // 175: iam.Iam.DictTypeUpdate:output_type -> iam.Empty
-	0,   // 176: iam.Iam.DictTypeDelete:output_type -> iam.Empty
-	84,  // 177: iam.Iam.DictTypeList:output_type -> iam.DictTypeListResponse
-	0,   // 178: iam.Iam.DictItemCreate:output_type -> iam.Empty
-	0,   // 179: iam.Iam.DictItemUpdate:output_type -> iam.Empty
-	0,   // 180: iam.Iam.DictItemDelete:output_type -> iam.Empty
-	90,  // 181: iam.Iam.DictItemList:output_type -> iam.DictItemListResponse
-	92,  // 182: iam.Iam.DictGet:output_type -> iam.DictGetResponse
-	94,  // 183: iam.Iam.DictBatchGet:output_type -> iam.DictBatchGetResponse
-	0,   // 184: iam.Iam.FileCreate:output_type -> iam.Empty
-	0,   // 185: iam.Iam.FileUpdate:output_type -> iam.Empty
-	0,   // 186: iam.Iam.FileDelete:output_type -> iam.Empty
-	100, // 187: iam.Iam.FileList:output_type -> iam.FileListResponse
-	0,   // 188: iam.Iam.NoticeCreate:output_type -> iam.Empty
-	0,   // 189: iam.Iam.NoticeUpdate:output_type -> iam.Empty
-	0,   // 190: iam.Iam.NoticeDelete:output_type -> iam.Empty
-	106, // 191: iam.Iam.NoticeList:output_type -> iam.NoticeListResponse
-	109, // 192: iam.Iam.NotificationList:output_type -> iam.NotificationListResponse
-	0,   // 193: iam.Iam.NotificationRead:output_type -> iam.Empty
-	0,   // 194: iam.Iam.NotificationReadAll:output_type -> iam.Empty
-	0,   // 195: iam.Iam.NotificationClearRead:output_type -> iam.Empty
-	0,   // 196: iam.Iam.NotificationDelete:output_type -> iam.Empty
-	116, // 197: iam.Iam.OperationLogList:output_type -> iam.OperationLogListResponse
-	114, // 198: iam.Iam.OperationLogDetail:output_type -> iam.OperationLogItem
-	120, // 199: iam.Iam.LoginLogList:output_type -> iam.LoginLogListResponse
-	118, // 200: iam.Iam.LoginLogDetail:output_type -> iam.LoginLogItem
-	122, // 201: iam.Iam.LoginLogStats:output_type -> iam.LoginLogStatsResponse
-	125, // 202: iam.Iam.PerformanceLogList:output_type -> iam.PerformanceLogListResponse
-	128, // 203: iam.Iam.AuditLogList:output_type -> iam.AuditLogListResponse
-	126, // 204: iam.Iam.AuditLogDetail:output_type -> iam.AuditLogItem
-	0,   // 205: iam.Iam.MetricReport:output_type -> iam.Empty
-	132, // 206: iam.Iam.MetricStats:output_type -> iam.MetricStatsResponse
-	133, // 207: iam.Iam.MonitorStats:output_type -> iam.MonitorStatsResponse
-	134, // 208: iam.Iam.MonitorStatus:output_type -> iam.MonitorStatusResponse
-	0,   // 209: iam.Iam.DemoCreate:output_type -> iam.Empty
-	0,   // 210: iam.Iam.DemoUpdate:output_type -> iam.Empty
-	0,   // 211: iam.Iam.DemoDelete:output_type -> iam.Empty
-	140, // 212: iam.Iam.DemoList:output_type -> iam.DemoListResponse
-	0,   // 213: iam.Iam.DailyShortSentenceCreate:output_type -> iam.Empty
-	0,   // 214: iam.Iam.DailyShortSentenceUpdate:output_type -> iam.Empty
-	0,   // 215: iam.Iam.DailyShortSentenceDelete:output_type -> iam.Empty
-	146, // 216: iam.Iam.DailyShortSentenceList:output_type -> iam.DailyShortSentenceListResponse
-	121, // [121:217] is the sub-list for method output_type
-	25,  // [25:121] is the sub-list for method input_type
-	25,  // [25:25] is the sub-list for extension type_name
-	25,  // [25:25] is the sub-list for extension extendee
-	0,   // [0:25] is the sub-list for field type_name
+	148, // 24: iam.FitnessDayContent.exercises:type_name -> iam.FitnessExercise
+	149, // 25: iam.FitnessDayContent.meals:type_name -> iam.FitnessMeal
+	151, // 26: iam.FitnessTemplateListResponse.list:type_name -> iam.FitnessTemplateItem
+	150, // 27: iam.FitnessTemplateDayItem.content:type_name -> iam.FitnessDayContent
+	155, // 28: iam.FitnessTemplateDaysResponse.weekly:type_name -> iam.FitnessTemplateDayItem
+	155, // 29: iam.FitnessTemplateDaysResponse.overrides:type_name -> iam.FitnessTemplateDayItem
+	150, // 30: iam.FitnessTemplateDaySaveRequest.content:type_name -> iam.FitnessDayContent
+	159, // 31: iam.FitnessTipListResponse.list:type_name -> iam.FitnessTipItem
+	163, // 32: iam.FitnessCheckinItem.meals:type_name -> iam.FitnessMealCheck
+	150, // 33: iam.FitnessMyDayResponse.content:type_name -> iam.FitnessDayContent
+	159, // 34: iam.FitnessMyDayResponse.tips:type_name -> iam.FitnessTipItem
+	164, // 35: iam.FitnessMyDayResponse.checkin:type_name -> iam.FitnessCheckinItem
+	174, // 36: iam.FitnessMyDayResponse.suggestion:type_name -> iam.FitnessSuggestionItem
+	163, // 37: iam.FitnessMyCheckinSaveRequest.meals:type_name -> iam.FitnessMealCheck
+	168, // 38: iam.FitnessBodyRecordListResponse.list:type_name -> iam.FitnessBodyRecordItem
+	172, // 39: iam.FitnessMyProfileResponse.current_template:type_name -> iam.FitnessTemplateBrief
+	173, // 40: iam.FitnessMyProfileResponse.pending_switch:type_name -> iam.FitnessPendingSwitch
+	174, // 41: iam.FitnessMyProfileResponse.suggestion:type_name -> iam.FitnessSuggestionItem
+	172, // 42: iam.FitnessMyProfileResponse.templates:type_name -> iam.FitnessTemplateBrief
+	181, // 43: iam.FitnessMemberListResponse.list:type_name -> iam.FitnessMemberItem
+	185, // 44: iam.FitnessSwitchListResponse.list:type_name -> iam.FitnessSwitchItem
+	189, // 45: iam.FitnessStatsOverviewResponse.streak_ranking:type_name -> iam.FitnessRankItem
+	190, // 46: iam.FitnessStatsOverviewResponse.daily_counts:type_name -> iam.FitnessDailyCount
+	192, // 47: iam.FitnessCheckinListResponse.list:type_name -> iam.FitnessCheckinRow
+	181, // 48: iam.FitnessMemberDetailResponse.member:type_name -> iam.FitnessMemberItem
+	196, // 49: iam.FitnessMemberDetailResponse.calendar:type_name -> iam.FitnessCalendarDay
+	168, // 50: iam.FitnessMemberDetailResponse.body_records:type_name -> iam.FitnessBodyRecordItem
+	185, // 51: iam.FitnessMemberDetailResponse.switches:type_name -> iam.FitnessSwitchItem
+	92,  // 52: iam.DictBatchGetResponse.DictsEntry.value:type_name -> iam.DictGetResponse
+	1,   // 53: iam.Iam.CheckPermission:input_type -> iam.CheckPermissionRequest
+	3,   // 54: iam.Iam.CheckApiEnabled:input_type -> iam.CheckApiEnabledRequest
+	6,   // 55: iam.Iam.SyncApiRoutes:input_type -> iam.SyncApiRoutesRequest
+	8,   // 56: iam.Iam.BatchRecordOperationLog:input_type -> iam.BatchRecordOperationLogRequest
+	9,   // 57: iam.Iam.RecordPerformanceLog:input_type -> iam.RecordPerformanceLogRequest
+	10,  // 58: iam.Iam.FileRegister:input_type -> iam.FileRegisterRequest
+	12,  // 59: iam.Iam.FileGetMeta:input_type -> iam.FileGetMetaRequest
+	0,   // 60: iam.Iam.Ping:input_type -> iam.Empty
+	15,  // 61: iam.Iam.Login:input_type -> iam.LoginRequest
+	18,  // 62: iam.Iam.LoginFeishu:input_type -> iam.LoginFeishuRequest
+	17,  // 63: iam.Iam.Refresh:input_type -> iam.RefreshRequest
+	19,  // 64: iam.Iam.Logout:input_type -> iam.LogoutRequest
+	20,  // 65: iam.Iam.Profile:input_type -> iam.ProfileRequest
+	22,  // 66: iam.Iam.ProfileUpdate:input_type -> iam.ProfileUpdateRequest
+	23,  // 67: iam.Iam.PasswordChange:input_type -> iam.PasswordChangeRequest
+	25,  // 68: iam.Iam.UserCreate:input_type -> iam.UserCreateRequest
+	26,  // 69: iam.Iam.UserUpdate:input_type -> iam.UserUpdateRequest
+	27,  // 70: iam.Iam.UserDelete:input_type -> iam.UserDeleteRequest
+	28,  // 71: iam.Iam.UserList:input_type -> iam.UserListRequest
+	31,  // 72: iam.Iam.RoleCreate:input_type -> iam.RoleCreateRequest
+	32,  // 73: iam.Iam.RoleUpdate:input_type -> iam.RoleUpdateRequest
+	33,  // 74: iam.Iam.RoleDelete:input_type -> iam.RoleDeleteRequest
+	34,  // 75: iam.Iam.RoleList:input_type -> iam.RoleListRequest
+	37,  // 76: iam.Iam.PermissionCreate:input_type -> iam.PermissionCreateRequest
+	38,  // 77: iam.Iam.PermissionUpdate:input_type -> iam.PermissionUpdateRequest
+	39,  // 78: iam.Iam.PermissionDelete:input_type -> iam.PermissionDeleteRequest
+	40,  // 79: iam.Iam.PermissionList:input_type -> iam.PermissionListRequest
+	43,  // 80: iam.Iam.MenuCreate:input_type -> iam.MenuCreateRequest
+	44,  // 81: iam.Iam.MenuUpdate:input_type -> iam.MenuUpdateRequest
+	45,  // 82: iam.Iam.MenuDelete:input_type -> iam.MenuDeleteRequest
+	0,   // 83: iam.Iam.MenuTree:input_type -> iam.Empty
+	47,  // 84: iam.Iam.MenuMyTree:input_type -> iam.MenuMyTreeRequest
+	49,  // 85: iam.Iam.DepartmentCreate:input_type -> iam.DepartmentCreateRequest
+	50,  // 86: iam.Iam.DepartmentUpdate:input_type -> iam.DepartmentUpdateRequest
+	51,  // 87: iam.Iam.DepartmentDelete:input_type -> iam.DepartmentDeleteRequest
+	0,   // 88: iam.Iam.DepartmentTree:input_type -> iam.Empty
+	54,  // 89: iam.Iam.ApiCreate:input_type -> iam.ApiCreateRequest
+	55,  // 90: iam.Iam.ApiUpdate:input_type -> iam.ApiUpdateRequest
+	56,  // 91: iam.Iam.ApiDelete:input_type -> iam.ApiDeleteRequest
+	57,  // 92: iam.Iam.ApiList:input_type -> iam.ApiListRequest
+	59,  // 93: iam.Iam.PermissionMenuList:input_type -> iam.PermissionMenuListRequest
+	61,  // 94: iam.Iam.PermissionMenuUpdate:input_type -> iam.PermissionMenuUpdateRequest
+	62,  // 95: iam.Iam.PermissionApiList:input_type -> iam.PermissionApiListRequest
+	64,  // 96: iam.Iam.PermissionApiUpdate:input_type -> iam.PermissionApiUpdateRequest
+	65,  // 97: iam.Iam.UserRoleList:input_type -> iam.UserRoleListRequest
+	67,  // 98: iam.Iam.UserRoleUpdate:input_type -> iam.UserRoleUpdateRequest
+	68,  // 99: iam.Iam.RolePermissionList:input_type -> iam.RolePermissionListRequest
+	70,  // 100: iam.Iam.RolePermissionUpdate:input_type -> iam.RolePermissionUpdateRequest
+	72,  // 101: iam.Iam.ConfigCreate:input_type -> iam.ConfigCreateRequest
+	73,  // 102: iam.Iam.ConfigUpdate:input_type -> iam.ConfigUpdateRequest
+	74,  // 103: iam.Iam.ConfigDelete:input_type -> iam.ConfigDeleteRequest
+	75,  // 104: iam.Iam.ConfigList:input_type -> iam.ConfigListRequest
+	77,  // 105: iam.Iam.ConfigGet:input_type -> iam.ConfigGetRequest
+	80,  // 106: iam.Iam.DictTypeCreate:input_type -> iam.DictTypeCreateRequest
+	81,  // 107: iam.Iam.DictTypeUpdate:input_type -> iam.DictTypeUpdateRequest
+	82,  // 108: iam.Iam.DictTypeDelete:input_type -> iam.DictTypeDeleteRequest
+	83,  // 109: iam.Iam.DictTypeList:input_type -> iam.DictTypeListRequest
+	86,  // 110: iam.Iam.DictItemCreate:input_type -> iam.DictItemCreateRequest
+	87,  // 111: iam.Iam.DictItemUpdate:input_type -> iam.DictItemUpdateRequest
+	88,  // 112: iam.Iam.DictItemDelete:input_type -> iam.DictItemDeleteRequest
+	89,  // 113: iam.Iam.DictItemList:input_type -> iam.DictItemListRequest
+	91,  // 114: iam.Iam.DictGet:input_type -> iam.DictGetRequest
+	93,  // 115: iam.Iam.DictBatchGet:input_type -> iam.DictBatchGetRequest
+	96,  // 116: iam.Iam.FileCreate:input_type -> iam.FileCreateRequest
+	97,  // 117: iam.Iam.FileUpdate:input_type -> iam.FileUpdateRequest
+	98,  // 118: iam.Iam.FileDelete:input_type -> iam.FileDeleteRequest
+	99,  // 119: iam.Iam.FileList:input_type -> iam.FileListRequest
+	102, // 120: iam.Iam.NoticeCreate:input_type -> iam.NoticeCreateRequest
+	103, // 121: iam.Iam.NoticeUpdate:input_type -> iam.NoticeUpdateRequest
+	104, // 122: iam.Iam.NoticeDelete:input_type -> iam.NoticeDeleteRequest
+	105, // 123: iam.Iam.NoticeList:input_type -> iam.NoticeListRequest
+	108, // 124: iam.Iam.NotificationList:input_type -> iam.NotificationListRequest
+	110, // 125: iam.Iam.NotificationRead:input_type -> iam.NotificationReadRequest
+	111, // 126: iam.Iam.NotificationReadAll:input_type -> iam.NotificationReadAllRequest
+	112, // 127: iam.Iam.NotificationClearRead:input_type -> iam.NotificationClearReadRequest
+	113, // 128: iam.Iam.NotificationDelete:input_type -> iam.NotificationDeleteRequest
+	115, // 129: iam.Iam.OperationLogList:input_type -> iam.OperationLogListRequest
+	117, // 130: iam.Iam.OperationLogDetail:input_type -> iam.OperationLogDetailRequest
+	119, // 131: iam.Iam.LoginLogList:input_type -> iam.LoginLogListRequest
+	121, // 132: iam.Iam.LoginLogDetail:input_type -> iam.LoginLogDetailRequest
+	0,   // 133: iam.Iam.LoginLogStats:input_type -> iam.Empty
+	124, // 134: iam.Iam.PerformanceLogList:input_type -> iam.PerformanceLogListRequest
+	127, // 135: iam.Iam.AuditLogList:input_type -> iam.AuditLogListRequest
+	129, // 136: iam.Iam.AuditLogDetail:input_type -> iam.AuditLogDetailRequest
+	130, // 137: iam.Iam.MetricReport:input_type -> iam.MetricReportRequest
+	131, // 138: iam.Iam.MetricStats:input_type -> iam.MetricStatsRequest
+	0,   // 139: iam.Iam.MonitorStats:input_type -> iam.Empty
+	0,   // 140: iam.Iam.MonitorStatus:input_type -> iam.Empty
+	136, // 141: iam.Iam.DemoCreate:input_type -> iam.DemoCreateRequest
+	137, // 142: iam.Iam.DemoUpdate:input_type -> iam.DemoUpdateRequest
+	138, // 143: iam.Iam.DemoDelete:input_type -> iam.DemoDeleteRequest
+	139, // 144: iam.Iam.DemoList:input_type -> iam.DemoListRequest
+	142, // 145: iam.Iam.DailyShortSentenceCreate:input_type -> iam.DailyShortSentenceCreateRequest
+	143, // 146: iam.Iam.DailyShortSentenceUpdate:input_type -> iam.DailyShortSentenceUpdateRequest
+	144, // 147: iam.Iam.DailyShortSentenceDelete:input_type -> iam.DailyShortSentenceDeleteRequest
+	145, // 148: iam.Iam.DailyShortSentenceList:input_type -> iam.DailyShortSentenceListRequest
+	152, // 149: iam.Iam.FitnessTemplateList:input_type -> iam.FitnessTemplateListRequest
+	154, // 150: iam.Iam.FitnessTemplateCreate:input_type -> iam.FitnessTemplateSaveRequest
+	154, // 151: iam.Iam.FitnessTemplateUpdate:input_type -> iam.FitnessTemplateSaveRequest
+	147, // 152: iam.Iam.FitnessTemplateDelete:input_type -> iam.FitnessIdRequest
+	156, // 153: iam.Iam.FitnessTemplateDays:input_type -> iam.FitnessTemplateDaysRequest
+	158, // 154: iam.Iam.FitnessTemplateDaySave:input_type -> iam.FitnessTemplateDaySaveRequest
+	147, // 155: iam.Iam.FitnessTemplateDayDelete:input_type -> iam.FitnessIdRequest
+	160, // 156: iam.Iam.FitnessTipList:input_type -> iam.FitnessTipListRequest
+	162, // 157: iam.Iam.FitnessTipCreate:input_type -> iam.FitnessTipSaveRequest
+	162, // 158: iam.Iam.FitnessTipUpdate:input_type -> iam.FitnessTipSaveRequest
+	147, // 159: iam.Iam.FitnessTipDelete:input_type -> iam.FitnessIdRequest
+	182, // 160: iam.Iam.FitnessMemberList:input_type -> iam.FitnessMemberListRequest
+	184, // 161: iam.Iam.FitnessMemberAssign:input_type -> iam.FitnessMemberAssignRequest
+	186, // 162: iam.Iam.FitnessSwitchList:input_type -> iam.FitnessSwitchListRequest
+	188, // 163: iam.Iam.FitnessStatsOverview:input_type -> iam.FitnessStatsOverviewRequest
+	193, // 164: iam.Iam.FitnessCheckinList:input_type -> iam.FitnessCheckinListRequest
+	195, // 165: iam.Iam.FitnessMemberDetail:input_type -> iam.FitnessMemberDetailRequest
+	0,   // 166: iam.Iam.FitnessLoginConfig:input_type -> iam.Empty
+	165, // 167: iam.Iam.FitnessMyDay:input_type -> iam.FitnessMyDayRequest
+	167, // 168: iam.Iam.FitnessMyCheckinSave:input_type -> iam.FitnessMyCheckinSaveRequest
+	169, // 169: iam.Iam.FitnessMyBodyRecordList:input_type -> iam.FitnessMyBodyRecordListRequest
+	171, // 170: iam.Iam.FitnessMyBodyRecordSave:input_type -> iam.FitnessMyBodyRecordSaveRequest
+	175, // 171: iam.Iam.FitnessMyProfile:input_type -> iam.FitnessMyProfileRequest
+	177, // 172: iam.Iam.FitnessMyProfileUpdate:input_type -> iam.FitnessMyProfileUpdateRequest
+	178, // 173: iam.Iam.FitnessMyTemplateSwitch:input_type -> iam.FitnessMyTemplateSwitchRequest
+	180, // 174: iam.Iam.FitnessMySuggestionDecide:input_type -> iam.FitnessMySuggestionDecideRequest
+	2,   // 175: iam.Iam.CheckPermission:output_type -> iam.CheckPermissionResponse
+	4,   // 176: iam.Iam.CheckApiEnabled:output_type -> iam.CheckApiEnabledResponse
+	0,   // 177: iam.Iam.SyncApiRoutes:output_type -> iam.Empty
+	0,   // 178: iam.Iam.BatchRecordOperationLog:output_type -> iam.Empty
+	0,   // 179: iam.Iam.RecordPerformanceLog:output_type -> iam.Empty
+	11,  // 180: iam.Iam.FileRegister:output_type -> iam.FileRegisterResponse
+	13,  // 181: iam.Iam.FileGetMeta:output_type -> iam.FileGetMetaResponse
+	14,  // 182: iam.Iam.Ping:output_type -> iam.PingResponse
+	16,  // 183: iam.Iam.Login:output_type -> iam.TokenPair
+	16,  // 184: iam.Iam.LoginFeishu:output_type -> iam.TokenPair
+	16,  // 185: iam.Iam.Refresh:output_type -> iam.TokenPair
+	0,   // 186: iam.Iam.Logout:output_type -> iam.Empty
+	21,  // 187: iam.Iam.Profile:output_type -> iam.ProfileResponse
+	0,   // 188: iam.Iam.ProfileUpdate:output_type -> iam.Empty
+	0,   // 189: iam.Iam.PasswordChange:output_type -> iam.Empty
+	0,   // 190: iam.Iam.UserCreate:output_type -> iam.Empty
+	0,   // 191: iam.Iam.UserUpdate:output_type -> iam.Empty
+	0,   // 192: iam.Iam.UserDelete:output_type -> iam.Empty
+	29,  // 193: iam.Iam.UserList:output_type -> iam.UserListResponse
+	0,   // 194: iam.Iam.RoleCreate:output_type -> iam.Empty
+	0,   // 195: iam.Iam.RoleUpdate:output_type -> iam.Empty
+	0,   // 196: iam.Iam.RoleDelete:output_type -> iam.Empty
+	35,  // 197: iam.Iam.RoleList:output_type -> iam.RoleListResponse
+	0,   // 198: iam.Iam.PermissionCreate:output_type -> iam.Empty
+	0,   // 199: iam.Iam.PermissionUpdate:output_type -> iam.Empty
+	0,   // 200: iam.Iam.PermissionDelete:output_type -> iam.Empty
+	41,  // 201: iam.Iam.PermissionList:output_type -> iam.PermissionListResponse
+	0,   // 202: iam.Iam.MenuCreate:output_type -> iam.Empty
+	0,   // 203: iam.Iam.MenuUpdate:output_type -> iam.Empty
+	0,   // 204: iam.Iam.MenuDelete:output_type -> iam.Empty
+	46,  // 205: iam.Iam.MenuTree:output_type -> iam.MenuTreeResponse
+	46,  // 206: iam.Iam.MenuMyTree:output_type -> iam.MenuTreeResponse
+	0,   // 207: iam.Iam.DepartmentCreate:output_type -> iam.Empty
+	0,   // 208: iam.Iam.DepartmentUpdate:output_type -> iam.Empty
+	0,   // 209: iam.Iam.DepartmentDelete:output_type -> iam.Empty
+	52,  // 210: iam.Iam.DepartmentTree:output_type -> iam.DepartmentTreeResponse
+	0,   // 211: iam.Iam.ApiCreate:output_type -> iam.Empty
+	0,   // 212: iam.Iam.ApiUpdate:output_type -> iam.Empty
+	0,   // 213: iam.Iam.ApiDelete:output_type -> iam.Empty
+	58,  // 214: iam.Iam.ApiList:output_type -> iam.ApiListResponse
+	60,  // 215: iam.Iam.PermissionMenuList:output_type -> iam.PermissionMenuListResponse
+	0,   // 216: iam.Iam.PermissionMenuUpdate:output_type -> iam.Empty
+	63,  // 217: iam.Iam.PermissionApiList:output_type -> iam.PermissionApiListResponse
+	0,   // 218: iam.Iam.PermissionApiUpdate:output_type -> iam.Empty
+	66,  // 219: iam.Iam.UserRoleList:output_type -> iam.UserRoleListResponse
+	0,   // 220: iam.Iam.UserRoleUpdate:output_type -> iam.Empty
+	69,  // 221: iam.Iam.RolePermissionList:output_type -> iam.RolePermissionListResponse
+	0,   // 222: iam.Iam.RolePermissionUpdate:output_type -> iam.Empty
+	0,   // 223: iam.Iam.ConfigCreate:output_type -> iam.Empty
+	0,   // 224: iam.Iam.ConfigUpdate:output_type -> iam.Empty
+	0,   // 225: iam.Iam.ConfigDelete:output_type -> iam.Empty
+	76,  // 226: iam.Iam.ConfigList:output_type -> iam.ConfigListResponse
+	78,  // 227: iam.Iam.ConfigGet:output_type -> iam.ConfigGetResponse
+	0,   // 228: iam.Iam.DictTypeCreate:output_type -> iam.Empty
+	0,   // 229: iam.Iam.DictTypeUpdate:output_type -> iam.Empty
+	0,   // 230: iam.Iam.DictTypeDelete:output_type -> iam.Empty
+	84,  // 231: iam.Iam.DictTypeList:output_type -> iam.DictTypeListResponse
+	0,   // 232: iam.Iam.DictItemCreate:output_type -> iam.Empty
+	0,   // 233: iam.Iam.DictItemUpdate:output_type -> iam.Empty
+	0,   // 234: iam.Iam.DictItemDelete:output_type -> iam.Empty
+	90,  // 235: iam.Iam.DictItemList:output_type -> iam.DictItemListResponse
+	92,  // 236: iam.Iam.DictGet:output_type -> iam.DictGetResponse
+	94,  // 237: iam.Iam.DictBatchGet:output_type -> iam.DictBatchGetResponse
+	0,   // 238: iam.Iam.FileCreate:output_type -> iam.Empty
+	0,   // 239: iam.Iam.FileUpdate:output_type -> iam.Empty
+	0,   // 240: iam.Iam.FileDelete:output_type -> iam.Empty
+	100, // 241: iam.Iam.FileList:output_type -> iam.FileListResponse
+	0,   // 242: iam.Iam.NoticeCreate:output_type -> iam.Empty
+	0,   // 243: iam.Iam.NoticeUpdate:output_type -> iam.Empty
+	0,   // 244: iam.Iam.NoticeDelete:output_type -> iam.Empty
+	106, // 245: iam.Iam.NoticeList:output_type -> iam.NoticeListResponse
+	109, // 246: iam.Iam.NotificationList:output_type -> iam.NotificationListResponse
+	0,   // 247: iam.Iam.NotificationRead:output_type -> iam.Empty
+	0,   // 248: iam.Iam.NotificationReadAll:output_type -> iam.Empty
+	0,   // 249: iam.Iam.NotificationClearRead:output_type -> iam.Empty
+	0,   // 250: iam.Iam.NotificationDelete:output_type -> iam.Empty
+	116, // 251: iam.Iam.OperationLogList:output_type -> iam.OperationLogListResponse
+	114, // 252: iam.Iam.OperationLogDetail:output_type -> iam.OperationLogItem
+	120, // 253: iam.Iam.LoginLogList:output_type -> iam.LoginLogListResponse
+	118, // 254: iam.Iam.LoginLogDetail:output_type -> iam.LoginLogItem
+	122, // 255: iam.Iam.LoginLogStats:output_type -> iam.LoginLogStatsResponse
+	125, // 256: iam.Iam.PerformanceLogList:output_type -> iam.PerformanceLogListResponse
+	128, // 257: iam.Iam.AuditLogList:output_type -> iam.AuditLogListResponse
+	126, // 258: iam.Iam.AuditLogDetail:output_type -> iam.AuditLogItem
+	0,   // 259: iam.Iam.MetricReport:output_type -> iam.Empty
+	132, // 260: iam.Iam.MetricStats:output_type -> iam.MetricStatsResponse
+	133, // 261: iam.Iam.MonitorStats:output_type -> iam.MonitorStatsResponse
+	134, // 262: iam.Iam.MonitorStatus:output_type -> iam.MonitorStatusResponse
+	0,   // 263: iam.Iam.DemoCreate:output_type -> iam.Empty
+	0,   // 264: iam.Iam.DemoUpdate:output_type -> iam.Empty
+	0,   // 265: iam.Iam.DemoDelete:output_type -> iam.Empty
+	140, // 266: iam.Iam.DemoList:output_type -> iam.DemoListResponse
+	0,   // 267: iam.Iam.DailyShortSentenceCreate:output_type -> iam.Empty
+	0,   // 268: iam.Iam.DailyShortSentenceUpdate:output_type -> iam.Empty
+	0,   // 269: iam.Iam.DailyShortSentenceDelete:output_type -> iam.Empty
+	146, // 270: iam.Iam.DailyShortSentenceList:output_type -> iam.DailyShortSentenceListResponse
+	153, // 271: iam.Iam.FitnessTemplateList:output_type -> iam.FitnessTemplateListResponse
+	0,   // 272: iam.Iam.FitnessTemplateCreate:output_type -> iam.Empty
+	0,   // 273: iam.Iam.FitnessTemplateUpdate:output_type -> iam.Empty
+	0,   // 274: iam.Iam.FitnessTemplateDelete:output_type -> iam.Empty
+	157, // 275: iam.Iam.FitnessTemplateDays:output_type -> iam.FitnessTemplateDaysResponse
+	0,   // 276: iam.Iam.FitnessTemplateDaySave:output_type -> iam.Empty
+	0,   // 277: iam.Iam.FitnessTemplateDayDelete:output_type -> iam.Empty
+	161, // 278: iam.Iam.FitnessTipList:output_type -> iam.FitnessTipListResponse
+	0,   // 279: iam.Iam.FitnessTipCreate:output_type -> iam.Empty
+	0,   // 280: iam.Iam.FitnessTipUpdate:output_type -> iam.Empty
+	0,   // 281: iam.Iam.FitnessTipDelete:output_type -> iam.Empty
+	183, // 282: iam.Iam.FitnessMemberList:output_type -> iam.FitnessMemberListResponse
+	179, // 283: iam.Iam.FitnessMemberAssign:output_type -> iam.FitnessTemplateSwitchResponse
+	187, // 284: iam.Iam.FitnessSwitchList:output_type -> iam.FitnessSwitchListResponse
+	191, // 285: iam.Iam.FitnessStatsOverview:output_type -> iam.FitnessStatsOverviewResponse
+	194, // 286: iam.Iam.FitnessCheckinList:output_type -> iam.FitnessCheckinListResponse
+	197, // 287: iam.Iam.FitnessMemberDetail:output_type -> iam.FitnessMemberDetailResponse
+	198, // 288: iam.Iam.FitnessLoginConfig:output_type -> iam.FitnessLoginConfigResponse
+	166, // 289: iam.Iam.FitnessMyDay:output_type -> iam.FitnessMyDayResponse
+	164, // 290: iam.Iam.FitnessMyCheckinSave:output_type -> iam.FitnessCheckinItem
+	170, // 291: iam.Iam.FitnessMyBodyRecordList:output_type -> iam.FitnessBodyRecordListResponse
+	0,   // 292: iam.Iam.FitnessMyBodyRecordSave:output_type -> iam.Empty
+	176, // 293: iam.Iam.FitnessMyProfile:output_type -> iam.FitnessMyProfileResponse
+	0,   // 294: iam.Iam.FitnessMyProfileUpdate:output_type -> iam.Empty
+	179, // 295: iam.Iam.FitnessMyTemplateSwitch:output_type -> iam.FitnessTemplateSwitchResponse
+	0,   // 296: iam.Iam.FitnessMySuggestionDecide:output_type -> iam.Empty
+	175, // [175:297] is the sub-list for method output_type
+	53,  // [53:175] is the sub-list for method input_type
+	53,  // [53:53] is the sub-list for extension type_name
+	53,  // [53:53] is the sub-list for extension extendee
+	0,   // [0:53] is the sub-list for field type_name
 }
 
 func init() { file_rpc_iam_proto_init() }
@@ -11223,7 +15736,7 @@ func file_rpc_iam_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_rpc_iam_proto_rawDesc), len(file_rpc_iam_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   148,
+			NumMessages:   200,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

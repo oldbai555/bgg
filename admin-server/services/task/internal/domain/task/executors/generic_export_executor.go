@@ -37,6 +37,7 @@ var moduleDisplayNames = map[string]string{
 	consts.TaskModuleLoginLog:       "登录日志",
 	consts.TaskModulePerformanceLog: "性能监控日志",
 	consts.TaskModuleSdkCallLog:     "SDK调用日志",
+	consts.TaskModuleFitnessCheckin: "身材管理打卡明细",
 }
 
 // ModuleServiceRoute 是 module -> 拥有该模块数据的服务的 TaskCallback 客户端的静态路由表。
