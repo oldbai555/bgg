@@ -6,12 +6,15 @@ import (
 
 	systemmodel "postapocgame/admin-server/services/iam/internal/model/system"
 
+	sq "github.com/Masterminds/squirrel"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 )
 
 type DictItemRepository interface {
 	FindByID(ctx context.Context, id uint64) (*systemmodel.AdminDictItem, error)
 	FindByTypeID(ctx context.Context, typeID uint64) ([]systemmodel.AdminDictItem, error)
+	// FindByTypeIDs 一次查出多个字典类型下的启用字典项，排序与 FindByTypeID 一致
+	FindByTypeIDs(ctx context.Context, typeIDs []uint64) ([]systemmodel.AdminDictItem, error)
 	FindPage(ctx context.Context, page, pageSize int64, typeID uint64, label string) ([]systemmodel.AdminDictItem, int64, error)
 	DeleteByID(ctx context.Context, id uint64) error
 	Create(ctx context.Context, dictItem *systemmodel.AdminDictItem) error
@@ -35,6 +38,21 @@ func (r *dictItemRepository) FindByTypeID(ctx context.Context, typeID uint64) ([
 	var list []systemmodel.AdminDictItem
 	query := "select * from admin_dict_item where deleted_at = 0 and type_id = ? and status = 1 order by sort asc, id asc"
 	err := r.conn.QueryRowsCtx(ctx, &list, query, typeID)
+	return list, err
+}
+
+func (r *dictItemRepository) FindByTypeIDs(ctx context.Context, typeIDs []uint64) ([]systemmodel.AdminDictItem, error) {
+	if len(typeIDs) == 0 {
+		return nil, nil
+	}
+	query, args, err := sq.Select("*").From("admin_dict_item").
+		Where(sq.Eq{"type_id": typeIDs, "deleted_at": 0, "status": 1}).
+		OrderBy("type_id asc", "sort asc", "id asc").ToSql()
+	if err != nil {
+		return nil, err
+	}
+	var list []systemmodel.AdminDictItem
+	err = r.conn.QueryRowsCtx(ctx, &list, query, args...)
 	return list, err
 }
 

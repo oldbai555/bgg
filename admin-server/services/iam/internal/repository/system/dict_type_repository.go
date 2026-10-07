@@ -6,12 +6,15 @@ import (
 
 	systemmodel "postapocgame/admin-server/services/iam/internal/model/system"
 
+	sq "github.com/Masterminds/squirrel"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 )
 
 type DictTypeRepository interface {
 	FindByID(ctx context.Context, id uint64) (*systemmodel.AdminDictType, error)
 	FindByCode(ctx context.Context, code string) (*systemmodel.AdminDictType, error)
+	// FindByCodes 一次查出多个编码对应的字典类型（不存在的编码直接缺省，不报错）
+	FindByCodes(ctx context.Context, codes []string) ([]systemmodel.AdminDictType, error)
 	FindPage(ctx context.Context, page, pageSize int64, name, code string) ([]systemmodel.AdminDictType, int64, error)
 	DeleteByID(ctx context.Context, id uint64) error
 	Create(ctx context.Context, dictType *systemmodel.AdminDictType) error
@@ -33,6 +36,20 @@ func (r *dictTypeRepository) FindByID(ctx context.Context, id uint64) (*systemmo
 
 func (r *dictTypeRepository) FindByCode(ctx context.Context, code string) (*systemmodel.AdminDictType, error) {
 	return r.model.FindOneByCode(ctx, code)
+}
+
+func (r *dictTypeRepository) FindByCodes(ctx context.Context, codes []string) ([]systemmodel.AdminDictType, error) {
+	if len(codes) == 0 {
+		return nil, nil
+	}
+	query, args, err := sq.Select("*").From("admin_dict_type").
+		Where(sq.Eq{"code": codes, "deleted_at": 0}).ToSql()
+	if err != nil {
+		return nil, err
+	}
+	var list []systemmodel.AdminDictType
+	err = r.conn.QueryRowsCtx(ctx, &list, query, args...)
+	return list, err
 }
 
 func (r *dictTypeRepository) FindPage(ctx context.Context, page, pageSize int64, name, code string) ([]systemmodel.AdminDictType, int64, error) {

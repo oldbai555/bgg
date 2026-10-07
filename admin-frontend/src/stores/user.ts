@@ -56,10 +56,14 @@ export const useUserStore = defineStore('user', {
       await this.fetchProfile(true)
       await this.fetchMenus(true)
 
-      // 登录后加载字典数据
+      // 登录后加载字典数据；失败不拦登录（loadDicts 已打日志），进后台后 DefaultLayout 发现未加载会重拉
       const {useDictStore} = await import('./dict')
       const dictStore = useDictStore()
-      await dictStore.loadDicts()
+      try {
+        await dictStore.loadDicts()
+      } catch {
+        // 忽略：见上方注释
+      }
 
       // 登录后自动连接 WebSocket（如果有权限）
       const {useWebSocketStore} = await import('./websocket')
