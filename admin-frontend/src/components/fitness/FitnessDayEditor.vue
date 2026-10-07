@@ -91,7 +91,7 @@
                 :key="opt.value"
                 :label="opt.label"
                 :value="String(opt.value)"
-                :disabled="usedSlots.has(String(opt.value)) && meal.slot !== opt.value"
+                :disabled="usedSlots.has(String(opt.value)) && meal.slot !== String(opt.value)"
               />
             </el-select>
             <el-input v-model="meal.time" placeholder="时间 如 12:30" style="width: 110px" />

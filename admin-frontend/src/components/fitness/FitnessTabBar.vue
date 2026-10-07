@@ -17,15 +17,16 @@
 import {useRoute} from 'vue-router'
 import {useI18n} from 'vue-i18n'
 import {Calendar, CircleCheck, TrendCharts, User} from '@element-plus/icons-vue'
+import {FITNESS_BODY_PATH, FITNESS_CHECKIN_PATH, FITNESS_HOME_PATH, FITNESS_ME_PATH} from '@/constants/fitness'
 
 const route = useRoute()
 const {t} = useI18n()
 
 const tabs = [
-  {path: '/front/fitness', label: 'fitness.tabToday', icon: Calendar},
-  {path: '/front/fitness/checkin', label: 'fitness.tabCheckin', icon: CircleCheck},
-  {path: '/front/fitness/body', label: 'fitness.tabBody', icon: TrendCharts},
-  {path: '/front/fitness/me', label: 'fitness.tabMe', icon: User}
+  {path: FITNESS_HOME_PATH, label: 'fitness.tabToday', icon: Calendar},
+  {path: FITNESS_CHECKIN_PATH, label: 'fitness.tabCheckin', icon: CircleCheck},
+  {path: FITNESS_BODY_PATH, label: 'fitness.tabBody', icon: TrendCharts},
+  {path: FITNESS_ME_PATH, label: 'fitness.tabMe', icon: User}
 ]
 </script>
 

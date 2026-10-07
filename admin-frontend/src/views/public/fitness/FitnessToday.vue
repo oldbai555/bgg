@@ -72,7 +72,7 @@
             type="primary"
             size="large"
             round
-            @click="router.push('/front/fitness/checkin')"
+            @click="router.push(FITNESS_CHECKIN_PATH)"
           >
             {{ t('fitness.goCheckin') }}
           </el-button>
@@ -100,7 +100,7 @@ import {fitnessApi} from '@/api/fitness'
 import type {FitnessMyDayResp} from '@/api/generated/admin'
 import {useFitnessDicts} from '@/composables/useFitnessDicts'
 import {useFitnessDate} from '@/composables/useFitnessDate'
-import {FitnessSuggestionStatus} from '@/constants/fitness'
+import {FITNESS_CHECKIN_PATH, FitnessSuggestionStatus} from '@/constants/fitness'
 
 const router = useRouter()
 const {t} = useI18n()

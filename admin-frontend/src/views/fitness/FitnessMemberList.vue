@@ -33,6 +33,7 @@
             <span>{{ row.nickname }}</span>
           </div>
           <span v-else-if="column.prop === 'weekRate'">{{ formatRate(row.weekRate) }}</span>
+          <span v-else-if="column.prop === 'streakDays'">{{ row.streakDays ?? 0 }} 天</span>
           <span v-else-if="column.prop === 'weight'">
             {{ row.latestWeightKg || '-' }} / {{ row.targetWeightKg || '-' }}
           </span>
@@ -132,7 +133,7 @@ import D2Table from '@/components/common/D2Table.vue'
 import FitnessSwitchTable from '@/components/fitness/FitnessSwitchTable.vue'
 import {fitnessApi} from '@/api/fitness'
 import type {FitnessMemberItem, FitnessSwitchItem, FitnessTemplateItem} from '@/api/generated/admin'
-import {FitnessStatus} from '@/constants/fitness'
+import {FITNESS_ADMIN_STATS_PATH, FitnessStatus} from '@/constants/fitness'
 import type {TableColumn} from '@/types/table'
 import {formatRate} from '@/utils/fitness'
 
@@ -263,7 +264,7 @@ const openSwitches = (row: FitnessMemberItem | null) => {
 }
 
 const goStats = (row: FitnessMemberItem) => {
-  router.push({path: '/admin/fitness/stats', query: {userId: String(row.userId)}})
+  router.push({path: FITNESS_ADMIN_STATS_PATH, query: {userId: String(row.userId)}})
 }
 
 onMounted(loadData)

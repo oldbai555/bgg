@@ -4,6 +4,10 @@
  */
 export const FITNESS_HOME_PATH = '/front/fitness'
 export const FITNESS_LOGIN_PATH = '/front/fitness/login'
+export const FITNESS_CHECKIN_PATH = '/front/fitness/checkin'
+export const FITNESS_BODY_PATH = '/front/fitness/body'
+export const FITNESS_ME_PATH = '/front/fitness/me'
+export const FITNESS_ADMIN_STATS_PATH = '/admin/fitness/stats'
 
 /** 允许补打卡的天数（不含今天），与后端 FitnessBackfillDays 一致 */
 export const FITNESS_BACKFILL_DAYS = 7

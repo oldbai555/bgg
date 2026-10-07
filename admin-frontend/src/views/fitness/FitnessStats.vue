@@ -174,7 +174,7 @@ import type {
 } from '@/api/generated/admin'
 import {useDictOptions} from '@/composables/useDictOptions'
 import {addDays, formatRate} from '@/utils/fitness'
-import {FitnessTrainingStatus} from '@/constants/fitness'
+import {FITNESS_ADMIN_STATS_PATH, FitnessTrainingStatus} from '@/constants/fitness'
 
 const route = useRoute()
 const {t} = useI18n()
@@ -293,7 +293,7 @@ watch(userId, search)
 watch(
   () => route.query.userId,
   (v) => {
-    if (v && route.path === '/admin/fitness/stats') {
+    if (v && route.path === FITNESS_ADMIN_STATS_PATH) {
       userId.value = Number(v)
     }
   }

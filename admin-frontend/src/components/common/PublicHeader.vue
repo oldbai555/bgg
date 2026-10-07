@@ -37,6 +37,7 @@ import {ref, computed, onMounted} from 'vue'
 import {useRouter, useRoute} from 'vue-router'
 import {contentApi} from '@/api/content'
 import type {PublicBlogSocialInfoListResp} from '@/api/generated/admin'
+import {isFitnessPath} from '@/constants/fitness'
 
 const router = useRouter()
 const route = useRoute()
@@ -50,7 +51,7 @@ const activeTab = computed<'blog' | 'video' | 'fitness' | ''>(() => {
   if (route.path.startsWith('/front/videos')) {
     return 'video'
   }
-  if (route.path.startsWith('/front/fitness')) {
+  if (isFitnessPath(route.path)) {
     return 'fitness'
   }
   return ''

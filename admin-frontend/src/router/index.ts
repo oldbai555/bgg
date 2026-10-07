@@ -3,7 +3,14 @@ import {ElMessage} from 'element-plus'
 import {useUserStore} from '@/stores/user'
 import {usePermission} from '@/composables/usePermission'
 import type {MenuItem} from '@/api/generated/admin'
-import {FITNESS_LOGIN_PATH, isFitnessPath} from '@/constants/fitness'
+import {
+  FITNESS_BODY_PATH,
+  FITNESS_CHECKIN_PATH,
+  FITNESS_HOME_PATH,
+  FITNESS_LOGIN_PATH,
+  FITNESS_ME_PATH,
+  isFitnessPath
+} from '@/constants/fitness'
 
 const viewModules = import.meta.glob('../views/**/*.vue')
 const knownViewKeys = new Set(
@@ -43,22 +50,22 @@ const routes: RouteRecordRaw[] = [
   },
   // 身材管理手机端：挂在 /front 下走公共页外壳，但除登录页外都要求飞书登录（守卫里单独判断）
   {
-    path: '/front/fitness',
+    path: FITNESS_HOME_PATH,
     name: 'FitnessToday',
     component: () => import('@/views/public/fitness/FitnessToday.vue')
   },
   {
-    path: '/front/fitness/checkin',
+    path: FITNESS_CHECKIN_PATH,
     name: 'FitnessCheckin',
     component: () => import('@/views/public/fitness/FitnessCheckin.vue')
   },
   {
-    path: '/front/fitness/body',
+    path: FITNESS_BODY_PATH,
     name: 'FitnessBody',
     component: () => import('@/views/public/fitness/FitnessBody.vue')
   },
   {
-    path: '/front/fitness/me',
+    path: FITNESS_ME_PATH,
     name: 'FitnessMe',
     component: () => import('@/views/public/fitness/FitnessMe.vue')
   },
