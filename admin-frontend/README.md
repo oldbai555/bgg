@@ -12,13 +12,13 @@ Vite 5 + Vue 3.4（Composition API）+ TypeScript 5.9 + Element Plus + Pinia + A
 src/
 ├── api/
 │   ├── generated/   # goctl 从后端 .api 生成的接口代码，禁止手改
-│   └── *.ts          # 对 generated 的二次封装（iam/system/monitoring/content/chat/sdk/task/misc/public），业务代码统一从这里导入
+│   └── *.ts          # 对 generated 的二次封装（iam/system/monitoring/content/chat/sdk/task/misc/fitness/public），业务代码统一从这里导入
 ├── components/common/ # 通用组件（D2Table 等，见 components/common/README.md）
 ├── composables/        # useDictOptions、usePermission、useAppConfig 等
 ├── directives/permission.ts # v-permission 指令
 ├── stores/            # Pinia：app/dict/user/websocket（连接生命周期）/notification（未读消息，订阅 websocket）
 ├── styles/             # 含公共页样式模板 public-list.scss / public-detail.scss
-└── views/               # 按后端域分目录：iam/system/monitoring/misc/content/chat/sdk/task 后台页面 + public/ 公共页面
+└── views/               # 按后端域分目录：iam/system/monitoring/misc/content/chat/sdk/task/fitness 后台页面 + public/ 公共页面（含 public/fitness 身材管理手机端）
 ```
 
 详细规范（API 分层、字典/权限用法、命名规则）见根目录 [`AGENTS.md`](../AGENTS.md) 与 [`.cursor/rules/20-frontend.mdc`](../.cursor/rules/20-frontend.mdc)、[`.cursor/rules/21-public-pages.mdc`](../.cursor/rules/21-public-pages.mdc)。

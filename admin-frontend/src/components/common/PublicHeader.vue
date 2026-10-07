@@ -11,6 +11,9 @@
         <router-link to="/front/videos" class="public-header__nav-item" :class="{'is-active': activeTab === 'video'}">
           视频
         </router-link>
+        <router-link to="/front/fitness" class="public-header__nav-item" :class="{'is-active': activeTab === 'fitness'}">
+          今日计划
+        </router-link>
       </nav>
       <div v-if="socialInfoList.length > 0" class="public-header__social">
         <a
@@ -40,12 +43,15 @@ const route = useRoute()
 
 const socialInfoList = ref<PublicBlogSocialInfoListResp['list']>([])
 
-const activeTab = computed<'blog' | 'video' | ''>(() => {
+const activeTab = computed<'blog' | 'video' | 'fitness' | ''>(() => {
   if (route.path.startsWith('/front/blog')) {
     return 'blog'
   }
   if (route.path.startsWith('/front/videos')) {
     return 'video'
+  }
+  if (route.path.startsWith('/front/fitness')) {
+    return 'fitness'
   }
   return ''
 })

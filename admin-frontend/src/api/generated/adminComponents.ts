@@ -825,6 +825,452 @@ export interface FileUploadResp {
 	ext: string
 }
 
+export interface FitnessBodyRecordItem {
+	date: string
+	weightKg: number
+	waistCm: number
+	weightAvg7: number // 7 日移动平均
+}
+
+export interface FitnessBodyRecordListResp {
+	list: Array<FitnessBodyRecordItem>
+}
+
+export interface FitnessCalendarDay {
+	date: string
+	counted: boolean // 是否计入完成率（训练日）
+	checked: boolean // 当天有任意打卡
+	score: number
+	trainingType: number
+}
+
+export interface FitnessCheckinExportReq {
+	userId?: number
+	startDate?: string
+	endDate?: string
+}
+
+export interface FitnessCheckinItem {
+	date: string
+	templateId: number
+	trainingType: number
+	trainingStatus: number // 0未打卡 1完成 2部分完成 3跳过
+	exerciseDone: Array<number>
+	exerciseTotal: number
+	meals: Array<FitnessMealCheck>
+	steps: number
+	stepGoal: number
+	waterCups: number
+	updatedAt: number
+}
+
+export interface FitnessCheckinListReq {
+	page?: number
+	pageSize?: number
+	userId?: number
+	startDate?: string
+	endDate?: string
+}
+
+export interface FitnessCheckinListResp {
+	total: number
+	list: Array<FitnessCheckinRow>
+}
+
+export interface FitnessCheckinRow {
+	id: number
+	date: string
+	userId: number
+	nickname: string
+	templateName: string
+	trainingType: number
+	trainingStatus: number
+	exerciseDone: number
+	exerciseTotal: number
+	mealOnPlan: number
+	mealOther: number
+	mealSkipped: number
+	steps: number
+	stepGoal: number
+	waterCups: number
+	score: number // 训练完成度 0~1，-1 表示休息日不计入
+	updatedAt: number
+}
+
+export interface FitnessDailyCount {
+	date: string
+	count: number
+}
+
+export interface FitnessDayContent {
+	trainingType: number // 1力量 2有氧 3休息
+	trainingTime?: string
+	stepGoal?: number
+	warmup?: string
+	exercises?: Array<FitnessExercise>
+	stretch?: string
+	trainingNote?: string
+	meals?: Array<FitnessMeal>
+	tip?: string
+}
+
+export interface FitnessExercise {
+	name: string
+	sets?: number
+	reps?: string
+	duration?: string
+	note?: string
+}
+
+export interface FitnessIdReq {
+	id?: number
+}
+
+export interface FitnessLoginConfigResp {
+	appId: string
+}
+
+export interface FitnessLoginFeishuReq {
+	code?: string
+	state?: string
+	mode?: string // h5=飞书客户端内免登，oauth=普通浏览器跳转授权
+}
+
+export interface FitnessMeal {
+	slot: string // breakfast/lunch/snack/dinner/after_home
+	time?: string
+	place?: string
+	food?: string
+	portion?: string
+	kcal?: number
+	protein?: number
+	howToOrder?: string
+	alternatives?: Array<string>
+}
+
+export interface FitnessMealCheck {
+	slot: string
+	status: number // 1按计划吃了 2吃了别的 3没吃
+	note?: string
+}
+
+export interface FitnessMemberAssignReq {
+	userId?: number
+	templateId?: number
+	reason?: string
+}
+
+export interface FitnessMemberDetailReq {
+	userId?: number
+	startDate?: string // 默认结束日期往前 90 天
+	endDate?: string // 默认今天
+}
+
+export interface FitnessMemberDetailResp {
+	member: FitnessMemberItem
+	rangeRate: number
+	calendar: Array<FitnessCalendarDay>
+	bodyRecords: Array<FitnessBodyRecordItem>
+	switches: Array<FitnessSwitchItem>
+}
+
+export interface FitnessMemberItem {
+	userId: number
+	username: string
+	nickname: string
+	avatar: string
+	templateId: number
+	templateName: string
+	heightCm: number
+	targetWeightKg: number
+	latestWeightKg: number
+	streakDays: number
+	weekRate: number
+	lastCheckinDate: string
+	createdAt: number
+}
+
+export interface FitnessMemberListReq {
+	page?: number
+	pageSize?: number
+	keyword?: string // 昵称/用户名
+}
+
+export interface FitnessMemberListResp {
+	total: number
+	list: Array<FitnessMemberItem>
+}
+
+export interface FitnessMyBodyRecordListReq {
+	days?: number // 默认 90，最多 365
+}
+
+export interface FitnessMyBodyRecordSaveReq {
+	date?: string
+	weightKg?: number
+	waistCm?: number
+}
+
+export interface FitnessMyCheckinSaveReq {
+	date?: string
+	trainingStatus?: number
+	exerciseDone?: Array<number>
+	meals?: Array<FitnessMealCheck>
+	steps?: number
+	waterCups?: number
+}
+
+export interface FitnessMyDayReq {
+	date?: string // 默认今天
+}
+
+export interface FitnessMyDayResp {
+	date: string
+	today: string
+	weekday: number // 1周一~7周日
+	canCheckin: boolean
+	hasPlan: boolean
+	templateId: number
+	templateName: string
+	isOverride: boolean
+	content?: FitnessDayContent
+	tips: Array<FitnessTipItem>
+	checkin?: FitnessCheckinItem
+	suggestion?: FitnessSuggestionItem
+}
+
+export interface FitnessMyProfileResp {
+	today: string
+	nickname: string
+	avatar: string
+	heightCm: number
+	targetWeightKg: number
+	trainingPreference: number // 1早练 2晚练
+	latestWeightKg: number
+	streakDays: number
+	weekRate: number // 本周训练完成率 0~1
+	currentTemplate?: FitnessTemplateBrief
+	pendingSwitch?: FitnessPendingSwitch
+	suggestion?: FitnessSuggestionItem
+	templates: Array<FitnessTemplateBrief>
+}
+
+export interface FitnessMyProfileUpdateReq {
+	heightCm?: number
+	targetWeightKg?: number
+	trainingPreference?: number
+}
+
+export interface FitnessMySuggestionDecideReq {
+	id?: number
+	accept?: boolean
+}
+
+export interface FitnessMyTemplateSwitchReq {
+	templateId?: number
+}
+
+export interface FitnessPendingSwitch {
+	templateId: number
+	templateName: string
+	effectiveDate: string
+}
+
+export interface FitnessRankItem {
+	userId: number
+	nickname: string
+	avatar: string
+	streakDays: number
+	weekRate: number
+}
+
+export interface FitnessStatsOverviewReq {
+	date?: string // 默认今天
+}
+
+export interface FitnessStatsOverviewResp {
+	date: string
+	memberCount: number
+	todayCheckinCount: number
+	weekAvgRate: number
+	streakRanking: Array<FitnessRankItem>
+	dailyCounts: Array<FitnessDailyCount>
+}
+
+export interface FitnessSuggestionItem {
+	id: number
+	weekStart: string
+	ruleCode: string
+	fromTemplateId: number
+	fromTemplateName: string
+	toTemplateId: number
+	toTemplateName: string
+	reason: string
+	status: number
+}
+
+export interface FitnessSwitchItem {
+	id: number
+	userId: number
+	nickname: string
+	fromTemplateId: number
+	fromTemplateName: string
+	toTemplateId: number
+	toTemplateName: string
+	effectiveDate: string
+	source: number // 1手动 2采纳建议 3管理员指定 4首次登录默认
+	reason: string
+	operatorId: number
+	operatorName: string
+	createdAt: number
+}
+
+export interface FitnessSwitchListReq {
+	userId?: number
+	page?: number
+	pageSize?: number
+}
+
+export interface FitnessSwitchListResp {
+	total: number
+	list: Array<FitnessSwitchItem>
+}
+
+export interface FitnessTemplateBrief {
+	id: number
+	code: string
+	name: string
+	stage: string
+	summary: string
+}
+
+export interface FitnessTemplateCreateReq {
+	code?: string
+	name?: string
+	level?: number
+	stage?: string
+	summary?: string
+	dailyKcal?: number
+	dailyProtein?: number
+	sort?: number
+	status?: number
+}
+
+export interface FitnessTemplateDayItem {
+	id: number
+	templateId: number
+	weekday: number // 1~7；0 表示按日期调整
+	planDate: string
+	content: FitnessDayContent
+	updatedAt: number
+}
+
+export interface FitnessTemplateDaySaveReq {
+	templateId?: number
+	weekday?: number
+	planDate?: string
+	content?: FitnessDayContent
+}
+
+export interface FitnessTemplateDaysReq {
+	templateId?: number
+}
+
+export interface FitnessTemplateDaysResp {
+	weekly: Array<FitnessTemplateDayItem>
+	overrides: Array<FitnessTemplateDayItem>
+}
+
+export interface FitnessTemplateItem {
+	id: number
+	code: string
+	name: string
+	level: number
+	stage: string
+	summary: string
+	dailyKcal: number
+	dailyProtein: number
+	sort: number
+	status: number
+	createdAt: number
+	updatedAt: number
+}
+
+export interface FitnessTemplateListReq {
+	page?: number
+	pageSize?: number
+	keyword?: string
+}
+
+export interface FitnessTemplateListResp {
+	total: number
+	list: Array<FitnessTemplateItem>
+}
+
+export interface FitnessTemplateSwitchResp {
+	effectiveDate: string
+}
+
+export interface FitnessTemplateUpdateReq {
+	id?: number
+	name?: string
+	level?: number
+	stage?: string
+	summary?: string
+	dailyKcal?: number
+	dailyProtein?: number
+	sort?: number
+	status?: number
+}
+
+export interface FitnessTipItem {
+	id: number
+	code: string
+	title: string
+	content: string
+	sort: number
+	status: number
+	createdAt: number
+	updatedAt: number
+}
+
+export interface FitnessTipListReq {
+	page?: number
+	pageSize?: number
+	keyword?: string
+}
+
+export interface FitnessTipListResp {
+	total: number
+	list: Array<FitnessTipItem>
+}
+
+export interface FitnessTipSaveReq {
+	id?: number
+	code?: string
+	title?: string
+	content?: string
+	sort?: number
+	status?: number
+}
+
+export interface KnowledgeQaAskReq {
+	question?: string // 用户问题，必填校验在 Logic 层
+}
+
+export interface KnowledgeQaAskResp {
+	answer: string
+	sources: Array<string> // 命中并参与生成回答的文章标题（去重）
+}
+
+export interface KnowledgeQaReindexReq {
+}
+
+export interface KnowledgeQaReindexResp {
+	articleCount: number // 处理的文章篇数
+	chunkCount: number // 写入的向量片段数
+}
+
 export interface LoginFeishuReq {
 	code: string
 	state?: string
