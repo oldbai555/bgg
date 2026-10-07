@@ -154,9 +154,16 @@ jobs:
           node-version: "22"
           cache: pnpm
           cache-dependency-path: admin-frontend/pnpm-lock.yaml
+      # 后台飞书扫码登录在构建期读 VITE_FEISHU_APP_ID（.env.local 不进仓库），
+      # 值来自仓库 Settings → Secrets 的 FEISHU_APP_ID（放 Secrets 日志自动打码），与 bgg-dev admin-server/.env 的 FEISHU_APP_ID 保持一致
       - name: 构建前端
+        env:
+          VITE_FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
         run: |
           cd admin-frontend
+          if [ -z "$VITE_FEISHU_APP_ID" ]; then
+            echo "::warning::仓库 Secret FEISHU_APP_ID 未配置，后台飞书登录会提示未配置 App ID"
+          fi
           pnpm install --frozen-lockfile
           pnpm build
       - name: 打包 dist

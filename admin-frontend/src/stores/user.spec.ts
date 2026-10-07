@@ -12,9 +12,11 @@ vi.mock('@/api/iam', () => ({
   }
 }))
 
+const loadDicts = vi.hoisted(() => vi.fn())
+
 vi.mock('@/stores/dict', () => ({
   useDictStore: () => ({
-    loadDicts: vi.fn(),
+    loadDicts,
     clearDicts: vi.fn()
   })
 }))
@@ -49,6 +51,18 @@ describe('useUserStore', () => {
     expect(store.refreshToken).toBe('rt')
     expect(localStorage.getItem('admin_token')).toBe('at')
     expect(store.permissions).toEqual(['user:list'])
+  })
+
+  it('登录后字典加载失败不影响登录成功', async () => {
+    vi.mocked(iamApi.login).mockResolvedValue({accessToken: 'at', refreshToken: 'rt'} as never)
+    vi.mocked(iamApi.profile).mockResolvedValue({id: 1, username: 'admin', permissions: []} as never)
+    vi.mocked(iamApi.menuMyTree).mockResolvedValue({list: []} as never)
+    loadDicts.mockRejectedValueOnce(new Error('context deadline exceeded'))
+
+    const store = useUserStore()
+    await expect(store.login({username: 'admin', password: 'x'} as never)).resolves.toBeUndefined()
+    expect(store.token).toBe('at')
+    expect(loadDicts).toHaveBeenCalledOnce()
   })
 
   it('cacheValid 在 TTL 内返回 true，过期后返回 false', () => {
