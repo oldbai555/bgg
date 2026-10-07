@@ -59,6 +59,12 @@
 | [2026-07-17-2.md](2026-07-17-2.md) | bgg-dev 切到 ghcr.io 镜像部署（`docker-compose.dev-mixed.yml`/`deploy-dev.sh`）+ 新增 `script/branch_from_main.sh` 系列 Git 分支/PR 工作流脚本；踩坑记录：squash merge 断祖先导致 GitHub PR 比较页失效及 `rebase --onto` 修复方法 |
 | [2026-07-17-3.md](2026-07-17-3.md) | 文档治理：建立「文档分层与生命周期」规则，退役 `docs/后端开发进度.md`/`docs/前端开发进度.md`/3 份 DDD-lite 草稿，历史内容归档进 `archive-backend.md`/`archive-frontend.md` |
 | [2026-07-17-4.md](2026-07-17-4.md) | `admin-server/db` SQL 整理：全部模块的 `admin_menu.path`/`component` 补齐 `/admin` 前缀与域重组新值、飞书部门角色种子数据并入 init 源头、`user_third_party` 补进初始化循环，退役 10 份历史 fix/增量脚本，一键 `init-dev-db.sh` 不再需要额外手动执行任何脚本 |
+| [2026-07-21.md](2026-07-21.md) | AI 知识库问答 Phase 1：博客文章本地 RAG（`ai/knowledge_qa` 问答 + 重建索引），复用 Redis 向量检索，spec 见 `admin-server/docs/ai-knowledge-qa-spec.md` |
 | [2026-07-31.md](2026-07-31.md) | CI 飞书通知（#7）+ bgg-dev 自动部署（`deploy-dev` job）+ 部署专用 SSH 密钥配置与踩坑记录 |
+| [2026-09-11.md](2026-09-11.md) | 侧栏菜单高亮：sqlpub `admin_menu.path` 缺 `/admin` 前缀 + `default-active` 改最长前缀匹配 |
+| [2026-09-11-2.md](2026-09-11-2.md) | CI 新增 `deploy-frontend`：合入 main 后自动构建并部署前端到 bgg-dev，飞书卡片展示前端部署状态 |
+| [2026-09-11-3.md](2026-09-11-3.md) | CI `deploy-frontend`：Node 20 → 22（pnpm@11 要求 Node >= 22.13） |
+| [2026-09-11-4.md](2026-09-11-4.md) | CI `deploy-frontend`：scp 中间 tar 改落 `/tmp`（`$HOME` 不可写）+ ssh 远端 dash 不支持 `pipefail` |
 | [2026-10-07.md](2026-10-07.md) | 身材管理（fitness）第一期：手机端飞书登录/今日计划/打卡/身体数据 + 后台模板周编辑/使用者/打卡统计，fitness 域并入 iam-rpc |
 | [2026-10-07-2.md](2026-10-07-2.md) | 修 bgg-dev 后台登录：CI 构建注入 `VITE_FEISHU_APP_ID`（仓库 Secret）+ iam-rpc `DictBatchGet` 合并查询（外部库下逐个查超 2s RPC 超时），登录后字典失败不再拦登录 |
+| [2026-10-07-3.md](2026-10-07-3.md) | 公共导航页 `/bgg/front`（`views/Home.vue`）重做：地址栏逐字补全 + `/front`/`/admin` 分组入口，补今日计划入口，配色改走主题令牌支持暗色 |
