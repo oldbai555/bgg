@@ -130,7 +130,7 @@ func BuildSources(cfg config.Config) (*Repository, error) {
 }
 
 // Transact 在单个 MySQL 事务内执行 fn。
-// fn 收到的 txRepo 是 r 的克隆：DB 字段与全部 37 个 *Model 字段都已经换绑到本次事务的 session 上。
+// fn 收到的 txRepo 是 r 的克隆：DB 字段与全部 *Model 字段都已经换绑到本次事务的 session 上。
 // fn 内部必须只通过 txRepo 访问数据，不能继续闭包引用外层 r —— 否则读写会跳出事务边界。
 // 不做嵌套事务检测：调用方需保证不在已经开启的 Transact 内部再次调用 Transact。
 func (r *Repository) Transact(ctx context.Context, fn func(ctx context.Context, txRepo *Repository) error) error {
@@ -139,7 +139,7 @@ func (r *Repository) Transact(ctx context.Context, fn func(ctx context.Context, 
 	})
 }
 
-// withSession 返回一个新的 *Repository，DB 字段与全部 37 个 *Model 字段都换绑到给定的事务 session。
+// withSession 返回一个新的 *Repository，DB 字段与全部 *Model 字段都换绑到给定的事务 session。
 // CacheConf/Redis/BusinessCache 保持不变——事务内不使用查询缓存。
 func (r *Repository) withSession(session sqlx.Session) *Repository {
 	return &Repository{

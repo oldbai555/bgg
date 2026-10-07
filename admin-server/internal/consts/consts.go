@@ -224,6 +224,8 @@ const (
 	HeaderXForwardedProto  = "X-Forwarded-Proto"
 	HeaderXForwardedHost   = "X-Forwarded-Host"
 	HeaderXForwardedPrefix = "X-Forwarded-Prefix"
+	HeaderXForwardedFor    = "X-Forwarded-For"
+	HeaderXRealIP          = "X-Real-IP"
 
 	// HTTP 响应头
 	HeaderContentType                   = "Content-Type"

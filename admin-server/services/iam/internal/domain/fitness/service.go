@@ -2,6 +2,7 @@ package fitness
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"postapocgame/admin-server/pkg/errs"
@@ -97,7 +98,7 @@ func (s *Service) EnsureMember(ctx context.Context, userID uint64) (*fitnessmode
 			ToTemplateId:  tpl.Id,
 			EffectiveDate: EffectiveDateFor(consts.FitnessSwitchSourceDefault, s.Today()),
 			Source:        consts.FitnessSwitchSourceDefault,
-			Reason:        "首次使用，默认分配「" + tpl.Name + "」",
+			Reason:        fmt.Sprintf(consts.FitnessSwitchReasonDefaultFormat, tpl.Name),
 		}); err != nil {
 			return nil, dbErr(err)
 		}

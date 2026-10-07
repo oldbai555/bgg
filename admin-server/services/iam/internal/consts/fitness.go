@@ -76,6 +76,7 @@ const (
 	FitnessSwitchReasonManual           = "手动切换"
 	FitnessSwitchReasonAdmin            = "管理员指定"
 	FitnessSwitchReasonSuggestionPrefix = "采纳建议："
+	FitnessSwitchReasonDefaultFormat    = "首次使用，默认分配「%s」"
 )
 
 // 模板建议状态（字典 fitness_suggestion_status）

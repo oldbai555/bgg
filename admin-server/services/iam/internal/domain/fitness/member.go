@@ -376,6 +376,9 @@ func (s *Service) UpdateProfile(ctx context.Context, userID uint64, height, targ
 	if target != 0 && (target < 30 || target > 300) {
 		return errs.New(errs.CodeBadRequest, "目标体重需在 30~300kg 之间")
 	}
+	if preference == 0 {
+		preference = profile.TrainingPreference
+	}
 	if preference != consts.FitnessPreferenceMorning && preference != consts.FitnessPreferenceEvening {
 		return errs.New(errs.CodeBadRequest, "训练时间偏好不合法")
 	}
